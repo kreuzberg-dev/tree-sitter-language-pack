@@ -103,6 +103,12 @@ repos:
       - id: markdownlint-fix
         exclude: "^.ai-rulez/"
 
+  # AI Rules
+  - repo: https://github.com/Goldziher/ai-rulez
+    rev: v3.7.3
+    hooks:
+      - id: ai-rulez-generate
+
   # Spelling
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.2
