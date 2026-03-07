@@ -1,0 +1,13 @@
+[package]
+name = "ts-pack-elixir"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "ts_pack_elixir"
+crate-type = ["cdylib"]
+
+[dependencies]
+ts-pack-core = { path = "../ts-pack-core" }
+rustler = { workspace = true }

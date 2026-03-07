@@ -1,0 +1,26 @@
+[build-system]
+build-backend = "maturin"
+requires = [ "maturin>=1,<2" ]
+
+[project]
+name = "tree-sitter-language-pack"
+version = "2.0.0a1"
+description = "A comprehensive collection of tree-sitter language parsers"
+license = "MIT OR Apache-2.0"
+requires-python = ">=3.10"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+  "tree-sitter>=0.25.2",
+]
+
+[tool.maturin]
+features = [ "pyo3/extension-module" ]
+python-source = "python"
+module-name = "tree_sitter_language_pack._native"

@@ -1,0 +1,268 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g., v2.0.0)"
+        required: true
+        type: string
+      dry_run:
+        description: "Dry run (prepare artifacts without publishing)"
+        required: false
+        type: boolean
+        default: false
+      targets:
+        description: "Comma-separated targets (all, python, node, crates)"
+        required: false
+        type: string
+        default: "all"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  prepare:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      publish_python: ${{ steps.targets.outputs.python }}
+      publish_node: ${{ steps.targets.outputs.node }}
+      publish_crates: ${{ steps.targets.outputs.crates }}
+    steps:
+      - name: Extract version
+        id: meta
+        run: |
+          version="${{ inputs.tag }}"
+          version="${version#v}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Determine targets
+        id: targets
+        run: |
+          targets="${{ inputs.targets }}"
+          if [[ "$targets" == "all" || "$targets" == *"python"* ]]; then
+            echo "python=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "python=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [[ "$targets" == "all" || "$targets" == *"node"* ]]; then
+            echo "node=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "node=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [[ "$targets" == "all" || "$targets" == *"crates"* ]]; then
+            echo "crates=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "crates=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  clone-vendors:
+    name: Clone vendors
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --no-install-project
+
+      - name: Clone vendors
+        run: |
+          mkdir -p parsers
+          uv run --no-sync scripts/clone_vendors.py
+
+      - name: Upload parsers
+        uses: actions/upload-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+  publish-crates:
+    name: Publish Rust crates
+    needs: [prepare, clone-vendors]
+    if: needs.prepare.outputs.publish_crates == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Publish ts-pack-core
+        if: ${{ !inputs.dry_run }}
+        run: cargo publish -p ts-pack-core
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Publish ts-pack-ffi
+        if: ${{ !inputs.dry_run }}
+        run: |
+          sleep 30  # Wait for crates.io to index ts-pack-core
+          cargo publish -p ts-pack-ffi
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          PROJECT_ROOT: ${{ github.workspace }}
+
+  build-python-wheels:
+    name: Build Python wheel (${{ matrix.os }})
+    needs: [prepare, clone-vendors]
+    if: needs.prepare.outputs.publish_python == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest, ubuntu-24.04-arm]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install maturin
+        run: pip install maturin
+
+      - name: Build wheel
+        run: maturin build --release --manifest-path crates/ts-pack-python/Cargo.toml --out dist
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-wheel-${{ matrix.os }}
+          path: dist/*.whl
+
+  publish-python:
+    name: Publish Python to PyPI
+    needs: [prepare, build-python-wheels]
+    if: needs.prepare.outputs.publish_python == 'true'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download all wheels
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: dist-wheel-*
+          merge-multiple: true
+
+      - name: Publish to PyPI
+        if: ${{ !inputs.dry_run }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  build-node-native:
+    name: Build Node.js (${{ matrix.os }})
+    needs: [prepare, clone-vendors]
+    if: needs.prepare.outputs.publish_node == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install NAPI-RS CLI
+        run: npm install -g @napi-rs/cli
+
+      - name: Build native module
+        working-directory: crates/ts-pack-node
+        run: napi build --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Upload native module
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-native-${{ matrix.os }}
+          path: crates/ts-pack-node/*.node
+
+  publish-node:
+    name: Publish Node.js to npm
+    needs: [prepare, build-node-native]
+    if: needs.prepare.outputs.publish_node == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Download all native modules
+        uses: actions/download-artifact@v4
+        with:
+          path: crates/ts-pack-node
+          pattern: node-native-*
+          merge-multiple: true
+
+      - name: Publish to npm
+        if: ${{ !inputs.dry_run }}
+        working-directory: crates/ts-pack-node
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

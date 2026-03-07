@@ -1,0 +1,15 @@
+[package]
+name = "ts-pack-ffi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+ts-pack-core = { path = "../ts-pack-core" }
+tree-sitter = { workspace = true }
+
+[build-dependencies]
+cbindgen = { workspace = true }

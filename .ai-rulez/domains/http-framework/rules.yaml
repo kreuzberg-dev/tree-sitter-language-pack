@@ -1,0 +1,47 @@
+rules:
+  - name: tower-http-middleware-stack
+    file: ../../../.ai-rulez/rules/tower-http-middleware-stack.md
+    description: All standard middleware must be implemented in Rust using tower-http and exposed via typed ServerConfig
+
+  - name: request-surface-security
+    file: ../../../.ai-rulez/rules/request-surface-security.md
+    description: Validate all request surface data (headers, query params, path params) and use validated_params from ParameterValidator
+
+  - name: header-cookie-security
+    file: ../../../.ai-rulez/rules/header-cookie-security.md
+    description: Headers and cookies must be validated against testing_data/headers/*.json fixtures and properly parsed
+
+  - name: optimized-serialization-path
+    file: ../../../.ai-rulez/rules/optimized-serialization-path.md
+    description: Use raw_body for language bindings to avoid double-parsing; lazy-parse body only when validation needed
+
+  - name: cross-target-performance
+    file: ../../../.ai-rulez/rules/cross-target-performance.md
+    description: Use Arc<> for zero-copy parameter passing across FFI boundaries; maintain consistent response serialization
+
+  - name: http-framework-integration
+    description: |
+      HTTP framework must integrate seamlessly with Spikard-Core types (Route, Router, Method).
+      ServerConfig builder must expose all middleware options with sensible defaults.
+      Request/response lifecycle must support both synchronous and asynchronous handlers.
+      All middleware errors must be caught and converted to ProblemDetails responses.
+
+  - name: lifecycle-hook-execution
+    description: |
+      Lifecycle hooks (onRequest, preValidation, preHandler, onResponse, onError) must execute
+      in proper order per docs/adr/0005-lifecycle-hooks.md. Hooks are zero-cost when None.
+      Async hooks must work correctly with Python (pyo3_async_runtimes) and TypeScript (ThreadsafeFunction).
+      Hook errors must not prevent response transmission; must be logged and included in response metadata.
+
+  - name: websocket-sse-support
+    description: |
+      HTTP server must support WebSocket upgrades via Handler trait. SSE requires streaming
+      response bodies. Both require proper cleanup on connection termination.
+      Tests: websocket_integration.rs, sse_behavior.rs in /crates/spikard-http/tests/
+
+  - name: authentication-middleware
+    description: |
+      JWT validation must check algorithm, audience, issuer, and expiration claims.
+      API Key validation must support multiple keys and custom header names.
+      Auth failures must return 401 Unauthorized with proper ProblemDetails.
+      Auth config must be per-route via route metadata, not global.

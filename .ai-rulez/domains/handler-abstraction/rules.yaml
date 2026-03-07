@@ -1,0 +1,103 @@
+rules:
+  - name: handler-trait-lang-agnostic
+    description: |
+      Handler trait must remain completely language-agnostic. No language-specific
+      type hints or dependency requirements. RequestData and HandlerResponse must be
+      serializable and FFI-friendly. Zero-cost abstractions via Arc<dyn Handler>.
+
+  - name: request-data-efficiency
+    description: |
+      RequestData must:
+      - Use Arc<> for all HashMap fields (path_params, headers, cookies, raw_query_params)
+      - Prefer raw_body for language bindings (zero-copy)
+      - Lazy-parse body only when validation needed
+      - Include validated_params from ParameterValidator, not raw params
+      - Support optional DI dependencies when feature enabled
+      - Be serializable for FFI boundaries
+
+  - name: handler-response-consistency
+    description: |
+      HandlerResponse must:
+      - Support Json, Text, Binary, and Empty body types
+      - Include HTTP status code (u16)
+      - Support optional response headers
+      - Never fail serialization (errors return 500)
+      - Preserve content-type negotiation from Accept header
+
+  - name: binding-ffi-safety
+    description: |
+      All language bindings must:
+      - Implement Handler trait with Arc<Self> wrapper
+      - Safely handle RequestData across FFI boundary
+      - Convert HandlerResponse back to Rust types
+      - Propagate errors as HandlerError
+      - Support both sync and async handlers
+      - Handle panics/exceptions without crashing server
+
+  - name: python-binding-async
+    description: |
+      Python binding must:
+      - Use pyo3_async_runtimes for asyncio integration
+      - Convert RequestData to Python dict/object
+      - Support async def handle() in user code
+      - Return dict or response object
+      - Handle Python exceptions → HandlerError
+      - Use raw_body to avoid double JSON parsing
+
+  - name: nodejs-binding-promises
+    description: |
+      Node.js binding must:
+      - Use ThreadsafeFunction for async callbacks
+      - Convert RequestData to JavaScript object
+      - Support async/await and Promise in user code
+      - Properly handle Promise rejection
+      - Serialize responses back to Rust
+      - Integrate with libuv event loop
+
+  - name: ruby-binding-threads
+    description: |
+      Ruby binding must:
+      - Use background threads for async operations
+      - Convert RequestData to Ruby Hash
+      - Support Fiber/async_io patterns if available
+      - Handle Ruby exceptions → HandlerError
+      - Maintain thread safety with Arc
+      - Load RBS type definitions for static checking
+
+  - name: php-binding-sync
+    description: |
+      PHP binding must:
+      - Use thread pool for concurrent PHP execution
+      - Convert RequestData to PHP array
+      - Support both sync and async-php patterns
+      - Handle PHP errors/exceptions → HandlerError
+      - Validate phpstan type definitions
+      - Optimize for request-response cycles
+
+  - name: di-optional-feature
+    description: |
+      DependencyInjectingHandler must:
+      - Be optional (feature-gated with "di")
+      - Wrap any Handler implementation
+      - Resolve dependencies per-request
+      - Pass resolved dependencies in RequestData
+      - Have zero cost when feature disabled
+      - Support all language bindings
+
+  - name: handler-error-mapping
+    description: |
+      Handler errors must convert to HTTP status:
+      - ValidationError → 400 Bad Request
+      - NotFound → 404 Not Found
+      - Unauthorized → 401 Unauthorized
+      - InternalError → 500 Internal Server Error
+      - All errors must return ProblemDetails response
+
+  - name: handler-testing-fixtures
+    description: |
+      Handler implementations must be tested with:
+      - Fixtures in /testing_data/http_methods/
+      - Same test data across all language bindings
+      - Request/response round-trip validation
+      - Error handling verification
+      - Cross-binding consistency tests

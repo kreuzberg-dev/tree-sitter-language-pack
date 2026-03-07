@@ -89,7 +89,7 @@ async def process_language(
 
 async def main(args: argparse.Namespace) -> None:
     """Main function."""
-    max_workers = args.workers if args.workers else min(32, (os.cpu_count() or 4) * 2)
+    max_workers = args.workers or min(32, (os.cpu_count() or 4) * 2)
     print(f"Using up to {max_workers} concurrent workers")
 
     definitions_path = Path(__file__).parent.parent / "sources" / "language_definitions.json"

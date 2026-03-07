@@ -1,0 +1,217 @@
+project:
+  name: tree-sitter-language-pack
+  version: "2.0.0-alpha.1"
+  description: "A comprehensive collection of tree-sitter language parsers with polyglot bindings"
+  repository: "https://github.com/Goldziher/tree-sitter-language-pack"
+  license: "MIT OR Apache-2.0"
+  language_count: 170
+
+badges:
+  ci:
+    url: "https://img.shields.io/github/actions/workflow/status/Goldziher/tree-sitter-language-pack/ci.yaml?branch=main&label=CI"
+    link: "https://github.com/Goldziher/tree-sitter-language-pack/actions"
+  license:
+    url: "https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue"
+    link: "https://github.com/Goldziher/tree-sitter-language-pack/blob/main/LICENSE"
+  rust:
+    url: "https://img.shields.io/crates/v/ts-pack-core?label=Rust&color=007ec6"
+    link: "https://crates.io/crates/ts-pack-core"
+  python:
+    url: "https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6"
+    link: "https://pypi.org/project/tree-sitter-language-pack/"
+  node:
+    url: "https://img.shields.io/npm/v/@tree-sitter-language-pack/node?label=Node.js&color=007ec6"
+    link: "https://www.npmjs.com/package/@tree-sitter-language-pack/node"
+  go:
+    url: "https://img.shields.io/github/v/tag/Goldziher/tree-sitter-language-pack?label=Go&color=007ec6"
+    link: "https://github.com/Goldziher/tree-sitter-language-pack/tree/main/crates/ts-pack-go"
+  java:
+    url: "https://img.shields.io/maven-central/v/io.github.tree-sitter/tree-sitter-language-pack?label=Java&color=007ec6"
+    link: "https://central.sonatype.com/artifact/io.github.tree-sitter/tree-sitter-language-pack"
+  elixir:
+    url: "https://img.shields.io/hexpm/v/tree_sitter_language_pack?label=Elixir&color=007ec6"
+    link: "https://hex.pm/packages/tree_sitter_language_pack"
+
+languages:
+  rust:
+    name: "Rust"
+    template: language_package.md.jinja
+    output_path: crates/ts-pack-core/README.md
+    package_name: ts-pack-core
+    package_manager: [cargo]
+    description: "Rust core library providing access to 170+ tree-sitter parsers with static and dynamic linking support."
+    install_command: 'cargo add ts-pack-core'
+    quick_start: |
+      use ts_pack_core::{get_language, get_parser, available_languages};
+
+      // Get a language
+      let lang = get_language("python").unwrap();
+
+      // Get a pre-configured parser
+      let mut parser = get_parser("python").unwrap();
+      let tree = parser.parse("def hello(): pass", None).unwrap();
+      println!("{}", tree.root_node().to_sexp());
+
+      // List all available languages
+      for lang in available_languages() {
+          println!("{}", lang);
+      }
+
+  python:
+    name: "Python"
+    template: language_package.md.jinja
+    output_path: crates/ts-pack-python/README.md
+    package_name: tree-sitter-language-pack
+    package_manager: [pip, uv]
+    description: "Python bindings for tree-sitter-language-pack, providing access to 170+ pre-compiled tree-sitter parsers."
+    install_commands:
+      pip: "pip install tree-sitter-language-pack"
+      uv: "uv add tree-sitter-language-pack"
+    quick_start: |
+      from tree_sitter_language_pack import get_language, get_parser, available_languages
+
+      # Get a language
+      language = get_language("python")
+
+      # Get a pre-configured parser
+      parser = get_parser("python")
+      tree = parser.parse(b"def hello(): pass")
+      print(tree.root_node.sexp())
+
+      # List all available languages
+      for lang in available_languages():
+          print(lang)
+
+  node:
+    name: "Node.js"
+    template: language_package.md.jinja
+    output_path: crates/ts-pack-node/README.md
+    package_name: "@tree-sitter-language-pack/node"
+    package_manager: [npm, pnpm, yarn]
+    description: "Node.js NAPI bindings for tree-sitter-language-pack."
+    install_commands:
+      npm: "npm install @tree-sitter-language-pack/node"
+      pnpm: "pnpm add @tree-sitter-language-pack/node"
+      yarn: "yarn add @tree-sitter-language-pack/node"
+    quick_start: |
+      const { availableLanguages, hasLanguage, getLanguagePtr } = require("@tree-sitter-language-pack/node");
+
+      console.log(availableLanguages());
+      console.log(hasLanguage("python")); // true
+
+  go:
+    name: "Go"
+    template: language_package.md.jinja
+    output_path: crates/ts-pack-go/README.md
+    package_name: "github.com/Goldziher/tree-sitter-language-pack/go"
+    package_manager: [go]
+    description: "Go bindings for tree-sitter-language-pack using cgo."
+    install_command: "go get github.com/Goldziher/tree-sitter-language-pack/go"
+    quick_start: |
+      package main
+
+      import (
+          "fmt"
+          tspack "github.com/Goldziher/tree-sitter-language-pack/go"
+      )
+
+      func main() {
+          reg, _ := tspack.NewRegistry()
+          defer reg.Close()
+
+          langs := reg.AvailableLanguages()
+          fmt.Println(langs)
+      }
+
+  java:
+    name: "Java"
+    template: language_package.md.jinja
+    output_path: crates/ts-pack-java/README.md
+    package_name: "io.github.tree-sitter:tree-sitter-language-pack"
+    package_manager: [maven, gradle]
+    description: "Java bindings for tree-sitter-language-pack using Panama FFI (JDK 22+)."
+    install_commands:
+      maven: |
+        <dependency>
+          <groupId>io.github.tree-sitter</groupId>
+          <artifactId>tree-sitter-language-pack</artifactId>
+          <version>2.0.0-alpha.1</version>
+        </dependency>
+      gradle: |
+        implementation("io.github.tree-sitter:tree-sitter-language-pack:2.0.0-alpha.1")
+    quick_start: |
+      import io.github.treesitter.languagepack.TsPackRegistry;
+
+      try (var registry = new TsPackRegistry()) {
+          var languages = registry.availableLanguages();
+          System.out.println(languages);
+
+          var lang = registry.getLanguage("python");
+          System.out.println("Loaded: " + lang);
+      }
+
+  elixir:
+    name: "Elixir"
+    template: language_package.md.jinja
+    output_path: crates/ts-pack-elixir/README.md
+    package_name: "tree_sitter_language_pack"
+    package_manager: [mix]
+    description: "Elixir bindings for tree-sitter-language-pack using Rustler NIFs."
+    install_command: |
+      # In mix.exs
+      {:tree_sitter_language_pack, "~> 2.0"}
+    quick_start: |
+      # List all available languages
+      TreeSitterLanguagePack.available_languages()
+
+      # Check if a language exists
+      TreeSitterLanguagePack.has_language("python")
+
+      # Get language pointer for tree-sitter interop
+      ptr = TreeSitterLanguagePack.get_language_ptr("python")
+
+  ffi:
+    name: "C/C++ (FFI)"
+    template: language_package.md.jinja
+    output_path: crates/ts-pack-ffi/README.md
+    package_name: ts-pack-ffi
+    package_manager: []
+    description: "C-compatible FFI bindings for tree-sitter-language-pack. Use from any language with C interop."
+    quick_start: |
+      #include "ts_pack.h"
+
+      int main() {
+          TsPackRegistry *reg = ts_pack_registry_new();
+
+          size_t count = ts_pack_language_count(reg);
+          printf("Available languages: %zu\n", count);
+
+          const TSLanguage *lang = ts_pack_get_language(reg, "python");
+          if (lang) {
+              printf("Loaded python!\n");
+          }
+
+          ts_pack_registry_free(reg);
+          return 0;
+      }
+
+  cli:
+    name: "CLI"
+    template: language_package.md.jinja
+    output_path: crates/ts-pack-cli/README.md
+    package_name: ts-pack
+    package_manager: [cargo]
+    description: "Command-line tool for managing tree-sitter language parsers."
+    install_command: "cargo install ts-pack"
+    quick_start: |
+      # Initialize a language-pack.toml config
+      ts-pack init
+
+      # List available languages
+      ts-pack list
+
+      # Add languages to your config
+      ts-pack add python rust javascript
+
+      # Clone parser sources
+      ts-pack clone

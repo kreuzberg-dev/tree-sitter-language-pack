@@ -1,0 +1,18 @@
+[package]
+name = "ts-pack-node"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Node.js NAPI bindings for tree-sitter language pack"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+ts-pack-core = { path = "../ts-pack-core" }
+napi = { workspace = true }
+napi-derive = { workspace = true }
+
+[build-dependencies]
+napi-build = { workspace = true }

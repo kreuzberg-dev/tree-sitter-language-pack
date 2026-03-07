@@ -1,0 +1,10 @@
+{
+  "id": "registry_has_language_true",
+  "category": "registry",
+  "description": "has_language('python') should return true",
+  "language": "python",
+  "assertions": {
+    "language_available": true
+  },
+  "tags": ["registry"]
+}

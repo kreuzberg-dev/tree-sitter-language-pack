@@ -1,0 +1,30 @@
+{%- set pm_lang_map = {"maven": "xml", "gradle": "groovy", "mix": "elixir", "cargo": "toml", "npm": "sh", "pnpm": "sh", "yarn": "sh", "pip": "sh", "uv": "sh", "go": "sh"} -%}
+{%- if install_commands is defined %}
+{% for pm, cmd in install_commands.items() %}
+{%- if cmd is string and '\n' not in cmd %}
+```sh
+{{ cmd }}
+```
+{% elif cmd is string %}
+```{{ pm_lang_map.get(pm, "text") }}
+{{ cmd.strip() }}
+```
+{% endif %}
+{%- endfor %}
+{%- elif install_command is defined %}
+{%- if install_command is string and '\n' not in install_command %}
+
+```sh
+{{ install_command }}
+```
+{% else %}
+{%- set first_pm = package_manager[0] if package_manager else "text" %}
+
+```{{ pm_lang_map.get(first_pm, "text") }}
+{{ install_command.strip() }}
+```
+{% endif %}
+{%- elif package_manager | length == 0 %}
+
+Build from source as part of the [tree-sitter-language-pack]({{ project.repository }}) workspace.
+{%- endif %}

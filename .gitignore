@@ -23,6 +23,7 @@ __pycache__/
 build/
 coverage.xml
 dist/
+target/
 parsers/
 requirements.txt
 vendor/

@@ -1,0 +1,12 @@
+{
+  "id": "smoke_javascript",
+  "category": "smoke",
+  "description": "Smoke test: load javascript and parse a simple snippet",
+  "language": "javascript",
+  "source_code": "console.log('hello');",
+  "assertions": {
+    "tree_not_null": true,
+    "root_child_count_min": 1
+  },
+  "tags": ["smoke"]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "parsing_javascript_variable",
+  "category": "parsing",
+  "description": "Parse a JavaScript variable declaration and assert node type",
+  "language": "javascript",
+  "source_code": "const x = 1;",
+  "assertions": {
+    "tree_not_null": true,
+    "root_contains_node_type": "lexical_declaration"
+  },
+  "tags": ["parsing", "javascript"]
+}

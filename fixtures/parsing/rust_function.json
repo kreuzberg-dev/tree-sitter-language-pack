@@ -1,0 +1,12 @@
+{
+  "id": "parsing_rust_function",
+  "category": "parsing",
+  "description": "Parse a Rust function definition and assert node type",
+  "language": "rust",
+  "source_code": "fn main() {}",
+  "assertions": {
+    "tree_not_null": true,
+    "root_contains_node_type": "function_item"
+  },
+  "tags": ["parsing", "rust"]
+}

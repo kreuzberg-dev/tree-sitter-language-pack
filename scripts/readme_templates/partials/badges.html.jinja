@@ -1,0 +1,18 @@
+<div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
+  <!-- Language Bindings -->
+{%- for badge_id, badge in badges.items() %}
+{%- if badge_id not in ("ci", "license") %}
+  <a href="{{ badge.link }}">
+    <img src="{{ badge.url }}" alt="{{ badge_id | title }}">
+  </a>
+{%- endif %}
+{%- endfor %}
+
+  <!-- Project Info -->
+  <a href="{{ badges.ci.link }}">
+    <img src="{{ badges.ci.url }}" alt="CI">
+  </a>
+  <a href="{{ badges.license.link }}">
+    <img src="{{ badges.license.url }}" alt="License">
+  </a>
+</div>

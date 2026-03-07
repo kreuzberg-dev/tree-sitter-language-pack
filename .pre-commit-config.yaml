@@ -1,80 +1,113 @@
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+exclude: ^e2e/|vendor/|node_modules/|target/|parsers/
+
 repos:
-  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
-    rev: v9.23.0
+  # Commit message linting
+  - repo: https://github.com/Goldziher/gitfluff
+    rev: v0.8.0
     hooks:
-      - id: commitlint
+      - id: gitfluff-lint
+        args: ["--write"]
         stages: [commit-msg]
-        additional_dependencies: ["@commitlint/config-conventional"]
+
+  # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      - id: name-tests-test
-        args:
-          - --pytest
-        exclude: factories|test_utils|completion.py|test_data
       - id: trailing-whitespace
       - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+        exclude: Cargo.lock
+      - id: detect-private-key
+      - id: check-json
+      - id: check-yaml
+        args: ["--allow-multiple-documents", "--unsafe"]
       - id: check-toml
       - id: check-case-conflict
-      - id: detect-private-key
-  - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.24.1
-    hooks:
-      - id: validate-pyproject
-  - repo: https://github.com/executablebooks/mdformat
-    rev: 1.0.0
-    hooks:
-      - id: mdformat
-        additional_dependencies:
-          - mdformat-mkdocs==4.0.0
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.46.0
-    hooks:
-      - id: markdownlint-fix
-  - repo: https://github.com/adamchainz/blacken-docs
-    rev: 1.20.0
-    hooks:
-      - id: blacken-docs
-        args: ["--pyi", "--line-length", "130"]
-        additional_dependencies:
-          - black==25.1.0
-  - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.6.2
-    hooks:
-      - id: prettier
-        exclude: ^tests|^.idea|^migrations|^.git|README.md|CONTRIBUTING.md|^docs
+
+  # TOML formatting
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.11.1
+    rev: v2.16.2
     hooks:
       - id: pyproject-fmt
+
+  - repo: https://github.com/ComPWA/taplo-pre-commit
+    rev: v0.9.3
+    hooks:
+      - id: taplo-format
+        exclude: "pyproject.toml"
+
+  # Python: ruff (linting + formatting) + mypy (type checking)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.5
+    rev: v0.15.5
     hooks:
       - id: ruff
         args: ["--fix", "--unsafe-fixes"]
       - id: ruff-format
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
-    hooks:
-      - id: codespell
-        exclude: ^tests|^scripts
-        additional_dependencies:
-          - tomli
-  - repo: https://github.com/jsh9/pydoclint
-    rev: 0.8.1
-    hooks:
-      - id: pydoclint
-        args:
-          [
-            --style=google,
-            --check-return-types=False,
-            --arg-type-hints-in-docstring=False,
-          ]
-  - repo: local
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.19.1
     hooks:
       - id: mypy
-        name: mypy
-        entry: uv run --no-sync mypy
-        require_serial: true
-        language: system
-        types: [python]
+        exclude: "e2e/|scripts/|tests/|crates/"
+
+  # Rust: formatting and linting
+  - repo: https://github.com/AndrejOrsula/pre-commit-cargo
+    rev: 0.5.0
+    hooks:
+      - id: cargo-fmt
+        args: ["--all"]
+      - id: cargo-clippy
+        args: [
+          "--fix",
+          "--allow-dirty",
+          "--allow-staged",
+          "--workspace",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings",
+        ]
+
+  - repo: https://github.com/bnjbvr/cargo-machete
+    rev: v0.9.1
+    hooks:
+      - id: cargo-machete
+
+  # Shell scripts: formatting and linting
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.12.0-2
+    hooks:
+      - id: shfmt
+        args: ["-w", "-i", "2"]
+
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.11.0
+    hooks:
+      - id: shellcheck
+
+  # GitHub Actions: linting
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.11
+    hooks:
+      - id: actionlint
+
+  # Markdown
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.48.0
+    hooks:
+      - id: markdownlint-fix
+        exclude: "^.ai-rulez/"
+
+  # Spelling
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.2
+    hooks:
+      - id: codespell
+        exclude: ^tests|^parsers|^vendors|^target|^e2e|^\.ai-rulez
+        additional_dependencies:
+          - tomli

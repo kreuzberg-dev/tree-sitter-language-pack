@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "E2E Test Fixture",
+  "description": "A fixture describing an end-to-end test case for tree-sitter-language-pack bindings.",
+  "type": "object",
+  "required": ["id", "category", "description"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this fixture (used as test function name)."
+    },
+    "category": {
+      "type": "string",
+      "description": "Category grouping (smoke, parsing, error_handling, registry)."
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of what this test verifies."
+    },
+    "language": {
+      "type": "string",
+      "description": "The tree-sitter language name to load (omit for registry-level tests)."
+    },
+    "source_code": {
+      "type": "string",
+      "description": "Source code snippet to parse (omit for non-parsing tests)."
+    },
+    "assertions": {
+      "type": "object",
+      "description": "Assertions to verify after parsing.",
+      "properties": {
+        "tree_not_null": {
+          "type": "boolean",
+          "description": "Assert that the parse tree is not null."
+        },
+        "root_child_count_min": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Assert root node has at least this many children."
+        },
+        "root_contains_node_type": {
+          "type": "string",
+          "description": "Assert the root node contains a child of this type (recursive search)."
+        },
+        "expect_error": {
+          "type": "boolean",
+          "description": "Assert that loading the language or parsing should produce an error."
+        },
+        "has_error_nodes": {
+          "type": "boolean",
+          "description": "Assert that the parse tree contains ERROR nodes."
+        },
+        "language_available": {
+          "type": "boolean",
+          "description": "Expected result of has_language()."
+        },
+        "languages_not_empty": {
+          "type": "boolean",
+          "description": "Assert that available_languages() returns a non-empty list."
+        }
+      },
+      "additionalProperties": false
+    },
+    "skip": {
+      "type": "object",
+      "description": "Conditions under which this test should be skipped.",
+      "properties": {
+        "requires_language": {
+          "type": "string",
+          "description": "Skip if this language is not available."
+        }
+      },
+      "additionalProperties": false
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tags for filtering tests."
+    }
+  },
+  "additionalProperties": false
+}

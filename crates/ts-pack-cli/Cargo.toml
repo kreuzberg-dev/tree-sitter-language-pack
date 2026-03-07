@@ -1,0 +1,14 @@
+[package]
+name = "ts-pack-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "ts-pack"
+path = "src/main.rs"
+
+[dependencies]
+ts-pack-core = { path = "../ts-pack-core", features = ["config"] }
+clap = { workspace = true }
+toml_edit = { workspace = true }

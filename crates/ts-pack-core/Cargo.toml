@@ -1,0 +1,450 @@
+[package]
+name = "ts-pack-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Core library for tree-sitter language pack - provides compiled parsers for 170+ languages"
+
+[dependencies]
+tree-sitter = { workspace = true }
+thiserror = { workspace = true }
+libloading = { workspace = true }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+toml = { workspace = true, optional = true }
+
+[build-dependencies]
+cc = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[features]
+default = ["all"]
+config = ["dep:serde", "dep:serde_json", "dep:toml"]
+all = [
+  "lang-actionscript",
+  "lang-ada",
+  "lang-agda",
+  "lang-apex",
+  "lang-arduino",
+  "lang-asm",
+  "lang-astro",
+  "lang-bash",
+  "lang-beancount",
+  "lang-bibtex",
+  "lang-bicep",
+  "lang-bitbake",
+  "lang-bsl",
+  "lang-c",
+  "lang-cairo",
+  "lang-capnp",
+  "lang-chatito",
+  "lang-clarity",
+  "lang-clojure",
+  "lang-cmake",
+  "lang-cobol",
+  "lang-comment",
+  "lang-commonlisp",
+  "lang-cpon",
+  "lang-cpp",
+  "lang-css",
+  "lang-csv",
+  "lang-cuda",
+  "lang-d",
+  "lang-dart",
+  "lang-dockerfile",
+  "lang-doxygen",
+  "lang-dtd",
+  "lang-elisp",
+  "lang-elixir",
+  "lang-elm",
+  "lang-erlang",
+  "lang-fennel",
+  "lang-firrtl",
+  "lang-fish",
+  "lang-fortran",
+  "lang-fsharp",
+  "lang-fsharp_signature",
+  "lang-func",
+  "lang-gdscript",
+  "lang-gitattributes",
+  "lang-gitcommit",
+  "lang-gitignore",
+  "lang-gleam",
+  "lang-glsl",
+  "lang-gn",
+  "lang-go",
+  "lang-gomod",
+  "lang-gosum",
+  "lang-graphql",
+  "lang-groovy",
+  "lang-gstlaunch",
+  "lang-hack",
+  "lang-hare",
+  "lang-haskell",
+  "lang-haxe",
+  "lang-hcl",
+  "lang-heex",
+  "lang-hlsl",
+  "lang-html",
+  "lang-hyprlang",
+  "lang-ini",
+  "lang-ispc",
+  "lang-janet",
+  "lang-java",
+  "lang-javascript",
+  "lang-jsdoc",
+  "lang-json",
+  "lang-jsonnet",
+  "lang-julia",
+  "lang-kconfig",
+  "lang-kdl",
+  "lang-kotlin",
+  "lang-latex",
+  "lang-linkerscript",
+  "lang-llvm",
+  "lang-lua",
+  "lang-luadoc",
+  "lang-luap",
+  "lang-luau",
+  "lang-magik",
+  "lang-make",
+  "lang-markdown",
+  "lang-markdown_inline",
+  "lang-matlab",
+  "lang-mermaid",
+  "lang-meson",
+  "lang-netlinx",
+  "lang-nim",
+  "lang-ninja",
+  "lang-nix",
+  "lang-nqc",
+  "lang-objc",
+  "lang-ocaml",
+  "lang-ocaml_interface",
+  "lang-odin",
+  "lang-org",
+  "lang-pascal",
+  "lang-pem",
+  "lang-perl",
+  "lang-pgn",
+  "lang-php",
+  "lang-po",
+  "lang-pony",
+  "lang-powershell",
+  "lang-printf",
+  "lang-prisma",
+  "lang-properties",
+  "lang-proto",
+  "lang-psv",
+  "lang-puppet",
+  "lang-purescript",
+  "lang-pymanifest",
+  "lang-python",
+  "lang-qmldir",
+  "lang-qmljs",
+  "lang-query",
+  "lang-r",
+  "lang-racket",
+  "lang-re2c",
+  "lang-readline",
+  "lang-rego",
+  "lang-requirements",
+  "lang-ron",
+  "lang-rst",
+  "lang-ruby",
+  "lang-rust",
+  "lang-scala",
+  "lang-scheme",
+  "lang-scss",
+  "lang-smali",
+  "lang-smithy",
+  "lang-solidity",
+  "lang-sparql",
+  "lang-sql",
+  "lang-squirrel",
+  "lang-starlark",
+  "lang-svelte",
+  "lang-swift",
+  "lang-tablegen",
+  "lang-tcl",
+  "lang-terraform",
+  "lang-test",
+  "lang-thrift",
+  "lang-toml",
+  "lang-tsv",
+  "lang-tsx",
+  "lang-twig",
+  "lang-typescript",
+  "lang-typst",
+  "lang-udev",
+  "lang-ungrammar",
+  "lang-uxntal",
+  "lang-v",
+  "lang-verilog",
+  "lang-vhdl",
+  "lang-vim",
+  "lang-vue",
+  "lang-wast",
+  "lang-wat",
+  "lang-wgsl",
+  "lang-xcompose",
+  "lang-xml",
+  "lang-yuck",
+  "lang-zig",
+]
+web = [
+  "lang-html",
+  "lang-css",
+  "lang-javascript",
+  "lang-typescript",
+  "lang-tsx",
+  "lang-json",
+  "lang-vue",
+  "lang-svelte",
+  "lang-astro",
+  "lang-graphql",
+  "lang-scss",
+  "lang-jsdoc",
+  "lang-twig",
+  "lang-prisma",
+]
+systems = [
+  "lang-c",
+  "lang-cpp",
+  "lang-rust",
+  "lang-go",
+  "lang-zig",
+  "lang-odin",
+  "lang-nim",
+  "lang-d",
+  "lang-verilog",
+  "lang-vhdl",
+  "lang-asm",
+  "lang-cuda",
+  "lang-objc",
+  "lang-hare",
+  "lang-swift",
+]
+scripting = [
+  "lang-python",
+  "lang-ruby",
+  "lang-lua",
+  "lang-perl",
+  "lang-bash",
+  "lang-fish",
+  "lang-powershell",
+  "lang-elixir",
+  "lang-erlang",
+  "lang-php",
+  "lang-r",
+  "lang-julia",
+  "lang-tcl",
+  "lang-gdscript",
+  "lang-starlark",
+]
+data = [
+  "lang-json",
+  "lang-toml",
+  "lang-xml",
+  "lang-csv",
+  "lang-tsv",
+  "lang-psv",
+  "lang-ini",
+  "lang-properties",
+  "lang-ron",
+  "lang-sql",
+  "lang-graphql",
+  "lang-proto",
+  "lang-kdl",
+]
+jvm = ["lang-java", "lang-kotlin", "lang-scala", "lang-groovy", "lang-clojure"]
+functional = [
+  "lang-haskell",
+  "lang-ocaml",
+  "lang-ocaml_interface",
+  "lang-elm",
+  "lang-purescript",
+  "lang-fsharp",
+  "lang-fsharp_signature",
+  "lang-scheme",
+  "lang-racket",
+  "lang-commonlisp",
+  "lang-elisp",
+  "lang-fennel",
+  "lang-gleam",
+  "lang-clojure",
+  "lang-janet",
+  "lang-agda",
+]
+lang-actionscript = []
+lang-ada = []
+lang-agda = []
+lang-apex = []
+lang-arduino = []
+lang-asm = []
+lang-astro = []
+lang-bash = []
+lang-beancount = []
+lang-bibtex = []
+lang-bicep = []
+lang-bitbake = []
+lang-bsl = []
+lang-c = []
+lang-cairo = []
+lang-capnp = []
+lang-chatito = []
+lang-clarity = []
+lang-clojure = []
+lang-cmake = []
+lang-cobol = []
+lang-comment = []
+lang-commonlisp = []
+lang-cpon = []
+lang-cpp = []
+lang-css = []
+lang-csv = []
+lang-cuda = []
+lang-d = []
+lang-dart = []
+lang-dockerfile = []
+lang-doxygen = []
+lang-dtd = []
+lang-elisp = []
+lang-elixir = []
+lang-elm = []
+lang-erlang = []
+lang-fennel = []
+lang-firrtl = []
+lang-fish = []
+lang-fortran = []
+lang-fsharp = []
+lang-fsharp_signature = []
+lang-func = []
+lang-gdscript = []
+lang-gitattributes = []
+lang-gitcommit = []
+lang-gitignore = []
+lang-gleam = []
+lang-glsl = []
+lang-gn = []
+lang-go = []
+lang-gomod = []
+lang-gosum = []
+lang-graphql = []
+lang-groovy = []
+lang-gstlaunch = []
+lang-hack = []
+lang-hare = []
+lang-haskell = []
+lang-haxe = []
+lang-hcl = []
+lang-heex = []
+lang-hlsl = []
+lang-html = []
+lang-hyprlang = []
+lang-ini = []
+lang-ispc = []
+lang-janet = []
+lang-java = []
+lang-javascript = []
+lang-jsdoc = []
+lang-json = []
+lang-jsonnet = []
+lang-julia = []
+lang-kconfig = []
+lang-kdl = []
+lang-kotlin = []
+lang-latex = []
+lang-linkerscript = []
+lang-llvm = []
+lang-lua = []
+lang-luadoc = []
+lang-luap = []
+lang-luau = []
+lang-magik = []
+lang-make = []
+lang-markdown = []
+lang-markdown_inline = []
+lang-matlab = []
+lang-mermaid = []
+lang-meson = []
+lang-netlinx = []
+lang-nim = []
+lang-ninja = []
+lang-nix = []
+lang-nqc = []
+lang-objc = []
+lang-ocaml = []
+lang-ocaml_interface = []
+lang-odin = []
+lang-org = []
+lang-pascal = []
+lang-pem = []
+lang-perl = []
+lang-pgn = []
+lang-php = []
+lang-po = []
+lang-pony = []
+lang-powershell = []
+lang-printf = []
+lang-prisma = []
+lang-properties = []
+lang-proto = []
+lang-psv = []
+lang-puppet = []
+lang-purescript = []
+lang-pymanifest = []
+lang-python = []
+lang-qmldir = []
+lang-qmljs = []
+lang-query = []
+lang-r = []
+lang-racket = []
+lang-re2c = []
+lang-readline = []
+lang-rego = []
+lang-requirements = []
+lang-ron = []
+lang-rst = []
+lang-ruby = []
+lang-rust = []
+lang-scala = []
+lang-scheme = []
+lang-scss = []
+lang-smali = []
+lang-smithy = []
+lang-solidity = []
+lang-sparql = []
+lang-sql = []
+lang-squirrel = []
+lang-starlark = []
+lang-svelte = []
+lang-swift = []
+lang-tablegen = []
+lang-tcl = []
+lang-terraform = []
+lang-test = []
+lang-thrift = []
+lang-toml = []
+lang-tsv = []
+lang-tsx = []
+lang-twig = []
+lang-typescript = []
+lang-typst = []
+lang-udev = []
+lang-ungrammar = []
+lang-uxntal = []
+lang-v = []
+lang-verilog = []
+lang-vhdl = []
+lang-vim = []
+lang-vue = []
+lang-wast = []
+lang-wat = []
+lang-wgsl = []
+lang-xcompose = []
+lang-xml = []
+lang-yuck = []
+lang-zig = []

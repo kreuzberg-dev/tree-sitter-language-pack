@@ -1,0 +1,26 @@
+$schema: https://raw.githubusercontent.com/Goldziher/ai-rulez/main/schema/ai-rules-v3.schema.json
+description: >
+  Rust workspace providing tree-sitter language parsers with polyglot bindings
+  (Python/PyO3, Node.js/NAPI-RS, Go/cgo, Java/Panama FFI, Elixir/Rustler, C/FFI).
+  Compiles 165+ language grammars into a single library with per-language and
+  per-binding crate structure, fixture-driven E2E testing, and Jinja2-based
+  README generation.
+gitignore: true
+name: tree-sitter-language-pack
+
+includes:
+  - name: kreuzberg-shared-rules
+    source: git@github.com:kreuzberg-dev/ai-rulez.git
+    ref: main
+    include:
+      - rules
+      - context
+      - skills
+      - agents
+    merge_strategy: local-override
+
+presets:
+  - claude
+  - gemini
+  - codex
+version: "3.0"

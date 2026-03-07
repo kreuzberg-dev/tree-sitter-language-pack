@@ -1,0 +1,43 @@
+agents:
+  - name: http-server-engineer
+    description: |
+      Implements HTTP server infrastructure, middleware stack composition, and request/response
+      processing pipelines. Focuses on Axum routing, tower-http middleware ordering, and
+      performance optimization. Maintains ServerConfig builder APIs and ensures proper error
+      propagation through the HTTP layer.
+    model: sonnet
+    context:
+      - HTTP-FRAMEWORK.md
+      - ../../../crates/spikard-http/src/server/mod.rs
+      - ../../../crates/spikard-http/src/middleware/mod.rs
+      - ../../../crates/spikard-http/src/handler_trait.rs
+      - ../../../crates/spikard-http/Cargo.toml
+
+  - name: middleware-architect
+    description: |
+      Designs and implements tower-http middleware stack, lifecycle hooks, and authentication
+      middleware while maintaining zero-overhead design principles. Configures CompressionConfig,
+      RateLimitConfig, StaticFilesConfig and ensures configuration APIs are properly exposed
+      to all language bindings. Oversees CORS, rate limiting, timeouts, and request ID tracking.
+    model: sonnet
+    context:
+      - HTTP-FRAMEWORK.md
+      - ../../../crates/spikard-http/src/middleware/
+      - ../../../crates/spikard-http/src/cors.rs
+      - ../../../crates/spikard-http/src/auth.rs
+      - ../../../crates/spikard-http/tests/server_middleware_behavior.rs
+      - ../../../crates/spikard-http/tests/middleware_stack_integration.rs
+
+  - name: request-response-specialist
+    description: |
+      Owns request parsing, parameter extraction, response serialization, and the RequestData
+      type definitions. Optimizes body handling (raw_body vs parsed), manages Arc-based parameter
+      storage for efficient cloning, and ensures validated_params are properly computed by
+      ParameterValidator. Handles edge cases in content negotiation and media type handling.
+    model: sonnet
+    context:
+      - HTTP-FRAMEWORK.md
+      - ../../../crates/spikard-http/src/handler_trait.rs
+      - ../../../crates/spikard-http/src/response.rs
+      - ../../../crates/spikard-http/src/server/request_extraction.rs
+      - ../../../crates/spikard-http/src/query_parser.rs

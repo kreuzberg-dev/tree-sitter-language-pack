@@ -1,0 +1,27 @@
+[workspace]
+members = ["crates/*", "tools/e2e-generator"]
+exclude = ["crates/ts-pack-go", "crates/ts-pack-java"]
+resolver = "2"
+
+[workspace.package]
+version = "2.0.0-alpha.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Goldziher/tree-sitter-language-pack"
+
+[workspace.dependencies]
+tree-sitter = "0.25"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+thiserror = "2"
+cc = "1"
+libloading = "0.8"
+cbindgen = "0.29"
+clap = { version = "4", features = ["derive"] }
+toml_edit = "0.22"
+napi = { version = "2", features = ["napi4"] }
+napi-derive = "2"
+napi-build = "2"
+pyo3 = { version = "0.24", features = ["abi3-py310"] }
+rustler = "0.36"

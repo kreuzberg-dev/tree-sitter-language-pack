@@ -1,0 +1,12 @@
+{
+  "id": "smoke_python",
+  "category": "smoke",
+  "description": "Smoke test: load python and parse a simple snippet",
+  "language": "python",
+  "source_code": "print('hello')",
+  "assertions": {
+    "tree_not_null": true,
+    "root_child_count_min": 1
+  },
+  "tags": ["smoke"]
+}

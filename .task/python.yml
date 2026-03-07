@@ -1,0 +1,44 @@
+version: "3"
+
+tasks:
+  install:
+    desc: Install Python dependencies via uv
+    cmds:
+      - echo "Checking Python and uv..."
+      - python3 --version
+      - uv --version
+      - uv sync --no-install-project
+
+  format:
+    desc: Format Python code
+    cmds:
+      - uv run --no-sync ruff format
+      - uv run --no-sync ruff check --fix --unsafe-fixes
+
+  format:check:
+    desc: Check Python formatting (CI)
+    cmds:
+      - uv run --no-sync ruff format --check
+      - uv run --no-sync ruff check
+
+  lint:
+    desc: Lint Python code
+    cmds:
+      - uv run --no-sync ruff check --fix --unsafe-fixes
+      - uv run --no-sync ruff format
+
+  lint:check:
+    desc: Check Python linting without modifications
+    cmds:
+      - uv run --no-sync ruff check
+
+  clean:
+    desc: Clean Python build artifacts
+    cmds:
+      - rm -rf build/ dist/ *.egg-info __pycache__
+
+  update:
+    desc: Update Python dependencies
+    cmds:
+      - echo "Updating Python dependencies..."
+      - uv lock --upgrade

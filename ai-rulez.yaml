@@ -10,233 +10,156 @@ mcp_servers:
     description: AI-Rulez MCP server for configuration management
     name: ai-rulez
 metadata:
-  description: Python library that bundles a comprehensive collection of tree-sitter language parsers as both source distributions and pre-built wheels, providing easy access to multiple programming language parsers for syntax analysis and code manipulation.
+  description: Rust workspace bundling 170+ tree-sitter language parsers with polyglot bindings for Python, Node.js, Go, Java, Elixir, and C.
   name: tree-sitter-language-pack
-  version: 1.0.0
+  version: 2.0.0-alpha.1
 presets:
   - popular
 rules:
-  - content: All language additions must be registered in sources/language_definitions.json with complete metadata (name, source URL, commit hash). Pin vendor dependencies using scripts/pin_vendors.py before committing. Never commit unpinned language sources.
+  - content: All language additions must be registered in sources/language_definitions.json with complete metadata (name, source URL, commit hash). Pin vendor dependencies using `task update:grammars` before committing. Never commit unpinned language sources.
     name: Tree-sitter Language Definitions
     priority: critical
-  - content: Run 'poetry run pytest' before committing. All language bindings must have corresponding tests in tests/ directory. Verify each language can be loaded and basic parsing works.
+  - content: Run `task test` before committing. All language bindings must have corresponding E2E tests via fixtures in `fixtures/`. Use `task e2e:test:rust` to run the Rust E2E suite. Verify each language can be loaded and basic parsing works.
     name: Testing Requirements
     priority: critical
-  - content: Maintain py.typed marker in tree_sitter_language_pack/. Use type hints for all public APIs. Run type checking as part of CI to ensure bindings are properly typed.
-    name: Type Safety
-    priority: high
-  - content: Test both source distribution and wheel builds with 'poetry build' before releases. Verify C extensions compile correctly across platforms. Check MANIFEST.in includes all necessary source files.
-    name: Build Verification
-    priority: high
-  - content: Use Poetry for dependency management (pyproject.toml and uv.lock). Keep tree-sitter core library version pinned and tested. Document Python version support policy (currently 3.10+).
-    name: Dependency Management
-    priority: medium
+  - content: Run `task lint` (prek) to run all pre-commit hooks before committing. This includes cargo fmt, cargo clippy, ruff, mypy, markdownlint, actionlint, shellcheck, and codespell.
+    name: Linting
+    priority: critical
   - content: Only include languages with permissive licenses (MIT, Apache 2.0). No GPL-licensed tree-sitter grammars. Verify license compatibility in language_definitions.json before adding new languages.
     name: License Compliance
     priority: high
-  - content: Follow conventional commits using 'feat:', 'chore:', 'docs:', 'fix:' prefixes as seen in git history. Keep commits atomic and descriptive for changelog generation.
+  - content: Follow conventional commits using 'feat:', 'chore:', 'docs:', 'fix:' prefixes. Keep commits atomic and descriptive for changelog generation. Never add AI co-author signatures.
     name: Commit Convention
     priority: medium
+  - content: Use Taskfile.yml for all build/test/lint/update commands. Use `uv` for Python dependency management, `cargo` for Rust. Use `prek` (pre-commit) for linting hooks. Do not use Makefile.
+    name: Build Tools
+    priority: high
+  - content: READMEs are generated from Jinja2 templates in scripts/readme_templates/ with config in scripts/readme_config.yaml. Never edit generated READMEs directly. Use `task generate-readme` to regenerate and `task generate-readme:check` to validate.
+    name: README Generation
+    priority: high
+  - content: E2E tests are generated from JSON fixtures in fixtures/ by the e2e-generator tool. Never edit generated test files in e2e/ directly. Use `task e2e:generate:all` to regenerate.
+    name: E2E Test Generation
+    priority: high
 sections:
   - content: |-
-      ## Quick Start Development Guide
+      ## Quick Start
 
       ### Prerequisites
-      - Python 3.10+
-      - C compiler (gcc/clang/MSVC)
-      - [uv](https://github.com/astral-sh/uv) package manager
+      - Rust toolchain (rustup)
+      - Python 3.10+ with [uv](https://github.com/astral-sh/uv)
+      - [Task](https://taskfile.dev/) task runner
+      - Node.js (for tree-sitter CLI)
 
-      ### Setup in 4 Steps
+      ### Setup
 
       ```bash
-      # 1. Clone and navigate
       git clone https://github.com/Goldziher/tree-sitter-language-pack.git
       cd tree-sitter-language-pack
-
-      # 2. Install dependencies
-      uv sync --no-install-project
-
-      # 3. Clone language vendor repositories (165+ languages)
-      uv run --no-sync scripts/clone_vendors.py
-
-      # 4. Build native extensions
-      PROJECT_ROOT=. uv run setup.py build_ext --inplace
-      ```
-
-      ### Verify Installation
-
-      ```bash
-      # Run all tests
-      PROJECT_ROOT=. uv run --no-sync pytest tests
-
-      # Test specific language
-      PROJECT_ROOT=. uv run --no-sync pytest tests -k test_can_load_language[python]
+      task setup
       ```
 
       ### Common Commands
 
       ```bash
-      # Lint and format
-      uv run --no-sync ruff check
-      uv run --no-sync ruff format
-
-      # Type checking
-      uv run --no-sync mypy
-
-      # Build distributions
-      PROJECT_ROOT=. uv build  # Creates wheel and sdist in dist/
+      task build          # Build all crates
+      task build:dev      # Build with a few languages (fast iteration)
+      task test           # Run all tests
+      task lint           # Run all linters via prek
+      task format         # Format all code (Rust + Python)
+      task update         # Update all dependencies
+      task clean          # Clean build artifacts
       ```
 
-      **Note**: The `PROJECT_ROOT=.` prefix is required for build/test commands to locate vendor sources correctly.
-    name: Quick Start Development Guide
+      ### E2E Tests
+
+      ```bash
+      task e2e:generate:all       # Generate E2E tests for all bindings
+      task e2e:generate:rust      # Generate + format Rust E2E tests
+      task e2e:test:rust          # Generate + run Rust E2E tests
+      task e2e:generate:smoke-fixtures  # Auto-generate smoke fixtures
+      ```
+
+      ### README Generation
+
+      ```bash
+      task generate-readme        # Generate all READMEs
+      task generate-readme:check  # Validate READMEs (CI)
+      ```
+    name: Quick Start
     priority: high
+  - content: |-
+      ## Architecture
+
+      ### Workspace Structure
+
+      ```text
+      tree-sitter-language-pack/
+      ├── crates/
+      │   ├── ts-pack-core/       # Rust core: parser compilation + language registry
+      │   ├── ts-pack-ffi/        # C-FFI layer (cbindgen)
+      │   ├── ts-pack-python/     # Python binding (PyO3/maturin)
+      │   ├── ts-pack-node/       # Node.js binding (NAPI-RS)
+      │   ├── ts-pack-go/         # Go binding (cgo)
+      │   ├── ts-pack-java/       # Java binding (Panama FFI, JDK 22+)
+      │   ├── ts-pack-elixir/     # Elixir binding (Rustler NIF)
+      │   └── ts-pack-cli/        # CLI tool
+      ├── tools/
+      │   └── e2e-generator/      # Fixture-driven E2E test generator
+      ├── fixtures/               # E2E test fixtures (JSON)
+      ├── e2e/                    # Generated E2E test suites
+      ├── scripts/                # README generation, vendor management
+      ├── sources/                # Language definitions
+      └── .task/                  # Taskfile includes (rust.yml, python.yml)
+      ```
+
+      ### Key Crates
+
+      - **ts-pack-core**: Build script compiles tree-sitter grammars from `parsers/` directory. Supports `TSLP_LANGUAGES` env var for selective compilation and `TSLP_LINK_MODE` for static/dynamic linking.
+      - **ts-pack-ffi**: Exposes C API via `ts_pack.h` generated by cbindgen. Used by Go, Java, and C bindings.
+      - **ts-pack-python**: PyO3 binding with PyCapsule-based API compatible with tree-sitter Python package.
+      - **ts-pack-node**: NAPI-RS binding returning raw language pointers for use with tree-sitter Node.js package.
+
+      ### Build Configuration
+
+      Environment variables:
+      - `PROJECT_ROOT` — workspace root (set automatically by Taskfile)
+      - `TSLP_LANGUAGES` — comma-separated list of languages to compile (default: all)
+      - `TSLP_LINK_MODE` — `static` or `dynamic` linking (default: dynamic)
+    name: Architecture
+    priority: medium
   - content: |-
       ## Adding a New Language
 
-      ### Method 1: Binary Wheel Language (Recommended)
+      1. Edit `sources/language_definitions.json`:
+         ```json
+         {
+           "newlang": {
+             "repo": "https://github.com/tree-sitter/tree-sitter-newlang",
+             "rev": "abc123def456",
+             "branch": "main",
+             "directory": "src",
+             "generate": false
+           }
+         }
+         ```
 
-      Most languages are compiled from source and bundled into the wheel:
+      2. Clone and build:
+         ```bash
+         task clone
+         task build
+         ```
 
-      **Step 1**: Edit `sources/language_definitions.json`
+      3. Add a smoke fixture in `fixtures/smoke/newlang.json`
 
-      ```json
-      {
-        "newlang": {
-          "repo": "https://github.com/tree-sitter/tree-sitter-newlang",
-          "rev": "abc123def456",
-          "branch": "main",
-          "directory": "src",
-          "generate": false
-        }
-      }
-      ```
+      4. Regenerate E2E tests:
+         ```bash
+         task e2e:generate:all
+         ```
 
-      - `repo`: GitHub repository URL (required)
-      - `rev`: Specific commit hash for reproducibility (required)
-      - `branch`: Branch name if not "main" (optional)
-      - `directory`: Path to src folder from repo root (optional, defaults to root)
-      - `generate`: Set `true` to run `tree-sitter generate` before build (optional)
-
-      **Step 2**: Update type definitions in `tree_sitter_language_pack/__init__.py`
-
-      Add to the `SupportedLanguage` literal type:
-
-      ```python
-      SupportedLanguage = Literal[
-          "python",
-          "rust",
-          # ... existing languages ...
-          "newlang",  # Add here
-      ]
-      ```
-
-      **Step 3**: Build and test
-
-      ```bash
-      # Clone new language repo
-      uv run --no-sync scripts/clone_vendors.py
-
-      # Rebuild native extensions
-      PROJECT_ROOT=. uv run setup.py build_ext --inplace
-
-      # Test the language loads correctly
-      PROJECT_ROOT=. uv run --no-sync pytest tests -k test_can_load_language[newlang]
-      ```
-
-      **Step 4**: Update documentation in `README.md`
-
-      Add to the "Available Languages" list with license info:
-
-      ```markdown
-      - [newlang](https://github.com/tree-sitter/tree-sitter-newlang) - MIT License
-      ```
-
-      ### Method 2: Pre-installed Dependency
-
-      For languages distributed as separate PyPI packages:
-
-      ```bash
-      # Add dependency
-      uv add tree-sitter-newlang --no-install-project
-      ```
-
-      Then update `InstalledBindings` and `installed_bindings_map` in `tree_sitter_language_pack/__init__.py`.
-
-      ### Updating Language Versions
-
-      ```bash
-      # Update all languages to latest commits
-      uv run --no-sync scripts/pin_vendors.py
-
-      # Update only languages missing revisions
-      uv run --no-sync scripts/pin_vendors.py --only-missing
-
-      # Update specific languages
-      uv run --no-sync scripts/pin_vendors.py --languages=python,rust,go
-      ```
+      5. Run tests:
+         ```bash
+         task test
+         task e2e:test:rust
+         ```
     name: Adding a New Language
     priority: high
-  - content: |-
-      ## Architecture Overview
-
-      ### Project Structure
-
-      ```
-      tree-sitter-language-pack/
-      ├── tree_sitter_language_pack/     # Main Python package
-      │   ├── __init__.py                # Public API: get_binding(), get_language(), get_parser()
-      │   └── bindings/                  # Runtime binding imports
-      ├── sources/
-      │   ├── language_definitions.json  # Language metadata (repo, rev, paths)
-      │   └── language_extension.c       # C template for building extensions
-      ├── scripts/
-      │   ├── clone_vendors.py           # Clones language repos from definitions
-      │   └── pin_vendors.py             # Updates language revisions
-      ├── setup.py                       # Builds C extensions for all languages
-      └── vendors/                       # Cloned language repos (gitignored)
-      ```
-
-      ### How It Works
-
-      1. **Build Time**: `setup.py` reads `sources/language_definitions.json`, compiles each language's C parser into a Python extension module
-      2. **Distribution**: Pre-built wheels contain compiled bindings for all 165+ languages
-      3. **Runtime**: `get_language("python")` imports the compiled binding and returns a `tree_sitter.Language` instance
-
-      ### Public API
-
-      The package exposes three main functions in `tree_sitter_language_pack/__init__.py`:
-
-      ```python
-      from tree_sitter_language_pack import get_binding, get_language, get_parser
-
-      # Get raw C binding (PyCapsule object)
-      binding = get_binding("python")
-
-      # Get tree_sitter.Language instance
-      language = get_language("python")
-
-      # Get pre-configured tree_sitter.Parser
-      parser = get_parser("python")
-      parse_tree = parser.parse(b"print('hello')")
-      ```
-
-      ### Language Categories
-
-      - **Binary Wheel Languages**: Compiled from source during wheel build (most languages)
-      - **Installed Bindings**: External packages installed as dependencies (referenced in `installed_bindings_map`)
-
-      ### Build System
-
-      - Uses `setuptools` with custom C extension building
-      - `MANIFEST.in` ensures `sources/` directory is included in sdist
-      - `pyproject.toml` defines metadata and dependencies (managed by `uv`)
-      - Native extensions built per-platform during wheel creation
-
-      ### Testing Strategy
-
-      Parametrized tests in `tests/entry_point_test.py` verify:
-      - Each language can be loaded via `get_language()`
-      - Each language can create a parser via `get_parser()`
-      - All 165+ languages are tested automatically
-    name: Architecture Overview
-    priority: medium

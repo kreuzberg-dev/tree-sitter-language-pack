@@ -1,0 +1,269 @@
+# tree-sitter-language-pack Custom Rules
+# Rust workspace with polyglot bindings for 165+ tree-sitter language parsers
+#
+# Schema: ai-rules-v3
+# Last Updated: 2026-03-07
+
+---
+
+rules:
+
+  # =========================================================================
+  # LANGUAGE DEFINITIONS & GRAMMAR MANAGEMENT
+  # =========================================================================
+
+  - name: language-definitions-registry
+    priority: critical
+    description: |
+      All language additions must be registered in sources/language_definitions.json
+      with complete metadata: name, source repo URL, pinned commit hash (rev),
+      optional branch, optional directory, and optional generate flag. Never commit
+      unpinned language sources. Use `uv run --no-sync scripts/pin_vendors.py` to
+      update revisions before committing.
+
+      Implementation:
+      - Add entry to sources/language_definitions.json with repo and rev
+      - Run `uv run --no-sync scripts/pin_vendors.py` to pin revisions
+      - Run `uv run --no-sync scripts/clone_vendors.py` to clone sources
+      - Verify grammar compiles via `task build`
+      - Update SupportedLanguage type in Python bindings if applicable
+
+    scope:
+      - sources/language_definitions.json
+      - scripts/pin_vendors.py
+      - scripts/clone_vendors.py
+      - vendors/ (gitignored, cloned at build time)
+
+  - name: license-compliance
+    priority: high
+    description: |
+      Only include languages with permissive licenses (MIT, Apache 2.0, BSD).
+      No GPL-licensed tree-sitter grammars. Verify license compatibility in the
+      upstream repository before adding new languages to language_definitions.json.
+
+    scope:
+      - sources/language_definitions.json
+      - License verification for new grammar additions
+
+  # =========================================================================
+  # BUILD SYSTEM & TASK RUNNER
+  # =========================================================================
+
+  - name: task-runner-workflow
+    priority: critical
+    description: |
+      Use Taskfile.yml (go-task) for all build orchestration. Key commands:
+      - `task setup` - install deps, clone vendors, initialize project
+      - `task build` - build all Rust crates (dynamic mode, all languages)
+      - `task build:dev` - fast iteration with subset of languages
+      - `task test` - run all Rust tests
+      - `task lint` - run prek (pre-commit framework) on all files
+      - `task check` - lint + test
+      - `task format` - format all code (Rust + Python)
+      - `task clean` - clean build artifacts
+      - `task update` - update all dependencies
+
+      Never use raw cargo/uv commands for top-level orchestration; always prefer
+      task commands so local runs match CI execution.
+
+      Implementation:
+      - Taskfile.yml includes .task/rust.yml and .task/python.yml
+      - PROJECT_ROOT env var is set automatically from pwd
+      - TSLP_LINK_MODE controls static vs dynamic linking
+      - TSLP_LANGUAGES can restrict which languages to build (for dev speed)
+
+    scope:
+      - Taskfile.yml
+      - .task/rust.yml
+      - .task/python.yml
+
+  - name: rust-workspace-structure
+    priority: critical
+    description: |
+      The project is a Cargo workspace (Rust 2024 edition) with crates under crates/:
+      - ts-pack-core: core library with grammar compilation and language registry
+      - ts-pack-cli: CLI tool
+      - ts-pack-python: Python bindings via PyO3 (abi3-py310)
+      - ts-pack-node: Node.js bindings via NAPI-RS
+      - ts-pack-elixir: Elixir bindings via Rustler
+      - ts-pack-ffi: C FFI bindings
+      - ts-pack-go: Go bindings via cgo (excluded from default workspace build)
+      - ts-pack-java: Java bindings via Panama FFI (excluded from default workspace build)
+
+      Plus tools/e2e-generator for fixture-driven test generation.
+
+      All business logic lives in ts-pack-core. Binding crates are thin wrappers
+      that translate between language-native types and the Rust core.
+
+    scope:
+      - Cargo.toml (workspace root)
+      - crates/*/Cargo.toml
+      - tools/e2e-generator/
+
+  # =========================================================================
+  # POLYGLOT BINDINGS
+  # =========================================================================
+
+  - name: thin-binding-pattern
+    priority: high
+    description: |
+      All language bindings (Python/PyO3, Node/NAPI-RS, Elixir/Rustler, C/FFI,
+      Go/cgo, Java/Panama FFI) must follow the thin binding pattern: expose only
+      language-idiomatic APIs over the Rust core in ts-pack-core. Never duplicate
+      grammar loading, compilation, or language registry logic across bindings.
+
+      Implementation:
+      - Core logic in crates/ts-pack-core
+      - Each binding crate translates language types to/from Rust types
+      - No grammar or parser logic in binding crates
+      - Binding crates import and re-export ts-pack-core functionality
+
+    scope:
+      - crates/ts-pack-python/
+      - crates/ts-pack-node/
+      - crates/ts-pack-elixir/
+      - crates/ts-pack-ffi/
+      - crates/ts-pack-go/
+      - crates/ts-pack-java/
+
+  # =========================================================================
+  # TESTING & E2E
+  # =========================================================================
+
+  - name: fixture-driven-e2e-testing
+    priority: critical
+    description: |
+      E2E tests are generated from fixture files using the e2e-generator tool
+      (tools/e2e-generator). Fixtures live in fixtures/ and drive test generation
+      for multiple target languages.
+
+      Key commands:
+      - `task e2e:generate:all` - generate E2E tests for all languages
+      - `task e2e:generate:rust` - generate + format Rust E2E tests
+      - `task e2e:generate:python` - generate + lint Python E2E tests
+      - `task e2e:generate:smoke-fixtures` - auto-generate smoke fixtures from language_definitions.json
+      - `task e2e:test:rust` - generate + test Rust E2E suite
+
+      Implementation:
+      - Add fixture files to fixtures/ directory
+      - Run `cargo run -p e2e-generator -- generate --lang <target>`
+      - Generated tests land in e2e/<language>/
+      - Format generated code with language-appropriate formatter
+      - Run generated tests to verify
+
+    scope:
+      - fixtures/
+      - tools/e2e-generator/
+      - e2e/
+      - Taskfile.yml (e2e:* tasks)
+
+  - name: testing-requirements
+    priority: critical
+    description: |
+      Run `task test` before committing. All language bindings must have
+      corresponding tests. Verify each language grammar can be loaded and
+      basic parsing works. Use `task test` for the full suite or
+      `task rust:test:quick` for a fast subset during development.
+
+    scope:
+      - tests/
+      - e2e/
+      - crates/*/tests/
+
+  # =========================================================================
+  # DEPENDENCY MANAGEMENT
+  # =========================================================================
+
+  - name: dependency-management
+    priority: medium
+    description: |
+      Use `uv` for Python dependency management (pyproject.toml + uv.lock).
+      Use `cargo` for Rust dependency management (Cargo.toml + Cargo.lock).
+      Use `prek` (pre-commit framework) for linting hooks.
+
+      Key commands:
+      - `uv sync --no-install-project` - install Python deps
+      - `cargo update` - update Rust deps
+      - `uv lock --upgrade` - update Python deps
+      - `prek autoupdate` - update pre-commit hooks
+      - `task update` - update everything at once
+
+      Keep tree-sitter core library version pinned and tested across all
+      binding crates via workspace dependencies in root Cargo.toml.
+
+    scope:
+      - pyproject.toml
+      - uv.lock
+      - Cargo.toml (workspace)
+      - Cargo.lock
+
+  # =========================================================================
+  # CODE QUALITY & LINTING
+  # =========================================================================
+
+  - name: linting-and-formatting
+    priority: high
+    description: |
+      Use `task lint` to run all linters via prek (pre-commit framework).
+      This covers:
+      - Rust: cargo fmt + clippy (via .task/rust.yml)
+      - Python: ruff check + ruff format (via .task/python.yml)
+
+      Use `task format` for auto-fixing formatting issues.
+      Use `task rust:lint:check` or `task python:lint:check` for CI-mode
+      (check without modifications).
+
+    scope:
+      - .pre-commit-config.yaml (prek config)
+      - .task/rust.yml (rust:lint task)
+      - .task/python.yml (python:lint task)
+      - rustfmt.toml
+      - pyproject.toml (ruff config)
+
+  # =========================================================================
+  # DOCUMENTATION & README GENERATION
+  # =========================================================================
+
+  - name: readme-generation
+    priority: high
+    description: |
+      READMEs are generated from Jinja2 templates, not hand-written.
+      Use `task generate-readme` to regenerate all READMEs from templates.
+      Use `task generate-readme:check` to validate READMEs match templates (CI).
+      Use `task generate-readme:dry-run` for preview without writing.
+
+      The generation script is at scripts/generate_readme.py and uses
+      data from sources/language_definitions.json and Cargo.toml.
+
+      Never edit README.md directly; edit the templates instead.
+
+    scope:
+      - scripts/generate_readme.py
+      - templates/ (Jinja2 templates)
+      - README.md (generated output)
+
+  # =========================================================================
+  # COMMIT & WORKFLOW CONVENTIONS
+  # =========================================================================
+
+  - name: commit-convention
+    priority: medium
+    description: |
+      Follow conventional commits using 'feat:', 'chore:', 'docs:', 'fix:'
+      prefixes as seen in git history. Keep commits atomic and descriptive
+      for changelog generation.
+
+    scope:
+      - All commits
+
+  - name: type-safety
+    priority: high
+    description: |
+      Maintain py.typed marker in tree_sitter_language_pack/ for Python.
+      Use type hints for all public Python APIs. Use strong typing in Rust
+      (no unnecessary unwrap across FFI boundaries). Run type checking as
+      part of CI to ensure bindings are properly typed.
+
+    scope:
+      - tree_sitter_language_pack/
+      - crates/ts-pack-python/

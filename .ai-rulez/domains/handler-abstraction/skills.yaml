@@ -1,0 +1,32 @@
+skills:
+  - name: rust-latest-edition
+    file: ../../../.ai-rulez/skills/rust-latest-edition/SKILL.md
+    description: Rust trait objects, Arc<dyn Trait>, async/await
+
+  - name: python-modern-performance
+    file: ../../../.ai-rulez/skills/python-modern-performance/SKILL.md
+    description: PyO3 bindings, pyo3_async_runtimes, exception handling
+
+  - name: typescript-strictest
+    file: ../../../.ai-rulez/skills/typescript-strictest/SKILL.md
+    description: napi-rs bindings, ThreadsafeFunction, Promise handling
+
+  - name: ruby-3-2-rbs
+    file: ../../../.ai-rulez/skills/ruby-3-2-rbs/SKILL.md
+    description: Magnus bindings, thread safety, RBS type definitions
+
+  - name: php-8-2-phpstan
+    file: ../../../.ai-rulez/skills/php-8-2-phpstan/SKILL.md
+    description: ext-php-rs bindings, thread pools, phpstan validation
+
+  - name: spikard-error-handling
+    file: ../../../.ai-rulez/skills/spikard-error-handling/SKILL.md
+    description: HandlerError mapping, exception conversion
+
+  - name: spikard-testing-strategy
+    file: ../../../.ai-rulez/skills/spikard-testing-strategy/SKILL.md
+    description: Cross-language handler testing, fixture validation
+
+  - name: spikard-workspace-layout
+    file: ../../../.ai-rulez/skills/spikard-workspace-layout/SKILL.md
+    description: Monorepo organization, crate dependencies

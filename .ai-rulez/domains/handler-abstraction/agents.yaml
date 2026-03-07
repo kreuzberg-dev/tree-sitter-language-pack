@@ -1,0 +1,75 @@
+agents:
+  - name: handler-trait-architect
+    description: |
+      Owns the Handler trait definition, RequestData structure, and HandlerResponse types.
+      Ensures Handler trait remains language-agnostic and FFI-friendly. Manages Arc-based
+      parameter storage for efficient cloning, validates serialization boundaries, and
+      maintains backward compatibility across all language bindings. Designs APIs for
+      async/await and callback support in all target languages.
+    model: sonnet
+    context:
+      - HANDLER-ABSTRACTION.md
+      - ../../../crates/spikard-http/src/handler_trait.rs
+      - ../../../crates/spikard-http/src/handler_response.rs
+      - ../../../crates/spikard-http/src/bindings/mod.rs
+      - ../../../crates/spikard-core/src/handler.rs
+
+  - name: binding-implementer-py
+    description: |
+      Implements Python (PyO3) Handler binding. Manages RequestData serialization to Python objects,
+      async integration with pyo3_async_runtimes, and HandlerResponse deserialization. Ensures
+      raw_body is preferred for performance. Handles Python exception conversion to HandlerError.
+      Owns /crates/spikard-py/ Python binding implementation.
+    model: sonnet
+    context:
+      - HANDLER-ABSTRACTION.md
+      - ../../../crates/spikard-py/src/
+      - ../../../crates/spikard-py/src/handler.rs
+      - ../../../crates/spikard-py/tests/
+
+  - name: binding-implementer-node
+    description: |
+      Implements Node.js (napi-rs) Handler binding. Manages RequestData to JavaScript serialization,
+      async integration via ThreadsafeFunction and libuv event loop, and Promise handling.
+      Ensures proper error propagation from JavaScript to Rust. Owns /crates/spikard-node/
+      Node.js binding implementation.
+    model: sonnet
+    context:
+      - HANDLER-ABSTRACTION.md
+      - ../../../crates/spikard-node/src/
+      - ../../../crates/spikard-node/tests/
+
+  - name: binding-implementer-ruby
+    description: |
+      Implements Ruby (Magnus) Handler binding. Manages RequestData serialization to Ruby hashes,
+      background thread integration for async operations, and HandlerResponse conversion.
+      Validates RBS type definitions. Owns /crates/spikard-rb/ Ruby binding implementation.
+    model: sonnet
+    context:
+      - HANDLER-ABSTRACTION.md
+      - ../../../crates/spikard-rb/src/
+      - ../../../crates/spikard-rb/src/handler.rs
+      - ../../../crates/spikard-rb-macros/
+
+  - name: binding-implementer-php
+    description: |
+      Implements PHP (ext-php-rs) Handler binding. Manages RequestData to PHP array serialization,
+      thread pool integration for sync PHP code, and HandlerResponse extraction. Validates phpstan
+      type definitions. Owns /crates/spikard-php/ PHP binding implementation.
+    model: sonnet
+    context:
+      - HANDLER-ABSTRACTION.md
+      - ../../../crates/spikard-php/src/
+      - ../../../crates/spikard-php/src/handler.rs
+
+  - name: di-handler-engineer
+    description: |
+      Implements DependencyInjectingHandler wrapper. Manages request-scoped dependency resolution
+      and passes resolved dependencies to handlers via RequestData. Ensures zero-cost when DI
+      feature disabled. Handles dependency graph compilation and cycle detection.
+      Optional feature: di
+    model: sonnet
+    context:
+      - HANDLER-ABSTRACTION.md
+      - ../../../crates/spikard-http/src/di_handler.rs
+      - ../../../crates/spikard-core/src/di/

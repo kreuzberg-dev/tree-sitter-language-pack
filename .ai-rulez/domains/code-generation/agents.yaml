@@ -1,0 +1,57 @@
+agents:
+  - name: codegen-architect
+    description: |
+      Designs code generation pipelines for OpenAPI, GraphQL, AsyncAPI, and OpenRPC specs.
+      Manages specification parsing, type extraction, schema validation, and binding-agnostic
+      code templates. Oversees fixture integration and ensures generated code is testable
+      and maintainable. Defines code generation error handling and recovery strategies.
+    model: sonnet
+    context:
+      - CODE-GENERATION.md
+      - ../../../crates/spikard-codegen/src/lib.rs
+      - ../../../crates/spikard-codegen/src/openapi/
+      - ../../../crates/spikard-http/src/openapi/
+
+  - name: openapi-specialist
+    description: |
+      Implements OpenAPI 3.0+ specification parsing, route-to-spec conversion, and Swagger/ReDoc
+      UI generation. Generates parameter validators from JSON schemas. Maintains compatibility
+      with OpenAPI tooling ecosystem. Handles operation security, content negotiation, and
+      response schema definitions.
+    model: sonnet
+    context:
+      - CODE-GENERATION.md
+      - ../../../crates/spikard-http/src/openapi/mod.rs
+      - ../../../crates/spikard-http/src/openapi/spec_generation.rs
+      - ../../../crates/spikard-http/src/openapi/parameter_extraction.rs
+      - ../../../crates/spikard-http/src/openapi/schema_conversion.rs
+      - ../../../testing_data/openapi_schemas/
+
+  - name: graphql-executor
+    description: |
+      Implements GraphQL schema parsing, query execution, mutation handling, and introspection.
+      Manages federation support and subscription channels. Ensures GraphQL handler implements
+      Handler trait correctly. Validates query complexity and rate limits. Handles errors via
+      GraphQL error format with proper HTTP status codes.
+    model: sonnet
+    context:
+      - CODE-GENERATION.md
+      - ../../../crates/spikard-graphql/src/
+      - ../../../crates/spikard-graphql/src/schema.rs
+      - ../../../crates/spikard-graphql/src/executor.rs
+      - ../../../crates/spikard-graphql/src/handler.rs
+      - ../../../testing_data/graphql/
+
+  - name: async-protocol-engineer
+    description: |
+      Implements AsyncAPI and OpenRPC specification support for event-driven and JSON-RPC
+      architectures. Manages message payload validation, method registry generation, and
+      channel subscription handling. Ensures protocol-specific error handling and proper
+      payload serialization.
+    model: sonnet
+    context:
+      - CODE-GENERATION.md
+      - ../../../testing_data/asyncapi_schemas/
+      - ../../../testing_data/jsonrpc/
+      - ../../../crates/spikard-http/src/jsonrpc/
+      - ../../../tools/test-generator/

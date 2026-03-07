@@ -1,0 +1,32 @@
+skills:
+  - name: spikard-testing-strategy
+    file: ../../../.ai-rulez/skills/spikard-testing-strategy/SKILL.md
+    description: Fixture-driven test data and validation
+
+  - name: rust-latest-edition
+    file: ../../../.ai-rulez/skills/rust-latest-edition/SKILL.md
+    description: Rust code generation and metaprogramming
+
+  - name: spikard-error-handling
+    file: ../../../.ai-rulez/skills/spikard-error-handling/SKILL.md
+    description: Error response formats for different protocols
+
+  - name: spikard-documentation
+    file: ../../../.ai-rulez/skills/spikard-documentation/SKILL.md
+    description: OpenAPI docs generation and spec validation
+
+  - name: python-modern-performance
+    file: ../../../.ai-rulez/skills/python-modern-performance/SKILL.md
+    description: Python code generation patterns
+
+  - name: typescript-strictest
+    file: ../../../.ai-rulez/skills/typescript-strictest/SKILL.md
+    description: TypeScript code generation patterns
+
+  - name: ruby-3-2-rbs
+    file: ../../../.ai-rulez/skills/ruby-3-2-rbs/SKILL.md
+    description: Ruby code generation and type definitions
+
+  - name: php-8-2-phpstan
+    file: ../../../.ai-rulez/skills/php-8-2-phpstan/SKILL.md
+    description: PHP code generation patterns

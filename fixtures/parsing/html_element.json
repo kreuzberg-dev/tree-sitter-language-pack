@@ -1,0 +1,12 @@
+{
+  "id": "parsing_html_element",
+  "category": "parsing",
+  "description": "Parse an HTML element and assert node type",
+  "language": "html",
+  "source_code": "<div>hello</div>",
+  "assertions": {
+    "tree_not_null": true,
+    "root_contains_node_type": "element"
+  },
+  "tags": ["parsing", "html"]
+}

@@ -1,6 +1,5 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-
 requires = [ "cython>=3.0.12", "setuptools>=80.9.0", "typing-extensions>=4.15.0" ]
 
 [project]
@@ -18,7 +17,6 @@ keywords = [
   "tree-sitter",
 ]
 license = "MIT OR Apache-2.0"
-
 authors = [ { name = "Na'aman Hirschfeld", email = "nhirschfeld@gmail.com" } ]
 requires-python = ">=3.10.0"
 classifiers = [
@@ -41,7 +39,6 @@ dependencies = [
   "tree-sitter-embedded-template>=0.25.0",
   "tree-sitter-yaml>=0.7.2",
 ]
-
 urls.documentation = "https://github.com/Goldziher/tree-sitter-language-pack#readme"
 urls.homepage = "https://github.com/Goldziher/tree-sitter-language-pack"
 urls.issues = "https://github.com/Goldziher/tree-sitter-language-pack/issues"
@@ -51,9 +48,11 @@ urls.repository = "https://github.com/Goldziher/tree-sitter-language-pack"
 dev = [
   "anyio>=4.10.0",
   "gitpython>=3.1.45",
+  "jinja2>=3.1.0",
   "mypy>=1.18.2",
   "prek>=0.2.19",
   "pytest>=9.0.0",
+  "pyyaml>=6.0.0",
   "ruff>=0.14.6",
   "setuptools>=80.9.0",
   "tomli>=2.2.1; python_version<'3.11'",
@@ -62,8 +61,8 @@ dev = [
   "uv-bump",
 ]
 
-[tool.uv.sources]
-uv-bump = { git = "https://github.com/Goldziher/uv-bump" }
+[tool.uv]
+sources.uv-bump = { git = "https://github.com/Goldziher/uv-bump" }
 
 [tool.ruff]
 target-version = "py310"

@@ -1,0 +1,113 @@
+# tree-sitter-language-pack Profile
+# Rust workspace with polyglot tree-sitter bindings
+#
+# Schema: ai-rules-v3
+# Last Updated: 2026-03-07
+
+---
+
+profiles:
+
+  - name: tree-sitter-language-pack
+    description: |
+      Profile for the tree-sitter-language-pack project: a Rust workspace that
+      compiles 165+ tree-sitter language grammars and exposes them via polyglot
+      bindings (Python/PyO3, Node.js/NAPI-RS, Elixir/Rustler, C/FFI, Go/cgo,
+      Java/Panama FFI).
+
+      Development workflow:
+      - Build: `task build` (or `task build:dev` for fast iteration)
+      - Test: `task test`
+      - Lint: `task lint` (via prek)
+      - E2E: `task e2e:generate:all` + `task e2e:test:rust`
+      - README: `task generate-readme`
+
+    domains:
+      - rust-core
+      - polyglot-bindings
+      - grammar-management
+      - e2e-testing
+      - build-distribution
+      - documentation
+
+    agents:
+      # Architecture (Sonnet)
+      - rust-core-architect
+      - binding-architect
+
+      # Language binding engineers (Haiku)
+      - python-engineer
+      - node-engineer
+      - elixir-engineer
+      - ffi-engineer
+
+      # Quality & testing (Haiku)
+      - e2e-test-engineer
+
+      # Build & operations (Haiku)
+      - build-ops
+      - grammar-maintainer
+      - docs-engineer
+
+    priority_rules:
+      # Critical
+      - language-definitions-registry
+      - task-runner-workflow
+      - rust-workspace-structure
+      - fixture-driven-e2e-testing
+      - testing-requirements
+
+      # High
+      - license-compliance
+      - thin-binding-pattern
+      - linting-and-formatting
+      - readme-generation
+      - type-safety
+
+      # Medium
+      - dependency-management
+      - commit-convention
+
+    model_routing:
+      architecture_decisions: sonnet
+      binding_design: sonnet
+      core_implementation: haiku
+      binding_implementation: haiku
+      testing: haiku
+      documentation: haiku
+      build_ops: haiku
+
+    languages:
+      required:
+        - rust
+      optional:
+        - python
+        - typescript
+        - go
+        - java
+        - elixir
+        - c
+
+    platforms:
+      required:
+        - linux
+        - macos
+      optional:
+        - windows
+
+    toolchain:
+      rust:
+        edition: "2024"
+        formatter: rustfmt
+        linter: clippy
+        package_manager: cargo
+
+      python:
+        version: "3.10+"
+        formatter: ruff
+        linter: ruff
+        package_manager: uv
+        binding: pyo3
+
+      task_runner: go-task
+      pre_commit: prek

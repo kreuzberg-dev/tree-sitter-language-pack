@@ -1,0 +1,69 @@
+rules:
+  - name: fixture-first-testing
+    file: ../../../.ai-rulez/rules/fixture-first-testing.md
+    description: All code generation must be tested against fixtures in /testing_data/
+
+  - name: fixture-backed-testing
+    file: ../../../.ai-rulez/rules/fixture-backed-testing.md
+    description: Test data drives specification parsing and code generation validation
+
+  - name: binding-level-configuration-only
+    file: ../../../.ai-rulez/rules/binding-level-configuration-only.md
+    description: Code generation configuration is per-binding, not global
+
+  - name: openapi-codegen-rules
+    description: |
+      OpenAPI code generation must:
+      - Convert Route definitions to OpenAPI 3.0 spec
+      - Generate parameter validators from JSON schemas
+      - Support Swagger UI and ReDoc UI
+      - Include security schemes for auth middleware
+      - Generate server URLs from ServerInfo config
+      - Produce valid OpenAPI that passes validation
+
+  - name: graphql-execution-rules
+    description: |
+      GraphQL execution must:
+      - Parse SDL schemas correctly
+      - Execute queries with proper field resolution
+      - Validate mutations with input type schemas
+      - Support introspection queries
+      - Return errors in GraphQL format (errors array)
+      - Implement Handler trait for HTTP integration
+      - Support query complexity limits via middleware
+
+  - name: asyncapi-support
+    description: |
+      AsyncAPI support must:
+      - Parse AsyncAPI 3.0 specifications
+      - Extract channel and operation definitions
+      - Generate message validators from schemas
+      - Support publish/subscribe operations
+      - Integrate with WebSocket handler for subscriptions
+
+  - name: openrpc-support
+    description: |
+      OpenRPC (JSON-RPC) support must:
+      - Parse OpenRPC method definitions
+      - Generate type-safe method handlers
+      - Validate method parameters against schema
+      - Return JSON-RPC 2.0 responses (with id, result/error)
+      - Support batched requests
+
+  - name: schema-validation-codegen
+    description: |
+      Code generation must produce validators that:
+      - Check required vs optional parameters
+      - Validate parameter types (string, number, boolean, object, array)
+      - Support format validation (email, uuid, date-time, uri)
+      - Enforce pattern constraints (regex)
+      - Check min/max/length constraints
+      - Use SchemaValidator from spikard-core
+
+  - name: error-response-consistency
+    description: |
+      Generated handlers must return consistent error responses:
+      - OpenAPI: ProblemDetails (application/problem+json)
+      - GraphQL: GraphQL errors array with extensions
+      - AsyncAPI: Channel error messages
+      - OpenRPC: JSON-RPC 2.0 error object with code/message/data

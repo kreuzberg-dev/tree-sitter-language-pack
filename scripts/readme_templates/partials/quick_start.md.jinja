@@ -1,0 +1,15 @@
+{%- set lang_map = {
+  "rust": "rust",
+  "python": "python",
+  "node": "javascript",
+  "go": "go",
+  "java": "java",
+  "elixir": "elixir",
+  "ffi": "c",
+  "cli": "sh"
+} -%}
+{%- set syntax = lang_map.get(language, "text") -%}
+
+```{{ syntax }}
+{{ quick_start.strip() }}
+```

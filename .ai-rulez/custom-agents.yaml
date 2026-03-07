@@ -1,0 +1,156 @@
+# tree-sitter-language-pack Custom Agents
+# Agents for Rust workspace with polyglot tree-sitter bindings
+#
+# Schema: ai-rules-v3
+# Last Updated: 2026-03-07
+
+---
+
+agents:
+
+  # =========================================================================
+  # CORE ARCHITECTURE
+  # =========================================================================
+
+  - name: rust-core-architect
+    model: sonnet
+    description: |
+      Designs and maintains the ts-pack-core crate: grammar compilation pipeline,
+      language registry, dynamic/static linking modes, and the build system that
+      compiles 165+ tree-sitter grammars from C sources. Ensures workspace
+      Cargo.toml stays consistent and crate dependencies are minimal.
+
+    scope:
+      - crates/ts-pack-core/ architecture and API design
+      - Workspace Cargo.toml and dependency management
+      - Grammar compilation pipeline (build.rs, cc crate usage)
+      - Language registry and lookup
+
+  - name: binding-architect
+    model: sonnet
+    description: |
+      Ensures all polyglot bindings (Python/PyO3, Node/NAPI-RS, Elixir/Rustler,
+      C/FFI, Go/cgo, Java/Panama FFI) follow the thin binding pattern over
+      ts-pack-core. Reviews FFI boundary safety, type mapping conventions, and
+      cross-binding API consistency.
+
+    scope:
+      - crates/ts-pack-python/ (PyO3 bindings)
+      - crates/ts-pack-node/ (NAPI-RS bindings)
+      - crates/ts-pack-elixir/ (Rustler bindings)
+      - crates/ts-pack-ffi/ (C FFI)
+      - crates/ts-pack-go/ (cgo bindings)
+      - crates/ts-pack-java/ (Panama FFI bindings)
+      - FFI boundary design and type mapping
+
+  # =========================================================================
+  # LANGUAGE BINDING ENGINEERS
+  # =========================================================================
+
+  - name: python-engineer
+    model: haiku
+    description: |
+      Implements and maintains Python bindings via PyO3 in crates/ts-pack-python.
+      Ensures Pythonic API surface (get_language, get_parser, get_binding),
+      proper type hints, py.typed marker, and abi3-py310 compatibility.
+
+    scope:
+      - crates/ts-pack-python/ implementation
+      - tree_sitter_language_pack/ Python package
+      - Python type hints and py.typed
+
+  - name: node-engineer
+    model: haiku
+    description: |
+      Implements and maintains Node.js bindings via NAPI-RS in crates/ts-pack-node.
+      Ensures idiomatic JavaScript/TypeScript API and proper .d.ts type generation.
+
+    scope:
+      - crates/ts-pack-node/ implementation
+      - TypeScript type definitions
+
+  - name: elixir-engineer
+    model: haiku
+    description: |
+      Implements and maintains Elixir bindings via Rustler in crates/ts-pack-elixir.
+      Ensures idiomatic Elixir API with proper NIF resource management.
+
+    scope:
+      - crates/ts-pack-elixir/ implementation
+
+  - name: ffi-engineer
+    model: haiku
+    description: |
+      Implements and maintains C FFI bindings in crates/ts-pack-ffi and
+      Go/Java bindings that consume them. Manages cbindgen header generation
+      and ensures ABI stability.
+
+    scope:
+      - crates/ts-pack-ffi/ implementation
+      - crates/ts-pack-go/ (cgo over FFI)
+      - crates/ts-pack-java/ (Panama FFI)
+      - cbindgen configuration
+
+  # =========================================================================
+  # TESTING & QUALITY
+  # =========================================================================
+
+  - name: e2e-test-engineer
+    model: haiku
+    description: |
+      Maintains the fixture-driven E2E test generator (tools/e2e-generator)
+      and fixture collections. Generates test suites for Rust, Python, Go,
+      TypeScript, Java, Elixir, and C from shared fixture definitions.
+      Ensures all 165+ languages have smoke test coverage.
+
+    scope:
+      - tools/e2e-generator/ implementation
+      - fixtures/ test fixture files
+      - e2e/ generated test suites
+      - Taskfile.yml e2e:* tasks
+
+  # =========================================================================
+  # BUILD & CI
+  # =========================================================================
+
+  - name: build-ops
+    model: haiku
+    description: |
+      Maintains Taskfile.yml, .task/*.yml, CI workflows, and release automation.
+      Ensures task commands mirror CI execution, manages prek (pre-commit)
+      configuration, and coordinates cross-platform builds for all binding
+      crates.
+
+    scope:
+      - Taskfile.yml and .task/*.yml
+      - GitHub Actions workflows
+      - prek / pre-commit configuration
+      - Release automation
+
+  - name: grammar-maintainer
+    model: haiku
+    description: |
+      Manages the language grammar ecosystem: adding new grammars to
+      language_definitions.json, pinning vendor revisions, cloning vendor
+      repos, and verifying grammar compilation. Runs pin_vendors.py and
+      clone_vendors.py scripts.
+
+    scope:
+      - sources/language_definitions.json
+      - scripts/pin_vendors.py
+      - scripts/clone_vendors.py
+      - vendors/ (cloned grammar sources)
+
+  - name: docs-engineer
+    model: haiku
+    description: |
+      Maintains Jinja2 README templates and the generate_readme.py script.
+      Ensures generated READMEs stay in sync with language_definitions.json
+      and project metadata. Manages ai-rulez configuration for CLAUDE.md
+      generation.
+
+    scope:
+      - scripts/generate_readme.py
+      - templates/ (Jinja2 templates)
+      - .ai-rulez/ configuration
+      - README.md (generated)

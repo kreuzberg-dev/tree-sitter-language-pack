@@ -1,0 +1,20 @@
+skills:
+  - name: spikard-http-routing
+    file: ../../../.ai-rulez/skills/spikard-http-routing/SKILL.md
+    description: Tower-HTTP middleware stack, OpenAPI codegen, Lifecycle hooks
+
+  - name: rust-latest-edition
+    file: ../../../.ai-rulez/skills/rust-latest-edition/SKILL.md
+    description: Rust 2024 edition idioms, async/await, trait objects
+
+  - name: spikard-error-handling
+    file: ../../../.ai-rulez/skills/spikard-error-handling/SKILL.md
+    description: ProblemDetails error responses, proper HTTP status codes
+
+  - name: spikard-testing-strategy
+    file: ../../../.ai-rulez/skills/spikard-testing-strategy/SKILL.md
+    description: Fixture-driven tests for HTTP behavior and middleware composition
+
+  - name: spikard-documentation
+    file: ../../../.ai-rulez/skills/spikard-documentation/SKILL.md
+    description: ADR documentation for architecture decisions and design rationales
