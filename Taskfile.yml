@@ -5,6 +5,16 @@ includes:
     taskfile: .task/rust.yml
   python:
     taskfile: .task/python.yml
+  node:
+    taskfile: .task/node.yml
+  go:
+    taskfile: .task/go.yml
+  java:
+    taskfile: .task/java.yml
+  elixir:
+    taskfile: .task/elixir.yml
+  c:
+    taskfile: .task/c.yml
 
 vars:
   PROJECT_ROOT:

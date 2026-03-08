@@ -1,0 +1,48 @@
+version: "3"
+
+tasks:
+  deps:
+    desc: Install Elixir dependencies
+    dir: crates/ts-pack-elixir
+    cmds:
+      - mix deps.get
+
+  build:
+    desc: Compile Elixir project (includes Rustler NIF)
+    dir: crates/ts-pack-elixir
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - mix compile
+
+  test:
+    desc: Run Elixir tests
+    dir: crates/ts-pack-elixir
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      MIX_ENV: test
+    cmds:
+      - mix test
+
+  clean:
+    desc: Clean Elixir build artifacts
+    dir: crates/ts-pack-elixir
+    cmds:
+      - mix clean
+
+  e2e:generate:
+    desc: Generate Elixir E2E tests from fixtures
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - cargo run -p e2e-generator -- generate --lang elixir
+
+  e2e:test:
+    desc: Run Elixir E2E tests
+    dir: e2e/elixir
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      MIX_ENV: test
+    cmds:
+      - mix deps.get
+      - mix test

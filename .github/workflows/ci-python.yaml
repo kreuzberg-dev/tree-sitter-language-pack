@@ -1,0 +1,145 @@
+name: CI / Python
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-python/**"
+      - "crates/ts-pack-core/**"
+      - "e2e/python/**"
+      - "fixtures/**"
+      - ".github/workflows/ci-python.yaml"
+  push:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-python/**"
+      - "crates/ts-pack-core/**"
+      - "e2e/python/**"
+      - "fixtures/**"
+      - ".github/workflows/ci-python.yaml"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-python-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  RUST_BACKTRACE: short
+
+jobs:
+  clone-vendors:
+    name: Clone vendors
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --no-install-project
+
+      - name: Clone vendors
+        run: |
+          mkdir -p parsers
+          uv run --no-sync scripts/clone_vendors.py
+
+      - name: Upload parsers
+        uses: actions/upload-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+          retention-days: 1
+
+  build-python:
+    name: Build Python wheel (${{ matrix.os }})
+    needs: clone-vendors
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest, ubuntu-24.04-arm]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install maturin
+        run: pip install maturin
+
+      - name: Build wheel
+        run: maturin build --release --manifest-path crates/ts-pack-python/Cargo.toml --out dist
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}
+          path: dist/*.whl
+          if-no-files-found: error
+
+  test-python:
+    name: Test Python (${{ matrix.python-version }}, ${{ matrix.os }})
+    needs: build-python
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Download wheel
+        uses: actions/download-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}
+          path: dist
+
+      - name: Install wheel
+        run: |
+          wheel_file=$(find dist -name '*.whl' -print -quit)
+          pip install "$wheel_file" tree-sitter pytest
+
+      - name: Generate and run E2E tests
+        run: |
+          cargo run -p e2e-generator -- generate --lang python
+          cd e2e/python && pip install -e . && pytest tests/ -v
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}

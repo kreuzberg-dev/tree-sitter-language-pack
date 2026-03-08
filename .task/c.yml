@@ -1,0 +1,31 @@
+version: "3"
+
+tasks:
+  build:ffi:
+    desc: Build FFI library for C tests
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - cargo build -p ts-pack-ffi --release
+
+  e2e:generate:
+    desc: Generate C E2E tests from fixtures
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - cargo run -p e2e-generator -- generate --lang c
+
+  e2e:build:
+    desc: Build C E2E tests
+    deps: [build:ffi]
+    dir: e2e/c
+    cmds:
+      - cmake -B build .
+      - cmake --build build
+
+  e2e:test:
+    desc: Run C E2E tests
+    deps: [e2e:build]
+    dir: e2e/c/build
+    cmds:
+      - ctest --output-on-failure

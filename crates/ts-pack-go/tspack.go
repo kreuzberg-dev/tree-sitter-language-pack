@@ -29,13 +29,8 @@
 // underlying C registry.
 package tspack
 
-/*
-#cgo CFLAGS: -I${SRCDIR}/../ts-pack-ffi/include
-#cgo LDFLAGS: -L${SRCDIR}/../ts-pack-ffi/target/release -lts_pack_ffi
-
-#include "ts_pack.h"
-#include <stdlib.h>
-*/
+// CGO directives are in ffi_dev.go, ffi.go, and ffi_windows.go
+// depending on the build configuration.
 import "C"
 import (
 	"errors"

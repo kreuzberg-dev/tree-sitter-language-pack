@@ -1,0 +1,66 @@
+version: "3"
+
+tasks:
+  build:ffi:
+    desc: Build FFI static library for Go
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - cargo build -p ts-pack-ffi --release
+
+  build:
+    desc: Build Go bindings (requires FFI built first)
+    deps: [build:ffi]
+    dir: crates/ts-pack-go
+    cmds:
+      - go build -tags tspack_dev ./...
+
+  test:
+    desc: Run Go unit tests
+    deps: [build:ffi]
+    dir: crates/ts-pack-go
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - go test -tags tspack_dev -v ./...
+
+  lint:
+    desc: Lint and vet Go code
+    dir: crates/ts-pack-go
+    cmds:
+      - go vet -tags tspack_dev ./...
+
+  format:
+    desc: Format Go code
+    dir: crates/ts-pack-go
+    cmds:
+      - gofmt -w .
+
+  format:check:
+    desc: Check Go formatting
+    dir: crates/ts-pack-go
+    cmds:
+      - test -z "$(gofmt -l .)"
+
+  clean:
+    desc: Clean Go build cache
+    dir: crates/ts-pack-go
+    cmds:
+      - go clean -cache
+
+  e2e:generate:
+    desc: Generate Go E2E tests from fixtures
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - cargo run -p e2e-generator -- generate --lang go
+      - gofmt -w e2e/go/
+
+  e2e:test:
+    desc: Run Go E2E tests
+    deps: [build:ffi]
+    dir: e2e/go
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - go test -tags tspack_dev -v ./...

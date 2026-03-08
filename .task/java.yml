@@ -1,0 +1,30 @@
+version: "3"
+
+tasks:
+  build:ffi:
+    desc: Build FFI shared library for Java
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - cargo build -p ts-pack-ffi --release
+
+  test:
+    desc: Run Java tests (requires FFI built first)
+    deps: [build:ffi]
+    dir: crates/ts-pack-java
+    cmds:
+      - mvn test -Djava.library.path=../ts-pack-ffi/target/release
+
+  e2e:generate:
+    desc: Generate Java E2E tests from fixtures
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - cargo run -p e2e-generator -- generate --lang java
+
+  e2e:test:
+    desc: Run Java E2E tests
+    deps: [build:ffi]
+    dir: e2e/java
+    cmds:
+      - mvn test -Djava.library.path=../../crates/ts-pack-ffi/target/release

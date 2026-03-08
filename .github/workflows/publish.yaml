@@ -1,10 +1,10 @@
-name: Publish
+name: Publish Release
 
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag (e.g., v2.0.0)"
+        description: "Release tag (e.g., v1.0.0-rc.1)"
         required: true
         type: string
       dry_run:
@@ -13,15 +13,18 @@ on:
         type: boolean
         default: false
       targets:
-        description: "Comma-separated targets (all, python, node, crates)"
+        description: "Comma-separated targets (all, python, node, crates, go)"
         required: false
         type: string
         default: "all"
 
 env:
   CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  RUST_BACKTRACE: short
 
 jobs:
+  # ─── Prepare ───────────────────────────────────────────────────────
   prepare:
     name: Prepare release
     runs-on: ubuntu-latest
@@ -30,6 +33,7 @@ jobs:
       publish_python: ${{ steps.targets.outputs.python }}
       publish_node: ${{ steps.targets.outputs.node }}
       publish_crates: ${{ steps.targets.outputs.crates }}
+      publish_go: ${{ steps.targets.outputs.go }}
     steps:
       - name: Extract version
         id: meta
@@ -42,22 +46,76 @@ jobs:
         id: targets
         run: |
           targets="${{ inputs.targets }}"
-          if [[ "$targets" == "all" || "$targets" == *"python"* ]]; then
-            echo "python=true" >> "$GITHUB_OUTPUT"
+          for target in python node crates go; do
+            if [[ "$targets" == "all" || "$targets" == *"$target"* ]]; then
+              echo "$target=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "$target=false" >> "$GITHUB_OUTPUT"
+            fi
+          done
+
+  # ─── Registry checks ──────────────────────────────────────────────
+  check-cratesio:
+    name: Check crates.io
+    needs: prepare
+    if: needs.prepare.outputs.publish_crates == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check if version exists
+        id: check
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://crates.io/api/v1/crates/ts-pack-core/$VERSION")
+          if [[ "$STATUS" == "200" ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "ts-pack-core $VERSION already published on crates.io"
           else
-            echo "python=false" >> "$GITHUB_OUTPUT"
-          fi
-          if [[ "$targets" == "all" || "$targets" == *"node"* ]]; then
-            echo "node=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "node=false" >> "$GITHUB_OUTPUT"
-          fi
-          if [[ "$targets" == "all" || "$targets" == *"crates"* ]]; then
-            echo "crates=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "crates=false" >> "$GITHUB_OUTPUT"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
+  check-pypi:
+    name: Check PyPI
+    needs: prepare
+    if: needs.prepare.outputs.publish_python == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check if version exists
+        id: check
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/tree-sitter-language-pack/$VERSION/json")
+          if [[ "$STATUS" == "200" ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "tree-sitter-language-pack $VERSION already published on PyPI"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  check-npm:
+    name: Check npm
+    needs: prepare
+    if: needs.prepare.outputs.publish_node == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check if version exists
+        id: check
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/tree-sitter-language-pack/$VERSION")
+          if [[ "$STATUS" == "200" ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "tree-sitter-language-pack $VERSION already published on npm"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ─── Clone vendors ────────────────────────────────────────────────
   clone-vendors:
     name: Clone vendors
     runs-on: ubuntu-latest
@@ -97,10 +155,13 @@ jobs:
           name: language-parsers
           path: parsers
 
+  # ─── Publish Rust crates ──────────────────────────────────────────
   publish-crates:
     name: Publish Rust crates
-    needs: [prepare, clone-vendors]
-    if: needs.prepare.outputs.publish_crates == 'true'
+    needs: [prepare, clone-vendors, check-cratesio]
+    if: |
+      needs.prepare.outputs.publish_crates == 'true' &&
+      needs.check-cratesio.outputs.exists != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -127,16 +188,19 @@ jobs:
       - name: Publish ts-pack-ffi
         if: ${{ !inputs.dry_run }}
         run: |
-          sleep 30  # Wait for crates.io to index ts-pack-core
+          sleep 30
           cargo publish -p ts-pack-ffi
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           PROJECT_ROOT: ${{ github.workspace }}
 
+  # ─── Build & Publish Python ───────────────────────────────────────
   build-python-wheels:
     name: Build Python wheel (${{ matrix.os }})
-    needs: [prepare, clone-vendors]
-    if: needs.prepare.outputs.publish_python == 'true'
+    needs: [prepare, clone-vendors, check-pypi]
+    if: |
+      needs.prepare.outputs.publish_python == 'true' &&
+      needs.check-pypi.outputs.exists != 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -191,10 +255,13 @@ jobs:
         if: ${{ !inputs.dry_run }}
         uses: pypa/gh-action-pypi-publish@release/v1
 
+  # ─── Build & Publish Node.js ──────────────────────────────────────
   build-node-native:
     name: Build Node.js (${{ matrix.os }})
-    needs: [prepare, clone-vendors]
-    if: needs.prepare.outputs.publish_node == 'true'
+    needs: [prepare, clone-vendors, check-npm]
+    if: |
+      needs.prepare.outputs.publish_node == 'true' &&
+      needs.check-npm.outputs.exists != 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -266,3 +333,117 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # ─── Build Go FFI libraries ──────────────────────────────────────
+  build-go-ffi:
+    name: Build Go FFI (${{ matrix.label }})
+    needs: [prepare, clone-vendors]
+    if: needs.prepare.outputs.publish_go == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x86_64
+          - os: macos-latest
+            label: macos-arm64
+          - os: windows-latest
+            label: windows-x86_64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build FFI library
+        run: cargo build -p ts-pack-ffi --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Stage artifacts (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
+          cp target/release/libts_pack_ffi.a staging/ts-pack-ffi/lib/
+          cp crates/ts-pack-ffi/include/ts_pack.h staging/ts-pack-ffi/include/
+          cd staging && tar -czf "../ts-pack-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
+
+      - name: Stage artifacts (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
+          cp target/release/ts_pack_ffi.lib staging/ts-pack-ffi/lib/ 2>/dev/null || cp target/release/libts_pack_ffi.a staging/ts-pack-ffi/lib/
+          cp crates/ts-pack-ffi/include/ts_pack.h staging/ts-pack-ffi/include/
+          cd staging && tar -czf "../ts-pack-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
+
+      - name: Upload FFI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-ffi-${{ matrix.label }}
+          path: ts-pack-ffi-${{ matrix.label }}.tar.gz
+          retention-days: 14
+
+  # ─── GitHub Release ───────────────────────────────────────────────
+  github-release:
+    name: Create GitHub Release
+    needs:
+      - prepare
+      - publish-crates
+      - publish-python
+      - publish-node
+      - build-go-ffi
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download Go FFI artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          pattern: go-ffi-*
+          merge-multiple: true
+        continue-on-error: true
+
+      - name: Create GitHub Release
+        if: ${{ !inputs.dry_run }}
+        run: |
+          TAG="${{ inputs.tag }}"
+          # Find any Go FFI artifacts to attach
+          ASSETS=""
+          for f in release-assets/ts-pack-ffi-*.tar.gz; do
+            [ -f "$f" ] && ASSETS="$ASSETS $f"
+          done
+          # shellcheck disable=SC2086
+          gh release create "$TAG" \
+            --title "Release $TAG" \
+            --generate-notes \
+            ${ASSETS}
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Summary
+        run: |
+          {
+            echo "## Release Summary"
+            echo "- **Tag**: ${{ inputs.tag }}"
+            echo "- **Version**: ${{ needs.prepare.outputs.version }}"
+            echo "- **Dry run**: ${{ inputs.dry_run }}"
+            echo "- **Targets**: ${{ inputs.targets }}"
+          } >> "$GITHUB_STEP_SUMMARY"

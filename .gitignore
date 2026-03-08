@@ -29,6 +29,10 @@ requirements.txt
 vendor/
 wheelhouse/
 
+# C E2E build artifacts
+e2e/c/build/
+e2e/c/test_*
+
 # Claude artifacts
 CLAUDE.md
 .claude/

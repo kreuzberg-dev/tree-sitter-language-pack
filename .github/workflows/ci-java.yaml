@@ -1,0 +1,141 @@
+name: CI / Java
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-java/**"
+      - "crates/ts-pack-ffi/**"
+      - "crates/ts-pack-core/**"
+      - "e2e/java/**"
+      - "fixtures/**"
+      - ".github/workflows/ci-java.yaml"
+  push:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-java/**"
+      - "crates/ts-pack-ffi/**"
+      - "crates/ts-pack-core/**"
+      - "e2e/java/**"
+      - "fixtures/**"
+      - ".github/workflows/ci-java.yaml"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-java-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  RUST_BACKTRACE: short
+
+jobs:
+  clone-vendors:
+    name: Clone vendors
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --no-install-project
+
+      - name: Clone vendors
+        run: |
+          mkdir -p parsers
+          uv run --no-sync scripts/clone_vendors.py
+
+      - name: Upload parsers
+        uses: actions/upload-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+          retention-days: 1
+
+  build-ffi:
+    name: Build FFI library
+    needs: clone-vendors
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build FFI library
+        run: cargo build -p ts-pack-ffi --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LINK_MODE: dynamic
+
+      - name: Upload FFI artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffi-linux
+          path: |
+            target/release/libts_pack_ffi.so
+            crates/ts-pack-ffi/include/
+          retention-days: 1
+
+  test-java:
+    name: Java tests
+    needs: build-ffi
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Download FFI artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ffi-linux
+          path: ffi-artifacts
+
+      - name: Restore FFI to expected path
+        run: |
+          mkdir -p target/release
+          cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "22"
+          distribution: "temurin"
+
+      - name: Run Java tests
+        working-directory: crates/ts-pack-java
+        run: mvn test -Djava.library.path=../ts-pack-ffi/target/release --enable-native-access=ALL-UNNAMED
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}

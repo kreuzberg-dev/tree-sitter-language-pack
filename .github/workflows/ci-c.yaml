@@ -1,0 +1,109 @@
+name: CI / C
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-ffi/**"
+      - "crates/ts-pack-core/**"
+      - "e2e/c/**"
+      - "fixtures/**"
+      - ".github/workflows/ci-c.yaml"
+  push:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-ffi/**"
+      - "crates/ts-pack-core/**"
+      - "e2e/c/**"
+      - "fixtures/**"
+      - ".github/workflows/ci-c.yaml"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-c-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  RUST_BACKTRACE: short
+
+jobs:
+  clone-vendors:
+    name: Clone vendors
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --no-install-project
+
+      - name: Clone vendors
+        run: |
+          mkdir -p parsers
+          uv run --no-sync scripts/clone_vendors.py
+
+      - name: Upload parsers
+        uses: actions/upload-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+          retention-days: 1
+
+  build-and-test-c:
+    name: C E2E tests
+    needs: clone-vendors
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build FFI library
+        run: cargo build -p ts-pack-ffi --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LINK_MODE: dynamic
+
+      - name: Generate C E2E tests
+        run: cargo run -p e2e-generator -- generate --lang c
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Build C tests
+        working-directory: e2e/c
+        run: |
+          cmake -B build .
+          cmake --build build
+
+      - name: Run C tests
+        working-directory: e2e/c/build
+        run: ctest --output-on-failure
+        env:
+          LD_LIBRARY_PATH: ${{ github.workspace }}/target/release

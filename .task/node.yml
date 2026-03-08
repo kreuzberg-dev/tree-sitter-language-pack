@@ -1,0 +1,30 @@
+version: "3"
+
+tasks:
+  build:
+    desc: Build NAPI-RS native module (release)
+    dir: crates/ts-pack-node
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - napi build --release
+
+  build:dev:
+    desc: Build NAPI-RS native module (debug)
+    dir: crates/ts-pack-node
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - napi build
+
+  test:
+    desc: Smoke test Node.js native module
+    dir: crates/ts-pack-node
+    cmds:
+      - node -e "const m = require('./'); console.log('Languages:', m.availableLanguages().length)"
+
+  clean:
+    desc: Clean Node.js build artifacts
+    dir: crates/ts-pack-node
+    cmds:
+      - rm -f *.node
