@@ -1,0 +1,7 @@
+version: "3"
+
+tasks:
+  sync:
+    desc: Sync version from Cargo.toml to all package manifests
+    cmds:
+      - uv run --no-sync python scripts/sync_versions.py

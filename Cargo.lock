@@ -933,7 +933,7 @@ checksum = "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
 
 [[package]]
 name = "ts-pack-cli"
-version = "2.0.0-alpha.1"
+version = "1.0.0-rc.1"
 dependencies = [
  "clap",
  "toml_edit",
@@ -942,7 +942,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core"
-version = "2.0.0-alpha.1"
+version = "1.0.0-rc.1"
 dependencies = [
  "cc",
  "libloading",
@@ -955,7 +955,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-elixir"
-version = "2.0.0-alpha.1"
+version = "1.0.0-rc.1"
 dependencies = [
  "rustler",
  "tree-sitter",
@@ -964,7 +964,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-ffi"
-version = "2.0.0-alpha.1"
+version = "1.0.0-rc.1"
 dependencies = [
  "cbindgen",
  "tree-sitter",
@@ -973,7 +973,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-node"
-version = "2.0.0-alpha.1"
+version = "1.0.0-rc.1"
 dependencies = [
  "napi",
  "napi-build",
@@ -984,7 +984,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-python"
-version = "2.0.0-alpha.1"
+version = "1.0.0-rc.1"
 dependencies = [
  "pyo3",
  "tree-sitter",
