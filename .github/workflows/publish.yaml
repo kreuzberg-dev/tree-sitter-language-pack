@@ -17,6 +17,11 @@ on:
         required: false
         type: string
         default: "all"
+      force_republish:
+        description: "Force re-publish even if version already exists on registries"
+        required: false
+        type: boolean
+        default: false
 
 env:
   CARGO_TERM_COLOR: always
@@ -30,17 +35,23 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.meta.outputs.version }}
+      dry_run: ${{ steps.meta.outputs.dry_run }}
+      force_republish: ${{ steps.meta.outputs.force_republish }}
       publish_python: ${{ steps.targets.outputs.python }}
       publish_node: ${{ steps.targets.outputs.node }}
       publish_crates: ${{ steps.targets.outputs.crates }}
       publish_go: ${{ steps.targets.outputs.go }}
     steps:
-      - name: Extract version
+      - name: Extract version and flags
         id: meta
         run: |
           version="${{ inputs.tag }}"
           version="${version#v}"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          {
+            echo "version=$version"
+            echo "dry_run=${{ inputs.dry_run }}"
+            echo "force_republish=${{ inputs.force_republish }}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Determine targets
         id: targets
@@ -53,6 +64,17 @@ jobs:
               echo "$target=false" >> "$GITHUB_OUTPUT"
             fi
           done
+
+      - name: Release info
+        run: |
+          {
+            echo "## Release Configuration"
+            echo "- **Tag**: ${{ inputs.tag }}"
+            echo "- **Version**: ${{ steps.meta.outputs.version }}"
+            echo "- **Dry run**: ${{ inputs.dry_run }}"
+            echo "- **Force republish**: ${{ inputs.force_republish }}"
+            echo "- **Targets**: ${{ inputs.targets }}"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   # ─── Registry checks ──────────────────────────────────────────────
   check-cratesio:
@@ -67,13 +89,23 @@ jobs:
         id: check
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://crates.io/api/v1/crates/ts-pack-core/$VERSION")
-          if [[ "$STATUS" == "200" ]]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "ts-pack-core $VERSION already published on crates.io"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+          MAX_ATTEMPTS=3
+          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              --retry 2 --retry-delay 3 --connect-timeout 10 --max-time 30 \
+              "https://crates.io/api/v1/crates/ts-pack-core/$VERSION")
+            if [[ "$STATUS" == "200" ]]; then
+              echo "exists=true" >> "$GITHUB_OUTPUT"
+              echo "ts-pack-core $VERSION already published on crates.io"
+              exit 0
+            elif [[ "$STATUS" == "404" ]]; then
+              echo "exists=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Attempt $attempt: unexpected status $STATUS, retrying..."
+            sleep $((attempt * 5))
+          done
+          echo "exists=false" >> "$GITHUB_OUTPUT"
 
   check-pypi:
     name: Check PyPI
@@ -87,13 +119,23 @@ jobs:
         id: check
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/tree-sitter-language-pack/$VERSION/json")
-          if [[ "$STATUS" == "200" ]]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "tree-sitter-language-pack $VERSION already published on PyPI"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+          MAX_ATTEMPTS=3
+          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              --retry 2 --retry-delay 3 --connect-timeout 10 --max-time 30 \
+              "https://pypi.org/pypi/tree-sitter-language-pack/$VERSION/json")
+            if [[ "$STATUS" == "200" ]]; then
+              echo "exists=true" >> "$GITHUB_OUTPUT"
+              echo "tree-sitter-language-pack $VERSION already published on PyPI"
+              exit 0
+            elif [[ "$STATUS" == "404" ]]; then
+              echo "exists=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Attempt $attempt: unexpected status $STATUS, retrying..."
+            sleep $((attempt * 5))
+          done
+          echo "exists=false" >> "$GITHUB_OUTPUT"
 
   check-npm:
     name: Check npm
@@ -107,13 +149,23 @@ jobs:
         id: check
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/tree-sitter-language-pack/$VERSION")
-          if [[ "$STATUS" == "200" ]]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "tree-sitter-language-pack $VERSION already published on npm"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+          MAX_ATTEMPTS=3
+          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              --retry 2 --retry-delay 3 --connect-timeout 10 --max-time 30 \
+              "https://registry.npmjs.org/@tree-sitter-language-pack%2Fnode/$VERSION")
+            if [[ "$STATUS" == "200" ]]; then
+              echo "exists=true" >> "$GITHUB_OUTPUT"
+              echo "@tree-sitter-language-pack/node $VERSION already published on npm"
+              exit 0
+            elif [[ "$STATUS" == "404" ]]; then
+              echo "exists=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Attempt $attempt: unexpected status $STATUS, retrying..."
+            sleep $((attempt * 5))
+          done
+          echo "exists=false" >> "$GITHUB_OUTPUT"
 
   # ─── Clone vendors ────────────────────────────────────────────────
   clone-vendors:
@@ -160,8 +212,10 @@ jobs:
     name: Publish Rust crates
     needs: [prepare, clone-vendors, check-cratesio]
     if: |
+      always() &&
       needs.prepare.outputs.publish_crates == 'true' &&
-      needs.check-cratesio.outputs.exists != 'true'
+      needs.clone-vendors.result == 'success' &&
+      (needs.prepare.outputs.force_republish == 'true' || needs.check-cratesio.outputs.exists != 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -178,18 +232,62 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Dry run - verify crate packaging
+        if: ${{ inputs.dry_run }}
+        run: |
+          cargo package -p ts-pack-core --allow-dirty 2>&1 | tail -5
+          cargo package -p ts-pack-ffi --allow-dirty 2>&1 | tail -5
+          {
+            echo "## Crates Dry Run"
+            echo "- ts-pack-core: packaged successfully"
+            echo "- ts-pack-ffi: packaged successfully"
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
       - name: Publish ts-pack-core
         if: ${{ !inputs.dry_run }}
-        run: cargo publish -p ts-pack-core
+        run: |
+          output=$(cargo publish -p ts-pack-core 2>&1) || {
+            if echo "$output" | grep -qiE "(already uploaded|already exists)"; then
+              echo "::notice::ts-pack-core already published; skipping."
+            else
+              echo "$output"
+              exit 1
+            fi
+          }
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           PROJECT_ROOT: ${{ github.workspace }}
 
+      - name: Wait for ts-pack-core indexing
+        if: ${{ !inputs.dry_run }}
+        run: |
+          echo "Waiting for ts-pack-core to be indexed on crates.io..."
+          VERSION="${{ needs.prepare.outputs.version }}"
+          for attempt in $(seq 1 15); do
+            sleep_time=$((2 ** attempt > 64 ? 64 : 2 ** attempt))
+            sleep "$sleep_time"
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://crates.io/api/v1/crates/ts-pack-core/$VERSION")
+            if [[ "$STATUS" == "200" ]]; then
+              echo "ts-pack-core $VERSION indexed successfully"
+              exit 0
+            fi
+            echo "Attempt $attempt: not yet indexed (status=$STATUS), waiting ${sleep_time}s..."
+          done
+          echo "::warning::ts-pack-core indexing timed out, attempting ts-pack-ffi publish anyway"
+
       - name: Publish ts-pack-ffi
         if: ${{ !inputs.dry_run }}
         run: |
-          sleep 30
-          cargo publish -p ts-pack-ffi
+          output=$(cargo publish -p ts-pack-ffi 2>&1) || {
+            if echo "$output" | grep -qiE "(already uploaded|already exists)"; then
+              echo "::notice::ts-pack-ffi already published; skipping."
+            else
+              echo "$output"
+              exit 1
+            fi
+          }
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           PROJECT_ROOT: ${{ github.workspace }}
@@ -199,8 +297,10 @@ jobs:
     name: Build Python wheel (${{ matrix.os }})
     needs: [prepare, clone-vendors, check-pypi]
     if: |
+      always() &&
       needs.prepare.outputs.publish_python == 'true' &&
-      needs.check-pypi.outputs.exists != 'true'
+      needs.clone-vendors.result == 'success' &&
+      (needs.prepare.outputs.force_republish == 'true' || needs.check-pypi.outputs.exists != 'true')
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -238,7 +338,10 @@ jobs:
   publish-python:
     name: Publish Python to PyPI
     needs: [prepare, build-python-wheels]
-    if: needs.prepare.outputs.publish_python == 'true'
+    if: |
+      always() &&
+      needs.prepare.outputs.publish_python == 'true' &&
+      needs.build-python-wheels.result == 'success'
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -251,6 +354,17 @@ jobs:
           pattern: dist-wheel-*
           merge-multiple: true
 
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          {
+            echo "## PyPI Dry Run"
+            echo "Artifacts staged for PyPI:"
+            echo '```'
+            ls -1 dist/
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Publish to PyPI
         if: ${{ !inputs.dry_run }}
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -260,8 +374,10 @@ jobs:
     name: Build Node.js (${{ matrix.os }})
     needs: [prepare, clone-vendors, check-npm]
     if: |
+      always() &&
       needs.prepare.outputs.publish_node == 'true' &&
-      needs.check-npm.outputs.exists != 'true'
+      needs.clone-vendors.result == 'success' &&
+      (needs.prepare.outputs.force_republish == 'true' || needs.check-npm.outputs.exists != 'true')
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -306,7 +422,10 @@ jobs:
   publish-node:
     name: Publish Node.js to npm
     needs: [prepare, build-node-native]
-    if: needs.prepare.outputs.publish_node == 'true'
+    if: |
+      always() &&
+      needs.prepare.outputs.publish_node == 'true' &&
+      needs.build-node-native.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -327,8 +446,33 @@ jobs:
           pattern: node-native-*
           merge-multiple: true
 
-      - name: Publish to npm
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          {
+            echo "## npm Dry Run"
+            echo "Native modules staged for npm:"
+            echo '```'
+            ls -1 crates/ts-pack-node/*.node
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Re-check npm before publish
         if: ${{ !inputs.dry_run }}
+        id: recheck
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://registry.npmjs.org/@tree-sitter-language-pack%2Fnode/$VERSION")
+          if [[ "$STATUS" == "200" ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Package already on npm; skipping publish."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to npm
+        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
         working-directory: crates/ts-pack-node
         run: npm publish --access public
         env:
@@ -338,7 +482,10 @@ jobs:
   build-go-ffi:
     name: Build Go FFI (${{ matrix.label }})
     needs: [prepare, clone-vendors]
-    if: needs.prepare.outputs.publish_go == 'true'
+    if: |
+      always() &&
+      needs.prepare.outputs.publish_go == 'true' &&
+      needs.clone-vendors.result == 'success'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -421,10 +568,27 @@ jobs:
           merge-multiple: true
         continue-on-error: true
 
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          {
+            echo "## GitHub Release Dry Run"
+            echo "Would create release **${{ inputs.tag }}** with artifacts:"
+            echo '```'
+            ls -1 release-assets/ts-pack-ffi-*.tar.gz 2>/dev/null || echo "(no Go FFI artifacts)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Create GitHub Release
         if: ${{ !inputs.dry_run }}
         run: |
           TAG="${{ inputs.tag }}"
+
+          # Delete existing release if force_republish
+          if [[ "${{ inputs.force_republish }}" == "true" ]]; then
+            gh release delete "$TAG" --yes 2>/dev/null || true
+          fi
+
           # Find any Go FFI artifacts to attach
           ASSETS=""
           for f in release-assets/ts-pack-ffi-*.tar.gz; do
@@ -438,12 +602,53 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: Summary
+      - name: Aggregate release status
+        if: always()
+        env:
+          CHECK_CRATESIO_EXISTS: ${{ needs.publish-crates.result == 'skipped' && 'true' || '' }}
+          CHECK_PYPI_EXISTS: ${{ needs.publish-python.result == 'skipped' && 'true' || '' }}
+          CHECK_NPM_EXISTS: ${{ needs.publish-node.result == 'skipped' && 'true' || '' }}
+          RESULT_PUBLISH_CRATES: ${{ needs.publish-crates.result }}
+          RESULT_PUBLISH_PYTHON: ${{ needs.publish-python.result }}
+          RESULT_PUBLISH_NODE: ${{ needs.publish-node.result }}
+          RESULT_BUILD_GO_FFI: ${{ needs.build-go-ffi.result }}
         run: |
           {
             echo "## Release Summary"
+            echo ""
+            echo "| Target | Status |"
+            echo "|--------|--------|"
+
+            declare -A results
+            results[crates]="${RESULT_PUBLISH_CRATES}"
+            results[python]="${RESULT_PUBLISH_PYTHON}"
+            results[node]="${RESULT_PUBLISH_NODE}"
+            results[go-ffi]="${RESULT_BUILD_GO_FFI}"
+
+            declare -A checks
+            checks[crates]="${CHECK_CRATESIO_EXISTS}"
+            checks[python]="${CHECK_PYPI_EXISTS}"
+            checks[node]="${CHECK_NPM_EXISTS}"
+
+            for target in crates python node go-ffi; do
+              result="${results[$target]}"
+              check="${checks[$target]:-}"
+              if [[ "$result" == "success" ]]; then
+                echo "| $target | published |"
+              elif [[ "$check" == "true" ]]; then
+                echo "| $target | already exists (skipped) |"
+              elif [[ "$result" == "skipped" ]]; then
+                echo "| $target | skipped (not enabled) |"
+              elif [[ "$result" == "failure" ]]; then
+                echo "| $target | **FAILED** |"
+              else
+                echo "| $target | $result |"
+              fi
+            done
+
+            echo ""
             echo "- **Tag**: ${{ inputs.tag }}"
             echo "- **Version**: ${{ needs.prepare.outputs.version }}"
             echo "- **Dry run**: ${{ inputs.dry_run }}"
-            echo "- **Targets**: ${{ inputs.targets }}"
+            echo "- **Force republish**: ${{ inputs.force_republish }}"
           } >> "$GITHUB_STEP_SUMMARY"
