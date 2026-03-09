@@ -4,7 +4,7 @@ import ctypes
 import sys
 from importlib import import_module
 from pathlib import Path
-from typing import Literal, cast
+from typing import Literal, cast, get_args
 
 import tree_sitter_c_sharp
 import tree_sitter_embedded_template
@@ -187,6 +187,8 @@ SupportedLanguage = Literal[
     "magik",
 ]
 
+_SUPPORTED_LANGUAGES: tuple[str, ...] = get_args(SupportedLanguage)
+
 
 def get_binding(language_name: SupportedLanguage) -> object:
     """Get the binding for the given language name.
@@ -254,4 +256,13 @@ def get_parser(language_name: SupportedLanguage) -> Parser:
     return Parser(get_language(language_name=language_name))
 
 
-__all__ = ["SupportedLanguage", "get_binding", "get_language", "get_parser"]
+def get_supported_languages() -> tuple[str, ...]:
+    """Get a tuple of all supported language names.
+
+    Returns:
+        A tuple of all supported language names.
+    """
+    return _SUPPORTED_LANGUAGES
+
+
+__all__ = ["SupportedLanguage", "get_binding", "get_language", "get_parser", "get_supported_languages"]

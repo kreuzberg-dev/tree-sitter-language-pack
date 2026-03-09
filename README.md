@@ -45,14 +45,15 @@ pip install tree-sitter-language-pack
 
 ## Usage
 
-This library exposes three functions: `get_binding`, `get_language`, and `get_parser`.
+This library exposes four functions: `get_binding`, `get_language`, `get_parser`, and `get_supported_languages`.
 
 ```python
-from tree_sitter_language_pack import get_binding, get_language, get_parser
+from tree_sitter_language_pack import get_binding, get_language, get_parser, get_supported_languages
 
 python_binding = get_binding("python")  # this is a pycapsule object pointing to the C binding
 python_lang = get_language("python")  # this is an instance of tree_sitter.Language
 python_parser = get_parser("python")  # this is an instance of tree_sitter.Parser
+supported_languages = get_supported_languages()  # a tuple of all supported language name strings
 ```
 
 See the list of available languages below to get the name of the language you want to use.

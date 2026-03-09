@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, cast
 import pytest
 from tree_sitter import Language, Parser
 
-from tree_sitter_language_pack import SupportedLanguage, get_binding, get_language, get_parser
+from tree_sitter_language_pack import SupportedLanguage, get_binding, get_language, get_parser, get_supported_languages
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -33,8 +33,20 @@ language_names = sorted([*list(language_definitions.keys()), "yaml", "csharp", "
 
 
 def test_language_names() -> None:
-    supported_languages = sorted(SupportedLanguage.__args__)  # type: ignore[attr-defined]
+    supported_languages = sorted(get_supported_languages())
     assert supported_languages == language_names
+
+
+def test_get_supported_languages() -> None:
+    languages = get_supported_languages()
+    assert isinstance(languages, tuple)
+    assert len(languages) > 0
+    assert all(isinstance(lang, str) for lang in languages)
+
+
+@pytest.mark.parametrize("language", language_names)
+def test_get_supported_languages_contains(language: str) -> None:
+    assert language in get_supported_languages()
 
 
 @pytest.mark.parametrize("language", language_names)
