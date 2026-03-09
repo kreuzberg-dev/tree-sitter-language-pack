@@ -1,165 +1,184 @@
 # Contributing to Tree-Sitter Language Pack
 
-Thank you for your interest in contributing to tree-sitter-language-pack! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to tree-sitter-language-pack! This guide will help you get started with development.
 
 ## Table of Contents
 
-- [Getting Started](#getting-started)
 - [Development Setup](#development-setup)
+    - [Task Installation](#task-installation)
+    - [Quick Start](#quick-start)
 - [Development Workflow](#development-workflow)
+    - [Common Commands](#common-commands)
+    - [Language-Specific Tasks](#language-specific-tasks)
 - [Adding Languages](#adding-languages)
-- [Testing](#testing)
-- [Code Style](#code-style)
+- [E2E Tests](#e2e-tests)
+- [Exploring Tasks](#exploring-tasks)
+- [Code Quality](#code-quality)
 - [Submitting Changes](#submitting-changes)
-- [Maintenance Tasks](#maintenance-tasks)
-
-## Getting Started
-
-Before contributing, please:
-
-1. Check existing [issues](https://github.com/kreuzberg-dev/tree-sitter-language-pack/issues) and [pull requests](https://github.com/kreuzberg-dev/tree-sitter-language-pack/pulls) to avoid duplicating work
-1. For significant changes, open an issue first to discuss your proposal
-1. Ensure you have Python 3.10+ installed
-1. Install [uv](https://github.com/astral-sh/uv) for dependency management
 
 ## Development Setup
 
-### Prerequisites
+### Task Installation
 
-- Python 3.10 or higher
-- C compiler (gcc, clang, or MSVC)
-- Git
-- [uv](https://github.com/astral-sh/uv) package manager
+This project uses [Task](https://taskfile.dev/) for task automation and orchestration. Task is a task runner that simplifies development workflows across multiple languages and platforms.
 
-### Initial Setup
+#### Install Task
 
-1. **Fork and clone the repository**
+Choose the installation method for your platform:
 
-    ```bash
-    git clone https://github.com/YOUR_USERNAME/tree-sitter-language-pack.git
-    cd tree-sitter-language-pack
-    ```
+**macOS (Homebrew):**
 
-1. **Install development dependencies**
+```bash
+brew install go-task
+```
 
-    ```bash
-    uv sync --no-install-project
-    ```
+**Linux:**
 
-1. **Generate AI rule documentation**
+```bash
+# Using the installer script
+sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+# Or via package managers:
+apt install go-task  # Debian/Ubuntu
+pacman -S go-task    # Arch
+```
 
-    ```bash
-    npx -y ai-rulez@latest --update-gitignore
-    ```
+**Windows:**
 
-    This command refreshes `AGENTS.md`, `CLAUDE.md`, and the other AI guidance files while keeping the generated artifacts out of version control.
+```powershell
+# Using Scoop
+scoop install task
 
-1. **Install prek hooks**
+# Or using Chocolatey
+choco install go-task
+```
 
-    ```bash
-    uv tool install prek
-    prek install
-    prek install --hook-type commit-msg
-    ```
+For complete installation instructions, visit the [official Task documentation](https://taskfile.dev/installation/).
 
-1. **Clone language repositories**
+### Quick Start
 
-    ```bash
-    uv run --no-sync scripts/clone_vendors.py
-    ```
+After installing Task, set up your development environment:
 
-1. **Build local extensions**
+```bash
+# One-time setup - installs all dependencies
+task setup
 
-    ```bash
-    PROJECT_ROOT=. uv run setup.py build_ext --inplace
-    ```
+# Clone grammar sources
+task clone
+
+# Build in dev mode (a few languages, fast iteration)
+task build:dev
+```
+
+The setup command will install Rust, Python, Node.js, Go, Java, and Elixir tooling as needed.
 
 ## Development Workflow
 
-### Running Tests
-
-Run the test suite to ensure everything is working:
+### Common Commands
 
 ```bash
-PROJECT_ROOT=. uv run --no-sync pytest tests
+# Build all crates (all languages, dynamic mode)
+task build
+
+# Build in dev mode (few languages, fast iteration)
+task build:dev
+
+# Build in release mode (optimized)
+task build:release
 ```
 
-Run tests for a specific language:
-
 ```bash
-PROJECT_ROOT=. uv run --no-sync pytest tests -k test_can_load_language[python]
+# Run all tests
+task test
+
+# Run all checks (lint + test)
+task check
 ```
 
-### Code Quality Checks
-
-The project uses several tools to maintain code quality:
-
-- **Ruff** for linting and formatting
-- **mypy** for type checking
-- **prek** for automated checks
-
-Run all checks manually:
-
 ```bash
-# Run all linters and formatters managed by prek
-prek run --all-files
+# Format all code
+task format
 
-# Type checking
-uv run --no-sync mypy
+# Run all linters via prek
+task lint
 
-# Linting without auto-fixes (optional)
-uv run --no-sync ruff check
-
-# Format code (optional when not using prek)
-uv run --no-sync ruff format
+# Generate READMEs from templates
+task generate-readme
 ```
 
-### Building Distributions
+```bash
+# Update all dependencies
+task update
 
-To build source and wheel distributions:
+# Clean all build artifacts
+task clean
+```
+
+### Language-Specific Tasks
+
+Each language binding has its own namespace:
+
+**Rust:**
 
 ```bash
-# Build source distribution only
-PROJECT_ROOT=. uv build --sdist
+task rust:build
+task rust:test
+task rust:format
+task rust:lint
+```
 
-# Build wheel only
-PROJECT_ROOT=. uv build --wheel
+**Python:**
 
-# Build both
-PROJECT_ROOT=. uv build
+```bash
+task python:install
+task python:test
+task python:format
+task python:lint
+```
+
+**Node.js:**
+
+```bash
+task node:build        # Build NAPI-RS native module (release)
+task node:build:dev    # Build in debug mode
+task node:test
+```
+
+**Go:**
+
+```bash
+task go:build          # Build Go bindings (requires FFI)
+task go:build:ffi      # Build FFI static library for Go
+task go:test
+task go:format
+task go:lint
+```
+
+**Java:**
+
+```bash
+task java:build:ffi    # Build FFI shared library for Java
+task java:test
+```
+
+**Elixir:**
+
+```bash
+task elixir:build      # Compile (includes Rustler NIF)
+task elixir:test
+task elixir:deps
+```
+
+**C:**
+
+```bash
+task c:build:ffi       # Build FFI library for C tests
+task c:e2e:build       # Build C E2E tests
+task c:e2e:test        # Run C E2E tests
 ```
 
 ## Adding Languages
 
-### Adding a Pre-installed Language Package
-
-Some languages are distributed as separate packages and installed as dependencies:
-
-1. **Add the dependency**
-
-    ```bash
-    uv add tree-sitter-<language> --no-install-project
-    ```
-
-1. **Update the code**
-
-    - Add the language to `InstalledBindings` literal type in `tree_sitter_language_pack/__init__.py`
-    - Update the `installed_bindings_map` dictionary
-
-1. **Clone vendors and rebuild**
-
-    ```bash
-    uv run --no-sync scripts/clone_vendors.py
-    PROJECT_ROOT=. uv run setup.py build_ext --inplace
-    ```
-
-### Adding a Binary Wheel Language
-
-Most languages are built from source and included in the wheel:
-
-1. **Add language definition**
-
-    Edit `sources/language_definitions.json`:
+1. **Add a language definition** to `sources/language_definitions.json`:
 
     ```json
     {
@@ -181,55 +200,76 @@ Most languages are built from source and included in the wheel:
     - `directory` (optional): Path to src folder if not in root
     - `generate` (optional): Run tree-sitter generate command
 
-1. **Update type definitions**
-
-    Add the language to `SupportedLanguage` literal type in `tree_sitter_language_pack/__init__.py`
+1. **Add a Cargo feature** for the language in `crates/ts-pack-core/Cargo.toml`
 
 1. **Clone and build**
 
     ```bash
-    uv run --no-sync scripts/clone_vendors.py
-    PROJECT_ROOT=. uv run setup.py build_ext --inplace
+    task clone
+    task build:dev
     ```
 
-1. **Update documentation**
-
-    Add the language to the README.md language list with its license
-
-1. **Test your addition**
+1. **Regenerate E2E smoke fixtures and test**
 
     ```bash
-    PROJECT_ROOT=. uv run --no-sync pytest tests -k test_can_load_language[language_name]
+    task e2e:generate:smoke-fixtures
+    task e2e:generate:all
+    task test
     ```
 
-## Testing
+## E2E Tests
 
-### Writing Tests
-
-When adding a new language, ensure it's covered by the existing parametrized tests in `tests/entry_point_test.py`.
-
-For new functionality, add appropriate test cases following the existing patterns.
-
-### Test Coverage
-
-Ensure your changes maintain or improve test coverage. Run tests with coverage:
+E2E tests are generated from JSON fixtures in `tools/e2e-generator/fixtures/` and produce runnable test suites for each language binding.
 
 ```bash
-PROJECT_ROOT=. uv run --no-sync pytest tests --cov=tree_sitter_language_pack
+# Generate E2E tests for all languages
+task e2e:generate:all
+
+# Generate for a specific language
+task e2e:generate:rust
+task e2e:generate:python
+task e2e:generate:go
+task e2e:generate:java
+task e2e:generate:elixir
+task e2e:generate:c
+
+# Run Rust E2E tests
+task e2e:test:rust
+
+# Auto-generate smoke fixtures from language_definitions.json
+task e2e:generate:smoke-fixtures
 ```
 
-## Code Style
+Generated test files in `e2e/` should not be edited directly — modify fixtures or the generator source instead.
 
-### Python Code
+## Exploring Tasks
 
-- Follow PEP 8 with a line length of 120 characters
-- Use type hints for all function signatures
-- Add docstrings for public functions and classes
-- Use meaningful variable names
+```bash
+# Show all available tasks
+task --list
+
+# Show all tasks including internal ones
+task --list-all
+```
+
+## Code Quality
+
+### Pre-commit Hooks
+
+The project uses [prek](https://github.com/Goldziher/gitfluff) for pre-commit hooks:
+
+```bash
+# Install hooks
+prek install
+prek install --hook-type commit-msg
+
+# Run all hooks manually
+prek run --all-files
+```
 
 ### Commit Messages
 
-We use conventional commits. Examples:
+We use conventional commits:
 
 - `feat: add support for tree-sitter-language`
 - `fix: correct parser initialization for language`
@@ -245,39 +285,27 @@ We use conventional commits. Examples:
     git checkout -b feat/add-language-support
     ```
 
-1. **Make your changes**
-
-    - Follow the coding standards
-    - Add tests for new functionality
-    - Update documentation as needed
-
-1. **Commit your changes**
+1. **Make your changes** and run checks locally:
 
     ```bash
-    git add .
-    git commit -m "feat: add support for new language"
+    task check
     ```
 
-1. **Push to your fork**
+1. **Commit and push**
 
     ```bash
+    git commit -m "feat: add support for new language"
     git push origin feat/add-language-support
     ```
 
-1. **Create a Pull Request**
-
-    - Fill out the PR template completely
-    - Link any related issues
-    - Ensure CI checks pass
+1. **Create a Pull Request** — link any related issues and ensure CI passes.
 
 ## Maintenance Tasks
 
 ### Updating Language Versions
 
-To update language repositories to their latest versions:
-
 ```bash
-# Update all languages
+# Update all languages to latest revisions
 uv run --no-sync scripts/pin_vendors.py
 
 # Update only missing revisions
@@ -287,27 +315,17 @@ uv run --no-sync scripts/pin_vendors.py --only-missing
 uv run --no-sync scripts/pin_vendors.py --languages=python,rust,go
 ```
 
-### Releasing New Versions
+### Version Synchronization
 
-1. Update version in `pyproject.toml`
-1. Ensure all tests pass
-1. Create a git tag
-1. Push the tag to trigger the release workflow
+Version is managed in `Cargo.toml` workspace and synced across all manifests:
 
-### CI/CD
-
-The project uses GitHub Actions for:
-
-- Running tests on multiple Python versions and platforms
-- Building wheels for different architectures
-- Publishing to PyPI on tagged releases
+```bash
+task version:sync
+```
 
 ## Questions?
 
-If you have questions or need help:
-
-1. Check existing issues and discussions
-1. Open a new issue with your question
-1. Join the discussion in relevant PRs
+- Check existing [issues](https://github.com/kreuzberg-dev/tree-sitter-language-pack/issues)
+- Join our [Discord community](https://discord.gg/xt9WY3GnKR)
 
 Thank you for contributing to tree-sitter-language-pack!
