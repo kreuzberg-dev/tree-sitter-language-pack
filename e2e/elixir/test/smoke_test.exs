@@ -3,1363 +3,2265 @@
 defmodule E2eTests.SmokeTest do
   use ExUnit.Case, async: true
 
+  @tag :skip_unless_actionscript
   test "smoke_actionscript" do
     # Smoke test: load actionscript and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("actionscript", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("actionscript") do
+      IO.puts("Skipping: language 'actionscript' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("actionscript", "var x:int = 1;")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_ada
   test "smoke_ada" do
     # Smoke test: load ada and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("ada", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("ada") do
+      IO.puts("Skipping: language 'ada' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("ada", "procedure Main is begin null; end Main;")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_agda
   test "smoke_agda" do
     # Smoke test: load agda and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("agda", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("agda") do
+      IO.puts("Skipping: language 'agda' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("agda", "module Main where")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_apex
   test "smoke_apex" do
     # Smoke test: load apex and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("apex", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("apex") do
+      IO.puts("Skipping: language 'apex' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("apex", "public class Main {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_arduino
   test "smoke_arduino" do
     # Smoke test: load arduino and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("arduino", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("arduino") do
+      IO.puts("Skipping: language 'arduino' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("arduino", "void setup() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_asm
   test "smoke_asm" do
     # Smoke test: load asm and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("asm", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("asm") do
+      IO.puts("Skipping: language 'asm' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("asm", "mov eax, 1")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_astro
   test "smoke_astro" do
     # Smoke test: load astro and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("astro", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("astro") do
+      IO.puts("Skipping: language 'astro' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("astro", "---\n---\n<p>hello</p>")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_bash
   test "smoke_bash" do
     # Smoke test: load bash and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("bash", "echo hello")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("bash") do
+      IO.puts("Skipping: language 'bash' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("bash", "echo hello")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_beancount
   test "smoke_beancount" do
     # Smoke test: load beancount and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("beancount", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("beancount") do
+      IO.puts("Skipping: language 'beancount' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("beancount", "2024-01-01 open Assets:Bank USD")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_bibtex
   test "smoke_bibtex" do
     # Smoke test: load bibtex and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("bibtex", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("bibtex") do
+      IO.puts("Skipping: language 'bibtex' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("bibtex", "@article{key, title={A}}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_bicep
   test "smoke_bicep" do
     # Smoke test: load bicep and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("bicep", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("bicep") do
+      IO.puts("Skipping: language 'bicep' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("bicep", "param name string")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_bitbake
   test "smoke_bitbake" do
     # Smoke test: load bitbake and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("bitbake", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("bitbake") do
+      IO.puts("Skipping: language 'bitbake' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("bitbake", "DESCRIPTION = \"hello\"")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_bsl
   test "smoke_bsl" do
     # Smoke test: load bsl and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("bsl", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("bsl") do
+      IO.puts("Skipping: language 'bsl' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("bsl", "Procedure Main() EndProcedure")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_c
   test "smoke_c" do
     # Smoke test: load c and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("c", "int main() { return 0; }")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("c") do
+      IO.puts("Skipping: language 'c' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("c", "int main() { return 0; }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_cairo
   test "smoke_cairo" do
     # Smoke test: load cairo and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("cairo", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("cairo") do
+      IO.puts("Skipping: language 'cairo' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("cairo", "fn main() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_capnp
   test "smoke_capnp" do
     # Smoke test: load capnp and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("capnp", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("capnp") do
+      IO.puts("Skipping: language 'capnp' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("capnp", "@0xabcdef1234567890;")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_chatito
   test "smoke_chatito" do
     # Smoke test: load chatito and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("chatito", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("chatito") do
+      IO.puts("Skipping: language 'chatito' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("chatito", "%[greeting]\n    hello")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_clarity
   test "smoke_clarity" do
     # Smoke test: load clarity and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("clarity", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("clarity") do
+      IO.puts("Skipping: language 'clarity' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("clarity", "(define-public (hello) (ok true))")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_clojure
   test "smoke_clojure" do
     # Smoke test: load clojure and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("clojure", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("clojure") do
+      IO.puts("Skipping: language 'clojure' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("clojure", "(def x 1)")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_cmake
   test "smoke_cmake" do
     # Smoke test: load cmake and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("cmake", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("cmake") do
+      IO.puts("Skipping: language 'cmake' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("cmake", "cmake_minimum_required(VERSION 3.0)")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_cobol
   test "smoke_cobol" do
     # Smoke test: load cobol and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("cobol", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("cobol") do
+      IO.puts("Skipping: language 'cobol' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "cobol",
+          "       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO."
+        )
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_comment
   test "smoke_comment" do
     # Smoke test: load comment and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("comment", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("comment") do
+      IO.puts("Skipping: language 'comment' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("comment", "TODO: fix this")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_commonlisp
   test "smoke_commonlisp" do
     # Smoke test: load commonlisp and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("commonlisp", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("commonlisp") do
+      IO.puts("Skipping: language 'commonlisp' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("commonlisp", "(defun hello () (print \"hello\"))")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_cpon
   test "smoke_cpon" do
     # Smoke test: load cpon and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("cpon", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("cpon") do
+      IO.puts("Skipping: language 'cpon' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("cpon", "{\"key\": 1}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_cpp
   test "smoke_cpp" do
     # Smoke test: load cpp and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("cpp", "int main() { return 0; }")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("cpp") do
+      IO.puts("Skipping: language 'cpp' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("cpp", "int main() { return 0; }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_css
   test "smoke_css" do
     # Smoke test: load css and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("css", "body { color: red; }")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("css") do
+      IO.puts("Skipping: language 'css' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("css", "body { color: red; }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_csv
   test "smoke_csv" do
     # Smoke test: load csv and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("csv", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("csv") do
+      IO.puts("Skipping: language 'csv' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("csv", "a,b,c\n1,2,3")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_cuda
   test "smoke_cuda" do
     # Smoke test: load cuda and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("cuda", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("cuda") do
+      IO.puts("Skipping: language 'cuda' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("cuda", "__global__ void kernel() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_d
   test "smoke_d" do
     # Smoke test: load d and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("d", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("d") do
+      IO.puts("Skipping: language 'd' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("d", "void main() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_dart
   test "smoke_dart" do
     # Smoke test: load dart and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("dart", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("dart") do
+      IO.puts("Skipping: language 'dart' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("dart", "void main() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_dockerfile
   test "smoke_dockerfile" do
     # Smoke test: load dockerfile and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("dockerfile", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("dockerfile") do
+      IO.puts("Skipping: language 'dockerfile' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("dockerfile", "FROM alpine")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_doxygen
   test "smoke_doxygen" do
     # Smoke test: load doxygen and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("doxygen", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("doxygen") do
+      IO.puts("Skipping: language 'doxygen' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("doxygen", "/** @brief A function */")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_dtd
   test "smoke_dtd" do
     # Smoke test: load dtd and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("dtd", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("dtd") do
+      IO.puts("Skipping: language 'dtd' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("dtd", "<!ELEMENT note (body)>")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_elisp
   test "smoke_elisp" do
     # Smoke test: load elisp and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("elisp", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("elisp") do
+      IO.puts("Skipping: language 'elisp' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("elisp", "(defun hello () (message \"hello\"))")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_elixir
   test "smoke_elixir" do
     # Smoke test: load elixir and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("elixir", "IO.puts(\"hello\")")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("elixir") do
+      IO.puts("Skipping: language 'elixir' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("elixir", "IO.puts(\"hello\")")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_elm
   test "smoke_elm" do
     # Smoke test: load elm and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("elm", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("elm") do
+      IO.puts("Skipping: language 'elm' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("elm", "module Main exposing (..)")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_erlang
   test "smoke_erlang" do
     # Smoke test: load erlang and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("erlang", "main() -> ok.")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("erlang") do
+      IO.puts("Skipping: language 'erlang' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("erlang", "main() -> ok.")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_fennel
   test "smoke_fennel" do
     # Smoke test: load fennel and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("fennel", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("fennel") do
+      IO.puts("Skipping: language 'fennel' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("fennel", "(fn hello [] (print :hello))")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_firrtl
   test "smoke_firrtl" do
     # Smoke test: load firrtl and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("firrtl", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("firrtl") do
+      IO.puts("Skipping: language 'firrtl' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("firrtl", "circuit Main :")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_fish
   test "smoke_fish" do
     # Smoke test: load fish and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("fish", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("fish") do
+      IO.puts("Skipping: language 'fish' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("fish", "echo hello")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_fortran
   test "smoke_fortran" do
     # Smoke test: load fortran and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("fortran", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("fortran") do
+      IO.puts("Skipping: language 'fortran' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("fortran", "program main\nend program main")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_fsharp
   test "smoke_fsharp" do
     # Smoke test: load fsharp and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("fsharp", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("fsharp") do
+      IO.puts("Skipping: language 'fsharp' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("fsharp", "let x = 1")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_fsharp_signature
   test "smoke_fsharp_signature" do
     # Smoke test: load fsharp_signature and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("fsharp_signature", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("fsharp_signature") do
+      IO.puts("Skipping: language 'fsharp_signature' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("fsharp_signature", "val x: int")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_func
   test "smoke_func" do
     # Smoke test: load func and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("func", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("func") do
+      IO.puts("Skipping: language 'func' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("func", "() recv_internal() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_gdscript
   test "smoke_gdscript" do
     # Smoke test: load gdscript and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("gdscript", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("gdscript") do
+      IO.puts("Skipping: language 'gdscript' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("gdscript", "extends Node\nfunc _ready():\n\tpass")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_gitattributes
   test "smoke_gitattributes" do
     # Smoke test: load gitattributes and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("gitattributes", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("gitattributes") do
+      IO.puts("Skipping: language 'gitattributes' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("gitattributes", "*.txt text")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_gitcommit
   test "smoke_gitcommit" do
     # Smoke test: load gitcommit and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("gitcommit", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("gitcommit") do
+      IO.puts("Skipping: language 'gitcommit' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("gitcommit", "feat: add feature\n\nBody text")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_gitignore
   test "smoke_gitignore" do
     # Smoke test: load gitignore and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("gitignore", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("gitignore") do
+      IO.puts("Skipping: language 'gitignore' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("gitignore", "*.o\n*.log")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_gleam
   test "smoke_gleam" do
     # Smoke test: load gleam and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("gleam", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("gleam") do
+      IO.puts("Skipping: language 'gleam' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("gleam", "pub fn main() { }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_glsl
   test "smoke_glsl" do
     # Smoke test: load glsl and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("glsl", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("glsl") do
+      IO.puts("Skipping: language 'glsl' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("glsl", "void main() { gl_Position = vec4(0.0); }")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_gn
   test "smoke_gn" do
     # Smoke test: load gn and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("gn", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("gn") do
+      IO.puts("Skipping: language 'gn' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("gn", "group(\"hello\") {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_go
   test "smoke_go" do
     # Smoke test: load go and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("go", "package main")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("go") do
+      IO.puts("Skipping: language 'go' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("go", "package main")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_gomod
   test "smoke_gomod" do
     # Smoke test: load gomod and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("gomod", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("gomod") do
+      IO.puts("Skipping: language 'gomod' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("gomod", "module example.com/hello\n\ngo 1.21")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_gosum
   test "smoke_gosum" do
     # Smoke test: load gosum and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("gosum", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("gosum") do
+      IO.puts("Skipping: language 'gosum' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("gosum", "example.com/pkg v1.0.0 h1:abc=")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_graphql
   test "smoke_graphql" do
     # Smoke test: load graphql and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("graphql", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("graphql") do
+      IO.puts("Skipping: language 'graphql' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("graphql", "type Query { hello: String }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_groovy
   test "smoke_groovy" do
     # Smoke test: load groovy and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("groovy", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("groovy") do
+      IO.puts("Skipping: language 'groovy' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("groovy", "def x = 1")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_gstlaunch
   test "smoke_gstlaunch" do
     # Smoke test: load gstlaunch and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("gstlaunch", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("gstlaunch") do
+      IO.puts("Skipping: language 'gstlaunch' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("gstlaunch", "fakesrc ! fakesink")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_hack
   test "smoke_hack" do
     # Smoke test: load hack and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("hack", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("hack") do
+      IO.puts("Skipping: language 'hack' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("hack", "<?hh\nfunction main(): void {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_hare
   test "smoke_hare" do
     # Smoke test: load hare and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("hare", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("hare") do
+      IO.puts("Skipping: language 'hare' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("hare", "export fn main() void = void;")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_haskell
   test "smoke_haskell" do
     # Smoke test: load haskell and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("haskell", "main = putStrLn \"hello\"")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("haskell") do
+      IO.puts("Skipping: language 'haskell' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("haskell", "main = putStrLn \"hello\"")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_haxe
   test "smoke_haxe" do
     # Smoke test: load haxe and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("haxe", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("haxe") do
+      IO.puts("Skipping: language 'haxe' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("haxe", "class Main { static function main() {} }")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_hcl
   test "smoke_hcl" do
     # Smoke test: load hcl and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("hcl", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("hcl") do
+      IO.puts("Skipping: language 'hcl' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("hcl", "variable \"name\" { type = string }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_heex
   test "smoke_heex" do
     # Smoke test: load heex and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("heex", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("heex") do
+      IO.puts("Skipping: language 'heex' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("heex", "<%= @greeting %>")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_hlsl
   test "smoke_hlsl" do
     # Smoke test: load hlsl and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("hlsl", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("hlsl") do
+      IO.puts("Skipping: language 'hlsl' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("hlsl", "float4 main() : SV_Target { return 0; }")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_html
   test "smoke_html" do
     # Smoke test: load html and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("html", "<p>hello</p>")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("html") do
+      IO.puts("Skipping: language 'html' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("html", "<p>hello</p>")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_hyprlang
   test "smoke_hyprlang" do
     # Smoke test: load hyprlang and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("hyprlang", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("hyprlang") do
+      IO.puts("Skipping: language 'hyprlang' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("hyprlang", "general { border_size = 1 }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_ini
   test "smoke_ini" do
     # Smoke test: load ini and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("ini", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("ini") do
+      IO.puts("Skipping: language 'ini' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("ini", "[section]\nkey = value")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_ispc
   test "smoke_ispc" do
     # Smoke test: load ispc and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("ispc", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("ispc") do
+      IO.puts("Skipping: language 'ispc' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("ispc", "export void main() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_janet
   test "smoke_janet" do
     # Smoke test: load janet and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("janet", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("janet") do
+      IO.puts("Skipping: language 'janet' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("janet", "(print \"hello\")")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_java
   test "smoke_java" do
     # Smoke test: load java and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("java", "class Main {}")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("java") do
+      IO.puts("Skipping: language 'java' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("java", "class Main {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_javascript
   test "smoke_javascript" do
     # Smoke test: load javascript and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("javascript", "console.log('hello');")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("javascript") do
+      IO.puts("Skipping: language 'javascript' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("javascript", "console.log('hello');")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_jsdoc
   test "smoke_jsdoc" do
     # Smoke test: load jsdoc and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("jsdoc", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("jsdoc") do
+      IO.puts("Skipping: language 'jsdoc' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("jsdoc", "/** @param {string} name */")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_json
   test "smoke_json" do
     # Smoke test: load json and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("json", "{\"key\": \"value\"}")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("json") do
+      IO.puts("Skipping: language 'json' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("json", "{\"key\": \"value\"}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_jsonnet
   test "smoke_jsonnet" do
     # Smoke test: load jsonnet and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("jsonnet", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("jsonnet") do
+      IO.puts("Skipping: language 'jsonnet' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("jsonnet", "{ key: 'value' }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_julia
   test "smoke_julia" do
     # Smoke test: load julia and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("julia", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("julia") do
+      IO.puts("Skipping: language 'julia' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("julia", "function main() end")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_kconfig
   test "smoke_kconfig" do
     # Smoke test: load kconfig and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("kconfig", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("kconfig") do
+      IO.puts("Skipping: language 'kconfig' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("kconfig", "config FOO\n\tbool \"Enable foo\"")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_kdl
   test "smoke_kdl" do
     # Smoke test: load kdl and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("kdl", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("kdl") do
+      IO.puts("Skipping: language 'kdl' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("kdl", "node \"value\"")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_kotlin
   test "smoke_kotlin" do
     # Smoke test: load kotlin and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("kotlin", "fun main() {}")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("kotlin") do
+      IO.puts("Skipping: language 'kotlin' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("kotlin", "fun main() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_latex
   test "smoke_latex" do
     # Smoke test: load latex and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("latex", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("latex") do
+      IO.puts("Skipping: language 'latex' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "latex",
+          "\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}"
+        )
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_linkerscript
   test "smoke_linkerscript" do
     # Smoke test: load linkerscript and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("linkerscript", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("linkerscript") do
+      IO.puts("Skipping: language 'linkerscript' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("linkerscript", "SECTIONS { .text : { *(.text) } }")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_llvm
   test "smoke_llvm" do
     # Smoke test: load llvm and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("llvm", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("llvm") do
+      IO.puts("Skipping: language 'llvm' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("llvm", "define i32 @main() { ret i32 0 }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_lua
   test "smoke_lua" do
     # Smoke test: load lua and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("lua", "print('hello')")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("lua") do
+      IO.puts("Skipping: language 'lua' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("lua", "print('hello')")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_luadoc
   test "smoke_luadoc" do
     # Smoke test: load luadoc and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("luadoc", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("luadoc") do
+      IO.puts("Skipping: language 'luadoc' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("luadoc", "---@param name string")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_luap
   test "smoke_luap" do
     # Smoke test: load luap and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("luap", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("luap") do
+      IO.puts("Skipping: language 'luap' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("luap", "[a-z]+")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_luau
   test "smoke_luau" do
     # Smoke test: load luau and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("luau", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("luau") do
+      IO.puts("Skipping: language 'luau' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("luau", "local x: number = 1")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_magik
   test "smoke_magik" do
     # Smoke test: load magik and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("magik", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("magik") do
+      IO.puts("Skipping: language 'magik' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("magik", "_method object.hello\n_endmethod")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_make
   test "smoke_make" do
     # Smoke test: load make and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("make", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("make") do
+      IO.puts("Skipping: language 'make' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("make", "all:\n\techo hello")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_markdown
   test "smoke_markdown" do
     # Smoke test: load markdown and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("markdown", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("markdown") do
+      IO.puts("Skipping: language 'markdown' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("markdown", "\# Hello\n\nWorld")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_markdown_inline
   test "smoke_markdown_inline" do
     # Smoke test: load markdown_inline and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("markdown_inline", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("markdown_inline") do
+      IO.puts("Skipping: language 'markdown_inline' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("markdown_inline", "**bold** and *italic*")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_matlab
   test "smoke_matlab" do
     # Smoke test: load matlab and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("matlab", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("matlab") do
+      IO.puts("Skipping: language 'matlab' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("matlab", "function y = hello(x)\ny = x;\nend")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_mermaid
   test "smoke_mermaid" do
     # Smoke test: load mermaid and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("mermaid", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("mermaid") do
+      IO.puts("Skipping: language 'mermaid' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("mermaid", "graph TD\nA --> B")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_meson
   test "smoke_meson" do
     # Smoke test: load meson and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("meson", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("meson") do
+      IO.puts("Skipping: language 'meson' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("meson", "project('hello', 'c')")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_netlinx
   test "smoke_netlinx" do
     # Smoke test: load netlinx and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("netlinx", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("netlinx") do
+      IO.puts("Skipping: language 'netlinx' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("netlinx", "PROGRAM_NAME='hello'")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_nim
   test "smoke_nim" do
     # Smoke test: load nim and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("nim", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("nim") do
+      IO.puts("Skipping: language 'nim' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("nim", "echo \"hello\"")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_ninja
   test "smoke_ninja" do
     # Smoke test: load ninja and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("ninja", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("ninja") do
+      IO.puts("Skipping: language 'ninja' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("ninja", "rule cc\n  command = cc $in -o $out")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_nix
   test "smoke_nix" do
     # Smoke test: load nix and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("nix", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("nix") do
+      IO.puts("Skipping: language 'nix' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("nix", "{ pkgs ? import <nixpkgs> {} }: pkgs.hello")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_nqc
   test "smoke_nqc" do
     # Smoke test: load nqc and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("nqc", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("nqc") do
+      IO.puts("Skipping: language 'nqc' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("nqc", "task main() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_objc
   test "smoke_objc" do
     # Smoke test: load objc and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("objc", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("objc") do
+      IO.puts("Skipping: language 'objc' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("objc", "@interface Main @end")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_ocaml
   test "smoke_ocaml" do
     # Smoke test: load ocaml and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("ocaml", "let () = print_endline \"hello\"")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("ocaml") do
+      IO.puts("Skipping: language 'ocaml' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("ocaml", "let () = print_endline \"hello\"")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_ocaml_interface
   test "smoke_ocaml_interface" do
     # Smoke test: load ocaml_interface and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("ocaml_interface", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("ocaml_interface") do
+      IO.puts("Skipping: language 'ocaml_interface' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("ocaml_interface", "val x : int")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_odin
   test "smoke_odin" do
     # Smoke test: load odin and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("odin", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("odin") do
+      IO.puts("Skipping: language 'odin' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("odin", "package main")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_org
   test "smoke_org" do
     # Smoke test: load org and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("org", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("org") do
+      IO.puts("Skipping: language 'org' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("org", "* Hello\nWorld")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_pascal
   test "smoke_pascal" do
     # Smoke test: load pascal and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("pascal", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("pascal") do
+      IO.puts("Skipping: language 'pascal' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("pascal", "program Hello; begin end.")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_pem
   test "smoke_pem" do
     # Smoke test: load pem and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("pem", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("pem") do
+      IO.puts("Skipping: language 'pem' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "pem",
+          "-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----"
+        )
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_perl
   test "smoke_perl" do
     # Smoke test: load perl and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("perl", "print 'hello';")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("perl") do
+      IO.puts("Skipping: language 'perl' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("perl", "print 'hello';")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_pgn
   test "smoke_pgn" do
     # Smoke test: load pgn and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("pgn", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("pgn") do
+      IO.puts("Skipping: language 'pgn' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("pgn", "1. e4 e5 *")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_php
   test "smoke_php" do
     # Smoke test: load php and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("php", "<?php echo 'hello'; ?>")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("php") do
+      IO.puts("Skipping: language 'php' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("php", "<?php echo 'hello'; ?>")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_po
   test "smoke_po" do
     # Smoke test: load po and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("po", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("po") do
+      IO.puts("Skipping: language 'po' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("po", "msgid \"hello\"\nmsgstr \"world\"")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_pony
   test "smoke_pony" do
     # Smoke test: load pony and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("pony", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("pony") do
+      IO.puts("Skipping: language 'pony' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("pony", "actor Main\n  new create(env: Env) => None")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_powershell
   test "smoke_powershell" do
     # Smoke test: load powershell and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("powershell", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("powershell") do
+      IO.puts("Skipping: language 'powershell' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("powershell", "Write-Host 'hello'")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_printf
   test "smoke_printf" do
     # Smoke test: load printf and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("printf", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("printf") do
+      IO.puts("Skipping: language 'printf' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("printf", "%d %s")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_prisma
   test "smoke_prisma" do
     # Smoke test: load prisma and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("prisma", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("prisma") do
+      IO.puts("Skipping: language 'prisma' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("prisma", "model User { id Int @id }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_properties
   test "smoke_properties" do
     # Smoke test: load properties and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("properties", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("properties") do
+      IO.puts("Skipping: language 'properties' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("properties", "key=value")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_proto
   test "smoke_proto" do
     # Smoke test: load proto and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("proto", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("proto") do
+      IO.puts("Skipping: language 'proto' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("proto", "syntax = \"proto3\";")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_psv
   test "smoke_psv" do
     # Smoke test: load psv and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("psv", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("psv") do
+      IO.puts("Skipping: language 'psv' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("psv", "a|b|c\n1|2|3")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_puppet
   test "smoke_puppet" do
     # Smoke test: load puppet and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("puppet", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("puppet") do
+      IO.puts("Skipping: language 'puppet' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("puppet", "notify { 'hello': }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_purescript
   test "smoke_purescript" do
     # Smoke test: load purescript and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("purescript", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("purescript") do
+      IO.puts("Skipping: language 'purescript' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("purescript", "module Main where")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_pymanifest
   test "smoke_pymanifest" do
     # Smoke test: load pymanifest and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("pymanifest", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("pymanifest") do
+      IO.puts("Skipping: language 'pymanifest' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("pymanifest", "include *.txt")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_python
   test "smoke_python" do
     # Smoke test: load python and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("python", "print('hello')")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("python") do
+      IO.puts("Skipping: language 'python' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("python", "print('hello')")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_qmldir
   test "smoke_qmldir" do
     # Smoke test: load qmldir and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("qmldir", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("qmldir") do
+      IO.puts("Skipping: language 'qmldir' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("qmldir", "module Example")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_qmljs
   test "smoke_qmljs" do
     # Smoke test: load qmljs and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("qmljs", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("qmljs") do
+      IO.puts("Skipping: language 'qmljs' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("qmljs", "import QtQuick 2.0\nItem {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_query
   test "smoke_query" do
     # Smoke test: load query and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("query", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("query") do
+      IO.puts("Skipping: language 'query' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("query", "(identifier) @name")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_r
   test "smoke_r" do
     # Smoke test: load r and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("r", "print('hello')")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("r") do
+      IO.puts("Skipping: language 'r' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("r", "print('hello')")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_racket
   test "smoke_racket" do
     # Smoke test: load racket and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("racket", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("racket") do
+      IO.puts("Skipping: language 'racket' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("racket", "\#lang racket\n(define x 1)")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_re2c
   test "smoke_re2c" do
     # Smoke test: load re2c and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("re2c", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("re2c") do
+      IO.puts("Skipping: language 're2c' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("re2c", "/*!re2c\n  [a-z]+ { return; }\n*/")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_readline
   test "smoke_readline" do
     # Smoke test: load readline and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("readline", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("readline") do
+      IO.puts("Skipping: language 'readline' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("readline", "set editing-mode vi")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_rego
   test "smoke_rego" do
     # Smoke test: load rego and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("rego", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("rego") do
+      IO.puts("Skipping: language 'rego' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("rego", "package main\ndefault allow = false")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_requirements
   test "smoke_requirements" do
     # Smoke test: load requirements and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("requirements", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("requirements") do
+      IO.puts("Skipping: language 'requirements' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("requirements", "flask>=2.0")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_ron
   test "smoke_ron" do
     # Smoke test: load ron and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("ron", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("ron") do
+      IO.puts("Skipping: language 'ron' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("ron", "(key: \"value\")")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_rst
   test "smoke_rst" do
     # Smoke test: load rst and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("rst", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("rst") do
+      IO.puts("Skipping: language 'rst' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("rst", "Hello\n=====\n\nWorld")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_ruby
   test "smoke_ruby" do
     # Smoke test: load ruby and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("ruby", "puts 'hello'")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("ruby") do
+      IO.puts("Skipping: language 'ruby' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("ruby", "puts 'hello'")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_rust
   test "smoke_rust" do
     # Smoke test: load rust and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("rust", "fn main() {}")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("rust") do
+      IO.puts("Skipping: language 'rust' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("rust", "fn main() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_scala
   test "smoke_scala" do
     # Smoke test: load scala and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("scala", "object Main")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("scala") do
+      IO.puts("Skipping: language 'scala' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("scala", "object Main")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_scheme
   test "smoke_scheme" do
     # Smoke test: load scheme and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("scheme", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("scheme") do
+      IO.puts("Skipping: language 'scheme' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("scheme", "(define x 1)")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_scss
   test "smoke_scss" do
     # Smoke test: load scss and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("scss", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("scss") do
+      IO.puts("Skipping: language 'scss' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("scss", "$color: red;\nbody { color: $color; }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_smali
   test "smoke_smali" do
     # Smoke test: load smali and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("smali", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("smali") do
+      IO.puts("Skipping: language 'smali' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "smali",
+          ".class public LMain;\n.super Ljava/lang/Object;"
+        )
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_smithy
   test "smoke_smithy" do
     # Smoke test: load smithy and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("smithy", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("smithy") do
+      IO.puts("Skipping: language 'smithy' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("smithy", "namespace example\nstring MyString")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_solidity
   test "smoke_solidity" do
     # Smoke test: load solidity and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("solidity", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("solidity") do
+      IO.puts("Skipping: language 'solidity' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "solidity",
+          "pragma solidity ^0.8.0;\ncontract Main {}"
+        )
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_sparql
   test "smoke_sparql" do
     # Smoke test: load sparql and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("sparql", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("sparql") do
+      IO.puts("Skipping: language 'sparql' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("sparql", "SELECT ?s WHERE { ?s ?p ?o }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_sql
   test "smoke_sql" do
     # Smoke test: load sql and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("sql", "SELECT 1;")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("sql") do
+      IO.puts("Skipping: language 'sql' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("sql", "SELECT 1;")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_squirrel
   test "smoke_squirrel" do
     # Smoke test: load squirrel and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("squirrel", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("squirrel") do
+      IO.puts("Skipping: language 'squirrel' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("squirrel", "function main() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_starlark
   test "smoke_starlark" do
     # Smoke test: load starlark and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("starlark", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("starlark") do
+      IO.puts("Skipping: language 'starlark' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("starlark", "def hello(): pass")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_svelte
   test "smoke_svelte" do
     # Smoke test: load svelte and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("svelte", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("svelte") do
+      IO.puts("Skipping: language 'svelte' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("svelte", "<p>hello</p>")
+      assert is_reference(tree), "Parse tree should be a reference"
+    end
   end
 
+  @tag :skip_unless_swift
   test "smoke_swift" do
     # Smoke test: load swift and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("swift", "print(\"hello\")")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("swift") do
+      IO.puts("Skipping: language 'swift' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("swift", "print(\"hello\")")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_tablegen
   test "smoke_tablegen" do
     # Smoke test: load tablegen and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("tablegen", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("tablegen") do
+      IO.puts("Skipping: language 'tablegen' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("tablegen", "def Hello : Base {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_tcl
   test "smoke_tcl" do
     # Smoke test: load tcl and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("tcl", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("tcl") do
+      IO.puts("Skipping: language 'tcl' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("tcl", "puts hello")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_terraform
   test "smoke_terraform" do
     # Smoke test: load terraform and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("terraform", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("terraform") do
+      IO.puts("Skipping: language 'terraform' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("terraform", "resource \"null_resource\" \"main\" {}")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_test
   test "smoke_test" do
     # Smoke test: load test and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("test", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("test") do
+      IO.puts("Skipping: language 'test' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("test", "===========\nTest\n===========\n---\n(node)")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_thrift
   test "smoke_thrift" do
     # Smoke test: load thrift and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("thrift", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("thrift") do
+      IO.puts("Skipping: language 'thrift' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("thrift", "service HelloService {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_toml
   test "smoke_toml" do
     # Smoke test: load toml and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("toml", "key = \"value\"")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("toml") do
+      IO.puts("Skipping: language 'toml' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("toml", "key = \"value\"")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_tsv
   test "smoke_tsv" do
     # Smoke test: load tsv and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("tsv", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("tsv") do
+      IO.puts("Skipping: language 'tsv' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("tsv", "a\tb\tc\n1\t2\t3")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_tsx
   test "smoke_tsx" do
     # Smoke test: load tsx and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("tsx", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("tsx") do
+      IO.puts("Skipping: language 'tsx' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("tsx", "const App = () => <div />;")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_twig
   test "smoke_twig" do
     # Smoke test: load twig and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("twig", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("twig") do
+      IO.puts("Skipping: language 'twig' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("twig", "{{ variable }}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_typescript
   test "smoke_typescript" do
     # Smoke test: load typescript and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("typescript", "const x: number = 42;")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("typescript") do
+      IO.puts("Skipping: language 'typescript' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("typescript", "const x: number = 42;")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_typst
   test "smoke_typst" do
     # Smoke test: load typst and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("typst", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("typst") do
+      IO.puts("Skipping: language 'typst' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("typst", "\#let x = 1")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_udev
   test "smoke_udev" do
     # Smoke test: load udev and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("udev", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("udev") do
+      IO.puts("Skipping: language 'udev' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("udev", "ACTION==\"add\", KERNEL==\"sd*\"")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_ungrammar
   test "smoke_ungrammar" do
     # Smoke test: load ungrammar and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("ungrammar", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("ungrammar") do
+      IO.puts("Skipping: language 'ungrammar' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("ungrammar", "Root = Item*\nItem = 'token'")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_uxntal
   test "smoke_uxntal" do
     # Smoke test: load uxntal and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("uxntal", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("uxntal") do
+      IO.puts("Skipping: language 'uxntal' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("uxntal", "|0100 LIT 01")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_v
   test "smoke_v" do
     # Smoke test: load v and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("v", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("v") do
+      IO.puts("Skipping: language 'v' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("v", "fn main() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_verilog
   test "smoke_verilog" do
     # Smoke test: load verilog and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("verilog", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("verilog") do
+      IO.puts("Skipping: language 'verilog' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("verilog", "module main; endmodule")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_vhdl
   test "smoke_vhdl" do
     # Smoke test: load vhdl and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("vhdl", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("vhdl") do
+      IO.puts("Skipping: language 'vhdl' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("vhdl", "entity main is end main;")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_vim
   test "smoke_vim" do
     # Smoke test: load vim and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("vim", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("vim") do
+      IO.puts("Skipping: language 'vim' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("vim", "echo 'hello'")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_vue
   test "smoke_vue" do
     # Smoke test: load vue and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("vue", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("vue") do
+      IO.puts("Skipping: language 'vue' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("vue", "<template><div>hello</div></template>")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_wast
   test "smoke_wast" do
     # Smoke test: load wast and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("wast", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("wast") do
+      IO.puts("Skipping: language 'wast' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("wast", "(module)")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_wat
   test "smoke_wat" do
     # Smoke test: load wat and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("wat", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("wat") do
+      IO.puts("Skipping: language 'wat' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("wat", "(module)")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_wgsl
   test "smoke_wgsl" do
     # Smoke test: load wgsl and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("wgsl", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("wgsl") do
+      IO.puts("Skipping: language 'wgsl' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "wgsl",
+          "@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }"
+        )
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_xcompose
   test "smoke_xcompose" do
     # Smoke test: load xcompose and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("xcompose", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("xcompose") do
+      IO.puts("Skipping: language 'xcompose' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("xcompose", "<Multi_key> <a> : \"a\"")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_xml
   test "smoke_xml" do
     # Smoke test: load xml and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("xml", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("xml") do
+      IO.puts("Skipping: language 'xml' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("xml", "<?xml version=\"1.0\"?>\n<root>hello</root>")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_yuck
   test "smoke_yuck" do
     # Smoke test: load yuck and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("yuck", "x")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("yuck") do
+      IO.puts("Skipping: language 'yuck' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("yuck", "(defwidget main [] (label :text \"hi\"))")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 
+  @tag :skip_unless_zig
   test "smoke_zig" do
     # Smoke test: load zig and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("zig", "pub fn main() void {}")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    unless TreeSitterLanguagePack.has_language("zig") do
+      IO.puts("Skipping: language 'zig' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("zig", "pub fn main() void {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
   end
 end

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load cuda and parse a simple snippet",
 	"id": "smoke_cuda",
 	"language": "cuda",
-	"source_code": "x",
+	"source_code": "__global__ void kernel() {}",
 	"tags": ["smoke"]
 }

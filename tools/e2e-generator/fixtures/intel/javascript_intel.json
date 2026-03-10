@@ -8,7 +8,7 @@
 		"intel_language": "javascript",
 		"intel_imports_count_min": 2,
 		"intel_structure_count_min": 1,
-		"intel_structure_contains_kind": "function",
+		"intel_structure_contains_kind": "Function",
 		"intel_metrics_total_lines_min": 6,
 		"intel_metrics_error_count": 0
 	},

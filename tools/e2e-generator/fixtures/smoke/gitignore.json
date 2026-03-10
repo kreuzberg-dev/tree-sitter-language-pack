@@ -7,6 +7,6 @@
 	"description": "Smoke test: load gitignore and parse a simple snippet",
 	"id": "smoke_gitignore",
 	"language": "gitignore",
-	"source_code": "x",
+	"source_code": "*.o\n*.log",
 	"tags": ["smoke"]
 }

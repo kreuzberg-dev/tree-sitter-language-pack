@@ -7,6 +7,6 @@
 	"description": "Smoke test: load pem and parse a simple snippet",
 	"id": "smoke_pem",
 	"language": "pem",
-	"source_code": "x",
+	"source_code": "-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----",
 	"tags": ["smoke"]
 }

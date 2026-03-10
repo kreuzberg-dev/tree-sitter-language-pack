@@ -3,6 +3,10 @@
 
 #[test]
 fn parsing_javascript_class() {
+    if !ts_pack_core::has_language("javascript") {
+        eprintln!("Skipping: language 'javascript' not available");
+        return;
+    }
     // Parse a JavaScript class declaration.
     let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("class Foo { bar() {} }", None);
@@ -22,6 +26,10 @@ fn parsing_javascript_class() {
 
 #[test]
 fn parsing_python_function() {
+    if !ts_pack_core::has_language("python") {
+        eprintln!("Skipping: language 'python' not available");
+        return;
+    }
     // Parse a Python function definition.
     let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
     let tree = parser.parse("def hello():\n    pass\n", None);
@@ -41,6 +49,10 @@ fn parsing_python_function() {
 
 #[test]
 fn parsing_rust_struct() {
+    if !ts_pack_core::has_language("rust") {
+        eprintln!("Skipping: language 'rust' not available");
+        return;
+    }
     // Parse a Rust struct definition.
     let mut parser = ts_pack_core::get_parser("rust").expect("Failed to get parser for 'rust'");
     let tree = parser.parse("struct Point { x: f64, y: f64 }", None);

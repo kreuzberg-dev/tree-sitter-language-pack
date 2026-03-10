@@ -7,6 +7,6 @@
 	"description": "Smoke test: load luap and parse a simple snippet",
 	"id": "smoke_luap",
 	"language": "luap",
-	"source_code": "x",
+	"source_code": "[a-z]+",
 	"tags": ["smoke"]
 }

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load verilog and parse a simple snippet",
 	"id": "smoke_verilog",
 	"language": "verilog",
-	"source_code": "x",
+	"source_code": "module main; endmodule",
 	"tags": ["smoke"]
 }

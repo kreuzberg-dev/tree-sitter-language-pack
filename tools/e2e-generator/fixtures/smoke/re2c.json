@@ -7,6 +7,6 @@
 	"description": "Smoke test: load re2c and parse a simple snippet",
 	"id": "smoke_re2c",
 	"language": "re2c",
-	"source_code": "x",
+	"source_code": "/*!re2c\n  [a-z]+ { return; }\n*/",
 	"tags": ["smoke"]
 }

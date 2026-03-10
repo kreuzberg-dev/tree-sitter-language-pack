@@ -7,6 +7,6 @@
 	"description": "Smoke test: load xcompose and parse a simple snippet",
 	"id": "smoke_xcompose",
 	"language": "xcompose",
-	"source_code": "x",
+	"source_code": "<Multi_key> <a> : \"a\"",
 	"tags": ["smoke"]
 }

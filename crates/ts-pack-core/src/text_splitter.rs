@@ -183,8 +183,8 @@ fn split_recursive(
                 // Greedily extend to the farthest boundary that keeps the chunk
                 // within max_chunk_size.
                 let mut best_end_idx = cursor + 1;
-                for j in (cursor + 1)..boundaries.len() {
-                    if boundaries[j] - chunk_start <= max_chunk_size {
+                for (j, &boundary) in boundaries.iter().enumerate().skip(cursor + 1) {
+                    if boundary - chunk_start <= max_chunk_size {
                         best_end_idx = j;
                     } else {
                         break;

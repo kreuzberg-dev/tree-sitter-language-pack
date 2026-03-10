@@ -7,6 +7,6 @@
 	"description": "Smoke test: load rst and parse a simple snippet",
 	"id": "smoke_rst",
 	"language": "rst",
-	"source_code": "x",
+	"source_code": "Hello\n=====\n\nWorld",
 	"tags": ["smoke"]
 }

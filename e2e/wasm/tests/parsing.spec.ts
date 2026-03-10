@@ -18,6 +18,10 @@ import {
 describe("parsing", () => {
   it("parsing_javascript_class", () => {
     // Parse a JavaScript class declaration.
+    if (!hasLanguage("javascript")) {
+      console.log("Skipping: language 'javascript' not available");
+      return;
+    }
     const tree = parseString("javascript", `class Foo { bar() {} }`);
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();

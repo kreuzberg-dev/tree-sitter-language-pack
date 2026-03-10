@@ -6,6 +6,7 @@ RSpec.describe "parsing" do
 
   it "parsing_javascript_class" do
     # Parse a JavaScript class declaration.
+    skip "Language 'javascript' not available" unless TreeSitterLanguagePack.has_language("javascript")
     tree = TreeSitterLanguagePack.parse_string("javascript", "class Foo { bar() {} }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
@@ -14,6 +15,7 @@ RSpec.describe "parsing" do
 
   it "parsing_python_function" do
     # Parse a Python function definition.
+    skip "Language 'python' not available" unless TreeSitterLanguagePack.has_language("python")
     tree = TreeSitterLanguagePack.parse_string("python", "def hello():\n    pass\n")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
@@ -22,6 +24,7 @@ RSpec.describe "parsing" do
 
   it "parsing_rust_struct" do
     # Parse a Rust struct definition.
+    skip "Language 'rust' not available" unless TreeSitterLanguagePack.has_language("rust")
     tree = TreeSitterLanguagePack.parse_string("rust", "struct Point { x: f64, y: f64 }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load ungrammar and parse a simple snippet",
 	"id": "smoke_ungrammar",
 	"language": "ungrammar",
-	"source_code": "x",
+	"source_code": "Root = Item*\nItem = 'token'",
 	"tags": ["smoke"]
 }

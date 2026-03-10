@@ -7,6 +7,6 @@
 	"description": "Smoke test: load jsdoc and parse a simple snippet",
 	"id": "smoke_jsdoc",
 	"language": "jsdoc",
-	"source_code": "x",
+	"source_code": "/** @param {string} name */",
 	"tags": ["smoke"]
 }

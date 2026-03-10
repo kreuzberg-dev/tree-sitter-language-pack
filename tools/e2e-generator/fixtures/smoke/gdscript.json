@@ -7,6 +7,6 @@
 	"description": "Smoke test: load gdscript and parse a simple snippet",
 	"id": "smoke_gdscript",
 	"language": "gdscript",
-	"source_code": "x",
+	"source_code": "extends Node\nfunc _ready():\n\tpass",
 	"tags": ["smoke"]
 }

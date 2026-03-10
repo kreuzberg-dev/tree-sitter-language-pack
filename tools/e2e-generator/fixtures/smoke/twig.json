@@ -7,6 +7,6 @@
 	"description": "Smoke test: load twig and parse a simple snippet",
 	"id": "smoke_twig",
 	"language": "twig",
-	"source_code": "x",
+	"source_code": "{{ variable }}",
 	"tags": ["smoke"]
 }

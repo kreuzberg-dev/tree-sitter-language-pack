@@ -7,6 +7,6 @@
 	"description": "Smoke test: load vue and parse a simple snippet",
 	"id": "smoke_vue",
 	"language": "vue",
-	"source_code": "x",
+	"source_code": "<template><div>hello</div></template>",
 	"tags": ["smoke"]
 }

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load scheme and parse a simple snippet",
 	"id": "smoke_scheme",
 	"language": "scheme",
-	"source_code": "x",
+	"source_code": "(define x 1)",
 	"tags": ["smoke"]
 }

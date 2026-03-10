@@ -7,6 +7,6 @@
 	"description": "Smoke test: load markdown and parse a simple snippet",
 	"id": "smoke_markdown",
 	"language": "markdown",
-	"source_code": "x",
+	"source_code": "# Hello\n\nWorld",
 	"tags": ["smoke"]
 }

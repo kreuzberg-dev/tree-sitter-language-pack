@@ -7,6 +7,6 @@
 	"description": "Smoke test: load bicep and parse a simple snippet",
 	"id": "smoke_bicep",
 	"language": "bicep",
-	"source_code": "x",
+	"source_code": "param name string",
 	"tags": ["smoke"]
 }

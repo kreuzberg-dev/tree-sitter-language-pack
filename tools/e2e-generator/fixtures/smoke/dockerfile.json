@@ -7,6 +7,6 @@
 	"description": "Smoke test: load dockerfile and parse a simple snippet",
 	"id": "smoke_dockerfile",
 	"language": "dockerfile",
-	"source_code": "x",
+	"source_code": "FROM alpine",
 	"tags": ["smoke"]
 }

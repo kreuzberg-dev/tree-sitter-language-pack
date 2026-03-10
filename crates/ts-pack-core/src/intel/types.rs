@@ -18,12 +18,19 @@ pub struct Span {
 pub struct FileIntelligence {
     pub language: String,
     pub metrics: FileMetrics,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub structure: Vec<StructureItem>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub imports: Vec<ImportInfo>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub exports: Vec<ExportInfo>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub comments: Vec<CommentInfo>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub docstrings: Vec<DocstringInfo>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub symbols: Vec<SymbolInfo>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub diagnostics: Vec<Diagnostic>,
 }
 
@@ -63,13 +70,20 @@ pub enum StructureKind {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StructureItem {
     pub kind: StructureKind,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub name: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     pub visibility: Option<String>,
     pub span: Span,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub children: Vec<StructureItem>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub decorators: Vec<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     pub doc_comment: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     pub signature: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub body_span: Option<Span>,
 }
 
@@ -89,6 +103,7 @@ pub struct CommentInfo {
     pub text: String,
     pub kind: CommentKind,
     pub span: Span,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub associated_node: Option<String>,
 }
 
@@ -111,7 +126,9 @@ pub struct DocstringInfo {
     pub text: String,
     pub format: DocstringFormat,
     pub span: Span,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub associated_item: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub parsed_sections: Vec<DocSection>,
 }
 
@@ -129,7 +146,9 @@ pub struct DocSection {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ImportInfo {
     pub source: String,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub items: Vec<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     pub alias: Option<String>,
     pub is_wildcard: bool,
     pub span: Span,
@@ -175,7 +194,9 @@ pub struct SymbolInfo {
     pub name: String,
     pub kind: SymbolKind,
     pub span: Span,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub type_annotation: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     pub doc: Option<String>,
 }
 

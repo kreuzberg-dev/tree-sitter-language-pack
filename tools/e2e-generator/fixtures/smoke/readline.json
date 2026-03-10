@@ -7,6 +7,6 @@
 	"description": "Smoke test: load readline and parse a simple snippet",
 	"id": "smoke_readline",
 	"language": "readline",
-	"source_code": "x",
+	"source_code": "set editing-mode vi",
 	"tags": ["smoke"]
 }

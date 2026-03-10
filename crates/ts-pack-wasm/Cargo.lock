@@ -373,6 +373,8 @@ dependencies = [
 name = "ts-pack-wasm"
 version = "1.0.0-rc.1"
 dependencies = [
+ "js-sys",
+ "serde_json",
  "tree-sitter",
  "ts-pack-core",
  "wasm-bindgen",

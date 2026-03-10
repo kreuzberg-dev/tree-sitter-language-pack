@@ -6,12 +6,14 @@ RSpec.describe "error-handling" do
 
   it "error_handling_empty_source" do
     # Parsing an empty string should still produce a tree.
+    skip "Language 'javascript' not available" unless TreeSitterLanguagePack.has_language("javascript")
     tree = TreeSitterLanguagePack.parse_string("javascript", "")
     expect(tree).not_to be_nil
   end
 
   it "error_handling_invalid_syntax" do
     # Parsing invalid syntax should produce a tree with error nodes.
+    skip "Language 'javascript' not available" unless TreeSitterLanguagePack.has_language("javascript")
     tree = TreeSitterLanguagePack.parse_string("javascript", "function function function @@@ %%%")
     expect(tree).not_to be_nil
     expect(tree.has_error_nodes).to be true

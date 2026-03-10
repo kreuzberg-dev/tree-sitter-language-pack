@@ -7,6 +7,6 @@
 	"description": "Smoke test: load cobol and parse a simple snippet",
 	"id": "smoke_cobol",
 	"language": "cobol",
-	"source_code": "x",
+	"source_code": "       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.",
 	"tags": ["smoke"]
 }

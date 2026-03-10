@@ -7,6 +7,6 @@
 	"description": "Smoke test: load gitattributes and parse a simple snippet",
 	"id": "smoke_gitattributes",
 	"language": "gitattributes",
-	"source_code": "x",
+	"source_code": "*.txt text",
 	"tags": ["smoke"]
 }

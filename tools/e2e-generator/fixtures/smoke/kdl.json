@@ -7,6 +7,6 @@
 	"description": "Smoke test: load kdl and parse a simple snippet",
 	"id": "smoke_kdl",
 	"language": "kdl",
-	"source_code": "x",
+	"source_code": "node \"value\"",
 	"tags": ["smoke"]
 }

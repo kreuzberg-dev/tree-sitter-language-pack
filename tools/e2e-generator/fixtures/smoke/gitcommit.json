@@ -7,6 +7,6 @@
 	"description": "Smoke test: load gitcommit and parse a simple snippet",
 	"id": "smoke_gitcommit",
 	"language": "gitcommit",
-	"source_code": "x",
+	"source_code": "feat: add feature\n\nBody text",
 	"tags": ["smoke"]
 }

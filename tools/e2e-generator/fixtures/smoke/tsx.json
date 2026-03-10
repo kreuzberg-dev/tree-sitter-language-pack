@@ -7,6 +7,6 @@
 	"description": "Smoke test: load tsx and parse a simple snippet",
 	"id": "smoke_tsx",
 	"language": "tsx",
-	"source_code": "x",
+	"source_code": "const App = () => <div />;",
 	"tags": ["smoke"]
 }

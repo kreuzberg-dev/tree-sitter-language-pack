@@ -42,6 +42,21 @@ tasks:
     cmds:
       - test -z "$(gofmt -l .)"
 
+  vendor:
+    desc: Vendor FFI artifacts into Go package for distribution
+    deps: [build:ffi]
+    cmds:
+      - python3 scripts/ci/go/vendor-ffi.py
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+
+  vendor:clean:
+    desc: Remove vendored FFI artifacts from Go package
+    cmds:
+      - python3 scripts/ci/go/vendor-ffi.py --clean
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+
   clean:
     desc: Clean Go build cache
     dir: crates/ts-pack-go

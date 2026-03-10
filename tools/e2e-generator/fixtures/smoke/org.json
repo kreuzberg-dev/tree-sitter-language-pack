@@ -7,6 +7,6 @@
 	"description": "Smoke test: load org and parse a simple snippet",
 	"id": "smoke_org",
 	"language": "org",
-	"source_code": "x",
+	"source_code": "* Hello\nWorld",
 	"tags": ["smoke"]
 }

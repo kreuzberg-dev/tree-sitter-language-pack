@@ -7,6 +7,7 @@ import "testing"
 func TestParsingJavascriptClass(t *testing.T) {
 	// Parse a JavaScript class declaration.
 	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "javascript")
 	ptr, err := reg.GetLanguage("javascript")
 	if err != nil {
 		t.Fatalf("Failed to get language %q: %v", "javascript", err)
@@ -19,6 +20,7 @@ func TestParsingJavascriptClass(t *testing.T) {
 func TestParsingPythonFunction(t *testing.T) {
 	// Parse a Python function definition.
 	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "python")
 	ptr, err := reg.GetLanguage("python")
 	if err != nil {
 		t.Fatalf("Failed to get language %q: %v", "python", err)
@@ -31,6 +33,7 @@ func TestParsingPythonFunction(t *testing.T) {
 func TestParsingRustStruct(t *testing.T) {
 	// Parse a Rust struct definition.
 	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "rust")
 	ptr, err := reg.GetLanguage("rust")
 	if err != nil {
 		t.Fatalf("Failed to get language %q: %v", "rust", err)

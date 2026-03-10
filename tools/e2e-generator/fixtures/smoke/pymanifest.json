@@ -7,6 +7,6 @@
 	"description": "Smoke test: load pymanifest and parse a simple snippet",
 	"id": "smoke_pymanifest",
 	"language": "pymanifest",
-	"source_code": "x",
+	"source_code": "include *.txt",
 	"tags": ["smoke"]
 }

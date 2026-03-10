@@ -7,6 +7,6 @@
 	"description": "Smoke test: load purescript and parse a simple snippet",
 	"id": "smoke_purescript",
 	"language": "purescript",
-	"source_code": "x",
+	"source_code": "module Main where",
 	"tags": ["smoke"]
 }

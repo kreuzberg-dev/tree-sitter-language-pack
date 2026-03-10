@@ -31,12 +31,12 @@ class IntelTest {
           intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
       boolean foundKind = false;
       for (var elem : intel.getAsJsonArray("structure")) {
-        if (elem.getAsJsonObject().get("kind").getAsString().equals("function")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
           foundKind = true;
           break;
         }
       }
-      assertTrue(foundKind, "Structure should contain a 'function' kind node");
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
       assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
       JsonObject metrics = intel.getAsJsonObject("metrics");
       assertTrue(
@@ -67,12 +67,12 @@ class IntelTest {
           intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
       boolean foundKind = false;
       for (var elem : intel.getAsJsonArray("structure")) {
-        if (elem.getAsJsonObject().get("kind").getAsString().equals("function")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
           foundKind = true;
           break;
         }
       }
-      assertTrue(foundKind, "Structure should contain a 'function' kind node");
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
       assertTrue(intel.getAsJsonArray("imports").size() >= 2, "Should have at least 2 import(s)");
       JsonObject metrics = intel.getAsJsonObject("metrics");
       assertTrue(
@@ -134,12 +134,12 @@ class IntelTest {
           intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
       boolean foundKind = false;
       for (var elem : intel.getAsJsonArray("structure")) {
-        if (elem.getAsJsonObject().get("kind").getAsString().equals("class")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Class")) {
           foundKind = true;
           break;
         }
       }
-      assertTrue(foundKind, "Structure should contain a 'class' kind node");
+      assertTrue(foundKind, "Structure should contain a 'Class' kind node");
       JsonObject metrics = intel.getAsJsonObject("metrics");
       assertTrue(
           metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
@@ -163,12 +163,12 @@ class IntelTest {
           intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
       boolean foundKind = false;
       for (var elem : intel.getAsJsonArray("structure")) {
-        if (elem.getAsJsonObject().get("kind").getAsString().equals("function")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
           foundKind = true;
           break;
         }
       }
-      assertTrue(foundKind, "Structure should contain a 'function' kind node");
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
       JsonObject metrics = intel.getAsJsonObject("metrics");
       assertTrue(
           metrics.get("total_lines").getAsInt() >= 2, "Should have at least 2 total line(s)");
@@ -253,12 +253,12 @@ class IntelTest {
           intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
       boolean foundKind = false;
       for (var elem : intel.getAsJsonArray("structure")) {
-        if (elem.getAsJsonObject().get("kind").getAsString().equals("function")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
           foundKind = true;
           break;
         }
       }
-      assertTrue(foundKind, "Structure should contain a 'function' kind node");
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
       JsonObject metrics = intel.getAsJsonObject("metrics");
       assertTrue(
           metrics.get("total_lines").getAsInt() >= 3, "Should have at least 3 total line(s)");
@@ -287,12 +287,12 @@ class IntelTest {
           intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
       boolean foundKind = false;
       for (var elem : intel.getAsJsonArray("structure")) {
-        if (elem.getAsJsonObject().get("kind").getAsString().equals("function")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
           foundKind = true;
           break;
         }
       }
-      assertTrue(foundKind, "Structure should contain a 'function' kind node");
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
       assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
       JsonObject metrics = intel.getAsJsonObject("metrics");
       assertTrue(

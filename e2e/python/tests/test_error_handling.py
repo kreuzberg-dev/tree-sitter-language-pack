@@ -4,11 +4,13 @@ import pytest
 from tree_sitter_language_pack import (
     get_language,
     get_parser,
+    has_language,
 )
 
 from .helpers import tree_has_error_nodes
 
 
+@pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
 def test_error_handling_empty_source():
     """Parsing an empty string should still produce a tree."""
     parser = get_parser("javascript")
@@ -17,6 +19,7 @@ def test_error_handling_empty_source():
     root = tree.root_node
 
 
+@pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
 def test_error_handling_invalid_syntax():
     """Parsing invalid syntax should produce a tree with error nodes."""
     parser = get_parser("javascript")

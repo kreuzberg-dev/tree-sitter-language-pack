@@ -7,6 +7,6 @@
 	"description": "Smoke test: load firrtl and parse a simple snippet",
 	"id": "smoke_firrtl",
 	"language": "firrtl",
-	"source_code": "x",
+	"source_code": "circuit Main :",
 	"tags": ["smoke"]
 }

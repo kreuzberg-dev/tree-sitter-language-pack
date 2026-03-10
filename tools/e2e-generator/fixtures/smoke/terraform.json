@@ -7,6 +7,6 @@
 	"description": "Smoke test: load terraform and parse a simple snippet",
 	"id": "smoke_terraform",
 	"language": "terraform",
-	"source_code": "x",
+	"source_code": "resource \"null_resource\" \"main\" {}",
 	"tags": ["smoke"]
 }

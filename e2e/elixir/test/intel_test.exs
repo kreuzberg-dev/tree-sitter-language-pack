@@ -9,16 +9,15 @@ defmodule E2eTests.IntelTest do
     unless TreeSitterLanguagePack.has_language("go") do
       IO.puts("Skipping: language 'go' not available")
     else
-      result_json =
+      intel =
         TreeSitterLanguagePack.process(
           "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n",
           "go"
         )
 
-      intel = Jason.decode!(result_json)
       assert intel["language"] == "go"
       assert length(intel["structure"]) >= 1
-      assert Enum.any?(intel["structure"], fn s -> s["kind"] == "function" end)
+      assert Enum.any?(intel["structure"], fn s -> s["kind"] == "Function" end)
       assert length(intel["imports"]) >= 1
       assert intel["metrics"]["total_lines"] >= 7
       assert intel["metrics"]["error_count"] == 0
@@ -31,16 +30,15 @@ defmodule E2eTests.IntelTest do
     unless TreeSitterLanguagePack.has_language("javascript") do
       IO.puts("Skipping: language 'javascript' not available")
     else
-      result_json =
+      intel =
         TreeSitterLanguagePack.process(
           "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n",
           "javascript"
         )
 
-      intel = Jason.decode!(result_json)
       assert intel["language"] == "javascript"
       assert length(intel["structure"]) >= 1
-      assert Enum.any?(intel["structure"], fn s -> s["kind"] == "function" end)
+      assert Enum.any?(intel["structure"], fn s -> s["kind"] == "Function" end)
       assert length(intel["imports"]) >= 2
       assert intel["metrics"]["total_lines"] >= 6
       assert intel["metrics"]["error_count"] == 0
@@ -53,14 +51,13 @@ defmodule E2eTests.IntelTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      result_json =
+      result =
         TreeSitterLanguagePack.process_and_chunk(
           "def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n",
           "python",
           30
         )
 
-      result = Jason.decode!(result_json)
       intel = result["intelligence"]
       chunks = result["chunks"]
       assert intel["language"] == "python"
@@ -75,16 +72,15 @@ defmodule E2eTests.IntelTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      result_json =
+      intel =
         TreeSitterLanguagePack.process(
           "class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n",
           "python"
         )
 
-      intel = Jason.decode!(result_json)
       assert intel["language"] == "python"
       assert length(intel["structure"]) >= 1
-      assert Enum.any?(intel["structure"], fn s -> s["kind"] == "class" end)
+      assert Enum.any?(intel["structure"], fn s -> s["kind"] == "Class" end)
       assert intel["metrics"]["total_lines"] >= 6
       assert intel["metrics"]["error_count"] == 0
     end
@@ -96,16 +92,15 @@ defmodule E2eTests.IntelTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      result_json =
+      intel =
         TreeSitterLanguagePack.process(
           "def greet(name):\n    return f'Hello, {name}!'\n",
           "python"
         )
 
-      intel = Jason.decode!(result_json)
       assert intel["language"] == "python"
       assert length(intel["structure"]) >= 1
-      assert Enum.any?(intel["structure"], fn s -> s["kind"] == "function" end)
+      assert Enum.any?(intel["structure"], fn s -> s["kind"] == "Function" end)
       assert intel["metrics"]["total_lines"] >= 2
       assert intel["metrics"]["error_count"] == 0
     end
@@ -117,8 +112,7 @@ defmodule E2eTests.IntelTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      result_json = TreeSitterLanguagePack.process("def broken(\n    return\nclass", "python")
-      intel = Jason.decode!(result_json)
+      intel = TreeSitterLanguagePack.process("def broken(\n    return\nclass", "python")
       assert intel["language"] == "python"
       assert length(intel["diagnostics"]) > 0
     end
@@ -130,13 +124,12 @@ defmodule E2eTests.IntelTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      result_json =
+      intel =
         TreeSitterLanguagePack.process(
           "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
           "python"
         )
 
-      intel = Jason.decode!(result_json)
       assert intel["language"] == "python"
       assert length(intel["structure"]) >= 1
       assert length(intel["imports"]) >= 3
@@ -151,14 +144,13 @@ defmodule E2eTests.IntelTest do
     unless TreeSitterLanguagePack.has_language("rust") do
       IO.puts("Skipping: language 'rust' not available")
     else
-      result_json =
+      result =
         TreeSitterLanguagePack.process_and_chunk(
           "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n",
           "rust",
           30
         )
 
-      result = Jason.decode!(result_json)
       intel = result["intelligence"]
       chunks = result["chunks"]
       assert intel["language"] == "rust"
@@ -173,13 +165,12 @@ defmodule E2eTests.IntelTest do
     unless TreeSitterLanguagePack.has_language("rust") do
       IO.puts("Skipping: language 'rust' not available")
     else
-      result_json =
+      intel =
         TreeSitterLanguagePack.process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", "rust")
 
-      intel = Jason.decode!(result_json)
       assert intel["language"] == "rust"
       assert length(intel["structure"]) >= 1
-      assert Enum.any?(intel["structure"], fn s -> s["kind"] == "function" end)
+      assert Enum.any?(intel["structure"], fn s -> s["kind"] == "Function" end)
       assert intel["metrics"]["total_lines"] >= 3
       assert intel["metrics"]["error_count"] == 0
     end
@@ -191,16 +182,15 @@ defmodule E2eTests.IntelTest do
     unless TreeSitterLanguagePack.has_language("typescript") do
       IO.puts("Skipping: language 'typescript' not available")
     else
-      result_json =
+      intel =
         TreeSitterLanguagePack.process(
           "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n",
           "typescript"
         )
 
-      intel = Jason.decode!(result_json)
       assert intel["language"] == "typescript"
       assert length(intel["structure"]) >= 1
-      assert Enum.any?(intel["structure"], fn s -> s["kind"] == "function" end)
+      assert Enum.any?(intel["structure"], fn s -> s["kind"] == "Function" end)
       assert length(intel["imports"]) >= 1
       assert intel["metrics"]["total_lines"] >= 5
       assert intel["metrics"]["error_count"] == 0

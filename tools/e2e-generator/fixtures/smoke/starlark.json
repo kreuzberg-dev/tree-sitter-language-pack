@@ -7,6 +7,6 @@
 	"description": "Smoke test: load starlark and parse a simple snippet",
 	"id": "smoke_starlark",
 	"language": "starlark",
-	"source_code": "x",
+	"source_code": "def hello(): pass",
 	"tags": ["smoke"]
 }

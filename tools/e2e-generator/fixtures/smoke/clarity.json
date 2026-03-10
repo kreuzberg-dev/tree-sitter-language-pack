@@ -7,6 +7,6 @@
 	"description": "Smoke test: load clarity and parse a simple snippet",
 	"id": "smoke_clarity",
 	"language": "clarity",
-	"source_code": "x",
+	"source_code": "(define-public (hello) (ok true))",
 	"tags": ["smoke"]
 }

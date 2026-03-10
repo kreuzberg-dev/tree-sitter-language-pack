@@ -22,12 +22,10 @@ describe("intel", () => {
       console.log("Skipping: language 'javascript' not available");
       return;
     }
-    const resultJson = process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", "javascript");
-    const result = JSON.parse(resultJson);
-    const intel = result;
+    const intel = process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", "javascript");
     expect(intel.language).toBe("javascript");
     expect((intel.structure || []).length).toBeGreaterThanOrEqual(1);
-    expect((intel.structure || []).some((s: any) => s.kind === "function")).toBe(true);
+    expect((intel.structure || []).some((s: any) => s.kind === "Function")).toBe(true);
     expect((intel.imports || []).length).toBeGreaterThanOrEqual(2);
     expect((intel.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(6);
     expect((intel.metrics || {}).error_count || 0).toBe(0);
@@ -39,12 +37,10 @@ describe("intel", () => {
       console.log("Skipping: language 'typescript' not available");
       return;
     }
-    const resultJson = process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return \`Hello, \${name}!\`;\n}\n", "typescript");
-    const result = JSON.parse(resultJson);
-    const intel = result;
+    const intel = process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return \`Hello, \${name}!\`;\n}\n", "typescript");
     expect(intel.language).toBe("typescript");
     expect((intel.structure || []).length).toBeGreaterThanOrEqual(1);
-    expect((intel.structure || []).some((s: any) => s.kind === "function")).toBe(true);
+    expect((intel.structure || []).some((s: any) => s.kind === "Function")).toBe(true);
     expect((intel.imports || []).length).toBeGreaterThanOrEqual(1);
     expect((intel.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(5);
     expect((intel.metrics || {}).error_count || 0).toBe(0);

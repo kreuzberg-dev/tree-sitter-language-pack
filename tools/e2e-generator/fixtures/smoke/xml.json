@@ -7,6 +7,6 @@
 	"description": "Smoke test: load xml and parse a simple snippet",
 	"id": "smoke_xml",
 	"language": "xml",
-	"source_code": "x",
+	"source_code": "<?xml version=\"1.0\"?>\n<root>hello</root>",
 	"tags": ["smoke"]
 }

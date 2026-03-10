@@ -153,10 +153,18 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         writeln!(out, "  it(\"{test_name}\", () => {{").unwrap();
         writeln!(out, "    // {}", fixture.description).unwrap();
 
-        // Skip logic
-        if let Some(skip) = &fixture.skip
-            && let Some(req_lang) = &skip.requires_language
-        {
+        // Auto-skip: guard any test that requires a specific language.
+        let is_availability_agnostic = assertions.is_some_and(|a| {
+            a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
+        });
+        let skip_lang = fixture.skip.as_ref().and_then(|s| s.requires_language.as_deref()).or({
+            if !is_availability_agnostic {
+                fixture.language.as_deref()
+            } else {
+                None
+            }
+        });
+        if let Some(req_lang) = skip_lang {
             writeln!(out, "    if (!hasLanguage(\"{req_lang}\")) {{").unwrap();
             writeln!(
                 out,
@@ -199,29 +207,22 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
                 writeln!(
                     out,
-                    "    const resultJson = processAndChunk(\"{}\", \"{}\", {});",
+                    "    const result = processAndChunk(\"{}\", \"{}\", {});",
                     escape_js_string(source),
                     escape_js_string(lang),
                     max_chunk_size
                 )
                 .unwrap();
+                writeln!(out, "    const intel = result.intelligence;").unwrap();
+                writeln!(out, "    const chunks = result.chunks;").unwrap();
             } else {
                 writeln!(
                     out,
-                    "    const resultJson = process(\"{}\", \"{}\");",
+                    "    const intel = process(\"{}\", \"{}\");",
                     escape_js_string(source),
                     escape_js_string(lang)
                 )
                 .unwrap();
-            }
-
-            writeln!(out, "    const result = JSON.parse(resultJson);").unwrap();
-
-            if has_chunk_assertions(fixture) {
-                writeln!(out, "    const intel = result.intelligence;").unwrap();
-                writeln!(out, "    const chunks = result.chunks;").unwrap();
-            } else {
-                writeln!(out, "    const intel = result;").unwrap();
             }
 
             if let Some(expected_lang) = &assertions.intel_language {

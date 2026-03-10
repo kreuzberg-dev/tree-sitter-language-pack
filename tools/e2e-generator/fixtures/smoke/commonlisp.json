@@ -7,6 +7,6 @@
 	"description": "Smoke test: load commonlisp and parse a simple snippet",
 	"id": "smoke_commonlisp",
 	"language": "commonlisp",
-	"source_code": "x",
+	"source_code": "(defun hello () (print \"hello\"))",
 	"tags": ["smoke"]
 }

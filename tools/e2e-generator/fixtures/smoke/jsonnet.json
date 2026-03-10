@@ -7,6 +7,6 @@
 	"description": "Smoke test: load jsonnet and parse a simple snippet",
 	"id": "smoke_jsonnet",
 	"language": "jsonnet",
-	"source_code": "x",
+	"source_code": "{ key: 'value' }",
 	"tags": ["smoke"]
 }

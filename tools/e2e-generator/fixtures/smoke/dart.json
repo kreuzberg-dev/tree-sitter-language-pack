@@ -7,6 +7,6 @@
 	"description": "Smoke test: load dart and parse a simple snippet",
 	"id": "smoke_dart",
 	"language": "dart",
-	"source_code": "x",
+	"source_code": "void main() {}",
 	"tags": ["smoke"]
 }

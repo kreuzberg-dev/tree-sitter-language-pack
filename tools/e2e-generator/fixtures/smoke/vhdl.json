@@ -7,6 +7,6 @@
 	"description": "Smoke test: load vhdl and parse a simple snippet",
 	"id": "smoke_vhdl",
 	"language": "vhdl",
-	"source_code": "x",
+	"source_code": "entity main is end main;",
 	"tags": ["smoke"]
 }

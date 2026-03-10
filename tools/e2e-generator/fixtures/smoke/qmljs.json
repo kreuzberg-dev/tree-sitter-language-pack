@@ -7,6 +7,6 @@
 	"description": "Smoke test: load qmljs and parse a simple snippet",
 	"id": "smoke_qmljs",
 	"language": "qmljs",
-	"source_code": "x",
+	"source_code": "import QtQuick 2.0\nItem {}",
 	"tags": ["smoke"]
 }

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load fish and parse a simple snippet",
 	"id": "smoke_fish",
 	"language": "fish",
-	"source_code": "x",
+	"source_code": "echo hello",
 	"tags": ["smoke"]
 }

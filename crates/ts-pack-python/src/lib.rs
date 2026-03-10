@@ -261,28 +261,53 @@ fn query_match_to_dict(py: Python<'_>, qm: &ts_pack_core::QueryMatch) -> PyResul
 // Intel: process / process_and_chunk
 // ---------------------------------------------------------------------------
 
-/// Process source code and extract file intelligence as a JSON string.
-#[pyfunction]
-fn process(source: &str, language: &str) -> PyResult<String> {
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let intel = registry
-        .process(source, language)
-        .map_err(|e| ParseError::new_err(format!("{e}")))?;
-    serde_json::to_string(&intel).map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))
+/// Convert a serde_json::Value to a Python object (dict, list, str, int, float, bool, None).
+fn json_value_to_py(py: Python<'_>, value: &serde_json::Value) -> PyResult<Py<PyAny>> {
+    match value {
+        serde_json::Value::Null => Ok(py.None()),
+        serde_json::Value::Bool(b) => Ok((*b).into_pyobject(py)?.to_owned().into_any().unbind()),
+        serde_json::Value::Number(n) => {
+            if let Some(i) = n.as_i64() {
+                Ok(i.into_pyobject(py)?.into_any().unbind())
+            } else if let Some(f) = n.as_f64() {
+                Ok(f.into_pyobject(py)?.into_any().unbind())
+            } else {
+                Ok(py.None())
+            }
+        }
+        serde_json::Value::String(s) => Ok(s.as_str().into_pyobject(py)?.into_any().unbind()),
+        serde_json::Value::Array(arr) => {
+            let items: Vec<Py<PyAny>> = arr.iter().map(|v| json_value_to_py(py, v)).collect::<PyResult<_>>()?;
+            Ok(PyList::new(py, &items)?.into_any().unbind())
+        }
+        serde_json::Value::Object(map) => {
+            let dict = PyDict::new(py);
+            for (k, v) in map {
+                dict.set_item(k, json_value_to_py(py, v)?)?;
+            }
+            Ok(dict.into_any().unbind())
+        }
+    }
 }
 
-/// Process and chunk source code, returning intelligence + chunks as a JSON string.
+/// Process source code and extract file intelligence as a Python dict.
 #[pyfunction]
-fn process_and_chunk(source: &str, language: &str, max_chunk_size: usize) -> PyResult<String> {
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let (intel, chunks) = registry
-        .process_and_chunk(source, language, max_chunk_size)
+fn process(py: Python<'_>, source: &str, language: &str) -> PyResult<Py<PyAny>> {
+    let intel = ts_pack_core::process(source, language).map_err(|e| ParseError::new_err(format!("{e}")))?;
+    let value = serde_json::to_value(&intel).map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))?;
+    json_value_to_py(py, &value)
+}
+
+/// Process and chunk source code, returning a dict with intelligence and chunks.
+#[pyfunction]
+fn process_and_chunk(py: Python<'_>, source: &str, language: &str, max_chunk_size: usize) -> PyResult<Py<PyAny>> {
+    let (intel, chunks) = ts_pack_core::process_and_chunk(source, language, max_chunk_size)
         .map_err(|e| ParseError::new_err(format!("{e}")))?;
     let result = serde_json::json!({
         "intelligence": intel,
         "chunks": chunks,
     });
-    serde_json::to_string(&result).map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))
+    json_value_to_py(py, &result)
 }
 
 // ---------------------------------------------------------------------------

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load magik and parse a simple snippet",
 	"id": "smoke_magik",
 	"language": "magik",
-	"source_code": "x",
+	"source_code": "_method object.hello\n_endmethod",
 	"tags": ["smoke"]
 }

@@ -112,10 +112,18 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         writeln!(out, "\t// {}", fixture.description).unwrap();
         writeln!(out, "\treg := newTestRegistry(t)").unwrap();
 
-        // Skip logic
-        if let Some(skip) = &fixture.skip
-            && let Some(req_lang) = &skip.requires_language
-        {
+        // Auto-skip: guard any test that requires a specific language.
+        let is_availability_agnostic = assertions.is_some_and(|a| {
+            a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
+        });
+        let skip_lang = fixture.skip.as_ref().and_then(|s| s.requires_language.as_deref()).or({
+            if !is_availability_agnostic {
+                fixture.language.as_deref()
+            } else {
+                None
+            }
+        });
+        if let Some(req_lang) = skip_lang {
             writeln!(
                 out,
                 "\tskipIfLanguageUnavailable(t, reg, \"{}\")",

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load csv and parse a simple snippet",
 	"id": "smoke_csv",
 	"language": "csv",
-	"source_code": "x",
+	"source_code": "a,b,c\n1,2,3",
 	"tags": ["smoke"]
 }

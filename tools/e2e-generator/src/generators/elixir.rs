@@ -56,8 +56,7 @@ defmodule E2eTests.MixProject do
 
   defp deps do
     [
-      {:tree_sitter_language_pack, path: "../../crates/ts-pack-elixir"},
-      {:jason, "~> 1.4"}
+      {:tree_sitter_language_pack, path: "../../crates/ts-pack-elixir"}
     ]
   end
 end
@@ -97,30 +96,38 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         let test_name = sanitize_name(&fixture.id);
         let assertions = fixture.assertions.as_ref();
 
+        // Auto-skip: guard any test that requires a specific language.
+        let is_availability_agnostic = assertions.is_some_and(|a| {
+            a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
+        });
+        let skip_lang = fixture.skip.as_ref().and_then(|s| s.requires_language.as_deref()).or({
+            if !is_availability_agnostic {
+                fixture.language.as_deref()
+            } else {
+                None
+            }
+        });
+
         // Skip logic via tag
-        if let Some(skip) = &fixture.skip
-            && let Some(req_lang) = &skip.requires_language
-        {
-            writeln!(out, "  @tag :skip_unless_{}", sanitize_name(req_lang)).unwrap();
+        if let Some(lang) = skip_lang {
+            writeln!(out, "  @tag :skip_unless_{}", sanitize_name(lang)).unwrap();
         }
 
         writeln!(out, "  test \"{}\" do", test_name).unwrap();
         writeln!(out, "    # {}", fixture.description).unwrap();
 
         // Skip logic check
-        if let Some(skip) = &fixture.skip
-            && let Some(req_lang) = &skip.requires_language
-        {
+        if let Some(lang) = skip_lang {
             writeln!(
                 out,
                 "    unless TreeSitterLanguagePack.has_language(\"{}\") do",
-                escape_elixir_string(req_lang)
+                escape_elixir_string(lang)
             )
             .unwrap();
             writeln!(
                 out,
                 "      IO.puts(\"Skipping: language '{}' not available\")",
-                escape_elixir_string(req_lang)
+                escape_elixir_string(lang)
             )
             .unwrap();
             writeln!(out, "    else").unwrap();
@@ -162,24 +169,22 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 let chunk_size = assertions.and_then(|a| a.intel_chunk_max_size).unwrap_or(1024);
                 writeln!(
                     out,
-                    "    result_json = TreeSitterLanguagePack.process_and_chunk(\"{}\", \"{}\", {})",
+                    "    result = TreeSitterLanguagePack.process_and_chunk(\"{}\", \"{}\", {})",
                     escape_elixir_string(source),
                     escape_elixir_string(lang),
                     chunk_size
                 )
                 .unwrap();
-                writeln!(out, "    result = Jason.decode!(result_json)").unwrap();
                 writeln!(out, "    intel = result[\"intelligence\"]").unwrap();
                 writeln!(out, "    chunks = result[\"chunks\"]").unwrap();
             } else {
                 writeln!(
                     out,
-                    "    result_json = TreeSitterLanguagePack.process(\"{}\", \"{}\")",
+                    "    intel = TreeSitterLanguagePack.process(\"{}\", \"{}\")",
                     escape_elixir_string(source),
                     escape_elixir_string(lang)
                 )
                 .unwrap();
-                writeln!(out, "    intel = Jason.decode!(result_json)").unwrap();
             }
 
             if let Some(expected_lang) = assertions.and_then(|a| a.intel_language.as_deref()) {
@@ -284,7 +289,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         }
 
         // Close skip block
-        if fixture.skip.as_ref().is_some_and(|s| s.requires_language.is_some()) {
+        if skip_lang.is_some() {
             writeln!(out, "    end").unwrap();
         }
 

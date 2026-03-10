@@ -7,6 +7,6 @@
 	"description": "Smoke test: load matlab and parse a simple snippet",
 	"id": "smoke_matlab",
 	"language": "matlab",
-	"source_code": "x",
+	"source_code": "function y = hello(x)\ny = x;\nend",
 	"tags": ["smoke"]
 }

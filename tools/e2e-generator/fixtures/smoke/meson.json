@@ -7,6 +7,6 @@
 	"description": "Smoke test: load meson and parse a simple snippet",
 	"id": "smoke_meson",
 	"language": "meson",
-	"source_code": "x",
+	"source_code": "project('hello', 'c')",
 	"tags": ["smoke"]
 }

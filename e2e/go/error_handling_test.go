@@ -7,6 +7,7 @@ import "testing"
 func TestErrorHandlingEmptySource(t *testing.T) {
 	// Parsing an empty string should still produce a tree.
 	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "javascript")
 	ptr, err := reg.GetLanguage("javascript")
 	if err != nil {
 		t.Fatalf("Failed to get language %q: %v", "javascript", err)
@@ -19,6 +20,7 @@ func TestErrorHandlingEmptySource(t *testing.T) {
 func TestErrorHandlingInvalidSyntax(t *testing.T) {
 	// Parsing invalid syntax should produce a tree with error nodes.
 	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "javascript")
 	ptr, err := reg.GetLanguage("javascript")
 	if err != nil {
 		t.Fatalf("Failed to get language %q: %v", "javascript", err)

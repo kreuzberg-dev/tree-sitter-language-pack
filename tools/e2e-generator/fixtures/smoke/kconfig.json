@@ -7,6 +7,6 @@
 	"description": "Smoke test: load kconfig and parse a simple snippet",
 	"id": "smoke_kconfig",
 	"language": "kconfig",
-	"source_code": "x",
+	"source_code": "config FOO\n\tbool \"Enable foo\"",
 	"tags": ["smoke"]
 }

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load sparql and parse a simple snippet",
 	"id": "smoke_sparql",
 	"language": "sparql",
-	"source_code": "x",
+	"source_code": "SELECT ?s WHERE { ?s ?p ?o }",
 	"tags": ["smoke"]
 }

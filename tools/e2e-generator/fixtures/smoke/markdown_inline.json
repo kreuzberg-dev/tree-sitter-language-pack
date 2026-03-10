@@ -7,6 +7,6 @@
 	"description": "Smoke test: load markdown_inline and parse a simple snippet",
 	"id": "smoke_markdown_inline",
 	"language": "markdown_inline",
-	"source_code": "x",
+	"source_code": "**bold** and *italic*",
 	"tags": ["smoke"]
 }

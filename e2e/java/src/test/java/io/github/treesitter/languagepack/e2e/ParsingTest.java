@@ -12,6 +12,10 @@ class ParsingTest {
   void parsing_javascript_class() {
     // Parse a JavaScript class declaration.
     try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("javascript"), "Language 'javascript' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
       var langPtr = registry.getLanguage("javascript");
       assertNotNull(langPtr, "Language pointer should not be null");
     }
@@ -21,6 +25,10 @@ class ParsingTest {
   void parsing_python_function() {
     // Parse a Python function definition.
     try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
       var langPtr = registry.getLanguage("python");
       assertNotNull(langPtr, "Language pointer should not be null");
     }
@@ -29,6 +37,10 @@ class ParsingTest {
   @Test
   void parsing_rust_struct() {
     // Parse a Rust struct definition.
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("rust"), "Language 'rust' not available");
+    }
     try (var registry = Helpers.createRegistry()) {
       var langPtr = registry.getLanguage("rust");
       assertNotNull(langPtr, "Language pointer should not be null");

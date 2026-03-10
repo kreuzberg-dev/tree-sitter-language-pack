@@ -7,6 +7,6 @@
 	"description": "Smoke test: load v and parse a simple snippet",
 	"id": "smoke_v",
 	"language": "v",
-	"source_code": "x",
+	"source_code": "fn main() {}",
 	"tags": ["smoke"]
 }

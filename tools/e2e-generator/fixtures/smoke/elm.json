@@ -7,6 +7,6 @@
 	"description": "Smoke test: load elm and parse a simple snippet",
 	"id": "smoke_elm",
 	"language": "elm",
-	"source_code": "x",
+	"source_code": "module Main exposing (..)",
 	"tags": ["smoke"]
 }

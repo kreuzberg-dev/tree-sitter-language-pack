@@ -7,6 +7,6 @@
 	"description": "Smoke test: load wgsl and parse a simple snippet",
 	"id": "smoke_wgsl",
 	"language": "wgsl",
-	"source_code": "x",
+	"source_code": "@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }",
 	"tags": ["smoke"]
 }

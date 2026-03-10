@@ -111,9 +111,9 @@ mod tests {
         let result = run_query(&tree, first, "(function_definition) @fn", b"x");
         // This might error if the grammar doesn't have function_definition,
         // or return empty matches. Either is acceptable.
-        match result {
-            Ok(matches) => assert!(matches.is_empty()),
-            Err(_) => {} // Query compilation error is fine for some grammars
+        if let Ok(matches) = result {
+            assert!(matches.is_empty());
         }
+        // Query compilation error is fine for some grammars
     }
 }

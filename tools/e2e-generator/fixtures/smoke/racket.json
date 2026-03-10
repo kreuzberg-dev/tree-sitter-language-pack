@@ -7,6 +7,6 @@
 	"description": "Smoke test: load racket and parse a simple snippet",
 	"id": "smoke_racket",
 	"language": "racket",
-	"source_code": "x",
+	"source_code": "#lang racket\n(define x 1)",
 	"tags": ["smoke"]
 }

@@ -6,10 +6,13 @@ version = "0.0.0"
 edition = "2024"
 publish = false
 
+[lib]
+doctest = false
+
 [workspace]
 
 [workspace.dependencies]
-ts-pack-core = { path = "../../crates/ts-pack-core", features = ["serde"] }
+ts-pack-core = { path = "../../crates/ts-pack-core", features = ["serde", "all"] }
 tree-sitter = "0.26"
 serde_json = "1"
 

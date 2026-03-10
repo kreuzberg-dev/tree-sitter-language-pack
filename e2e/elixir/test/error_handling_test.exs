@@ -3,17 +3,29 @@
 defmodule E2eTests.ErrorHandlingTest do
   use ExUnit.Case, async: true
 
+  @tag :skip_unless_javascript
   test "error_handling_empty_source" do
     # Parsing an empty string should still produce a tree.
-    tree = TreeSitterLanguagePack.parse_string("javascript", "")
-    assert is_reference(tree), "Parse tree should be a reference"
+    unless TreeSitterLanguagePack.has_language("javascript") do
+      IO.puts("Skipping: language 'javascript' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("javascript", "")
+      assert is_reference(tree), "Parse tree should be a reference"
+    end
   end
 
+  @tag :skip_unless_javascript
   test "error_handling_invalid_syntax" do
     # Parsing invalid syntax should produce a tree with error nodes.
-    tree = TreeSitterLanguagePack.parse_string("javascript", "function function function @@@ %%%")
-    assert is_reference(tree), "Parse tree should be a reference"
-    assert TreeSitterLanguagePack.tree_has_error_nodes(tree), "Tree should contain error nodes"
+    unless TreeSitterLanguagePack.has_language("javascript") do
+      IO.puts("Skipping: language 'javascript' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string("javascript", "function function function @@@ %%%")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      assert TreeSitterLanguagePack.tree_has_error_nodes(tree), "Tree should contain error nodes"
+    end
   end
 
   test "error_handling_unknown_language" do

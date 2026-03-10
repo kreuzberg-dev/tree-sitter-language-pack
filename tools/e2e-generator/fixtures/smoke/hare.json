@@ -7,6 +7,6 @@
 	"description": "Smoke test: load hare and parse a simple snippet",
 	"id": "smoke_hare",
 	"language": "hare",
-	"source_code": "x",
+	"source_code": "export fn main() void = void;",
 	"tags": ["smoke"]
 }

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load proto and parse a simple snippet",
 	"id": "smoke_proto",
 	"language": "proto",
-	"source_code": "x",
+	"source_code": "syntax = \"proto3\";",
 	"tags": ["smoke"]
 }

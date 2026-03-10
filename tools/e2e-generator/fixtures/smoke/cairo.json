@@ -7,6 +7,6 @@
 	"description": "Smoke test: load cairo and parse a simple snippet",
 	"id": "smoke_cairo",
 	"language": "cairo",
-	"source_code": "x",
+	"source_code": "fn main() {}",
 	"tags": ["smoke"]
 }

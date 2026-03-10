@@ -7,6 +7,6 @@
 	"description": "Smoke test: load cpon and parse a simple snippet",
 	"id": "smoke_cpon",
 	"language": "cpon",
-	"source_code": "x",
+	"source_code": "{\"key\": 1}",
 	"tags": ["smoke"]
 }

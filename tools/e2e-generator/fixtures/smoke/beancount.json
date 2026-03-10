@@ -7,6 +7,6 @@
 	"description": "Smoke test: load beancount and parse a simple snippet",
 	"id": "smoke_beancount",
 	"language": "beancount",
-	"source_code": "x",
+	"source_code": "2024-01-01 open Assets:Bank USD",
 	"tags": ["smoke"]
 }

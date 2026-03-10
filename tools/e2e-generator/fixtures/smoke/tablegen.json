@@ -7,6 +7,6 @@
 	"description": "Smoke test: load tablegen and parse a simple snippet",
 	"id": "smoke_tablegen",
 	"language": "tablegen",
-	"source_code": "x",
+	"source_code": "def Hello : Base {}",
 	"tags": ["smoke"]
 }

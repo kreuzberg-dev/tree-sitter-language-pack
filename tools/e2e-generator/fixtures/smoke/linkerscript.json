@@ -7,6 +7,6 @@
 	"description": "Smoke test: load linkerscript and parse a simple snippet",
 	"id": "smoke_linkerscript",
 	"language": "linkerscript",
-	"source_code": "x",
+	"source_code": "SECTIONS { .text : { *(.text) } }",
 	"tags": ["smoke"]
 }

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load solidity and parse a simple snippet",
 	"id": "smoke_solidity",
 	"language": "solidity",
-	"source_code": "x",
+	"source_code": "pragma solidity ^0.8.0;\ncontract Main {}",
 	"tags": ["smoke"]
 }

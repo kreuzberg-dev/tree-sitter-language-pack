@@ -26,7 +26,7 @@ libloading = "0.9"
 cbindgen = "0.29"
 clap = { version = "4", features = ["derive"] }
 toml_edit = "0.25"
-napi = { version = "3", features = ["napi4"] }
+napi = { version = "3", features = ["napi4", "serde-json"] }
 napi-derive = "3"
 napi-build = "2"
 pyo3 = { version = "0.28", features = ["abi3-py310"] }

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load po and parse a simple snippet",
 	"id": "smoke_po",
 	"language": "po",
-	"source_code": "x",
+	"source_code": "msgid \"hello\"\nmsgstr \"world\"",
 	"tags": ["smoke"]
 }

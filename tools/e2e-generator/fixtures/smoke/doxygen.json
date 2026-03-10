@@ -7,6 +7,6 @@
 	"description": "Smoke test: load doxygen and parse a simple snippet",
 	"id": "smoke_doxygen",
 	"language": "doxygen",
-	"source_code": "x",
+	"source_code": "/** @brief A function */",
 	"tags": ["smoke"]
 }

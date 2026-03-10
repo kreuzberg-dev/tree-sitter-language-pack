@@ -26,7 +26,7 @@ fn go_function_intel() {
             .structure
             .iter()
             .any(|s| s.kind == ts_pack_core::StructureKind::Function),
-        "Structure should contain a 'function' item"
+        "Structure should contain a 'Function' item"
     );
     assert!(
         intel.imports.len() >= 1,
@@ -65,7 +65,7 @@ fn javascript_multi_import_intel() {
             .structure
             .iter()
             .any(|s| s.kind == ts_pack_core::StructureKind::Function),
-        "Structure should contain a 'function' item"
+        "Structure should contain a 'Function' item"
     );
     assert!(
         intel.imports.len() >= 2,
@@ -128,7 +128,7 @@ fn python_class_with_methods_intel() {
             .structure
             .iter()
             .any(|s| s.kind == ts_pack_core::StructureKind::Class),
-        "Structure should contain a 'class' item"
+        "Structure should contain a 'Class' item"
     );
     assert!(
         intel.metrics.total_lines >= 6,
@@ -164,7 +164,7 @@ fn python_function_intel() {
             .structure
             .iter()
             .any(|s| s.kind == ts_pack_core::StructureKind::Function),
-        "Structure should contain a 'function' item"
+        "Structure should contain a 'Function' item"
     );
     assert!(
         intel.metrics.total_lines >= 2,
@@ -276,7 +276,7 @@ fn rust_function_intel() {
             .structure
             .iter()
             .any(|s| s.kind == ts_pack_core::StructureKind::Function),
-        "Structure should contain a 'function' item"
+        "Structure should contain a 'Function' item"
     );
     assert!(
         intel.metrics.total_lines >= 3,
@@ -310,7 +310,7 @@ fn typescript_function_intel() {
             .structure
             .iter()
             .any(|s| s.kind == ts_pack_core::StructureKind::Function),
-        "Structure should contain a 'function' item"
+        "Structure should contain a 'Function' item"
     );
     assert!(
         intel.imports.len() >= 1,

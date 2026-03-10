@@ -7,6 +7,6 @@
 	"description": "Smoke test: load tsv and parse a simple snippet",
 	"id": "smoke_tsv",
 	"language": "tsv",
-	"source_code": "x",
+	"source_code": "a\tb\tc\n1\t2\t3",
 	"tags": ["smoke"]
 }

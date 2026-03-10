@@ -7,6 +7,6 @@
 	"description": "Smoke test: load actionscript and parse a simple snippet",
 	"id": "smoke_actionscript",
 	"language": "actionscript",
-	"source_code": "x",
+	"source_code": "var x:int = 1;",
 	"tags": ["smoke"]
 }

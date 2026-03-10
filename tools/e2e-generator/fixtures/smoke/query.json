@@ -7,6 +7,6 @@
 	"description": "Smoke test: load query and parse a simple snippet",
 	"id": "smoke_query",
 	"language": "query",
-	"source_code": "x",
+	"source_code": "(identifier) @name",
 	"tags": ["smoke"]
 }

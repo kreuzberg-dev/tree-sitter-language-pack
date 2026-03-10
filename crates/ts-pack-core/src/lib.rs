@@ -61,6 +61,20 @@ pub fn language_count() -> usize {
     REGISTRY.language_count()
 }
 
+/// Process source code and extract file intelligence using the global registry.
+pub fn process(source: &str, language: &str) -> Result<intel::types::FileIntelligence, Error> {
+    REGISTRY.process(source, language)
+}
+
+/// Process, extract intelligence, and chunk source code using the global registry.
+pub fn process_and_chunk(
+    source: &str,
+    language: &str,
+    max_chunk_size: usize,
+) -> Result<(intel::types::FileIntelligence, Vec<intel::types::IntelligentChunk>), Error> {
+    REGISTRY.process_and_chunk(source, language, max_chunk_size)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -69,7 +83,8 @@ mod tests {
     fn test_available_languages() {
         let langs = available_languages();
         // With zero default parsers, this may be empty unless lang-* features are enabled
-        assert!(langs.len() >= 0, "available_languages should not panic");
+        // Verify available_languages doesn't panic; may be empty without lang-* features
+        let _ = langs;
     }
 
     #[test]

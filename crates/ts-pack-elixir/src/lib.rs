@@ -1,10 +1,11 @@
-use rustler::{Error, NifResult, ResourceArc};
+use rustler::{Encoder, Env, Error, NifResult, ResourceArc, Term};
 use std::sync::Mutex;
 
 mod atoms {
     rustler::atoms! {
         language_not_found,
         parse_error,
+        nil,
     }
 }
 
@@ -84,28 +85,51 @@ fn tree_has_error_nodes(tree: ResourceArc<TreeResource>) -> NifResult<bool> {
 // Intel: process / process_and_chunk
 // ---------------------------------------------------------------------------
 
-#[rustler::nif]
-fn process(source: String, language: String) -> NifResult<String> {
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let intel = registry
-        .process(&source, &language)
-        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
-    serde_json::to_string(&intel)
-        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("serialization failed: {e}")))))
+/// Convert a serde_json::Value to an Elixir term (map, list, string, integer, float, boolean, nil).
+fn json_to_term<'a>(env: Env<'a>, value: &serde_json::Value) -> Term<'a> {
+    match value {
+        serde_json::Value::Null => atoms::nil().encode(env),
+        serde_json::Value::Bool(b) => b.encode(env),
+        serde_json::Value::Number(n) => {
+            if let Some(i) = n.as_i64() {
+                i.encode(env)
+            } else if let Some(f) = n.as_f64() {
+                f.encode(env)
+            } else {
+                atoms::nil().encode(env)
+            }
+        }
+        serde_json::Value::String(s) => s.encode(env),
+        serde_json::Value::Array(arr) => {
+            let terms: Vec<Term<'a>> = arr.iter().map(|v| json_to_term(env, v)).collect();
+            terms.encode(env)
+        }
+        serde_json::Value::Object(map) => {
+            let pairs: Vec<(Term<'a>, Term<'a>)> =
+                map.iter().map(|(k, v)| (k.encode(env), json_to_term(env, v))).collect();
+            Term::map_from_pairs(env, &pairs).unwrap_or_else(|_| atoms::nil().encode(env))
+        }
+    }
 }
 
 #[rustler::nif]
-fn process_and_chunk(source: String, language: String, max_chunk_size: u64) -> NifResult<String> {
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let (intel, chunks) = registry
-        .process_and_chunk(&source, &language, max_chunk_size as usize)
+fn process<'a>(env: Env<'a>, source: String, language: String) -> NifResult<Term<'a>> {
+    let intel = ts_pack_core::process(&source, &language)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
+    let value = serde_json::to_value(&intel)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("serialization failed: {e}")))))?;
+    Ok(json_to_term(env, &value))
+}
+
+#[rustler::nif]
+fn process_and_chunk<'a>(env: Env<'a>, source: String, language: String, max_chunk_size: u64) -> NifResult<Term<'a>> {
+    let (intel, chunks) = ts_pack_core::process_and_chunk(&source, &language, max_chunk_size as usize)
         .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
     let result = serde_json::json!({
         "intelligence": intel,
         "chunks": chunks,
     });
-    serde_json::to_string(&result)
-        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("serialization failed: {e}")))))
+    Ok(json_to_term(env, &result))
 }
 
 rustler::init!("Elixir.TreeSitterLanguagePack");

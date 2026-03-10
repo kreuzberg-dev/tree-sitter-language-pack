@@ -7,6 +7,6 @@
 	"description": "Smoke test: load fsharp_signature and parse a simple snippet",
 	"id": "smoke_fsharp_signature",
 	"language": "fsharp_signature",
-	"source_code": "x",
+	"source_code": "val x: int",
 	"tags": ["smoke"]
 }

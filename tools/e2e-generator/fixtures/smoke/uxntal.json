@@ -7,6 +7,6 @@
 	"description": "Smoke test: load uxntal and parse a simple snippet",
 	"id": "smoke_uxntal",
 	"language": "uxntal",
-	"source_code": "x",
+	"source_code": "|0100 LIT 01",
 	"tags": ["smoke"]
 }

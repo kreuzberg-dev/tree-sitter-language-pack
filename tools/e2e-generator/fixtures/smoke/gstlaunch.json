@@ -7,6 +7,6 @@
 	"description": "Smoke test: load gstlaunch and parse a simple snippet",
 	"id": "smoke_gstlaunch",
 	"language": "gstlaunch",
-	"source_code": "x",
+	"source_code": "fakesrc ! fakesink",
 	"tags": ["smoke"]
 }

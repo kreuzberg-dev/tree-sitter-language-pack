@@ -7,6 +7,6 @@
 	"description": "Smoke test: load nix and parse a simple snippet",
 	"id": "smoke_nix",
 	"language": "nix",
-	"source_code": "x",
+	"source_code": "{ pkgs ? import <nixpkgs> {} }: pkgs.hello",
 	"tags": ["smoke"]
 }

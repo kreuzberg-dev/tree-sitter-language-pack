@@ -7,6 +7,6 @@
 	"description": "Smoke test: load julia and parse a simple snippet",
 	"id": "smoke_julia",
 	"language": "julia",
-	"source_code": "x",
+	"source_code": "function main() end",
 	"tags": ["smoke"]
 }

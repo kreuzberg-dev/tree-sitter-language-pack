@@ -7,6 +7,6 @@
 	"description": "Smoke test: load netlinx and parse a simple snippet",
 	"id": "smoke_netlinx",
 	"language": "netlinx",
-	"source_code": "x",
+	"source_code": "PROGRAM_NAME='hello'",
 	"tags": ["smoke"]
 }

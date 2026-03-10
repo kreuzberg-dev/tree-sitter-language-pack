@@ -14,8 +14,7 @@ defmodule E2eTests.MixProject do
 
   defp deps do
     [
-      {:tree_sitter_language_pack, path: "../../crates/ts-pack-elixir"},
-      {:jason, "~> 1.4"}
+      {:tree_sitter_language_pack, path: "../../crates/ts-pack-elixir"}
     ]
   end
 end

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load apex and parse a simple snippet",
 	"id": "smoke_apex",
 	"language": "apex",
-	"source_code": "x",
+	"source_code": "public class Main {}",
 	"tags": ["smoke"]
 }

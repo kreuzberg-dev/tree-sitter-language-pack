@@ -7,6 +7,6 @@
 	"description": "Smoke test: load nim and parse a simple snippet",
 	"id": "smoke_nim",
 	"language": "nim",
-	"source_code": "x",
+	"source_code": "echo \"hello\"",
 	"tags": ["smoke"]
 }

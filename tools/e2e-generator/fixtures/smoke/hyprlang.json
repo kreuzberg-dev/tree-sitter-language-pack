@@ -7,6 +7,6 @@
 	"description": "Smoke test: load hyprlang and parse a simple snippet",
 	"id": "smoke_hyprlang",
 	"language": "hyprlang",
-	"source_code": "x",
+	"source_code": "general { border_size = 1 }",
 	"tags": ["smoke"]
 }

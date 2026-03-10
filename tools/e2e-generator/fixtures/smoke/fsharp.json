@@ -7,6 +7,6 @@
 	"description": "Smoke test: load fsharp and parse a simple snippet",
 	"id": "smoke_fsharp",
 	"language": "fsharp",
-	"source_code": "x",
+	"source_code": "let x = 1",
 	"tags": ["smoke"]
 }

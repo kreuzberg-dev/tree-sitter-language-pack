@@ -7,6 +7,6 @@
 	"description": "Smoke test: load ninja and parse a simple snippet",
 	"id": "smoke_ninja",
 	"language": "ninja",
-	"source_code": "x",
+	"source_code": "rule cc\n  command = cc $in -o $out",
 	"tags": ["smoke"]
 }

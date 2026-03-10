@@ -12,6 +12,10 @@ class ErrorHandlingTest {
   void error_handling_empty_source() {
     // Parsing an empty string should still produce a tree.
     try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("javascript"), "Language 'javascript' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
       var langPtr = registry.getLanguage("javascript");
       assertNotNull(langPtr, "Language pointer should not be null");
     }
@@ -20,6 +24,10 @@ class ErrorHandlingTest {
   @Test
   void error_handling_invalid_syntax() {
     // Parsing invalid syntax should produce a tree with error nodes.
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("javascript"), "Language 'javascript' not available");
+    }
     try (var registry = Helpers.createRegistry()) {
       var langPtr = registry.getLanguage("javascript");
       assertNotNull(langPtr, "Language pointer should not be null");

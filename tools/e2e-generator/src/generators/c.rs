@@ -146,21 +146,30 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
     writeln!(out, "    TsPackRegistry *reg = ts_pack_registry_new();").unwrap();
     writeln!(out, "    ASSERT_NOT_NULL(reg, \"Failed to create registry\");").unwrap();
 
-    // Skip logic
-    if let Some(skip) = &fixture.skip
-        && let Some(req_lang) = &skip.requires_language
-    {
+    // Auto-skip: guard any test that requires a specific language.
+    let is_availability_agnostic = assertions.is_some_and(|a| {
+        a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
+    });
+    let skip_lang = fixture.skip.as_ref().and_then(|s| s.requires_language.as_deref()).or({
+        if !is_availability_agnostic {
+            fixture.language.as_deref()
+        } else {
+            None
+        }
+    });
+
+    if let Some(lang) = skip_lang {
         writeln!(
             out,
             "    if (!ts_pack_has_language(reg, \"{}\")) {{",
-            escape_c_string(req_lang)
+            escape_c_string(lang)
         )
         .unwrap();
         writeln!(
             out,
             "        printf(\"SKIP: {} (language '{}' not available)\\n\");",
             fn_name,
-            escape_c_string(req_lang)
+            escape_c_string(lang)
         )
         .unwrap();
         writeln!(out, "        ts_pack_registry_free(reg);").unwrap();

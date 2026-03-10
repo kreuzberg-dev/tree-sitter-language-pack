@@ -47,3 +47,16 @@ export declare function treeRootChildCount(tree: ExternalObject<Tree>): number;
 
 /** Get the type name of the root node. */
 export declare function treeRootNodeType(tree: ExternalObject<Tree>): string;
+
+/** Process source code and extract file intelligence as a JavaScript object. */
+export declare function process(
+	source: string,
+	language: string,
+): Record<string, unknown>;
+
+/** Process and chunk source code, returning a JavaScript object with intelligence and chunks. */
+export declare function processAndChunk(
+	source: string,
+	language: string,
+	maxChunkSize: number,
+): Record<string, unknown>;

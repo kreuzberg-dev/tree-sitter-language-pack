@@ -7,6 +7,6 @@
 	"description": "Smoke test: load ini and parse a simple snippet",
 	"id": "smoke_ini",
 	"language": "ini",
-	"source_code": "x",
+	"source_code": "[section]\nkey = value",
 	"tags": ["smoke"]
 }

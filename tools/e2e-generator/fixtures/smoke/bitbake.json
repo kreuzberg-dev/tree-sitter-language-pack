@@ -7,6 +7,6 @@
 	"description": "Smoke test: load bitbake and parse a simple snippet",
 	"id": "smoke_bitbake",
 	"language": "bitbake",
-	"source_code": "x",
+	"source_code": "DESCRIPTION = \"hello\"",
 	"tags": ["smoke"]
 }

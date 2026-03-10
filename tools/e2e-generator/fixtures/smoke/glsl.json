@@ -7,6 +7,6 @@
 	"description": "Smoke test: load glsl and parse a simple snippet",
 	"id": "smoke_glsl",
 	"language": "glsl",
-	"source_code": "x",
+	"source_code": "void main() { gl_Position = vec4(0.0); }",
 	"tags": ["smoke"]
 }

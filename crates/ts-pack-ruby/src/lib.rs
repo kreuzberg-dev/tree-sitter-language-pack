@@ -59,26 +59,65 @@ fn parse_string(ruby: &Ruby, language: String, source: String) -> Result<TreeWra
     Ok(TreeWrapper(Mutex::new(tree)))
 }
 
-fn process(ruby: &Ruby, source: String, language: String) -> Result<String, Error> {
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let intel = registry
-        .process(&source, &language)
-        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
-    serde_json::to_string(&intel)
-        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))
+/// Convert a serde_json::Value to a Ruby value (Hash, Array, String, Integer, Float, true/false, nil).
+fn json_value_to_ruby(ruby: &Ruby, value: &serde_json::Value) -> Result<magnus::Value, Error> {
+    match value {
+        serde_json::Value::Null => Ok(ruby.qnil().as_value()),
+        serde_json::Value::Bool(b) => {
+            if *b {
+                Ok(ruby.qtrue().as_value())
+            } else {
+                Ok(ruby.qfalse().as_value())
+            }
+        }
+        serde_json::Value::Number(n) => {
+            if let Some(i) = n.as_i64() {
+                Ok(ruby.integer_from_i64(i).as_value())
+            } else if let Some(f) = n.as_f64() {
+                Ok(ruby.float_from_f64(f).as_value())
+            } else {
+                Ok(ruby.qnil().as_value())
+            }
+        }
+        serde_json::Value::String(s) => Ok(ruby.str_new(s).as_value()),
+        serde_json::Value::Array(arr) => {
+            let r_arr = ruby.ary_new_capa(arr.len());
+            for v in arr {
+                r_arr.push(json_value_to_ruby(ruby, v)?)?;
+            }
+            Ok(r_arr.as_value())
+        }
+        serde_json::Value::Object(map) => {
+            let hash = ruby.hash_new();
+            for (k, v) in map {
+                hash.aset(ruby.str_new(k), json_value_to_ruby(ruby, v)?)?;
+            }
+            Ok(hash.as_value())
+        }
+    }
 }
 
-fn process_and_chunk(ruby: &Ruby, source: String, language: String, max_chunk_size: usize) -> Result<String, Error> {
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let (intel, chunks) = registry
-        .process_and_chunk(&source, &language, max_chunk_size)
+fn process(ruby: &Ruby, source: String, language: String) -> Result<magnus::Value, Error> {
+    let intel = ts_pack_core::process(&source, &language)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
+    let value = serde_json::to_value(&intel)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))?;
+    json_value_to_ruby(ruby, &value)
+}
+
+fn process_and_chunk(
+    ruby: &Ruby,
+    source: String,
+    language: String,
+    max_chunk_size: usize,
+) -> Result<magnus::Value, Error> {
+    let (intel, chunks) = ts_pack_core::process_and_chunk(&source, &language, max_chunk_size)
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
     let result = serde_json::json!({
         "intelligence": intel,
         "chunks": chunks,
     });
-    serde_json::to_string(&result)
-        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))
+    json_value_to_ruby(ruby, &result)
 }
 
 #[magnus::init]

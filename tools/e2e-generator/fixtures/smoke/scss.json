@@ -7,6 +7,6 @@
 	"description": "Smoke test: load scss and parse a simple snippet",
 	"id": "smoke_scss",
 	"language": "scss",
-	"source_code": "x",
+	"source_code": "$color: red;\nbody { color: $color; }",
 	"tags": ["smoke"]
 }

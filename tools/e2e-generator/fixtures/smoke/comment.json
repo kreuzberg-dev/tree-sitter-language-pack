@@ -7,6 +7,6 @@
 	"description": "Smoke test: load comment and parse a simple snippet",
 	"id": "smoke_comment",
 	"language": "comment",
-	"source_code": "x",
+	"source_code": "TODO: fix this",
 	"tags": ["smoke"]
 }

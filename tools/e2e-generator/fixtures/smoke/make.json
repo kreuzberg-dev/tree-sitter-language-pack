@@ -7,6 +7,6 @@
 	"description": "Smoke test: load make and parse a simple snippet",
 	"id": "smoke_make",
 	"language": "make",
-	"source_code": "x",
+	"source_code": "all:\n\techo hello",
 	"tags": ["smoke"]
 }

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load fennel and parse a simple snippet",
 	"id": "smoke_fennel",
 	"language": "fennel",
-	"source_code": "x",
+	"source_code": "(fn hello [] (print :hello))",
 	"tags": ["smoke"]
 }

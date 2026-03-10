@@ -7,6 +7,6 @@
 	"description": "Smoke test: load haxe and parse a simple snippet",
 	"id": "smoke_haxe",
 	"language": "haxe",
-	"source_code": "x",
+	"source_code": "class Main { static function main() {} }",
 	"tags": ["smoke"]
 }

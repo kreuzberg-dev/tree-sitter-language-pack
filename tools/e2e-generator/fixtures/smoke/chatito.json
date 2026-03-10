@@ -7,6 +7,6 @@
 	"description": "Smoke test: load chatito and parse a simple snippet",
 	"id": "smoke_chatito",
 	"language": "chatito",
-	"source_code": "x",
+	"source_code": "%[greeting]\n    hello",
 	"tags": ["smoke"]
 }

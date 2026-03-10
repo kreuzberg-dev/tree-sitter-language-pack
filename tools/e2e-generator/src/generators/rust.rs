@@ -48,10 +48,13 @@ version = "0.0.0"
 edition = "2024"
 publish = false
 
+[lib]
+doctest = false
+
 [workspace]
 
 [workspace.dependencies]
-ts-pack-core = { path = "../../crates/ts-pack-core", features = ["serde"] }
+ts-pack-core = { path = "../../crates/ts-pack-core", features = ["serde", "all"] }
 tree-sitter = "0.26"
 serde_json = "1"
 
@@ -105,7 +108,7 @@ pub fn tree_has_error_nodes(node: tree_sitter::Node) -> bool {
 
 /// Map a fixture kind string to a Rust StructureKind variant expression.
 fn structure_kind_variant(kind: &str) -> String {
-    match kind {
+    match kind.to_ascii_lowercase().as_str() {
         "function" => "ts_pack_core::StructureKind::Function".to_string(),
         "method" => "ts_pack_core::StructureKind::Method".to_string(),
         "class" => "ts_pack_core::StructureKind::Class".to_string(),
@@ -116,9 +119,9 @@ fn structure_kind_variant(kind: &str) -> String {
         "trait" => "ts_pack_core::StructureKind::Trait".to_string(),
         "impl" => "ts_pack_core::StructureKind::Impl".to_string(),
         "namespace" => "ts_pack_core::StructureKind::Namespace".to_string(),
-        other => format!(
+        _ => format!(
             "ts_pack_core::StructureKind::Other(\"{}\".to_string())",
-            escape_rust_string(other)
+            escape_rust_string(kind)
         ),
     }
 }
@@ -234,10 +237,20 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         writeln!(out, "#[test]").unwrap();
         writeln!(out, "fn {fn_name}() {{").unwrap();
 
-        // Skip logic
-        if let Some(skip) = &fixture.skip
-            && let Some(req_lang) = &skip.requires_language
-        {
+        // Auto-skip: guard any test that requires a specific language to be available.
+        // Explicit skip.requires_language takes precedence; otherwise infer from fixture.language.
+        let assertions = fixture.assertions.as_ref();
+        let is_availability_agnostic = assertions.is_some_and(|a| {
+            a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
+        });
+        let skip_lang = fixture.skip.as_ref().and_then(|s| s.requires_language.as_deref()).or({
+            if !is_availability_agnostic {
+                fixture.language.as_deref()
+            } else {
+                None
+            }
+        });
+        if let Some(req_lang) = skip_lang {
             writeln!(out, "    if !ts_pack_core::has_language(\"{req_lang}\") {{").unwrap();
             writeln!(
                 out,
@@ -248,8 +261,6 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             writeln!(out, "        return;").unwrap();
             writeln!(out, "    }}").unwrap();
         }
-
-        let assertions = fixture.assertions.as_ref();
 
         // Check if this is an expect_error test
         if assertions.is_some_and(|a| a.expect_error == Some(true)) {

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load ada and parse a simple snippet",
 	"id": "smoke_ada",
 	"language": "ada",
-	"source_code": "x",
+	"source_code": "procedure Main is begin null; end Main;",
 	"tags": ["smoke"]
 }

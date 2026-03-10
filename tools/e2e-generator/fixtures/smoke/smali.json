@@ -7,6 +7,6 @@
 	"description": "Smoke test: load smali and parse a simple snippet",
 	"id": "smoke_smali",
 	"language": "smali",
-	"source_code": "x",
+	"source_code": ".class public LMain;\n.super Ljava/lang/Object;",
 	"tags": ["smoke"]
 }

@@ -7,6 +7,6 @@
 	"description": "Smoke test: load bsl and parse a simple snippet",
 	"id": "smoke_bsl",
 	"language": "bsl",
-	"source_code": "x",
+	"source_code": "Procedure Main() EndProcedure",
 	"tags": ["smoke"]
 }

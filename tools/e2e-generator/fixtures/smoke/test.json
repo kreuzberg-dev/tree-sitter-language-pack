@@ -7,6 +7,6 @@
 	"description": "Smoke test: load test and parse a simple snippet",
 	"id": "smoke_test",
 	"language": "test",
-	"source_code": "x",
+	"source_code": "===========\nTest\n===========\n---\n(node)",
 	"tags": ["smoke"]
 }

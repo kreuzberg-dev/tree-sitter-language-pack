@@ -7,6 +7,6 @@
 	"description": "Smoke test: load hlsl and parse a simple snippet",
 	"id": "smoke_hlsl",
 	"language": "hlsl",
-	"source_code": "x",
+	"source_code": "float4 main() : SV_Target { return 0; }",
 	"tags": ["smoke"]
 }

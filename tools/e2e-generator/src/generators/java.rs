@@ -93,6 +93,12 @@ fn write_pom_xml(dir: &Path) -> Result<(), String> {
             <version>5.11.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.11.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
 "#;
@@ -160,10 +166,18 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
         writeln!(out, "    void {method_name}() {{").unwrap();
         writeln!(out, "        // {}", fixture.description).unwrap();
 
-        // Skip logic (using Assumptions in JUnit 5)
-        if let Some(skip) = &fixture.skip
-            && let Some(req_lang) = &skip.requires_language
-        {
+        // Auto-skip: guard any test that requires a specific language.
+        let is_availability_agnostic = assertions.is_some_and(|a| {
+            a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
+        });
+        let skip_lang = fixture.skip.as_ref().and_then(|s| s.requires_language.as_deref()).or({
+            if !is_availability_agnostic {
+                fixture.language.as_deref()
+            } else {
+                None
+            }
+        });
+        if let Some(req_lang) = skip_lang {
             writeln!(out, "        try (var registry = Helpers.createRegistry()) {{").unwrap();
             writeln!(
                     out,

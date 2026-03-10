@@ -7,6 +7,6 @@
 	"description": "Smoke test: load llvm and parse a simple snippet",
 	"id": "smoke_llvm",
 	"language": "llvm",
-	"source_code": "x",
+	"source_code": "define i32 @main() { ret i32 0 }",
 	"tags": ["smoke"]
 }

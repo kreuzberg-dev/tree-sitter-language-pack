@@ -7,6 +7,6 @@
 	"description": "Smoke test: load hcl and parse a simple snippet",
 	"id": "smoke_hcl",
 	"language": "hcl",
-	"source_code": "x",
+	"source_code": "variable \"name\" { type = string }",
 	"tags": ["smoke"]
 }

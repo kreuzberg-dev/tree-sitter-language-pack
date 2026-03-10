@@ -7,6 +7,6 @@
 	"description": "Smoke test: load typst and parse a simple snippet",
 	"id": "smoke_typst",
 	"language": "typst",
-	"source_code": "x",
+	"source_code": "#let x = 1",
 	"tags": ["smoke"]
 }

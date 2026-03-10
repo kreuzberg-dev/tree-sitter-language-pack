@@ -7,6 +7,6 @@
 	"description": "Smoke test: load udev and parse a simple snippet",
 	"id": "smoke_udev",
 	"language": "udev",
-	"source_code": "x",
+	"source_code": "ACTION==\"add\", KERNEL==\"sd*\"",
 	"tags": ["smoke"]
 }

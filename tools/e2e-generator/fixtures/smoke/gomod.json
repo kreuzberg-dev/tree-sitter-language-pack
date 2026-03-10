@@ -7,6 +7,6 @@
 	"description": "Smoke test: load gomod and parse a simple snippet",
 	"id": "smoke_gomod",
 	"language": "gomod",
-	"source_code": "x",
+	"source_code": "module example.com/hello\n\ngo 1.21",
 	"tags": ["smoke"]
 }

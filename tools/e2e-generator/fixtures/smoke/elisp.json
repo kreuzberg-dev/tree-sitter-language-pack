@@ -7,6 +7,6 @@
 	"description": "Smoke test: load elisp and parse a simple snippet",
 	"id": "smoke_elisp",
 	"language": "elisp",
-	"source_code": "x",
+	"source_code": "(defun hello () (message \"hello\"))",
 	"tags": ["smoke"]
 }

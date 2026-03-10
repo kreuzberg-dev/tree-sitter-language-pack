@@ -6,12 +6,20 @@ import { availableLanguages, hasLanguage, getLanguagePtr, process, processAndChu
 describe("error_handling", () => {
   it("error_handling_empty_source", () => {
     // Parsing an empty string should still produce a tree.
+    if (!hasLanguage("javascript")) {
+      console.log("Skipping: language 'javascript' not available");
+      return;
+    }
     const ptr = getLanguagePtr("javascript");
     expect(ptr).toBeTruthy();
   });
 
   it("error_handling_invalid_syntax", () => {
     // Parsing invalid syntax should produce a tree with error nodes.
+    if (!hasLanguage("javascript")) {
+      console.log("Skipping: language 'javascript' not available");
+      return;
+    }
     const ptr = getLanguagePtr("javascript");
     expect(ptr).toBeTruthy();
   });

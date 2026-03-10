@@ -7,6 +7,6 @@
 	"description": "Smoke test: load gosum and parse a simple snippet",
 	"id": "smoke_gosum",
 	"language": "gosum",
-	"source_code": "x",
+	"source_code": "example.com/pkg v1.0.0 h1:abc=",
 	"tags": ["smoke"]
 }

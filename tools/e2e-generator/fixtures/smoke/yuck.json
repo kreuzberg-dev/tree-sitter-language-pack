@@ -7,6 +7,6 @@
 	"description": "Smoke test: load yuck and parse a simple snippet",
 	"id": "smoke_yuck",
 	"language": "yuck",
-	"source_code": "x",
+	"source_code": "(defwidget main [] (label :text \"hi\"))",
 	"tags": ["smoke"]
 }

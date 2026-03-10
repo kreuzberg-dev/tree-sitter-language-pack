@@ -3,6 +3,10 @@
 
 #[test]
 fn error_handling_empty_source() {
+    if !ts_pack_core::has_language("javascript") {
+        eprintln!("Skipping: language 'javascript' not available");
+        return;
+    }
     // Parsing an empty string should still produce a tree.
     let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("", None);
@@ -11,6 +15,10 @@ fn error_handling_empty_source() {
 
 #[test]
 fn error_handling_invalid_syntax() {
+    if !ts_pack_core::has_language("javascript") {
+        eprintln!("Skipping: language 'javascript' not available");
+        return;
+    }
     // Parsing invalid syntax should produce a tree with error nodes.
     let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("function function function @@@ %%%", None);

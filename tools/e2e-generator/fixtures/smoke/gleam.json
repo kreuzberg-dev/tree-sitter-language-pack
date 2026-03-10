@@ -7,6 +7,6 @@
 	"description": "Smoke test: load gleam and parse a simple snippet",
 	"id": "smoke_gleam",
 	"language": "gleam",
-	"source_code": "x",
+	"source_code": "pub fn main() { }",
 	"tags": ["smoke"]
 }

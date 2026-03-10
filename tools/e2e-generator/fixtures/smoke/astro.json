@@ -7,6 +7,6 @@
 	"description": "Smoke test: load astro and parse a simple snippet",
 	"id": "smoke_astro",
 	"language": "astro",
-	"source_code": "x",
+	"source_code": "---\n---\n<p>hello</p>",
 	"tags": ["smoke"]
 }

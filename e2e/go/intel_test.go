@@ -34,14 +34,14 @@ func TestGoFunctionIntel(t *testing.T) {
 	foundKind := false
 	for _, s := range structureList {
 		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "function" {
+			if k, _ := m["kind"].(string); k == "Function" {
 				foundKind = true
 				break
 			}
 		}
 	}
 	if !foundKind {
-		t.Fatal("structure should contain a 'function' kind node")
+		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
 	imports, _ := intel["imports"].([]interface{})
@@ -87,14 +87,14 @@ func TestJavascriptMultiImportIntel(t *testing.T) {
 	foundKind := false
 	for _, s := range structureList {
 		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "function" {
+			if k, _ := m["kind"].(string); k == "Function" {
 				foundKind = true
 				break
 			}
 		}
 	}
 	if !foundKind {
-		t.Fatal("structure should contain a 'function' kind node")
+		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
 	imports, _ := intel["imports"].([]interface{})
@@ -173,14 +173,14 @@ func TestPythonClassWithMethodsIntel(t *testing.T) {
 	foundKind := false
 	for _, s := range structureList {
 		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "class" {
+			if k, _ := m["kind"].(string); k == "Class" {
 				foundKind = true
 				break
 			}
 		}
 	}
 	if !foundKind {
-		t.Fatal("structure should contain a 'class' kind node")
+		t.Fatal("structure should contain a 'Class' kind node")
 	}
 
 	metrics, _ := intel["metrics"].(map[string]interface{})
@@ -221,14 +221,14 @@ func TestPythonFunctionIntel(t *testing.T) {
 	foundKind := false
 	for _, s := range structureList {
 		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "function" {
+			if k, _ := m["kind"].(string); k == "Function" {
 				foundKind = true
 				break
 			}
 		}
 	}
 	if !foundKind {
-		t.Fatal("structure should contain a 'function' kind node")
+		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
 	metrics, _ := intel["metrics"].(map[string]interface{})
@@ -365,14 +365,14 @@ func TestRustFunctionIntel(t *testing.T) {
 	foundKind := false
 	for _, s := range structureList {
 		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "function" {
+			if k, _ := m["kind"].(string); k == "Function" {
 				foundKind = true
 				break
 			}
 		}
 	}
 	if !foundKind {
-		t.Fatal("structure should contain a 'function' kind node")
+		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
 	metrics, _ := intel["metrics"].(map[string]interface{})
@@ -413,14 +413,14 @@ func TestTypescriptFunctionIntel(t *testing.T) {
 	foundKind := false
 	for _, s := range structureList {
 		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "function" {
+			if k, _ := m["kind"].(string); k == "Function" {
 				foundKind = true
 				break
 			}
 		}
 	}
 	if !foundKind {
-		t.Fatal("structure should contain a 'function' kind node")
+		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
 	imports, _ := intel["imports"].([]interface{})

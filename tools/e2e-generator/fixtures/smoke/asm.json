@@ -7,6 +7,6 @@
 	"description": "Smoke test: load asm and parse a simple snippet",
 	"id": "smoke_asm",
 	"language": "asm",
-	"source_code": "x",
+	"source_code": "mov eax, 1",
 	"tags": ["smoke"]
 }

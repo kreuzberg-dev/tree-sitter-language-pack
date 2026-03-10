@@ -71,26 +71,21 @@ pub fn tree_has_error_nodes(tree: &External<tree_sitter::Tree>) -> bool {
 // Intel: process / processAndChunk
 // ---------------------------------------------------------------------------
 
-/// Process source code and extract file intelligence as a JSON string.
+/// Process source code and extract file intelligence as a JavaScript object.
 #[napi(js_name = "process")]
-pub fn process(source: String, language: String) -> napi::Result<String> {
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let intel = registry
-        .process(&source, &language)
-        .map_err(|e| napi::Error::from_reason(format!("{e}")))?;
-    serde_json::to_string(&intel).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))
+pub fn process(source: String, language: String) -> napi::Result<serde_json::Value> {
+    let intel = ts_pack_core::process(&source, &language).map_err(|e| napi::Error::from_reason(format!("{e}")))?;
+    serde_json::to_value(&intel).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))
 }
 
-/// Process and chunk source code, returning intelligence + chunks as a JSON string.
+/// Process and chunk source code, returning a JavaScript object with intelligence and chunks.
 #[napi(js_name = "processAndChunk")]
-pub fn process_and_chunk(source: String, language: String, max_chunk_size: u32) -> napi::Result<String> {
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let (intel, chunks) = registry
-        .process_and_chunk(&source, &language, max_chunk_size as usize)
+pub fn process_and_chunk(source: String, language: String, max_chunk_size: u32) -> napi::Result<serde_json::Value> {
+    let (intel, chunks) = ts_pack_core::process_and_chunk(&source, &language, max_chunk_size as usize)
         .map_err(|e| napi::Error::from_reason(format!("{e}")))?;
     let result = serde_json::json!({
         "intelligence": intel,
         "chunks": chunks,
     });
-    serde_json::to_string(&result).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))
+    Ok(result)
 }

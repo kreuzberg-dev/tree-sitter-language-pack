@@ -7,6 +7,6 @@
 	"description": "Smoke test: load agda and parse a simple snippet",
 	"id": "smoke_agda",
 	"language": "agda",
-	"source_code": "x",
+	"source_code": "module Main where",
 	"tags": ["smoke"]
 }

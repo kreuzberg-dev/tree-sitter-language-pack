@@ -7,6 +7,6 @@
 	"description": "Smoke test: load cmake and parse a simple snippet",
 	"id": "smoke_cmake",
 	"language": "cmake",
-	"source_code": "x",
+	"source_code": "cmake_minimum_required(VERSION 3.0)",
 	"tags": ["smoke"]
 }

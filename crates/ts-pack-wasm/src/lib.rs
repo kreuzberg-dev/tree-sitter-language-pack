@@ -129,26 +129,26 @@ pub fn free_tree(_tree: WasmTree) {
 // Intel: process / processAndChunk
 // ---------------------------------------------------------------------------
 
-/// Process source code and extract file intelligence as a JSON string.
+/// Process source code and extract file intelligence as a JavaScript object.
 #[wasm_bindgen(js_name = "process")]
-pub fn process(source: &str, language: &str) -> Result<String, JsValue> {
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let intel = registry
-        .process(source, language)
+pub fn process(source: &str, language: &str) -> Result<JsValue, JsValue> {
+    let intel = ts_pack_core::process(source, language)
         .map_err(|e| JsValue::from_str(&format!("{e}")))?;
-    serde_json::to_string(&intel).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))
+    let json_str = serde_json::to_string(&intel)
+        .map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
+    js_sys::JSON::parse(&json_str)
 }
 
-/// Process and chunk source code, returning intelligence + chunks as a JSON string.
+/// Process and chunk source code, returning a JavaScript object with intelligence and chunks.
 #[wasm_bindgen(js_name = "processAndChunk")]
-pub fn process_and_chunk(source: &str, language: &str, max_chunk_size: usize) -> Result<String, JsValue> {
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let (intel, chunks) = registry
-        .process_and_chunk(source, language, max_chunk_size)
+pub fn process_and_chunk(source: &str, language: &str, max_chunk_size: usize) -> Result<JsValue, JsValue> {
+    let (intel, chunks) = ts_pack_core::process_and_chunk(source, language, max_chunk_size)
         .map_err(|e| JsValue::from_str(&format!("{e}")))?;
     let result = serde_json::json!({
         "intelligence": intel,
         "chunks": chunks,
     });
-    serde_json::to_string(&result).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))
+    let json_str = serde_json::to_string(&result)
+        .map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
+    js_sys::JSON::parse(&json_str)
 }
