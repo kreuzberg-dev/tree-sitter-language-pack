@@ -1,4 +1,6 @@
-use crate::fixtures::{Fixture, escape_ruby_string, group_by_category, sanitize_name};
+use crate::fixtures::{
+    Fixture, escape_ruby_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+};
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
 use std::path::Path;
@@ -12,6 +14,10 @@ impl Generator for RubyGenerator {
 
     fn generate(&self, fixtures: &[Fixture], output_dir: &Path) -> Result<(), String> {
         let rb_dir = output_dir.join("ruby");
+
+        // Clean stale test files before writing new ones
+        let _ = std::fs::remove_dir_all(&rb_dir);
+
         std::fs::create_dir_all(rb_dir.join("spec")).map_err(|e| format!("Failed to create ruby output dir: {e}"))?;
 
         write_gemfile(&rb_dir)?;
@@ -21,6 +27,12 @@ impl Generator for RubyGenerator {
         for (category, cat_fixtures) in &groups {
             write_spec_file(&rb_dir, category, cat_fixtures)?;
         }
+
+        // Run rubocop if available
+        let _ = std::process::Command::new("rubocop")
+            .args(["-A"])
+            .arg(rb_dir.join("spec"))
+            .status();
 
         Ok(())
     }
@@ -45,29 +57,6 @@ require "json"
 "#;
     std::fs::write(dir.join("spec").join("spec_helper.rb"), content)
         .map_err(|e| format!("Failed to write spec_helper.rb: {e}"))
-}
-
-fn has_intel_assertions(fixture: &Fixture) -> bool {
-    if let Some(assertions) = &fixture.assertions {
-        assertions.intel_language.is_some()
-            || assertions.intel_structure_count_min.is_some()
-            || assertions.intel_structure_contains_kind.is_some()
-            || assertions.intel_imports_count_min.is_some()
-            || assertions.intel_metrics_total_lines_min.is_some()
-            || assertions.intel_metrics_error_count.is_some()
-            || assertions.intel_diagnostics_not_empty.is_some()
-            || assertions.intel_chunk_count_min.is_some()
-    } else {
-        false
-    }
-}
-
-fn has_chunk_assertions(fixture: &Fixture) -> bool {
-    if let Some(assertions) = &fixture.assertions {
-        assertions.intel_chunk_count_min.is_some() || assertions.intel_chunk_max_size.is_some()
-    } else {
-        false
-    }
 }
 
 fn write_spec_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {

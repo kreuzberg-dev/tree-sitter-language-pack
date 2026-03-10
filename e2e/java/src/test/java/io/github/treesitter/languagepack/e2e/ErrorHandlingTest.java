@@ -4,35 +4,33 @@ package io.github.treesitter.languagepack.e2e;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.treesitter.languagepack.TsPackRegistry;
 import org.junit.jupiter.api.Test;
 
 class ErrorHandlingTest {
 
-    @Test
-    void error_handling_empty_source() {
-        // Parsing an empty string should still produce a tree
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("javascript");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
+  @Test
+  void error_handling_empty_source() {
+    // Parsing an empty string should still produce a tree.
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("javascript");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
+  }
 
-    @Test
-    void error_handling_invalid_syntax() {
-        // Parsing invalid syntax should produce a tree with error nodes
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("javascript");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
+  @Test
+  void error_handling_invalid_syntax() {
+    // Parsing invalid syntax should produce a tree with error nodes.
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("javascript");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
+  }
 
-    @Test
-    void error_handling_unknown_language() {
-        // Loading a nonexistent language should produce an error
-        try (var registry = Helpers.createRegistry()) {
-            assertThrows(Exception.class, () -> registry.getLanguage("nonexistent_xyz"));
-        }
+  @Test
+  void error_handling_unknown_language() {
+    // Loading a nonexistent language should produce an error.
+    try (var registry = Helpers.createRegistry()) {
+      assertThrows(Exception.class, () -> registry.getLanguage("nonexistent_xyz"));
     }
-
+  }
 }

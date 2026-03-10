@@ -2,23 +2,23 @@
 
 require_relative "spec_helper"
 
-RSpec.describe "error_handling" do
+RSpec.describe "error-handling" do
 
   it "error_handling_empty_source" do
-    # Parsing an empty string should still produce a tree
+    # Parsing an empty string should still produce a tree.
     tree = TreeSitterLanguagePack.parse_string("javascript", "")
     expect(tree).not_to be_nil
   end
 
   it "error_handling_invalid_syntax" do
-    # Parsing invalid syntax should produce a tree with error nodes
+    # Parsing invalid syntax should produce a tree with error nodes.
     tree = TreeSitterLanguagePack.parse_string("javascript", "function function function @@@ %%%")
     expect(tree).not_to be_nil
     expect(tree.has_error_nodes).to be true
   end
 
   it "error_handling_unknown_language" do
-    # Loading a nonexistent language should produce an error
+    # Loading a nonexistent language should produce an error.
     expect { TreeSitterLanguagePack.get_language_ptr("nonexistent_xyz") }.to raise_error(RuntimeError)
   end
 end

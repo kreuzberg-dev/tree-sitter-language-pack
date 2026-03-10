@@ -1,4 +1,4 @@
-use crate::fixtures::{Fixture, escape_c_string, sanitize_name};
+use crate::fixtures::{Fixture, escape_c_string, has_chunk_assertions, has_intel_assertions, sanitize_name};
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
 use std::path::Path;
@@ -12,6 +12,10 @@ impl Generator for CGenerator {
 
     fn generate(&self, fixtures: &[Fixture], output_dir: &Path) -> Result<(), String> {
         let c_dir = output_dir.join("c");
+
+        // Clean stale test files before writing new ones
+        let _ = std::fs::remove_dir_all(&c_dir);
+
         std::fs::create_dir_all(&c_dir).map_err(|e| format!("Failed to create c output dir: {e}"))?;
 
         write_cmake_lists(&c_dir, fixtures)?;
@@ -124,26 +128,6 @@ fn write_helpers_h(dir: &Path) -> Result<(), String> {
 #endif /* E2E_HELPERS_H */
 "#;
     std::fs::write(dir.join("helpers.h"), content).map_err(|e| format!("Failed to write helpers.h: {e}"))
-}
-
-fn has_intel_assertions(fixture: &Fixture) -> bool {
-    fixture.assertions.as_ref().is_some_and(|a| {
-        a.intel_language.is_some()
-            || a.intel_structure_count_min.is_some()
-            || a.intel_structure_contains_kind.is_some()
-            || a.intel_imports_count_min.is_some()
-            || a.intel_metrics_total_lines_min.is_some()
-            || a.intel_metrics_error_count.is_some()
-            || a.intel_diagnostics_not_empty.is_some()
-            || a.intel_chunk_count_min.is_some()
-    })
-}
-
-fn has_chunk_assertions(fixture: &Fixture) -> bool {
-    fixture
-        .assertions
-        .as_ref()
-        .is_some_and(|a| a.intel_chunk_count_min.is_some())
 }
 
 fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {

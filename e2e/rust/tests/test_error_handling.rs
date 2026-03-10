@@ -3,7 +3,7 @@
 
 #[test]
 fn error_handling_empty_source() {
-    // Parsing an empty string should still produce a tree
+    // Parsing an empty string should still produce a tree.
     let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("", None);
     assert!(tree.is_some(), "Parse tree should not be None");
@@ -11,7 +11,7 @@ fn error_handling_empty_source() {
 
 #[test]
 fn error_handling_invalid_syntax() {
-    // Parsing invalid syntax should produce a tree with error nodes
+    // Parsing invalid syntax should produce a tree with error nodes.
     let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("function function function @@@ %%%", None);
     assert!(tree.is_some(), "Parse tree should not be None");
@@ -22,7 +22,7 @@ fn error_handling_invalid_syntax() {
 
 #[test]
 fn error_handling_unknown_language() {
-    // Loading a nonexistent language should produce an error
+    // Loading a nonexistent language should produce an error.
     let result = ts_pack_core::get_language("nonexistent_xyz");
     assert!(result.is_err(), "Expected error loading language 'nonexistent_xyz'");
 }

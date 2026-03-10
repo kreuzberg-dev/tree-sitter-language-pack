@@ -1,0 +1,18 @@
+{
+	"id": "python_multi_import_intel",
+	"category": "intel",
+	"description": "Intel: detect multiple Python imports",
+	"language": "python",
+	"source_code": "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+	"assertions": {
+		"intel_language": "python",
+		"intel_imports_count_min": 3,
+		"intel_structure_count_min": 1,
+		"intel_metrics_total_lines_min": 5,
+		"intel_metrics_error_count": 0
+	},
+	"skip": {
+		"requires_language": "python"
+	},
+	"tags": ["intel", "imports"]
+}

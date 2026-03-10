@@ -5,7 +5,7 @@ package e2e_tests
 import "testing"
 
 func TestErrorHandlingEmptySource(t *testing.T) {
-	// Parsing an empty string should still produce a tree
+	// Parsing an empty string should still produce a tree.
 	reg := newTestRegistry(t)
 	ptr, err := reg.GetLanguage("javascript")
 	if err != nil {
@@ -17,7 +17,7 @@ func TestErrorHandlingEmptySource(t *testing.T) {
 }
 
 func TestErrorHandlingInvalidSyntax(t *testing.T) {
-	// Parsing invalid syntax should produce a tree with error nodes
+	// Parsing invalid syntax should produce a tree with error nodes.
 	reg := newTestRegistry(t)
 	ptr, err := reg.GetLanguage("javascript")
 	if err != nil {
@@ -29,11 +29,10 @@ func TestErrorHandlingInvalidSyntax(t *testing.T) {
 }
 
 func TestErrorHandlingUnknownLanguage(t *testing.T) {
-	// Loading a nonexistent language should produce an error
+	// Loading a nonexistent language should produce an error.
 	reg := newTestRegistry(t)
 	_, err := reg.GetLanguage("nonexistent_xyz")
 	if err == nil {
 		t.Fatalf("Expected error loading language %q, got nil", "nonexistent_xyz")
 	}
 }
-

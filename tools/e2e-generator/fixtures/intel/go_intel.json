@@ -1,0 +1,19 @@
+{
+	"id": "go_function_intel",
+	"category": "intel",
+	"description": "Intel: extract structure from Go function definition",
+	"language": "go",
+	"source_code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n",
+	"assertions": {
+		"intel_language": "go",
+		"intel_structure_count_min": 1,
+		"intel_structure_contains_kind": "function",
+		"intel_imports_count_min": 1,
+		"intel_metrics_total_lines_min": 7,
+		"intel_metrics_error_count": 0
+	},
+	"skip": {
+		"requires_language": "go"
+	},
+	"tags": ["intel"]
+}

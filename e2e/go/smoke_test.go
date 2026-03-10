@@ -2043,4 +2043,3 @@ func TestSmokeZig(t *testing.T) {
 		t.Fatalf("Language pointer for %q is nil", "zig")
 	}
 }
-

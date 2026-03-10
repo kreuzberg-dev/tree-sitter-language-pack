@@ -1,4 +1,6 @@
-use crate::fixtures::{Fixture, escape_go_string, group_by_category, sanitize_name};
+use crate::fixtures::{
+    Fixture, escape_go_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+};
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
 use std::path::Path;
@@ -12,6 +14,10 @@ impl Generator for GoGenerator {
 
     fn generate(&self, fixtures: &[Fixture], output_dir: &Path) -> Result<(), String> {
         let go_dir = output_dir.join("go");
+
+        // Clean stale test files before writing new ones
+        let _ = std::fs::remove_dir_all(&go_dir);
+
         std::fs::create_dir_all(&go_dir).map_err(|e| format!("Failed to create go output dir: {e}"))?;
 
         write_go_mod(&go_dir)?;
@@ -21,6 +27,9 @@ impl Generator for GoGenerator {
         for (category, cat_fixtures) in &groups {
             write_test_file(&go_dir, category, cat_fixtures)?;
         }
+
+        // Run gofmt if available
+        let _ = std::process::Command::new("gofmt").args(["-w"]).arg(&go_dir).status();
 
         Ok(())
     }
@@ -76,26 +85,6 @@ func skipIfLanguageUnavailable(t *testing.T, reg *tspack.Registry, lang string) 
     std::fs::write(dir.join("helpers_test.go"), content).map_err(|e| format!("Failed to write helpers_test.go: {e}"))
 }
 
-fn has_intel_assertions(fixture: &Fixture) -> bool {
-    fixture.assertions.as_ref().is_some_and(|a| {
-        a.intel_language.is_some()
-            || a.intel_structure_count_min.is_some()
-            || a.intel_structure_contains_kind.is_some()
-            || a.intel_imports_count_min.is_some()
-            || a.intel_metrics_total_lines_min.is_some()
-            || a.intel_metrics_error_count.is_some()
-            || a.intel_diagnostics_not_empty.is_some()
-            || a.intel_chunk_count_min.is_some()
-    })
-}
-
-fn has_chunk_assertions(fixture: &Fixture) -> bool {
-    fixture
-        .assertions
-        .as_ref()
-        .is_some_and(|a| a.intel_chunk_count_min.is_some())
-}
-
 fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {
     let needs_json = fixtures.iter().any(|f| has_intel_assertions(f));
 
@@ -121,12 +110,12 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
         writeln!(out, "func {fn_name}(t *testing.T) {{").unwrap();
         writeln!(out, "\t// {}", fixture.description).unwrap();
+        writeln!(out, "\treg := newTestRegistry(t)").unwrap();
 
         // Skip logic
         if let Some(skip) = &fixture.skip
             && let Some(req_lang) = &skip.requires_language
         {
-            writeln!(out, "\treg := newTestRegistry(t)").unwrap();
             writeln!(
                 out,
                 "\tskipIfLanguageUnavailable(t, reg, \"{}\")",
@@ -137,7 +126,6 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
         if assertions.is_some_and(|a| a.expect_error == Some(true)) {
             if let Some(lang) = &fixture.language {
-                writeln!(out, "\treg := newTestRegistry(t)").unwrap();
                 writeln!(out, "\t_, err := reg.GetLanguage(\"{}\")", escape_go_string(lang)).unwrap();
                 writeln!(out, "\tif err == nil {{").unwrap();
                 writeln!(
@@ -149,7 +137,6 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "\t}}").unwrap();
             }
         } else if assertions.is_some_and(|a| a.languages_not_empty == Some(true)) {
-            writeln!(out, "\treg := newTestRegistry(t)").unwrap();
             writeln!(out, "\tlangs := reg.AvailableLanguages()").unwrap();
             writeln!(out, "\tif len(langs) == 0 {{").unwrap();
             writeln!(out, "\t\tt.Fatal(\"AvailableLanguages() should not be empty\")").unwrap();
@@ -157,7 +144,6 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         } else if assertions.is_some_and(|a| a.language_available.is_some()) {
             let expected = assertions.unwrap().language_available.unwrap();
             let lang = fixture.language.as_deref().unwrap_or("unknown");
-            writeln!(out, "\treg := newTestRegistry(t)").unwrap();
             writeln!(out, "\tgot := reg.HasLanguage(\"{}\")", escape_go_string(lang)).unwrap();
             writeln!(out, "\tif got != {} {{", expected).unwrap();
             writeln!(
@@ -172,8 +158,6 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             let lang = fixture.language.as_deref().unwrap_or("unknown");
             let source = fixture.source_code.as_deref().unwrap_or("");
             let assertions = assertions.unwrap();
-
-            writeln!(out, "\treg := newTestRegistry(t)").unwrap();
 
             if has_chunk_assertions(fixture) {
                 let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
@@ -299,9 +283,15 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "\t}}").unwrap();
             }
 
-            if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+            // Emit metrics variable once if either metrics assertion is present
+            let needs_metrics =
+                assertions.intel_metrics_total_lines_min.is_some() || assertions.intel_metrics_error_count.is_some();
+            if needs_metrics {
                 writeln!(out).unwrap();
                 writeln!(out, "\tmetrics, _ := intel[\"metrics\"].(map[string]interface{{}})").unwrap();
+            }
+
+            if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
                 writeln!(out, "\ttotalLines, _ := metrics[\"total_lines\"].(float64)").unwrap();
                 writeln!(out, "\tif int(totalLines) < {} {{", min_lines).unwrap();
                 writeln!(
@@ -314,9 +304,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             }
 
             if let Some(expected_error_count) = assertions.intel_metrics_error_count {
-                writeln!(out).unwrap();
-                writeln!(out, "\tmetricsMap, _ := intel[\"metrics\"].(map[string]interface{{}})").unwrap();
-                writeln!(out, "\terrorCount, _ := metricsMap[\"error_count\"].(float64)").unwrap();
+                writeln!(out, "\terrorCount, _ := metrics[\"error_count\"].(float64)").unwrap();
                 writeln!(out, "\tif int(errorCount) != {} {{", expected_error_count).unwrap();
                 writeln!(
                     out,
@@ -335,7 +323,6 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "\t}}").unwrap();
             }
         } else if let Some(lang) = &fixture.language {
-            writeln!(out, "\treg := newTestRegistry(t)").unwrap();
             writeln!(out, "\tptr, err := reg.GetLanguage(\"{}\")", escape_go_string(lang)).unwrap();
             writeln!(out, "\tif err != nil {{").unwrap();
             writeln!(

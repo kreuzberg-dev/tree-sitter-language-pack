@@ -1362,5 +1362,4 @@ defmodule E2eTests.SmokeTest do
     child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
     assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
-
 end

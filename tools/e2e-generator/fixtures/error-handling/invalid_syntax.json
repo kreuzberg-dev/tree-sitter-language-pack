@@ -1,0 +1,12 @@
+{
+	"id": "error_handling_invalid_syntax",
+	"category": "error-handling",
+	"description": "Parsing invalid syntax should produce a tree with error nodes.",
+	"language": "javascript",
+	"source_code": "function function function @@@ %%%",
+	"assertions": {
+		"tree_not_null": true,
+		"has_error_nodes": true
+	},
+	"tags": ["error-handling"]
+}

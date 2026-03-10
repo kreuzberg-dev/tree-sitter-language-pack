@@ -1,0 +1,19 @@
+{
+	"id": "typescript_function_intel",
+	"category": "intel",
+	"description": "Intel: extract structure from TypeScript function",
+	"language": "typescript",
+	"source_code": "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n",
+	"assertions": {
+		"intel_language": "typescript",
+		"intel_structure_count_min": 1,
+		"intel_structure_contains_kind": "function",
+		"intel_imports_count_min": 1,
+		"intel_metrics_total_lines_min": 5,
+		"intel_metrics_error_count": 0
+	},
+	"skip": {
+		"requires_language": "typescript"
+	},
+	"tags": ["intel"]
+}

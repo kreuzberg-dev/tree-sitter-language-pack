@@ -1,4 +1,6 @@
-use crate::fixtures::{Fixture, escape_python_string, group_by_category, sanitize_name};
+use crate::fixtures::{
+    Fixture, escape_python_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+};
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
 use std::path::Path;
@@ -12,6 +14,7 @@ impl Generator for PythonGenerator {
 
     fn generate(&self, fixtures: &[Fixture], output_dir: &Path) -> Result<(), String> {
         let py_dir = output_dir.join("python");
+        let _ = std::fs::remove_dir_all(&py_dir);
         std::fs::create_dir_all(py_dir.join("tests"))
             .map_err(|e| format!("Failed to create python output dir: {e}"))?;
 
@@ -23,6 +26,12 @@ impl Generator for PythonGenerator {
         for (category, cat_fixtures) in &groups {
             write_test_file(&py_dir, category, cat_fixtures)?;
         }
+
+        // Run ruff format if available
+        let _ = std::process::Command::new("ruff")
+            .args(["format", "--quiet"])
+            .arg(py_dir.join("tests"))
+            .status();
 
         Ok(())
     }
@@ -43,6 +52,32 @@ dependencies = [
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D203",    # incompatible with D211
+    "D213",    # incompatible with D212
+    "COM812",  # conflicts with formatter
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = [
+    "S101",     # assert usage expected in tests
+    "ANN",      # type annotations not needed for tests
+    "D",        # docstring rules relaxed for generated tests
+    "INP001",   # implicit namespace package
+    "T201",     # print statements
+    "PLR2004",  # magic value comparisons expected in tests
+    "PT011",    # broad pytest.raises
+    "B017",     # broad pytest.raises
+    "F841",     # unused variable (root assigned for structure)
+    "Q003",     # escaped quotes in generated strings
+    "E501",     # line length in generated assertions
+]
 "#;
     std::fs::write(dir.join("pyproject.toml"), content).map_err(|e| format!("Failed to write pyproject.toml: {e}"))
 }
@@ -59,64 +94,151 @@ def tree_contains_node_type(node, node_type: str) -> bool:
     """Check whether a tree-sitter node or any descendant has the given type."""
     if node.type == node_type:
         return True
-    for child in node.children:
-        if tree_contains_node_type(child, node_type):
-            return True
-    return False
+    return any(tree_contains_node_type(child, node_type) for child in node.children)
 
 
 def tree_has_error_nodes(node) -> bool:
     """Check whether a tree-sitter node or any descendant is an ERROR node."""
     if node.type == "ERROR" or node.is_missing:
         return True
-    for child in node.children:
-        if tree_has_error_nodes(child):
-            return True
-    return False
+    return any(tree_has_error_nodes(child) for child in node.children)
 "#;
     std::fs::write(dir.join("tests").join("helpers.py"), content)
         .map_err(|e| format!("Failed to write helpers.py: {e}"))
 }
 
-fn has_intel_assertions(fixture: &Fixture) -> bool {
-    fixture.assertions.as_ref().is_some_and(|a| {
-        a.intel_language.is_some()
-            || a.intel_structure_count_min.is_some()
-            || a.intel_structure_contains_kind.is_some()
-            || a.intel_imports_count_min.is_some()
-            || a.intel_metrics_total_lines_min.is_some()
-            || a.intel_metrics_error_count.is_some()
-            || a.intel_diagnostics_not_empty.is_some()
-            || a.intel_chunk_count_min.is_some()
-    })
+fn needs_import(fixtures: &[&Fixture], check: fn(&Fixture) -> bool) -> bool {
+    fixtures.iter().any(|f| check(f))
 }
 
-fn has_chunk_assertions(fixture: &Fixture) -> bool {
-    fixture
-        .assertions
+fn fixture_needs_get_parser(f: &Fixture) -> bool {
+    let a = f.assertions.as_ref();
+    let is_error = a.is_some_and(|a| a.expect_error == Some(true));
+    let is_registry = a.is_some_and(|a| a.languages_not_empty == Some(true));
+    let is_lang_check = a.is_some_and(|a| a.language_available.is_some());
+    f.language.is_some() && !has_intel_assertions(f) && !is_error && !is_registry && !is_lang_check
+}
+
+fn fixture_needs_get_language(f: &Fixture) -> bool {
+    f.assertions.as_ref().is_some_and(|a| a.expect_error == Some(true))
+}
+
+fn fixture_needs_available_languages(f: &Fixture) -> bool {
+    f.assertions
         .as_ref()
-        .is_some_and(|a| a.intel_chunk_count_min.is_some())
+        .is_some_and(|a| a.languages_not_empty == Some(true))
+}
+
+fn fixture_needs_has_language(f: &Fixture) -> bool {
+    f.skip.as_ref().is_some_and(|s| s.requires_language.is_some())
+        || f.assertions.as_ref().is_some_and(|a| a.language_available.is_some())
+}
+
+fn fixture_needs_process(f: &Fixture) -> bool {
+    has_intel_assertions(f) && !has_chunk_assertions(f)
+}
+
+fn fixture_needs_process_and_chunk(f: &Fixture) -> bool {
+    has_chunk_assertions(f)
+}
+
+fn fixture_needs_json(f: &Fixture) -> bool {
+    has_intel_assertions(f)
+}
+
+fn fixture_needs_tree_contains(f: &Fixture) -> bool {
+    f.assertions
+        .as_ref()
+        .is_some_and(|a| a.root_contains_node_type.is_some())
+}
+
+fn fixture_needs_tree_has_error(f: &Fixture) -> bool {
+    f.assertions.as_ref().is_some_and(|a| a.has_error_nodes == Some(true))
 }
 
 fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {
     let mut out = String::new();
 
+    // Determine which imports are needed for this category
+    let need_get_parser = needs_import(fixtures, fixture_needs_get_parser);
+    let need_get_language = needs_import(fixtures, fixture_needs_get_language);
+    let need_available_languages = needs_import(fixtures, fixture_needs_available_languages);
+    let need_has_language = needs_import(fixtures, fixture_needs_has_language);
+    let need_process = needs_import(fixtures, fixture_needs_process);
+    let need_process_and_chunk = needs_import(fixtures, fixture_needs_process_and_chunk);
+    let need_json = needs_import(fixtures, fixture_needs_json);
+    let need_tree_contains = needs_import(fixtures, fixture_needs_tree_contains);
+    let need_tree_has_error = needs_import(fixtures, fixture_needs_tree_has_error);
+    let need_pytest = fixtures.iter().any(|f| {
+        f.skip.as_ref().is_some_and(|s| s.requires_language.is_some())
+            || f.assertions.as_ref().is_some_and(|a| a.expect_error == Some(true))
+    });
+
     writeln!(out, "# Code generated by e2e-generator. DO NOT EDIT.").unwrap();
     writeln!(out).unwrap();
-    writeln!(out, "import pytest").unwrap();
-    writeln!(out, "import json").unwrap();
-    writeln!(out).unwrap();
-    writeln!(
-        out,
-        "from tree_sitter_language_pack import get_language, get_parser, available_languages, has_language, process, process_and_chunk"
-    )
-    .unwrap();
-    writeln!(out).unwrap();
-    writeln!(
-        out,
-        "from .helpers import tree_contains_node_type, tree_has_error_nodes"
-    )
-    .unwrap();
+
+    // Build pack imports list
+    let mut pack_imports = Vec::new();
+    if need_available_languages {
+        pack_imports.push("available_languages");
+    }
+    if need_get_language {
+        pack_imports.push("get_language");
+    }
+    if need_get_parser {
+        pack_imports.push("get_parser");
+    }
+    if need_has_language {
+        pack_imports.push("has_language");
+    }
+    if need_process {
+        pack_imports.push("process");
+    }
+    if need_process_and_chunk {
+        pack_imports.push("process_and_chunk");
+    }
+
+    // Build helper imports list
+    let mut helper_imports = Vec::new();
+    if need_tree_contains {
+        helper_imports.push("tree_contains_node_type");
+    }
+    if need_tree_has_error {
+        helper_imports.push("tree_has_error_nodes");
+    }
+
+    // Emit imports in isort-compatible order:
+    // 1. Standard library (json)
+    // 2. Third-party (pytest, tree_sitter_language_pack) — blank line before if stdlib present
+    // 3. Local (.helpers) — blank line before if third-party present
+    if need_json {
+        writeln!(out, "import json").unwrap();
+    }
+    let has_third_party = need_pytest || !pack_imports.is_empty();
+    if need_json && has_third_party {
+        writeln!(out).unwrap();
+    }
+    if need_pytest {
+        writeln!(out, "import pytest").unwrap();
+    }
+    if !pack_imports.is_empty() {
+        if pack_imports.len() == 1 {
+            writeln!(out, "from tree_sitter_language_pack import {}", pack_imports[0]).unwrap();
+        } else {
+            writeln!(out, "from tree_sitter_language_pack import (").unwrap();
+            for imp in &pack_imports {
+                writeln!(out, "    {imp},").unwrap();
+            }
+            writeln!(out, ")").unwrap();
+        }
+    }
+    if !helper_imports.is_empty() {
+        if need_json || has_third_party {
+            writeln!(out).unwrap();
+        }
+        writeln!(out, "from .helpers import {}", helper_imports.join(", ")).unwrap();
+    }
+
     writeln!(out).unwrap();
     writeln!(out).unwrap();
 
@@ -172,16 +294,15 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             let assertions = assertions.unwrap();
 
             if has_chunk_assertions(fixture) {
-                if let Some(max_chunk_size) = assertions.intel_chunk_count_min {
-                    writeln!(
-                        out,
-                        "    result_json = process_and_chunk(\"{}\", \"{}\", {})",
-                        escape_python_string(source),
-                        escape_python_string(lang),
-                        max_chunk_size
-                    )
-                    .unwrap();
-                }
+                let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
+                writeln!(
+                    out,
+                    "    result_json = process_and_chunk(\"{}\", \"{}\", {})",
+                    escape_python_string(source),
+                    escape_python_string(lang),
+                    max_chunk_size
+                )
+                .unwrap();
             } else {
                 writeln!(
                     out,
@@ -219,7 +340,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(min_structures) = assertions.intel_structure_count_min {
                 writeln!(
                     out,
-                    "    assert len(intel.get(\"structure\", [])) >= {min_structures}, f\"Should have at least {min_structures} structure(s)\""
+                    "    assert len(intel.get(\"structure\", [])) >= {min_structures}, \"Should have at least {min_structures} structure(s)\""
                 )
                 .unwrap();
             }
@@ -227,7 +348,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(expected_kind) = &assertions.intel_structure_contains_kind {
                 writeln!(
                     out,
-                    "    assert any(s.get(\"kind\") == \"{}\" for s in intel.get(\"structure\", [])), f\"Structure should contain a '{}' kind node\"",
+                    "    assert any(s.get(\"kind\") == \"{}\" for s in intel.get(\"structure\", [])), \"Structure should contain a '{}' kind node\"",
                     escape_python_string(expected_kind),
                     escape_python_string(expected_kind)
                 )
@@ -237,22 +358,24 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(min_imports) = assertions.intel_imports_count_min {
                 writeln!(
                     out,
-                    "    assert len(intel.get(\"imports\", [])) >= {min_imports}, f\"Should have at least {min_imports} import(s)\""
+                    "    assert len(intel.get(\"imports\", [])) >= {min_imports}, \"Should have at least {min_imports} import(s)\""
                 )
                 .unwrap();
             }
 
-            if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+            if assertions.intel_metrics_total_lines_min.is_some() || assertions.intel_metrics_error_count.is_some() {
                 writeln!(out, "    metrics = intel.get(\"metrics\", {{}})").unwrap();
+            }
+
+            if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
                 writeln!(
                     out,
-                    "    assert metrics.get(\"total_lines\", 0) >= {min_lines}, f\"Should have at least {min_lines} total line(s)\""
+                    "    assert metrics.get(\"total_lines\", 0) >= {min_lines}, \"Should have at least {min_lines} total line(s)\""
                 )
                 .unwrap();
             }
 
             if let Some(expected_error_count) = assertions.intel_metrics_error_count {
-                writeln!(out, "    metrics = intel.get(\"metrics\", {{}})").unwrap();
                 writeln!(
                     out,
                     "    assert metrics.get(\"error_count\", 0) == {expected_error_count}, f\"Expected error_count {expected_error_count}, got {{metrics.get('error_count', 0)}}\""
@@ -308,6 +431,8 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         writeln!(out).unwrap();
     }
 
+    // Trim trailing whitespace to single newline
+    let trimmed = out.trim_end().to_owned() + "\n";
     let filename = format!("test_{}.py", sanitize_name(category));
-    std::fs::write(dir.join("tests").join(&filename), &out).map_err(|e| format!("Failed to write {filename}: {e}"))
+    std::fs::write(dir.join("tests").join(&filename), &trimmed).map_err(|e| format!("Failed to write {filename}: {e}"))
 }

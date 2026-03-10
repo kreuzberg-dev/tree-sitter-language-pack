@@ -1,0 +1,12 @@
+{
+	"id": "parsing_rust_struct",
+	"category": "parsing",
+	"description": "Parse a Rust struct definition.",
+	"language": "rust",
+	"source_code": "struct Point { x: f64, y: f64 }",
+	"assertions": {
+		"tree_not_null": true,
+		"root_child_count_min": 1
+	},
+	"tags": ["parsing"]
+}

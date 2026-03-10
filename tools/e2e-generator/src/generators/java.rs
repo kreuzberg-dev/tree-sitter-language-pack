@@ -1,4 +1,6 @@
-use crate::fixtures::{Fixture, escape_java_string, group_by_category, sanitize_name};
+use crate::fixtures::{
+    Fixture, escape_java_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+};
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
 use std::path::Path;
@@ -12,6 +14,10 @@ impl Generator for JavaGenerator {
 
     fn generate(&self, fixtures: &[Fixture], output_dir: &Path) -> Result<(), String> {
         let java_dir = output_dir.join("java");
+
+        // Clean stale test files before writing new ones
+        let _ = std::fs::remove_dir_all(&java_dir);
+
         let test_pkg = java_dir.join("src/test/java/io/github/treesitter/languagepack/e2e");
         std::fs::create_dir_all(&test_pkg).map_err(|e| format!("Failed to create java output dir: {e}"))?;
 
@@ -21,6 +27,21 @@ impl Generator for JavaGenerator {
         let groups = group_by_category(fixtures);
         for (category, cat_fixtures) in &groups {
             write_test_file(&test_pkg, category, cat_fixtures)?;
+        }
+
+        // Run google-java-format if available (on all .java files)
+        if let Ok(entries) = std::fs::read_dir(&test_pkg) {
+            let java_files: Vec<_> = entries
+                .filter_map(|e| e.ok())
+                .map(|e| e.path())
+                .filter(|p| p.extension().is_some_and(|ext| ext == "java"))
+                .collect();
+            if !java_files.is_empty() {
+                let _ = std::process::Command::new("google-java-format")
+                    .arg("-i")
+                    .args(&java_files)
+                    .status();
+            }
         }
 
         Ok(())
@@ -101,26 +122,6 @@ final class Helpers {
 }
 "#;
     std::fs::write(pkg_dir.join("Helpers.java"), content).map_err(|e| format!("Failed to write Helpers.java: {e}"))
-}
-
-fn has_intel_assertions(fixture: &Fixture) -> bool {
-    fixture.assertions.as_ref().is_some_and(|a| {
-        a.intel_language.is_some()
-            || a.intel_structure_count_min.is_some()
-            || a.intel_structure_contains_kind.is_some()
-            || a.intel_imports_count_min.is_some()
-            || a.intel_metrics_total_lines_min.is_some()
-            || a.intel_metrics_error_count.is_some()
-            || a.intel_diagnostics_not_empty.is_some()
-            || a.intel_chunk_count_min.is_some()
-    })
-}
-
-fn has_chunk_assertions(fixture: &Fixture) -> bool {
-    fixture
-        .assertions
-        .as_ref()
-        .is_some_and(|a| a.intel_chunk_count_min.is_some())
 }
 
 fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {
@@ -305,34 +306,32 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                 .unwrap();
             }
 
-            if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+            if assertions.intel_metrics_total_lines_min.is_some() || assertions.intel_metrics_error_count.is_some() {
                 writeln!(
                     out,
                     "            JsonObject metrics = intel.getAsJsonObject(\"metrics\");"
                 )
                 .unwrap();
-                writeln!(
-                    out,
-                    "            assertTrue(metrics.get(\"total_lines\").getAsInt() >= {}, \"Should have at least {} total line(s)\");",
-                    min_lines,
-                    min_lines
-                )
-                .unwrap();
-            }
 
-            if let Some(expected_error_count) = assertions.intel_metrics_error_count {
-                writeln!(
-                    out,
-                    "            JsonObject metricsObj = intel.getAsJsonObject(\"metrics\");"
-                )
-                .unwrap();
-                writeln!(
-                    out,
-                    "            assertEquals({}, metricsObj.get(\"error_count\").getAsInt(), \"Expected error_count {}\");",
-                    expected_error_count,
-                    expected_error_count
-                )
-                .unwrap();
+                if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+                    writeln!(
+                        out,
+                        "            assertTrue(metrics.get(\"total_lines\").getAsInt() >= {}, \"Should have at least {} total line(s)\");",
+                        min_lines,
+                        min_lines
+                    )
+                    .unwrap();
+                }
+
+                if let Some(expected_error_count) = assertions.intel_metrics_error_count {
+                    writeln!(
+                        out,
+                        "            assertEquals({}, metrics.get(\"error_count\").getAsInt(), \"Expected error_count {}\");",
+                        expected_error_count,
+                        expected_error_count
+                    )
+                    .unwrap();
+                }
             }
 
             if assertions.intel_diagnostics_not_empty == Some(true) {

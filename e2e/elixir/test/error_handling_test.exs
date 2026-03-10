@@ -4,23 +4,22 @@ defmodule E2eTests.ErrorHandlingTest do
   use ExUnit.Case, async: true
 
   test "error_handling_empty_source" do
-    # Parsing an empty string should still produce a tree
+    # Parsing an empty string should still produce a tree.
     tree = TreeSitterLanguagePack.parse_string("javascript", "")
     assert is_reference(tree), "Parse tree should be a reference"
   end
 
   test "error_handling_invalid_syntax" do
-    # Parsing invalid syntax should produce a tree with error nodes
+    # Parsing invalid syntax should produce a tree with error nodes.
     tree = TreeSitterLanguagePack.parse_string("javascript", "function function function @@@ %%%")
     assert is_reference(tree), "Parse tree should be a reference"
     assert TreeSitterLanguagePack.tree_has_error_nodes(tree), "Tree should contain error nodes"
   end
 
   test "error_handling_unknown_language" do
-    # Loading a nonexistent language should produce an error
+    # Loading a nonexistent language should produce an error.
     assert_raise ErlangError, fn ->
       TreeSitterLanguagePack.get_language_ptr("nonexistent_xyz")
     end
   end
-
 end

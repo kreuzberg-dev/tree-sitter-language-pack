@@ -2,6 +2,89 @@
 #![allow(clippy::too_many_lines)]
 
 #[test]
+fn go_function_intel() {
+    if !ts_pack_core::has_language("go") {
+        eprintln!("Skipping: language 'go' not available");
+        return;
+    }
+    // Intel: extract structure from Go function definition
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let intel = registry
+        .process(
+            "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n",
+            "go",
+        )
+        .expect("process failed");
+    assert_eq!(intel.language, "go", "intel.language mismatch");
+    assert!(
+        intel.structure.len() >= 1,
+        "Expected at least 1 structure item(s), got {}",
+        intel.structure.len()
+    );
+    assert!(
+        intel
+            .structure
+            .iter()
+            .any(|s| s.kind == ts_pack_core::StructureKind::Function),
+        "Structure should contain a 'function' item"
+    );
+    assert!(
+        intel.imports.len() >= 1,
+        "Expected at least 1 import(s), got {}",
+        intel.imports.len()
+    );
+    assert!(
+        intel.metrics.total_lines >= 7,
+        "Expected at least 7 total line(s), got {}",
+        intel.metrics.total_lines
+    );
+    assert_eq!(
+        intel.metrics.error_count, 0,
+        "Expected error_count == 0, got {}",
+        intel.metrics.error_count
+    );
+}
+
+#[test]
+fn javascript_multi_import_intel() {
+    if !ts_pack_core::has_language("javascript") {
+        eprintln!("Skipping: language 'javascript' not available");
+        return;
+    }
+    // Intel: detect multiple imports and function in JavaScript
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let intel = registry.process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", "javascript").expect("process failed");
+    assert_eq!(intel.language, "javascript", "intel.language mismatch");
+    assert!(
+        intel.structure.len() >= 1,
+        "Expected at least 1 structure item(s), got {}",
+        intel.structure.len()
+    );
+    assert!(
+        intel
+            .structure
+            .iter()
+            .any(|s| s.kind == ts_pack_core::StructureKind::Function),
+        "Structure should contain a 'function' item"
+    );
+    assert!(
+        intel.imports.len() >= 2,
+        "Expected at least 2 import(s), got {}",
+        intel.imports.len()
+    );
+    assert!(
+        intel.metrics.total_lines >= 6,
+        "Expected at least 6 total line(s), got {}",
+        intel.metrics.total_lines
+    );
+    assert_eq!(
+        intel.metrics.error_count, 0,
+        "Expected error_count == 0, got {}",
+        intel.metrics.error_count
+    );
+}
+
+#[test]
 fn python_chunking_intel() {
     if !ts_pack_core::has_language("python") {
         eprintln!("Skipping: language 'python' not available");
@@ -9,10 +92,54 @@ fn python_chunking_intel() {
     }
     // Intel: chunk multi-function Python source into multiple pieces
     let registry = ts_pack_core::LanguageRegistry::new();
-    let (intel, chunks) = registry.process_and_chunk("def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n", "python", 30).expect("process_and_chunk failed");
+    let (intel, chunks) = registry
+        .process_and_chunk(
+            "def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n",
+            "python",
+            30,
+        )
+        .expect("process_and_chunk failed");
     assert!(chunks.len() >= 2, "Expected at least 2 chunk(s), got {}", chunks.len());
     assert_eq!(intel.language, "python", "intel.language mismatch");
-    assert!(intel.metrics.total_lines >= 8, "Expected at least 8 total line(s), got {}", intel.metrics.total_lines);
+    assert!(
+        intel.metrics.total_lines >= 8,
+        "Expected at least 8 total line(s), got {}",
+        intel.metrics.total_lines
+    );
+}
+
+#[test]
+fn python_class_with_methods_intel() {
+    if !ts_pack_core::has_language("python") {
+        eprintln!("Skipping: language 'python' not available");
+        return;
+    }
+    // Intel: extract nested structure from Python class with methods
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let intel = registry.process("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", "python").expect("process failed");
+    assert_eq!(intel.language, "python", "intel.language mismatch");
+    assert!(
+        intel.structure.len() >= 1,
+        "Expected at least 1 structure item(s), got {}",
+        intel.structure.len()
+    );
+    assert!(
+        intel
+            .structure
+            .iter()
+            .any(|s| s.kind == ts_pack_core::StructureKind::Class),
+        "Structure should contain a 'class' item"
+    );
+    assert!(
+        intel.metrics.total_lines >= 6,
+        "Expected at least 6 total line(s), got {}",
+        intel.metrics.total_lines
+    );
+    assert_eq!(
+        intel.metrics.error_count, 0,
+        "Expected error_count == 0, got {}",
+        intel.metrics.error_count
+    );
 }
 
 #[test]
@@ -23,12 +150,108 @@ fn python_function_intel() {
     }
     // Intel: extract structure from Python function definition
     let registry = ts_pack_core::LanguageRegistry::new();
-    let intel = registry.process("def greet(name):\n    return f'Hello, {name}!'\n", "python").expect("process failed");
+    let intel = registry
+        .process("def greet(name):\n    return f'Hello, {name}!'\n", "python")
+        .expect("process failed");
     assert_eq!(intel.language, "python", "intel.language mismatch");
-    assert!(intel.structure.len() >= 1, "Expected at least 1 structure item(s), got {}", intel.structure.len());
-    assert!(intel.structure.iter().any(|s| s.kind == ts_pack_core::StructureKind::Function), "Structure should contain a 'function' item");
-    assert!(intel.metrics.total_lines >= 2, "Expected at least 2 total line(s), got {}", intel.metrics.total_lines);
-    assert_eq!(intel.metrics.error_count, 0, "Expected error_count == 0, got {}", intel.metrics.error_count);
+    assert!(
+        intel.structure.len() >= 1,
+        "Expected at least 1 structure item(s), got {}",
+        intel.structure.len()
+    );
+    assert!(
+        intel
+            .structure
+            .iter()
+            .any(|s| s.kind == ts_pack_core::StructureKind::Function),
+        "Structure should contain a 'function' item"
+    );
+    assert!(
+        intel.metrics.total_lines >= 2,
+        "Expected at least 2 total line(s), got {}",
+        intel.metrics.total_lines
+    );
+    assert_eq!(
+        intel.metrics.error_count, 0,
+        "Expected error_count == 0, got {}",
+        intel.metrics.error_count
+    );
+}
+
+#[test]
+fn python_malformed_code_intel() {
+    if !ts_pack_core::has_language("python") {
+        eprintln!("Skipping: language 'python' not available");
+        return;
+    }
+    // Intel: detect diagnostics in malformed Python code
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let intel = registry
+        .process("def broken(\n    return\nclass", "python")
+        .expect("process failed");
+    assert_eq!(intel.language, "python", "intel.language mismatch");
+    assert!(!intel.diagnostics.is_empty(), "diagnostics should not be empty");
+}
+
+#[test]
+fn python_multi_import_intel() {
+    if !ts_pack_core::has_language("python") {
+        eprintln!("Skipping: language 'python' not available");
+        return;
+    }
+    // Intel: detect multiple Python imports
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let intel = registry
+        .process(
+            "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+            "python",
+        )
+        .expect("process failed");
+    assert_eq!(intel.language, "python", "intel.language mismatch");
+    assert!(
+        intel.structure.len() >= 1,
+        "Expected at least 1 structure item(s), got {}",
+        intel.structure.len()
+    );
+    assert!(
+        intel.imports.len() >= 3,
+        "Expected at least 3 import(s), got {}",
+        intel.imports.len()
+    );
+    assert!(
+        intel.metrics.total_lines >= 5,
+        "Expected at least 5 total line(s), got {}",
+        intel.metrics.total_lines
+    );
+    assert_eq!(
+        intel.metrics.error_count, 0,
+        "Expected error_count == 0, got {}",
+        intel.metrics.error_count
+    );
+}
+
+#[test]
+fn rust_chunking_intel() {
+    if !ts_pack_core::has_language("rust") {
+        eprintln!("Skipping: language 'rust' not available");
+        return;
+    }
+    // Intel: chunk multi-function Rust source into pieces
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let (intel, chunks) = registry
+        .process_and_chunk(
+            "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n",
+            "rust",
+            30,
+        )
+        .expect("process_and_chunk failed");
+    assert!(chunks.len() >= 2, "Expected at least 2 chunk(s), got {}", chunks.len());
+    assert_eq!(intel.language, "rust", "intel.language mismatch");
+    assert!(
+        intel.metrics.total_lines >= 7,
+        "Expected at least 7 total line(s), got {}",
+        intel.metrics.total_lines
+    );
 }
 
 #[test]
@@ -39,10 +262,69 @@ fn rust_function_intel() {
     }
     // Intel: extract structure from Rust function definition
     let registry = ts_pack_core::LanguageRegistry::new();
-    let intel = registry.process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", "rust").expect("process failed");
+    let intel = registry
+        .process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", "rust")
+        .expect("process failed");
     assert_eq!(intel.language, "rust", "intel.language mismatch");
-    assert!(intel.structure.len() >= 1, "Expected at least 1 structure item(s), got {}", intel.structure.len());
-    assert!(intel.structure.iter().any(|s| s.kind == ts_pack_core::StructureKind::Function), "Structure should contain a 'function' item");
-    assert!(intel.metrics.total_lines >= 3, "Expected at least 3 total line(s), got {}", intel.metrics.total_lines);
-    assert_eq!(intel.metrics.error_count, 0, "Expected error_count == 0, got {}", intel.metrics.error_count);
+    assert!(
+        intel.structure.len() >= 1,
+        "Expected at least 1 structure item(s), got {}",
+        intel.structure.len()
+    );
+    assert!(
+        intel
+            .structure
+            .iter()
+            .any(|s| s.kind == ts_pack_core::StructureKind::Function),
+        "Structure should contain a 'function' item"
+    );
+    assert!(
+        intel.metrics.total_lines >= 3,
+        "Expected at least 3 total line(s), got {}",
+        intel.metrics.total_lines
+    );
+    assert_eq!(
+        intel.metrics.error_count, 0,
+        "Expected error_count == 0, got {}",
+        intel.metrics.error_count
+    );
+}
+
+#[test]
+fn typescript_function_intel() {
+    if !ts_pack_core::has_language("typescript") {
+        eprintln!("Skipping: language 'typescript' not available");
+        return;
+    }
+    // Intel: extract structure from TypeScript function
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let intel = registry.process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", "typescript").expect("process failed");
+    assert_eq!(intel.language, "typescript", "intel.language mismatch");
+    assert!(
+        intel.structure.len() >= 1,
+        "Expected at least 1 structure item(s), got {}",
+        intel.structure.len()
+    );
+    assert!(
+        intel
+            .structure
+            .iter()
+            .any(|s| s.kind == ts_pack_core::StructureKind::Function),
+        "Structure should contain a 'function' item"
+    );
+    assert!(
+        intel.imports.len() >= 1,
+        "Expected at least 1 import(s), got {}",
+        intel.imports.len()
+    );
+    assert!(
+        intel.metrics.total_lines >= 5,
+        "Expected at least 5 total line(s), got {}",
+        intel.metrics.total_lines
+    );
+    assert_eq!(
+        intel.metrics.error_count, 0,
+        "Expected error_count == 0, got {}",
+        intel.metrics.error_count
+    );
 }

@@ -3,39 +3,33 @@
 defmodule E2eTests.ParsingTest do
   use ExUnit.Case, async: true
 
-  test "parsing_go_function" do
-    # Parse a Go function declaration and assert node type
-    tree = TreeSitterLanguagePack.parse_string("go", "package main\nfunc main() {}")
+  test "parsing_javascript_class" do
+    # Parse a JavaScript class declaration.
+    tree = TreeSitterLanguagePack.parse_string("javascript", "class Foo { bar() {} }")
     assert is_reference(tree), "Parse tree should be a reference"
-    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_declaration"), "Tree should contain a 'function_declaration' node"
-  end
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
 
-  test "parsing_html_element" do
-    # Parse an HTML element and assert node type
-    tree = TreeSitterLanguagePack.parse_string("html", "<div>hello</div>")
-    assert is_reference(tree), "Parse tree should be a reference"
-    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "element"), "Tree should contain a 'element' node"
-  end
-
-  test "parsing_javascript_variable" do
-    # Parse a JavaScript variable declaration and assert node type
-    tree = TreeSitterLanguagePack.parse_string("javascript", "const x = 1;")
-    assert is_reference(tree), "Parse tree should be a reference"
-    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "lexical_declaration"), "Tree should contain a 'lexical_declaration' node"
+    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "class_declaration"),
+           "Tree should contain a 'class_declaration' node"
   end
 
   test "parsing_python_function" do
-    # Parse a Python function definition and assert node type
-    tree = TreeSitterLanguagePack.parse_string("python", "def hello(): pass")
+    # Parse a Python function definition.
+    tree = TreeSitterLanguagePack.parse_string("python", "def hello():\n    pass\n")
     assert is_reference(tree), "Parse tree should be a reference"
-    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_definition"), "Tree should contain a 'function_definition' node"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+
+    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_definition"),
+           "Tree should contain a 'function_definition' node"
   end
 
-  test "parsing_rust_function" do
-    # Parse a Rust function definition and assert node type
-    tree = TreeSitterLanguagePack.parse_string("rust", "fn main() {}")
+  test "parsing_rust_struct" do
+    # Parse a Rust struct definition.
+    tree = TreeSitterLanguagePack.parse_string("rust", "struct Point { x: f64, y: f64 }")
     assert is_reference(tree), "Parse tree should be a reference"
-    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_item"), "Tree should contain a 'function_item' node"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
-
 end

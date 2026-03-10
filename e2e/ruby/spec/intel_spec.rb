@@ -4,6 +4,32 @@ require_relative "spec_helper"
 
 RSpec.describe "intel" do
 
+  it "go_function_intel" do
+    # Intel: extract structure from Go function definition
+    skip "Language 'go' not available" unless TreeSitterLanguagePack.has_language("go")
+    result_json = TreeSitterLanguagePack.process("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", "go")
+    intel = JSON.parse(result_json)
+    expect(intel["language"]).to eq("go")
+    expect(intel["structure"].length).to be >= 1
+    expect(intel["structure"].any? { |s| s["kind"] == "function" }).to be true
+    expect(intel["imports"].length).to be >= 1
+    expect(intel["metrics"]["total_lines"]).to be >= 7
+    expect(intel["metrics"]["error_count"]).to eq(0)
+  end
+
+  it "javascript_multi_import_intel" do
+    # Intel: detect multiple imports and function in JavaScript
+    skip "Language 'javascript' not available" unless TreeSitterLanguagePack.has_language("javascript")
+    result_json = TreeSitterLanguagePack.process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", "javascript")
+    intel = JSON.parse(result_json)
+    expect(intel["language"]).to eq("javascript")
+    expect(intel["structure"].length).to be >= 1
+    expect(intel["structure"].any? { |s| s["kind"] == "function" }).to be true
+    expect(intel["imports"].length).to be >= 2
+    expect(intel["metrics"]["total_lines"]).to be >= 6
+    expect(intel["metrics"]["error_count"]).to eq(0)
+  end
+
   it "python_chunking_intel" do
     # Intel: chunk multi-function Python source into multiple pieces
     skip "Language 'python' not available" unless TreeSitterLanguagePack.has_language("python")
@@ -14,6 +40,18 @@ RSpec.describe "intel" do
     expect(intel["language"]).to eq("python")
     expect(intel["metrics"]["total_lines"]).to be >= 8
     expect(chunks.length).to be >= 2
+  end
+
+  it "python_class_with_methods_intel" do
+    # Intel: extract nested structure from Python class with methods
+    skip "Language 'python' not available" unless TreeSitterLanguagePack.has_language("python")
+    result_json = TreeSitterLanguagePack.process("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", "python")
+    intel = JSON.parse(result_json)
+    expect(intel["language"]).to eq("python")
+    expect(intel["structure"].length).to be >= 1
+    expect(intel["structure"].any? { |s| s["kind"] == "class" }).to be true
+    expect(intel["metrics"]["total_lines"]).to be >= 6
+    expect(intel["metrics"]["error_count"]).to eq(0)
   end
 
   it "python_function_intel" do
@@ -28,6 +66,39 @@ RSpec.describe "intel" do
     expect(intel["metrics"]["error_count"]).to eq(0)
   end
 
+  it "python_malformed_code_intel" do
+    # Intel: detect diagnostics in malformed Python code
+    skip "Language 'python' not available" unless TreeSitterLanguagePack.has_language("python")
+    result_json = TreeSitterLanguagePack.process("def broken(\n    return\nclass", "python")
+    intel = JSON.parse(result_json)
+    expect(intel["language"]).to eq("python")
+    expect(intel["diagnostics"]).not_to be_empty
+  end
+
+  it "python_multi_import_intel" do
+    # Intel: detect multiple Python imports
+    skip "Language 'python' not available" unless TreeSitterLanguagePack.has_language("python")
+    result_json = TreeSitterLanguagePack.process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", "python")
+    intel = JSON.parse(result_json)
+    expect(intel["language"]).to eq("python")
+    expect(intel["structure"].length).to be >= 1
+    expect(intel["imports"].length).to be >= 3
+    expect(intel["metrics"]["total_lines"]).to be >= 5
+    expect(intel["metrics"]["error_count"]).to eq(0)
+  end
+
+  it "rust_chunking_intel" do
+    # Intel: chunk multi-function Rust source into pieces
+    skip "Language 'rust' not available" unless TreeSitterLanguagePack.has_language("rust")
+    result_json = TreeSitterLanguagePack.process_and_chunk("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", "rust", 30)
+    result = JSON.parse(result_json)
+    intel = result["intelligence"]
+    chunks = result["chunks"]
+    expect(intel["language"]).to eq("rust")
+    expect(intel["metrics"]["total_lines"]).to be >= 7
+    expect(chunks.length).to be >= 2
+  end
+
   it "rust_function_intel" do
     # Intel: extract structure from Rust function definition
     skip "Language 'rust' not available" unless TreeSitterLanguagePack.has_language("rust")
@@ -37,6 +108,19 @@ RSpec.describe "intel" do
     expect(intel["structure"].length).to be >= 1
     expect(intel["structure"].any? { |s| s["kind"] == "function" }).to be true
     expect(intel["metrics"]["total_lines"]).to be >= 3
+    expect(intel["metrics"]["error_count"]).to eq(0)
+  end
+
+  it "typescript_function_intel" do
+    # Intel: extract structure from TypeScript function
+    skip "Language 'typescript' not available" unless TreeSitterLanguagePack.has_language("typescript")
+    result_json = TreeSitterLanguagePack.process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", "typescript")
+    intel = JSON.parse(result_json)
+    expect(intel["language"]).to eq("typescript")
+    expect(intel["structure"].length).to be >= 1
+    expect(intel["structure"].any? { |s| s["kind"] == "function" }).to be true
+    expect(intel["imports"].length).to be >= 1
+    expect(intel["metrics"]["total_lines"]).to be >= 5
     expect(intel["metrics"]["error_count"]).to eq(0)
   end
 end

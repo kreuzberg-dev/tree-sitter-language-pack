@@ -21,6 +21,7 @@
 .run
 .venv
 __pycache__/
+node_modules/
 build/
 coverage.xml
 dist/

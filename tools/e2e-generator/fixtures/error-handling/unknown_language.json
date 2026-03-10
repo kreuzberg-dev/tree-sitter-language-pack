@@ -1,0 +1,10 @@
+{
+	"id": "error_handling_unknown_language",
+	"category": "error-handling",
+	"description": "Loading a nonexistent language should produce an error.",
+	"language": "nonexistent_xyz",
+	"assertions": {
+		"expect_error": true
+	},
+	"tags": ["error-handling"]
+}

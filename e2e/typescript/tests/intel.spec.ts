@@ -4,19 +4,69 @@ import { describe, it, expect } from "vitest";
 import { availableLanguages, hasLanguage, getLanguagePtr, process, processAndChunk } from "./helpers";
 
 describe("intel", () => {
+  it("go_function_intel", () => {
+    // Intel: extract structure from Go function definition
+    if (!hasLanguage("go")) {
+      console.log("Skipping: language 'go' not available");
+      return;
+    }
+    const resultJson = process("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", "go");
+    const result = JSON.parse(resultJson);
+    const intel = result;
+    expect(intel.language).toBe("go");
+    expect((intel.structure || []).length).toBeGreaterThanOrEqual(1);
+    expect((intel.structure || []).some((s: any) => s.kind === "function")).toBe(true);
+    expect((intel.imports || []).length).toBeGreaterThanOrEqual(1);
+    expect((intel.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(7);
+    expect((intel.metrics || {}).error_count || 0).toBe(0);
+  });
+
+  it("javascript_multi_import_intel", () => {
+    // Intel: detect multiple imports and function in JavaScript
+    if (!hasLanguage("javascript")) {
+      console.log("Skipping: language 'javascript' not available");
+      return;
+    }
+    const resultJson = process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", "javascript");
+    const result = JSON.parse(resultJson);
+    const intel = result;
+    expect(intel.language).toBe("javascript");
+    expect((intel.structure || []).length).toBeGreaterThanOrEqual(1);
+    expect((intel.structure || []).some((s: any) => s.kind === "function")).toBe(true);
+    expect((intel.imports || []).length).toBeGreaterThanOrEqual(2);
+    expect((intel.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(6);
+    expect((intel.metrics || {}).error_count || 0).toBe(0);
+  });
+
   it("python_chunking_intel", () => {
     // Intel: chunk multi-function Python source into multiple pieces
     if (!hasLanguage("python")) {
       console.log("Skipping: language 'python' not available");
       return;
     }
-    const resultJson = processAndChunk("def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n", "python", 2);
+    const resultJson = processAndChunk("def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n", "python", 30);
     const result = JSON.parse(resultJson);
     const intel = result.intelligence;
     const chunks = result.chunks;
     expect(intel.language).toBe("python");
     expect((intel.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(8);
     expect((chunks || []).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("python_class_with_methods_intel", () => {
+    // Intel: extract nested structure from Python class with methods
+    if (!hasLanguage("python")) {
+      console.log("Skipping: language 'python' not available");
+      return;
+    }
+    const resultJson = process("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", "python");
+    const result = JSON.parse(resultJson);
+    const intel = result;
+    expect(intel.language).toBe("python");
+    expect((intel.structure || []).length).toBeGreaterThanOrEqual(1);
+    expect((intel.structure || []).some((s: any) => s.kind === "class")).toBe(true);
+    expect((intel.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(6);
+    expect((intel.metrics || {}).error_count || 0).toBe(0);
   });
 
   it("python_function_intel", () => {
@@ -35,6 +85,50 @@ describe("intel", () => {
     expect((intel.metrics || {}).error_count || 0).toBe(0);
   });
 
+  it("python_malformed_code_intel", () => {
+    // Intel: detect diagnostics in malformed Python code
+    if (!hasLanguage("python")) {
+      console.log("Skipping: language 'python' not available");
+      return;
+    }
+    const resultJson = process("def broken(\n    return\nclass", "python");
+    const result = JSON.parse(resultJson);
+    const intel = result;
+    expect(intel.language).toBe("python");
+    expect((intel.diagnostics || []).length).toBeGreaterThan(0);
+  });
+
+  it("python_multi_import_intel", () => {
+    // Intel: detect multiple Python imports
+    if (!hasLanguage("python")) {
+      console.log("Skipping: language 'python' not available");
+      return;
+    }
+    const resultJson = process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", "python");
+    const result = JSON.parse(resultJson);
+    const intel = result;
+    expect(intel.language).toBe("python");
+    expect((intel.structure || []).length).toBeGreaterThanOrEqual(1);
+    expect((intel.imports || []).length).toBeGreaterThanOrEqual(3);
+    expect((intel.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(5);
+    expect((intel.metrics || {}).error_count || 0).toBe(0);
+  });
+
+  it("rust_chunking_intel", () => {
+    // Intel: chunk multi-function Rust source into pieces
+    if (!hasLanguage("rust")) {
+      console.log("Skipping: language 'rust' not available");
+      return;
+    }
+    const resultJson = processAndChunk("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", "rust", 30);
+    const result = JSON.parse(resultJson);
+    const intel = result.intelligence;
+    const chunks = result.chunks;
+    expect(intel.language).toBe("rust");
+    expect((intel.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(7);
+    expect((chunks || []).length).toBeGreaterThanOrEqual(2);
+  });
+
   it("rust_function_intel", () => {
     // Intel: extract structure from Rust function definition
     if (!hasLanguage("rust")) {
@@ -48,6 +142,23 @@ describe("intel", () => {
     expect((intel.structure || []).length).toBeGreaterThanOrEqual(1);
     expect((intel.structure || []).some((s: any) => s.kind === "function")).toBe(true);
     expect((intel.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(3);
+    expect((intel.metrics || {}).error_count || 0).toBe(0);
+  });
+
+  it("typescript_function_intel", () => {
+    // Intel: extract structure from TypeScript function
+    if (!hasLanguage("typescript")) {
+      console.log("Skipping: language 'typescript' not available");
+      return;
+    }
+    const resultJson = process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return \`Hello, \${name}!\`;\n}\n", "typescript");
+    const result = JSON.parse(resultJson);
+    const intel = result;
+    expect(intel.language).toBe("typescript");
+    expect((intel.structure || []).length).toBeGreaterThanOrEqual(1);
+    expect((intel.structure || []).some((s: any) => s.kind === "function")).toBe(true);
+    expect((intel.imports || []).length).toBeGreaterThanOrEqual(1);
+    expect((intel.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(5);
     expect((intel.metrics || {}).error_count || 0).toBe(0);
   });
 

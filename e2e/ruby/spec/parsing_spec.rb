@@ -4,38 +4,26 @@ require_relative "spec_helper"
 
 RSpec.describe "parsing" do
 
-  it "parsing_go_function" do
-    # Parse a Go function declaration and assert node type
-    tree = TreeSitterLanguagePack.parse_string("go", "package main\nfunc main() {}")
+  it "parsing_javascript_class" do
+    # Parse a JavaScript class declaration.
+    tree = TreeSitterLanguagePack.parse_string("javascript", "class Foo { bar() {} }")
     expect(tree).not_to be_nil
-    expect(tree.contains_node_type("function_declaration")).to be true
-  end
-
-  it "parsing_html_element" do
-    # Parse an HTML element and assert node type
-    tree = TreeSitterLanguagePack.parse_string("html", "<div>hello</div>")
-    expect(tree).not_to be_nil
-    expect(tree.contains_node_type("element")).to be true
-  end
-
-  it "parsing_javascript_variable" do
-    # Parse a JavaScript variable declaration and assert node type
-    tree = TreeSitterLanguagePack.parse_string("javascript", "const x = 1;")
-    expect(tree).not_to be_nil
-    expect(tree.contains_node_type("lexical_declaration")).to be true
+    expect(tree.root_child_count).to be >= 1
+    expect(tree.contains_node_type("class_declaration")).to be true
   end
 
   it "parsing_python_function" do
-    # Parse a Python function definition and assert node type
-    tree = TreeSitterLanguagePack.parse_string("python", "def hello(): pass")
+    # Parse a Python function definition.
+    tree = TreeSitterLanguagePack.parse_string("python", "def hello():\n    pass\n")
     expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
     expect(tree.contains_node_type("function_definition")).to be true
   end
 
-  it "parsing_rust_function" do
-    # Parse a Rust function definition and assert node type
-    tree = TreeSitterLanguagePack.parse_string("rust", "fn main() {}")
+  it "parsing_rust_struct" do
+    # Parse a Rust struct definition.
+    tree = TreeSitterLanguagePack.parse_string("rust", "struct Point { x: f64, y: f64 }")
     expect(tree).not_to be_nil
-    expect(tree.contains_node_type("function_item")).to be true
+    expect(tree.root_child_count).to be >= 1
   end
 end

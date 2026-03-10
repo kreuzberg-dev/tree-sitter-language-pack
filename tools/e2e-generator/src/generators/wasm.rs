@@ -1,4 +1,6 @@
-use crate::fixtures::{Fixture, escape_js_string, group_by_category, sanitize_name};
+use crate::fixtures::{
+    Fixture, escape_js_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+};
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
 use std::path::Path;
@@ -30,19 +32,11 @@ impl Generator for WasmGenerator {
 
     fn generate(&self, fixtures: &[Fixture], output_dir: &Path) -> Result<(), String> {
         let wasm_dir = output_dir.join("wasm");
+
+        // Clean stale test files before writing new ones
+        let _ = std::fs::remove_dir_all(&wasm_dir);
+
         let tests_dir = wasm_dir.join("tests");
-
-        // Clean old generated test files before writing new ones
-        if tests_dir.exists() {
-            for entry in std::fs::read_dir(&tests_dir).map_err(|e| format!("Failed to read tests dir: {e}"))? {
-                let entry = entry.map_err(|e| format!("Failed to read dir entry: {e}"))?;
-                let path = entry.path();
-                if path.extension().is_some_and(|ext| ext == "ts") {
-                    std::fs::remove_file(&path).map_err(|e| format!("Failed to remove {}: {e}", path.display()))?;
-                }
-            }
-        }
-
         std::fs::create_dir_all(&tests_dir).map_err(|e| format!("Failed to create wasm output dir: {e}"))?;
 
         write_package_json(&wasm_dir)?;
@@ -69,6 +63,12 @@ impl Generator for WasmGenerator {
         for (category, cat_fixtures) in &groups {
             write_test_file(&wasm_dir, category, cat_fixtures)?;
         }
+
+        // Run biome format if available
+        let _ = std::process::Command::new("biome")
+            .args(["format", "--write"])
+            .arg(&wasm_dir)
+            .status();
 
         Ok(())
     }
@@ -116,26 +116,6 @@ export {
 "#;
     std::fs::write(dir.join("tests").join("helpers.ts"), content)
         .map_err(|e| format!("Failed to write helpers.ts: {e}"))
-}
-
-fn has_intel_assertions(fixture: &Fixture) -> bool {
-    fixture.assertions.as_ref().is_some_and(|a| {
-        a.intel_language.is_some()
-            || a.intel_structure_count_min.is_some()
-            || a.intel_structure_contains_kind.is_some()
-            || a.intel_imports_count_min.is_some()
-            || a.intel_metrics_total_lines_min.is_some()
-            || a.intel_metrics_error_count.is_some()
-            || a.intel_diagnostics_not_empty.is_some()
-            || a.intel_chunk_count_min.is_some()
-    })
-}
-
-fn has_chunk_assertions(fixture: &Fixture) -> bool {
-    fixture
-        .assertions
-        .as_ref()
-        .is_some_and(|a| a.intel_chunk_count_min.is_some())
 }
 
 fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {
@@ -216,16 +196,15 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             let assertions = assertions.unwrap();
 
             if has_chunk_assertions(fixture) {
-                if let Some(max_chunk_size) = assertions.intel_chunk_count_min {
-                    writeln!(
-                        out,
-                        "    const resultJson = processAndChunk(\"{}\", \"{}\", {});",
-                        escape_js_string(source),
-                        escape_js_string(lang),
-                        max_chunk_size
-                    )
-                    .unwrap();
-                }
+                let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
+                writeln!(
+                    out,
+                    "    const resultJson = processAndChunk(\"{}\", \"{}\", {});",
+                    escape_js_string(source),
+                    escape_js_string(lang),
+                    max_chunk_size
+                )
+                .unwrap();
             } else {
                 writeln!(
                     out,

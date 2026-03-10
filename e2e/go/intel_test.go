@@ -7,11 +7,116 @@ import (
 	"testing"
 )
 
+func TestGoFunctionIntel(t *testing.T) {
+	// Intel: extract structure from Go function definition
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "go")
+	resultJSON, err := reg.Process("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", "go")
+	if err != nil {
+		t.Fatalf("process failed: %v", err)
+	}
+
+	var intel map[string]interface{}
+	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
+		t.Fatalf("failed to unmarshal JSON: %v", err)
+	}
+
+	if lang, _ := intel["language"].(string); lang != "go" {
+		t.Fatalf("expected language %q, got %q", "go", lang)
+	}
+
+	structure, _ := intel["structure"].([]interface{})
+	if len(structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
+	}
+
+	structureList, _ := intel["structure"].([]interface{})
+	foundKind := false
+	for _, s := range structureList {
+		if m, ok := s.(map[string]interface{}); ok {
+			if k, _ := m["kind"].(string); k == "function" {
+				foundKind = true
+				break
+			}
+		}
+	}
+	if !foundKind {
+		t.Fatal("structure should contain a 'function' kind node")
+	}
+
+	imports, _ := intel["imports"].([]interface{})
+	if len(imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(imports))
+	}
+
+	metrics, _ := intel["metrics"].(map[string]interface{})
+	totalLines, _ := metrics["total_lines"].(float64)
+	if int(totalLines) < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %v", totalLines)
+	}
+	errorCount, _ := metrics["error_count"].(float64)
+	if int(errorCount) != 0 {
+		t.Fatalf("expected error_count 0, got %v", errorCount)
+	}
+}
+
+func TestJavascriptMultiImportIntel(t *testing.T) {
+	// Intel: detect multiple imports and function in JavaScript
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "javascript")
+	resultJSON, err := reg.Process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", "javascript")
+	if err != nil {
+		t.Fatalf("process failed: %v", err)
+	}
+
+	var intel map[string]interface{}
+	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
+		t.Fatalf("failed to unmarshal JSON: %v", err)
+	}
+
+	if lang, _ := intel["language"].(string); lang != "javascript" {
+		t.Fatalf("expected language %q, got %q", "javascript", lang)
+	}
+
+	structure, _ := intel["structure"].([]interface{})
+	if len(structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
+	}
+
+	structureList, _ := intel["structure"].([]interface{})
+	foundKind := false
+	for _, s := range structureList {
+		if m, ok := s.(map[string]interface{}); ok {
+			if k, _ := m["kind"].(string); k == "function" {
+				foundKind = true
+				break
+			}
+		}
+	}
+	if !foundKind {
+		t.Fatal("structure should contain a 'function' kind node")
+	}
+
+	imports, _ := intel["imports"].([]interface{})
+	if len(imports) < 2 {
+		t.Fatalf("expected at least 2 import(s), got %d", len(imports))
+	}
+
+	metrics, _ := intel["metrics"].(map[string]interface{})
+	totalLines, _ := metrics["total_lines"].(float64)
+	if int(totalLines) < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %v", totalLines)
+	}
+	errorCount, _ := metrics["error_count"].(float64)
+	if int(errorCount) != 0 {
+		t.Fatalf("expected error_count 0, got %v", errorCount)
+	}
+}
+
 func TestPythonChunkingIntel(t *testing.T) {
 	// Intel: chunk multi-function Python source into multiple pieces
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	reg := newTestRegistry(t)
 	resultJSON, err := reg.ProcessAndChunk("def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n", "python", 30)
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
@@ -41,11 +146,58 @@ func TestPythonChunkingIntel(t *testing.T) {
 	}
 }
 
+func TestPythonClassWithMethodsIntel(t *testing.T) {
+	// Intel: extract nested structure from Python class with methods
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "python")
+	resultJSON, err := reg.Process("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", "python")
+	if err != nil {
+		t.Fatalf("process failed: %v", err)
+	}
+
+	var intel map[string]interface{}
+	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
+		t.Fatalf("failed to unmarshal JSON: %v", err)
+	}
+
+	if lang, _ := intel["language"].(string); lang != "python" {
+		t.Fatalf("expected language %q, got %q", "python", lang)
+	}
+
+	structure, _ := intel["structure"].([]interface{})
+	if len(structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
+	}
+
+	structureList, _ := intel["structure"].([]interface{})
+	foundKind := false
+	for _, s := range structureList {
+		if m, ok := s.(map[string]interface{}); ok {
+			if k, _ := m["kind"].(string); k == "class" {
+				foundKind = true
+				break
+			}
+		}
+	}
+	if !foundKind {
+		t.Fatal("structure should contain a 'class' kind node")
+	}
+
+	metrics, _ := intel["metrics"].(map[string]interface{})
+	totalLines, _ := metrics["total_lines"].(float64)
+	if int(totalLines) < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %v", totalLines)
+	}
+	errorCount, _ := metrics["error_count"].(float64)
+	if int(errorCount) != 0 {
+		t.Fatalf("expected error_count 0, got %v", errorCount)
+	}
+}
+
 func TestPythonFunctionIntel(t *testing.T) {
 	// Intel: extract structure from Python function definition
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	reg := newTestRegistry(t)
 	resultJSON, err := reg.Process("def greet(name):\n    return f'Hello, {name}!'\n", "python")
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
@@ -84,11 +236,105 @@ func TestPythonFunctionIntel(t *testing.T) {
 	if int(totalLines) < 2 {
 		t.Fatalf("expected at least 2 total line(s), got %v", totalLines)
 	}
-
-	metricsMap, _ := intel["metrics"].(map[string]interface{})
-	errorCount, _ := metricsMap["error_count"].(float64)
+	errorCount, _ := metrics["error_count"].(float64)
 	if int(errorCount) != 0 {
 		t.Fatalf("expected error_count 0, got %v", errorCount)
+	}
+}
+
+func TestPythonMalformedCodeIntel(t *testing.T) {
+	// Intel: detect diagnostics in malformed Python code
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "python")
+	resultJSON, err := reg.Process("def broken(\n    return\nclass", "python")
+	if err != nil {
+		t.Fatalf("process failed: %v", err)
+	}
+
+	var intel map[string]interface{}
+	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
+		t.Fatalf("failed to unmarshal JSON: %v", err)
+	}
+
+	if lang, _ := intel["language"].(string); lang != "python" {
+		t.Fatalf("expected language %q, got %q", "python", lang)
+	}
+
+	diagnostics, _ := intel["diagnostics"].([]interface{})
+	if len(diagnostics) == 0 {
+		t.Fatal("diagnostics should not be empty")
+	}
+}
+
+func TestPythonMultiImportIntel(t *testing.T) {
+	// Intel: detect multiple Python imports
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "python")
+	resultJSON, err := reg.Process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", "python")
+	if err != nil {
+		t.Fatalf("process failed: %v", err)
+	}
+
+	var intel map[string]interface{}
+	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
+		t.Fatalf("failed to unmarshal JSON: %v", err)
+	}
+
+	if lang, _ := intel["language"].(string); lang != "python" {
+		t.Fatalf("expected language %q, got %q", "python", lang)
+	}
+
+	structure, _ := intel["structure"].([]interface{})
+	if len(structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
+	}
+
+	imports, _ := intel["imports"].([]interface{})
+	if len(imports) < 3 {
+		t.Fatalf("expected at least 3 import(s), got %d", len(imports))
+	}
+
+	metrics, _ := intel["metrics"].(map[string]interface{})
+	totalLines, _ := metrics["total_lines"].(float64)
+	if int(totalLines) < 5 {
+		t.Fatalf("expected at least 5 total line(s), got %v", totalLines)
+	}
+	errorCount, _ := metrics["error_count"].(float64)
+	if int(errorCount) != 0 {
+		t.Fatalf("expected error_count 0, got %v", errorCount)
+	}
+}
+
+func TestRustChunkingIntel(t *testing.T) {
+	// Intel: chunk multi-function Rust source into pieces
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "rust")
+	resultJSON, err := reg.ProcessAndChunk("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", "rust", 30)
+	if err != nil {
+		t.Fatalf("process failed: %v", err)
+	}
+
+	var intel map[string]interface{}
+	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
+		t.Fatalf("failed to unmarshal JSON: %v", err)
+	}
+
+	chunks, _ := intel["chunks"].([]interface{})
+	if len(chunks) < 2 {
+		t.Fatalf("expected at least 2 chunk(s), got %d", len(chunks))
+	}
+	if intelObj, ok := intel["intelligence"].(map[string]interface{}); ok {
+		intel = intelObj
+	}
+
+	if lang, _ := intel["language"].(string); lang != "rust" {
+		t.Fatalf("expected language %q, got %q", "rust", lang)
+	}
+
+	metrics, _ := intel["metrics"].(map[string]interface{})
+	totalLines, _ := metrics["total_lines"].(float64)
+	if int(totalLines) < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %v", totalLines)
 	}
 }
 
@@ -96,7 +342,6 @@ func TestRustFunctionIntel(t *testing.T) {
 	// Intel: extract structure from Rust function definition
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "rust")
-	reg := newTestRegistry(t)
 	resultJSON, err := reg.Process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", "rust")
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
@@ -135,11 +380,61 @@ func TestRustFunctionIntel(t *testing.T) {
 	if int(totalLines) < 3 {
 		t.Fatalf("expected at least 3 total line(s), got %v", totalLines)
 	}
-
-	metricsMap, _ := intel["metrics"].(map[string]interface{})
-	errorCount, _ := metricsMap["error_count"].(float64)
+	errorCount, _ := metrics["error_count"].(float64)
 	if int(errorCount) != 0 {
 		t.Fatalf("expected error_count 0, got %v", errorCount)
 	}
 }
 
+func TestTypescriptFunctionIntel(t *testing.T) {
+	// Intel: extract structure from TypeScript function
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "typescript")
+	resultJSON, err := reg.Process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", "typescript")
+	if err != nil {
+		t.Fatalf("process failed: %v", err)
+	}
+
+	var intel map[string]interface{}
+	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
+		t.Fatalf("failed to unmarshal JSON: %v", err)
+	}
+
+	if lang, _ := intel["language"].(string); lang != "typescript" {
+		t.Fatalf("expected language %q, got %q", "typescript", lang)
+	}
+
+	structure, _ := intel["structure"].([]interface{})
+	if len(structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
+	}
+
+	structureList, _ := intel["structure"].([]interface{})
+	foundKind := false
+	for _, s := range structureList {
+		if m, ok := s.(map[string]interface{}); ok {
+			if k, _ := m["kind"].(string); k == "function" {
+				foundKind = true
+				break
+			}
+		}
+	}
+	if !foundKind {
+		t.Fatal("structure should contain a 'function' kind node")
+	}
+
+	imports, _ := intel["imports"].([]interface{})
+	if len(imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(imports))
+	}
+
+	metrics, _ := intel["metrics"].(map[string]interface{})
+	totalLines, _ := metrics["total_lines"].(float64)
+	if int(totalLines) < 5 {
+		t.Fatalf("expected at least 5 total line(s), got %v", totalLines)
+	}
+	errorCount, _ := metrics["error_count"].(float64)
+	if int(errorCount) != 0 {
+		t.Fatalf("expected error_count 0, got %v", errorCount)
+	}
+}

@@ -1,4 +1,6 @@
-use crate::fixtures::{Fixture, escape_rust_string, group_by_category, sanitize_name};
+use crate::fixtures::{
+    Fixture, escape_rust_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+};
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
 use std::path::Path;
@@ -12,6 +14,10 @@ impl Generator for RustGenerator {
 
     fn generate(&self, fixtures: &[Fixture], output_dir: &Path) -> Result<(), String> {
         let rust_dir = output_dir.join("rust");
+
+        // Clean stale test files before writing new ones
+        let _ = std::fs::remove_dir_all(&rust_dir);
+
         std::fs::create_dir_all(rust_dir.join("src")).map_err(|e| format!("Failed to create rust output dir: {e}"))?;
         std::fs::create_dir_all(rust_dir.join("tests")).map_err(|e| format!("Failed to create rust tests dir: {e}"))?;
 
@@ -22,6 +28,12 @@ impl Generator for RustGenerator {
         for (category, cat_fixtures) in &groups {
             write_test_file(&rust_dir, category, cat_fixtures)?;
         }
+
+        // Run cargo fmt if available
+        let _ = std::process::Command::new("cargo")
+            .args(["fmt", "--manifest-path"])
+            .arg(rust_dir.join("Cargo.toml"))
+            .status();
 
         Ok(())
     }
@@ -89,28 +101,6 @@ pub fn tree_has_error_nodes(node: tree_sitter::Node) -> bool {
 }
 "#;
     std::fs::write(dir.join("src").join("lib.rs"), content).map_err(|e| format!("Failed to write lib.rs: {e}"))
-}
-
-/// Check if a fixture has any intel-related assertions.
-fn has_intel_assertions(fixture: &Fixture) -> bool {
-    fixture.assertions.as_ref().is_some_and(|a| {
-        a.intel_language.is_some()
-            || a.intel_structure_count_min.is_some()
-            || a.intel_structure_contains_kind.is_some()
-            || a.intel_imports_count_min.is_some()
-            || a.intel_metrics_total_lines_min.is_some()
-            || a.intel_metrics_error_count.is_some()
-            || a.intel_diagnostics_not_empty.is_some()
-            || a.intel_chunk_count_min.is_some()
-    })
-}
-
-/// Check if a fixture has chunk-related assertions (requires process_and_chunk).
-fn has_chunk_assertions(fixture: &Fixture) -> bool {
-    fixture
-        .assertions
-        .as_ref()
-        .is_some_and(|a| a.intel_chunk_count_min.is_some())
 }
 
 /// Map a fixture kind string to a Rust StructureKind variant expression.

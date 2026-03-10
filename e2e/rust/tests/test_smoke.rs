@@ -9,7 +9,11 @@ fn smoke_actionscript() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -20,7 +24,11 @@ fn smoke_ada() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -31,7 +39,11 @@ fn smoke_agda() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -42,7 +54,11 @@ fn smoke_apex() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -53,7 +69,11 @@ fn smoke_arduino() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -64,7 +84,11 @@ fn smoke_asm() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -75,7 +99,11 @@ fn smoke_astro() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -86,7 +114,11 @@ fn smoke_bash() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -97,7 +129,11 @@ fn smoke_beancount() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -108,7 +144,11 @@ fn smoke_bibtex() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -119,7 +159,11 @@ fn smoke_bicep() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -130,7 +174,11 @@ fn smoke_bitbake() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -141,7 +189,11 @@ fn smoke_bsl() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -152,7 +204,11 @@ fn smoke_c() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -163,7 +219,11 @@ fn smoke_cairo() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -174,7 +234,11 @@ fn smoke_capnp() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -185,7 +249,11 @@ fn smoke_chatito() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -196,7 +264,11 @@ fn smoke_clarity() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -207,7 +279,11 @@ fn smoke_clojure() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -218,7 +294,11 @@ fn smoke_cmake() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -229,7 +309,11 @@ fn smoke_cobol() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -240,7 +324,11 @@ fn smoke_comment() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -251,7 +339,11 @@ fn smoke_commonlisp() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -262,7 +354,11 @@ fn smoke_cpon() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -273,7 +369,11 @@ fn smoke_cpp() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -284,7 +384,11 @@ fn smoke_css() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -295,7 +399,11 @@ fn smoke_csv() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -306,7 +414,11 @@ fn smoke_cuda() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -317,7 +429,11 @@ fn smoke_d() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -328,7 +444,11 @@ fn smoke_dart() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -339,7 +459,11 @@ fn smoke_dockerfile() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -350,7 +474,11 @@ fn smoke_doxygen() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -361,7 +489,11 @@ fn smoke_dtd() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -372,7 +504,11 @@ fn smoke_elisp() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -383,7 +519,11 @@ fn smoke_elixir() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -394,7 +534,11 @@ fn smoke_elm() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -405,7 +549,11 @@ fn smoke_erlang() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -416,7 +564,11 @@ fn smoke_fennel() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -427,7 +579,11 @@ fn smoke_firrtl() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -438,7 +594,11 @@ fn smoke_fish() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -449,7 +609,11 @@ fn smoke_fortran() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -460,7 +624,11 @@ fn smoke_fsharp() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -471,7 +639,11 @@ fn smoke_fsharp_signature() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -482,7 +654,11 @@ fn smoke_func() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -493,7 +669,11 @@ fn smoke_gdscript() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -504,7 +684,11 @@ fn smoke_gitattributes() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -515,7 +699,11 @@ fn smoke_gitcommit() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -526,7 +714,11 @@ fn smoke_gitignore() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -537,7 +729,11 @@ fn smoke_gleam() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -548,7 +744,11 @@ fn smoke_glsl() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -559,7 +759,11 @@ fn smoke_gn() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -570,7 +774,11 @@ fn smoke_go() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -581,7 +789,11 @@ fn smoke_gomod() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -592,7 +804,11 @@ fn smoke_gosum() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -603,7 +819,11 @@ fn smoke_graphql() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -614,7 +834,11 @@ fn smoke_groovy() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -625,7 +849,11 @@ fn smoke_gstlaunch() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -636,7 +864,11 @@ fn smoke_hack() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -647,7 +879,11 @@ fn smoke_hare() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -658,7 +894,11 @@ fn smoke_haskell() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -669,7 +909,11 @@ fn smoke_haxe() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -680,7 +924,11 @@ fn smoke_hcl() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -691,7 +939,11 @@ fn smoke_heex() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -702,7 +954,11 @@ fn smoke_hlsl() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -713,7 +969,11 @@ fn smoke_html() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -724,7 +984,11 @@ fn smoke_hyprlang() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -735,7 +999,11 @@ fn smoke_ini() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -746,7 +1014,11 @@ fn smoke_ispc() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -757,7 +1029,11 @@ fn smoke_janet() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -768,7 +1044,11 @@ fn smoke_java() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -779,7 +1059,11 @@ fn smoke_javascript() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -790,7 +1074,11 @@ fn smoke_jsdoc() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -801,7 +1089,11 @@ fn smoke_json() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -812,7 +1104,11 @@ fn smoke_jsonnet() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -823,7 +1119,11 @@ fn smoke_julia() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -834,7 +1134,11 @@ fn smoke_kconfig() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -845,7 +1149,11 @@ fn smoke_kdl() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -856,7 +1164,11 @@ fn smoke_kotlin() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -867,7 +1179,11 @@ fn smoke_latex() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -878,7 +1194,11 @@ fn smoke_linkerscript() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -889,7 +1209,11 @@ fn smoke_llvm() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -900,7 +1224,11 @@ fn smoke_lua() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -911,7 +1239,11 @@ fn smoke_luadoc() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -922,7 +1254,11 @@ fn smoke_luap() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -933,7 +1269,11 @@ fn smoke_luau() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -944,7 +1284,11 @@ fn smoke_magik() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -955,7 +1299,11 @@ fn smoke_make() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -966,7 +1314,11 @@ fn smoke_markdown() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -977,7 +1329,11 @@ fn smoke_markdown_inline() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -988,7 +1344,11 @@ fn smoke_matlab() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -999,7 +1359,11 @@ fn smoke_mermaid() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1010,7 +1374,11 @@ fn smoke_meson() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1021,7 +1389,11 @@ fn smoke_netlinx() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1032,7 +1404,11 @@ fn smoke_nim() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1043,7 +1419,11 @@ fn smoke_ninja() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1054,7 +1434,11 @@ fn smoke_nix() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1065,7 +1449,11 @@ fn smoke_nqc() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1076,7 +1464,11 @@ fn smoke_objc() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1087,7 +1479,11 @@ fn smoke_ocaml() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1098,7 +1494,11 @@ fn smoke_ocaml_interface() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1109,7 +1509,11 @@ fn smoke_odin() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1120,7 +1524,11 @@ fn smoke_org() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1131,7 +1539,11 @@ fn smoke_pascal() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1142,7 +1554,11 @@ fn smoke_pem() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1153,7 +1569,11 @@ fn smoke_perl() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1164,7 +1584,11 @@ fn smoke_pgn() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1175,7 +1599,11 @@ fn smoke_php() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1186,7 +1614,11 @@ fn smoke_po() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1197,7 +1629,11 @@ fn smoke_pony() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1208,7 +1644,11 @@ fn smoke_powershell() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1219,7 +1659,11 @@ fn smoke_printf() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1230,7 +1674,11 @@ fn smoke_prisma() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1241,7 +1689,11 @@ fn smoke_properties() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1252,7 +1704,11 @@ fn smoke_proto() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1263,7 +1719,11 @@ fn smoke_psv() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1274,7 +1734,11 @@ fn smoke_puppet() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1285,7 +1749,11 @@ fn smoke_purescript() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1296,7 +1764,11 @@ fn smoke_pymanifest() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1307,7 +1779,11 @@ fn smoke_python() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1318,7 +1794,11 @@ fn smoke_qmldir() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1329,7 +1809,11 @@ fn smoke_qmljs() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1340,7 +1824,11 @@ fn smoke_query() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1351,7 +1839,11 @@ fn smoke_r() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1362,7 +1854,11 @@ fn smoke_racket() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1373,7 +1869,11 @@ fn smoke_re2c() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1384,7 +1884,11 @@ fn smoke_readline() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1395,7 +1899,11 @@ fn smoke_rego() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1406,7 +1914,11 @@ fn smoke_requirements() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1417,7 +1929,11 @@ fn smoke_ron() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1428,7 +1944,11 @@ fn smoke_rst() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1439,7 +1959,11 @@ fn smoke_ruby() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1450,7 +1974,11 @@ fn smoke_rust() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1461,7 +1989,11 @@ fn smoke_scala() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1472,7 +2004,11 @@ fn smoke_scheme() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1483,7 +2019,11 @@ fn smoke_scss() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1494,7 +2034,11 @@ fn smoke_smali() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1505,7 +2049,11 @@ fn smoke_smithy() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1516,7 +2064,11 @@ fn smoke_solidity() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1527,7 +2079,11 @@ fn smoke_sparql() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1538,7 +2094,11 @@ fn smoke_sql() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1549,7 +2109,11 @@ fn smoke_squirrel() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1560,7 +2124,11 @@ fn smoke_starlark() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1571,7 +2139,11 @@ fn smoke_svelte() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1582,7 +2154,11 @@ fn smoke_swift() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1593,7 +2169,11 @@ fn smoke_tablegen() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1604,7 +2184,11 @@ fn smoke_tcl() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1615,7 +2199,11 @@ fn smoke_terraform() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1626,7 +2214,11 @@ fn smoke_test() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1637,7 +2229,11 @@ fn smoke_thrift() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1648,7 +2244,11 @@ fn smoke_toml() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1659,7 +2259,11 @@ fn smoke_tsv() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1670,7 +2274,11 @@ fn smoke_tsx() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1681,7 +2289,11 @@ fn smoke_twig() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1692,7 +2304,11 @@ fn smoke_typescript() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1703,7 +2319,11 @@ fn smoke_typst() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1714,7 +2334,11 @@ fn smoke_udev() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1725,7 +2349,11 @@ fn smoke_ungrammar() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1736,7 +2364,11 @@ fn smoke_uxntal() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1747,7 +2379,11 @@ fn smoke_v() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1758,7 +2394,11 @@ fn smoke_verilog() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1769,7 +2409,11 @@ fn smoke_vhdl() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1780,7 +2424,11 @@ fn smoke_vim() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1791,7 +2439,11 @@ fn smoke_vue() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1802,7 +2454,11 @@ fn smoke_wast() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1813,7 +2469,11 @@ fn smoke_wat() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1824,7 +2484,11 @@ fn smoke_wgsl() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1835,7 +2499,11 @@ fn smoke_xcompose() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1846,7 +2514,11 @@ fn smoke_xml() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1857,7 +2529,11 @@ fn smoke_yuck() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -1868,5 +2544,9 @@ fn smoke_zig() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }

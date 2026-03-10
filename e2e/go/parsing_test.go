@@ -4,32 +4,8 @@ package e2e_tests
 
 import "testing"
 
-func TestParsingGoFunction(t *testing.T) {
-	// Parse a Go function declaration and assert node type
-	reg := newTestRegistry(t)
-	ptr, err := reg.GetLanguage("go")
-	if err != nil {
-		t.Fatalf("Failed to get language %q: %v", "go", err)
-	}
-	if ptr == nil {
-		t.Fatalf("Language pointer for %q is nil", "go")
-	}
-}
-
-func TestParsingHtmlElement(t *testing.T) {
-	// Parse an HTML element and assert node type
-	reg := newTestRegistry(t)
-	ptr, err := reg.GetLanguage("html")
-	if err != nil {
-		t.Fatalf("Failed to get language %q: %v", "html", err)
-	}
-	if ptr == nil {
-		t.Fatalf("Language pointer for %q is nil", "html")
-	}
-}
-
-func TestParsingJavascriptVariable(t *testing.T) {
-	// Parse a JavaScript variable declaration and assert node type
+func TestParsingJavascriptClass(t *testing.T) {
+	// Parse a JavaScript class declaration.
 	reg := newTestRegistry(t)
 	ptr, err := reg.GetLanguage("javascript")
 	if err != nil {
@@ -41,7 +17,7 @@ func TestParsingJavascriptVariable(t *testing.T) {
 }
 
 func TestParsingPythonFunction(t *testing.T) {
-	// Parse a Python function definition and assert node type
+	// Parse a Python function definition.
 	reg := newTestRegistry(t)
 	ptr, err := reg.GetLanguage("python")
 	if err != nil {
@@ -52,8 +28,8 @@ func TestParsingPythonFunction(t *testing.T) {
 	}
 }
 
-func TestParsingRustFunction(t *testing.T) {
-	// Parse a Rust function definition and assert node type
+func TestParsingRustStruct(t *testing.T) {
+	// Parse a Rust struct definition.
 	reg := newTestRegistry(t)
 	ptr, err := reg.GetLanguage("rust")
 	if err != nil {
@@ -63,4 +39,3 @@ func TestParsingRustFunction(t *testing.T) {
 		t.Fatalf("Language pointer for %q is nil", "rust")
 	}
 }
-

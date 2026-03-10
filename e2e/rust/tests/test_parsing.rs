@@ -2,56 +2,54 @@
 #![allow(clippy::too_many_lines)]
 
 #[test]
-fn parsing_go_function() {
-    // Parse a Go function declaration and assert node type
-    let mut parser = ts_pack_core::get_parser("go").expect("Failed to get parser for 'go'");
-    let tree = parser.parse("package main\nfunc main() {}", None);
-    assert!(tree.is_some(), "Parse tree should not be None");
-    let tree = tree.unwrap();
-    let root = tree.root_node();
-    assert!(e2e_tests::tree_contains_node_type(root, "function_declaration"), "Tree should contain a 'function_declaration' node");
-}
-
-#[test]
-fn parsing_html_element() {
-    // Parse an HTML element and assert node type
-    let mut parser = ts_pack_core::get_parser("html").expect("Failed to get parser for 'html'");
-    let tree = parser.parse("<div>hello</div>", None);
-    assert!(tree.is_some(), "Parse tree should not be None");
-    let tree = tree.unwrap();
-    let root = tree.root_node();
-    assert!(e2e_tests::tree_contains_node_type(root, "element"), "Tree should contain a 'element' node");
-}
-
-#[test]
-fn parsing_javascript_variable() {
-    // Parse a JavaScript variable declaration and assert node type
+fn parsing_javascript_class() {
+    // Parse a JavaScript class declaration.
     let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
-    let tree = parser.parse("const x = 1;", None);
+    let tree = parser.parse("class Foo { bar() {} }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(e2e_tests::tree_contains_node_type(root, "lexical_declaration"), "Tree should contain a 'lexical_declaration' node");
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "class_declaration"),
+        "Tree should contain a 'class_declaration' node"
+    );
 }
 
 #[test]
 fn parsing_python_function() {
-    // Parse a Python function definition and assert node type
+    // Parse a Python function definition.
     let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
-    let tree = parser.parse("def hello(): pass", None);
+    let tree = parser.parse("def hello():\n    pass\n", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(e2e_tests::tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node");
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_definition"),
+        "Tree should contain a 'function_definition' node"
+    );
 }
 
 #[test]
-fn parsing_rust_function() {
-    // Parse a Rust function definition and assert node type
+fn parsing_rust_struct() {
+    // Parse a Rust struct definition.
     let mut parser = ts_pack_core::get_parser("rust").expect("Failed to get parser for 'rust'");
-    let tree = parser.parse("fn main() {}", None);
+    let tree = parser.parse("struct Point { x: f64, y: f64 }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(e2e_tests::tree_contains_node_type(root, "function_item"), "Tree should contain a 'function_item' node");
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }

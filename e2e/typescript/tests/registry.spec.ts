@@ -5,17 +5,17 @@ import { availableLanguages, hasLanguage, getLanguagePtr, process, processAndChu
 
 describe("registry", () => {
   it("registry_has_language_false", () => {
-    // has_language('nonexistent') should return false
+    // has_language('nonexistent') should return false.
     expect(hasLanguage("nonexistent")).toBe(false);
   });
 
   it("registry_has_language_true", () => {
-    // has_language('python') should return true
+    // has_language('python') should return true.
     expect(hasLanguage("python")).toBe(true);
   });
 
   it("registry_list_languages", () => {
-    // available_languages should return a non-empty list
+    // available_languages should return a non-empty list.
     const langs = availableLanguages();
     expect(langs.length).toBeGreaterThan(0);
   });

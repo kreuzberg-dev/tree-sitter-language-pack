@@ -217,3 +217,25 @@ pub fn escape_c_string(s: &str) -> String {
         .replace('\r', "\\r")
         .replace('\t', "\\t")
 }
+
+/// Check if a fixture has any intel-related assertions.
+pub fn has_intel_assertions(fixture: &Fixture) -> bool {
+    fixture.assertions.as_ref().is_some_and(|a| {
+        a.intel_language.is_some()
+            || a.intel_structure_count_min.is_some()
+            || a.intel_structure_contains_kind.is_some()
+            || a.intel_imports_count_min.is_some()
+            || a.intel_metrics_total_lines_min.is_some()
+            || a.intel_metrics_error_count.is_some()
+            || a.intel_diagnostics_not_empty.is_some()
+            || a.intel_chunk_count_min.is_some()
+    })
+}
+
+/// Check if a fixture has chunk-related assertions (requires process_and_chunk).
+pub fn has_chunk_assertions(fixture: &Fixture) -> bool {
+    fixture
+        .assertions
+        .as_ref()
+        .is_some_and(|a| a.intel_chunk_count_min.is_some())
+}

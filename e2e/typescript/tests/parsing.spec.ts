@@ -4,32 +4,20 @@ import { describe, it, expect } from "vitest";
 import { availableLanguages, hasLanguage, getLanguagePtr, process, processAndChunk } from "./helpers";
 
 describe("parsing", () => {
-  it("parsing_go_function", () => {
-    // Parse a Go function declaration and assert node type
-    const ptr = getLanguagePtr("go");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("parsing_html_element", () => {
-    // Parse an HTML element and assert node type
-    const ptr = getLanguagePtr("html");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("parsing_javascript_variable", () => {
-    // Parse a JavaScript variable declaration and assert node type
+  it("parsing_javascript_class", () => {
+    // Parse a JavaScript class declaration.
     const ptr = getLanguagePtr("javascript");
     expect(ptr).toBeTruthy();
   });
 
   it("parsing_python_function", () => {
-    // Parse a Python function definition and assert node type
+    // Parse a Python function definition.
     const ptr = getLanguagePtr("python");
     expect(ptr).toBeTruthy();
   });
 
-  it("parsing_rust_function", () => {
-    // Parse a Rust function definition and assert node type
+  it("parsing_rust_struct", () => {
+    // Parse a Rust struct definition.
     const ptr = getLanguagePtr("rust");
     expect(ptr).toBeTruthy();
   });

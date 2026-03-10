@@ -5,17 +5,11 @@ def tree_contains_node_type(node, node_type: str) -> bool:
     """Check whether a tree-sitter node or any descendant has the given type."""
     if node.type == node_type:
         return True
-    for child in node.children:
-        if tree_contains_node_type(child, node_type):
-            return True
-    return False
+    return any(tree_contains_node_type(child, node_type) for child in node.children)
 
 
 def tree_has_error_nodes(node) -> bool:
     """Check whether a tree-sitter node or any descendant is an ERROR node."""
     if node.type == "ERROR" or node.is_missing:
         return True
-    for child in node.children:
-        if tree_has_error_nodes(child):
-            return True
-    return False
+    return any(tree_has_error_nodes(child) for child in node.children)
