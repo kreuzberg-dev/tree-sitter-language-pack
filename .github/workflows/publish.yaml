@@ -152,25 +152,11 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          MAX_ATTEMPTS=3
-          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              --retry 2 --retry-delay 3 --connect-timeout 10 --max-time 30 \
-              "https://crates.io/api/v1/crates/ts-pack-core/$VERSION")
-            if [[ "$STATUS" == "200" ]]; then
-              echo "exists=true" >> "$GITHUB_OUTPUT"
-              echo "ts-pack-core $VERSION already published on crates.io"
-              exit 0
-            elif [[ "$STATUS" == "404" ]]; then
-              echo "exists=false" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            echo "Attempt $attempt: unexpected status $STATUS, retrying..."
-            sleep $((attempt * 5))
-          done
-          echo "exists=false" >> "$GITHUB_OUTPUT"
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: cratesio
+          package: ts-pack-core
+          version: ${{ needs.prepare.outputs.version }}
 
   check-pypi:
     name: Check PyPI
@@ -182,25 +168,11 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          MAX_ATTEMPTS=3
-          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              --retry 2 --retry-delay 3 --connect-timeout 10 --max-time 30 \
-              "https://pypi.org/pypi/tree-sitter-language-pack/$VERSION/json")
-            if [[ "$STATUS" == "200" ]]; then
-              echo "exists=true" >> "$GITHUB_OUTPUT"
-              echo "tree-sitter-language-pack $VERSION already published on PyPI"
-              exit 0
-            elif [[ "$STATUS" == "404" ]]; then
-              echo "exists=false" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            echo "Attempt $attempt: unexpected status $STATUS, retrying..."
-            sleep $((attempt * 5))
-          done
-          echo "exists=false" >> "$GITHUB_OUTPUT"
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: pypi
+          package: tree-sitter-language-pack
+          version: ${{ needs.prepare.outputs.version }}
 
   check-npm:
     name: Check npm
@@ -212,25 +184,11 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          MAX_ATTEMPTS=3
-          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              --retry 2 --retry-delay 3 --connect-timeout 10 --max-time 30 \
-              "https://registry.npmjs.org/@tree-sitter-language-pack%2Fnode/$VERSION")
-            if [[ "$STATUS" == "200" ]]; then
-              echo "exists=true" >> "$GITHUB_OUTPUT"
-              echo "@tree-sitter-language-pack/node $VERSION already published on npm"
-              exit 0
-            elif [[ "$STATUS" == "404" ]]; then
-              echo "exists=false" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            echo "Attempt $attempt: unexpected status $STATUS, retrying..."
-            sleep $((attempt * 5))
-          done
-          echo "exists=false" >> "$GITHUB_OUTPUT"
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: npm
+          package: "@kreuzberg/tree-sitter-language-pack"
+          version: ${{ needs.prepare.outputs.version }}
 
   check-rubygems:
     name: Check RubyGems
@@ -242,43 +200,11 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          # Ruby uses dots instead of hyphens for pre-release: 1.0.0.rc.1
-          RUBY_VERSION="${VERSION//-/.}"
-          MAX_ATTEMPTS=3
-          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
-            RESPONSE=$(curl -s --retry 2 --retry-delay 3 --connect-timeout 10 --max-time 30 \
-              -w "\n%{http_code}" \
-              "https://rubygems.org/api/v1/versions/tree_sitter_language_pack.json")
-            STATUS=$(echo "$RESPONSE" | tail -1)
-            BODY=$(echo "$RESPONSE" | sed '$d')
-            if [[ "$STATUS" == "200" ]]; then
-              # Check if our specific version exists in the versions list
-              if echo "$BODY" | python3 -c "
-          import sys, json
-          versions = json.load(sys.stdin)
-          target = '$RUBY_VERSION'
-          found = any(v.get('number') == target for v in versions)
-          print('true' if found else 'false')
-          " 2>/dev/null | grep -q "true"; then
-                echo "exists=true" >> "$GITHUB_OUTPUT"
-                echo "tree_sitter_language_pack $RUBY_VERSION already published on RubyGems"
-                exit 0
-              else
-                echo "exists=false" >> "$GITHUB_OUTPUT"
-                echo "tree_sitter_language_pack $RUBY_VERSION not found on RubyGems"
-                exit 0
-              fi
-            elif [[ "$STATUS" == "404" ]]; then
-              echo "exists=false" >> "$GITHUB_OUTPUT"
-              echo "tree_sitter_language_pack gem not found on RubyGems (new gem)"
-              exit 0
-            fi
-            echo "Attempt $attempt: unexpected status $STATUS, retrying..."
-            sleep $((attempt * 5))
-          done
-          echo "exists=false" >> "$GITHUB_OUTPUT"
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: rubygems
+          package: tree_sitter_language_pack
+          version: ${{ needs.prepare.outputs.version }}
 
   check-npm-wasm:
     name: Check npm (WASM)
@@ -290,25 +216,11 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          MAX_ATTEMPTS=3
-          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              --retry 2 --retry-delay 3 --connect-timeout 10 --max-time 30 \
-              "https://registry.npmjs.org/@kreuzberg%2Ftree-sitter-language-pack-wasm/$VERSION")
-            if [[ "$STATUS" == "200" ]]; then
-              echo "exists=true" >> "$GITHUB_OUTPUT"
-              echo "@kreuzberg/tree-sitter-language-pack-wasm $VERSION already published on npm"
-              exit 0
-            elif [[ "$STATUS" == "404" ]]; then
-              echo "exists=false" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            echo "Attempt $attempt: unexpected status $STATUS, retrying..."
-            sleep $((attempt * 5))
-          done
-          echo "exists=false" >> "$GITHUB_OUTPUT"
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: npm
+          package: "@kreuzberg/tree-sitter-language-pack-wasm"
+          version: ${{ needs.prepare.outputs.version }}
 
   # ─── Clone vendors ────────────────────────────────────────────────
   clone-vendors:
@@ -612,7 +524,7 @@ jobs:
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://registry.npmjs.org/@tree-sitter-language-pack%2Fnode/$VERSION")
+            "https://registry.npmjs.org/@kreuzberg%2Ftree-sitter-language-pack/$VERSION")
           if [[ "$STATUS" == "200" ]]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
             echo "::notice::Package already on npm; skipping publish."
@@ -1099,26 +1011,19 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Delete existing release (force republish)
+        if: ${{ !inputs.dry_run && inputs.force_republish }}
+        run: gh release delete "${{ inputs.tag }}" --yes 2>/dev/null || true
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Create GitHub Release
-        if: ${{ !inputs.dry_run }}
-        run: |
-          TAG="${{ inputs.tag }}"
-
-          # Delete existing release if force_republish
-          if [[ "${{ inputs.force_republish }}" == "true" ]]; then
-            gh release delete "$TAG" --yes 2>/dev/null || true
-          fi
-
-          # Find any Go FFI artifacts to attach
-          ASSETS=""
-          for f in release-assets/ts-pack-ffi-*.tar.gz; do
-            [ -f "$f" ] && ASSETS="$ASSETS $f"
-          done
-          # shellcheck disable=SC2086
-          gh release create "$TAG" \
-            --title "Release $TAG" \
-            --generate-notes \
-            ${ASSETS}
+        uses: kreuzberg-dev/actions/publish-github-release@v1
+        with:
+          tag: ${{ inputs.tag }}
+          title: "Release ${{ inputs.tag }}"
+          artifacts: "release-assets/ts-pack-ffi-*.tar.gz"
+          dry-run: ${{ inputs.dry_run }}
         env:
           GH_TOKEN: ${{ github.token }}
 

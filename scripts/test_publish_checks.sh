@@ -47,8 +47,8 @@ check_registry "crates.io (ts-pack-core/$VERSION)" \
   "https://crates.io/api/v1/crates/ts-pack-core/$VERSION" "not_found"
 check_registry "PyPI (tree-sitter-language-pack/$VERSION)" \
   "https://pypi.org/pypi/tree-sitter-language-pack/$VERSION/json" "not_found"
-check_registry "npm (@tree-sitter-language-pack/node/$VERSION)" \
-  "https://registry.npmjs.org/@tree-sitter-language-pack%2Fnode/$VERSION" "not_found"
+check_registry "npm (@kreuzberg/tree-sitter-language-pack/$VERSION)" \
+  "https://registry.npmjs.org/@kreuzberg%2Ftree-sitter-language-pack/$VERSION" "not_found"
 
 echo ""
 echo "2. Known published version SHOULD exist (PyPI 0.11.0):"
