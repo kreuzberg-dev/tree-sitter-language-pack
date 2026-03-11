@@ -610,8 +610,10 @@ jobs:
 
       - name: Publish to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        working-directory: crates/ts-pack-node
-        run: npm publish --access public
+        uses: kreuzberg-dev/actions/publish-npm@v1
+        with:
+          package-dir: crates/ts-pack-node
+          dry-run: ${{ inputs.dry_run }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -829,25 +831,10 @@ jobs:
 
       - name: Publish gems to RubyGems
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        working-directory: dist
-        run: |
-          publish_count=0
-          for gem in tree_sitter_language_pack-*.gem; do
-            [ -f "$gem" ] || continue
-            echo "Publishing $gem..."
-            output=$(gem push "$gem" 2>&1) || {
-              if echo "$output" | grep -qiE "(already been pushed|repushing|already exists)"; then
-                echo "::notice::$gem already published; skipping."
-                continue
-              else
-                echo "$output"
-                exit 1
-              fi
-            }
-            echo "$output"
-            publish_count=$((publish_count + 1))
-          done
-          echo "Published $publish_count gem(s) successfully"
+        uses: kreuzberg-dev/actions/publish-rubygems@v1
+        with:
+          gems-dir: dist
+          dry-run: ${{ inputs.dry_run }}
         env:
           GEM_HOST_API_KEY: ${{ secrets.GEM_HOST_API_KEY }}
 
@@ -962,28 +949,22 @@ jobs:
 
       - name: Publish to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        working-directory: crates/ts-pack-wasm
-        run: npm publish --access public --provenance
+        uses: kreuzberg-dev/actions/publish-npm@v1
+        with:
+          package-dir: crates/ts-pack-wasm/pkg
+          provenance: "true"
+          dry-run: ${{ inputs.dry_run }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Wait for npm indexing
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          echo "Waiting for @kreuzberg/tree-sitter-language-pack-wasm@$VERSION to be indexed..."
-          for attempt in $(seq 1 20); do
-            sleep_time=$((attempt * 3))
-            sleep "$sleep_time"
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              "https://registry.npmjs.org/@kreuzberg%2Ftree-sitter-language-pack-wasm/$VERSION")
-            if [[ "$STATUS" == "200" ]]; then
-              echo "Package indexed successfully"
-              exit 0
-            fi
-            echo "Attempt $attempt: not yet indexed (status=$STATUS), waiting ${sleep_time}s..."
-          done
-          echo "::warning::npm indexing timed out after all attempts"
+        uses: kreuzberg-dev/actions/wait-for-package@v1
+        with:
+          registry: npm
+          package: "@kreuzberg/tree-sitter-language-pack-wasm"
+          version: ${{ needs.prepare.outputs.version }}
+          max-attempts: "20"
 
   # ─── Build Go FFI libraries ──────────────────────────────────────
   build-go-ffi:
