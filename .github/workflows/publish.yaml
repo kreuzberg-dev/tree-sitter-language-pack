@@ -499,34 +499,11 @@ jobs:
           pattern: dist-wheel-*
           merge-multiple: true
 
-      - name: Dry run summary
-        if: ${{ inputs.dry_run }}
-        run: |
-          {
-            echo "## PyPI Dry Run"
-            echo "Artifacts staged for PyPI:"
-            echo '```'
-            ls -1 dist/
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Re-check PyPI before publish
-        if: ${{ !inputs.dry_run }}
-        id: recheck
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://pypi.org/pypi/tree-sitter-language-pack/$VERSION/json")
-          if [[ "$STATUS" == "200" ]]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "::notice::Package already on PyPI; skipping publish."
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Publish to PyPI
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: kreuzberg-dev/actions/publish-pypi@v1
+        with:
+          packages-dir: dist
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
 
   # ─── Build & Publish Node.js ──────────────────────────────────────
   build-node-native:
