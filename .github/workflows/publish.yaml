@@ -218,10 +218,10 @@ jobs:
           for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
               --retry 2 --retry-delay 3 --connect-timeout 10 --max-time 30 \
-              "https://registry.npmjs.org/@tree-sitter-language-pack%2Fnode/$VERSION")
+              "https://registry.npmjs.org/@kreuzberg%2Ftree-sitter-language-pack/$VERSION")
             if [[ "$STATUS" == "200" ]]; then
               echo "exists=true" >> "$GITHUB_OUTPUT"
-              echo "@tree-sitter-language-pack/node $VERSION already published on npm"
+              echo "@kreuzberg/tree-sitter-language-pack $VERSION already published on npm"
               exit 0
             elif [[ "$STATUS" == "404" ]]; then
               echo "exists=false" >> "$GITHUB_OUTPUT"
@@ -623,7 +623,7 @@ jobs:
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://registry.npmjs.org/@tree-sitter-language-pack%2Fnode/$VERSION")
+            "https://registry.npmjs.org/@kreuzberg%2Ftree-sitter-language-pack/$VERSION")
           if [[ "$STATUS" == "200" ]]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
             echo "::notice::Package already on npm; skipping publish."

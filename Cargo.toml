@@ -13,6 +13,9 @@ version = "1.0.0-rc.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+homepage = "https://kreuzberg.dev"
+authors = ["Na'aman Hirschfeld <nhirschfeld@gmail.com>"]
+description = "A comprehensive tree-sitter language pack with polyglot bindings"
 keywords = ["tree-sitter", "parser", "syntax", "language-pack", "kreuzberg"]
 
 [workspace.dependencies]
