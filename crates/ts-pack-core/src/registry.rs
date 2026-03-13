@@ -7,6 +7,26 @@ use crate::error::Error;
 // Include the build.rs-generated language table
 include!(concat!(env!("OUT_DIR"), "/registry_generated.rs"));
 
+/// Alternative names that resolve to an existing grammar.
+const LANGUAGE_ALIASES: &[(&str, &str)] = &[
+    ("bazel", "starlark"),
+    ("gradle", "groovy"),
+    ("ignorefile", "gitignore"),
+    ("lisp", "commonlisp"),
+    ("makefile", "make"),
+    ("shell", "bash"),
+];
+
+#[inline(always)]
+fn resolve_alias(name: &str) -> &str {
+    for &(alias, target) in LANGUAGE_ALIASES {
+        if name == alias {
+            return target;
+        }
+    }
+    name
+}
+
 #[cfg(feature = "dynamic-loading")]
 mod dynamic {
     use std::collections::HashMap;
@@ -181,6 +201,7 @@ impl LanguageRegistry {
     }
 
     pub fn get_language(&self, name: &str) -> Result<Language, Error> {
+        let name = resolve_alias(name);
         // Try static first
         if let Some(loader) = self.static_lookup.get(name) {
             return Ok(loader());
@@ -224,6 +245,11 @@ impl LanguageRegistry {
                 }
             }
         }
+        for &(alias, target) in LANGUAGE_ALIASES {
+            if langs.iter().any(|lang| lang.as_ref() == target) {
+                langs.push(alias.to_string());
+            }
+        }
 
         langs.sort_unstable();
         langs.dedup();
@@ -231,6 +257,7 @@ impl LanguageRegistry {
     }
 
     pub fn has_language(&self, name: &str) -> bool {
+        let name = resolve_alias(name);
         if self.static_lookup.contains_key(name) {
             return true;
         }
@@ -260,23 +287,12 @@ impl LanguageRegistry {
     }
 
     pub fn language_count(&self) -> usize {
-        let mut count = self.static_lookup.len();
-
-        #[cfg(feature = "dynamic-loading")]
-        {
-            for n in &self.dynamic_loader.dynamic_names {
-                if !self.static_lookup.contains_key(n) {
-                    count += 1;
-                }
-            }
-        }
-
-        count
+        self.available_languages().len()
     }
 
     /// Parse source code and extract full file intelligence in a single pass.
     pub fn process(&self, source: &str, language: &str) -> Result<crate::intel::types::FileIntelligence, Error> {
-        crate::intel::process(source, language, self)
+        crate::intel::process(source, resolve_alias(language), self)
     }
 
     /// Parse, extract intelligence, and chunk source code in a single pass.
@@ -292,7 +308,7 @@ impl LanguageRegistry {
         ),
         Error,
     > {
-        crate::intel::process_and_chunk(source, language, max_chunk_size, self)
+        crate::intel::process_and_chunk(source, resolve_alias(language), max_chunk_size, self)
     }
 }
 
