@@ -278,8 +278,14 @@ fn apply_wasm32_sysroot(build: &mut cc::Build) {
     }
 
     if let Some(sysroot) = find_wasi_sysroot() {
-        // Only add generic include paths — NOT the wasm32-wasi specific dir,
-        // which contains wasi/api.h that errors on wasm32-unknown-unknown targets.
+        // The wasm32-wasi include dir has stdlib.h etc. that parsers need.
+        // Define __wasi__ so wasi/api.h's platform guard passes — parsers
+        // only use basic C headers (malloc, string), not actual WASI APIs.
+        let wasi_include = sysroot.join("include/wasm32-wasi");
+        if wasi_include.exists() {
+            build.define("__wasi__", None);
+            build.include(&wasi_include);
+        }
         let flat_include = sysroot.join("include");
         if flat_include.exists() {
             build.include(&flat_include);
