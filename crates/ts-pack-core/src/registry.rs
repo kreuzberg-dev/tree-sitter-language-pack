@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+#[cfg(feature = "dynamic-loading")]
 use std::path::PathBuf;
 use tree_sitter::Language;
 

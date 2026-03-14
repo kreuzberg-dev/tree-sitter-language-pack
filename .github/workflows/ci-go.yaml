@@ -130,7 +130,7 @@ jobs:
         run: task go:build:ffi
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-          TSLP_LINK_MODE: dynamic
+          TSLP_LINK_MODE: static
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Upload FFI artifacts

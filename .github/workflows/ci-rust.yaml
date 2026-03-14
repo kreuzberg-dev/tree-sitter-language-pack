@@ -165,7 +165,7 @@ jobs:
         run: task rust:test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-          TSLP_LINK_MODE: dynamic
+          TSLP_LINK_MODE: static
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
   e2e:
@@ -204,5 +204,5 @@ jobs:
         run: task rust:e2e:test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-          TSLP_LINK_MODE: dynamic
+          TSLP_LINK_MODE: static
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"

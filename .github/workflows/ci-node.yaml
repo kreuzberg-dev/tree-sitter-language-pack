@@ -160,6 +160,7 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+          TSLP_LINK_MODE: static
 
       - name: Report native module size
         shell: bash
