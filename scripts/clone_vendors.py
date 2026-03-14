@@ -225,6 +225,10 @@ async def move_src_folder(language_name: str, directory: str | None) -> None:
         else (vendor_directory / language_name / "src").resolve()
     )
     target_source_dir = (parsers_directory / language_name).resolve()
+    # Clean existing parser dir to avoid "already exists" errors on re-runs
+    target_src = target_source_dir / "src"
+    if target_src.exists():
+        await run_sync(rmtree, target_src)
     await AsyncPath(target_source_dir).mkdir(parents=True, exist_ok=True)
     await run_sync(move, source_dir, target_source_dir)
     print(f"Moved {language_name} parser files successfully")
