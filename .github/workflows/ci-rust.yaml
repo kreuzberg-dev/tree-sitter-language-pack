@@ -113,13 +113,13 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           use-sccache: "false"
           install-llvm-cov: "false"
 
       - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/install-task@v1.0.0 # v1.0.0
 
       - name: Check formatting
         run: task rust:format:check
@@ -152,14 +152,14 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
 
       - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/install-task@v1.0.0 # v1.0.0
 
       - name: Run workspace tests
         run: task rust:test
@@ -184,14 +184,14 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
 
       - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/install-task@v1.0.0 # v1.0.0
 
       - name: Generate E2E tests
         run: task rust:e2e:generate

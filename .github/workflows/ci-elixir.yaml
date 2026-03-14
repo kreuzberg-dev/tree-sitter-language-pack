@@ -115,7 +115,7 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
@@ -129,7 +129,7 @@ jobs:
           version-type: strict
 
       - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/install-task@v1.0.0 # v1.0.0
 
       - name: Cache Elixir dependencies
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
@@ -143,6 +143,16 @@ jobs:
 
       - name: Install Elixir dependencies
         run: task elixir:deps
+
+      - name: Build NIF library
+        run: cargo build -p ts-pack-elixir --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Stage NIF for Elixir
+        run: |
+          mkdir -p crates/ts-pack-elixir/priv/native
+          cp target/release/libts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts_pack_elixir.so
 
       - name: Compile Elixir (warnings as errors)
         working-directory: crates/ts-pack-elixir
@@ -173,7 +183,7 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
@@ -187,7 +197,17 @@ jobs:
           version-type: strict
 
       - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/install-task@v1.0.0 # v1.0.0
+
+      - name: Build NIF library
+        run: cargo build -p ts-pack-elixir --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Stage NIF for Elixir
+        run: |
+          mkdir -p crates/ts-pack-elixir/priv/native
+          cp target/release/libts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts_pack_elixir.so
 
       - name: Generate E2E tests
         run: task elixir:e2e:generate

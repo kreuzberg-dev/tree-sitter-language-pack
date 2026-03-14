@@ -117,14 +117,14 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
 
       - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/install-task@v1.0.0 # v1.0.0
 
       - name: Build FFI library
         run: task go:build:ffi
@@ -164,12 +164,15 @@ jobs:
           name: ffi-go-linux
           path: ffi-artifacts
 
-      - name: Restore FFI to expected path
+      - name: Restore FFI to expected paths
         run: |
           mkdir -p target/release
           cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
           mkdir -p crates/ts-pack-ffi/include
           cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
+          # Place in path CGO expects (relative to crates/ts-pack-go/)
+          mkdir -p crates/ts-pack-ffi/target/release
+          cp target/release/libts_pack_ffi.* crates/ts-pack-ffi/target/release/ 2>/dev/null || true
 
       - name: Setup Go
         uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
@@ -178,7 +181,7 @@ jobs:
           cache-dependency-path: crates/ts-pack-go/go.sum
 
       - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/install-task@v1.0.0 # v1.0.0
 
       - name: Run Go tests
         run: task go:test
@@ -215,15 +218,18 @@ jobs:
           name: ffi-go-linux
           path: ffi-artifacts
 
-      - name: Restore FFI to expected path
+      - name: Restore FFI to expected paths
         run: |
           mkdir -p target/release
           cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
           mkdir -p crates/ts-pack-ffi/include
           cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
+          # Place in path CGO expects (relative to crates/ts-pack-go/)
+          mkdir -p crates/ts-pack-ffi/target/release
+          cp target/release/libts_pack_ffi.* crates/ts-pack-ffi/target/release/ 2>/dev/null || true
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
@@ -236,7 +242,7 @@ jobs:
           cache-dependency-path: crates/ts-pack-go/go.sum
 
       - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/install-task@v1.0.0 # v1.0.0
 
       - name: Generate E2E tests
         run: task go:e2e:generate

@@ -116,7 +116,7 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
@@ -222,7 +222,7 @@ jobs:
           cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"

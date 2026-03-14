@@ -115,14 +115,14 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
 
       - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/install-task@v1.0.0 # v1.0.0
 
       - name: Generate C E2E tests
         run: task c:e2e:generate

@@ -152,7 +152,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0 # v1.0.0
         with:
           registry: cratesio
           package: ts-pack-core
@@ -168,7 +168,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0 # v1.0.0
         with:
           registry: pypi
           package: tree-sitter-language-pack
@@ -184,7 +184,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0 # v1.0.0
         with:
           registry: npm
           package: "@kreuzberg/tree-sitter-language-pack"
@@ -200,7 +200,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0 # v1.0.0
         with:
           registry: rubygems
           package: tree_sitter_language_pack
@@ -216,7 +216,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0 # v1.0.0
         with:
           registry: npm
           package: "@kreuzberg/tree-sitter-language-pack-wasm"
@@ -286,7 +286,7 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
@@ -380,7 +380,7 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
@@ -420,7 +420,7 @@ jobs:
           merge-multiple: true
 
       - name: Publish to PyPI
-        uses: kreuzberg-dev/actions/publish-pypi@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/publish-pypi@v1.0.0 # v1.0.0
         with:
           packages-dir: dist
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -453,7 +453,7 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
@@ -534,7 +534,7 @@ jobs:
 
       - name: Publish to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-npm@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/publish-npm@v1.0.0 # v1.0.0
         with:
           package-dir: crates/ts-pack-node
           dry-run: ${{ inputs.dry_run }}
@@ -581,7 +581,7 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
@@ -759,7 +759,7 @@ jobs:
 
       - name: Publish gems to RubyGems
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-rubygems@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/publish-rubygems@v1.0.0 # v1.0.0
         with:
           gems-dir: dist
           dry-run: ${{ inputs.dry_run }}
@@ -790,7 +790,7 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           target: wasm32-unknown-unknown
           components: ""
@@ -880,7 +880,7 @@ jobs:
 
       - name: Publish to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-npm@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/publish-npm@v1.0.0 # v1.0.0
         with:
           package-dir: crates/ts-pack-wasm/pkg
           provenance: "true"
@@ -890,7 +890,7 @@ jobs:
 
       - name: Wait for npm indexing
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/wait-for-package@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/wait-for-package@v1.0.0 # v1.0.0
         with:
           registry: npm
           package: "@kreuzberg/tree-sitter-language-pack-wasm"
@@ -930,7 +930,7 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
@@ -1018,7 +1018,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Create GitHub Release
-        uses: kreuzberg-dev/actions/publish-github-release@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/publish-github-release@v1.0.0 # v1.0.0
         with:
           tag: ${{ inputs.tag }}
           title: "Release ${{ inputs.tag }}"

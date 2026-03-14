@@ -118,22 +118,27 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.12"
+
+      - name: Vendor core
+        run: python3 scripts/ci/ruby/vendor-core.py
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Clippy (ts-pack-ruby)
         if: matrix.ruby-version == '3.2'
         run: cargo clippy --manifest-path crates/ts-pack-ruby/Cargo.toml -- -D warnings
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-
-      - name: Set up Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: "3.12"
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@4eb9f110bac952a8b68ecf92e3b5c7a987594ba6 # v1.292.0
@@ -145,11 +150,6 @@ jobs:
       - name: Install Ruby dependencies
         working-directory: crates/ts-pack-ruby
         run: bundle install
-
-      - name: Vendor core
-        run: python3 scripts/ci/ruby/vendor-core.py
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Build native extension
         working-directory: crates/ts-pack-ruby
@@ -180,7 +180,7 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
         with:
           components: ""
           use-sccache: "false"
