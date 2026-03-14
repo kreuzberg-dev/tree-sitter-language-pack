@@ -40,7 +40,7 @@ fn write_go_mod(dir: &Path) -> Result<(), String> {
 
 module e2e_tests
 
-go 1.22
+go 1.26
 
 require github.com/kreuzberg-dev/tree-sitter-language-pack/crates/ts-pack-go v0.0.0
 

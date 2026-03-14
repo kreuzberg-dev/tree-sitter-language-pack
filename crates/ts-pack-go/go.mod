@@ -1,3 +1,3 @@
 module github.com/kreuzberg-dev/tree-sitter-language-pack/go
 
-go 1.21
+go 1.26
