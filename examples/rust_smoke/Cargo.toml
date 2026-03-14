@@ -1,0 +1,8 @@
+[package]
+name = "tree-sitter-language-pack-smoke"
+version = "0.0.1"
+edition = "2024"
+publish = false
+
+[dependencies]
+ts-pack-core = { path = "../../crates/ts-pack-core" }

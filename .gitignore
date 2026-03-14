@@ -32,8 +32,8 @@ vendor/
 wheelhouse/
 
 # Go vendored FFI artifacts (built by scripts/ci/go/vendor-ffi.py)
-crates/ts-pack-go/include/
-crates/ts-pack-go/lib/
+packages/go/v1/include/
+packages/go/v1/lib/
 
 # Ruby native extension build artifacts
 crates/ts-pack-ruby/tmp/

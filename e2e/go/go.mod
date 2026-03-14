@@ -4,6 +4,6 @@ module e2e_tests
 
 go 1.26
 
-require github.com/kreuzberg-dev/tree-sitter-language-pack/crates/ts-pack-go v0.0.0
+require github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1 v0.0.0
 
-replace github.com/kreuzberg-dev/tree-sitter-language-pack/crates/ts-pack-go => ../../crates/ts-pack-go
+replace github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1 => ../../packages/go/v1

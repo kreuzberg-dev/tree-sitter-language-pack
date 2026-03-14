@@ -9,7 +9,7 @@
     <img src="https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6" alt="Python">
   </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack">
     <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack?label=Node.js&color=007ec6" alt="Node">
-  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-go">
+  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1">
     <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6" alt="Go">
   </a>  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
@@ -40,7 +40,7 @@ Go bindings for tree-sitter-language-pack using cgo.
 ## Installation
 
 ```sh
-go get github.com/kreuzberg-dev/tree-sitter-language-pack/go
+go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1
 ```
 
 ## Quick Start
@@ -50,7 +50,7 @@ package main
 
 import (
     "fmt"
-    tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/go"
+    tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
 )
 
 func main() {
@@ -64,7 +64,7 @@ func main() {
 
 ## API Reference
 
-For detailed API documentation, see the [Go package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-go).
+For detailed API documentation, see the [Go package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1).
 
 ## License
 

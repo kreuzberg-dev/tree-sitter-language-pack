@@ -11,14 +11,14 @@ tasks:
   build:
     desc: Build Go bindings (requires FFI built first)
     deps: [build:ffi]
-    dir: crates/ts-pack-go
+    dir: packages/go/v1
     cmds:
       - go build -tags tspack_dev ./...
 
   test:
     desc: Run Go unit tests
     deps: [build:ffi]
-    dir: crates/ts-pack-go
+    dir: packages/go/v1
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
@@ -26,19 +26,19 @@ tasks:
 
   lint:
     desc: Lint and vet Go code
-    dir: crates/ts-pack-go
+    dir: packages/go/v1
     cmds:
       - go vet -tags tspack_dev ./...
 
   format:
     desc: Format Go code
-    dir: crates/ts-pack-go
+    dir: packages/go/v1
     cmds:
       - gofmt -w .
 
   format:check:
     desc: Check Go formatting
-    dir: crates/ts-pack-go
+    dir: packages/go/v1
     cmds:
       - test -z "$(gofmt -l .)"
 
@@ -59,7 +59,7 @@ tasks:
 
   clean:
     desc: Clean Go build cache
-    dir: crates/ts-pack-go
+    dir: packages/go/v1
     cmds:
       - go clean -cache
 

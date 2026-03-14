@@ -56,7 +56,7 @@ sources.uv-bump = { git = "https://github.com/Goldziher/uv-bump" }
 [tool.ruff]
 target-version = "py310"
 line-length = 120
-src = [ "scripts" ]
+src = [ "examples", "scripts" ]
 format.docstring-code-line-length = 120
 format.docstring-code-format = true
 lint.select = [ "ALL" ]
@@ -75,6 +75,7 @@ lint.ignore = [
   "TD",     # we allow todo and fixme comments
   "TRY",    # Try except block, rules are too strict
 ]
+lint.per-file-ignores."examples/**/*.*" = [ "D", "INP001", "S101", "T201" ]
 lint.per-file-ignores."scripts/**/*.*" = [ "ASYNC", "D", "S", "T201" ]
 lint.isort.known-first-party = [ "scripts" ]
 lint.pydocstyle.convention = "google"

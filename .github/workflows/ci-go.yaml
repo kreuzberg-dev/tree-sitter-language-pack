@@ -11,7 +11,7 @@ on:
       - 'Cargo.lock'
       - 'crates/ts-pack-core/**'
       - 'crates/ts-pack-ffi/**'
-      - 'crates/ts-pack-go/**'
+      - 'packages/go/v1/**'
       - 'e2e/go/**'
       - 'fixtures/**'
       - 'tools/e2e-generator/**'
@@ -28,7 +28,7 @@ on:
       - 'Cargo.lock'
       - 'crates/ts-pack-core/**'
       - 'crates/ts-pack-ffi/**'
-      - 'crates/ts-pack-go/**'
+      - 'packages/go/v1/**'
       - 'e2e/go/**'
       - 'fixtures/**'
       - 'tools/e2e-generator/**'
@@ -171,7 +171,7 @@ jobs:
           cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
           mkdir -p crates/ts-pack-ffi/include
           cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
-          # Place in path CGO expects (relative to crates/ts-pack-go/)
+          # Place in path CGO expects (relative to packages/go/v1/)
           mkdir -p crates/ts-pack-ffi/target/release
           cp target/release/libts_pack_ffi.* crates/ts-pack-ffi/target/release/ 2>/dev/null || true
 
@@ -179,7 +179,7 @@ jobs:
         uses: actions/setup-go@v6.3.0
         with:
           go-version: "1.26"
-          cache-dependency-path: crates/ts-pack-go/go.sum
+          cache-dependency-path: packages/go/v1/go.sum
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1.0.0 # v1.0.0
@@ -225,7 +225,7 @@ jobs:
           cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
           mkdir -p crates/ts-pack-ffi/include
           cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
-          # Place in path CGO expects (relative to crates/ts-pack-go/)
+          # Place in path CGO expects (relative to packages/go/v1/)
           mkdir -p crates/ts-pack-ffi/target/release
           cp target/release/libts_pack_ffi.* crates/ts-pack-ffi/target/release/ 2>/dev/null || true
 
@@ -240,7 +240,7 @@ jobs:
         uses: actions/setup-go@v6.3.0
         with:
           go-version: "1.26"
-          cache-dependency-path: crates/ts-pack-go/go.sum
+          cache-dependency-path: packages/go/v1/go.sum
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1.0.0 # v1.0.0

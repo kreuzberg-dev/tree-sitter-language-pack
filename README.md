@@ -9,7 +9,7 @@
     <img src="https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6" alt="Python">
   </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack">
     <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack?label=Node.js&color=007ec6" alt="Node">
-  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-go">
+  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1">
     <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6" alt="Go">
   </a>  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
@@ -106,7 +106,7 @@ See [Node.js README](crates/ts-pack-node/README.md) for full documentation.
 go get github.com/kreuzberg-dev/tree-sitter-language-pack/go
 ```
 
-See [Go README](crates/ts-pack-go/README.md) for full documentation.
+See [Go README](packages/go/v1/README.md) for full documentation.
 
 ### Java
 
@@ -191,7 +191,7 @@ This pack includes 170+ languages. See the [Rust core Cargo.toml](crates/ts-pack
 - [Rust](crates/ts-pack-core/README.md) -- Rust core library providing access to 170+ tree-sitter parsers with static and dynamic linking support.
 - [Python](crates/ts-pack-python/README.md) -- Python bindings for tree-sitter-language-pack, providing access to 170+ pre-compiled tree-sitter parsers.
 - [Node.js](crates/ts-pack-node/README.md) -- Node.js NAPI bindings for tree-sitter-language-pack.
-- [Go](crates/ts-pack-go/README.md) -- Go bindings for tree-sitter-language-pack using cgo.
+- [Go](packages/go/v1/README.md) -- Go bindings for tree-sitter-language-pack using cgo.
 - [Java](crates/ts-pack-java/README.md) -- Java bindings for tree-sitter-language-pack using Panama FFI (JDK 22+).
 - [Elixir](crates/ts-pack-elixir/README.md) -- Elixir bindings for tree-sitter-language-pack using Rustler NIFs.
 - [Ruby](crates/ts-pack-ruby/README.md) -- Ruby bindings for tree-sitter-language-pack using Magnus native extensions.

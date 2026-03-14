@@ -1,7 +1,7 @@
 [workspace]
 members = ["crates/*", "tools/e2e-generator"]
 exclude = [
-  "crates/ts-pack-go",
+  "packages/go/v1",
   "crates/ts-pack-java",
   "crates/ts-pack-wasm",
   "crates/ts-pack-ruby",

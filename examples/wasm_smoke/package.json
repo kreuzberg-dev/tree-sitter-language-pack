@@ -1,0 +1,13 @@
+{
+	"name": "@kreuzberg/tree-sitter-language-pack-wasm-smoke",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Smoke test for @kreuzberg/tree-sitter-language-pack-wasm",
+	"type": "module",
+	"scripts": {
+		"check": "node check.mjs"
+	},
+	"dependencies": {
+		"@kreuzberg/tree-sitter-language-pack-wasm": "*"
+	}
+}

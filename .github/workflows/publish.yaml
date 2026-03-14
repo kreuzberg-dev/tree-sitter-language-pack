@@ -4,45 +4,56 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag (e.g., v1.0.0-rc.1)"
+        description: "Release tag (e.g., v1.0.0-rc.2)"
         required: true
         type: string
       dry_run:
-        description: "Dry run (prepare artifacts without publishing)"
+        description: "Dry run without publishing"
+        required: false
+        type: boolean
+        default: false
+      force_republish:
+        description: "Force republish even if version exists"
         required: false
         type: boolean
         default: false
       targets:
-        description: "Comma-separated targets (all, python, node, crates, go, ruby, wasm)"
+        description: "Comma-separated targets or 'all'"
         required: false
         type: string
         default: "all"
-      force_republish:
-        description: "Force re-publish even if version already exists on registries"
-        required: false
-        type: boolean
-        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.inputs.tag || github.run_id }}
+  cancel-in-progress: false
 
 env:
   CARGO_TERM_COLOR: always
   CARGO_INCREMENTAL: "0"
   RUST_BACKTRACE: short
 
+permissions:
+  contents: read
+
 jobs:
   # ─── Prepare ───────────────────────────────────────────────────────
   prepare:
     name: Prepare release
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       version: ${{ steps.meta.outputs.version }}
       dry_run: ${{ steps.meta.outputs.dry_run }}
       force_republish: ${{ steps.meta.outputs.force_republish }}
-      publish_python: ${{ steps.targets.outputs.python }}
-      publish_node: ${{ steps.targets.outputs.node }}
-      publish_crates: ${{ steps.targets.outputs.crates }}
-      publish_go: ${{ steps.targets.outputs.go }}
-      publish_ruby: ${{ steps.targets.outputs.ruby }}
-      publish_wasm: ${{ steps.targets.outputs.wasm }}
+      release_crates: ${{ steps.targets.outputs.crates }}
+      release_python: ${{ steps.targets.outputs.python }}
+      release_node: ${{ steps.targets.outputs.node }}
+      release_wasm: ${{ steps.targets.outputs.wasm }}
+      release_ruby: ${{ steps.targets.outputs.ruby }}
+      release_go: ${{ steps.targets.outputs.go }}
+      release_java: ${{ steps.targets.outputs.java }}
+      release_elixir: ${{ steps.targets.outputs.elixir }}
+      release_c_ffi: ${{ steps.targets.outputs.c_ffi }}
     steps:
       - name: Extract version and flags
         id: meta
@@ -59,7 +70,7 @@ jobs:
         id: targets
         run: |
           targets="${{ inputs.targets }}"
-          for target in python node crates go ruby wasm; do
+          for target in crates python node wasm ruby go java elixir c_ffi; do
             if [[ "$targets" == "all" || "$targets" == *"$target"* ]]; then
               echo "$target=true" >> "$GITHUB_OUTPUT"
             else
@@ -83,9 +94,10 @@ jobs:
     name: Validate version consistency
     needs: prepare
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ inputs.tag }}
 
@@ -97,9 +109,9 @@ jobs:
             echo "::error::Cargo.toml version ($CARGO_VERSION) does not match tag version ($VERSION)"
             exit 1
           fi
-          echo "Version $VERSION matches across Cargo.toml and tag"
+          echo "Cargo.toml: $CARGO_VERSION"
 
-      - name: Verify Node.js package version (if applicable)
+      - name: Verify Node.js package version
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
           if [ -f crates/ts-pack-node/package.json ]; then
@@ -108,9 +120,10 @@ jobs:
               echo "::error::Node.js package version ($NODE_VERSION) does not match tag version ($VERSION)"
               exit 1
             fi
+            echo "Node.js: $NODE_VERSION"
           fi
 
-      - name: Verify WASM package version (if applicable)
+      - name: Verify WASM package version
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
           if [ -f crates/ts-pack-wasm/package.json ]; then
@@ -119,12 +132,12 @@ jobs:
               echo "::error::WASM package version ($WASM_VERSION) does not match tag version ($VERSION)"
               exit 1
             fi
+            echo "WASM: $WASM_VERSION"
           fi
 
-      - name: Verify Ruby gemspec version (if applicable)
+      - name: Verify Ruby gemspec version
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
-          # Ruby uses dots instead of hyphens for pre-release: 1.0.0.rc.1
           RUBY_VERSION="${VERSION//-/.}"
           if [ -f crates/ts-pack-ruby/tree_sitter_language_pack.gemspec ]; then
             GEMSPEC_VERSION=$(grep "spec.version" crates/ts-pack-ruby/tree_sitter_language_pack.gemspec | sed "s/.*'\(.*\)'/\1/")
@@ -132,6 +145,31 @@ jobs:
               echo "::error::Gemspec version ($GEMSPEC_VERSION) does not match tag version ($RUBY_VERSION)"
               exit 1
             fi
+            echo "Ruby: $GEMSPEC_VERSION"
+          fi
+
+      - name: Verify Maven pom.xml version
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          if [ -f crates/ts-pack-java/pom.xml ]; then
+            POM_VERSION=$(grep -m1 '<version>' crates/ts-pack-java/pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/' | tr -d '[:space:]')
+            if [[ "$POM_VERSION" != "$VERSION" ]]; then
+              echo "::error::pom.xml version ($POM_VERSION) does not match tag version ($VERSION)"
+              exit 1
+            fi
+            echo "Maven: $POM_VERSION"
+          fi
+
+      - name: Verify Elixir mix.exs version
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          if [ -f crates/ts-pack-elixir/mix.exs ]; then
+            MIX_VERSION=$(grep '@version' crates/ts-pack-elixir/mix.exs | head -1 | sed 's/.*"\(.*\)".*/\1/')
+            if [[ "$MIX_VERSION" != "$VERSION" ]]; then
+              echo "::error::mix.exs version ($MIX_VERSION) does not match tag version ($VERSION)"
+              exit 1
+            fi
+            echo "Elixir: $MIX_VERSION"
           fi
 
       - name: Version summary
@@ -145,14 +183,15 @@ jobs:
   check-cratesio:
     name: Check crates.io
     needs: prepare
-    if: needs.prepare.outputs.publish_crates == 'true'
+    if: needs.prepare.outputs.release_crates == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0
         with:
           registry: cratesio
           package: ts-pack-core
@@ -161,14 +200,15 @@ jobs:
   check-pypi:
     name: Check PyPI
     needs: prepare
-    if: needs.prepare.outputs.publish_python == 'true'
+    if: needs.prepare.outputs.release_python == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0
         with:
           registry: pypi
           package: tree-sitter-language-pack
@@ -177,79 +217,126 @@ jobs:
   check-npm:
     name: Check npm
     needs: prepare
-    if: needs.prepare.outputs.publish_node == 'true'
+    if: needs.prepare.outputs.release_node == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0
         with:
           registry: npm
           package: "@kreuzberg/tree-sitter-language-pack"
           version: ${{ needs.prepare.outputs.version }}
 
-  check-rubygems:
-    name: Check RubyGems
+  check-npm-wasm:
+    name: Check npm (WASM)
     needs: prepare
-    if: needs.prepare.outputs.publish_ruby == 'true'
+    if: needs.prepare.outputs.release_wasm == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        with:
+          registry: npm
+          package: "@kreuzberg/tree-sitter-language-pack-wasm"
+          version: ${{ needs.prepare.outputs.version }}
+
+  check-rubygems:
+    name: Check RubyGems
+    needs: prepare
+    if: needs.prepare.outputs.release_ruby == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check if version exists
+        id: check
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0
         with:
           registry: rubygems
           package: tree_sitter_language_pack
           version: ${{ needs.prepare.outputs.version }}
 
-  check-npm-wasm:
-    name: Check npm (WASM)
+  check-maven:
+    name: Check Maven Central
     needs: prepare
-    if: needs.prepare.outputs.publish_wasm == 'true'
+    if: needs.prepare.outputs.release_java == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0
         with:
-          registry: npm
-          package: "@kreuzberg/tree-sitter-language-pack-wasm"
+          registry: maven
+          package: tree-sitter-language-pack
+          group-id: dev.kreuzberg
+          version: ${{ needs.prepare.outputs.version }}
+
+  check-hex:
+    name: Check Hex.pm
+    needs: prepare
+    if: needs.prepare.outputs.release_elixir == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check if version exists
+        id: check
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        with:
+          registry: hex
+          package: tree_sitter_language_pack
           version: ${{ needs.prepare.outputs.version }}
 
   # ─── Clone vendors ────────────────────────────────────────────────
   clone-vendors:
     name: Clone vendors
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ inputs.tag }}
 
       - name: Setup Node
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        uses: actions/setup-node@v6.3.0
 
       - name: Install tree-sitter CLI
         run: npm install -g tree-sitter-cli
 
       - name: Install uv
-        uses: astral-sh/setup-uv@e06108dd0aef18192324c70427afc47652e63a82 # v7.5.0
+        uses: astral-sh/setup-uv@v7.5.0
         with:
           enable-cache: true
 
       - name: Set up Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.14"
 
       - name: Install dependencies
         run: uv sync --no-install-project
+
+      - name: Cache parsers
+        uses: actions/cache@v5.0.3
+        with:
+          path: parsers
+          key: parsers-${{ hashFiles('sources/language_definitions.json') }}
+          restore-keys: |
+            parsers-
 
       - name: Clone vendors
         run: |
@@ -257,36 +344,942 @@ jobs:
           uv run --no-sync scripts/clone_vendors.py
 
       - name: Upload parsers
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: language-parsers
           path: parsers
+          retention-days: 3
 
-  # ─── Publish Rust crates ──────────────────────────────────────────
-  publish-crates:
-    name: Publish Rust crates
-    needs: [prepare, validate-versions, clone-vendors, check-cratesio]
-    if: |
-      always() &&
-      needs.prepare.outputs.publish_crates == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.clone-vendors.result == 'success' &&
-      (needs.prepare.outputs.force_republish == 'true' || needs.check-cratesio.outputs.exists != 'true')
-    runs-on: ubuntu-latest
+  # ─── Build parser binaries ─────────────────────────────────────────
+  build-parser-binaries:
+    name: Build parser binaries (${{ matrix.label }})
+    needs: [prepare, validate-versions, clone-vendors]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x86_64
+          - os: ubuntu-24.04-arm
+            label: linux-aarch64
+          - os: macos-latest
+            label: macos-arm64
+          - os: windows-latest
+            label: windows-x86_64
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Build all parsers
+        run: cargo build -p ts-pack-core --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LINK_MODE: dynamic
+
+      - name: Package parser binaries (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p staging
+          find target/release -maxdepth 1 \( -name '*.so' -o -name '*.dylib' \) -exec cp {} staging/ \;
+          cd staging && tar -cf - . | zstd -19 -o "../parsers-${{ matrix.label }}.tar.zst"
+
+      - name: Package parser binaries (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p staging
+          find target/release -maxdepth 1 -name '*.dll' -exec cp {} staging/ \;
+          cd staging && tar -cf - . | zstd -19 -o "../parsers-${{ matrix.label }}.tar.zst"
+
+      - name: Upload parser binaries
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: parsers-${{ matrix.label }}
+          path: parsers-${{ matrix.label }}.tar.zst
+          retention-days: 14
+
+  # ─── Build Python wheels ───────────────────────────────────────────
+  build-python-wheels:
+    name: Build Python wheel (${{ matrix.label }})
+    needs: [prepare, validate-versions, clone-vendors]
+    if: needs.prepare.outputs.release_python == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x86_64
+          - os: ubuntu-24.04-arm
+            label: linux-aarch64
+          - os: macos-latest
+            label: macos-arm64
+          - os: windows-latest
+            label: windows-x86_64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Install maturin
+        run: pip install maturin
+
+      - name: Build wheel
+        run: maturin build --release --manifest-path crates/ts-pack-python/Cargo.toml --out dist
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: python-wheel-${{ matrix.label }}
+          path: dist/*.whl
+          retention-days: 14
+
+  # ─── Build Node.js native modules ─────────────────────────────────
+  build-node-native:
+    name: Build Node.js (${{ matrix.label }})
+    needs: [prepare, validate-versions, clone-vendors]
+    if: needs.prepare.outputs.release_node == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x64
+          - os: macos-latest
+            label: macos-arm64
+          - os: windows-latest
+            label: windows-x64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6.3.0
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install NAPI-RS CLI
+        run: npm install -g @napi-rs/cli
+
+      - name: Build native module
+        working-directory: crates/ts-pack-node
+        run: napi build --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Upload native module
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: node-native-${{ matrix.label }}
+          path: crates/ts-pack-node/*.node
+          retention-days: 14
+
+  # ─── Build Ruby gems ──────────────────────────────────────────────
+  build-ruby-gem:
+    name: Build Ruby gem (${{ matrix.label }})
+    needs: [prepare, validate-versions, clone-vendors]
+    if: needs.prepare.outputs.release_ruby == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    env:
+      RB_SYS_CARGO_PROFILE: release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x86_64
+            ruby_platform: x86_64-linux
+          - os: ubuntu-24.04-arm
+            label: linux-aarch64
+            ruby_platform: aarch64-linux
+          - os: macos-latest
+            label: macos-arm64
+            ruby_platform: arm64-darwin
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1.292.0
+        with:
+          ruby-version: "3.3"
+          bundler: none
+          bundler-cache: false
+
+      - name: Install Bundler
+        run: gem install bundler --no-document && bundler --version
+
+      - name: Set up Python (for vendor script)
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.14"
+
+      - name: Vendor ts-pack-core into Ruby package
+        run: python3 scripts/ci/ruby/vendor-core.py
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Install Ruby dependencies
+        working-directory: crates/ts-pack-ruby
+        run: |
+          bundle config set --local path vendor/bundle
+          bundle check || bundle install
+
+      - name: Compile native extension
+        working-directory: crates/ts-pack-ruby
+        timeout-minutes: 60
+        run: |
+          echo "Compiling native extension..."
+          bundle exec rake compile
+          echo "Native extension compiled successfully"
+          echo "=== Native libraries ==="
+          find lib -name '*.so' -o -name '*.bundle' -o -name '*.dylib' 2>/dev/null | head -20
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          CARGO_TARGET_DIR: ${{ github.workspace }}/crates/ts-pack-ruby/target
+
+      - name: Build platform gem
+        working-directory: crates/ts-pack-ruby
+        run: gem build ./*.gemspec
+
+      - name: Verify gem was built
+        working-directory: crates/ts-pack-ruby
+        run: |
+          if ! ls ./*.gem 1>/dev/null 2>&1; then
+            echo "ERROR: No gem file found" >&2
+            exit 1
+          fi
+          echo "Gem built successfully:"
+          ls -lh ./*.gem
+
+      - name: Verify gem integrity
+        working-directory: crates/ts-pack-ruby
+        run: |
+          for gem in ./*.gem; do
+            echo "Validating: $gem"
+            file "$gem"
+            if ! gem spec "$gem" >/dev/null 2>&1; then
+              echo "WARNING: gem spec check failed for $gem"
+              if ! tar -tzf "$gem" >/dev/null 2>&1; then
+                echo "ERROR: Corrupted gem file: $gem" >&2
+                exit 1
+              fi
+            else
+              echo "gem spec validation passed"
+            fi
+          done
+
+      - name: Upload gem artifacts
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: rubygems-${{ matrix.label }}
+          path: crates/ts-pack-ruby/*.gem
+          retention-days: 14
+          compression-level: 0
+
+  # ─── Build WASM package ────────────────────────────────────────────
+  build-wasm:
+    name: Build WASM package
+    needs: [prepare, validate-versions, clone-vendors]
+    if: needs.prepare.outputs.release_wasm == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          target: wasm32-unknown-unknown
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Install WASI SDK
+        uses: kreuzberg-dev/actions/install-wasi-sdk@v1.0.0
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build WASM (web target)
+        working-directory: crates/ts-pack-wasm
+        run: wasm-pack build --target web --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LINK_MODE: static
+
+      - name: Build WASM (nodejs target)
+        working-directory: crates/ts-pack-wasm
+        run: wasm-pack build --target nodejs --release --out-dir pkg-node
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LINK_MODE: static
+
+      - name: Verify WASM build output
+        working-directory: crates/ts-pack-wasm
+        run: |
+          if [ ! -d pkg ]; then
+            echo "ERROR: pkg/ directory not created by wasm-pack" >&2
+            exit 1
+          fi
+          echo "=== WASM build output (web) ==="
+          ls -lh pkg/
+          if [ ! -f pkg/ts_pack_wasm_bg.wasm ]; then
+            echo "ERROR: WASM binary not found" >&2
+            exit 1
+          fi
+          echo "WASM binary size: $(wc -c < pkg/ts_pack_wasm_bg.wasm) bytes"
+
+      - name: Upload WASM package
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: wasm-pkg
+          path: crates/ts-pack-wasm/pkg/
+          retention-days: 14
+
+  # ─── Build Go FFI libraries ────────────────────────────────────────
+  build-go-ffi:
+    name: Build Go FFI (${{ matrix.label }})
+    needs: [prepare, validate-versions, clone-vendors]
+    if: needs.prepare.outputs.release_go == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x86_64
+          - os: ubuntu-24.04-arm
+            label: linux-aarch64
+          - os: macos-latest
+            label: macos-arm64
+          - os: windows-latest
+            label: windows-x86_64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Build FFI library
+        run: cargo build -p ts-pack-ffi --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Stage artifacts (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
+          cp target/release/libts_pack_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/libts_pack_ffi.so staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/libts_pack_ffi.dylib staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp crates/ts-pack-ffi/include/ts_pack.h staging/ts-pack-ffi/include/
+          cd staging && tar -czf "../go-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
+
+      - name: Stage artifacts (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
+          cp target/release/ts_pack_ffi.lib staging/ts-pack-ffi/lib/ 2>/dev/null || cp target/release/libts_pack_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/ts_pack_ffi.dll staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp crates/ts-pack-ffi/include/ts_pack.h staging/ts-pack-ffi/include/
+          cd staging && tar -czf "../go-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
+
+      - name: Upload FFI artifact
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: go-ffi-${{ matrix.label }}
+          path: go-ffi-${{ matrix.label }}.tar.gz
+          retention-days: 14
+
+  # ─── Build Java native libraries ───────────────────────────────────
+  build-java-natives:
+    name: Build Java natives (${{ matrix.label }})
+    needs: [prepare, validate-versions, clone-vendors]
+    if: needs.prepare.outputs.release_java == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x86_64
+            rid: linux-x86_64
+          - os: ubuntu-24.04-arm
+            label: linux-aarch64
+            rid: linux-arm64
+          - os: macos-latest
+            label: macos-arm64
+            rid: macos-arm64
+          - os: windows-latest
+            label: windows-x86_64
+            rid: windows-x86_64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Build FFI library for JNI
+        run: cargo build -p ts-pack-ffi --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Collect native artifacts (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p java-natives/${{ matrix.rid }}
+          cp target/release/libts_pack_ffi.so java-natives/${{ matrix.rid }}/ 2>/dev/null || true
+          cp target/release/libts_pack_ffi.dylib java-natives/${{ matrix.rid }}/ 2>/dev/null || true
+
+      - name: Collect native artifacts (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p java-natives/${{ matrix.rid }}
+          cp target/release/ts_pack_ffi.dll java-natives/${{ matrix.rid }}/ 2>/dev/null || true
+
+      - name: Upload native artifact
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: java-natives-${{ matrix.label }}
+          path: java-natives/${{ matrix.rid }}
+          retention-days: 14
+
+  # ─── Build Java package ────────────────────────────────────────────
+  build-java-package:
+    name: Build Java package
+    needs: [prepare, validate-versions, build-java-natives]
+    if: needs.prepare.outputs.release_java == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Setup Java
+        uses: actions/setup-java@v5.2.0
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+          cache: 'maven'
+
+      - name: Setup Maven
+        uses: kreuzberg-dev/actions/setup-maven@v1.0.0
+
+      - name: Download Java native artifacts
+        uses: actions/download-artifact@v8.0.1
+        with:
+          pattern: java-natives-*
+          path: artifacts/java-natives
+          merge-multiple: false
+
+      - name: Stage Java native resources
+        shell: bash
+        run: |
+          RESOURCES_DIR="crates/ts-pack-java/src/main/resources/natives"
+          mkdir -p "$RESOURCES_DIR"
+          for dir in artifacts/java-natives/*/; do
+            rid=$(basename "$dir")
+            mkdir -p "$RESOURCES_DIR/$rid"
+            cp "$dir"/* "$RESOURCES_DIR/$rid/" 2>/dev/null || true
+          done
+          echo "=== Staged native resources ==="
+          find "$RESOURCES_DIR" -type f | head -20
+
+      - name: Build and package
+        working-directory: crates/ts-pack-java
+        run: mvn clean package -DskipTests
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: maven-packages
+          path: crates/ts-pack-java/target/*.jar
+          retention-days: 14
+
+  # ─── Build Elixir NIFs ────────────────────────────────────────────
+  build-elixir-nifs:
+    name: Build Elixir NIF (${{ matrix.label }})
+    needs: [prepare, validate-versions, clone-vendors]
+    if: needs.prepare.outputs.release_elixir == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x86_64
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-24.04-arm
+            label: linux-aarch64
+            target: aarch64-unknown-linux-gnu
+          - os: macos-latest
+            label: macos-arm64
+            target: aarch64-apple-darwin
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          target: ${{ matrix.target }}
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Build Elixir NIF
+        working-directory: crates/ts-pack-elixir
+        run: cargo build --release --target ${{ matrix.target }}
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          CARGO_BUILD_TARGET: ${{ matrix.target }}
+
+      - name: Package NIF libraries (NIF 2.16)
+        shell: bash
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          TARGET="${{ matrix.target }}"
+          NIF_VERSION="2.16"
+
+          if [[ "${{ runner.os }}" == "macOS" ]]; then
+            ARCHIVE_EXT="so"
+            LIB_NAME="libts_pack_elixir.dylib"
+          else
+            ARCHIVE_EXT="so"
+            LIB_NAME="libts_pack_elixir.so"
+          fi
+
+          mkdir -p dist/elixir
+          ARTIFACT_NAME="libts_pack_elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
+          TARBALL="${ARTIFACT_NAME}.tar.gz"
+
+          LIB_PATH="target/${TARGET}/release/${LIB_NAME}"
+          if [[ ! -f "$LIB_PATH" ]]; then
+            LIB_PATH="target/release/${LIB_NAME}"
+          fi
+
+          if [[ ! -f "$LIB_PATH" ]]; then
+            echo "ERROR: Library not found"
+            exit 1
+          fi
+
+          cp "$LIB_PATH" "${ARTIFACT_NAME}"
+          tar -czf "dist/elixir/${TARBALL}" "${ARTIFACT_NAME}"
+          echo "Created: dist/elixir/${TARBALL}"
+
+      - name: Package NIF libraries (NIF 2.17)
+        shell: bash
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          TARGET="${{ matrix.target }}"
+          NIF_VERSION="2.17"
+
+          if [[ "${{ runner.os }}" == "macOS" ]]; then
+            ARCHIVE_EXT="so"
+            LIB_NAME="libts_pack_elixir.dylib"
+          else
+            ARCHIVE_EXT="so"
+            LIB_NAME="libts_pack_elixir.so"
+          fi
+
+          ARTIFACT_NAME="libts_pack_elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
+          TARBALL="${ARTIFACT_NAME}.tar.gz"
+
+          LIB_PATH="target/${TARGET}/release/${LIB_NAME}"
+          if [[ ! -f "$LIB_PATH" ]]; then
+            LIB_PATH="target/release/${LIB_NAME}"
+          fi
+
+          if [[ ! -f "$LIB_PATH" ]]; then
+            echo "ERROR: Library not found"
+            exit 1
+          fi
+
+          cp "$LIB_PATH" "${ARTIFACT_NAME}"
+          tar -czf "dist/elixir/${TARBALL}" "${ARTIFACT_NAME}"
+          echo "Created: dist/elixir/${TARBALL}"
+
+      - name: Upload NIF artifacts
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: elixir-${{ matrix.label }}
+          path: dist/elixir/*.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+
+  # ─── Build C FFI libraries ────────────────────────────────────────
+  build-c-ffi:
+    name: Build C FFI (${{ matrix.label }})
+    needs: [prepare, validate-versions, clone-vendors]
+    if: needs.prepare.outputs.release_c_ffi == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x86_64
+          - os: ubuntu-24.04-arm
+            label: linux-aarch64
+          - os: macos-latest
+            label: macos-arm64
+          - os: windows-latest
+            label: windows-x86_64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Build FFI library
+        run: cargo build -p ts-pack-ffi --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Generate C headers
+        run: |
+          if command -v cbindgen >/dev/null 2>&1; then
+            cbindgen --crate ts-pack-ffi --output target/ts_pack.h 2>/dev/null || true
+          fi
+
+      - name: Stage C FFI artifacts (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
+          cp target/release/libts_pack_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/libts_pack_ffi.so staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/libts_pack_ffi.dylib staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp crates/ts-pack-ffi/include/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
+          cp target/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
+          cd staging && tar -czf "../c-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
+
+      - name: Stage C FFI artifacts (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
+          cp target/release/ts_pack_ffi.lib staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/ts_pack_ffi.dll staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/libts_pack_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp crates/ts-pack-ffi/include/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
+          cp target/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
+          cd staging && tar -czf "../c-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
+
+      - name: Upload C FFI artifact
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: c-ffi-${{ matrix.label }}
+          path: c-ffi-${{ matrix.label }}.tar.gz
+          retention-days: 14
+
+  # ─── Upload to GitHub Release: parser binaries ─────────────────────
+  upload-parser-binaries:
+    name: Upload parser binaries to GitHub Release
+    needs: [prepare, validate-versions, build-parser-binaries]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.build-parser-binaries.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parser binary artifacts
+        uses: actions/download-artifact@v8.0.1
+        with:
+          pattern: parsers-*
+          path: dist/parsers
+          merge-multiple: true
+
+      - name: Upload to GitHub Release
+        uses: kreuzberg-dev/actions/publish-github-release@v1.0.0
+        with:
+          tag: ${{ inputs.tag }}
+          title: "Release ${{ inputs.tag }}"
+          artifacts: "dist/parsers/parsers-*.tar.zst"
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  # ─── Upload to GitHub Release: Go FFI ──────────────────────────────
+  upload-go-release:
+    name: Upload Go FFI to GitHub Release
+    needs: [prepare, validate-versions, build-go-ffi]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.release_go == 'true' &&
+      needs.build-go-ffi.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download Go FFI artifacts
+        uses: actions/download-artifact@v8.0.1
+        with:
+          pattern: go-ffi-*
+          path: dist/go
+          merge-multiple: true
+
+      - name: Upload to GitHub Release
+        uses: kreuzberg-dev/actions/publish-github-release@v1.0.0
+        with:
+          tag: ${{ inputs.tag }}
+          title: "Release ${{ inputs.tag }}"
+          artifacts: "dist/go/go-ffi-*.tar.gz"
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  # ─── Upload to GitHub Release: C FFI ───────────────────────────────
+  upload-c-ffi-release:
+    name: Upload C FFI to GitHub Release
+    needs: [prepare, validate-versions, build-c-ffi]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.release_c_ffi == 'true' &&
+      needs.build-c-ffi.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download C FFI artifacts
+        uses: actions/download-artifact@v8.0.1
+        with:
+          pattern: c-ffi-*
+          path: dist/c-ffi
+          merge-multiple: true
+
+      - name: Upload to GitHub Release
+        uses: kreuzberg-dev/actions/publish-github-release@v1.0.0
+        with:
+          tag: ${{ inputs.tag }}
+          title: "Release ${{ inputs.tag }}"
+          artifacts: "dist/c-ffi/c-ffi-*.tar.gz"
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  # ─── Upload to GitHub Release: Elixir NIFs ────────────────────────
+  upload-elixir-release:
+    name: Upload Elixir NIFs to GitHub Release
+    needs: [prepare, validate-versions, build-elixir-nifs]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.release_elixir == 'true' &&
+      needs.build-elixir-nifs.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download Elixir NIF artifacts
+        uses: actions/download-artifact@v8.0.1
+        with:
+          pattern: elixir-*
+          path: dist/elixir
+          merge-multiple: true
+
+      - name: Upload to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ inputs.tag }}"
+          # Ensure release exists (draft)
+          gh release view "$TAG" >/dev/null 2>&1 || \
+            gh release create "$TAG" --draft --title "Release $TAG"
+          for file in dist/elixir/*.tar.gz; do
+            echo "Uploading $(basename "$file")..."
+            gh release upload "$TAG" "$file" --clobber
+          done
+
+  # ─── Publish Rust crates ───────────────────────────────────────────
+  publish-crates:
+    name: Publish Rust crates
+    needs: [prepare, validate-versions, clone-vendors, check-cratesio]
+    if: |
+      always() &&
+      needs.prepare.outputs.release_crates == 'true' &&
+      needs.validate-versions.result == 'success' &&
+      needs.clone-vendors.result == 'success' &&
+      (needs.check-cratesio.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
         with:
           components: ""
           use-sccache: "false"
@@ -352,156 +1345,74 @@ jobs:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           PROJECT_ROOT: ${{ github.workspace }}
 
-  # ─── Build & Publish Python ───────────────────────────────────────
-  build-python-wheels:
-    name: Build Python wheel (${{ matrix.os }})
-    needs: [prepare, validate-versions, clone-vendors, check-pypi]
-    if: |
-      always() &&
-      needs.prepare.outputs.publish_python == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.clone-vendors.result == 'success' &&
-      (needs.prepare.outputs.force_republish == 'true' || needs.check-pypi.outputs.exists != 'true')
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest, ubuntu-24.04-arm]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          ref: ${{ inputs.tag }}
-
-      - name: Download parsers
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: language-parsers
-          path: parsers
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
-        with:
-          components: ""
-          use-sccache: "false"
-          install-llvm-cov: "false"
-
-      - name: Install maturin
-        run: pip install maturin
-
-      - name: Build wheel
-        run: maturin build --release --manifest-path crates/ts-pack-python/Cargo.toml --out dist
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-
-      - name: Upload wheel
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: dist-wheel-${{ matrix.os }}
-          path: dist/*.whl
-
-  publish-python:
+  # ─── Publish Python to PyPI ────────────────────────────────────────
+  publish-pypi:
     name: Publish Python to PyPI
-    needs: [prepare, build-python-wheels]
+    needs: [prepare, validate-versions, check-pypi, build-python-wheels]
     if: |
       always() &&
-      needs.prepare.outputs.publish_python == 'true' &&
-      needs.build-python-wheels.result == 'success'
+      needs.prepare.outputs.release_python == 'true' &&
+      needs.build-python-wheels.result == 'success' &&
+      (needs.check-pypi.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: pypi
     permissions:
       id-token: write
     steps:
       - name: Download all wheels
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           path: dist
-          pattern: dist-wheel-*
+          pattern: python-wheel-*
           merge-multiple: true
 
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          {
+            echo "## PyPI Dry Run"
+            echo "Wheels staged for PyPI:"
+            echo '```'
+            ls -1 dist/*.whl
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Publish to PyPI
-        uses: kreuzberg-dev/actions/publish-pypi@v1.0.0 # v1.0.0
+        if: ${{ !inputs.dry_run }}
+        uses: kreuzberg-dev/actions/publish-pypi@v1.0.0
         with:
           packages-dir: dist
           dry-run: ${{ needs.prepare.outputs.dry_run }}
 
-  # ─── Build & Publish Node.js ──────────────────────────────────────
-  build-node-native:
-    name: Build Node.js (${{ matrix.os }})
-    needs: [prepare, validate-versions, clone-vendors, check-npm]
-    if: |
-      always() &&
-      needs.prepare.outputs.publish_node == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.clone-vendors.result == 'success' &&
-      (needs.prepare.outputs.force_republish == 'true' || needs.check-npm.outputs.exists != 'true')
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          ref: ${{ inputs.tag }}
-
-      - name: Download parsers
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: language-parsers
-          path: parsers
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
-        with:
-          components: ""
-          use-sccache: "false"
-          install-llvm-cov: "false"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "24"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Install NAPI-RS CLI
-        run: npm install -g @napi-rs/cli
-
-      - name: Build native module
-        working-directory: crates/ts-pack-node
-        run: napi build --release
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-
-      - name: Upload native module
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: node-native-${{ matrix.os }}
-          path: crates/ts-pack-node/*.node
-
+  # ─── Publish Node.js to npm ────────────────────────────────────────
   publish-node:
     name: Publish Node.js to npm
-    needs: [prepare, build-node-native]
+    needs: [prepare, validate-versions, check-npm, build-node-native]
     if: |
       always() &&
-      needs.prepare.outputs.publish_node == 'true' &&
-      needs.build-node-native.result == 'success'
+      needs.prepare.outputs.release_node == 'true' &&
+      needs.build-node-native.result == 'success' &&
+      (needs.check-npm.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ inputs.tag }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        uses: actions/setup-node@v6.3.0
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
       - name: Download all native modules
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           path: crates/ts-pack-node
           pattern: node-native-*
@@ -534,170 +1445,125 @@ jobs:
 
       - name: Publish to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-npm@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-npm@v1.0.0
         with:
           package-dir: crates/ts-pack-node
           dry-run: ${{ inputs.dry_run }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  # ─── Build Ruby native gems ─────────────────────────────────────
-  build-ruby-gem:
-    name: Build Ruby gem (${{ matrix.label }})
-    needs: [prepare, validate-versions, clone-vendors, check-rubygems]
+  # ─── Publish WASM to npm ───────────────────────────────────────────
+  publish-wasm:
+    name: Publish WASM to npm
+    needs: [prepare, validate-versions, check-npm-wasm, build-wasm, publish-node]
     if: |
       always() &&
-      needs.prepare.outputs.publish_ruby == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.clone-vendors.result == 'success' &&
-      (needs.prepare.outputs.force_republish == 'true' || needs.check-rubygems.outputs.exists != 'true')
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            label: linux-x86_64
-            ruby_platform: x86_64-linux
-          - os: ubuntu-24.04-arm
-            label: linux-arm64
-            ruby_platform: aarch64-linux
-          - os: macos-latest
-            label: macos-arm64
-            ruby_platform: arm64-darwin
-    timeout-minutes: 120
-    env:
-      RB_SYS_CARGO_PROFILE: release
+      needs.prepare.outputs.release_wasm == 'true' &&
+      needs.build-wasm.result == 'success' &&
+      (needs.check-npm-wasm.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ inputs.tag }}
 
-      - name: Download parsers
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - name: Setup Node.js
+        uses: actions/setup-node@v6.3.0
         with:
-          name: language-parsers
-          path: parsers
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
 
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
+      - name: Download WASM package
+        uses: actions/download-artifact@v8.0.1
         with:
-          components: ""
-          use-sccache: "false"
-          install-llvm-cov: "false"
+          name: wasm-pkg
+          path: crates/ts-pack-wasm/pkg
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@4eb9f110bac952a8b68ecf92e3b5c7a987594ba6 # v1.292.0
-        with:
-          ruby-version: "3.3"
-          bundler: none
-          bundler-cache: false
-
-      - name: Install Bundler
-        run: gem install bundler --no-document && bundler --version
-
-      - name: Set up Python (for vendor script)
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: "3.14"
-
-      - name: Vendor ts-pack-core into Ruby package
-        run: python3 scripts/ci/ruby/vendor-core.py
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-
-      - name: Install Ruby dependencies
-        working-directory: crates/ts-pack-ruby
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
         run: |
-          bundle config set --local path vendor/bundle
-          bundle check || bundle install
+          {
+            echo "## npm WASM Dry Run"
+            echo "WASM package staged for npm:"
+            echo '```'
+            ls -1 crates/ts-pack-wasm/pkg/
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Compile native extension
-        working-directory: crates/ts-pack-ruby
-        timeout-minutes: 60
+      - name: Re-check npm before publish
+        if: ${{ !inputs.dry_run }}
+        id: recheck
         run: |
-          echo "Compiling native extension..."
-          bundle exec rake compile
-          echo "Native extension compiled successfully"
-          echo "=== Native libraries ==="
-          find lib -name '*.so' -o -name '*.bundle' -o -name '*.dylib' 2>/dev/null | head -20
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-          CARGO_TARGET_DIR: ${{ github.workspace }}/crates/ts-pack-ruby/target
-
-      - name: Build platform gem
-        working-directory: crates/ts-pack-ruby
-        run: gem build ./*.gemspec
-
-      - name: Verify gem was built
-        working-directory: crates/ts-pack-ruby
-        run: |
-          if ! ls ./*.gem 1>/dev/null 2>&1; then
-            echo "ERROR: No gem file found" >&2
-            ls -la >&2
-            exit 1
+          VERSION="${{ needs.prepare.outputs.version }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://registry.npmjs.org/@kreuzberg%2Ftree-sitter-language-pack-wasm/$VERSION")
+          if [[ "$STATUS" == "200" ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::WASM package already on npm; skipping publish."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
-          echo "Gem built successfully:"
-          ls -lh ./*.gem
 
-      - name: Verify gem integrity
-        working-directory: crates/ts-pack-ruby
-        run: |
-          for gem in ./*.gem; do
-            echo "Validating: $gem"
-            file "$gem"
-            if ! gem spec "$gem" >/dev/null 2>&1; then
-              echo "WARNING: gem spec check failed for $gem"
-              # Verify it's at least a valid archive
-              if ! tar -tzf "$gem" >/dev/null 2>&1; then
-                echo "ERROR: Corrupted gem file: $gem" >&2
-                exit 1
-              fi
-            else
-              echo "gem spec validation passed"
-            fi
-          done
-
-      - name: Upload gem artifacts
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+      - name: Publish to npm
+        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        uses: kreuzberg-dev/actions/publish-npm@v1.0.0
         with:
-          name: rubygems-${{ matrix.label }}
-          path: crates/ts-pack-ruby/*.gem
-          retention-days: 14
-          compression-level: 0
+          package-dir: crates/ts-pack-wasm/pkg
+          provenance: "true"
+          dry-run: ${{ inputs.dry_run }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  # ─── Publish Ruby gems ──────────────────────────────────────────
-  publish-ruby:
+      - name: Wait for npm indexing
+        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        uses: kreuzberg-dev/actions/wait-for-package@v1.0.0
+        with:
+          registry: npm
+          package: "@kreuzberg/tree-sitter-language-pack-wasm"
+          version: ${{ needs.prepare.outputs.version }}
+          max-attempts: "20"
+
+  # ─── Publish Ruby gems ────────────────────────────────────────────
+  publish-rubygems:
     name: Publish Ruby gems
     needs: [prepare, validate-versions, check-rubygems, build-ruby-gem]
     if: |
       always() &&
-      needs.prepare.outputs.publish_ruby == 'true' &&
-      needs.build-ruby-gem.result == 'success'
+      needs.prepare.outputs.release_ruby == 'true' &&
+      needs.build-ruby-gem.result == 'success' &&
+      (needs.check-rubygems.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ inputs.tag }}
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@4eb9f110bac952a8b68ecf92e3b5c7a987594ba6 # v1.292.0
+        uses: ruby/setup-ruby@v1.292.0
         with:
           ruby-version: "3.3"
           bundler: none
           bundler-cache: false
 
       - name: Download Ruby gem artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           pattern: rubygems-*
           path: dist
           merge-multiple: true
 
       - name: Set up Python (for vendor script)
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.14"
 
@@ -714,7 +1580,6 @@ jobs:
         run: |
           echo "=== All gems to publish ==="
           ls -lh tree_sitter_language_pack-*.gem 2>/dev/null || echo "(no gems found)"
-          echo ""
           gem_count=$(find . -maxdepth 1 -name 'tree_sitter_language_pack-*.gem' -print | wc -l)
           echo "Total gems: $gem_count"
 
@@ -759,273 +1624,339 @@ jobs:
 
       - name: Publish gems to RubyGems
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-rubygems@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-rubygems@v1.0.0
         with:
           gems-dir: dist
           dry-run: ${{ inputs.dry_run }}
         env:
           GEM_HOST_API_KEY: ${{ secrets.GEM_HOST_API_KEY }}
 
-  # ─── Build & Publish WASM ─────────────────────────────────────────
-  build-wasm:
-    name: Build WASM package
-    needs: [prepare, validate-versions, clone-vendors, check-npm-wasm]
+  # ─── Publish Maven package ────────────────────────────────────────
+  publish-maven:
+    name: Publish Maven package
+    needs: [prepare, validate-versions, check-maven, build-java-package]
     if: |
       always() &&
-      needs.prepare.outputs.publish_wasm == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.clone-vendors.result == 'success' &&
-      (needs.prepare.outputs.force_republish == 'true' || needs.check-npm-wasm.outputs.exists != 'true')
+      needs.prepare.outputs.release_java == 'true' &&
+      needs.build-java-package.result == 'success' &&
+      (needs.check-maven.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ inputs.tag }}
 
-      - name: Download parsers
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: language-parsers
-          path: parsers
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
-        with:
-          target: wasm32-unknown-unknown
-          components: ""
-          use-sccache: "false"
-          install-llvm-cov: "false"
-
-      - name: Install wasm-pack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-
-      - name: Build WASM (web target)
-        working-directory: crates/ts-pack-wasm
-        run: wasm-pack build --target web --release
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-
-      - name: Verify WASM build output
-        working-directory: crates/ts-pack-wasm
-        run: |
-          if [ ! -d pkg ]; then
-            echo "ERROR: pkg/ directory not created by wasm-pack" >&2
-            exit 1
-          fi
-          echo "=== WASM build output ==="
-          ls -lh pkg/
-          if [ ! -f pkg/ts_pack_wasm_bg.wasm ]; then
-            echo "ERROR: WASM binary not found" >&2
-            exit 1
-          fi
-          echo "WASM binary size: $(wc -c < pkg/ts_pack_wasm_bg.wasm) bytes"
-
-      - name: Upload WASM package
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: wasm-pkg
-          path: crates/ts-pack-wasm/pkg/
-
-  publish-wasm:
-    name: Publish WASM to npm
-    needs: [prepare, build-wasm]
-    if: |
-      always() &&
-      needs.prepare.outputs.publish_wasm == 'true' &&
-      needs.build-wasm.result == 'success'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          ref: ${{ inputs.tag }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "24"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Download WASM package
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: wasm-pkg
-          path: crates/ts-pack-wasm/pkg
-
-      - name: Dry run summary
-        if: ${{ inputs.dry_run }}
-        run: |
-          {
-            echo "## npm WASM Dry Run"
-            echo "WASM package staged for npm:"
-            echo '```'
-            ls -1 crates/ts-pack-wasm/pkg/
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Re-check npm before publish
-        if: ${{ !inputs.dry_run }}
+      - name: Re-check Maven Central before publish
         id: recheck
+        if: ${{ !inputs.dry_run }}
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://registry.npmjs.org/@kreuzberg%2Ftree-sitter-language-pack-wasm/$VERSION")
+            "https://repo1.maven.org/maven2/dev/kreuzberg/tree-sitter-language-pack/$VERSION/")
           if [[ "$STATUS" == "200" ]]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "::notice::WASM package already on npm; skipping publish."
+            echo "::notice::Maven package already published; skipping."
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Publish to npm
+      - name: Setup Java
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-npm@v1.0.0 # v1.0.0
+        uses: actions/setup-java@v5.2.0
         with:
-          package-dir: crates/ts-pack-wasm/pkg
-          provenance: "true"
-          dry-run: ${{ inputs.dry_run }}
+          distribution: temurin
+          java-version: 25
+          cache: maven
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Setup Maven
+        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        uses: kreuzberg-dev/actions/setup-maven@v1.0.0
+
+      - name: Download Java package artifacts
+        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: maven-packages
+          path: crates/ts-pack-java/target
+
+      - name: Publish to Maven Central
+        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        uses: kreuzberg-dev/actions/publish-maven@v1.0.0
+        with:
+          pom-file: crates/ts-pack-java/pom.xml
+          maven-profile: publish
+          extra-args: -DskipTests
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPP_PASSPHRASE }}
 
-      - name: Wait for npm indexing
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/wait-for-package@v1.0.0 # v1.0.0
-        with:
-          registry: npm
-          package: "@kreuzberg/tree-sitter-language-pack-wasm"
-          version: ${{ needs.prepare.outputs.version }}
-          max-attempts: "20"
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: echo "Dry run requested; Maven publish skipped." >> "$GITHUB_STEP_SUMMARY"
 
-  # ─── Build Go FFI libraries ──────────────────────────────────────
-  build-go-ffi:
-    name: Build Go FFI (${{ matrix.label }})
-    needs: [prepare, validate-versions, clone-vendors]
+  # ─── Publish Elixir to Hex.pm ──────────────────────────────────────
+  publish-hex:
+    name: Publish Elixir to Hex.pm
+    needs: [prepare, validate-versions, check-hex, publish-crates, upload-elixir-release]
     if: |
       always() &&
-      needs.prepare.outputs.publish_go == 'true' &&
-      needs.validate-versions.result == 'success' &&
-      needs.clone-vendors.result == 'success'
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            label: linux-x86_64
-          - os: macos-latest
-            label: macos-arm64
-          - os: windows-latest
-            label: windows-x86_64
+      needs.prepare.outputs.release_elixir == 'true' &&
+      (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: hex
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ inputs.tag }}
+          fetch-depth: 0
 
-      - name: Download parsers
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - name: Generate checksums from GitHub release
+        run: |
+          if [ -f scripts/publish/generate_elixir_checksums.sh ]; then
+            ./scripts/publish/generate_elixir_checksums.sh "${{ needs.prepare.outputs.version }}"
+          fi
+
+      - name: Setup Elixir
+        uses: erlef/setup-elixir@v1.22.0
         with:
-          name: language-parsers
-          path: parsers
+          elixir-version: "1.17"
+          otp-version: "26"
 
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
+      - name: Install Elixir dependencies
+        working-directory: crates/ts-pack-elixir
+        run: mix deps.get
+
+      - name: Compile project
+        working-directory: crates/ts-pack-elixir
+        run: mix compile
+
+      - name: Build documentation
+        working-directory: crates/ts-pack-elixir
+        run: mix docs
+
+      - name: Re-check Hex.pm before publish
+        id: recheck
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            --retry 3 --retry-delay 5 --connect-timeout 30 --max-time 60 \
+            "https://hex.pm/api/packages/tree_sitter_language_pack/releases/${{ needs.prepare.outputs.version }}")
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Package already exists on Hex.pm -- skipping publish"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to Hex.pm
+        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        uses: kreuzberg-dev/actions/publish-hex@v1.0.0
         with:
-          components: ""
-          use-sccache: "false"
-          install-llvm-cov: "false"
-
-      - name: Build FFI library
-        run: cargo build -p ts-pack-ffi --release
+          package-dir: crates/ts-pack-elixir
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
-          PROJECT_ROOT: ${{ github.workspace }}
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
 
-      - name: Stage artifacts (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
-          cp target/release/libts_pack_ffi.a staging/ts-pack-ffi/lib/
-          cp crates/ts-pack-ffi/include/ts_pack.h staging/ts-pack-ffi/include/
-          cd staging && tar -czf "../ts-pack-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: echo "Dry run requested; Hex.pm publish skipped." >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Stage artifacts (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
-          cp target/release/ts_pack_ffi.lib staging/ts-pack-ffi/lib/ 2>/dev/null || cp target/release/libts_pack_ffi.a staging/ts-pack-ffi/lib/
-          cp crates/ts-pack-ffi/include/ts_pack.h staging/ts-pack-ffi/include/
-          cd staging && tar -czf "../ts-pack-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
-
-      - name: Upload FFI artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+  # ─── Smoke tests ──────────────────────────────────────────────────
+  smoke-rust:
+    name: Smoke test (Rust)
+    needs: [prepare, publish-crates]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.release_crates == 'true' &&
+      needs.publish-crates.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Smoke test Rust crate
+        uses: kreuzberg-dev/actions/smoke-rust@v1.0.0
         with:
-          name: go-ffi-${{ matrix.label }}
-          path: ts-pack-ffi-${{ matrix.label }}.tar.gz
-          retention-days: 14
+          package: ts-pack-core
+          version: ${{ needs.prepare.outputs.version }}
 
-  # ─── GitHub Release ───────────────────────────────────────────────
-  github-release:
-    name: Create GitHub Release
+  smoke-python:
+    name: Smoke test (Python)
+    needs: [prepare, publish-pypi]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.release_python == 'true' &&
+      needs.publish-pypi.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Smoke test Python package
+        uses: kreuzberg-dev/actions/smoke-python@v1.0.0
+        with:
+          package: tree-sitter-language-pack
+          version: ${{ needs.prepare.outputs.version }}
+
+  smoke-node:
+    name: Smoke test (Node.js)
+    needs: [prepare, publish-node]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.release_node == 'true' &&
+      needs.publish-node.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Smoke test Node.js package
+        uses: kreuzberg-dev/actions/smoke-node@v1.0.0
+        with:
+          package: "@kreuzberg/tree-sitter-language-pack"
+          version: ${{ needs.prepare.outputs.version }}
+
+  smoke-wasm:
+    name: Smoke test (WASM)
+    needs: [prepare, publish-wasm]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.release_wasm == 'true' &&
+      needs.publish-wasm.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Smoke test WASM package
+        uses: kreuzberg-dev/actions/smoke-wasm@v1.0.0
+        with:
+          package: "@kreuzberg/tree-sitter-language-pack-wasm"
+          version: ${{ needs.prepare.outputs.version }}
+
+  smoke-ruby:
+    name: Smoke test (Ruby)
+    needs: [prepare, publish-rubygems]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.release_ruby == 'true' &&
+      needs.publish-rubygems.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Smoke test Ruby gem
+        uses: kreuzberg-dev/actions/smoke-ruby@v1.0.0
+        with:
+          package: tree_sitter_language_pack
+          version: ${{ needs.prepare.outputs.version }}
+
+  smoke-java:
+    name: Smoke test (Java)
+    needs: [prepare, publish-maven]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.release_java == 'true' &&
+      needs.publish-maven.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Smoke test Java package
+        uses: kreuzberg-dev/actions/smoke-java@v1.0.0
+        with:
+          package: tree-sitter-language-pack
+          group-id: dev.kreuzberg
+          version: ${{ needs.prepare.outputs.version }}
+
+  smoke-go:
+    name: Smoke test (Go)
+    needs: [prepare, upload-go-release, release-finalize]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.release_go == 'true' &&
+      needs.upload-go-release.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Smoke test Go module
+        uses: kreuzberg-dev/actions/smoke-go@v1.0.0
+        with:
+          module: github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
+          version: ${{ needs.prepare.outputs.version }}
+
+  # ─── Release finalize ──────────────────────────────────────────────
+  release-finalize:
+    name: Finalize release
     needs:
       - prepare
       - validate-versions
       - check-cratesio
       - check-pypi
       - check-npm
-      - check-rubygems
       - check-npm-wasm
+      - check-rubygems
+      - check-maven
+      - check-hex
+      - upload-parser-binaries
+      - upload-go-release
+      - upload-c-ffi-release
+      - upload-elixir-release
       - publish-crates
-      - publish-python
+      - publish-pypi
       - publish-node
-      - publish-ruby
       - publish-wasm
-      - build-go-ffi
-    if: always() && !cancelled()
+      - publish-rubygems
+      - publish-maven
+      - publish-hex
+    if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ inputs.tag }}
+          fetch-depth: 0
 
-      - name: Download Go FFI artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          path: release-assets
-          pattern: go-ffi-*
-          merge-multiple: true
-        continue-on-error: true
-
-      - name: Dry run summary
-        if: ${{ inputs.dry_run }}
+      - name: Setup Git credentials
         run: |
-          {
-            echo "## GitHub Release Dry Run"
-            echo "Would create release **${{ inputs.tag }}** with artifacts:"
-            echo '```'
-            ls -1 release-assets/ts-pack-ffi-*.tar.gz 2>/dev/null || echo "(no Go FFI artifacts)"
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Delete existing release (force republish)
-        if: ${{ !inputs.dry_run && inputs.force_republish }}
-        run: gh release delete "${{ inputs.tag }}" --yes 2>/dev/null || true
+      - name: Create Go module tag
+        if: ${{ needs.prepare.outputs.release_go == 'true' && needs.prepare.outputs.dry_run != 'true' }}
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          GO_TAG="packages/go/v${VERSION}"
+          echo "Creating Go module tag: $GO_TAG"
+          git tag "$GO_TAG" || echo "Tag already exists"
+          git push origin "$GO_TAG" 2>/dev/null || echo "Tag already pushed"
+
+      - name: Publish release from draft state
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
-
-      - name: Create GitHub Release
-        uses: kreuzberg-dev/actions/publish-github-release@v1.0.0 # v1.0.0
-        with:
-          tag: ${{ inputs.tag }}
-          title: "Release ${{ inputs.tag }}"
-          artifacts: "release-assets/ts-pack-ffi-*.tar.gz"
-          dry-run: ${{ inputs.dry_run }}
-        env:
-          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ inputs.tag }}"
+          # Mark release as non-draft if it exists
+          gh release edit "$TAG" --draft=false 2>/dev/null || \
+            gh release create "$TAG" --title "Release $TAG" --generate-notes 2>/dev/null || \
+            echo "Release already published"
 
       - name: Aggregate release status
         if: always()
@@ -1033,15 +1964,22 @@ jobs:
           CHECK_CRATESIO_EXISTS: ${{ needs.check-cratesio.outputs.exists || '' }}
           CHECK_PYPI_EXISTS: ${{ needs.check-pypi.outputs.exists || '' }}
           CHECK_NPM_EXISTS: ${{ needs.check-npm.outputs.exists || '' }}
-          CHECK_RUBYGEMS_EXISTS: ${{ needs.check-rubygems.outputs.exists || '' }}
           CHECK_NPM_WASM_EXISTS: ${{ needs.check-npm-wasm.outputs.exists || '' }}
+          CHECK_RUBYGEMS_EXISTS: ${{ needs.check-rubygems.outputs.exists || '' }}
+          CHECK_MAVEN_EXISTS: ${{ needs.check-maven.outputs.exists || '' }}
+          CHECK_HEX_EXISTS: ${{ needs.check-hex.outputs.exists || '' }}
           RESULT_VALIDATE: ${{ needs.validate-versions.result }}
           RESULT_PUBLISH_CRATES: ${{ needs.publish-crates.result }}
-          RESULT_PUBLISH_PYTHON: ${{ needs.publish-python.result }}
+          RESULT_PUBLISH_PYPI: ${{ needs.publish-pypi.result }}
           RESULT_PUBLISH_NODE: ${{ needs.publish-node.result }}
-          RESULT_PUBLISH_RUBY: ${{ needs.publish-ruby.result }}
           RESULT_PUBLISH_WASM: ${{ needs.publish-wasm.result }}
-          RESULT_BUILD_GO_FFI: ${{ needs.build-go-ffi.result }}
+          RESULT_PUBLISH_RUBYGEMS: ${{ needs.publish-rubygems.result }}
+          RESULT_PUBLISH_MAVEN: ${{ needs.publish-maven.result }}
+          RESULT_PUBLISH_HEX: ${{ needs.publish-hex.result }}
+          RESULT_UPLOAD_PARSERS: ${{ needs.upload-parser-binaries.result }}
+          RESULT_UPLOAD_GO: ${{ needs.upload-go-release.result }}
+          RESULT_UPLOAD_C_FFI: ${{ needs.upload-c-ffi-release.result }}
+          RESULT_UPLOAD_ELIXIR: ${{ needs.upload-elixir-release.result }}
         run: |
           {
             echo "## Release Summary"
@@ -1057,20 +1995,27 @@ jobs:
 
             declare -A results
             results[crates]="${RESULT_PUBLISH_CRATES}"
-            results[python]="${RESULT_PUBLISH_PYTHON}"
+            results[python]="${RESULT_PUBLISH_PYPI}"
             results[node]="${RESULT_PUBLISH_NODE}"
-            results[ruby]="${RESULT_PUBLISH_RUBY}"
             results[wasm]="${RESULT_PUBLISH_WASM}"
-            results[go-ffi]="${RESULT_BUILD_GO_FFI}"
+            results[ruby]="${RESULT_PUBLISH_RUBYGEMS}"
+            results[maven]="${RESULT_PUBLISH_MAVEN}"
+            results[hex]="${RESULT_PUBLISH_HEX}"
+            results[parser-binaries]="${RESULT_UPLOAD_PARSERS}"
+            results[go-ffi]="${RESULT_UPLOAD_GO}"
+            results[c-ffi]="${RESULT_UPLOAD_C_FFI}"
+            results[elixir-nifs]="${RESULT_UPLOAD_ELIXIR}"
 
             declare -A checks
             checks[crates]="${CHECK_CRATESIO_EXISTS}"
             checks[python]="${CHECK_PYPI_EXISTS}"
             checks[node]="${CHECK_NPM_EXISTS}"
-            checks[ruby]="${CHECK_RUBYGEMS_EXISTS}"
             checks[wasm]="${CHECK_NPM_WASM_EXISTS}"
+            checks[ruby]="${CHECK_RUBYGEMS_EXISTS}"
+            checks[maven]="${CHECK_MAVEN_EXISTS}"
+            checks[hex]="${CHECK_HEX_EXISTS}"
 
-            for target in crates python node ruby wasm go-ffi; do
+            for target in crates python node wasm ruby maven hex parser-binaries go-ffi c-ffi elixir-nifs; do
               result="${results[$target]}"
               check="${checks[$target]:-}"
               if [[ "$result" == "success" ]]; then

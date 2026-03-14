@@ -26,7 +26,7 @@ badges:
     link: "https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack"
   go:
     url: "https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6"
-    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-go"
+    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1"
   java:
     url: "https://img.shields.io/maven-central/v/dev.kreuzberg/tree-sitter-language-pack?label=Java&color=007ec6"
     link: "https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack"
@@ -110,17 +110,17 @@ languages:
   go:
     name: "Go"
     template: language_package.md.jinja
-    output_path: crates/ts-pack-go/README.md
-    package_name: "github.com/kreuzberg-dev/tree-sitter-language-pack/go"
+    output_path: packages/go/v1/README.md
+    package_name: "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
     package_manager: [go]
     description: "Go bindings for tree-sitter-language-pack using cgo."
-    install_command: "go get github.com/kreuzberg-dev/tree-sitter-language-pack/go"
+    install_command: "go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
     quick_start: |
       package main
 
       import (
           "fmt"
-          tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/go"
+          tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
       )
 
       func main() {
