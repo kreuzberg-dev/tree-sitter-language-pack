@@ -2,6 +2,7 @@ pub mod error;
 pub mod intel;
 pub mod node;
 pub mod parse;
+pub mod process_config;
 pub mod query;
 pub mod registry;
 pub mod text_splitter;
@@ -15,12 +16,13 @@ pub mod download;
 
 pub use error::Error;
 pub use intel::types::{
-    ChunkMetadata, CommentInfo, CommentKind, Diagnostic, DiagnosticSeverity, DocSection, DocstringFormat,
-    DocstringInfo, ExportInfo, ExportKind, FileIntelligence, FileMetrics, ImportInfo, IntelligentChunk, Span,
-    StructureItem, StructureKind, SymbolInfo, SymbolKind,
+    ChunkContext, CodeChunk, CommentInfo, CommentKind, Diagnostic, DiagnosticSeverity, DocSection, DocstringFormat,
+    DocstringInfo, ExportInfo, ExportKind, FileMetrics, ImportInfo, ProcessResult, Span, StructureItem, StructureKind,
+    SymbolInfo, SymbolKind,
 };
 pub use node::{NodeInfo, extract_text, find_nodes_by_type, named_children_info, node_info_from_node, root_node_info};
 pub use parse::{parse_string, tree_contains_node_type, tree_error_count, tree_has_error_nodes, tree_to_sexp};
+pub use process_config::ProcessConfig;
 pub use query::{QueryMatch, run_query};
 pub use registry::LanguageRegistry;
 pub use text_splitter::split_code;
@@ -62,17 +64,8 @@ pub fn language_count() -> usize {
 }
 
 /// Process source code and extract file intelligence using the global registry.
-pub fn process(source: &str, language: &str) -> Result<intel::types::FileIntelligence, Error> {
-    REGISTRY.process(source, language)
-}
-
-/// Process, extract intelligence, and chunk source code using the global registry.
-pub fn process_and_chunk(
-    source: &str,
-    language: &str,
-    max_chunk_size: usize,
-) -> Result<(intel::types::FileIntelligence, Vec<intel::types::IntelligentChunk>), Error> {
-    REGISTRY.process_and_chunk(source, language, max_chunk_size)
+pub fn process(source: &str, config: &ProcessConfig) -> Result<ProcessResult, Error> {
+    REGISTRY.process(source, config)
 }
 
 #[cfg(test)]

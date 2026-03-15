@@ -12,9 +12,9 @@ pub struct Span {
 }
 
 /// Complete intelligence extracted from a source file.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct FileIntelligence {
+pub struct ProcessResult {
     pub language: String,
     pub metrics: FileMetrics,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
@@ -31,10 +31,12 @@ pub struct FileIntelligence {
     pub symbols: Vec<SymbolInfo>,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub diagnostics: Vec<Diagnostic>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
+    pub chunks: Vec<CodeChunk>,
 }
 
 /// Aggregate metrics for a source file.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FileMetrics {
     pub total_lines: usize,
@@ -220,19 +222,19 @@ pub struct Diagnostic {
 /// A chunk of source code with rich metadata.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct IntelligentChunk {
+pub struct CodeChunk {
     pub content: String,
     pub start_byte: usize,
     pub end_byte: usize,
     pub start_line: usize,
     pub end_line: usize,
-    pub metadata: ChunkMetadata,
+    pub metadata: ChunkContext,
 }
 
 /// Metadata for a single chunk of source code.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ChunkMetadata {
+pub struct ChunkContext {
     pub language: String,
     pub chunk_index: usize,
     pub total_chunks: usize,

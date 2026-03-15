@@ -12,7 +12,7 @@ pub fn chunk_source(
     max_chunk_size: usize,
     _lang: &Language,
     tree: &Tree,
-) -> Vec<IntelligentChunk> {
+) -> Vec<CodeChunk> {
     // Split source into chunks using AST-aware boundaries
     let raw_chunks = crate::text_splitter::split_code(source, tree, max_chunk_size);
     let total_chunks = raw_chunks.len();
@@ -49,13 +49,13 @@ pub fn chunk_source(
                 0,
             );
 
-            IntelligentChunk {
+            CodeChunk {
                 content: content.to_string(),
                 start_byte,
                 end_byte,
                 start_line,
                 end_line,
-                metadata: ChunkMetadata {
+                metadata: ChunkContext {
                     language: language.to_string(),
                     chunk_index: idx,
                     total_chunks,

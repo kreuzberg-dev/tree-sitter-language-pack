@@ -36,6 +36,7 @@ package tspack
 */
 import "C"
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"runtime"
@@ -393,4 +394,55 @@ func (r *Registry) ProcessAndChunk(source, language string, maxChunkSize int) (s
 	defer C.ts_pack_free_string(result)
 
 	return C.GoString(result), nil
+}
+
+// ProcessWithConfig extracts file intelligence (and optionally chunks) from the
+// given source code using a ProcessConfig. The config specifies the language and
+// which extraction features to enable.
+//
+// When config.ChunkMaxSize is non-nil, chunking is performed via ProcessAndChunk.
+// Otherwise, only metadata extraction is performed via Process.
+//
+// Returns a typed ProcessResult with deserialized metadata and chunks.
+func (r *Registry) ProcessWithConfig(source string, config ProcessConfig) (*ProcessResult, error) {
+	var rawJSON string
+	var err error
+
+	if config.ChunkMaxSize != nil {
+		rawJSON, err = r.ProcessAndChunk(source, config.Language, *config.ChunkMaxSize)
+	} else {
+		rawJSON, err = r.Process(source, config.Language)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	// When Process (without chunking) is called, the JSON contains the intelligence
+	// fields at the top level. When ProcessAndChunk is called, it returns
+	// {"intelligence": ..., "chunks": [...]}.
+	// We normalize both into a ProcessResult.
+	if config.ChunkMaxSize != nil {
+		// ProcessAndChunk returns {"intelligence": {...}, "chunks": [...]}
+		var combined struct {
+			Intelligence FileMetadata `json:"intelligence"`
+			Chunks       []CodeChunk  `json:"chunks"`
+		}
+		if err := json.Unmarshal([]byte(rawJSON), &combined); err != nil {
+			return nil, fmt.Errorf("tspack: failed to deserialize process result: %w", err)
+		}
+		return &ProcessResult{
+			Metadata: combined.Intelligence,
+			Chunks:   combined.Chunks,
+		}, nil
+	}
+
+	// Process returns the intelligence fields at the top level
+	var metadata FileMetadata
+	if err := json.Unmarshal([]byte(rawJSON), &metadata); err != nil {
+		return nil, fmt.Errorf("tspack: failed to deserialize process result: %w", err)
+	}
+	return &ProcessResult{
+		Metadata: metadata,
+		Chunks:   nil,
+	}, nil
 }

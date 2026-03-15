@@ -3,6 +3,7 @@ from typing import TypeAlias
 from tree_sitter_language_pack._native import (
     LanguageNotFoundError,
     ParseError,
+    ProcessConfig,
     QueryError,
     TreeHandle,
     available_languages,
@@ -13,7 +14,6 @@ from tree_sitter_language_pack._native import (
     language_count,
     parse_string,
     process,
-    process_and_chunk,
 )
 
 SupportedLanguage: TypeAlias = str
@@ -21,6 +21,7 @@ SupportedLanguage: TypeAlias = str
 __all__ = [
     "LanguageNotFoundError",
     "ParseError",
+    "ProcessConfig",
     "QueryError",
     "SupportedLanguage",
     "TreeHandle",
@@ -32,5 +33,4 @@ __all__ = [
     "language_count",
     "parse_string",
     "process",
-    "process_and_chunk",
 ]

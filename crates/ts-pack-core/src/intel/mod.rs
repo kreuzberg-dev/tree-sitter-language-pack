@@ -10,29 +10,49 @@ pub mod types;
 
 pub use types::*;
 
-/// Process source code: parse once, extract intelligence and return it.
+use crate::process_config::ProcessConfig;
+
+/// Process source code: parse once, extract intelligence based on config, and return it.
 pub fn process(
     source: &str,
-    language: &str,
+    config: &ProcessConfig,
     registry: &crate::LanguageRegistry,
-) -> Result<FileIntelligence, crate::Error> {
-    let (_lang, tree) = parse_source(source, language, registry)?;
-    Ok(intelligence::extract_intelligence(source, language, &tree))
-}
+) -> Result<ProcessResult, crate::Error> {
+    let (lang, tree) = parse_source(source, &config.language, registry)?;
+    let root = tree.root_node();
 
-/// Process and chunk source code in a single pass.
-///
-/// Parses once and extracts both file-level intelligence and per-chunk metadata.
-pub fn process_and_chunk(
-    source: &str,
-    language: &str,
-    max_chunk_size: usize,
-    registry: &crate::LanguageRegistry,
-) -> Result<(FileIntelligence, Vec<IntelligentChunk>), crate::Error> {
-    let (lang, tree) = parse_source(source, language, registry)?;
-    let intel = intelligence::extract_intelligence(source, language, &tree);
-    let chunks = chunking::chunk_source(source, language, max_chunk_size, &lang, &tree);
-    Ok((intel, chunks))
+    let mut result = ProcessResult {
+        language: config.language.clone(),
+        metrics: intelligence::compute_metrics(source, &root),
+        ..Default::default()
+    };
+
+    if config.structure {
+        result.structure = intelligence::extract_structure(&root, source);
+    }
+    if config.imports {
+        result.imports = intelligence::extract_imports(&root, source, &config.language);
+    }
+    if config.exports {
+        result.exports = intelligence::extract_exports(&root, source, &config.language);
+    }
+    if config.comments {
+        result.comments = intelligence::extract_comments(&root, source, &config.language);
+    }
+    if config.docstrings {
+        result.docstrings = intelligence::extract_docstrings(&root, source, &config.language);
+    }
+    if config.symbols {
+        result.symbols = intelligence::extract_symbols(&root, source, &config.language);
+    }
+    if config.diagnostics {
+        result.diagnostics = intelligence::extract_diagnostics(&root, source);
+    }
+    if let Some(max_size) = config.chunk_max_size {
+        result.chunks = chunking::chunk_source(source, &config.language, max_size, &lang, &tree);
+    }
+
+    Ok(result)
 }
 
 /// Parse source code and return the tree-sitter language and tree.
@@ -53,6 +73,7 @@ fn parse_source(
 #[cfg(test)]
 mod tests {
     use crate::LanguageRegistry;
+    use crate::process_config::ProcessConfig;
 
     fn first_lang(registry: &LanguageRegistry) -> Option<String> {
         let langs = registry.available_languages();
@@ -64,7 +85,8 @@ mod tests {
         let registry = LanguageRegistry::new();
         let Some(lang) = first_lang(&registry) else { return };
         let source = "x";
-        let result = super::process(source, &lang, &registry);
+        let config = ProcessConfig::new(&lang).all();
+        let result = super::process(source, &config, &registry);
         assert!(result.is_ok(), "process should succeed for available language");
         let intel = result.unwrap();
         assert_eq!(intel.language, lang);
@@ -73,22 +95,24 @@ mod tests {
     }
 
     #[test]
-    fn test_process_and_chunk_returns_both() {
+    fn test_process_with_chunking() {
         let registry = LanguageRegistry::new();
         let Some(lang) = first_lang(&registry) else { return };
         let source = "x";
-        let result = super::process_and_chunk(source, &lang, 1000, &registry);
+        let config = ProcessConfig::new(&lang).all().with_chunking(1000);
+        let result = super::process(source, &config, &registry);
         assert!(result.is_ok());
-        let (intel, chunks) = result.unwrap();
+        let intel = result.unwrap();
         assert_eq!(intel.language, lang);
-        assert!(!chunks.is_empty(), "should have at least one chunk");
-        assert_eq!(chunks[0].metadata.language, lang);
+        assert!(!intel.chunks.is_empty(), "should have at least one chunk");
+        assert_eq!(intel.chunks[0].metadata.language, lang);
     }
 
     #[test]
     fn test_process_invalid_language() {
         let registry = LanguageRegistry::new();
-        let result = super::process("x", "nonexistent_lang_xyz", &registry);
+        let config = ProcessConfig::new("nonexistent_lang_xyz");
+        let result = super::process("x", &config, &registry);
         assert!(result.is_err(), "should fail for nonexistent language");
     }
 
@@ -96,24 +120,26 @@ mod tests {
     fn test_process_empty_source() {
         let registry = LanguageRegistry::new();
         let Some(lang) = first_lang(&registry) else { return };
-        let result = super::process("", &lang, &registry);
+        let config = ProcessConfig::new(&lang);
+        let result = super::process("", &config, &registry);
         assert!(result.is_ok(), "empty source should parse without error");
         let intel = result.unwrap();
         assert_eq!(intel.metrics.total_bytes, 0);
     }
 
     #[test]
-    fn test_process_and_chunk_small_max_size() {
+    fn test_process_with_small_chunk_size() {
         let registry = LanguageRegistry::new();
         if !registry.has_language("python") {
             return;
         }
         let source = "def foo():\n    pass\ndef bar():\n    pass\n";
-        let result = super::process_and_chunk(source, "python", 20, &registry);
+        let config = ProcessConfig::new("python").all().with_chunking(20);
+        let result = super::process(source, &config, &registry);
         assert!(result.is_ok());
-        let (intel, chunks) = result.unwrap();
+        let intel = result.unwrap();
         assert!(
-            chunks.len() >= 2,
+            intel.chunks.len() >= 2,
             "small max_chunk_size should split into multiple chunks"
         );
         assert_eq!(intel.language, "python");

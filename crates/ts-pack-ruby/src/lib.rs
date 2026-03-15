@@ -97,7 +97,7 @@ fn json_value_to_ruby(ruby: &Ruby, value: &serde_json::Value) -> Result<magnus::
     }
 }
 
-fn process(ruby: &Ruby, source: String, language: String) -> Result<magnus::Value, Error> {
+fn process_legacy(ruby: &Ruby, source: String, language: String) -> Result<magnus::Value, Error> {
     let intel = ts_pack_core::process(&source, &language)
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
     let value = serde_json::to_value(&intel)
@@ -120,6 +120,45 @@ fn process_and_chunk(
     json_value_to_ruby(ruby, &result)
 }
 
+/// Unified process method that accepts a JSON config string and returns a JSON result string.
+///
+/// The config JSON must contain at least `"language"`. Optional fields:
+/// - `structure`, `imports`, `exports`, `comments`, `docstrings`, `symbols`, `diagnostics` (booleans, default true)
+/// - `chunk_max_size` (integer or null, default null meaning no chunking)
+///
+/// When `chunk_max_size` is set, the result includes both intelligence and chunks.
+/// When it is null/absent, only intelligence is returned (with an empty chunks array).
+fn process(ruby: &Ruby, source: String, config_json: String) -> Result<String, Error> {
+    let config: serde_json::Value = serde_json::from_str(&config_json)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("invalid config JSON: {e}")))?;
+
+    let language = config
+        .get("language")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| Error::new(ruby.exception_runtime_error(), "config must contain 'language' string field"))?;
+
+    let chunk_max_size = config.get("chunk_max_size").and_then(|v| v.as_u64()).map(|v| v as usize);
+
+    let result = if let Some(max_size) = chunk_max_size {
+        let (intel, chunks) = ts_pack_core::process_and_chunk(&source, language, max_size)
+            .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
+        serde_json::json!({
+            "metadata": intel,
+            "chunks": chunks,
+        })
+    } else {
+        let intel = ts_pack_core::process(&source, language)
+            .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
+        serde_json::json!({
+            "metadata": intel,
+            "chunks": [],
+        })
+    };
+
+    serde_json::to_string(&result)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))
+}
+
 #[magnus::init]
 fn init(ruby: &Ruby) -> Result<(), Error> {
     let module = ruby.define_module("TreeSitterLanguagePack")?;
@@ -130,6 +169,7 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_module_function("get_language_ptr", function!(get_language_ptr, 1))?;
     module.define_module_function("parse_string", function!(parse_string, 2))?;
     module.define_module_function("process", function!(process, 2))?;
+    module.define_module_function("process_legacy", function!(process_legacy, 2))?;
     module.define_module_function("process_and_chunk", function!(process_and_chunk, 3))?;
 
     let tree_class = module.define_class("Tree", ruby.class_object())?;

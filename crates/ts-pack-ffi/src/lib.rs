@@ -532,10 +532,14 @@ pub unsafe extern "C" fn ts_pack_tree_error_count(tree: *const TsPackTree) -> us
 }
 
 // ---------------------------------------------------------------------------
-// Intel: process / process_and_chunk
+// Process: unified API
 // ---------------------------------------------------------------------------
 
-/// Process source code and extract file intelligence as a JSON C string.
+/// Process source code and extract metadata + chunks as a JSON C string.
+///
+/// `config_json` is a null-terminated JSON string with fields:
+/// - `language` (string, required): the language name
+/// - `chunk_max_size` (number, optional): maximum chunk size in bytes (default: 1500)
 ///
 /// Returns a newly-allocated C string that the caller must free with
 /// `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
@@ -544,25 +548,39 @@ pub unsafe extern "C" fn ts_pack_tree_error_count(tree: *const TsPackTree) -> us
 ///
 /// `registry` must be a valid pointer returned by `ts_pack_registry_new`.
 /// `source` must be a valid pointer to `source_len` bytes.
-/// `language` must be a valid null-terminated UTF-8 C string.
+/// `config_json` must be a valid null-terminated UTF-8 C string.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_process(
     registry: *const TsPackRegistry,
     source: *const c_char,
     source_len: usize,
-    language: *const c_char,
+    config_json: *const c_char,
 ) -> *mut c_char {
     ffi_guard!(ptr::null_mut(), {
         clear_last_error();
-        if registry.is_null() || source.is_null() || language.is_null() {
+        if registry.is_null() || source.is_null() || config_json.is_null() {
             set_last_error("null pointer argument");
             return ptr::null_mut();
         }
         let reg = unsafe { &*registry };
-        let lang_str = match unsafe { CStr::from_ptr(language) }.to_str() {
+        let config_str = match unsafe { CStr::from_ptr(config_json) }.to_str() {
             Ok(s) => s,
             Err(e) => {
-                set_last_error(&format!("invalid UTF-8 in language: {e}"));
+                set_last_error(&format!("invalid UTF-8 in config_json: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        let config: serde_json::Value = match serde_json::from_str(config_str) {
+            Ok(v) => v,
+            Err(e) => {
+                set_last_error(&format!("invalid JSON in config: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        let core_config: ts_pack_core::ProcessConfig = match serde_json::from_value(config) {
+            Ok(c) => c,
+            Err(e) => {
+                set_last_error(&format!("invalid config: {e}"));
                 return ptr::null_mut();
             }
         };
@@ -574,8 +592,8 @@ pub unsafe extern "C" fn ts_pack_process(
                 return ptr::null_mut();
             }
         };
-        match reg.inner.process(source_str, lang_str) {
-            Ok(intel) => match serde_json::to_string(&intel) {
+        match reg.inner.process(source_str, &core_config) {
+            Ok(result) => match serde_json::to_string(&result) {
                 Ok(json) => match CString::new(json) {
                     Ok(c) => CString::into_raw(c),
                     Err(e) => {
@@ -588,74 +606,6 @@ pub unsafe extern "C" fn ts_pack_process(
                     ptr::null_mut()
                 }
             },
-            Err(e) => {
-                set_last_error(&e.to_string());
-                ptr::null_mut()
-            }
-        }
-    })
-}
-
-/// Process and chunk source code, returning intelligence + chunks as a JSON C string.
-///
-/// Returns a newly-allocated C string that the caller must free with
-/// `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
-///
-/// # Safety
-///
-/// `registry` must be a valid pointer returned by `ts_pack_registry_new`.
-/// `source` must be a valid pointer to `source_len` bytes.
-/// `language` must be a valid null-terminated UTF-8 C string.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_process_and_chunk(
-    registry: *const TsPackRegistry,
-    source: *const c_char,
-    source_len: usize,
-    language: *const c_char,
-    max_chunk_size: usize,
-) -> *mut c_char {
-    ffi_guard!(ptr::null_mut(), {
-        clear_last_error();
-        if registry.is_null() || source.is_null() || language.is_null() {
-            set_last_error("null pointer argument");
-            return ptr::null_mut();
-        }
-        let reg = unsafe { &*registry };
-        let lang_str = match unsafe { CStr::from_ptr(language) }.to_str() {
-            Ok(s) => s,
-            Err(e) => {
-                set_last_error(&format!("invalid UTF-8 in language: {e}"));
-                return ptr::null_mut();
-            }
-        };
-        let source_bytes = unsafe { std::slice::from_raw_parts(source as *const u8, source_len) };
-        let source_str = match std::str::from_utf8(source_bytes) {
-            Ok(s) => s,
-            Err(e) => {
-                set_last_error(&format!("invalid UTF-8 in source: {e}"));
-                return ptr::null_mut();
-            }
-        };
-        match reg.inner.process_and_chunk(source_str, lang_str, max_chunk_size) {
-            Ok((intel, chunks)) => {
-                let result = serde_json::json!({
-                    "intelligence": intel,
-                    "chunks": chunks,
-                });
-                match serde_json::to_string(&result) {
-                    Ok(json) => match CString::new(json) {
-                        Ok(c) => CString::into_raw(c),
-                        Err(e) => {
-                            set_last_error(&format!("null byte in JSON: {e}"));
-                            ptr::null_mut()
-                        }
-                    },
-                    Err(e) => {
-                        set_last_error(&format!("serialization failed: {e}"));
-                        ptr::null_mut()
-                    }
-                }
-            }
             Err(e) => {
                 set_last_error(&e.to_string());
                 ptr::null_mut()

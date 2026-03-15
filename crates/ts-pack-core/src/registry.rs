@@ -291,25 +291,15 @@ impl LanguageRegistry {
         self.available_languages().len()
     }
 
-    /// Parse source code and extract full file intelligence in a single pass.
-    pub fn process(&self, source: &str, language: &str) -> Result<crate::intel::types::FileIntelligence, Error> {
-        crate::intel::process(source, resolve_alias(language), self)
-    }
-
-    /// Parse, extract intelligence, and chunk source code in a single pass.
-    pub fn process_and_chunk(
+    /// Parse source code and extract file intelligence based on config in a single pass.
+    pub fn process(
         &self,
         source: &str,
-        language: &str,
-        max_chunk_size: usize,
-    ) -> Result<
-        (
-            crate::intel::types::FileIntelligence,
-            Vec<crate::intel::types::IntelligentChunk>,
-        ),
-        Error,
-    > {
-        crate::intel::process_and_chunk(source, resolve_alias(language), max_chunk_size, self)
+        config: &crate::process_config::ProcessConfig,
+    ) -> Result<crate::intel::types::ProcessResult, Error> {
+        let mut resolved_config = config.clone();
+        resolved_config.language = resolve_alias(&config.language).to_string();
+        crate::intel::process(source, &resolved_config, self)
     }
 }
 
@@ -322,6 +312,7 @@ impl Default for LanguageRegistry {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::process_config::ProcessConfig;
 
     fn first_available_lang() -> Option<String> {
         let langs = crate::available_languages();
@@ -332,7 +323,8 @@ mod tests {
     fn test_registry_process() {
         let Some(lang) = first_available_lang() else { return };
         let registry = LanguageRegistry::new();
-        let result = registry.process("x", &lang);
+        let config = ProcessConfig::new(&lang);
+        let result = registry.process("x", &config);
         assert!(result.is_ok(), "registry.process() should succeed");
         let intel = result.unwrap();
         assert_eq!(intel.language, lang);
@@ -340,20 +332,22 @@ mod tests {
     }
 
     #[test]
-    fn test_registry_process_and_chunk() {
+    fn test_registry_process_with_chunking() {
         let Some(lang) = first_available_lang() else { return };
         let registry = LanguageRegistry::new();
-        let result = registry.process_and_chunk("x", &lang, 1000);
-        assert!(result.is_ok(), "registry.process_and_chunk() should succeed");
-        let (intel, chunks) = result.unwrap();
+        let config = ProcessConfig::new(&lang).with_chunking(1000);
+        let result = registry.process("x", &config);
+        assert!(result.is_ok(), "registry.process() with chunking should succeed");
+        let intel = result.unwrap();
         assert_eq!(intel.language, lang);
-        assert!(!chunks.is_empty());
+        assert!(!intel.chunks.is_empty());
     }
 
     #[test]
     fn test_registry_process_invalid_language() {
         let registry = LanguageRegistry::new();
-        let result = registry.process("x", "nonexistent_lang_xyz");
+        let config = ProcessConfig::new("nonexistent_lang_xyz");
+        let result = registry.process("x", &config);
         assert!(result.is_err());
     }
 
@@ -370,13 +364,14 @@ mod tests {
 
     #[cfg(feature = "serde")]
     #[test]
-    fn test_file_intelligence_serde_roundtrip() {
+    fn test_process_result_serde_roundtrip() {
         let Some(lang) = first_available_lang() else { return };
         let registry = LanguageRegistry::new();
         let source = "x";
-        let intel = registry.process(source, &lang).unwrap();
+        let config = ProcessConfig::new(&lang);
+        let intel = registry.process(source, &config).unwrap();
         let json = serde_json::to_string(&intel).expect("serialize should succeed");
-        let deserialized: crate::intel::types::FileIntelligence =
+        let deserialized: crate::intel::types::ProcessResult =
             serde_json::from_str(&json).expect("deserialize should succeed");
         assert_eq!(deserialized.language, intel.language);
         assert_eq!(deserialized.metrics.total_lines, intel.metrics.total_lines);

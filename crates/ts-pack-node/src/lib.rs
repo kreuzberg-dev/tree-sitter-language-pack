@@ -68,24 +68,43 @@ pub fn tree_has_error_nodes(tree: &External<tree_sitter::Tree>) -> bool {
 }
 
 // ---------------------------------------------------------------------------
-// Intel: process / processAndChunk
+// Process with config
 // ---------------------------------------------------------------------------
 
-/// Process source code and extract file intelligence as a JavaScript object.
-#[napi(js_name = "process")]
-pub fn process(source: String, language: String) -> napi::Result<serde_json::Value> {
-    let intel = ts_pack_core::process(&source, &language).map_err(|e| napi::Error::from_reason(format!("{e}")))?;
-    serde_json::to_value(&intel).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))
+/// Configuration for the `process` function.
+#[napi(object)]
+pub struct JsProcessConfig {
+    pub language: String,
+    pub structure: Option<bool>,
+    pub imports: Option<bool>,
+    pub exports: Option<bool>,
+    pub comments: Option<bool>,
+    pub docstrings: Option<bool>,
+    pub symbols: Option<bool>,
+    pub diagnostics: Option<bool>,
+    pub chunk_max_size: Option<u32>,
 }
 
-/// Process and chunk source code, returning a JavaScript object with intelligence and chunks.
-#[napi(js_name = "processAndChunk")]
-pub fn process_and_chunk(source: String, language: String, max_chunk_size: u32) -> napi::Result<serde_json::Value> {
-    let (intel, chunks) = ts_pack_core::process_and_chunk(&source, &language, max_chunk_size as usize)
-        .map_err(|e| napi::Error::from_reason(format!("{e}")))?;
-    let result = serde_json::json!({
-        "intelligence": intel,
-        "chunks": chunks,
-    });
-    Ok(result)
+impl From<JsProcessConfig> for ts_pack_core::ProcessConfig {
+    fn from(js: JsProcessConfig) -> Self {
+        Self {
+            language: js.language,
+            structure: js.structure.unwrap_or(true),
+            imports: js.imports.unwrap_or(true),
+            exports: js.exports.unwrap_or(true),
+            comments: js.comments.unwrap_or(true),
+            docstrings: js.docstrings.unwrap_or(true),
+            symbols: js.symbols.unwrap_or(true),
+            diagnostics: js.diagnostics.unwrap_or(true),
+            chunk_max_size: js.chunk_max_size.map(|v| v as usize),
+        }
+    }
+}
+
+/// Process source code using a config and return a JavaScript object with metadata and chunks.
+#[napi(js_name = "process")]
+pub fn process(source: String, config: JsProcessConfig) -> napi::Result<serde_json::Value> {
+    let core_config: ts_pack_core::ProcessConfig = config.into();
+    let result = ts_pack_core::process(&source, &core_config).map_err(|e| napi::Error::from_reason(format!("{e}")))?;
+    serde_json::to_value(&result).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))
 }

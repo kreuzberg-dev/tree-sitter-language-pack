@@ -220,7 +220,11 @@ char *ts_pack_tree_to_sexp(const struct TsPackTree *tree);
 uintptr_t ts_pack_tree_error_count(const struct TsPackTree *tree);
 
 /**
- * Process source code and extract file intelligence as a JSON C string.
+ * Process source code and extract metadata + chunks as a JSON C string.
+ *
+ * `config_json` is a null-terminated JSON string with fields:
+ * - `language` (string, required): the language name
+ * - `chunk_max_size` (number, optional): maximum chunk size in bytes (default: 1500)
  *
  * Returns a newly-allocated C string that the caller must free with
  * `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
@@ -229,29 +233,11 @@ uintptr_t ts_pack_tree_error_count(const struct TsPackTree *tree);
  *
  * `registry` must be a valid pointer returned by `ts_pack_registry_new`.
  * `source` must be a valid pointer to `source_len` bytes.
- * `language` must be a valid null-terminated UTF-8 C string.
+ * `config_json` must be a valid null-terminated UTF-8 C string.
  */
 char *ts_pack_process(const struct TsPackRegistry *registry,
                       const char *source,
                       uintptr_t source_len,
-                      const char *language);
-
-/**
- * Process and chunk source code, returning intelligence + chunks as a JSON C string.
- *
- * Returns a newly-allocated C string that the caller must free with
- * `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
- *
- * # Safety
- *
- * `registry` must be a valid pointer returned by `ts_pack_registry_new`.
- * `source` must be a valid pointer to `source_len` bytes.
- * `language` must be a valid null-terminated UTF-8 C string.
- */
-char *ts_pack_process_and_chunk(const struct TsPackRegistry *registry,
-                                const char *source,
-                                uintptr_t source_len,
-                                const char *language,
-                                uintptr_t max_chunk_size);
+                      const char *config_json);
 
 #endif  /* TS_PACK_H */

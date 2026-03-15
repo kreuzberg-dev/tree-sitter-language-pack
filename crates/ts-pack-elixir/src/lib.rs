@@ -82,7 +82,7 @@ fn tree_has_error_nodes(tree: ResourceArc<TreeResource>) -> NifResult<bool> {
 }
 
 // ---------------------------------------------------------------------------
-// Intel: process / process_and_chunk
+// Process: unified API
 // ---------------------------------------------------------------------------
 
 /// Convert a serde_json::Value to an Elixir term (map, list, string, integer, float, boolean, nil).
@@ -112,24 +112,20 @@ fn json_to_term<'a>(env: Env<'a>, value: &serde_json::Value) -> Term<'a> {
     }
 }
 
+/// Process source code and extract metadata + chunks as an Elixir map.
+///
+/// `config_json` is a JSON string with fields:
+/// - `language` (string, required): the language name
+/// - `chunk_max_size` (number, optional): maximum chunk size in bytes (default: 1500)
 #[rustler::nif]
-fn process<'a>(env: Env<'a>, source: String, language: String) -> NifResult<Term<'a>> {
-    let intel = ts_pack_core::process(&source, &language)
+fn process<'a>(env: Env<'a>, source: String, config_json: String) -> NifResult<Term<'a>> {
+    let core_config: ts_pack_core::ProcessConfig = serde_json::from_str(&config_json)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("invalid config JSON: {e}")))))?;
+    let result = ts_pack_core::process(&source, &core_config)
         .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
-    let value = serde_json::to_value(&intel)
+    let value = serde_json::to_value(&result)
         .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("serialization failed: {e}")))))?;
     Ok(json_to_term(env, &value))
-}
-
-#[rustler::nif]
-fn process_and_chunk<'a>(env: Env<'a>, source: String, language: String, max_chunk_size: u64) -> NifResult<Term<'a>> {
-    let (intel, chunks) = ts_pack_core::process_and_chunk(&source, &language, max_chunk_size as usize)
-        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
-    let result = serde_json::json!({
-        "intelligence": intel,
-        "chunks": chunks,
-    });
-    Ok(json_to_term(env, &result))
 }
 
 rustler::init!("Elixir.TreeSitterLanguagePack");

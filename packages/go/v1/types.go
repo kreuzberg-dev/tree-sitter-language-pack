@@ -159,3 +159,32 @@ type ProcessResult struct {
 	Metadata FileMetadata `json:"metadata"`
 	Chunks   []CodeChunk  `json:"chunks"`
 }
+
+// ProcessConfig specifies what to extract from source code.
+type ProcessConfig struct {
+	Language    string `json:"language"`
+	Structure   bool   `json:"structure"`
+	Imports     bool   `json:"imports"`
+	Exports     bool   `json:"exports"`
+	Comments    bool   `json:"comments"`
+	Docstrings  bool   `json:"docstrings"`
+	Symbols     bool   `json:"symbols"`
+	Diagnostics bool   `json:"diagnostics"`
+	// ChunkMaxSize controls chunking. When nil, no chunking is performed.
+	ChunkMaxSize *int  `json:"chunk_max_size,omitempty"`
+}
+
+// NewProcessConfig creates a ProcessConfig with all extraction options enabled
+// and no chunking. Pass the language name (e.g. "python", "rust").
+func NewProcessConfig(language string) ProcessConfig {
+	return ProcessConfig{
+		Language:    language,
+		Structure:   true,
+		Imports:     true,
+		Exports:     true,
+		Comments:    true,
+		Docstrings:  true,
+		Symbols:     true,
+		Diagnostics: true,
+	}
+}

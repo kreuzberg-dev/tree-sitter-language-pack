@@ -258,7 +258,126 @@ fn query_match_to_dict(py: Python<'_>, qm: &ts_pack_core::QueryMatch) -> PyResul
 }
 
 // ---------------------------------------------------------------------------
-// Intel: process / process_and_chunk
+// ProcessConfig pyclass
+// ---------------------------------------------------------------------------
+
+/// Configuration for the `process` function.
+///
+/// Controls which analysis features are enabled and chunking behavior.
+#[pyclass(from_py_object)]
+#[derive(Clone)]
+struct ProcessConfig {
+    #[pyo3(get, set)]
+    language: String,
+    #[pyo3(get, set)]
+    structure: bool,
+    #[pyo3(get, set)]
+    imports: bool,
+    #[pyo3(get, set)]
+    exports: bool,
+    #[pyo3(get, set)]
+    comments: bool,
+    #[pyo3(get, set)]
+    docstrings: bool,
+    #[pyo3(get, set)]
+    symbols: bool,
+    #[pyo3(get, set)]
+    diagnostics: bool,
+    #[pyo3(get, set)]
+    chunk_max_size: Option<usize>,
+}
+
+#[pymethods]
+impl ProcessConfig {
+    #[new]
+    #[pyo3(signature = (
+        language,
+        *,
+        structure = true,
+        imports = true,
+        exports = true,
+        comments = true,
+        docstrings = true,
+        symbols = true,
+        diagnostics = true,
+        chunk_max_size = None,
+    ))]
+    #[allow(clippy::too_many_arguments)]
+    fn new(
+        language: String,
+        structure: bool,
+        imports: bool,
+        exports: bool,
+        comments: bool,
+        docstrings: bool,
+        symbols: bool,
+        diagnostics: bool,
+        chunk_max_size: Option<usize>,
+    ) -> Self {
+        Self {
+            language,
+            structure,
+            imports,
+            exports,
+            comments,
+            docstrings,
+            symbols,
+            diagnostics,
+            chunk_max_size,
+        }
+    }
+
+    /// Create a config with all features enabled and no chunking.
+    #[staticmethod]
+    fn all(language: String) -> Self {
+        Self {
+            language,
+            structure: true,
+            imports: true,
+            exports: true,
+            comments: true,
+            docstrings: true,
+            symbols: true,
+            diagnostics: true,
+            chunk_max_size: None,
+        }
+    }
+
+    /// Create a config with only language and metrics (minimal extraction).
+    #[staticmethod]
+    fn minimal(language: String) -> Self {
+        Self {
+            language,
+            structure: false,
+            imports: false,
+            exports: false,
+            comments: false,
+            docstrings: false,
+            symbols: false,
+            diagnostics: false,
+            chunk_max_size: None,
+        }
+    }
+}
+
+impl From<&ProcessConfig> for ts_pack_core::ProcessConfig {
+    fn from(py_config: &ProcessConfig) -> Self {
+        Self {
+            language: py_config.language.clone(),
+            structure: py_config.structure,
+            imports: py_config.imports,
+            exports: py_config.exports,
+            comments: py_config.comments,
+            docstrings: py_config.docstrings,
+            symbols: py_config.symbols,
+            diagnostics: py_config.diagnostics,
+            chunk_max_size: py_config.chunk_max_size,
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Process function
 // ---------------------------------------------------------------------------
 
 /// Convert a serde_json::Value to a Python object (dict, list, str, int, float, bool, None).
@@ -290,24 +409,13 @@ fn json_value_to_py(py: Python<'_>, value: &serde_json::Value) -> PyResult<Py<Py
     }
 }
 
-/// Process source code and extract file intelligence as a Python dict.
+/// Process source code using a ProcessConfig and return the result as a Python dict.
 #[pyfunction]
-fn process(py: Python<'_>, source: &str, language: &str) -> PyResult<Py<PyAny>> {
-    let intel = ts_pack_core::process(source, language).map_err(|e| ParseError::new_err(format!("{e}")))?;
-    let value = serde_json::to_value(&intel).map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))?;
+fn process(py: Python<'_>, source: &str, config: &ProcessConfig) -> PyResult<Py<PyAny>> {
+    let core_config: ts_pack_core::ProcessConfig = config.into();
+    let result = ts_pack_core::process(source, &core_config).map_err(|e| ParseError::new_err(format!("{e}")))?;
+    let value = serde_json::to_value(&result).map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))?;
     json_value_to_py(py, &value)
-}
-
-/// Process and chunk source code, returning a dict with intelligence and chunks.
-#[pyfunction]
-fn process_and_chunk(py: Python<'_>, source: &str, language: &str, max_chunk_size: usize) -> PyResult<Py<PyAny>> {
-    let (intel, chunks) = ts_pack_core::process_and_chunk(source, language, max_chunk_size)
-        .map_err(|e| ParseError::new_err(format!("{e}")))?;
-    let result = serde_json::json!({
-        "intelligence": intel,
-        "chunks": chunks,
-    });
-    json_value_to_py(py, &result)
 }
 
 // ---------------------------------------------------------------------------
@@ -320,6 +428,7 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("ParseError", py.get_type::<ParseError>())?;
     m.add("QueryError", py.get_type::<QueryError>())?;
     m.add_class::<TreeHandle>()?;
+    m.add_class::<ProcessConfig>()?;
     m.add_function(wrap_pyfunction!(get_binding, m)?)?;
     m.add_function(wrap_pyfunction!(get_language, m)?)?;
     m.add_function(wrap_pyfunction!(get_parser, m)?)?;
@@ -328,6 +437,5 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(language_count, m)?)?;
     m.add_function(wrap_pyfunction!(parse_string, m)?)?;
     m.add_function(wrap_pyfunction!(process, m)?)?;
-    m.add_function(wrap_pyfunction!(process_and_chunk, m)?)?;
     Ok(())
 }

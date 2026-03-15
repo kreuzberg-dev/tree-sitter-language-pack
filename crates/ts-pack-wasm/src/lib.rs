@@ -126,28 +126,30 @@ pub fn free_tree(_tree: WasmTree) {
 }
 
 // ---------------------------------------------------------------------------
-// Intel: process / processAndChunk
+// Process: unified API
 // ---------------------------------------------------------------------------
 
-/// Process source code and extract file intelligence as a JavaScript object.
+/// Process source code and extract metadata + chunks as a JavaScript object.
+///
+/// `config` is a JS object with fields:
+/// - `language` (string, required): the language name
+/// - `chunk_max_size` (number, optional): maximum chunk size in bytes (default: 1500)
 #[wasm_bindgen(js_name = "process")]
-pub fn process(source: &str, language: &str) -> Result<JsValue, JsValue> {
-    let intel = ts_pack_core::process(source, language)
-        .map_err(|e| JsValue::from_str(&format!("{e}")))?;
-    let json_str = serde_json::to_string(&intel)
-        .map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
-    js_sys::JSON::parse(&json_str)
-}
+pub fn process(source: &str, config: JsValue) -> Result<JsValue, JsValue> {
+    let config_json: serde_json::Value = js_sys::JSON::stringify(&config)
+        .map_err(|e| JsValue::from_str(&format!("failed to stringify config: {e:?}")))?
+        .as_string()
+        .ok_or_else(|| JsValue::from_str("config stringify returned non-string"))
+        .and_then(|s| {
+            serde_json::from_str(&s)
+                .map_err(|e| JsValue::from_str(&format!("failed to parse config JSON: {e}")))
+        })?;
 
-/// Process and chunk source code, returning a JavaScript object with intelligence and chunks.
-#[wasm_bindgen(js_name = "processAndChunk")]
-pub fn process_and_chunk(source: &str, language: &str, max_chunk_size: usize) -> Result<JsValue, JsValue> {
-    let (intel, chunks) = ts_pack_core::process_and_chunk(source, language, max_chunk_size)
+    let core_config: ts_pack_core::ProcessConfig = serde_json::from_value(config_json)
+        .map_err(|e| JsValue::from_str(&format!("invalid config: {e}")))?;
+
+    let result = ts_pack_core::process(source, &core_config)
         .map_err(|e| JsValue::from_str(&format!("{e}")))?;
-    let result = serde_json::json!({
-        "intelligence": intel,
-        "chunks": chunks,
-    });
     let json_str = serde_json::to_string(&result)
         .map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
     js_sys::JSON::parse(&json_str)

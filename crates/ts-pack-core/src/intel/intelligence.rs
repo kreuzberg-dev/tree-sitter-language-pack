@@ -1,11 +1,9 @@
-use tree_sitter::Tree;
-
 use super::types::*;
 
 /// Extract all intelligence from a parsed source file.
-pub fn extract_intelligence(source: &str, language: &str, tree: &Tree) -> FileIntelligence {
+pub fn extract_intelligence(source: &str, language: &str, tree: &tree_sitter::Tree) -> ProcessResult {
     let root = tree.root_node();
-    FileIntelligence {
+    ProcessResult {
         language: language.to_string(),
         metrics: compute_metrics(source, &root),
         structure: extract_structure(&root, source),
@@ -15,6 +13,7 @@ pub fn extract_intelligence(source: &str, language: &str, tree: &Tree) -> FileIn
         docstrings: extract_docstrings(&root, source, language),
         symbols: extract_symbols(&root, source, language),
         diagnostics: extract_diagnostics(&root, source),
+        chunks: Vec::new(),
     }
 }
 
@@ -35,7 +34,7 @@ fn node_text<'a>(node: &tree_sitter::Node, source: &'a str) -> &'a str {
     &source[node.start_byte()..node.end_byte()]
 }
 
-fn compute_metrics(source: &str, root: &tree_sitter::Node) -> FileMetrics {
+pub(crate) fn compute_metrics(source: &str, root: &tree_sitter::Node) -> FileMetrics {
     let total_lines = source.lines().count().max(1);
     let mut blank_lines = 0;
     let mut comment_lines = 0;
@@ -83,7 +82,7 @@ fn count_nodes(node: &tree_sitter::Node, depth: usize, count: &mut usize, errors
     }
 }
 
-fn extract_comments(root: &tree_sitter::Node, source: &str, _language: &str) -> Vec<CommentInfo> {
+pub(crate) fn extract_comments(root: &tree_sitter::Node, source: &str, _language: &str) -> Vec<CommentInfo> {
     let mut comments = Vec::new();
     collect_comments(root, source, &mut comments);
     comments
@@ -113,7 +112,7 @@ fn collect_comments(node: &tree_sitter::Node, source: &str, comments: &mut Vec<C
     }
 }
 
-fn extract_docstrings(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<DocstringInfo> {
+pub(crate) fn extract_docstrings(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<DocstringInfo> {
     let mut docstrings = Vec::new();
     collect_docstrings(root, source, language, &mut docstrings);
     docstrings
@@ -153,7 +152,7 @@ fn collect_docstrings(node: &tree_sitter::Node, source: &str, language: &str, do
     }
 }
 
-fn extract_imports(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<ImportInfo> {
+pub(crate) fn extract_imports(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<ImportInfo> {
     let mut imports = Vec::new();
     collect_imports(root, source, language, &mut imports);
     imports
@@ -185,7 +184,7 @@ fn collect_imports(node: &tree_sitter::Node, source: &str, language: &str, impor
     }
 }
 
-fn extract_exports(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<ExportInfo> {
+pub(crate) fn extract_exports(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<ExportInfo> {
     let mut exports = Vec::new();
     collect_exports(root, source, language, &mut exports);
     exports
@@ -218,7 +217,7 @@ fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, expor
     }
 }
 
-fn extract_structure(root: &tree_sitter::Node, source: &str) -> Vec<StructureItem> {
+pub(crate) fn extract_structure(root: &tree_sitter::Node, source: &str) -> Vec<StructureItem> {
     let mut items = Vec::new();
     collect_structure(root, source, &mut items);
     items
@@ -269,7 +268,7 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, items: &mut Vec<Str
     }
 }
 
-fn extract_symbols(root: &tree_sitter::Node, source: &str, _language: &str) -> Vec<SymbolInfo> {
+pub(crate) fn extract_symbols(root: &tree_sitter::Node, source: &str, _language: &str) -> Vec<SymbolInfo> {
     let mut symbols = Vec::new();
     collect_symbols(root, source, &mut symbols);
     symbols
@@ -306,7 +305,7 @@ fn collect_symbols(node: &tree_sitter::Node, source: &str, symbols: &mut Vec<Sym
     }
 }
 
-fn extract_diagnostics(root: &tree_sitter::Node, source: &str) -> Vec<Diagnostic> {
+pub(crate) fn extract_diagnostics(root: &tree_sitter::Node, source: &str) -> Vec<Diagnostic> {
     let mut diags = Vec::new();
     collect_diagnostics(root, source, &mut diags);
     diags
