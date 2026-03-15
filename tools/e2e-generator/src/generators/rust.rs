@@ -54,17 +54,17 @@ doctest = false
 [workspace]
 
 [workspace.dependencies]
-ts-pack-core = { path = "../../crates/ts-pack-core", features = ["serde", "all"] }
+tree-sitter-language-pack = { path = "../../crates/ts-pack-core", features = ["serde", "all"] }
 tree-sitter = "0.26"
 serde_json = "1"
 
 [dependencies]
-ts-pack-core = { workspace = true }
+tree-sitter-language-pack = { workspace = true }
 tree-sitter = { workspace = true }
 serde_json = { workspace = true }
 
 [dev-dependencies]
-ts-pack-core = { workspace = true }
+tree-sitter-language-pack = { workspace = true }
 tree-sitter = { workspace = true }
 serde_json = { workspace = true }
 "#;

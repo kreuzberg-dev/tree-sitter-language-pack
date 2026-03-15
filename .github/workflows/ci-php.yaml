@@ -221,11 +221,20 @@ jobs:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
+      - name: Configure PHP extension
+        run: |
+          EXT_PATH="${{ github.workspace }}/target/release/libts_pack_php.so"
+          if [ ! -f "$EXT_PATH" ]; then
+            EXT_PATH="${{ github.workspace }}/target/release/libts_pack_php.dylib"
+          fi
+          echo "extension=$EXT_PATH" > /tmp/ts-pack-php.ini
+          echo "PHP_INI_SCAN_DIR=/tmp" >> "$GITHUB_ENV"
+
       - name: Run E2E tests
         working-directory: e2e/php
         run: |
           composer install --no-progress --prefer-dist
-          composer exec -- phpunit
+          php -d "extension=${{ github.workspace }}/target/release/libts_pack_php.so" vendor/bin/phpunit
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
