@@ -1,5 +1,7 @@
-/// Types for content intelligence extracted from source code via tree-sitter.
 /// Byte and line/column range in source code.
+///
+/// Represents both byte offsets (for slicing) and human-readable line/column
+/// positions (for display and diagnostics).
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Span {
@@ -11,7 +13,24 @@ pub struct Span {
     pub end_column: usize,
 }
 
-/// Complete intelligence extracted from a source file.
+/// Complete analysis result from processing a source file.
+///
+/// Contains metrics, structural analysis, imports/exports, comments,
+/// docstrings, symbols, diagnostics, and optionally chunked code segments.
+/// Fields are populated based on the [`crate::ProcessConfig`] flags.
+///
+/// # Fields
+///
+/// - `language` - The language used for parsing
+/// - `metrics` - Always computed: line counts, byte sizes, error counts
+/// - `structure` - Functions, classes, structs (when `config.structure = true`)
+/// - `imports` - Import statements (when `config.imports = true`)
+/// - `exports` - Export statements (when `config.exports = true`)
+/// - `comments` - Comments (when `config.comments = true`)
+/// - `docstrings` - Docstrings (when `config.docstrings = true`)
+/// - `symbols` - Symbol definitions (when `config.symbols = true`)
+/// - `diagnostics` - Parse errors (when `config.diagnostics = true`)
+/// - `chunks` - Chunked code segments (when `config.chunk_max_size` is set)
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcessResult {
@@ -49,7 +68,11 @@ pub struct FileMetrics {
     pub max_depth: usize,
 }
 
-/// The kind of a structural item in source code.
+/// The kind of structural item found in source code.
+///
+/// Categorizes top-level and nested declarations such as functions, classes,
+/// structs, enums, traits, and more. Use [`Other`](StructureKind::Other) for
+/// language-specific constructs that do not fit a standard category.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum StructureKind {
@@ -88,7 +111,10 @@ pub struct StructureItem {
     pub body_span: Option<Span>,
 }
 
-/// The kind of a comment.
+/// The kind of a comment found in source code.
+///
+/// Distinguishes between single-line comments, block (multi-line) comments,
+/// and documentation comments.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum CommentKind {
@@ -108,7 +134,10 @@ pub struct CommentInfo {
     pub associated_node: Option<String>,
 }
 
-/// The format of a docstring.
+/// The format of a docstring extracted from source code.
+///
+/// Identifies the docstring convention used, which varies by language
+/// (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum DocstringFormat {
@@ -155,7 +184,9 @@ pub struct ImportInfo {
     pub span: Span,
 }
 
-/// The kind of an export.
+/// The kind of an export statement found in source code.
+///
+/// Covers named exports, default exports, and re-exports from other modules.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ExportKind {
@@ -173,7 +204,10 @@ pub struct ExportInfo {
     pub span: Span,
 }
 
-/// The kind of a symbol.
+/// The kind of a symbol definition found in source code.
+///
+/// Categorizes symbol definitions such as variables, constants, functions,
+/// classes, types, interfaces, enums, and modules.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SymbolKind {
@@ -201,7 +235,10 @@ pub struct SymbolInfo {
     pub doc: Option<String>,
 }
 
-/// Severity of a diagnostic.
+/// Severity level of a diagnostic produced during parsing.
+///
+/// Used to classify parse errors, warnings, and informational messages
+/// found in the syntax tree.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum DiagnosticSeverity {

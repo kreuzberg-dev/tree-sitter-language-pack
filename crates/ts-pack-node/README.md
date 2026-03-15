@@ -58,9 +58,32 @@ const { availableLanguages, hasLanguage, getLanguagePtr } = require("@kreuzberg/
 
 console.log(availableLanguages());
 console.log(hasLanguage("python")); // true
+
+const { process } = require('@kreuzberg/tree-sitter-language-pack');
+
+const result = process('function hello() {}', { language: 'javascript' });
+console.log('Functions:', result.structure.length);
+
+// With chunking
+const result2 = process(source, { language: 'javascript', chunkMaxSize: 1000 });
+console.log('Chunks:', result2.chunks.length);
 ```
 
 ## API Reference
+
+### Language Discovery
+
+- `available_languages()` -- list all supported language names
+- `has_language(name)` -- check if a language is available
+- `language_count()` -- total number of supported languages
+
+### Parsing
+
+- `get_parser(name)` / `parse_string(source, language)` -- parse source code into a syntax tree
+
+### Intelligence
+
+- `process(source, config)` -- extract structured analysis (functions, classes, imports, comments, chunks) from source code
 
 For detailed API documentation, see the [Node.js package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-node).
 

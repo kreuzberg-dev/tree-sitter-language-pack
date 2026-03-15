@@ -1,3 +1,35 @@
+//! # tree-sitter-language-pack
+//!
+//! Pre-compiled tree-sitter grammars for 170+ programming languages with
+//! a unified API for parsing, analysis, and intelligent code chunking.
+//!
+//! ## Quick Start
+//!
+//! ```no_run
+//! use ts_pack_core::{ProcessConfig, available_languages, has_language, process};
+//!
+//! // Check available languages
+//! let langs = available_languages();
+//! assert!(has_language("python"));
+//!
+//! // Process source code
+//! let config = ProcessConfig::new("python").all();
+//! let result = process("def hello(): pass", &config).unwrap();
+//! println!("Language: {}", result.language);
+//! println!("Functions: {}", result.structure.len());
+//! ```
+//!
+//! ## Modules
+//!
+//! - [`registry`] - Thread-safe language registry for parser lookup
+//! - [`intel`] - Source code intelligence extraction (structure, imports, exports, etc.)
+//! - [`parse`] - Low-level tree-sitter parsing utilities
+//! - [`node`] - Tree node traversal and information extraction
+//! - [`query`] - Tree-sitter query execution
+//! - [`text_splitter`] - Syntax-aware code chunking
+//! - [`process_config`] - Configuration for the `process` pipeline
+//! - [`error`] - Error types
+
 pub mod error;
 pub mod intel;
 pub mod node;
@@ -33,12 +65,49 @@ pub use download::DownloadManager;
 
 static REGISTRY: std::sync::LazyLock<LanguageRegistry> = std::sync::LazyLock::new(LanguageRegistry::new);
 
-/// Get a tree-sitter Language by name using the global registry.
+/// Get a tree-sitter [`Language`] by name using the global registry.
+///
+/// Resolves language aliases (e.g., `"shell"` maps to `"bash"`).
+///
+/// # Errors
+///
+/// Returns [`Error::LanguageNotFound`] if the language name is not recognized.
+///
+/// # Example
+///
+/// ```no_run
+/// use ts_pack_core::get_language;
+///
+/// let lang = get_language("python").unwrap();
+/// // Use the Language with a tree-sitter Parser
+/// let mut parser = tree_sitter::Parser::new();
+/// parser.set_language(&lang).unwrap();
+/// let tree = parser.parse("x = 1", None).unwrap();
+/// assert_eq!(tree.root_node().kind(), "module");
+/// ```
 pub fn get_language(name: &str) -> Result<Language, Error> {
     REGISTRY.get_language(name)
 }
 
-/// Get a tree-sitter Parser pre-configured for the given language.
+/// Get a tree-sitter [`Parser`] pre-configured for the given language.
+///
+/// This is a convenience function that calls [`get_language`] and configures
+/// a new parser in one step.
+///
+/// # Errors
+///
+/// Returns [`Error::LanguageNotFound`] if the language is not recognized, or
+/// [`Error::ParserSetup`] if the language cannot be applied to the parser.
+///
+/// # Example
+///
+/// ```no_run
+/// use ts_pack_core::get_parser;
+///
+/// let mut parser = get_parser("rust").unwrap();
+/// let tree = parser.parse("fn main() {}", None).unwrap();
+/// assert!(!tree.root_node().has_error());
+/// ```
 pub fn get_parser(name: &str) -> Result<tree_sitter::Parser, Error> {
     let language = get_language(name)?;
     let mut parser = tree_sitter::Parser::new();
@@ -48,22 +117,81 @@ pub fn get_parser(name: &str) -> Result<tree_sitter::Parser, Error> {
     Ok(parser)
 }
 
-/// List all available language names.
+/// List all available language names (sorted, deduplicated, includes aliases).
+///
+/// Returns names of both statically compiled and dynamically loadable languages,
+/// plus any configured aliases.
+///
+/// # Example
+///
+/// ```no_run
+/// use ts_pack_core::available_languages;
+///
+/// let langs = available_languages();
+/// for name in &langs {
+///     println!("{}", name);
+/// }
+/// ```
 pub fn available_languages() -> Vec<String> {
     REGISTRY.available_languages()
 }
 
-/// Check if a language is available.
+/// Check if a language is available by name or alias.
+///
+/// Returns `true` if the language can be loaded (statically compiled,
+/// dynamically available, or a known alias for one of these).
+///
+/// # Example
+///
+/// ```no_run
+/// use ts_pack_core::has_language;
+///
+/// assert!(has_language("python"));
+/// assert!(has_language("shell")); // alias for "bash"
+/// assert!(!has_language("nonexistent_language"));
+/// ```
 pub fn has_language(name: &str) -> bool {
     REGISTRY.has_language(name)
 }
 
-/// Return the number of available languages without allocating.
+/// Return the number of available languages.
+///
+/// Includes statically compiled languages, dynamically loadable languages,
+/// and aliases.
+///
+/// # Example
+///
+/// ```no_run
+/// use ts_pack_core::language_count;
+///
+/// let count = language_count();
+/// println!("{} languages available", count);
+/// ```
 pub fn language_count() -> usize {
     REGISTRY.language_count()
 }
 
 /// Process source code and extract file intelligence using the global registry.
+///
+/// Parses the source with tree-sitter and extracts metrics, structure, imports,
+/// exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+/// the flags set in [`ProcessConfig`].
+///
+/// # Errors
+///
+/// Returns an error if the language is not found or parsing fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use ts_pack_core::{ProcessConfig, process};
+///
+/// let config = ProcessConfig::new("python").all();
+/// let result = process("def hello(): pass", &config).unwrap();
+/// println!("Language: {}", result.language);
+/// println!("Lines: {}", result.metrics.total_lines);
+/// println!("Structures: {}", result.structure.len());
+/// ```
 pub fn process(source: &str, config: &ProcessConfig) -> Result<ProcessResult, Error> {
     REGISTRY.process(source, config)
 }

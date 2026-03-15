@@ -63,9 +63,33 @@ print(tree.root_node.sexp())
 # List all available languages
 for lang in available_languages():
     print(lang)
+
+from tree_sitter_language_pack import process, ProcessConfig
+
+# Extract file intelligence
+result = process("def hello(): pass", ProcessConfig(language="python"))
+print(f"Functions: {len(result['structure'])}")
+
+# With chunking
+result = process(source, ProcessConfig(language="python", chunk_max_size=1000, comments=True))
+print(f"Chunks: {len(result['chunks'])}")
 ```
 
 ## API Reference
+
+### Language Discovery
+
+- `available_languages()` -- list all supported language names
+- `has_language(name)` -- check if a language is available
+- `language_count()` -- total number of supported languages
+
+### Parsing
+
+- `get_parser(name)` / `parse_string(source, language)` -- parse source code into a syntax tree
+
+### Intelligence
+
+- `process(source, config)` -- extract structured analysis (functions, classes, imports, comments, chunks) from source code
 
 For detailed API documentation, see the [Python package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-python).
 

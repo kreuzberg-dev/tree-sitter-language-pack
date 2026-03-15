@@ -55,9 +55,26 @@ TreeSitterLanguagePack.has_language("python")
 
 # Get language pointer for tree-sitter interop
 ptr = TreeSitterLanguagePack.get_language_ptr("python")
+
+result = TreeSitterLanguagePack.process(source, ~s({"language":"elixir"}))
+IO.inspect(result)
 ```
 
 ## API Reference
+
+### Language Discovery
+
+- `available_languages()` -- list all supported language names
+- `has_language(name)` -- check if a language is available
+- `language_count()` -- total number of supported languages
+
+### Parsing
+
+- `get_parser(name)` / `parse_string(source, language)` -- parse source code into a syntax tree
+
+### Intelligence
+
+- `process(source, config)` -- extract structured analysis (functions, classes, imports, comments, chunks) from source code
 
 For detailed API documentation, see the [Elixir package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-elixir).
 

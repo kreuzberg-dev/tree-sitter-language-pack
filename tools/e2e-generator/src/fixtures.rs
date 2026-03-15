@@ -38,7 +38,7 @@ pub struct Assertions {
     pub language_available: Option<bool>,
     #[serde(default)]
     pub languages_not_empty: Option<bool>,
-    // Intel assertions (process / process_and_chunk)
+    // Intel assertions (process / process with chunking)
     #[serde(default)]
     pub intel_language: Option<String>,
     #[serde(default)]
@@ -232,7 +232,7 @@ pub fn has_intel_assertions(fixture: &Fixture) -> bool {
     })
 }
 
-/// Check if a fixture has chunk-related assertions (requires process_and_chunk).
+/// Check if a fixture has chunk-related assertions (requires process with chunking).
 pub fn has_chunk_assertions(fixture: &Fixture) -> bool {
     fixture
         .assertions

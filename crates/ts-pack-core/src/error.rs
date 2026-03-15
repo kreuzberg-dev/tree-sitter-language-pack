@@ -1,5 +1,10 @@
 use thiserror::Error;
 
+/// Errors that can occur when using the tree-sitter language pack.
+///
+/// Covers language lookup failures, parse errors, query errors, and I/O issues.
+/// Feature-gated variants are included when `config`, `download`, or related
+/// features are enabled.
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("Language '{0}' not found")]

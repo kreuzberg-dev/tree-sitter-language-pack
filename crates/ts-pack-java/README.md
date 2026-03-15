@@ -62,10 +62,27 @@ try (var registry = new TsPackRegistry()) {
 
     var lang = registry.getLanguage("python");
     System.out.println("Loaded: " + lang);
+
+    String result = registry.process(source, "{\"language\":\"java\"}");
+    System.out.println("Result: " + result);
 }
 ```
 
 ## API Reference
+
+### Language Discovery
+
+- `available_languages()` -- list all supported language names
+- `has_language(name)` -- check if a language is available
+- `language_count()` -- total number of supported languages
+
+### Parsing
+
+- `get_parser(name)` / `parse_string(source, language)` -- parse source code into a syntax tree
+
+### Intelligence
+
+- `process(source, config)` -- extract structured analysis (functions, classes, imports, comments, chunks) from source code
 
 For detailed API documentation, see the [Java package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-java).
 

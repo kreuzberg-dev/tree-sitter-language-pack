@@ -60,9 +60,27 @@ await init();
 
 console.log(availableLanguages());
 console.log(hasLanguage("python")); // true
+
+import { process } from '@kreuzberg/tree-sitter-language-pack-wasm';
+const result = process(source, { language: 'javascript' });
+console.log('Structure:', result.structure);
 ```
 
 ## API Reference
+
+### Language Discovery
+
+- `available_languages()` -- list all supported language names
+- `has_language(name)` -- check if a language is available
+- `language_count()` -- total number of supported languages
+
+### Parsing
+
+- `get_parser(name)` / `parse_string(source, language)` -- parse source code into a syntax tree
+
+### Intelligence
+
+- `process(source, config)` -- extract structured analysis (functions, classes, imports, comments, chunks) from source code
 
 For detailed API documentation, see the [WebAssembly package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-wasm).
 

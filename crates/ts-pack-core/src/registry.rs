@@ -159,6 +159,26 @@ mod dynamic {
     }
 }
 
+/// Thread-safe registry of tree-sitter language parsers.
+///
+/// Manages both statically compiled and dynamically loaded language grammars.
+/// Use [`LanguageRegistry::new()`] for the default registry, or access the
+/// global instance via the module-level convenience functions
+/// ([`crate::get_language`], [`crate::available_languages`], etc.).
+///
+/// # Example
+///
+/// ```no_run
+/// use ts_pack_core::{LanguageRegistry, ProcessConfig};
+///
+/// let registry = LanguageRegistry::new();
+/// let langs = registry.available_languages();
+/// println!("Available: {:?}", langs);
+///
+/// let config = ProcessConfig::new("python").all();
+/// let result = registry.process("def hello(): pass", &config).unwrap();
+/// println!("Structure: {:?}", result.structure);
+/// ```
 pub struct LanguageRegistry {
     static_lookup: HashMap<&'static str, fn() -> Language>,
     #[cfg(feature = "dynamic-loading")]
@@ -169,6 +189,10 @@ pub struct LanguageRegistry {
 }
 
 impl LanguageRegistry {
+    /// Create a new registry populated with all statically compiled languages.
+    ///
+    /// When the `dynamic-loading` feature is enabled, the registry also knows
+    /// about dynamically loadable grammars and will load them on demand.
     pub fn new() -> Self {
         let mut static_lookup = HashMap::with_capacity(STATIC_LANGUAGES.len());
         for &(name, loader) in STATIC_LANGUAGES {
@@ -185,6 +209,9 @@ impl LanguageRegistry {
     }
 
     /// Create a registry with a custom directory for dynamic libraries.
+    ///
+    /// Overrides the default build-time library directory. Useful when
+    /// dynamic grammar shared libraries are stored in a non-standard location.
     #[cfg(feature = "dynamic-loading")]
     pub fn with_libs_dir(libs_dir: PathBuf) -> Self {
         let mut reg = Self::new();
@@ -193,7 +220,10 @@ impl LanguageRegistry {
     }
 
     /// Add an additional directory to search for dynamic libraries.
-    /// This is used by the download system to register its cache directory.
+    ///
+    /// When [`get_language`](Self::get_language) cannot find a grammar in the
+    /// primary library directory, it searches these extra directories in order.
+    /// Typically used by the download system to register its cache directory.
     #[cfg(feature = "dynamic-loading")]
     pub fn add_extra_libs_dir(&mut self, dir: PathBuf) {
         if !self.extra_lib_dirs.contains(&dir) {
@@ -201,6 +231,16 @@ impl LanguageRegistry {
         }
     }
 
+    /// Get a tree-sitter [`Language`] by name.
+    ///
+    /// Resolves aliases (e.g., `"shell"` -> `"bash"`, `"makefile"` -> `"make"`),
+    /// then looks up the language in the static table. When the `dynamic-loading`
+    /// feature is enabled, falls back to loading a shared library on demand.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::LanguageNotFound`] if the name (after alias resolution)
+    /// does not match any known grammar.
     pub fn get_language(&self, name: &str) -> Result<Language, Error> {
         let name = resolve_alias(name);
         // Try static first
@@ -234,6 +274,10 @@ impl LanguageRegistry {
         Err(Error::LanguageNotFound(name.to_string()))
     }
 
+    /// List all available language names, sorted and deduplicated.
+    ///
+    /// Includes statically compiled languages, dynamically loadable languages
+    /// (if the `dynamic-loading` feature is enabled), and all configured aliases.
     pub fn available_languages(&self) -> Vec<String> {
         let mut langs: Vec<String> = self.static_lookup.keys().map(|s| s.to_string()).collect();
 
@@ -257,6 +301,10 @@ impl LanguageRegistry {
         langs
     }
 
+    /// Check whether a language is available by name or alias.
+    ///
+    /// Returns `true` if the language can be loaded, either from the static
+    /// table or from a dynamic library on disk.
     pub fn has_language(&self, name: &str) -> bool {
         let name = resolve_alias(name);
         if self.static_lookup.contains_key(name) {
@@ -287,6 +335,7 @@ impl LanguageRegistry {
         false
     }
 
+    /// Return the total number of available languages (including aliases).
     pub fn language_count(&self) -> usize {
         self.available_languages().len()
     }

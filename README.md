@@ -172,6 +172,24 @@ cargo install ts-pack
 
 See [CLI README](crates/ts-pack-cli/README.md) for full documentation.
 
+## Core API
+
+All bindings expose a unified `process()` function for extracting structured intelligence from source code:
+
+| Language | Function |
+|----------|----------|
+| Rust | `ts_pack_core::process(source, &config)` |
+| Python | `process(source, ProcessConfig(...))` |
+| Node.js | `process(source, { language: '...' })` |
+| Go | `registry.Process(source, config)` |
+| Java | `registry.process(source, configJson)` |
+| Ruby | `TreeSitterLanguagePack.process(source, configJson)` |
+| Elixir | `TreeSitterLanguagePack.process(source, configJson)` |
+| WASM | `process(source, { language: '...' })` |
+| C FFI | `ts_pack_process(registry, source, len, configJson)` |
+
+The `process()` function returns structured analysis including functions, classes, imports, comments, and optionally chunked source segments.
+
 ## Features
 
 | Feature | Description |

@@ -59,10 +59,28 @@ func main() {
 
     langs := reg.AvailableLanguages()
     fmt.Println(langs)
+
+    config := tspack.ProcessConfig{Language: "go"}
+    result, _ := reg.Process(source, config)
+    fmt.Printf("Functions: %d\n", len(result.Structure))
 }
 ```
 
 ## API Reference
+
+### Language Discovery
+
+- `available_languages()` -- list all supported language names
+- `has_language(name)` -- check if a language is available
+- `language_count()` -- total number of supported languages
+
+### Parsing
+
+- `get_parser(name)` / `parse_string(source, language)` -- parse source code into a syntax tree
+
+### Intelligence
+
+- `process(source, config)` -- extract structured analysis (functions, classes, imports, comments, chunks) from source code
 
 For detailed API documentation, see the [Go package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1).
 

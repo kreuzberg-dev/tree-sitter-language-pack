@@ -60,6 +60,17 @@ println!("{}", tree.root_node().to_sexp());
 for lang in available_languages() {
     println!("{}", lang);
 }
+
+// Process source code
+let config = ts_pack_core::ProcessConfig::new("python").all();
+let result = ts_pack_core::process("def hello(): pass", &config).unwrap();
+println!("Functions: {}", result.structure.len());
+println!("Imports: {}", result.imports.len());
+
+// With chunking
+let config = ts_pack_core::ProcessConfig::new("python").all().with_chunking(1000);
+let result = ts_pack_core::process(source, &config).unwrap();
+println!("Chunks: {}", result.chunks.len());
 ```
 
 ## Features
@@ -85,6 +96,20 @@ ts-pack-core = { version = "1.0.0-rc.1", default-features = false, features = ["
 Available groups: `all` (default), `web`, `systems`, `scripting`, `data`, `jvm`, `functional`.
 
 ## API Reference
+
+### Language Discovery
+
+- `available_languages()` -- list all supported language names
+- `has_language(name)` -- check if a language is available
+- `language_count()` -- total number of supported languages
+
+### Parsing
+
+- `get_parser(name)` / `parse_string(source, language)` -- parse source code into a syntax tree
+
+### Intelligence
+
+- `process(source, config)` -- extract structured analysis (functions, classes, imports, comments, chunks) from source code
 
 For detailed API documentation, see the [Rust package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-core).
 
