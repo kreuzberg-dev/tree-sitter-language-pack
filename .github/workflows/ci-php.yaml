@@ -124,8 +124,12 @@ jobs:
         uses: kreuzberg-dev/actions/setup-rust@v1.0.0
         with:
           components: ""
-          use-sccache: "false"
+          use-sccache: "true"
+          cache-key-prefix: php-${{ matrix.os }}
           install-llvm-cov: "false"
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1.0.0
 
       - name: Set up Python
         uses: actions/setup-python@v6.2.0
@@ -179,6 +183,10 @@ jobs:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
+      - name: Cleanup Rust cache
+        if: always()
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1.0.0
+
   e2e-php:
     name: E2E PHP
     needs: clone-vendors
@@ -198,8 +206,12 @@ jobs:
         uses: kreuzberg-dev/actions/setup-rust@v1.0.0
         with:
           components: ""
-          use-sccache: "false"
+          use-sccache: "true"
+          cache-key-prefix: php-e2e-ubuntu-latest
           install-llvm-cov: "false"
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1.0.0
 
       - name: Set up Python
         uses: actions/setup-python@v6.2.0
@@ -239,3 +251,7 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+
+      - name: Cleanup Rust cache
+        if: always()
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1.0.0

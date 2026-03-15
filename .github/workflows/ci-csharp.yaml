@@ -117,11 +117,15 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
         with:
           components: ""
-          use-sccache: "false"
+          use-sccache: "true"
+          cache-key-prefix: csharp-ubuntu-latest
           install-llvm-cov: "false"
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1.0.0
 
       - name: Build FFI library
         run: cargo build -p ts-pack-ffi --release
@@ -139,25 +143,49 @@ jobs:
             crates/ts-pack-ffi/include/
           retention-days: 1
 
+      - name: Cleanup Rust cache
+        if: always()
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1.0.0
+
   test-csharp:
-    name: C# unit tests
-    needs: build-ffi
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    name: C# unit tests (${{ matrix.os }})
+    needs: clone-vendors
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+          - os: macos-latest
+          - os: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
 
-      - name: Download FFI artifacts
+      - name: Download parsers
         uses: actions/download-artifact@v8.0.1
         with:
-          name: ffi-linux
-          path: ffi-artifacts
+          name: language-parsers
+          path: parsers
 
-      - name: Restore FFI to expected path
-        run: |
-          mkdir -p target/release
-          cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          components: ""
+          use-sccache: "true"
+          cache-key-prefix: csharp-${{ matrix.os }}
+          install-llvm-cov: "false"
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1.0.0
+
+      - name: Build FFI library
+        run: cargo build -p ts-pack-ffi --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+          TSLP_LINK_MODE: static
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -177,6 +205,10 @@ jobs:
       - name: Run C# tests
         working-directory: packages/csharp
         run: dotnet test TreeSitterLanguagePack.sln -c Release --no-build
+
+      - name: Cleanup Rust cache
+        if: always()
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1.0.0
 
   e2e-csharp:
     name: C# E2E tests
@@ -205,11 +237,15 @@ jobs:
           cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
         with:
           components: ""
-          use-sccache: "false"
+          use-sccache: "true"
+          cache-key-prefix: csharp-e2e-ubuntu-latest
           install-llvm-cov: "false"
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1.0.0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -231,3 +267,7 @@ jobs:
       - name: Run E2E tests
         working-directory: e2e/csharp
         run: dotnet test -c Release
+
+      - name: Cleanup Rust cache
+        if: always()
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1.0.0
