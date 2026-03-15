@@ -9,6 +9,14 @@ import org.junit.jupiter.api.Test;
 class ErrorHandlingTest {
 
   @Test
+  void error_empty_language_name() {
+    // Parsing with empty language name should error
+    try (var registry = Helpers.createRegistry()) {
+      assertThrows(Exception.class, () -> registry.getLanguage(""));
+    }
+  }
+
+  @Test
   void error_handling_empty_source() {
     // Parsing an empty string should still produce a tree.
     try (var registry = Helpers.createRegistry()) {

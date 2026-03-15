@@ -10,7 +10,7 @@ class RegistryTest {
 
   @Test
   void registry_has_language_false() {
-    // has_language('nonexistent') should return false.
+    // has_language('nonexistent') should return false
     try (var registry = Helpers.createRegistry()) {
       assertEquals(false, registry.hasLanguage("nonexistent"));
     }
@@ -18,7 +18,7 @@ class RegistryTest {
 
   @Test
   void registry_has_language_true() {
-    // has_language('python') should return true.
+    // has_language('python') should return true
     try (var registry = Helpers.createRegistry()) {
       assertEquals(true, registry.hasLanguage("python"));
     }
@@ -26,7 +26,7 @@ class RegistryTest {
 
   @Test
   void registry_list_languages() {
-    // available_languages should return a non-empty list.
+    // available_languages should return a non-empty list
     try (var registry = Helpers.createRegistry()) {
       assertFalse(
           registry.availableLanguages().isEmpty(), "availableLanguages() should not be empty");

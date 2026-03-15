@@ -1,0 +1,15 @@
+{
+	"id": "config_minimal_python",
+	"category": "intel",
+	"description": "Intel: process with minimal config - only metrics",
+	"language": "python",
+	"source_code": "def hello():\n    pass\n",
+	"assertions": {
+		"intel_language": "python",
+		"intel_metrics_total_lines_min": 2
+	},
+	"skip": {
+		"requires_language": "python"
+	},
+	"tags": ["intel", "config"]
+}

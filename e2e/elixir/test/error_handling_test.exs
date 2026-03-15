@@ -3,6 +3,13 @@
 defmodule E2eTests.ErrorHandlingTest do
   use ExUnit.Case, async: true
 
+  test "error_empty_language_name" do
+    # Parsing with empty language name should error
+    assert_raise ErlangError, fn ->
+      TreeSitterLanguagePack.get_language_ptr("")
+    end
+  end
+
   @tag :skip_unless_javascript
   test "error_handling_empty_source" do
     # Parsing an empty string should still produce a tree.

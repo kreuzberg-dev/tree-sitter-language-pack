@@ -7,16 +7,16 @@ from tree_sitter_language_pack import (
 
 
 def test_registry_has_language_false():
-    """has_language('nonexistent') should return false."""
+    """has_language('nonexistent') should return false"""
     assert has_language("nonexistent") is False, "has_language('nonexistent') should be false"
 
 
 def test_registry_has_language_true():
-    """has_language('python') should return true."""
+    """has_language('python') should return true"""
     assert has_language("python") is True, "has_language('python') should be true"
 
 
 def test_registry_list_languages():
-    """available_languages should return a non-empty list."""
+    """available_languages should return a non-empty list"""
     langs = available_languages()
     assert len(langs) > 0, "available_languages() should not be empty"

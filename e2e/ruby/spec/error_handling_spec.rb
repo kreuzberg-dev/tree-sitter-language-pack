@@ -4,6 +4,11 @@ require_relative "spec_helper"
 
 RSpec.describe "error-handling" do
 
+  it "error_empty_language_name" do
+    # Parsing with empty language name should error
+    expect { TreeSitterLanguagePack.get_language_ptr("") }.to raise_error(RuntimeError)
+  end
+
   it "error_handling_empty_source" do
     # Parsing an empty string should still produce a tree.
     skip "Language 'javascript' not available" unless TreeSitterLanguagePack.has_language("javascript")

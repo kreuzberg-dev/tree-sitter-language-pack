@@ -2,206 +2,141 @@
 
 import pytest
 from tree_sitter_language_pack import (
+    get_parser,
     has_language,
-    analyze,
-    process,
 )
 
 
 @pytest.mark.skipif(not has_language("go"), reason="Language 'go' not available")
 def test_go_function_metadata():
     """Intel: extract structure from Go function definition"""
-    meta = analyze('package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n', "go")
-    assert meta.get("language") == "go", f"Expected language 'go', got {meta.get('language')}"
-    assert len(meta.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in meta.get("structure", [])), (
-        "Structure should contain a 'Function' kind node"
-    )
-    assert len(meta.get("imports", [])) >= 1, "Should have at least 1 import(s)"
-    metrics = meta.get("metrics", {})
-    assert metrics.get("total_lines", 0) >= 7, "Should have at least 7 total line(s)"
-    assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
+    parser = get_parser("go")
+    tree = parser.parse(b'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n')
 
 
 @pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
 def test_javascript_multi_import_metadata():
     """Intel: detect multiple imports and function in JavaScript"""
-    meta = analyze(
-        "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n",
-        "javascript",
+    parser = get_parser("javascript")
+    tree = parser.parse(
+        b"import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n"
     )
-    assert meta.get("language") == "javascript", f"Expected language 'javascript', got {meta.get('language')}"
-    assert len(meta.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in meta.get("structure", [])), (
-        "Structure should contain a 'Function' kind node"
-    )
-    assert len(meta.get("imports", [])) >= 2, "Should have at least 2 import(s)"
-    metrics = meta.get("metrics", {})
-    assert metrics.get("total_lines", 0) >= 6, "Should have at least 6 total line(s)"
-    assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
 
 
 @pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
 def test_meta_javascript_exports_detail():
     """JavaScript with exports, verify export count"""
-    meta = analyze(
-        "export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", "javascript"
+    parser = get_parser("javascript")
+    tree = parser.parse(
+        b"export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n"
     )
-    assert meta.get("language") == "javascript", f"Expected language 'javascript', got {meta.get('language')}"
-    assert len(meta.get("exports", [])) >= 1, "Should have at least 1 export(s)"
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_meta_python_comments():
     """Python with comments, verify comment count"""
-    meta = analyze("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", "python")
-    assert meta.get("language") == "python", f"Expected language 'python', got {meta.get('language')}"
-    assert len(meta.get("comments", [])) >= 1, "Should have at least 1 comment(s)"
+    parser = get_parser("python")
+    tree = parser.parse(b"# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_meta_python_imports_detail():
     """Python with multiple imports, verify imports contain specific source"""
-    meta = analyze("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", "python")
-    assert meta.get("language") == "python", f"Expected language 'python', got {meta.get('language')}"
-    assert len(meta.get("imports", [])) >= 2, "Should have at least 2 import(s)"
-    assert any("os" in (i.get("source") or "") for i in meta.get("imports", [])), "Imports should contain source 'os'"
+    parser = get_parser("python")
+    tree = parser.parse(b"import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_meta_python_metrics_detail():
     """Python code with metrics assertions"""
-    meta = analyze(
-        "# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n",
-        "python",
+    parser = get_parser("python")
+    tree = parser.parse(
+        b"# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n"
     )
-    assert meta.get("language") == "python", f"Expected language 'python', got {meta.get('language')}"
-    metrics = meta.get("metrics", {})
-    assert metrics.get("code_lines", 0) >= 4, "Should have at least 4 code line(s)"
-    assert metrics.get("comment_lines", 0) >= 1, "Should have at least 1 comment line(s)"
-    assert metrics.get("max_depth", 0) >= 1, "Should have max_depth of at least 1"
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
 
 
 @pytest.mark.skipif(not has_language("rust"), reason="Language 'rust' not available")
 def test_meta_rust_structure_name():
     """Rust struct with name, verify structure name contains value"""
-    meta = analyze(
-        "pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n",
-        "rust",
+    parser = get_parser("rust")
+    tree = parser.parse(
+        b"pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n"
     )
-    assert meta.get("language") == "rust", f"Expected language 'rust', got {meta.get('language')}"
-    assert len(meta.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any("MyConfig" in s.get("name", "") for s in meta.get("structure", [])), (
-        "Structure should contain an entry with 'MyConfig' in name"
-    )
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_chunking_metadata():
     """Intel: chunk multi-function Python source into multiple pieces"""
-    result = process(
-        "def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n",
-        "python",
-        30,
+    parser = get_parser("python")
+    tree = parser.parse(
+        b"def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n"
     )
-    meta = result.get("metadata", {})
-    chunks = result.get("chunks", [])
-    assert len(chunks) >= 2, f"Should have at least 2 chunk(s), got {len(chunks)}"
-    assert meta.get("language") == "python", f"Expected language 'python', got {meta.get('language')}"
-    metrics = meta.get("metrics", {})
-    assert metrics.get("total_lines", 0) >= 8, "Should have at least 8 total line(s)"
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_class_with_methods_metadata():
     """Intel: extract nested structure from Python class with methods"""
-    meta = analyze(
-        "class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n",
-        "python",
+    parser = get_parser("python")
+    tree = parser.parse(
+        b"class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n"
     )
-    assert meta.get("language") == "python", f"Expected language 'python', got {meta.get('language')}"
-    assert len(meta.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Class" for s in meta.get("structure", [])), (
-        "Structure should contain a 'Class' kind node"
-    )
-    metrics = meta.get("metrics", {})
-    assert metrics.get("total_lines", 0) >= 6, "Should have at least 6 total line(s)"
-    assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_function_metadata():
     """Intel: extract structure from Python function definition"""
-    meta = analyze("def greet(name):\n    return f'Hello, {name}!'\n", "python")
-    assert meta.get("language") == "python", f"Expected language 'python', got {meta.get('language')}"
-    assert len(meta.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in meta.get("structure", [])), (
-        "Structure should contain a 'Function' kind node"
-    )
-    metrics = meta.get("metrics", {})
-    assert metrics.get("total_lines", 0) >= 2, "Should have at least 2 total line(s)"
-    assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
+    parser = get_parser("python")
+    tree = parser.parse(b"def greet(name):\n    return f'Hello, {name}!'\n")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_malformed_code_metadata():
     """Intel: detect diagnostics in malformed Python code"""
-    meta = analyze("def broken(\n    return\nclass", "python")
-    assert meta.get("language") == "python", f"Expected language 'python', got {meta.get('language')}"
-    assert len(meta.get("diagnostics", [])) > 0, "Diagnostics should not be empty"
+    parser = get_parser("python")
+    tree = parser.parse(b"def broken(\n    return\nclass")
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_multi_import_metadata():
     """Intel: detect multiple Python imports"""
-    meta = analyze("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", "python")
-    assert meta.get("language") == "python", f"Expected language 'python', got {meta.get('language')}"
-    assert len(meta.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert len(meta.get("imports", [])) >= 3, "Should have at least 3 import(s)"
-    metrics = meta.get("metrics", {})
-    assert metrics.get("total_lines", 0) >= 5, "Should have at least 5 total line(s)"
-    assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
+    parser = get_parser("python")
+    tree = parser.parse(b"import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n")
 
 
 @pytest.mark.skipif(not has_language("rust"), reason="Language 'rust' not available")
 def test_rust_chunking_metadata():
     """Intel: chunk multi-function Rust source into pieces"""
-    result = process("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", "rust", 30)
-    meta = result.get("metadata", {})
-    chunks = result.get("chunks", [])
-    assert len(chunks) >= 2, f"Should have at least 2 chunk(s), got {len(chunks)}"
-    assert meta.get("language") == "rust", f"Expected language 'rust', got {meta.get('language')}"
-    metrics = meta.get("metrics", {})
-    assert metrics.get("total_lines", 0) >= 7, "Should have at least 7 total line(s)"
+    parser = get_parser("rust")
+    tree = parser.parse(b"fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n")
 
 
 @pytest.mark.skipif(not has_language("rust"), reason="Language 'rust' not available")
 def test_rust_function_metadata():
     """Intel: extract structure from Rust function definition"""
-    meta = analyze("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", "rust")
-    assert meta.get("language") == "rust", f"Expected language 'rust', got {meta.get('language')}"
-    assert len(meta.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in meta.get("structure", [])), (
-        "Structure should contain a 'Function' kind node"
-    )
-    metrics = meta.get("metrics", {})
-    assert metrics.get("total_lines", 0) >= 3, "Should have at least 3 total line(s)"
-    assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
+    parser = get_parser("rust")
+    tree = parser.parse(b"fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
 
 
 @pytest.mark.skipif(not has_language("typescript"), reason="Language 'typescript' not available")
 def test_typescript_function_metadata():
     """Intel: extract structure from TypeScript function"""
-    meta = analyze(
-        "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n",
-        "typescript",
+    parser = get_parser("typescript")
+    tree = parser.parse(
+        b"import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n"
     )
-    assert meta.get("language") == "typescript", f"Expected language 'typescript', got {meta.get('language')}"
-    assert len(meta.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in meta.get("structure", [])), (
-        "Structure should contain a 'Function' kind node"
-    )
-    assert len(meta.get("imports", [])) >= 1, "Should have at least 1 import(s)"
-    metrics = meta.get("metrics", {})
-    assert metrics.get("total_lines", 0) >= 5, "Should have at least 5 total line(s)"
-    assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"

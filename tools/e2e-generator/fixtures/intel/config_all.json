@@ -1,0 +1,19 @@
+{
+	"id": "config_all_python",
+	"category": "intel",
+	"description": "Intel: process with all features enabled",
+	"language": "python",
+	"source_code": "# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n",
+	"assertions": {
+		"intel_language": "python",
+		"intel_structure_count_min": 1,
+		"intel_structure_contains_kind": "Function",
+		"intel_imports_count_min": 1,
+		"intel_metrics_total_lines_min": 6,
+		"intel_metrics_error_count": 0
+	},
+	"skip": {
+		"requires_language": "python"
+	},
+	"tags": ["intel", "config"]
+}

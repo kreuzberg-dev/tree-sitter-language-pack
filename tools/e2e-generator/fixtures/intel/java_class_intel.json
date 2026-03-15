@@ -1,0 +1,19 @@
+{
+	"id": "java_class_intel",
+	"category": "intel",
+	"description": "Intel: Java class with methods and imports",
+	"language": "java",
+	"source_code": "import java.util.List;\n\npublic class Greeter {\n    public String greet(String name) {\n        return \"Hello \" + name;\n    }\n}\n",
+	"assertions": {
+		"intel_language": "java",
+		"intel_structure_count_min": 1,
+		"intel_structure_contains_kind": "Class",
+		"intel_imports_count_min": 1,
+		"intel_metrics_total_lines_min": 7,
+		"intel_metrics_error_count": 0
+	},
+	"skip": {
+		"requires_language": "java"
+	},
+	"tags": ["intel"]
+}

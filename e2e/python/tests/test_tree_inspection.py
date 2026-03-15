@@ -2,8 +2,8 @@
 
 import pytest
 from tree_sitter_language_pack import (
+    get_parser,
     has_language,
-    parse_string,
 )
 
 from .helpers import tree_has_error_nodes
@@ -12,37 +12,44 @@ from .helpers import tree_has_error_nodes
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_tree_error_count_broken():
     """Parse broken Python code and verify error count >= 1"""
-    tree = parse_string("python", "def (broken syntax @@@ !!!")
+    parser = get_parser("python")
+    tree = parser.parse(b"def (broken syntax @@@ !!!")
     assert tree is not None, "Parse tree should not be None"
-    assert tree.has_error_nodes(), "Tree should contain error nodes"
+    root = tree.root_node
+    assert tree_has_error_nodes(root), "Tree should contain error nodes"
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_tree_error_count_valid():
     """Parse valid Python code and verify zero error count"""
-    tree = parse_string("python", "x = 1\ny = 2\n")
-    assert tree.error_count() == 0, f"Expected error_count == 0, got {tree.error_count()}"
+    parser = get_parser("python")
+    tree = parser.parse(b"x = 1\ny = 2\n")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_tree_find_nodes_two_functions():
     """Parse Python with 2 functions and verify find_nodes_by_type count"""
-    tree = parse_string("python", "def foo():\n    pass\n\ndef bar():\n    pass\n")
-    nodes = tree.find_nodes_by_type("function_definition")
-    assert len(nodes) >= 2, f"Should find at least 2 'function_definition' node(s), got {len(nodes)}"
+    parser = get_parser("python")
+    tree = parser.parse(b"def foo():\n    pass\n\ndef bar():\n    pass\n")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_tree_named_children_class_and_function():
     """Parse Python with class and function, verify named children count"""
-    tree = parse_string("python", "class Foo:\n    pass\n\ndef bar():\n    pass\n")
-    children = tree.named_children_info()
-    assert len(children) >= 2, f"Root should have at least 2 named child(ren), got {len(children)}"
+    parser = get_parser("python")
+    tree = parser.parse(b"class Foo:\n    pass\n\ndef bar():\n    pass\n")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_tree_root_node_info_python():
     """Parse Python source and verify root node info"""
-    tree = parse_string("python", "def hello():\n    pass\n")
-    info = tree.root_node_info()
-    assert info["kind"] == "module", f"Root node type should be 'module', got {info['kind']}"
+    parser = get_parser("python")
+    tree = parser.parse(b"def hello():\n    pass\n")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node

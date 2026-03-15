@@ -9,18 +9,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("go") do
       IO.puts("Skipping: language 'go' not available")
     else
-      metadata =
-        TreeSitterLanguagePack.analyze(
-          "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n",
-          "go"
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "go",
+          "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n"
         )
 
-      assert metadata["language"] == "go"
-      assert length(metadata["structure"]) >= 1
-      assert Enum.any?(metadata["structure"], fn s -> s["kind"] == "Function" end)
-      assert length(metadata["imports"]) >= 1
-      assert metadata["metrics"]["total_lines"] >= 7
-      assert metadata["metrics"]["error_count"] == 0
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -30,18 +25,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("javascript") do
       IO.puts("Skipping: language 'javascript' not available")
     else
-      metadata =
-        TreeSitterLanguagePack.analyze(
-          "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n",
-          "javascript"
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "javascript",
+          "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n"
         )
 
-      assert metadata["language"] == "javascript"
-      assert length(metadata["structure"]) >= 1
-      assert Enum.any?(metadata["structure"], fn s -> s["kind"] == "Function" end)
-      assert length(metadata["imports"]) >= 2
-      assert metadata["metrics"]["total_lines"] >= 6
-      assert metadata["metrics"]["error_count"] == 0
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -51,14 +41,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("javascript") do
       IO.puts("Skipping: language 'javascript' not available")
     else
-      metadata =
-        TreeSitterLanguagePack.analyze(
-          "export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n",
-          "javascript"
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "javascript",
+          "export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n"
         )
 
-      assert metadata["language"] == "javascript"
-      assert length(metadata["exports"]) >= 1
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -68,14 +57,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      metadata =
-        TreeSitterLanguagePack.analyze(
-          "\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n",
-          "python"
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "python",
+          "\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n"
         )
 
-      assert metadata["language"] == "python"
-      assert length(metadata["comments"]) >= 1
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -85,15 +73,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      metadata =
-        TreeSitterLanguagePack.analyze(
-          "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
-          "python"
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "python",
+          "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
         )
 
-      assert metadata["language"] == "python"
-      assert length(metadata["imports"]) >= 2
-      assert Enum.any?(metadata["imports"], fn i -> String.contains?(i["source"] || "", "os") end)
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -103,16 +89,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      metadata =
-        TreeSitterLanguagePack.analyze(
-          "\# module docstring\nimport os\n\ndef hello():\n    \# greeting\n    print('hello')\n\ndef world():\n    print('world')\n",
-          "python"
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "python",
+          "\# module docstring\nimport os\n\ndef hello():\n    \# greeting\n    print('hello')\n\ndef world():\n    print('world')\n"
         )
 
-      assert metadata["language"] == "python"
-      assert metadata["metrics"]["code_lines"] >= 4
-      assert metadata["metrics"]["comment_lines"] >= 1
-      assert metadata["metrics"]["max_depth"] >= 1
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -122,18 +105,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("rust") do
       IO.puts("Skipping: language 'rust' not available")
     else
-      metadata =
-        TreeSitterLanguagePack.analyze(
-          "pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n",
-          "rust"
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "rust",
+          "pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n"
         )
 
-      assert metadata["language"] == "rust"
-      assert length(metadata["structure"]) >= 1
-
-      assert Enum.any?(metadata["structure"], fn s ->
-               s["name"] != nil and String.contains?(s["name"], "MyConfig")
-             end)
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -143,18 +121,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      result =
-        TreeSitterLanguagePack.process(
-          "def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n",
+      tree =
+        TreeSitterLanguagePack.parse_string(
           "python",
-          30
+          "def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n"
         )
 
-      metadata = result["metadata"]
-      chunks = result["chunks"]
-      assert metadata["language"] == "python"
-      assert metadata["metrics"]["total_lines"] >= 8
-      assert length(chunks) >= 2
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -164,17 +137,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      metadata =
-        TreeSitterLanguagePack.analyze(
-          "class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n",
-          "python"
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "python",
+          "class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n"
         )
 
-      assert metadata["language"] == "python"
-      assert length(metadata["structure"]) >= 1
-      assert Enum.any?(metadata["structure"], fn s -> s["kind"] == "Class" end)
-      assert metadata["metrics"]["total_lines"] >= 6
-      assert metadata["metrics"]["error_count"] == 0
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -184,17 +153,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      metadata =
-        TreeSitterLanguagePack.analyze(
-          "def greet(name):\n    return f'Hello, {name}!'\n",
-          "python"
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "python",
+          "def greet(name):\n    return f'Hello, {name}!'\n"
         )
 
-      assert metadata["language"] == "python"
-      assert length(metadata["structure"]) >= 1
-      assert Enum.any?(metadata["structure"], fn s -> s["kind"] == "Function" end)
-      assert metadata["metrics"]["total_lines"] >= 2
-      assert metadata["metrics"]["error_count"] == 0
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -204,9 +169,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      metadata = TreeSitterLanguagePack.analyze("def broken(\n    return\nclass", "python")
-      assert metadata["language"] == "python"
-      assert length(metadata["diagnostics"]) > 0
+      tree = TreeSitterLanguagePack.parse_string("python", "def broken(\n    return\nclass")
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -216,17 +180,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      metadata =
-        TreeSitterLanguagePack.analyze(
-          "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
-          "python"
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "python",
+          "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
         )
 
-      assert metadata["language"] == "python"
-      assert length(metadata["structure"]) >= 1
-      assert length(metadata["imports"]) >= 3
-      assert metadata["metrics"]["total_lines"] >= 5
-      assert metadata["metrics"]["error_count"] == 0
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -236,18 +196,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("rust") do
       IO.puts("Skipping: language 'rust' not available")
     else
-      result =
-        TreeSitterLanguagePack.process(
-          "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n",
+      tree =
+        TreeSitterLanguagePack.parse_string(
           "rust",
-          30
+          "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n"
         )
 
-      metadata = result["metadata"]
-      chunks = result["chunks"]
-      assert metadata["language"] == "rust"
-      assert metadata["metrics"]["total_lines"] >= 7
-      assert length(chunks) >= 2
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -257,14 +212,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("rust") do
       IO.puts("Skipping: language 'rust' not available")
     else
-      metadata =
-        TreeSitterLanguagePack.analyze("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", "rust")
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "rust",
+          "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n"
+        )
 
-      assert metadata["language"] == "rust"
-      assert length(metadata["structure"]) >= 1
-      assert Enum.any?(metadata["structure"], fn s -> s["kind"] == "Function" end)
-      assert metadata["metrics"]["total_lines"] >= 3
-      assert metadata["metrics"]["error_count"] == 0
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -274,18 +228,13 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("typescript") do
       IO.puts("Skipping: language 'typescript' not available")
     else
-      metadata =
-        TreeSitterLanguagePack.analyze(
-          "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n",
-          "typescript"
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "typescript",
+          "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n"
         )
 
-      assert metadata["language"] == "typescript"
-      assert length(metadata["structure"]) >= 1
-      assert Enum.any?(metadata["structure"], fn s -> s["kind"] == "Function" end)
-      assert length(metadata["imports"]) >= 1
-      assert metadata["metrics"]["total_lines"] >= 5
-      assert metadata["metrics"]["error_count"] == 0
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 end

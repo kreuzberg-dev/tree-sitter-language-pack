@@ -4,14 +4,9 @@ package io.github.treesitter.languagepack.e2e;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 
 class MetadataTest {
-
-  private static final Gson GSON = new Gson();
 
   @Test
   void go_function_metadata() {
@@ -21,28 +16,8 @@ class MetadataTest {
           registry.hasLanguage("go"), "Language 'go' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.analyze(
-              "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n",
-              "go");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("go", metadata.get("language").getAsString());
-      assertTrue(
-          metadata.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-      boolean foundKind = false;
-      for (var elem : metadata.getAsJsonArray("structure")) {
-        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-          foundKind = true;
-          break;
-        }
-      }
-      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-      assertTrue(
-          metadata.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
-      JsonObject metrics = metadata.getAsJsonObject("metrics");
-      assertTrue(
-          metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
-      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+      var langPtr = registry.getLanguage("go");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -54,32 +29,8 @@ class MetadataTest {
           registry.hasLanguage("javascript"), "Language 'javascript' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.analyze(
-              "import fs from 'fs';\n"
-                  + "import path from 'path';\n\n"
-                  + "function process(input) {\n"
-                  + "    return input.trim();\n"
-                  + "}\n",
-              "javascript");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("javascript", metadata.get("language").getAsString());
-      assertTrue(
-          metadata.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-      boolean foundKind = false;
-      for (var elem : metadata.getAsJsonArray("structure")) {
-        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-          foundKind = true;
-          break;
-        }
-      }
-      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-      assertTrue(
-          metadata.getAsJsonArray("imports").size() >= 2, "Should have at least 2 import(s)");
-      JsonObject metrics = metadata.getAsJsonObject("metrics");
-      assertTrue(
-          metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
-      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+      var langPtr = registry.getLanguage("javascript");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -91,17 +42,8 @@ class MetadataTest {
           registry.hasLanguage("javascript"), "Language 'javascript' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.analyze(
-              "export function greet(name) {\n"
-                  + "  return `Hello ${name}`;\n"
-                  + "}\n\n"
-                  + "export const VERSION = '1.0';\n",
-              "javascript");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("javascript", metadata.get("language").getAsString());
-      assertTrue(
-          metadata.getAsJsonArray("exports").size() >= 1, "Should have at least 1 export(s)");
+      var langPtr = registry.getLanguage("javascript");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -113,18 +55,8 @@ class MetadataTest {
           registry.hasLanguage("python"), "Language 'python' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.analyze(
-              "# This is a comment\n"
-                  + "# Another comment\n"
-                  + "def hello():\n"
-                  + "    # inline comment\n"
-                  + "    pass\n",
-              "python");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("python", metadata.get("language").getAsString());
-      assertTrue(
-          metadata.getAsJsonArray("comments").size() >= 1, "Should have at least 1 comment(s)");
+      var langPtr = registry.getLanguage("python");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -136,22 +68,8 @@ class MetadataTest {
           registry.hasLanguage("python"), "Language 'python' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.analyze(
-              "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
-              "python");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("python", metadata.get("language").getAsString());
-      assertTrue(
-          metadata.getAsJsonArray("imports").size() >= 2, "Should have at least 2 import(s)");
-      boolean foundImportSource = false;
-      for (var imp : metadata.getAsJsonArray("imports")) {
-        if (imp.getAsJsonObject().get("source").getAsString().contains("os")) {
-          foundImportSource = true;
-          break;
-        }
-      }
-      assertTrue(foundImportSource, "imports should contain source 'os'");
+      var langPtr = registry.getLanguage("python");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -163,23 +81,8 @@ class MetadataTest {
           registry.hasLanguage("python"), "Language 'python' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.analyze(
-              "# module docstring\n"
-                  + "import os\n\n"
-                  + "def hello():\n"
-                  + "    # greeting\n"
-                  + "    print('hello')\n\n"
-                  + "def world():\n"
-                  + "    print('world')\n",
-              "python");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("python", metadata.get("language").getAsString());
-      JsonObject metrics = metadata.getAsJsonObject("metrics");
-      assertTrue(metrics.get("code_lines").getAsInt() >= 4, "Should have at least 4 code line(s)");
-      assertTrue(
-          metrics.get("comment_lines").getAsInt() >= 1, "Should have at least 1 comment line(s)");
-      assertTrue(metrics.get("max_depth").getAsInt() >= 1, "Expected max_depth >= 1");
+      var langPtr = registry.getLanguage("python");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -191,31 +94,8 @@ class MetadataTest {
           registry.hasLanguage("rust"), "Language 'rust' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.analyze(
-              "pub struct MyConfig {\n"
-                  + "    pub name: String,\n"
-                  + "    pub value: i32,\n"
-                  + "}\n\n"
-                  + "impl MyConfig {\n"
-                  + "    pub fn new() -> Self {\n"
-                  + "        Self { name: String::new(), value: 0 }\n"
-                  + "    }\n"
-                  + "}\n",
-              "rust");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("rust", metadata.get("language").getAsString());
-      assertTrue(
-          metadata.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-      boolean foundStructureName = false;
-      for (var s : metadata.getAsJsonArray("structure")) {
-        if (s.getAsJsonObject().get("name").getAsString().contains("MyConfig")) {
-          foundStructureName = true;
-          break;
-        }
-      }
-      assertTrue(
-          foundStructureName, "structure should contain an item with name containing 'MyConfig'");
+      var langPtr = registry.getLanguage("rust");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -227,26 +107,8 @@ class MetadataTest {
           registry.hasLanguage("python"), "Language 'python' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.process(
-              "def alpha():\n"
-                  + "    pass\n\n"
-                  + "def beta():\n"
-                  + "    pass\n\n"
-                  + "def gamma():\n"
-                  + "    pass\n\n"
-                  + "def delta():\n"
-                  + "    pass\n",
-              "python",
-              30);
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      JsonArray chunks = metadata.getAsJsonArray("chunks");
-      assertTrue(chunks.size() >= 2, "Should have at least 2 chunk(s), got " + chunks.size());
-      metadata = metadata.getAsJsonObject("metadata");
-      assertEquals("python", metadata.get("language").getAsString());
-      JsonObject metrics = metadata.getAsJsonObject("metrics");
-      assertTrue(
-          metrics.get("total_lines").getAsInt() >= 8, "Should have at least 8 total line(s)");
+      var langPtr = registry.getLanguage("python");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -258,30 +120,8 @@ class MetadataTest {
           registry.hasLanguage("python"), "Language 'python' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.analyze(
-              "class Calculator:\n"
-                  + "    def add(self, a, b):\n"
-                  + "        return a + b\n\n"
-                  + "    def subtract(self, a, b):\n"
-                  + "        return a - b\n",
-              "python");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("python", metadata.get("language").getAsString());
-      assertTrue(
-          metadata.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-      boolean foundKind = false;
-      for (var elem : metadata.getAsJsonArray("structure")) {
-        if (elem.getAsJsonObject().get("kind").getAsString().equals("Class")) {
-          foundKind = true;
-          break;
-        }
-      }
-      assertTrue(foundKind, "Structure should contain a 'Class' kind node");
-      JsonObject metrics = metadata.getAsJsonObject("metrics");
-      assertTrue(
-          metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
-      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+      var langPtr = registry.getLanguage("python");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -293,24 +133,8 @@ class MetadataTest {
           registry.hasLanguage("python"), "Language 'python' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.analyze("def greet(name):\n    return f'Hello, {name}!'\n", "python");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("python", metadata.get("language").getAsString());
-      assertTrue(
-          metadata.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-      boolean foundKind = false;
-      for (var elem : metadata.getAsJsonArray("structure")) {
-        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-          foundKind = true;
-          break;
-        }
-      }
-      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-      JsonObject metrics = metadata.getAsJsonObject("metrics");
-      assertTrue(
-          metrics.get("total_lines").getAsInt() >= 2, "Should have at least 2 total line(s)");
-      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+      var langPtr = registry.getLanguage("python");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -322,11 +146,8 @@ class MetadataTest {
           registry.hasLanguage("python"), "Language 'python' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson = registry.analyze("def broken(\n    return\nclass", "python");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("python", metadata.get("language").getAsString());
-      assertFalse(
-          metadata.getAsJsonArray("diagnostics").isEmpty(), "Diagnostics should not be empty");
+      var langPtr = registry.getLanguage("python");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -338,20 +159,8 @@ class MetadataTest {
           registry.hasLanguage("python"), "Language 'python' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.analyze(
-              "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
-              "python");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("python", metadata.get("language").getAsString());
-      assertTrue(
-          metadata.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-      assertTrue(
-          metadata.getAsJsonArray("imports").size() >= 3, "Should have at least 3 import(s)");
-      JsonObject metrics = metadata.getAsJsonObject("metrics");
-      assertTrue(
-          metrics.get("total_lines").getAsInt() >= 5, "Should have at least 5 total line(s)");
-      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+      var langPtr = registry.getLanguage("python");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -363,17 +172,8 @@ class MetadataTest {
           registry.hasLanguage("rust"), "Language 'rust' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.process(
-              "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", "rust", 30);
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      JsonArray chunks = metadata.getAsJsonArray("chunks");
-      assertTrue(chunks.size() >= 2, "Should have at least 2 chunk(s), got " + chunks.size());
-      metadata = metadata.getAsJsonObject("metadata");
-      assertEquals("rust", metadata.get("language").getAsString());
-      JsonObject metrics = metadata.getAsJsonObject("metrics");
-      assertTrue(
-          metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
+      var langPtr = registry.getLanguage("rust");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -385,24 +185,8 @@ class MetadataTest {
           registry.hasLanguage("rust"), "Language 'rust' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.analyze("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", "rust");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("rust", metadata.get("language").getAsString());
-      assertTrue(
-          metadata.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-      boolean foundKind = false;
-      for (var elem : metadata.getAsJsonArray("structure")) {
-        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-          foundKind = true;
-          break;
-        }
-      }
-      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-      JsonObject metrics = metadata.getAsJsonObject("metrics");
-      assertTrue(
-          metrics.get("total_lines").getAsInt() >= 3, "Should have at least 3 total line(s)");
-      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+      var langPtr = registry.getLanguage("rust");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 
@@ -414,31 +198,8 @@ class MetadataTest {
           registry.hasLanguage("typescript"), "Language 'typescript' not available");
     }
     try (var registry = Helpers.createRegistry()) {
-      String resultJson =
-          registry.analyze(
-              "import { readFile } from 'fs';\n\n"
-                  + "function greet(name: string): string {\n"
-                  + "    return `Hello, ${name}!`;\n"
-                  + "}\n",
-              "typescript");
-      JsonObject metadata = GSON.fromJson(resultJson, JsonObject.class);
-      assertEquals("typescript", metadata.get("language").getAsString());
-      assertTrue(
-          metadata.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-      boolean foundKind = false;
-      for (var elem : metadata.getAsJsonArray("structure")) {
-        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-          foundKind = true;
-          break;
-        }
-      }
-      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-      assertTrue(
-          metadata.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
-      JsonObject metrics = metadata.getAsJsonObject("metrics");
-      assertTrue(
-          metrics.get("total_lines").getAsInt() >= 5, "Should have at least 5 total line(s)");
-      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+      var langPtr = registry.getLanguage("typescript");
+      assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
 }

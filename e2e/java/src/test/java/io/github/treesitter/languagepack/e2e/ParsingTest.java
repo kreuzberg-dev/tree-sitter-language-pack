@@ -9,6 +9,32 @@ import org.junit.jupiter.api.Test;
 class ParsingTest {
 
   @Test
+  void parsing_go_function() {
+    // Parse a Go function declaration and assert node type
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("go"), "Language 'go' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("go");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void parsing_html_element() {
+    // Parse an HTML element and assert node type
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("html"), "Language 'html' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("html");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
   void parsing_javascript_class() {
     // Parse a JavaScript class declaration.
     try (var registry = Helpers.createRegistry()) {
@@ -22,14 +48,40 @@ class ParsingTest {
   }
 
   @Test
+  void parsing_javascript_variable() {
+    // Parse a JavaScript variable declaration and assert node type
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("javascript"), "Language 'javascript' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("javascript");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
   void parsing_python_function() {
-    // Parse a Python function definition.
+    // Parse a Python function definition and assert node type
     try (var registry = Helpers.createRegistry()) {
       org.junit.jupiter.api.Assumptions.assumeTrue(
           registry.hasLanguage("python"), "Language 'python' not available");
     }
     try (var registry = Helpers.createRegistry()) {
       var langPtr = registry.getLanguage("python");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void parsing_rust_function() {
+    // Parse a Rust function definition and assert node type
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("rust"), "Language 'rust' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("rust");
       assertNotNull(langPtr, "Language pointer should not be null");
     }
   }

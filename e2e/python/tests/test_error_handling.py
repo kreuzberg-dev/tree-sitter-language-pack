@@ -10,6 +10,12 @@ from tree_sitter_language_pack import (
 from .helpers import tree_has_error_nodes
 
 
+def test_error_empty_language_name():
+    """Parsing with empty language name should error"""
+    with pytest.raises(Exception):
+        get_language("")
+
+
 @pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
 def test_error_handling_empty_source():
     """Parsing an empty string should still produce a tree."""

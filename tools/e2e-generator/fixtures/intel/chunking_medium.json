@@ -1,0 +1,18 @@
+{
+	"id": "python_chunking_medium",
+	"category": "intel",
+	"description": "Intel: Python code with medium chunk size",
+	"language": "python",
+	"source_code": "def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n",
+	"assertions": {
+		"intel_language": "python",
+		"intel_structure_count_min": 3,
+		"intel_chunk_max_size": 50,
+		"intel_chunk_count_min": 2,
+		"intel_metrics_error_count": 0
+	},
+	"skip": {
+		"requires_language": "python"
+	},
+	"tags": ["intel", "chunking"]
+}

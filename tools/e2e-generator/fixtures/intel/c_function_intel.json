@@ -1,0 +1,18 @@
+{
+	"id": "c_function_intel",
+	"category": "intel",
+	"description": "Intel: C function with include",
+	"language": "c",
+	"source_code": "#include <stdio.h>\n\nint main() {\n    printf(\"hello\");\n    return 0;\n}\n",
+	"assertions": {
+		"intel_language": "c",
+		"intel_structure_count_min": 1,
+		"intel_structure_contains_kind": "Function",
+		"intel_metrics_total_lines_min": 6,
+		"intel_metrics_error_count": 0
+	},
+	"skip": {
+		"requires_language": "c"
+	},
+	"tags": ["intel"]
+}

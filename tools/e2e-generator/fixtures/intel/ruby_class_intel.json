@@ -1,0 +1,18 @@
+{
+	"id": "ruby_class_intel",
+	"category": "intel",
+	"description": "Intel: Ruby class with method",
+	"language": "ruby",
+	"source_code": "require 'json'\n\nclass Greeter\n  def greet(name)\n    \"Hello #{name}\"\n  end\nend\n",
+	"assertions": {
+		"intel_language": "ruby",
+		"intel_structure_count_min": 1,
+		"intel_structure_contains_kind": "Class",
+		"intel_metrics_total_lines_min": 7,
+		"intel_metrics_error_count": 0
+	},
+	"skip": {
+		"requires_language": "ruby"
+	},
+	"tags": ["intel"]
+}

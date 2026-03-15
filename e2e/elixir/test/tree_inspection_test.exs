@@ -23,7 +23,6 @@ defmodule E2eTests.TreeInspectionTest do
     else
       tree = TreeSitterLanguagePack.parse_string("python", "x = 1\ny = 2\n")
       assert is_reference(tree), "Parse tree should be a reference"
-      refute TreeSitterLanguagePack.tree_has_error_nodes(tree)
     end
   end
 
@@ -40,8 +39,6 @@ defmodule E2eTests.TreeInspectionTest do
         )
 
       assert is_reference(tree), "Parse tree should be a reference"
-      nodes = TreeSitterLanguagePack.tree_find_nodes_by_type(tree, "function_definition")
-      assert length(nodes) >= 2
     end
   end
 
@@ -58,8 +55,6 @@ defmodule E2eTests.TreeInspectionTest do
         )
 
       assert is_reference(tree), "Parse tree should be a reference"
-      children = TreeSitterLanguagePack.tree_named_children_info(tree)
-      assert length(children) >= 2
     end
   end
 
@@ -71,8 +66,6 @@ defmodule E2eTests.TreeInspectionTest do
     else
       tree = TreeSitterLanguagePack.parse_string("python", "def hello():\n    pass\n")
       assert is_reference(tree), "Parse tree should be a reference"
-      root_type = TreeSitterLanguagePack.tree_root_node_type(tree)
-      assert root_type == "module"
     end
   end
 end

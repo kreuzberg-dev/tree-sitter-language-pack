@@ -5,17 +5,17 @@ require_relative "spec_helper"
 RSpec.describe "registry" do
 
   it "registry_has_language_false" do
-    # has_language('nonexistent') should return false.
+    # has_language('nonexistent') should return false
     expect(TreeSitterLanguagePack.has_language("nonexistent")).to eq(false)
   end
 
   it "registry_has_language_true" do
-    # has_language('python') should return true.
+    # has_language('python') should return true
     expect(TreeSitterLanguagePack.has_language("python")).to eq(true)
   end
 
   it "registry_list_languages" do
-    # available_languages should return a non-empty list.
+    # available_languages should return a non-empty list
     langs = TreeSitterLanguagePack.available_languages
     expect(langs).not_to be_empty
   end

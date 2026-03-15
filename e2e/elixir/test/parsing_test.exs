@@ -3,6 +3,34 @@
 defmodule E2eTests.ParsingTest do
   use ExUnit.Case, async: true
 
+  @tag :skip_unless_go
+  test "parsing_go_function" do
+    # Parse a Go function declaration and assert node type
+    unless TreeSitterLanguagePack.has_language("go") do
+      IO.puts("Skipping: language 'go' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("go", "package main\nfunc main() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+
+      assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_declaration"),
+             "Tree should contain a 'function_declaration' node"
+    end
+  end
+
+  @tag :skip_unless_html
+  test "parsing_html_element" do
+    # Parse an HTML element and assert node type
+    unless TreeSitterLanguagePack.has_language("html") do
+      IO.puts("Skipping: language 'html' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("html", "<div>hello</div>")
+      assert is_reference(tree), "Parse tree should be a reference"
+
+      assert TreeSitterLanguagePack.tree_contains_node_type(tree, "element"),
+             "Tree should contain a 'element' node"
+    end
+  end
+
   @tag :skip_unless_javascript
   test "parsing_javascript_class" do
     # Parse a JavaScript class declaration.
@@ -19,19 +47,45 @@ defmodule E2eTests.ParsingTest do
     end
   end
 
+  @tag :skip_unless_javascript
+  test "parsing_javascript_variable" do
+    # Parse a JavaScript variable declaration and assert node type
+    unless TreeSitterLanguagePack.has_language("javascript") do
+      IO.puts("Skipping: language 'javascript' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("javascript", "const x = 1;")
+      assert is_reference(tree), "Parse tree should be a reference"
+
+      assert TreeSitterLanguagePack.tree_contains_node_type(tree, "lexical_declaration"),
+             "Tree should contain a 'lexical_declaration' node"
+    end
+  end
+
   @tag :skip_unless_python
   test "parsing_python_function" do
-    # Parse a Python function definition.
+    # Parse a Python function definition and assert node type
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree = TreeSitterLanguagePack.parse_string("python", "def hello():\n    pass\n")
+      tree = TreeSitterLanguagePack.parse_string("python", "def hello(): pass")
       assert is_reference(tree), "Parse tree should be a reference"
-      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
 
       assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_definition"),
              "Tree should contain a 'function_definition' node"
+    end
+  end
+
+  @tag :skip_unless_rust
+  test "parsing_rust_function" do
+    # Parse a Rust function definition and assert node type
+    unless TreeSitterLanguagePack.has_language("rust") do
+      IO.puts("Skipping: language 'rust' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("rust", "fn main() {}")
+      assert is_reference(tree), "Parse tree should be a reference"
+
+      assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_item"),
+             "Tree should contain a 'function_item' node"
     end
   end
 

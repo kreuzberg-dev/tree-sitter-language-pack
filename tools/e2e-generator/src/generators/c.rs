@@ -114,6 +114,22 @@ fn write_helpers_h(dir: &Path) -> Result<(), String> {
         } \
     } while (0)
 
+#define ASSERT_GTE(a, b, msg) \
+    do { \
+        if (!((a) >= (b))) { \
+            fprintf(stderr, "FAIL: %s (line %d): %s (got %zu < %zu)\n", __func__, __LINE__, (msg), (size_t)(a), (size_t)(b)); \
+            exit(1); \
+        } \
+    } while (0)
+
+#define ASSERT_EQ_INT(a, b, msg) \
+    do { \
+        if ((a) != (b)) { \
+            fprintf(stderr, "FAIL: %s (line %d): %s (got %d, want %d)\n", __func__, __LINE__, (msg), (int)(a), (int)(b)); \
+            exit(1); \
+        } \
+    } while (0)
+
 #define ASSERT_EQ_BOOL(a, b, msg) \
     do { \
         if ((a) != (b)) { \
@@ -124,6 +140,130 @@ fn write_helpers_h(dir: &Path) -> Result<(), String> {
 
 #define TEST_PASS() \
     printf("PASS: %s\n", __func__)
+
+/*
+ * Minimal JSON helpers for asserting on process() output.
+ * These are intentionally simple substring/counting approaches
+ * suitable for generated E2E tests, not a full JSON parser.
+ */
+
+/* Check if the JSON string contains "key":"value" */
+static inline int json_has_string_field(const char *json, const char *key, const char *value) {
+    char pattern[512];
+    snprintf(pattern, sizeof(pattern), "\"%s\":\"%s\"", key, value);
+    return strstr(json, pattern) != NULL;
+}
+
+/* Check if the JSON string contains "key": followed by a string value,
+ * and also check with a space after the colon. */
+static inline int json_has_string_field_spaced(const char *json, const char *key, const char *value) {
+    char pattern[512];
+    /* Try without space */
+    snprintf(pattern, sizeof(pattern), "\"%s\":\"%s\"", key, value);
+    if (strstr(json, pattern) != NULL) return 1;
+    /* Try with space after colon */
+    snprintf(pattern, sizeof(pattern), "\"%s\": \"%s\"", key, value);
+    return strstr(json, pattern) != NULL;
+}
+
+/* Find the value of a numeric field "key":N in the JSON string.
+ * Returns -1 if not found. */
+static inline int json_get_int_field(const char *json, const char *key) {
+    char pattern[256];
+    const char *p;
+    /* Try "key": N (with space) and "key":N (without) */
+    snprintf(pattern, sizeof(pattern), "\"%s\":", key);
+    p = strstr(json, pattern);
+    if (p == NULL) return -1;
+    p += strlen(pattern);
+    while (*p == ' ' || *p == '\t') p++;
+    if (*p == '-' || (*p >= '0' && *p <= '9')) {
+        return atoi(p);
+    }
+    return -1;
+}
+
+/* Count elements in a JSON array that appears as "key":[...].
+ * Counts by counting commas + 1 (returns 0 for empty array). */
+static inline size_t json_count_array(const char *json, const char *key) {
+    char pattern[256];
+    const char *p, *end;
+    size_t count;
+    int depth;
+
+    snprintf(pattern, sizeof(pattern), "\"%s\":", key);
+    p = strstr(json, pattern);
+    if (p == NULL) return 0;
+    p += strlen(pattern);
+    while (*p == ' ' || *p == '\t') p++;
+    if (*p != '[') return 0;
+    p++;
+    /* Skip whitespace */
+    while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r') p++;
+    if (*p == ']') return 0; /* empty array */
+
+    count = 1;
+    depth = 1;
+    end = p;
+    while (*end && depth > 0) {
+        if (*end == '[' || *end == '{') depth++;
+        else if (*end == ']' || *end == '}') {
+            depth--;
+            if (depth == 0) break;
+        }
+        else if (*end == ',' && depth == 1) count++;
+        else if (*end == '"') {
+            /* Skip string contents */
+            end++;
+            while (*end && *end != '"') {
+                if (*end == '\\') end++; /* skip escaped char */
+                if (*end) end++;
+            }
+        }
+        end++;
+    }
+    return count;
+}
+
+/* Check if a JSON array "key":[...] contains an object with "kind":"value". */
+static inline int json_array_contains_kind(const char *json, const char *array_key, const char *kind_value) {
+    char array_pattern[256];
+    char kind_pattern[256];
+    const char *arr_start, *arr_end;
+    int depth;
+
+    snprintf(array_pattern, sizeof(array_pattern), "\"%s\":", array_key);
+    arr_start = strstr(json, array_pattern);
+    if (arr_start == NULL) return 0;
+    arr_start += strlen(array_pattern);
+    while (*arr_start == ' ' || *arr_start == '\t') arr_start++;
+    if (*arr_start != '[') return 0;
+
+    /* Find end of array */
+    depth = 1;
+    arr_end = arr_start + 1;
+    while (*arr_end && depth > 0) {
+        if (*arr_end == '[' || *arr_end == '{') depth++;
+        else if (*arr_end == ']' || *arr_end == '}') depth--;
+        else if (*arr_end == '"') {
+            arr_end++;
+            while (*arr_end && *arr_end != '"') {
+                if (*arr_end == '\\') arr_end++;
+                if (*arr_end) arr_end++;
+            }
+        }
+        arr_end++;
+    }
+
+    /* Search within the array bounds for the kind value */
+    snprintf(kind_pattern, sizeof(kind_pattern), "\"kind\":\"%s\"", kind_value);
+    const char *found = strstr(arr_start, kind_pattern);
+    if (found != NULL && found < arr_end) return 1;
+    /* Try with space */
+    snprintf(kind_pattern, sizeof(kind_pattern), "\"kind\": \"%s\"", kind_value);
+    found = strstr(arr_start, kind_pattern);
+    return (found != NULL && found < arr_end) ? 1 : 0;
+}
 
 #endif /* E2E_HELPERS_H */
 "#;
@@ -204,12 +344,13 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
         let lang = fixture.language.as_deref().unwrap_or("unknown");
         let source = fixture.source_code.as_deref().unwrap_or("");
         let source_escaped = escape_c_string(source);
+        let assertions = assertions.unwrap();
 
         if has_chunk_assertions(fixture) {
-            let max_chunk_size = assertions.unwrap().intel_chunk_max_size.unwrap_or(512);
+            let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
             writeln!(
                 out,
-                "    char *result = ts_pack_process_and_chunk(reg, \"{}\", {}, \"{}\", {});",
+                "    char *result = ts_pack_process(reg, \"{}\", {}, \"{{\\\"language\\\":\\\"{}\\\",\\\"chunk_max_size\\\":{}}}\");",
                 source_escaped,
                 source.len(),
                 escape_c_string(lang),
@@ -219,7 +360,7 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
         } else {
             writeln!(
                 out,
-                "    char *result = ts_pack_process(reg, \"{}\", {}, \"{}\");",
+                "    char *result = ts_pack_process(reg, \"{}\", {}, \"{{\\\"language\\\":\\\"{}\\\"}}\");",
                 source_escaped,
                 source.len(),
                 escape_c_string(lang)
@@ -227,12 +368,82 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
             .unwrap();
         }
         writeln!(out, "    ASSERT_NOT_NULL(result, \"process returned NULL\");").unwrap();
-        writeln!(out, "    /* Verify JSON string is non-empty */").unwrap();
         writeln!(
             out,
             "    ASSERT_TRUE(strlen(result) > 2, \"JSON result should not be empty\");"
         )
         .unwrap();
+
+        if let Some(expected_lang) = &assertions.intel_language {
+            writeln!(
+                out,
+                "    ASSERT_TRUE(json_has_string_field_spaced(result, \"language\", \"{}\"), \"Expected language '{}'\");",
+                escape_c_string(expected_lang),
+                escape_c_string(expected_lang)
+            )
+            .unwrap();
+        }
+
+        if let Some(min_structures) = assertions.intel_structure_count_min {
+            writeln!(
+                out,
+                "    ASSERT_GTE(json_count_array(result, \"structure\"), (size_t){min_structures}, \"Should have at least {min_structures} structure(s)\");"
+            )
+            .unwrap();
+        }
+
+        if let Some(expected_kind) = &assertions.intel_structure_contains_kind {
+            writeln!(
+                out,
+                "    ASSERT_TRUE(json_array_contains_kind(result, \"structure\", \"{}\"), \"Structure should contain a '{}' kind node\");",
+                escape_c_string(expected_kind),
+                escape_c_string(expected_kind)
+            )
+            .unwrap();
+        }
+
+        if let Some(min_imports) = assertions.intel_imports_count_min {
+            writeln!(
+                out,
+                "    ASSERT_GTE(json_count_array(result, \"imports\"), (size_t){min_imports}, \"Should have at least {min_imports} import(s)\");"
+            )
+            .unwrap();
+        }
+
+        if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+            writeln!(
+                out,
+                "    ASSERT_GTE((size_t)json_get_int_field(result, \"total_lines\"), (size_t){min_lines}, \"Should have at least {min_lines} total line(s)\");"
+            )
+            .unwrap();
+        }
+
+        if let Some(expected_error_count) = assertions.intel_metrics_error_count {
+            writeln!(
+                out,
+                "    ASSERT_EQ_INT(json_get_int_field(result, \"error_count\"), {expected_error_count}, \"Expected error_count == {expected_error_count}\");"
+            )
+            .unwrap();
+        }
+
+        if assertions.intel_diagnostics_not_empty == Some(true) {
+            writeln!(
+                out,
+                "    ASSERT_GT(json_count_array(result, \"diagnostics\"), (size_t)0, \"Diagnostics should not be empty\");"
+            )
+            .unwrap();
+        }
+
+        if has_chunk_assertions(fixture)
+            && let Some(min_chunks) = assertions.intel_chunk_count_min
+        {
+            writeln!(
+                out,
+                "    ASSERT_GTE(json_count_array(result, \"chunks\"), (size_t){min_chunks}, \"Should have at least {min_chunks} chunk(s)\");"
+            )
+            .unwrap();
+        }
+
         writeln!(out, "    ts_pack_free_string(result);").unwrap();
     } else if let Some(lang) = &fixture.language {
         writeln!(

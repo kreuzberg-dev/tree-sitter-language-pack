@@ -9,6 +9,26 @@ from tree_sitter_language_pack import (
 from .helpers import tree_contains_node_type
 
 
+@pytest.mark.skipif(not has_language("go"), reason="Language 'go' not available")
+def test_parsing_go_function():
+    """Parse a Go function declaration and assert node type"""
+    parser = get_parser("go")
+    tree = parser.parse(b"package main\nfunc main() {}")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert tree_contains_node_type(root, "function_declaration"), "Tree should contain a 'function_declaration' node"
+
+
+@pytest.mark.skipif(not has_language("html"), reason="Language 'html' not available")
+def test_parsing_html_element():
+    """Parse an HTML element and assert node type"""
+    parser = get_parser("html")
+    tree = parser.parse(b"<div>hello</div>")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert tree_contains_node_type(root, "element"), "Tree should contain a 'element' node"
+
+
 @pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
 def test_parsing_javascript_class():
     """Parse a JavaScript class declaration."""
@@ -20,15 +40,34 @@ def test_parsing_javascript_class():
     assert tree_contains_node_type(root, "class_declaration"), "Tree should contain a 'class_declaration' node"
 
 
-@pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
-def test_parsing_python_function():
-    """Parse a Python function definition."""
-    parser = get_parser("python")
-    tree = parser.parse(b"def hello():\n    pass\n")
+@pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
+def test_parsing_javascript_variable():
+    """Parse a JavaScript variable declaration and assert node type"""
+    parser = get_parser("javascript")
+    tree = parser.parse(b"const x = 1;")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
-    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+    assert tree_contains_node_type(root, "lexical_declaration"), "Tree should contain a 'lexical_declaration' node"
+
+
+@pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
+def test_parsing_python_function():
+    """Parse a Python function definition and assert node type"""
+    parser = get_parser("python")
+    tree = parser.parse(b"def hello(): pass")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
     assert tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node"
+
+
+@pytest.mark.skipif(not has_language("rust"), reason="Language 'rust' not available")
+def test_parsing_rust_function():
+    """Parse a Rust function definition and assert node type"""
+    parser = get_parser("rust")
+    tree = parser.parse(b"fn main() {}")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert tree_contains_node_type(root, "function_item"), "Tree should contain a 'function_item' node"
 
 
 @pytest.mark.skipif(not has_language("rust"), reason="Language 'rust' not available")

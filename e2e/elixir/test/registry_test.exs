@@ -4,17 +4,17 @@ defmodule E2eTests.RegistryTest do
   use ExUnit.Case, async: true
 
   test "registry_has_language_false" do
-    # has_language('nonexistent') should return false.
+    # has_language('nonexistent') should return false
     assert TreeSitterLanguagePack.has_language("nonexistent") == false
   end
 
   test "registry_has_language_true" do
-    # has_language('python') should return true.
+    # has_language('python') should return true
     assert TreeSitterLanguagePack.has_language("python") == true
   end
 
   test "registry_list_languages" do
-    # available_languages should return a non-empty list.
+    # available_languages should return a non-empty list
     langs = TreeSitterLanguagePack.available_languages()
     assert length(langs) > 0, "available_languages() should not be empty"
   end
