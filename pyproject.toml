@@ -81,7 +81,7 @@ lint.isort.known-first-party = [ "scripts" ]
 lint.pydocstyle.convention = "google"
 
 [tool.codespell]
-ignore-words-list = "wast"
+ignore-words-list = "wast,inout"
 
 [tool.pyproject-fmt]
 keep_full_version = true
