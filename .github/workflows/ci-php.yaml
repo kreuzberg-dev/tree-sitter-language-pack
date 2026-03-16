@@ -209,6 +209,14 @@ jobs:
           extensions: ffi
           tools: composer
 
+      - name: Export PHP build config
+        run: |
+          PHP_CONFIG_BIN="$(command -v php-config || true)"
+          if [ -n "$PHP_CONFIG_BIN" ]; then
+            echo "PHP_CONFIG=$PHP_CONFIG_BIN" >> "$GITHUB_ENV"
+            echo "Using php-config: $PHP_CONFIG_BIN"
+          fi
+
       - name: Build PHP extension
         run: cargo build --release --manifest-path crates/ts-pack-php/Cargo.toml
         env:

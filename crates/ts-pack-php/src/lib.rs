@@ -192,4 +192,11 @@ pub fn ts_pack_process(source: String, config_json: String) -> PhpResult<String>
 #[php_module]
 pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
     module
+        .function(wrap_function!(ts_pack_version))
+        .function(wrap_function!(ts_pack_available_languages))
+        .function(wrap_function!(ts_pack_has_language))
+        .function(wrap_function!(ts_pack_language_count))
+        .function(wrap_function!(ts_pack_get_language))
+        .function(wrap_function!(ts_pack_parse_string))
+        .function(wrap_function!(ts_pack_process))
 }
