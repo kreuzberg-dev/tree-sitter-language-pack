@@ -1557,10 +1557,10 @@ jobs:
 
       - name: Publish to PyPI
         if: ${{ !inputs.dry_run }}
-        uses: kreuzberg-dev/actions/publish-pypi@v1.0.0
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          skip-existing: true
 
   # ─── Publish Node.js to npm ────────────────────────────────────────
   publish-node:
