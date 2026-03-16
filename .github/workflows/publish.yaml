@@ -1401,7 +1401,9 @@ jobs:
         with:
           tag: ${{ inputs.tag }}
           title: "Release ${{ inputs.tag }}"
-          artifacts: "dist/parsers/parsers-*.tar.zst,dist/parsers/parsers.json"
+          artifacts: |
+            dist/parsers/parsers-*.tar.zst
+            dist/parsers/parsers.json
           dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
           GH_TOKEN: ${{ github.token }}
