@@ -4,8 +4,22 @@ requires = [ "maturin>=1,<2" ]
 
 [project]
 name = "tree-sitter-language-pack"
-version = "2.0.0a1"
-description = "A comprehensive collection of tree-sitter language parsers"
+version = "1.0.0rc1"
+description = """\
+  Pre-compiled tree-sitter parsers for 170+ programming languages with a unified process() API for parsing, analysis, \
+  and intelligent code chunking.\
+  """
+readme = "README.md"
+keywords = [
+  "ast",
+  "code-analysis",
+  "code-intelligence",
+  "kreuzberg",
+  "language-pack",
+  "parser",
+  "syntax",
+  "tree-sitter",
+]
 license = "MIT OR Apache-2.0"
 requires-python = ">=3.10"
 classifiers = [
@@ -15,10 +29,21 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Rust",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Text Processing :: Linguistic",
+  "Typing :: Typed",
 ]
 dependencies = [ "tree-sitter>=0.24" ]
+urls.Homepage = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+urls.Issues = "https://github.com/kreuzberg-dev/tree-sitter-language-pack/issues"
+urls.Repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
 
 [tool.maturin]
 features = [ "pyo3/extension-module" ]
 python-source = "python"
 module-name = "tree_sitter_language_pack._native"
+include = [
+  { path = "python/tree_sitter_language_pack/__init__.pyi", format = "wheel" },
+  { path = "python/tree_sitter_language_pack/py.typed", format = "wheel" },
+]

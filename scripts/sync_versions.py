@@ -43,6 +43,19 @@ def get_workspace_version(repo_root: Path) -> str:
     return match.group(1)
 
 
+def cargo_to_pep440(version: str) -> str:
+    """Convert Cargo pre-release version to PEP 440 format.
+
+    Examples: 1.0.0-rc.1 -> 1.0.0rc1, 1.0.0-alpha.2 -> 1.0.0a2, 1.0.0 -> 1.0.0
+    """
+    m = re.match(r"^(\d+\.\d+\.\d+)-?(rc|alpha|beta|a|b)\.?(\d+)?$", version)
+    if m:
+        base, pre, num = m.group(1), m.group(2), m.group(3) or "0"
+        pre_map = {"alpha": "a", "beta": "b", "rc": "rc", "a": "a", "b": "b"}
+        return f"{base}{pre_map.get(pre, pre)}{num}"
+    return version
+
+
 def update_pyproject_toml(file_path: Path, version: str) -> tuple[bool, str, str]:
     """Update pyproject.toml version field."""
     content = file_path.read_text()
@@ -224,6 +237,7 @@ def main() -> None:
 
     targets: list[tuple[Path, str]] = [
         (repo_root / "pyproject.toml", "pyproject"),
+        (repo_root / "crates/ts-pack-python/pyproject.toml", "pyproject_pep440"),
         (repo_root / "crates/ts-pack-node/package.json", "package_json"),
         (repo_root / "crates/ts-pack-wasm/package.json", "package_json"),
         (repo_root / "crates/ts-pack-elixir/mix.exs", "mix_exs"),
@@ -235,8 +249,14 @@ def main() -> None:
         (repo_root / "packages/csharp/TreeSitterLanguagePack/TreeSitterLanguagePack.csproj", "csproj"),
     ]
 
+    def update_pyproject_pep440(file_path: Path, version: str) -> tuple[bool, str, str]:
+        """Update pyproject.toml version field with PEP 440 conversion."""
+        pep_version = cargo_to_pep440(version)
+        return update_pyproject_toml(file_path, pep_version)
+
     update_funcs = {
         "pyproject": update_pyproject_toml,
+        "pyproject_pep440": update_pyproject_pep440,
         "package_json": update_package_json,
         "mix_exs": update_mix_exs,
         "pom_xml": update_pom_xml,
