@@ -217,17 +217,20 @@ jobs:
           path: dist
 
       - name: Install wheel
+        shell: bash
         run: |
           wheel_file=$(find dist -name '*.whl' -print -quit)
           pip install "$wheel_file" tree-sitter pytest
 
       - name: Generate E2E tests
+        shell: bash
         run: cargo run -p e2e-generator -- generate --lang python
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Run E2E tests
+        shell: bash
         run: cd e2e/python && pip install -e . && pytest tests/ -v
         env:
           PROJECT_ROOT: ${{ github.workspace }}
