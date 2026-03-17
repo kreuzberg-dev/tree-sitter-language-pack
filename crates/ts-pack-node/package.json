@@ -33,7 +33,7 @@
 	"scripts": {
 		"artifacts": "napi artifacts",
 		"build": "napi build --platform --release",
-		"prepublishOnly": "napi prepublish -t npm"
+		"prepublishOnly": "napi prepublish -t npm --skip-optional-publish"
 	},
 	"keywords": [
 		"tree-sitter",
@@ -46,5 +46,12 @@
 	"license": "MIT OR Apache-2.0",
 	"devDependencies": {
 		"@napi-rs/cli": "^3.5.0"
+	},
+	"optionalDependencies": {
+		"@kreuzberg/tree-sitter-language-pack-darwin-x64": "1.0.0-rc.7",
+		"@kreuzberg/tree-sitter-language-pack-darwin-arm64": "1.0.0-rc.7",
+		"@kreuzberg/tree-sitter-language-pack-linux-x64-gnu": "1.0.0-rc.7",
+		"@kreuzberg/tree-sitter-language-pack-linux-arm64-gnu": "1.0.0-rc.7",
+		"@kreuzberg/tree-sitter-language-pack-win32-x64-msvc": "1.0.0-rc.7"
 	}
 }

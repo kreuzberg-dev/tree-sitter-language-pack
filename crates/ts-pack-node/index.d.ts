@@ -20,6 +20,19 @@ export declare function getLanguagePtr(name: string): number;
 /** Checks whether a language with the given name is available. */
 export declare function hasLanguage(name: string): boolean;
 
+/** Configuration for the `process` function. */
+export interface JsProcessConfig {
+	language: string;
+	structure?: boolean;
+	imports?: boolean;
+	exports?: boolean;
+	comments?: boolean;
+	docstrings?: boolean;
+	symbols?: boolean;
+	diagnostics?: boolean;
+	chunkMaxSize?: number;
+}
+
 /** Returns the number of available languages. */
 export declare function languageCount(): number;
 
@@ -32,6 +45,9 @@ export declare function parseString(
 	language: string,
 	source: string,
 ): ExternalObject<Tree>;
+
+/** Process source code using a config and return a JavaScript object with metadata and chunks. */
+export declare function process(source: string, config: JsProcessConfig): any;
 
 /** Check whether any node in the tree has the given type name. */
 export declare function treeContainsNodeType(
@@ -47,19 +63,3 @@ export declare function treeRootChildCount(tree: ExternalObject<Tree>): number;
 
 /** Get the type name of the root node. */
 export declare function treeRootNodeType(tree: ExternalObject<Tree>): string;
-
-/** Process source code and extract file intelligence as a JavaScript object. */
-export declare function process(
-	source: string,
-	config: {
-		language: string;
-		structure?: boolean;
-		imports?: boolean;
-		exports?: boolean;
-		comments?: boolean;
-		docstrings?: boolean;
-		symbols?: boolean;
-		diagnostics?: boolean;
-		chunkMaxSize?: number;
-	},
-): Record<string, unknown>;
