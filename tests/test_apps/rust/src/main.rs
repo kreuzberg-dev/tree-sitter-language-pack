@@ -2,7 +2,7 @@ use serde::Deserialize;
 use std::fs;
 use tree_sitter_language_pack::{DownloadManager, LanguageRegistry, ProcessConfig};
 
-const VERSION: &str = "1.0.0-rc.6";
+const VERSION: &str = "1.0.0-rc.7";
 
 #[derive(Deserialize)]
 struct BasicFixture {

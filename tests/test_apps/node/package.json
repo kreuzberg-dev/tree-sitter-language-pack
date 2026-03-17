@@ -9,7 +9,7 @@
 		"test:comprehensive": "vitest run comprehensive.spec.ts"
 	},
 	"dependencies": {
-		"@kreuzberg/tree-sitter-language-pack": "1.0.0-rc.6"
+		"@kreuzberg/tree-sitter-language-pack": "1.0.0-rc.7"
 	},
 	"devDependencies": {
 		"vitest": "^3.0.0",
