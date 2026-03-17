@@ -183,9 +183,11 @@ jobs:
           - os: windows-11-arm
             platform: windows-aarch64
             python-version: "3.11"
+            arch: arm64
           - os: windows-11-arm
             platform: windows-aarch64
             python-version: "3.14"
+            arch: arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
@@ -194,6 +196,7 @@ jobs:
         uses: actions/setup-python@v6.2.0
         with:
           python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.arch || 'x64' }}
 
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
