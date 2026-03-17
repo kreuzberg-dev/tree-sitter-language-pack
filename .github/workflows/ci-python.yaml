@@ -115,6 +115,8 @@ jobs:
             platform: macos-arm64
           - os: windows-latest
             platform: windows-x86_64
+          - os: windows-11-arm
+            platform: windows-arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
