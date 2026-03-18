@@ -2085,7 +2085,7 @@ checksum = "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
 
 [[package]]
 name = "tree-sitter-language-pack"
-version = "1.0.0-rc.8"
+version = "1.0.0-rc.9"
 dependencies = [
  "cc",
  "dirs",
@@ -2103,7 +2103,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-cli"
-version = "1.0.0-rc.8"
+version = "1.0.0-rc.9"
 dependencies = [
  "clap",
  "clap_complete",
@@ -2113,7 +2113,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-elixir"
-version = "1.0.0-rc.8"
+version = "1.0.0-rc.9"
 dependencies = [
  "rustler",
  "serde_json",
@@ -2123,7 +2123,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-ffi"
-version = "1.0.0-rc.8"
+version = "1.0.0-rc.9"
 dependencies = [
  "cbindgen",
  "serde_json",
@@ -2133,7 +2133,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-node"
-version = "1.0.0-rc.8"
+version = "1.0.0-rc.9"
 dependencies = [
  "napi",
  "napi-build",
@@ -2145,7 +2145,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-php"
-version = "1.0.0-rc.8"
+version = "1.0.0-rc.9"
 dependencies = [
  "ext-php-rs",
  "serde_json",
@@ -2154,7 +2154,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-python"
-version = "1.0.0-rc.8"
+version = "1.0.0-rc.9"
 dependencies = [
  "pyo3",
  "serde_json",
@@ -2164,7 +2164,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-ruby"
-version = "1.0.0-rc.8"
+version = "1.0.0-rc.9"
 dependencies = [
  "magnus",
  "rb-sys",
@@ -2175,7 +2175,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-wasm"
-version = "1.0.0-rc.8"
+version = "1.0.0-rc.9"
 dependencies = [
  "js-sys",
  "serde_json",

@@ -1,7 +1,7 @@
 defmodule TreeSitterLanguagePack.MixProject do
   use Mix.Project
 
-  @version "1.0.0-rc.8"
+  @version "1.0.0-rc.9"
 
   def project do
     [

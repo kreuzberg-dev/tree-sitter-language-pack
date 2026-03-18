@@ -3,7 +3,7 @@
 	"type": "project",
 	"require": {
 		"php": ">=8.2",
-		"kreuzberg/tree-sitter-language-pack": "1.0.0-rc.8"
+		"kreuzberg/tree-sitter-language-pack": "1.0.0-rc.9"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^11.0"
