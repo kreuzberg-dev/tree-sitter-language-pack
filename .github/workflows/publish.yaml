@@ -429,11 +429,21 @@ jobs:
       - name: Install zstd (if missing)
         shell: bash
         run: |
-          if ! command -v zstd &>/dev/null; then
-            echo "zstd not found, installing via cargo..."
-            cargo install --locked zstd-cli
-          else
+          if command -v zstd &>/dev/null; then
             echo "zstd already available: $(zstd --version)"
+          elif [[ "$RUNNER_OS" == "Windows" ]]; then
+            echo "Installing zstd for Windows..."
+            curl -fsSL "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-v1.5.7-win64.zip" -o /tmp/zstd.zip
+            unzip -q /tmp/zstd.zip -d /tmp/zstd
+            cp /tmp/zstd/zstd-v1.5.7-win64/zstd.exe "$HOME/.cargo/bin/"
+            echo "zstd installed: $(zstd --version)"
+          else
+            echo "Installing zstd via package manager..."
+            if [[ "$RUNNER_OS" == "macOS" ]]; then
+              brew install zstd
+            else
+              sudo apt-get update && sudo apt-get install -y zstd
+            fi
           fi
 
       - name: Setup Python
