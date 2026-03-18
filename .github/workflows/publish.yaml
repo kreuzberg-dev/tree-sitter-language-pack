@@ -758,6 +758,25 @@ jobs:
           fi
           echo "WASM binary size: $(wc -c < pkg/ts_pack_wasm_bg.wasm) bytes"
 
+      - name: Patch WASM package.json
+        working-directory: crates/ts-pack-wasm
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          python3 -c "
+          import json
+          with open('pkg/package.json', 'r') as f:
+              data = json.load(f)
+          data['name'] = '@kreuzberg/tree-sitter-language-pack-wasm'
+          data['version'] = '$VERSION'
+          data['publishConfig'] = {'registry': 'https://registry.npmjs.org/', 'access': 'public'}
+          data['repository'] = {'type': 'git', 'url': 'https://github.com/kreuzberg-dev/tree-sitter-language-pack'}
+          data['license'] = 'MIT OR Apache-2.0'
+          with open('pkg/package.json', 'w') as f:
+              json.dump(data, f, indent=2)
+              f.write('\n')
+          print(f'Patched pkg/package.json: name={data[\"name\"]}, version={data[\"version\"]}')
+          "
+
       - name: Upload WASM package
         uses: actions/upload-artifact@v7
         with:
@@ -1793,11 +1812,22 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Determine npm tag
+        id: wasm-npm-tag
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          if [[ "$VERSION" == *"-"* ]]; then
+            echo "tag=next" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=latest" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
         uses: kreuzberg-dev/actions/publish-npm@v1
         with:
           package-dir: crates/ts-pack-wasm/pkg
+          npm-tag: ${{ steps.wasm-npm-tag.outputs.tag }}
           provenance: "true"
           dry-run: ${{ inputs.dry_run }}
         env:
