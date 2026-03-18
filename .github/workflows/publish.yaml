@@ -405,8 +405,6 @@ jobs:
             label: macos-arm64
           - os: windows-latest
             label: windows-x86_64
-          - os: windows-11-arm
-            label: windows-aarch64
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -490,8 +488,6 @@ jobs:
             label: macos-arm64
           - os: windows-latest
             label: windows-x86_64
-          - os: windows-11-arm
-            label: windows-aarch64
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -2211,7 +2207,7 @@ jobs:
   # ─── Build Homebrew bottle ─────────────────────────────────────────
   homebrew-bottles:
     name: Build Homebrew bottle
-    needs: [prepare, check-homebrew]
+    needs: [prepare, check-homebrew, clone-vendors]
     if: |
       needs.prepare.outputs.release_homebrew == 'true' &&
       (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
@@ -2236,10 +2232,24 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Build CLI
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Get all language names
+        id: langs
+        shell: bash
+        run: |
+          LANGS=$(python3 -c "import json; d=json.load(open('sources/language_definitions.json')); print(','.join(sorted(d.keys())))")
+          echo "names=$LANGS" >> "$GITHUB_OUTPUT"
+
+      - name: Build CLI (with all parsers statically linked)
         run: cargo build --release -p ts-pack-cli
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: ${{ steps.langs.outputs.names }}
+          TSLP_LINK_MODE: static
 
       - name: Detect macOS bottle tag
         id: os-info
