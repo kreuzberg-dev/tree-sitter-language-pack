@@ -40,7 +40,8 @@
 	},
 	"batch": {
 		"repo": "https://github.com/davidevofficial/tree-sitter-batch",
-		"rev": "737a031b42240bf61bf7ea5e4356d4e0580dd6d9"
+		"rev": "737a031b42240bf61bf7ea5e4356d4e0580dd6d9",
+		"generate": true
 	},
 	"beancount": {
 		"branch": "master",
@@ -145,7 +146,8 @@
 	},
 	"diff": {
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-diff",
-		"rev": "2520c3f934b3179bb540d23e0ef45f75304b5fed"
+		"rev": "2520c3f934b3179bb540d23e0ef45f75304b5fed",
+		"generate": true
 	},
 	"dockerfile": {
 		"repo": "https://github.com/camdencheek/tree-sitter-dockerfile",
@@ -501,7 +503,8 @@
 	},
 	"pkl": {
 		"repo": "https://github.com/apple/tree-sitter-pkl",
-		"rev": "7c8a0d15d83c1a436e91277d5023340f1ae5726b"
+		"rev": "7c8a0d15d83c1a436e91277d5023340f1ae5726b",
+		"generate": true
 	},
 	"po": {
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-po",

@@ -33,9 +33,7 @@
 	},
 	{
 		"language": "batch",
-		"source": "@echo off",
-		"skip": true,
-		"skip_reason": "parser sources not yet available"
+		"source": "@echo off"
 	},
 	{
 		"language": "beancount",
@@ -127,9 +125,7 @@
 	},
 	{
 		"language": "diff",
-		"source": "--- a\n+++ b\n@@ -1 +1 @@\n-old\n+new",
-		"skip": true,
-		"skip_reason": "parser sources not yet available"
+		"source": "--- a\n+++ b\n@@ -1 +1 @@\n-old\n+new"
 	},
 	{
 		"language": "dockerfile",
@@ -441,9 +437,7 @@
 	},
 	{
 		"language": "pkl",
-		"source": "name = \"hello\"",
-		"skip": true,
-		"skip_reason": "parser sources not yet available"
+		"source": "name = \"hello\""
 	},
 	{
 		"language": "po",
