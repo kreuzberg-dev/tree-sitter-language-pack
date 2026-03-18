@@ -13,6 +13,9 @@ use std::ptr;
 use tree_sitter::ffi::TSLanguage;
 use tree_sitter_language_pack::LanguageRegistry;
 
+#[cfg(feature = "download")]
+use tree_sitter_language_pack::PackConfig;
+
 // ---------------------------------------------------------------------------
 // Opaque handles
 // ---------------------------------------------------------------------------
@@ -612,6 +615,299 @@ pub unsafe extern "C" fn ts_pack_process(
             }
         }
     })
+}
+
+// ---------------------------------------------------------------------------
+// Download API
+// ---------------------------------------------------------------------------
+
+/// Initialize the language pack with configuration.
+///
+/// `config_json` is a null-terminated JSON string with optional fields:
+/// - `cache_dir` (string): override default cache directory
+/// - `languages` (array of strings): languages to pre-download
+/// - `groups` (array of strings): language groups to pre-download
+///
+/// Returns 0 on success, -1 on error (check `ts_pack_last_error`).
+///
+/// # Safety
+///
+/// `config_json` must be a valid null-terminated UTF-8 C string, or null.
+#[cfg(feature = "download")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_init(config_json: *const c_char) -> i32 {
+    ffi_guard!(-1, {
+        clear_last_error();
+        let config_str = if config_json.is_null() {
+            "{}"
+        } else {
+            match CStr::from_ptr(config_json).to_str() {
+                Ok(s) => s,
+                Err(e) => {
+                    set_last_error(&format!("invalid UTF-8 in config_json: {e}"));
+                    return -1;
+                }
+            }
+        };
+        let config: PackConfig = match serde_json::from_str(config_str) {
+            Ok(c) => c,
+            Err(e) => {
+                set_last_error(&format!("invalid JSON in config: {e}"));
+                return -1;
+            }
+        };
+        match tree_sitter_language_pack::init(&config) {
+            Ok(()) => 0,
+            Err(e) => {
+                set_last_error(&e.to_string());
+                -1
+            }
+        }
+    })
+}
+
+/// Configure the language pack without downloading.
+///
+/// `config_json` is a null-terminated JSON string with optional fields:
+/// - `cache_dir` (string): override default cache directory
+///
+/// Returns 0 on success, -1 on error (check `ts_pack_last_error`).
+///
+/// # Safety
+///
+/// `config_json` must be a valid null-terminated UTF-8 C string, or null.
+#[cfg(feature = "download")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_configure(config_json: *const c_char) -> i32 {
+    ffi_guard!(-1, {
+        clear_last_error();
+        let config_str = if config_json.is_null() {
+            "{}"
+        } else {
+            match CStr::from_ptr(config_json).to_str() {
+                Ok(s) => s,
+                Err(e) => {
+                    set_last_error(&format!("invalid UTF-8 in config_json: {e}"));
+                    return -1;
+                }
+            }
+        };
+        let config: PackConfig = match serde_json::from_str(config_str) {
+            Ok(c) => c,
+            Err(e) => {
+                set_last_error(&format!("invalid JSON in config: {e}"));
+                return -1;
+            }
+        };
+        match tree_sitter_language_pack::configure(&config) {
+            Ok(()) => 0,
+            Err(e) => {
+                set_last_error(&e.to_string());
+                -1
+            }
+        }
+    })
+}
+
+/// Download specific languages to the cache.
+///
+/// `names` is an array of pointers to null-terminated language name strings.
+/// `count` is the number of strings in the array.
+///
+/// Returns the number of newly downloaded languages on success, or -1 on error.
+///
+/// # Safety
+///
+/// `names` must be a valid array of `count` pointers to null-terminated UTF-8 C strings.
+#[cfg(feature = "download")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_download(names: *const *const c_char, count: usize) -> i32 {
+    ffi_guard!(-1, {
+        clear_last_error();
+        if names.is_null() && count > 0 {
+            set_last_error("names array is null but count > 0");
+            return -1;
+        }
+        let mut lang_names: Vec<&str> = Vec::with_capacity(count);
+        // SAFETY: caller guarantees valid array of pointers
+        let names_arr = unsafe { std::slice::from_raw_parts(names, count) };
+        for name_ptr in names_arr {
+            if name_ptr.is_null() {
+                set_last_error("null pointer in names array");
+                return -1;
+            }
+            // SAFETY: caller guarantees valid null-terminated C string
+            match unsafe { CStr::from_ptr(*name_ptr) }.to_str() {
+                Ok(s) => lang_names.push(s),
+                Err(e) => {
+                    set_last_error(&format!("invalid UTF-8 in language name: {e}"));
+                    return -1;
+                }
+            }
+        }
+        match tree_sitter_language_pack::download(&lang_names) {
+            Ok(n) => n as i32,
+            Err(e) => {
+                set_last_error(&e.to_string());
+                -1
+            }
+        }
+    })
+}
+
+/// Download all available languages from the remote manifest.
+///
+/// Returns the number of newly downloaded languages on success, or -1 on error.
+#[cfg(feature = "download")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_download_all() -> i32 {
+    ffi_guard!(-1, {
+        clear_last_error();
+        match tree_sitter_language_pack::download_all() {
+            Ok(n) => n as i32,
+            Err(e) => {
+                set_last_error(&e.to_string());
+                -1
+            }
+        }
+    })
+}
+
+/// Get all language names available in the remote manifest.
+///
+/// Returns a newly-allocated array of language name strings. The caller must
+/// free the array with `ts_pack_free_string_array`, and the individual strings
+/// with `ts_pack_free_string`.
+///
+/// Sets `out_count` to the number of languages in the returned array.
+/// Returns null on error (check `ts_pack_last_error`).
+#[cfg(feature = "download")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_manifest_languages(out_count: *mut usize) -> *const *const c_char {
+    ffi_guard!(ptr::null(), {
+        clear_last_error();
+        if out_count.is_null() {
+            set_last_error("out_count pointer is null");
+            return ptr::null();
+        }
+        match tree_sitter_language_pack::manifest_languages() {
+            Ok(langs) => {
+                let c_strings: Vec<*const c_char> = langs
+                    .into_iter()
+                    .filter_map(|name| CString::new(name).ok())
+                    .map(|c| CString::into_raw(c) as *const c_char)
+                    .collect();
+                let count = c_strings.len();
+                // SAFETY: caller owns the returned pointer and must free with ts_pack_free_string_array
+                unsafe {
+                    *out_count = count;
+                }
+                Box::into_raw(c_strings.into_boxed_slice()) as *const *const c_char
+            }
+            Err(e) => {
+                set_last_error(&e.to_string());
+                ptr::null()
+            }
+        }
+    })
+}
+
+/// Get all languages that are already downloaded and cached locally.
+///
+/// Returns a newly-allocated array of language name strings. The caller must
+/// free the array with `ts_pack_free_string_array`, and the individual strings
+/// with `ts_pack_free_string`.
+///
+/// Sets `out_count` to the number of languages in the returned array.
+/// Returns null if the count pointer is null, but never fails otherwise.
+#[cfg(feature = "download")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_downloaded_languages(out_count: *mut usize) -> *const *const c_char {
+    ffi_guard!(ptr::null(), {
+        clear_last_error();
+        if out_count.is_null() {
+            set_last_error("out_count pointer is null");
+            return ptr::null();
+        }
+        let langs = tree_sitter_language_pack::downloaded_languages();
+        let c_strings: Vec<*const c_char> = langs
+            .into_iter()
+            .filter_map(|name| CString::new(name).ok())
+            .map(|c| CString::into_raw(c) as *const c_char)
+            .collect();
+        let count = c_strings.len();
+        // SAFETY: caller owns the returned pointer and must free with ts_pack_free_string_array
+        unsafe {
+            *out_count = count;
+        }
+        Box::into_raw(c_strings.into_boxed_slice()) as *const *const c_char
+    })
+}
+
+/// Delete all cached parser shared libraries.
+///
+/// Returns 0 on success, -1 on error (check `ts_pack_last_error`).
+#[cfg(feature = "download")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_clean_cache() -> i32 {
+    ffi_guard!(-1, {
+        clear_last_error();
+        match tree_sitter_language_pack::clean_cache() {
+            Ok(()) => 0,
+            Err(e) => {
+                set_last_error(&e.to_string());
+                -1
+            }
+        }
+    })
+}
+
+/// Get the effective cache directory path as a C string.
+///
+/// Returns a newly-allocated C string that the caller must free with
+/// `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
+#[cfg(feature = "download")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_cache_dir() -> *const c_char {
+    ffi_guard!(ptr::null(), {
+        clear_last_error();
+        match tree_sitter_language_pack::cache_dir() {
+            Ok(path) => match CString::new(path.to_string_lossy().to_string()) {
+                Ok(c) => CString::into_raw(c),
+                Err(e) => {
+                    set_last_error(&format!("path contains null byte: {e}"));
+                    ptr::null()
+                }
+            },
+            Err(e) => {
+                set_last_error(&e.to_string());
+                ptr::null()
+            }
+        }
+    })
+}
+
+/// Free a string array that was returned by the FFI (e.g. from `ts_pack_manifest_languages`).
+///
+/// Passing a null pointer is a safe no-op.
+/// This function only frees the array wrapper, not the individual strings.
+/// Use `ts_pack_free_string` on each individual string before calling this.
+///
+/// # Safety
+///
+/// `arr` must be a pointer returned by an FFI function in this crate that returns
+/// an array, or null. Individual strings must be freed first with `ts_pack_free_string`.
+#[cfg(feature = "download")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_free_string_array(arr: *mut *const c_char) {
+    ffi_guard!((), {
+        if !arr.is_null() {
+            // SAFETY: the pointer was created by Box::into_raw in our code
+            unsafe {
+                drop(Box::from_raw(arr));
+            }
+        }
+    });
 }
 
 // ---------------------------------------------------------------------------

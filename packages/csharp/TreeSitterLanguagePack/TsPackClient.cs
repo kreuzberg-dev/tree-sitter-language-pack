@@ -169,6 +169,220 @@ public static class TsPackClient
             Marshal.FreeHGlobal(sourcePtr);
         }
     }
+
+    /// <summary>
+    /// Initialize the language pack with configuration.
+    /// configJson is a JSON string with optional fields:
+    /// - "cache_dir" (string): override default cache directory
+    /// - "languages" (array): languages to pre-download
+    /// - "groups" (array): language groups to pre-download
+    /// </summary>
+    /// <exception cref="TsPackException">Thrown when initialization fails.</exception>
+    public static void Init(string? configJson = null)
+    {
+        var configPtr = configJson != null ? InteropUtilities.StringToUtf8Ptr(configJson) : IntPtr.Zero;
+        try
+        {
+            int rc = NativeMethods.Init(configPtr);
+            if (rc != 0)
+            {
+                InteropUtilities.ThrowIfError();
+                throw new TsPackException("ts_pack_init failed");
+            }
+        }
+        finally
+        {
+            if (configPtr != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(configPtr);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Configure the language pack cache directory without downloading.
+    /// configJson is a JSON string with optional fields:
+    /// - "cache_dir" (string): override default cache directory
+    /// </summary>
+    /// <exception cref="TsPackException">Thrown when configuration fails.</exception>
+    public static void Configure(string? configJson = null)
+    {
+        var configPtr = configJson != null ? InteropUtilities.StringToUtf8Ptr(configJson) : IntPtr.Zero;
+        try
+        {
+            int rc = NativeMethods.Configure(configPtr);
+            if (rc != 0)
+            {
+                InteropUtilities.ThrowIfError();
+                throw new TsPackException("ts_pack_configure failed");
+            }
+        }
+        finally
+        {
+            if (configPtr != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(configPtr);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Download specific languages to the cache.
+    /// </summary>
+    /// <returns>The number of newly downloaded languages.</returns>
+    /// <exception cref="TsPackException">Thrown when download fails.</exception>
+    public static int Download(params string[] languages)
+    {
+        if (languages.Length == 0)
+        {
+            return 0;
+        }
+
+        IntPtr[] namesPtrs = new IntPtr[languages.Length];
+        try
+        {
+            for (int i = 0; i < languages.Length; i++)
+            {
+                namesPtrs[i] = InteropUtilities.StringToUtf8Ptr(languages[i]);
+            }
+
+            IntPtr namesArray = Marshal.AllocHGlobal(IntPtr.Size * languages.Length);
+            for (int i = 0; i < languages.Length; i++)
+            {
+                Marshal.WriteIntPtr(namesArray, i * IntPtr.Size, namesPtrs[i]);
+            }
+
+            try
+            {
+                int rc = NativeMethods.Download(namesArray, (UIntPtr)languages.Length);
+                if (rc < 0)
+                {
+                    InteropUtilities.ThrowIfError();
+                    throw new TsPackException("ts_pack_download failed");
+                }
+                return rc;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(namesArray);
+            }
+        }
+        finally
+        {
+            for (int i = 0; i < namesPtrs.Length; i++)
+            {
+                if (namesPtrs[i] != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(namesPtrs[i]);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Download all available languages from the remote manifest.
+    /// </summary>
+    /// <returns>The number of newly downloaded languages.</returns>
+    /// <exception cref="TsPackException">Thrown when download fails.</exception>
+    public static int DownloadAll()
+    {
+        int rc = NativeMethods.DownloadAll();
+        if (rc < 0)
+        {
+            InteropUtilities.ThrowIfError();
+            throw new TsPackException("ts_pack_download_all failed");
+        }
+        return rc;
+    }
+
+    /// <summary>
+    /// Get all language names available in the remote manifest.
+    /// </summary>
+    /// <returns>An array of available language names.</returns>
+    /// <exception cref="TsPackException">Thrown when the operation fails.</exception>
+    public static string[] ManifestLanguages()
+    {
+        var arrPtr = NativeMethods.ManifestLanguages(out var count);
+        if (arrPtr == IntPtr.Zero)
+        {
+            InteropUtilities.ThrowIfError();
+            throw new TsPackException("ts_pack_manifest_languages failed");
+        }
+
+        try
+        {
+            var result = new string[(int)(nuint)count];
+            for (int i = 0; i < (int)(nuint)count; i++)
+            {
+                IntPtr strPtr = Marshal.ReadIntPtr(arrPtr, i * IntPtr.Size);
+                result[i] = Marshal.PtrToStringUTF8(strPtr) ?? string.Empty;
+            }
+            return result;
+        }
+        finally
+        {
+            NativeMethods.FreeStringArray(arrPtr);
+        }
+    }
+
+    /// <summary>
+    /// Get all languages that are already downloaded and cached locally.
+    /// </summary>
+    /// <returns>An array of locally cached language names.</returns>
+    /// <exception cref="TsPackException">Thrown when the operation fails.</exception>
+    public static string[] DownloadedLanguages()
+    {
+        var arrPtr = NativeMethods.DownloadedLanguages(out var count);
+        if (arrPtr == IntPtr.Zero)
+        {
+            return [];
+        }
+
+        try
+        {
+            var result = new string[(int)(nuint)count];
+            for (int i = 0; i < (int)(nuint)count; i++)
+            {
+                IntPtr strPtr = Marshal.ReadIntPtr(arrPtr, i * IntPtr.Size);
+                result[i] = Marshal.PtrToStringUTF8(strPtr) ?? string.Empty;
+            }
+            return result;
+        }
+        finally
+        {
+            NativeMethods.FreeStringArray(arrPtr);
+        }
+    }
+
+    /// <summary>
+    /// Delete all cached parser shared libraries.
+    /// </summary>
+    /// <exception cref="TsPackException">Thrown when the operation fails.</exception>
+    public static void CleanCache()
+    {
+        int rc = NativeMethods.CleanCache();
+        if (rc != 0)
+        {
+            InteropUtilities.ThrowIfError();
+            throw new TsPackException("ts_pack_clean_cache failed");
+        }
+    }
+
+    /// <summary>
+    /// Get the effective cache directory path.
+    /// </summary>
+    /// <returns>The cache directory path as a string.</returns>
+    /// <exception cref="TsPackException">Thrown when the operation fails.</exception>
+    public static string? CacheDir()
+    {
+        var cachePtr = NativeMethods.CacheDir();
+        if (cachePtr == IntPtr.Zero)
+        {
+            InteropUtilities.ThrowIfError();
+            throw new TsPackException("ts_pack_cache_dir failed");
+        }
+        return InteropUtilities.Utf8PtrToStringAndFree(cachePtr);
+    }
 }
 
 /// <summary>

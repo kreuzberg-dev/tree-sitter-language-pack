@@ -1,17 +1,26 @@
 from typing import TypeAlias
 
 from tree_sitter_language_pack._native import (
+    DownloadError,
     LanguageNotFoundError,
     ParseError,
     ProcessConfig,
     QueryError,
     TreeHandle,
     available_languages,
+    cache_dir,
+    clean_cache,
+    configure,
+    download,
+    download_all,
+    downloaded_languages,
     get_binding,
     get_language,
     get_parser,
     has_language,
+    init,
     language_count,
+    manifest_languages,
     parse_string,
     process,
 )
@@ -19,6 +28,7 @@ from tree_sitter_language_pack._native import (
 SupportedLanguage: TypeAlias = str
 
 __all__ = [
+    "DownloadError",
     "LanguageNotFoundError",
     "ParseError",
     "ProcessConfig",
@@ -26,11 +36,19 @@ __all__ = [
     "SupportedLanguage",
     "TreeHandle",
     "available_languages",
+    "cache_dir",
+    "clean_cache",
+    "configure",
+    "download",
+    "download_all",
+    "downloaded_languages",
     "get_binding",
     "get_language",
     "get_parser",
     "has_language",
+    "init",
     "language_count",
+    "manifest_languages",
     "parse_string",
     "process",
 ]

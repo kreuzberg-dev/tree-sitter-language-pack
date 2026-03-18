@@ -99,7 +99,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
@@ -193,7 +193,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: cratesio
           package: tree-sitter-language-pack
@@ -210,7 +210,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: pypi
           package: tree-sitter-language-pack
@@ -227,7 +227,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: npm
           package: "@kreuzberg/tree-sitter-language-pack"
@@ -244,7 +244,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: npm
           package: "@kreuzberg/tree-sitter-language-pack-wasm"
@@ -261,7 +261,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: rubygems
           package: tree_sitter_language_pack
@@ -278,7 +278,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: maven
           package: tree-sitter-language-pack
@@ -296,7 +296,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: hex
           package: tree_sitter_language_pack
@@ -313,7 +313,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: packagist
           package: kreuzberg/tree-sitter-language-pack
@@ -330,7 +330,7 @@ jobs:
     steps:
       - name: Check if version exists
         id: check
-        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: nuget
           package: TreeSitterLanguagePack
@@ -343,23 +343,23 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Setup Node
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
 
       - name: Install tree-sitter CLI
         run: npm install -g tree-sitter-cli
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7.5.0
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
       - name: Set up Python
-        uses: actions/setup-python@v6.2.0
+        uses: actions/setup-python@v6
         with:
           python-version: "3.14"
 
@@ -367,7 +367,7 @@ jobs:
         run: uv sync --no-install-project
 
       - name: Cache parsers
-        uses: actions/cache@v5.0.3
+        uses: actions/cache@v5
         with:
           path: parsers
           key: parsers-${{ hashFiles('sources/language_definitions.json') }}
@@ -380,7 +380,7 @@ jobs:
           uv run --no-sync scripts/clone_vendors.py
 
       - name: Upload parsers
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: language-parsers
           path: parsers
@@ -408,18 +408,18 @@ jobs:
             label: windows-aarch64
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           components: ""
           use-sccache: "false"
@@ -464,7 +464,7 @@ jobs:
           cd staging && tar -cf - . | zstd -19 -o "../parsers-${{ matrix.label }}.tar.zst"
 
       - name: Upload parser binaries
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: parsers-${{ matrix.label }}
           path: parsers-${{ matrix.label }}.tar.zst
@@ -493,18 +493,18 @@ jobs:
             label: windows-aarch64
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           components: ""
           use-sccache: "false"
@@ -519,7 +519,7 @@ jobs:
           PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Upload wheel
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: python-wheel-${{ matrix.label }}
           path: dist/*.whl
@@ -547,25 +547,25 @@ jobs:
             napi_target: x86_64-pc-windows-msvc
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
@@ -580,7 +580,7 @@ jobs:
           PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Upload native module
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: node-native-${{ matrix.label }}
           path: crates/ts-pack-node/*.node
@@ -610,27 +610,27 @@ jobs:
             ruby_platform: arm64-darwin
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1.292.0
+        uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.3"
+          ruby-version: "3.4"
           bundler: none
           bundler-cache: false
 
@@ -688,7 +688,7 @@ jobs:
           done
 
       - name: Upload gem artifacts
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: rubygems-${{ matrix.label }}
           path: crates/ts-pack-ruby/*.gem
@@ -704,18 +704,18 @@ jobs:
     timeout-minutes: 120
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           target: wasm32-unknown-unknown
           components: ""
@@ -723,7 +723,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Install WASI SDK
-        uses: kreuzberg-dev/actions/install-wasi-sdk@v1.0.0
+        uses: kreuzberg-dev/actions/install-wasi-sdk@v1
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
@@ -758,7 +758,7 @@ jobs:
           echo "WASM binary size: $(wc -c < pkg/ts_pack_wasm_bg.wasm) bytes"
 
       - name: Upload WASM package
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: wasm-pkg
           path: crates/ts-pack-wasm/pkg/
@@ -785,18 +785,18 @@ jobs:
             label: windows-x86_64
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           components: ""
           use-sccache: "false"
@@ -828,7 +828,7 @@ jobs:
           cd staging && tar -czf "../go-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
 
       - name: Upload FFI artifact
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: go-ffi-${{ matrix.label }}
           path: go-ffi-${{ matrix.label }}.tar.gz
@@ -859,18 +859,18 @@ jobs:
             rid: windows-x86_64
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           components: ""
           use-sccache: "false"
@@ -896,7 +896,7 @@ jobs:
           cp target/release/ts_pack_ffi.dll java-natives/${{ matrix.rid }}/ 2>/dev/null || true
 
       - name: Upload native artifact
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: java-natives-${{ matrix.label }}
           path: java-natives/${{ matrix.rid }}
@@ -911,22 +911,22 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Setup Java
-        uses: actions/setup-java@v5.2.0
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '25'
           cache: 'maven'
 
       - name: Setup Maven
-        uses: kreuzberg-dev/actions/setup-maven@v1.0.0
+        uses: kreuzberg-dev/actions/setup-maven@v1
 
       - name: Download Java native artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           pattern: java-natives-*
           path: artifacts/java-natives
@@ -950,7 +950,7 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Upload JAR artifact
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: maven-packages
           path: crates/ts-pack-java/target/*.jar
@@ -978,18 +978,18 @@ jobs:
             target: aarch64-apple-darwin
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           target: ${{ matrix.target }}
           components: ""
@@ -1069,7 +1069,7 @@ jobs:
           echo "Created: dist/elixir/${TARBALL}"
 
       - name: Upload NIF artifacts
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: elixir-${{ matrix.label }}
           path: dist/elixir/*.tar.gz
@@ -1097,18 +1097,18 @@ jobs:
             label: windows-x86_64
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           components: ""
           use-sccache: "false"
@@ -1150,7 +1150,7 @@ jobs:
           cd staging && tar -czf "../c-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
 
       - name: Upload C FFI artifact
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: c-ffi-${{ matrix.label }}
           path: c-ffi-${{ matrix.label }}.tar.gz
@@ -1175,18 +1175,18 @@ jobs:
             label: macos-arm64
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
+        uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
           tools: none
@@ -1198,7 +1198,7 @@ jobs:
           echo "RUSTFLAGS=${RUSTFLAGS:+$RUSTFLAGS }${EXTRA_FLAGS}" >> "$GITHUB_ENV"
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           components: ""
           use-sccache: "false"
@@ -1217,7 +1217,7 @@ jobs:
           cd staging && tar -czf "../php-ext-${{ matrix.label }}.tar.gz" .
 
       - name: Upload PHP extension artifact
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: php-ext-${{ matrix.label }}
           path: php-ext-${{ matrix.label }}.tar.gz
@@ -1248,18 +1248,18 @@ jobs:
             rid: win-x64
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           components: ""
           use-sccache: "false"
@@ -1285,7 +1285,7 @@ jobs:
           cp target/release/ts_pack_ffi.dll csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
 
       - name: Upload native artifact
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: csharp-natives-${{ matrix.label }}
           path: csharp-natives/${{ matrix.rid }}
@@ -1300,17 +1300,17 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.0"
+          dotnet-version: "10.0"
 
       - name: Download C# native artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           pattern: csharp-natives-*
           path: artifacts/csharp-natives
@@ -1334,7 +1334,7 @@ jobs:
         run: dotnet pack -c Release
 
       - name: Upload NuGet package
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: nuget-packages
           path: packages/csharp/TreeSitterLanguagePack/bin/Release/*.nupkg
@@ -1354,12 +1354,12 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parser binary artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           pattern: parsers-*
           path: dist/parsers
@@ -1404,7 +1404,7 @@ jobs:
           "
 
       - name: Upload to GitHub Release
-        uses: kreuzberg-dev/actions/publish-github-release@v1.0.0
+        uses: kreuzberg-dev/actions/publish-github-release@v1
         with:
           tag: ${{ inputs.tag }}
           title: "Release ${{ inputs.tag }}"
@@ -1430,19 +1430,19 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download Go FFI artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           pattern: go-ffi-*
           path: dist/go
           merge-multiple: true
 
       - name: Upload to GitHub Release
-        uses: kreuzberg-dev/actions/publish-github-release@v1.0.0
+        uses: kreuzberg-dev/actions/publish-github-release@v1
         with:
           tag: ${{ inputs.tag }}
           title: "Release ${{ inputs.tag }}"
@@ -1466,19 +1466,19 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download C FFI artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           pattern: c-ffi-*
           path: dist/c-ffi
           merge-multiple: true
 
       - name: Upload to GitHub Release
-        uses: kreuzberg-dev/actions/publish-github-release@v1.0.0
+        uses: kreuzberg-dev/actions/publish-github-release@v1
         with:
           tag: ${{ inputs.tag }}
           title: "Release ${{ inputs.tag }}"
@@ -1502,12 +1502,12 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download Elixir NIF artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           pattern: elixir-*
           path: dist/elixir
@@ -1543,18 +1543,18 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           components: ""
           use-sccache: "false"
@@ -1602,7 +1602,7 @@ jobs:
       id-token: write
     steps:
       - name: Download all wheels
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           path: dist
           pattern: python-wheel-*
@@ -1642,12 +1642,12 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
@@ -1656,7 +1656,7 @@ jobs:
         run: npm install -g @napi-rs/cli
 
       - name: Download all native modules
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           path: crates/ts-pack-node/artifacts
           pattern: node-native-*
@@ -1751,18 +1751,18 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
       - name: Download WASM package
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: wasm-pkg
           path: crates/ts-pack-wasm/pkg
@@ -1794,7 +1794,7 @@ jobs:
 
       - name: Publish to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-npm@v1.0.0
+        uses: kreuzberg-dev/actions/publish-npm@v1
         with:
           package-dir: crates/ts-pack-wasm/pkg
           provenance: "true"
@@ -1804,7 +1804,7 @@ jobs:
 
       - name: Wait for npm indexing
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/wait-for-package@v1.0.0
+        uses: kreuzberg-dev/actions/wait-for-package@v1
         with:
           registry: npm
           package: "@kreuzberg/tree-sitter-language-pack-wasm"
@@ -1827,26 +1827,26 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1.292.0
+        uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.3"
+          ruby-version: "3.4"
           bundler: none
           bundler-cache: false
 
       - name: Download Ruby gem artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           pattern: rubygems-*
           path: dist
           merge-multiple: true
 
       - name: Set up Python (for vendor script)
-        uses: actions/setup-python@v6.2.0
+        uses: actions/setup-python@v6
         with:
           python-version: "3.14"
 
@@ -1907,11 +1907,11 @@ jobs:
 
       - name: Configure trusted publishing credentials
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: rubygems/configure-rubygems-credentials@bc6dd217f8a4f919d6835fcfefd470ef821f5c44 # v1.0.0
+        uses: rubygems/configure-rubygems-credentials@v1
 
       - name: Publish gems to RubyGems
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-rubygems@v1.0.0
+        uses: kreuzberg-dev/actions/publish-rubygems@v1
         with:
           gems-dir: dist
           dry-run: ${{ inputs.dry_run }}
@@ -1931,7 +1931,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
@@ -1951,7 +1951,7 @@ jobs:
 
       - name: Setup Java
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: actions/setup-java@v5.2.0
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 25
@@ -1964,18 +1964,18 @@ jobs:
 
       - name: Setup Maven
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/setup-maven@v1.0.0
+        uses: kreuzberg-dev/actions/setup-maven@v1
 
       - name: Download Java package artifacts
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: maven-packages
           path: crates/ts-pack-java/target
 
       - name: Publish to Maven Central
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-maven@v1.0.0
+        uses: kreuzberg-dev/actions/publish-maven@v1
         with:
           pom-file: crates/ts-pack-java/pom.xml
           maven-profile: publish
@@ -2006,7 +2006,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
           fetch-depth: 0
@@ -2018,7 +2018,7 @@ jobs:
           fi
 
       - name: Setup Elixir
-        uses: erlef/setup-elixir@v1.22.0
+        uses: erlef/setup-elixir@v1
         with:
           elixir-version: "1.17"
           otp-version: "26"
@@ -2050,7 +2050,7 @@ jobs:
 
       - name: Publish to Hex.pm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-hex@v1.0.0
+        uses: kreuzberg-dev/actions/publish-hex@v1
         with:
           package-dir: crates/ts-pack-elixir
           skip-docs: "true"
@@ -2078,12 +2078,12 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Download PHP extension artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           pattern: php-ext-*
           path: dist/php
@@ -2102,7 +2102,7 @@ jobs:
 
       - name: Publish to Packagist
         if: ${{ !inputs.dry_run }}
-        uses: kreuzberg-dev/actions/publish-packagist@v1.0.0
+        uses: kreuzberg-dev/actions/publish-packagist@v1
         with:
           packagist-username: Goldziher
           package-name: kreuzberg/tree-sitter-language-pack
@@ -2127,17 +2127,17 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.0"
+          dotnet-version: "10.0"
 
       - name: Download NuGet package
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: nuget-packages
           path: dist/nuget
@@ -2155,7 +2155,7 @@ jobs:
 
       - name: Publish to NuGet
         if: ${{ !inputs.dry_run }}
-        uses: kreuzberg-dev/actions/publish-nuget@v1.0.0
+        uses: kreuzberg-dev/actions/publish-nuget@v1
         with:
           packages-dir: dist/nuget
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -2197,7 +2197,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
           fetch-depth: 0

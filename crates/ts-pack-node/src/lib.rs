@@ -110,3 +110,100 @@ pub fn process(source: String, config: JsProcessConfig) -> napi::Result<serde_js
         .map_err(|e| napi::Error::from_reason(format!("{e}")))?;
     serde_json::to_value(&result).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))
 }
+
+// ---------------------------------------------------------------------------
+// Download and configure API
+// ---------------------------------------------------------------------------
+
+/// Configuration for download and cache management.
+#[napi(object)]
+pub struct JsPackConfig {
+    pub cache_dir: Option<String>,
+    pub languages: Option<Vec<String>>,
+    pub groups: Option<Vec<String>>,
+}
+
+impl From<JsPackConfig> for tree_sitter_language_pack::PackConfig {
+    fn from(js: JsPackConfig) -> Self {
+        Self {
+            cache_dir: js.cache_dir.map(std::path::PathBuf::from),
+            languages: js.languages,
+            groups: js.groups,
+        }
+    }
+}
+
+/// Initialize download system with configuration and pre-download all specified languages.
+///
+/// Throws an error if configuration or download fails.
+#[napi(js_name = "init")]
+pub fn js_init(config: JsPackConfig) -> napi::Result<()> {
+    let pack_config = tree_sitter_language_pack::PackConfig::from(config);
+    tree_sitter_language_pack::init(&pack_config).map_err(|e| napi::Error::from_reason(format!("{e}")))
+}
+
+/// Configure the cache directory without downloading.
+///
+/// Throws an error if configuration fails.
+#[napi(js_name = "configure")]
+pub fn js_configure(config: JsPackConfig) -> napi::Result<()> {
+    let pack_config = tree_sitter_language_pack::PackConfig::from(config);
+    tree_sitter_language_pack::configure(&pack_config).map_err(|e| napi::Error::from_reason(format!("{e}")))
+}
+
+/// Download specific languages by name.
+///
+/// Returns the number of languages successfully downloaded.
+/// Throws an error if download fails.
+#[napi(js_name = "download")]
+pub fn js_download(names: Vec<String>) -> napi::Result<u32> {
+    let name_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
+    tree_sitter_language_pack::download(&name_refs)
+        .map(|count| count as u32)
+        .map_err(|e| napi::Error::from_reason(format!("{e}")))
+}
+
+/// Download all 170+ available languages from the remote manifest.
+///
+/// Returns the number of languages successfully downloaded.
+/// Throws an error if download fails.
+#[napi(js_name = "downloadAll")]
+pub fn js_download_all() -> napi::Result<u32> {
+    tree_sitter_language_pack::download_all()
+        .map(|count| count as u32)
+        .map_err(|e| napi::Error::from_reason(format!("{e}")))
+}
+
+/// Get all available languages from the remote manifest.
+///
+/// Returns an array of language names. Throws an error if manifest fetch fails.
+#[napi(js_name = "manifestLanguages")]
+pub fn js_manifest_languages() -> napi::Result<Vec<String>> {
+    tree_sitter_language_pack::manifest_languages().map_err(|e| napi::Error::from_reason(format!("{e}")))
+}
+
+/// Get all languages that have been downloaded and cached locally.
+///
+/// Returns an array of language names currently in the cache.
+#[napi(js_name = "downloadedLanguages")]
+pub fn js_downloaded_languages() -> Vec<String> {
+    tree_sitter_language_pack::downloaded_languages()
+}
+
+/// Delete all cached parser files.
+///
+/// Throws an error if cache deletion fails.
+#[napi(js_name = "cleanCache")]
+pub fn js_clean_cache() -> napi::Result<()> {
+    tree_sitter_language_pack::clean_cache().map_err(|e| napi::Error::from_reason(format!("{e}")))
+}
+
+/// Get the effective cache directory being used.
+///
+/// Returns the path as a string. Throws an error if cache directory cannot be determined.
+#[napi(js_name = "cacheDir")]
+pub fn js_cache_dir() -> napi::Result<String> {
+    tree_sitter_language_pack::cache_dir()
+        .map(|path| path.to_string_lossy().to_string())
+        .map_err(|e| napi::Error::from_reason(format!("{e}")))
+}

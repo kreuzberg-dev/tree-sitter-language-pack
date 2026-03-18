@@ -13,7 +13,10 @@ crate-type = ["cdylib"]
 test = false
 
 [dependencies]
-tree-sitter-language-pack = { workspace = true, features = ["serde"] }
+tree-sitter-language-pack = { workspace = true, features = [
+  "serde",
+  "download",
+] }
 serde_json = { workspace = true }
 ext-php-rs = "0.15"
 

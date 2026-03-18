@@ -240,4 +240,108 @@ char *ts_pack_process(const struct TsPackRegistry *registry,
                       uintptr_t source_len,
                       const char *config_json);
 
+/**
+ * Initialize the language pack with configuration.
+ *
+ * `config_json` is a null-terminated JSON string with optional fields:
+ * - `cache_dir` (string): override default cache directory
+ * - `languages` (array of strings): languages to pre-download
+ * - `groups` (array of strings): language groups to pre-download
+ *
+ * Returns 0 on success, -1 on error (check `ts_pack_last_error`).
+ *
+ * # Safety
+ *
+ * `config_json` must be a valid null-terminated UTF-8 C string, or null.
+ */
+int32_t ts_pack_init(const char *config_json);
+
+/**
+ * Configure the language pack without downloading.
+ *
+ * `config_json` is a null-terminated JSON string with optional fields:
+ * - `cache_dir` (string): override default cache directory
+ *
+ * Returns 0 on success, -1 on error (check `ts_pack_last_error`).
+ *
+ * # Safety
+ *
+ * `config_json` must be a valid null-terminated UTF-8 C string, or null.
+ */
+int32_t ts_pack_configure(const char *config_json);
+
+/**
+ * Download specific languages to the cache.
+ *
+ * `names` is an array of pointers to null-terminated language name strings.
+ * `count` is the number of strings in the array.
+ *
+ * Returns the number of newly downloaded languages on success, or -1 on error.
+ *
+ * # Safety
+ *
+ * `names` must be a valid array of `count` pointers to null-terminated UTF-8 C strings.
+ */
+int32_t ts_pack_download(const char *const *names, uintptr_t count);
+
+/**
+ * Download all available languages from the remote manifest.
+ *
+ * Returns the number of newly downloaded languages on success, or -1 on error.
+ */
+int32_t ts_pack_download_all(void);
+
+/**
+ * Get all language names available in the remote manifest.
+ *
+ * Returns a newly-allocated array of language name strings. The caller must
+ * free the array with `ts_pack_free_string_array`, and the individual strings
+ * with `ts_pack_free_string`.
+ *
+ * Sets `out_count` to the number of languages in the returned array.
+ * Returns null on error (check `ts_pack_last_error`).
+ */
+const char *const *ts_pack_manifest_languages(uintptr_t *out_count);
+
+/**
+ * Get all languages that are already downloaded and cached locally.
+ *
+ * Returns a newly-allocated array of language name strings. The caller must
+ * free the array with `ts_pack_free_string_array`, and the individual strings
+ * with `ts_pack_free_string`.
+ *
+ * Sets `out_count` to the number of languages in the returned array.
+ * Returns null if the count pointer is null, but never fails otherwise.
+ */
+const char *const *ts_pack_downloaded_languages(uintptr_t *out_count);
+
+/**
+ * Delete all cached parser shared libraries.
+ *
+ * Returns 0 on success, -1 on error (check `ts_pack_last_error`).
+ */
+int32_t ts_pack_clean_cache(void);
+
+/**
+ * Get the effective cache directory path as a C string.
+ *
+ * Returns a newly-allocated C string that the caller must free with
+ * `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
+ */
+const char *ts_pack_cache_dir(void);
+
+/**
+ * Free a string array that was returned by the FFI (e.g. from `ts_pack_manifest_languages`).
+ *
+ * Passing a null pointer is a safe no-op.
+ * This function only frees the array wrapper, not the individual strings.
+ * Use `ts_pack_free_string` on each individual string before calling this.
+ *
+ * # Safety
+ *
+ * `arr` must be a pointer returned by an FFI function in this crate that returns
+ * an array, or null. Individual strings must be freed first with `ts_pack_free_string`.
+ */
+void ts_pack_free_string_array(const char **arr);
+
 #endif  /* TS_PACK_H */

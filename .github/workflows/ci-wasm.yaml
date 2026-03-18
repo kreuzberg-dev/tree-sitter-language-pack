@@ -58,10 +58,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
 
@@ -69,12 +69,12 @@ jobs:
         run: npm install -g tree-sitter-cli
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7.5.0
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
       - name: Set up Python
-        uses: actions/setup-python@v6.2.0
+        uses: actions/setup-python@v6
         with:
           python-version: "3.14"
 
@@ -82,7 +82,7 @@ jobs:
         run: uv sync --no-install-project
 
       - name: Cache parsers
-        uses: actions/cache@v5.0.3
+        uses: actions/cache@v5
         with:
           path: parsers
           key: parsers-${{ hashFiles('sources/language_definitions.json') }}
@@ -95,7 +95,7 @@ jobs:
           uv run --no-sync scripts/clone_vendors.py
 
       - name: Upload parsers
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: language-parsers
           path: parsers
@@ -109,16 +109,16 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           target: wasm32-unknown-unknown
           components: ""
@@ -129,7 +129,7 @@ jobs:
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
       - name: Install wasi-sdk
-        uses: kreuzberg-dev/actions/install-wasi-sdk@v1.0.0
+        uses: kreuzberg-dev/actions/install-wasi-sdk@v1
 
       - name: Build WASM (web target)
         working-directory: crates/ts-pack-wasm
@@ -167,7 +167,7 @@ jobs:
           done
 
       - name: Upload WASM artifacts
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: wasm-pkg
           path: |
@@ -185,16 +185,16 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           target: wasm32-unknown-unknown
           components: ""
@@ -205,7 +205,7 @@ jobs:
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
       - name: Install wasi-sdk
-        uses: kreuzberg-dev/actions/install-wasi-sdk@v1.0.0
+        uses: kreuzberg-dev/actions/install-wasi-sdk@v1
 
       - name: Build WASM (Node.js target)
         working-directory: crates/ts-pack-wasm
@@ -225,7 +225,7 @@ jobs:
           echo "WASM binary size: $SIZE bytes ($(( SIZE / 1024 )) KB)"
 
       - name: Upload WASM Node.js artifacts
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: wasm-node-pkg
           path: |
@@ -243,16 +243,16 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Download WASM artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: wasm-node-pkg
           path: crates/ts-pack-wasm/pkg/
 
       - name: Setup Node
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
 

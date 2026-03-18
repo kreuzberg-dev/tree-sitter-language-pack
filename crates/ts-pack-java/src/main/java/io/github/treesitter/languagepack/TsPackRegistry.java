@@ -47,6 +47,15 @@ public class TsPackRegistry implements AutoCloseable {
   private static final MethodHandle FREE_STRING;
   private static final MethodHandle PARSE_STRING;
   private static final MethodHandle PROCESS;
+  private static final MethodHandle INIT;
+  private static final MethodHandle CONFIGURE;
+  private static final MethodHandle DOWNLOAD;
+  private static final MethodHandle DOWNLOAD_ALL;
+  private static final MethodHandle MANIFEST_LANGUAGES;
+  private static final MethodHandle DOWNLOADED_LANGUAGES;
+  private static final MethodHandle CLEAN_CACHE;
+  private static final MethodHandle CACHE_DIR;
+  private static final MethodHandle FREE_STRING_ARRAY;
 
   static {
     // Load the native library: check TSPACK_LIB_PATH env var first, then system path
@@ -132,6 +141,61 @@ public class TsPackRegistry implements AutoCloseable {
                 ValueLayout.ADDRESS,
                 ValueLayout.JAVA_LONG,
                 ValueLayout.ADDRESS));
+
+    // ts_pack_init(pointer) -> int32
+    INIT =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_init").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+    // ts_pack_configure(pointer) -> int32
+    CONFIGURE =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_configure").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+    // ts_pack_download(pointer, long) -> int32
+    DOWNLOAD =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_download").orElseThrow(),
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
+
+    // ts_pack_download_all() -> int32
+    DOWNLOAD_ALL =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_download_all").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.JAVA_INT));
+
+    // ts_pack_manifest_languages(pointer) -> pointer
+    MANIFEST_LANGUAGES =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_manifest_languages").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    // ts_pack_downloaded_languages(pointer) -> pointer
+    DOWNLOADED_LANGUAGES =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_downloaded_languages").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    // ts_pack_clean_cache() -> int32
+    CLEAN_CACHE =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_clean_cache").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.JAVA_INT));
+
+    // ts_pack_cache_dir() -> pointer
+    CACHE_DIR =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_cache_dir").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS));
+
+    // ts_pack_free_string_array(pointer) -> void
+    FREE_STRING_ARRAY =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_free_string_array").orElseThrow(),
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
   }
 
   private static final System.Logger LOGGER = System.getLogger(TsPackRegistry.class.getName());
@@ -407,6 +471,240 @@ public class TsPackRegistry implements AutoCloseable {
     } catch (Throwable t) {
       LOGGER.log(System.Logger.Level.WARNING, "Failed to read FFI error message", t);
       return null;
+    }
+  }
+
+  /**
+   * Initializes the language pack with configuration (static method).
+   *
+   * <p>{@code configJson} is a JSON string with optional fields:
+   *
+   * <ul>
+   *   <li>{@code "cache_dir"} (string): override default cache directory
+   *   <li>{@code "languages"} (array): languages to pre-download
+   *   <li>{@code "groups"} (array): language groups to pre-download
+   * </ul>
+   *
+   * @param configJson a JSON string specifying the configuration (may be null or empty)
+   * @throws RuntimeException if initialization fails
+   */
+  public static void init(String configJson) {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment cConfig =
+          configJson != null && !configJson.isEmpty()
+              ? arena.allocateFrom(configJson)
+              : MemorySegment.NULL;
+      int rc = (int) INIT.invokeExact(cConfig);
+      if (rc != 0) {
+        String error = lastError();
+        throw new RuntimeException("ts_pack_init failed" + (error != null ? ": " + error : ""));
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_init", t);
+    }
+  }
+
+  /**
+   * Configures the language pack cache directory without downloading (static method).
+   *
+   * <p>{@code configJson} is a JSON string with optional fields:
+   *
+   * <ul>
+   *   <li>{@code "cache_dir"} (string): override default cache directory
+   * </ul>
+   *
+   * @param configJson a JSON string specifying the configuration (may be null or empty)
+   * @throws RuntimeException if configuration fails
+   */
+  public static void configure(String configJson) {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment cConfig =
+          configJson != null && !configJson.isEmpty()
+              ? arena.allocateFrom(configJson)
+              : MemorySegment.NULL;
+      int rc = (int) CONFIGURE.invokeExact(cConfig);
+      if (rc != 0) {
+        String error = lastError();
+        throw new RuntimeException(
+            "ts_pack_configure failed" + (error != null ? ": " + error : ""));
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_configure", t);
+    }
+  }
+
+  /**
+   * Downloads specific languages to the cache (static method).
+   *
+   * @param languages a list of language names to download
+   * @return the number of newly downloaded languages
+   * @throws RuntimeException if the download fails
+   */
+  public static int download(List<String> languages) {
+    if (languages == null || languages.isEmpty()) {
+      return 0;
+    }
+
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment namesArray = arena.allocate(ValueLayout.ADDRESS.byteSize() * languages.size());
+      for (int i = 0; i < languages.size(); i++) {
+        MemorySegment name = arena.allocateFrom(languages.get(i));
+        namesArray.setAtIndex(ValueLayout.ADDRESS, i, name);
+      }
+
+      int rc = (int) DOWNLOAD.invokeExact(namesArray, (long) languages.size());
+      if (rc < 0) {
+        String error = lastError();
+        throw new RuntimeException("ts_pack_download failed" + (error != null ? ": " + error : ""));
+      }
+      return rc;
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_download", t);
+    }
+  }
+
+  /**
+   * Downloads all available languages from the remote manifest (static method).
+   *
+   * @return the number of newly downloaded languages
+   * @throws RuntimeException if the download fails
+   */
+  public static int downloadAll() {
+    try {
+      int rc = (int) DOWNLOAD_ALL.invokeExact();
+      if (rc < 0) {
+        String error = lastError();
+        throw new RuntimeException(
+            "ts_pack_download_all failed" + (error != null ? ": " + error : ""));
+      }
+      return rc;
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_download_all", t);
+    }
+  }
+
+  /**
+   * Gets all language names available in the remote manifest (static method).
+   *
+   * @return an unmodifiable list of language names
+   * @throws RuntimeException if the operation fails
+   */
+  public static List<String> manifestLanguages() {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment countPtr = arena.allocate(ValueLayout.JAVA_LONG);
+      MemorySegment arr = (MemorySegment) MANIFEST_LANGUAGES.invokeExact(countPtr);
+
+      if (arr.equals(MemorySegment.NULL)) {
+        String error = lastError();
+        throw new RuntimeException(
+            "ts_pack_manifest_languages failed" + (error != null ? ": " + error : ""));
+      }
+
+      try {
+        long count = countPtr.get(ValueLayout.JAVA_LONG, 0);
+        List<String> languages = new ArrayList<>((int) count);
+        for (int i = 0; i < count; i++) {
+          MemorySegment strPtr = arr.getAtIndex(ValueLayout.ADDRESS, i);
+          String name = strPtr.reinterpret(Long.MAX_VALUE).getString(0);
+          languages.add(name);
+        }
+        return Collections.unmodifiableList(languages);
+      } finally {
+        FREE_STRING_ARRAY.invokeExact(arr);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_manifest_languages", t);
+    }
+  }
+
+  /**
+   * Gets all languages that are already downloaded and cached locally (static method).
+   *
+   * @return an unmodifiable list of locally cached language names
+   * @throws RuntimeException if the operation fails
+   */
+  public static List<String> downloadedLanguages() {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment countPtr = arena.allocate(ValueLayout.JAVA_LONG);
+      MemorySegment arr = (MemorySegment) DOWNLOADED_LANGUAGES.invokeExact(countPtr);
+
+      if (arr.equals(MemorySegment.NULL)) {
+        return Collections.emptyList();
+      }
+
+      try {
+        long count = countPtr.get(ValueLayout.JAVA_LONG, 0);
+        List<String> languages = new ArrayList<>((int) count);
+        for (int i = 0; i < count; i++) {
+          MemorySegment strPtr = arr.getAtIndex(ValueLayout.ADDRESS, i);
+          String name = strPtr.reinterpret(Long.MAX_VALUE).getString(0);
+          languages.add(name);
+        }
+        return Collections.unmodifiableList(languages);
+      } finally {
+        FREE_STRING_ARRAY.invokeExact(arr);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_downloaded_languages", t);
+    }
+  }
+
+  /**
+   * Deletes all cached parser shared libraries (static method).
+   *
+   * @throws RuntimeException if the operation fails
+   */
+  public static void cleanCache() {
+    try {
+      int rc = (int) CLEAN_CACHE.invokeExact();
+      if (rc != 0) {
+        String error = lastError();
+        throw new RuntimeException(
+            "ts_pack_clean_cache failed" + (error != null ? ": " + error : ""));
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_clean_cache", t);
+    }
+  }
+
+  /**
+   * Gets the effective cache directory path (static method).
+   *
+   * @return the cache directory path as a string
+   * @throws RuntimeException if the operation fails
+   */
+  public static String cacheDir() {
+    try {
+      MemorySegment cStr = (MemorySegment) CACHE_DIR.invokeExact();
+      if (cStr.equals(MemorySegment.NULL)) {
+        String error = lastError();
+        throw new RuntimeException(
+            "ts_pack_cache_dir failed" + (error != null ? ": " + error : ""));
+      }
+
+      try {
+        return cStr.reinterpret(Long.MAX_VALUE).getString(0);
+      } finally {
+        FREE_STRING.invokeExact(cStr);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_cache_dir", t);
     }
   }
 

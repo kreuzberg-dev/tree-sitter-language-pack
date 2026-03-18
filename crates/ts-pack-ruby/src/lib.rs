@@ -75,16 +75,94 @@ fn process(ruby: &Ruby, source: String, config_json: String) -> Result<String, E
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))
 }
 
+/// Initialize the language pack with configuration.
+///
+/// Accepts a JSON string with optional fields:
+/// - `cache_dir` (string): override default cache directory
+/// - `languages` (array): language names to pre-download
+/// - `groups` (array): language groups to pre-download
+fn rb_init(ruby: &Ruby, config_json: String) -> Result<(), Error> {
+    let config: tree_sitter_language_pack::PackConfig = serde_json::from_str(&config_json)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("invalid config JSON: {e}")))?;
+
+    tree_sitter_language_pack::init(&config).map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))
+}
+
+/// Configure the language pack without downloading.
+///
+/// Accepts a JSON string with optional fields:
+/// - `cache_dir` (string): override default cache directory
+fn rb_configure(ruby: &Ruby, config_json: String) -> Result<(), Error> {
+    let config: tree_sitter_language_pack::PackConfig = serde_json::from_str(&config_json)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("invalid config JSON: {e}")))?;
+
+    tree_sitter_language_pack::configure(&config)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))
+}
+
+/// Download specific languages to the cache.
+///
+/// Returns the number of newly downloaded languages.
+fn rb_download(ruby: &Ruby, names: Vec<String>) -> Result<usize, Error> {
+    let refs: Vec<&str> = names.iter().map(String::as_str).collect();
+    tree_sitter_language_pack::download(&refs).map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))
+}
+
+/// Download all available languages from the remote manifest.
+///
+/// Returns the number of newly downloaded languages.
+fn rb_download_all(ruby: &Ruby) -> Result<usize, Error> {
+    tree_sitter_language_pack::download_all().map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))
+}
+
+/// Get all language names available in the remote manifest.
+fn rb_manifest_languages(ruby: &Ruby) -> Result<Vec<String>, Error> {
+    tree_sitter_language_pack::manifest_languages()
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))
+}
+
+/// Get all languages that are already downloaded and cached locally.
+fn rb_downloaded_languages() -> Vec<String> {
+    tree_sitter_language_pack::downloaded_languages()
+}
+
+/// Delete all cached parser shared libraries.
+fn rb_clean_cache(ruby: &Ruby) -> Result<(), Error> {
+    tree_sitter_language_pack::clean_cache().map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))
+}
+
+/// Get the effective cache directory path as a string.
+fn rb_cache_dir(ruby: &Ruby) -> Result<String, Error> {
+    tree_sitter_language_pack::cache_dir()
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))
+        .and_then(|path| {
+            path.to_str()
+                .ok_or_else(|| Error::new(ruby.exception_runtime_error(), "cache path is not valid UTF-8"))
+                .map(|s| s.to_string())
+        })
+}
+
 #[magnus::init]
 fn init(ruby: &Ruby) -> Result<(), Error> {
     let module = ruby.define_module("TreeSitterLanguagePack")?;
 
+    // Registry and parsing functions
     module.define_module_function("available_languages", function!(available_languages, 0))?;
     module.define_module_function("has_language", function!(has_language, 1))?;
     module.define_module_function("language_count", function!(language_count, 0))?;
     module.define_module_function("get_language_ptr", function!(get_language_ptr, 1))?;
     module.define_module_function("parse_string", function!(parse_string, 2))?;
     module.define_module_function("process", function!(process, 2))?;
+
+    // Download API functions
+    module.define_module_function("init", function!(rb_init, 1))?;
+    module.define_module_function("configure", function!(rb_configure, 1))?;
+    module.define_module_function("download", function!(rb_download, 1))?;
+    module.define_module_function("download_all", function!(rb_download_all, 0))?;
+    module.define_module_function("manifest_languages", function!(rb_manifest_languages, 0))?;
+    module.define_module_function("downloaded_languages", function!(rb_downloaded_languages, 0))?;
+    module.define_module_function("clean_cache", function!(rb_clean_cache, 0))?;
+    module.define_module_function("cache_dir", function!(rb_cache_dir, 0))?;
 
     let tree_class = module.define_class("Tree", ruby.class_object())?;
     tree_class.define_method("root_node_type", method!(TreeWrapper::root_node_type, 0))?;

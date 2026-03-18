@@ -188,6 +188,207 @@ pub fn ts_pack_process(source: String, config_json: String) -> PhpResult<String>
     serde_json::to_string(&result).map_err(|e| PhpException::default(format!("serialization failed: {e}")))
 }
 
+/// Initialize the language pack with the given configuration (JSON string).
+///
+/// Applies cache directory settings and downloads specified languages/groups.
+/// `config_json` should contain optional fields:
+/// - `cache_dir` (string, optional): custom cache directory path
+/// - `languages` (list, optional): language names to download
+/// - `groups` (list, optional): language groups to download
+///
+/// # Arguments
+///
+/// * `config_json` - JSON string with configuration.
+///
+/// # Throws
+///
+/// Throws an exception if the config JSON is invalid or downloads fail.
+///
+/// # Example
+///
+/// ```php
+/// ts_pack_init('{"languages":["python","rust"]}');
+/// ```
+#[php_function]
+pub fn ts_pack_init(config_json: String) -> PhpResult<()> {
+    let config: tree_sitter_language_pack::PackConfig =
+        serde_json::from_str(&config_json).map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
+    tree_sitter_language_pack::init(&config).map_err(|e| PhpException::default(format!("{e}")))
+}
+
+/// Apply download configuration without downloading anything.
+///
+/// Use this to set a custom cache directory before the first call to
+/// [`ts_pack_get_language`] or any download function.
+/// `config_json` should contain optional fields:
+/// - `cache_dir` (string, optional): custom cache directory path
+///
+/// # Arguments
+///
+/// * `config_json` - JSON string with configuration.
+///
+/// # Throws
+///
+/// Throws an exception if the config JSON is invalid.
+///
+/// # Example
+///
+/// ```php
+/// ts_pack_configure('{"cache_dir":"/tmp/parsers"}');
+/// ```
+#[php_function]
+pub fn ts_pack_configure(config_json: String) -> PhpResult<()> {
+    let config: tree_sitter_language_pack::PackConfig =
+        serde_json::from_str(&config_json).map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
+    tree_sitter_language_pack::configure(&config).map_err(|e| PhpException::default(format!("{e}")))
+}
+
+/// Download specific languages to the local cache.
+///
+/// Returns the number of newly downloaded languages (already cached languages
+/// are not counted).
+///
+/// # Arguments
+///
+/// * `names` - Array of language names to download.
+///
+/// # Returns
+///
+/// Integer count of newly downloaded languages.
+///
+/// # Throws
+///
+/// Throws an exception if any language is not available or download fails.
+///
+/// # Example
+///
+/// ```php
+/// $count = ts_pack_download(["python", "rust", "typescript"]);
+/// echo "Downloaded $count new languages\n";
+/// ```
+#[php_function]
+pub fn ts_pack_download(names: Vec<String>) -> PhpResult<i64> {
+    let refs: Vec<&str> = names.iter().map(String::as_str).collect();
+    tree_sitter_language_pack::download(&refs)
+        .map(|count| count as i64)
+        .map_err(|e| PhpException::default(format!("{e}")))
+}
+
+/// Download all available languages from the remote manifest.
+///
+/// Returns the number of newly downloaded languages.
+///
+/// # Returns
+///
+/// Integer count of newly downloaded languages.
+///
+/// # Throws
+///
+/// Throws an exception if the manifest cannot be fetched or a download fails.
+///
+/// # Example
+///
+/// ```php
+/// $count = ts_pack_download_all();
+/// echo "Downloaded $count languages\n";
+/// ```
+#[php_function]
+pub fn ts_pack_download_all() -> PhpResult<i64> {
+    tree_sitter_language_pack::download_all()
+        .map(|count| count as i64)
+        .map_err(|e| PhpException::default(format!("{e}")))
+}
+
+/// Return all language names available in the remote manifest (170+).
+///
+/// Fetches (and caches) the remote manifest to discover the full list of
+/// downloadable languages.
+///
+/// # Returns
+///
+/// Array of language names sorted alphabetically.
+///
+/// # Throws
+///
+/// Throws an exception if the manifest cannot be fetched.
+///
+/// # Example
+///
+/// ```php
+/// $langs = ts_pack_manifest_languages();
+/// echo count($langs) . " languages available for download\n";
+/// ```
+#[php_function]
+pub fn ts_pack_manifest_languages() -> PhpResult<Vec<String>> {
+    tree_sitter_language_pack::manifest_languages().map_err(|e| PhpException::default(format!("{e}")))
+}
+
+/// Return languages that are already downloaded and cached locally.
+///
+/// Does not perform any network requests. Returns an empty array if the
+/// cache directory does not exist or cannot be read.
+///
+/// # Returns
+///
+/// Array of cached language names sorted alphabetically.
+///
+/// # Example
+///
+/// ```php
+/// $cached = ts_pack_downloaded_languages();
+/// echo count($cached) . " languages already cached\n";
+/// ```
+#[php_function]
+pub fn ts_pack_downloaded_languages() -> Vec<String> {
+    tree_sitter_language_pack::downloaded_languages()
+}
+
+/// Delete all cached parser shared libraries.
+///
+/// Resets the cache registration so the next call to ts_pack_get_language or
+/// a download function will re-register the (now empty) cache directory.
+///
+/// # Throws
+///
+/// Throws an exception if the cache directory cannot be removed.
+///
+/// # Example
+///
+/// ```php
+/// ts_pack_clean_cache();
+/// echo "Cache cleared\n";
+/// ```
+#[php_function]
+pub fn ts_pack_clean_cache() -> PhpResult<()> {
+    tree_sitter_language_pack::clean_cache().map_err(|e| PhpException::default(format!("{e}")))
+}
+
+/// Return the effective cache directory path.
+///
+/// This is either the custom path set via ts_pack_configure/ts_pack_init or the
+/// default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
+///
+/// # Returns
+///
+/// String path to the cache directory.
+///
+/// # Throws
+///
+/// Throws an exception if the system cache directory cannot be determined.
+///
+/// # Example
+///
+/// ```php
+/// $dir = ts_pack_cache_dir();
+/// echo "Cache directory: $dir\n";
+/// ```
+#[php_function]
+pub fn ts_pack_cache_dir() -> PhpResult<String> {
+    tree_sitter_language_pack::cache_dir()
+        .map(|p| p.to_string_lossy().to_string())
+        .map_err(|e| PhpException::default(format!("{e}")))
+}
+
 /// tree-sitter-language-pack PHP extension module.
 #[php_module]
 pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
@@ -199,4 +400,12 @@ pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
         .function(wrap_function!(ts_pack_get_language))
         .function(wrap_function!(ts_pack_parse_string))
         .function(wrap_function!(ts_pack_process))
+        .function(wrap_function!(ts_pack_init))
+        .function(wrap_function!(ts_pack_configure))
+        .function(wrap_function!(ts_pack_download))
+        .function(wrap_function!(ts_pack_download_all))
+        .function(wrap_function!(ts_pack_manifest_languages))
+        .function(wrap_function!(ts_pack_downloaded_languages))
+        .function(wrap_function!(ts_pack_clean_cache))
+        .function(wrap_function!(ts_pack_cache_dir))
 }

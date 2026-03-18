@@ -63,23 +63,23 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       # --- Rust ---
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           use-sccache: "false"
           install-llvm-cov: "false"
 
       # --- Python ---
       - name: Install uv
-        uses: astral-sh/setup-uv@v7.5.0
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
       - name: Setup Python
-        uses: actions/setup-python@v6.2.0
+        uses: actions/setup-python@v6
         with:
           python-version: "3.14"
 
@@ -88,7 +88,7 @@ jobs:
 
       # --- Node.js (for biome) ---
       - name: Setup Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
 
@@ -97,7 +97,7 @@ jobs:
 
       # --- Ruby ---
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1.292.0
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
           bundler-cache: true
@@ -105,7 +105,7 @@ jobs:
 
       # --- Go ---
       - name: Setup Go
-        uses: actions/setup-go@v6.3.0
+        uses: actions/setup-go@v6
         with:
           go-version: "1.26"
           cache-dependency-path: packages/go/v1/go.sum
@@ -117,14 +117,14 @@ jobs:
 
       # --- Java ---
       - name: Setup Java
-        uses: actions/setup-java@v5.2.0
+        uses: actions/setup-java@v5
         with:
           distribution: "temurin"
           java-version: "24"
 
       # --- Elixir ---
       - name: Setup Elixir
-        uses: erlef/setup-elixir@v1.22.0
+        uses: erlef/setup-elixir@v1
         with:
           elixir-version: "1.17"
           otp-version: "27.2"
@@ -141,11 +141,11 @@ jobs:
 
       # --- Task runner ---
       - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/install-task@v1
 
       # --- Prek ---
       - name: Run prek hooks
-        uses: j178/prek-action@v1.1.1
+        uses: j178/prek-action@v1
         with:
           extra-args: --all-files
 
@@ -156,15 +156,15 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Setup Python
-        uses: actions/setup-python@v6.2.0
+        uses: actions/setup-python@v6
         with:
           python-version: "3.14"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7.5.0
+        uses: astral-sh/setup-uv@v7
 
       - name: Check README generation
         run: uv run scripts/generate_readme.py --validate

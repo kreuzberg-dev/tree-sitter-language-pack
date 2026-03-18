@@ -12,7 +12,10 @@ name = "ts_pack_ruby"
 crate-type = ["cdylib"]
 
 [dependencies]
-tree-sitter-language-pack = { workspace = true, features = ["serde"] }
+tree-sitter-language-pack = { workspace = true, features = [
+  "serde",
+  "download",
+] }
 serde_json = { workspace = true }
 tree-sitter = { workspace = true }
 magnus = "0.8"

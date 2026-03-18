@@ -199,13 +199,13 @@
 	"fsharp": {
 		"branch": "main",
 		"repo": "https://github.com/ionide/tree-sitter-fsharp",
-		"rev": "2b3c4fae185d5185b5fa1a3d3117cad35f669352",
+		"rev": "1c2d9351d1f731c08cfdc4ed41e63126ae56e462",
 		"directory": "fsharp"
 	},
 	"fsharp_signature": {
 		"branch": "main",
 		"repo": "https://github.com/ionide/tree-sitter-fsharp",
-		"rev": "2b3c4fae185d5185b5fa1a3d3117cad35f669352",
+		"rev": "1c2d9351d1f731c08cfdc4ed41e63126ae56e462",
 		"directory": "fsharp_signature"
 	},
 	"func": {
@@ -362,7 +362,7 @@
 	},
 	"kotlin": {
 		"repo": "https://github.com/fwcd/tree-sitter-kotlin",
-		"rev": "a1760ba7178fe76515e7cfe7577deae2335fa57d"
+		"rev": "fce5f0c5f932bf6fdfea7d90da562b704b15b38a"
 	},
 	"latex": {
 		"branch": "master",
@@ -397,7 +397,7 @@
 	"magik": {
 		"generate": true,
 		"repo": "https://github.com/krn-robin/tree-sitter-magik",
-		"rev": "7e2070ed3dfb6a7137db063649cea44841d5394e"
+		"rev": "297345ebd36fa9c1a3cfd1b22293e272c765a8a4"
 	},
 	"make": {
 		"repo": "https://github.com/alemuller/tree-sitter-make",
@@ -513,7 +513,7 @@
 	},
 	"powershell": {
 		"repo": "https://github.com/airbus-cert/tree-sitter-powershell",
-		"rev": "b881dfbe71a770ea37d434c80d3523091b81f6db"
+		"rev": "73800ecc8bddeee8f1079a5a2e0c13c3d00269bb"
 	},
 	"printf": {
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-printf",
@@ -574,7 +574,7 @@
 	},
 	"racket": {
 		"repo": "https://github.com/6cdh/tree-sitter-racket",
-		"rev": "56b57807f86aa4ddb14892572b318edd4bc90ebe"
+		"rev": "54649be8b939341d2d5410b594ab954fe8814bd0"
 	},
 	"re2c": {
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-re2c",
@@ -618,7 +618,7 @@
 	},
 	"scheme": {
 		"repo": "https://github.com/6cdh/tree-sitter-scheme",
-		"rev": "8004e59a1d17ca670aa34d09021c8499fdefaf61"
+		"rev": "c6cb7c7d7a04b3f5d999c28e2e9c0c31b2d50ece"
 	},
 	"scss": {
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-scss",

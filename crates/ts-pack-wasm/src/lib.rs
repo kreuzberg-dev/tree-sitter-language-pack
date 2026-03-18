@@ -153,3 +153,67 @@ pub fn process(source: &str, config: JsValue) -> Result<JsValue, JsValue> {
         serde_json::to_string(&result).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
     js_sys::JSON::parse(&json_str)
 }
+
+// ---------------------------------------------------------------------------
+// Download/configure API (not supported in WASM)
+// ---------------------------------------------------------------------------
+
+/// Configure the language pack (stub for WASM).
+/// WASM cannot perform network I/O, so download functions are not supported.
+#[wasm_bindgen(js_name = "configure")]
+pub fn configure(_config: &str) -> Result<(), JsValue> {
+    Err(JsValue::from_str(
+        "configure not supported in WASM - no persistent cache",
+    ))
+}
+
+/// Initialize the language pack (stub for WASM).
+/// WASM cannot perform network I/O, so download functions are not supported.
+#[wasm_bindgen(js_name = "init")]
+pub fn init(_config: &str) -> Result<(), JsValue> {
+    Err(JsValue::from_str(
+        "init/download not supported in WASM - no network I/O",
+    ))
+}
+
+/// Download specific languages (not supported in WASM).
+#[wasm_bindgen(js_name = "download")]
+pub fn download(_languages: js_sys::Array) -> Result<i32, JsValue> {
+    Err(JsValue::from_str("download not supported in WASM - no network I/O"))
+}
+
+/// Download all languages (not supported in WASM).
+#[wasm_bindgen(js_name = "downloadAll")]
+pub fn download_all() -> Result<i32, JsValue> {
+    Err(JsValue::from_str("downloadAll not supported in WASM - no network I/O"))
+}
+
+/// Get manifest languages (not supported in WASM).
+#[wasm_bindgen(js_name = "manifestLanguages")]
+pub fn manifest_languages() -> Result<js_sys::Array, JsValue> {
+    Err(JsValue::from_str(
+        "manifestLanguages not supported in WASM - no network I/O",
+    ))
+}
+
+/// Get downloaded languages (stub for WASM).
+/// Returns empty array since WASM has no persistent cache.
+#[wasm_bindgen(js_name = "downloadedLanguages")]
+pub fn downloaded_languages() -> Result<js_sys::Array, JsValue> {
+    Ok(js_sys::Array::new())
+}
+
+/// Clean cache (stub for WASM).
+/// WASM has no persistent cache, so this is a no-op.
+#[wasm_bindgen(js_name = "cleanCache")]
+pub fn clean_cache() -> Result<(), JsValue> {
+    Ok(())
+}
+
+/// Get cache directory (not supported in WASM).
+#[wasm_bindgen(js_name = "cacheDir")]
+pub fn cache_dir() -> Result<String, JsValue> {
+    Err(JsValue::from_str(
+        "cacheDir not supported in WASM - no persistent cache",
+    ))
+}

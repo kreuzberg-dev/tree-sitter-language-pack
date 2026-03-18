@@ -28,11 +28,13 @@
 //! - [`query`] - Tree-sitter query execution
 //! - [`text_splitter`] - Syntax-aware code chunking
 //! - [`process_config`] - Configuration for the `process` pipeline
+//! - [`pack_config`] - Configuration for the language pack (cache dir, languages to download)
 //! - [`error`] - Error types
 
 pub mod error;
 pub mod intel;
 pub mod node;
+pub mod pack_config;
 pub mod parse;
 pub mod process_config;
 pub mod query;
@@ -53,6 +55,7 @@ pub use intel::types::{
     SymbolInfo, SymbolKind,
 };
 pub use node::{NodeInfo, extract_text, find_nodes_by_type, named_children_info, node_info_from_node, root_node_info};
+pub use pack_config::PackConfig;
 pub use parse::{parse_string, tree_contains_node_type, tree_error_count, tree_has_error_nodes, tree_to_sexp};
 pub use process_config::ProcessConfig;
 pub use query::{QueryMatch, run_query};
@@ -63,15 +66,26 @@ pub use tree_sitter::{Language, Parser, Tree};
 #[cfg(feature = "download")]
 pub use download::DownloadManager;
 
-static REGISTRY: std::sync::LazyLock<LanguageRegistry> = std::sync::LazyLock::new(LanguageRegistry::new);
+use std::sync::{LazyLock, RwLock};
+
+static REGISTRY: LazyLock<RwLock<LanguageRegistry>> = LazyLock::new(|| RwLock::new(LanguageRegistry::new()));
+
+#[cfg(feature = "download")]
+static CACHE_REGISTERED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+#[cfg(feature = "download")]
+static CUSTOM_CACHE_DIR: LazyLock<RwLock<Option<std::path::PathBuf>>> = LazyLock::new(|| RwLock::new(None));
 
 /// Get a tree-sitter [`Language`] by name using the global registry.
 ///
 /// Resolves language aliases (e.g., `"shell"` maps to `"bash"`).
+/// When the `download` feature is enabled (default), automatically downloads
+/// the parser from GitHub releases if not found locally.
 ///
 /// # Errors
 ///
-/// Returns [`Error::LanguageNotFound`] if the language name is not recognized.
+/// Returns [`Error::LanguageNotFound`] if the language is not recognized,
+/// or [`Error::Download`] if auto-download fails.
 ///
 /// # Example
 ///
@@ -86,7 +100,25 @@ static REGISTRY: std::sync::LazyLock<LanguageRegistry> = std::sync::LazyLock::ne
 /// assert_eq!(tree.root_node().kind(), "module");
 /// ```
 pub fn get_language(name: &str) -> Result<Language, Error> {
-    REGISTRY.get_language(name)
+    // Fast path: check registry (read lock)
+    {
+        let registry = REGISTRY.read().map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        if let Ok(lang) = registry.get_language(name) {
+            return Ok(lang);
+        }
+    }
+    // Slow path: auto-download if feature enabled
+    #[cfg(feature = "download")]
+    {
+        ensure_cache_registered()?;
+        let cache_dir = effective_cache_dir()?;
+        let mut dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+        dm.ensure_languages(&[name])?;
+        let registry = REGISTRY.read().map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        registry.get_language(name)
+    }
+    #[cfg(not(feature = "download"))]
+    Err(Error::LanguageNotFound(name.to_string()))
 }
 
 /// Get a tree-sitter [`Parser`] pre-configured for the given language.
@@ -133,7 +165,7 @@ pub fn get_parser(name: &str) -> Result<tree_sitter::Parser, Error> {
 /// }
 /// ```
 pub fn available_languages() -> Vec<String> {
-    REGISTRY.available_languages()
+    REGISTRY.read().map(|r| r.available_languages()).unwrap_or_default()
 }
 
 /// Check if a language is available by name or alias.
@@ -151,7 +183,7 @@ pub fn available_languages() -> Vec<String> {
 /// assert!(!has_language("nonexistent_language"));
 /// ```
 pub fn has_language(name: &str) -> bool {
-    REGISTRY.has_language(name)
+    REGISTRY.read().map(|r| r.has_language(name)).unwrap_or(false)
 }
 
 /// Return the number of available languages.
@@ -168,7 +200,7 @@ pub fn has_language(name: &str) -> bool {
 /// println!("{} languages available", count);
 /// ```
 pub fn language_count() -> usize {
-    REGISTRY.language_count()
+    REGISTRY.read().map(|r| r.language_count()).unwrap_or(0)
 }
 
 /// Process source code and extract file intelligence using the global registry.
@@ -193,7 +225,263 @@ pub fn language_count() -> usize {
 /// println!("Structures: {}", result.structure.len());
 /// ```
 pub fn process(source: &str, config: &ProcessConfig) -> Result<ProcessResult, Error> {
-    REGISTRY.process(source, config)
+    let registry = REGISTRY.read().map_err(|e| Error::LockPoisoned(e.to_string()))?;
+    registry.process(source, config)
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Download feature helpers and public API
+// ──────────────────────────────────────────────────────────────────────────────
+
+#[cfg(feature = "download")]
+fn ensure_cache_registered() -> Result<(), Error> {
+    if CACHE_REGISTERED.load(std::sync::atomic::Ordering::Relaxed) {
+        return Ok(());
+    }
+    let cache_dir = effective_cache_dir()?;
+    let mut registry = REGISTRY.write().map_err(|e| Error::LockPoisoned(e.to_string()))?;
+    registry.add_extra_libs_dir(cache_dir);
+    CACHE_REGISTERED.store(true, std::sync::atomic::Ordering::Release);
+    Ok(())
+}
+
+#[cfg(feature = "download")]
+fn effective_cache_dir() -> Result<std::path::PathBuf, Error> {
+    let custom = CUSTOM_CACHE_DIR
+        .read()
+        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+    match custom.as_ref() {
+        Some(dir) => Ok(dir.clone()),
+        None => DownloadManager::default_cache_dir(env!("CARGO_PKG_VERSION")),
+    }
+}
+
+/// Initialize the language pack with the given configuration.
+///
+/// Applies any custom cache directory, then downloads all languages and groups
+/// specified in the config. This is the recommended entry point when you want
+/// to pre-warm the cache before use.
+///
+/// # Errors
+///
+/// Returns an error if configuration cannot be applied or if downloads fail.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::{PackConfig, init};
+///
+/// let config = PackConfig {
+///     cache_dir: None,
+///     languages: Some(vec!["python".to_string(), "rust".to_string()]),
+///     groups: None,
+/// };
+/// init(&config).unwrap();
+/// ```
+#[cfg(feature = "download")]
+pub fn init(config: &PackConfig) -> Result<(), Error> {
+    configure(config)?;
+    if let Some(ref languages) = config.languages {
+        let refs: Vec<&str> = languages.iter().map(String::as_str).collect();
+        download(&refs)?;
+    }
+    if let Some(ref groups) = config.groups {
+        let cache_dir = effective_cache_dir()?;
+        let mut dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+        for group in groups {
+            dm.ensure_group(group)?;
+        }
+    }
+    ensure_cache_registered()?;
+    Ok(())
+}
+
+/// Apply download configuration without downloading anything.
+///
+/// Use this to set a custom cache directory before the first call to
+/// [`get_language`] or any download function. Changing the cache dir
+/// after languages have been registered has no effect on already-loaded
+/// languages.
+///
+/// # Errors
+///
+/// Returns an error if the lock cannot be acquired.
+///
+/// # Example
+///
+/// ```no_run
+/// use std::path::PathBuf;
+/// use tree_sitter_language_pack::{PackConfig, configure};
+///
+/// let config = PackConfig {
+///     cache_dir: Some(PathBuf::from("/tmp/my-parsers")),
+///     languages: None,
+///     groups: None,
+/// };
+/// configure(&config).unwrap();
+/// ```
+#[cfg(feature = "download")]
+pub fn configure(config: &PackConfig) -> Result<(), Error> {
+    if let Some(ref dir) = config.cache_dir {
+        let mut custom = CUSTOM_CACHE_DIR
+            .write()
+            .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        *custom = Some(dir.clone());
+        // Reset cache registration so the new directory gets registered on next use
+        CACHE_REGISTERED.store(false, std::sync::atomic::Ordering::Release);
+    }
+    Ok(())
+}
+
+/// Download specific languages to the local cache.
+///
+/// Returns the number of newly downloaded languages (languages that were
+/// already cached are not counted).
+///
+/// # Errors
+///
+/// Returns an error if any language is not available in the manifest or if
+/// the download fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::download;
+///
+/// let count = download(&["python", "rust", "typescript"]).unwrap();
+/// println!("Downloaded {} new languages", count);
+/// ```
+#[cfg(feature = "download")]
+pub fn download(names: &[&str]) -> Result<usize, Error> {
+    ensure_cache_registered()?;
+    let cache_dir = effective_cache_dir()?;
+    let mut dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+    let before = dm.installed_languages().len();
+    dm.ensure_languages(names)?;
+    let after = dm.installed_languages().len();
+    Ok(after.saturating_sub(before))
+}
+
+/// Download all available languages from the remote manifest.
+///
+/// Returns the number of newly downloaded languages.
+///
+/// # Errors
+///
+/// Returns an error if the manifest cannot be fetched or a download fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::download_all;
+///
+/// let count = download_all().unwrap();
+/// println!("Downloaded {} languages", count);
+/// ```
+#[cfg(feature = "download")]
+pub fn download_all() -> Result<usize, Error> {
+    let langs = manifest_languages()?;
+    let refs: Vec<&str> = langs.iter().map(String::as_str).collect();
+    download(&refs)
+}
+
+/// Return all language names available in the remote manifest (170+).
+///
+/// Fetches (and caches) the remote manifest to discover the full list of
+/// downloadable languages. Use [`downloaded_languages`] to list what is
+/// already cached locally.
+///
+/// # Errors
+///
+/// Returns an error if the manifest cannot be fetched.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::manifest_languages;
+///
+/// let langs = manifest_languages().unwrap();
+/// println!("{} languages available for download", langs.len());
+/// ```
+#[cfg(feature = "download")]
+pub fn manifest_languages() -> Result<Vec<String>, Error> {
+    let cache_dir = effective_cache_dir()?;
+    let mut dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+    let manifest = dm.fetch_manifest()?;
+    let mut langs: Vec<String> = manifest.languages.keys().cloned().collect();
+    langs.sort_unstable();
+    Ok(langs)
+}
+
+/// Return languages that are already downloaded and cached locally.
+///
+/// Does not perform any network requests. Returns an empty list if the
+/// cache directory does not exist or cannot be read.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::downloaded_languages;
+///
+/// let langs = downloaded_languages();
+/// println!("{} languages already cached", langs.len());
+/// ```
+#[cfg(feature = "download")]
+pub fn downloaded_languages() -> Vec<String> {
+    let cache_dir = match effective_cache_dir() {
+        Ok(dir) => dir,
+        Err(_) => return Vec::new(),
+    };
+    let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+    dm.installed_languages()
+}
+
+/// Delete all cached parser shared libraries.
+///
+/// Resets the cache registration so the next call to [`get_language`] or
+/// a download function will re-register the (now empty) cache directory.
+///
+/// # Errors
+///
+/// Returns an error if the cache directory cannot be removed.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::clean_cache;
+///
+/// clean_cache().unwrap();
+/// println!("Cache cleared");
+/// ```
+#[cfg(feature = "download")]
+pub fn clean_cache() -> Result<(), Error> {
+    let cache_dir = effective_cache_dir()?;
+    let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+    dm.clean_cache()?;
+    CACHE_REGISTERED.store(false, std::sync::atomic::Ordering::Release);
+    Ok(())
+}
+
+/// Return the effective cache directory path.
+///
+/// This is either the custom path set via [`configure`] / [`init`] or the
+/// default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
+///
+/// # Errors
+///
+/// Returns an error if the system cache directory cannot be determined.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::cache_dir;
+///
+/// let dir = cache_dir().unwrap();
+/// println!("Cache directory: {}", dir.display());
+/// ```
+#[cfg(feature = "download")]
+pub fn cache_dir() -> Result<std::path::PathBuf, Error> {
+    effective_cache_dir()
 }
 
 #[cfg(test)]
@@ -246,5 +534,13 @@ mod tests {
             let parser = get_parser(first.as_str());
             assert!(parser.is_ok(), "get_parser should succeed for '{first}'");
         }
+    }
+
+    #[test]
+    fn test_pack_config_default() {
+        let config = PackConfig::default();
+        assert!(config.cache_dir.is_none());
+        assert!(config.languages.is_none());
+        assert!(config.groups.is_none());
     }
 }

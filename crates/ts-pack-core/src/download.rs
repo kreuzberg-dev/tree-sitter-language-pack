@@ -60,7 +60,7 @@ impl DownloadManager {
     }
 
     /// Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
-    fn default_cache_dir(version: &str) -> Result<PathBuf, Error> {
+    pub fn default_cache_dir(version: &str) -> Result<PathBuf, Error> {
         let base = dirs::cache_dir()
             .ok_or_else(|| Error::Download("Could not determine system cache directory".to_string()))?;
         Ok(base
@@ -197,7 +197,7 @@ impl DownloadManager {
     }
 
     /// Fetch the parser manifest from GitHub Releases.
-    fn fetch_manifest(&self) -> Result<ParserManifest, Error> {
+    pub fn fetch_manifest(&mut self) -> Result<ParserManifest, Error> {
         // Check for cached manifest first
         let manifest_path = self.cache_dir.parent().map(|p| p.join("manifest.json"));
         if let Some(ref path) = manifest_path

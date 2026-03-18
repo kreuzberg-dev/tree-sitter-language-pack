@@ -375,3 +375,178 @@ func (r *Registry) Process(source string, config ProcessConfig) (*ProcessResult,
 	}
 	return &processResult, nil
 }
+
+// Init initializes the language pack with configuration.
+// configJSON is a JSON string with optional fields:
+//   - "cache_dir" (string): override default cache directory
+//   - "languages" (array): languages to pre-download
+//   - "groups" (array): language groups to pre-download
+//
+// Returns an error if initialization fails.
+func Init(configJSON string) error {
+	cconfigJSON := C.CString(configJSON)
+	defer C.free(unsafe.Pointer(cconfigJSON))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	rc := C.ts_pack_init(cconfigJSON)
+	if rc != 0 {
+		if err := lastError(); err != nil {
+			return fmt.Errorf("tspack: init failed: %w", err)
+		}
+		return errors.New("tspack: init failed")
+	}
+
+	return nil
+}
+
+// Configure configures the language pack cache directory without downloading.
+// configJSON is a JSON string with optional fields:
+//   - "cache_dir" (string): override default cache directory
+//
+// Returns an error if configuration fails.
+func Configure(configJSON string) error {
+	cconfigJSON := C.CString(configJSON)
+	defer C.free(unsafe.Pointer(cconfigJSON))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	rc := C.ts_pack_configure(cconfigJSON)
+	if rc != 0 {
+		if err := lastError(); err != nil {
+			return fmt.Errorf("tspack: configure failed: %w", err)
+		}
+		return errors.New("tspack: configure failed")
+	}
+
+	return nil
+}
+
+// Download downloads specific languages to the cache.
+// Returns the number of newly downloaded languages.
+func Download(languages []string) (int, error) {
+	if len(languages) == 0 {
+		return 0, nil
+	}
+
+	cnames := make([]*C.char, len(languages))
+	for i, name := range languages {
+		cnames[i] = C.CString(name)
+		defer C.free(unsafe.Pointer(cnames[i]))
+	}
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	rc := C.ts_pack_download((**C.char)(unsafe.Pointer(&cnames[0])), C.uintptr_t(len(languages)))
+
+	if rc < 0 {
+		if err := lastError(); err != nil {
+			return 0, fmt.Errorf("tspack: download failed: %w", err)
+		}
+		return 0, errors.New("tspack: download failed")
+	}
+
+	return int(rc), nil
+}
+
+// DownloadAll downloads all available languages from the remote manifest.
+// Returns the number of newly downloaded languages.
+func DownloadAll() (int, error) {
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	rc := C.ts_pack_download_all()
+
+	if rc < 0 {
+		if err := lastError(); err != nil {
+			return 0, fmt.Errorf("tspack: download all failed: %w", err)
+		}
+		return 0, errors.New("tspack: download all failed")
+	}
+
+	return int(rc), nil
+}
+
+// ManifestLanguages returns all language names available in the remote manifest.
+func ManifestLanguages() ([]string, error) {
+	var count C.uintptr_t
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	arr := C.ts_pack_manifest_languages(&count)
+	if arr == nil {
+		if err := lastError(); err != nil {
+			return nil, fmt.Errorf("tspack: manifest languages failed: %w", err)
+		}
+		return nil, errors.New("tspack: manifest languages failed")
+	}
+	defer C.ts_pack_free_string_array(arr)
+
+	languages := make([]string, int(count))
+	for i := 0; i < int(count); i++ {
+		// Unsafe pointer arithmetic to get each string pointer
+		ptr := *(**C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(arr)) + uintptr(i)*unsafe.Sizeof(arr)))
+		languages[i] = C.GoString(ptr)
+	}
+
+	return languages, nil
+}
+
+// DownloadedLanguages returns all languages that are already downloaded and cached locally.
+func DownloadedLanguages() ([]string, error) {
+	var count C.uintptr_t
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	arr := C.ts_pack_downloaded_languages(&count)
+	if arr == nil {
+		return nil, errors.New("tspack: failed to get downloaded languages")
+	}
+	defer C.ts_pack_free_string_array(arr)
+
+	languages := make([]string, int(count))
+	for i := 0; i < int(count); i++ {
+		ptr := *(**C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(arr)) + uintptr(i)*unsafe.Sizeof(arr)))
+		languages[i] = C.GoString(ptr)
+	}
+
+	return languages, nil
+}
+
+// CleanCache deletes all cached parser shared libraries.
+func CleanCache() error {
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	rc := C.ts_pack_clean_cache()
+	if rc != 0 {
+		if err := lastError(); err != nil {
+			return fmt.Errorf("tspack: clean cache failed: %w", err)
+		}
+		return errors.New("tspack: clean cache failed")
+	}
+
+	return nil
+}
+
+// CacheDir returns the effective cache directory path.
+func CacheDir() (string, error) {
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	cstr := C.ts_pack_cache_dir()
+	if cstr == nil {
+		if err := lastError(); err != nil {
+			return "", fmt.Errorf("tspack: cache dir failed: %w", err)
+		}
+		return "", errors.New("tspack: cache dir failed")
+	}
+	defer C.ts_pack_free_string(cstr)
+
+	return C.GoString(cstr), nil
+}

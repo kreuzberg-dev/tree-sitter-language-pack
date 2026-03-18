@@ -1,49 +1,49 @@
-*$py.class
-*.bak
-*.Cache
-*.cscfg
-*.egg-info/
-*.log
-*.py[cod]
-*.so
-*.bundle
-*.suo
-*.user
-.coverage
-.dist/
-.DS_store
-.env
-.idea/
-.mypy_cache
-.pytest_cache
-.python-version
-.ruff_cache
-.run
-.venv
-__pycache__/
-node_modules/
-build/
-coverage.xml
-dist/
+# Build output
 target/
-parsers/
-requirements.txt
-vendor/
+build/
+dist/
 wheelhouse/
 
-# Go vendored FFI artifacts (built by scripts/ci/go/vendor-ffi.py)
+# Language-specific build artifacts
+*.so
+*.dylib
+*.dll
+*.node
+*.bundle
+*.class
+*.egg-info/
+*$py.class
+*.py[cod]
+__pycache__/
+_build/
+deps/
+
+# Python
+.venv
+.coverage
+coverage.xml
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.python-version
+
+# Node.js
+node_modules/
+
+# C#/.NET
+packages/csharp/**/bin/
+packages/csharp/**/obj/
+packages/csharp/**/runtimes/
+
+# Go vendored FFI artifacts
 packages/go/v1/include/
 packages/go/v1/lib/
 
-# Ruby native extension build artifacts
+# Ruby
 crates/ts-pack-ruby/tmp/
 
-# Elixir build artifacts
-_build/
-
-# C E2E build artifacts
-e2e/c/build/
-e2e/c/test_*
+# Parsers (cloned at build time)
+parsers/
 
 # Test app build/install artifacts
 tests/test_apps/*/target/
@@ -54,19 +54,34 @@ tests/test_apps/*/_build/
 tests/test_apps/*/deps/
 tests/test_apps/c/build/
 
-# Claude artifacts
+# E2E build artifacts
+e2e/c/build/
+e2e/c/test_*
+
+# IDE / OS
+.DS_store
+.idea/
+.run
+*.bak
+*.Cache
+*.cscfg
+*.suo
+*.user
+*.log
+
+# Environment
+.env
+requirements.txt
+vendor/
+
+# AI assistant config (generated)
 CLAUDE.md
 .claude/
-
-# AI Rules generated files
-.claude/agents/
-.cursor/rules/
-.gemini/settings.json
-.github/copilot-instructions.md
-.mcp.json
-.windsurf/
-AGENTS.md
-GEMINI.md
-.codex/
 .cursor/
 .gemini/
+.windsurf/
+.codex/
+.mcp.json
+.github/copilot-instructions.md
+AGENTS.md
+GEMINI.md

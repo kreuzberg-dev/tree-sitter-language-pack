@@ -57,21 +57,21 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
 
       - name: Install tree-sitter CLI
         run: npm install -g tree-sitter-cli
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7.5.0
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
       - name: Set up Python
-        uses: actions/setup-python@v6.2.0
+        uses: actions/setup-python@v6
         with:
           python-version: "3.14"
 
@@ -79,7 +79,7 @@ jobs:
         run: uv sync --no-install-project
 
       - name: Cache parsers
-        uses: actions/cache@v5.0.3
+        uses: actions/cache@v5
         with:
           path: parsers
           key: parsers-${{ hashFiles('sources/language_definitions.json') }}
@@ -92,7 +92,7 @@ jobs:
           uv run --no-sync scripts/clone_vendors.py
 
       - name: Upload parsers
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: language-parsers
           path: parsers
@@ -106,33 +106,33 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        ruby-version: ["3.2", "3.4"]
+        ruby-version: ["3.4"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
 
       - name: Clippy (ts-pack-ruby)
-        if: matrix.ruby-version == '3.2'
+        if: matrix.ruby-version == '3.4'
         run: cargo clippy --manifest-path crates/ts-pack-ruby/Cargo.toml -- -D warnings
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1.292.0
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
@@ -164,25 +164,25 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8
         with:
           name: language-parsers
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1.0.0 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1.292.0
+        uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.2"
+          ruby-version: "3.4"
           bundler-cache: true
           working-directory: crates/ts-pack-ruby
 

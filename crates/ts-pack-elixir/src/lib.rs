@@ -112,6 +112,96 @@ fn json_to_term<'a>(env: Env<'a>, value: &serde_json::Value) -> Term<'a> {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Download API
+// ---------------------------------------------------------------------------
+
+/// Initialize the language pack with the given configuration (JSON string).
+///
+/// Applies cache directory settings and downloads specified languages/groups.
+/// `config_json` should contain optional fields:
+/// - `cache_dir` (string, optional): custom cache directory path
+/// - `languages` (list, optional): language names to download
+/// - `groups` (list, optional): language groups to download
+#[rustler::nif]
+fn init(config_json: String) -> NifResult<()> {
+    let config: tree_sitter_language_pack::PackConfig = serde_json::from_str(&config_json)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("invalid config JSON: {e}")))))?;
+    tree_sitter_language_pack::init(&config)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))
+}
+
+/// Apply download configuration without downloading anything.
+///
+/// Use this to set a custom cache directory before the first call to
+/// [`get_language`] or any download function.
+/// `config_json` should contain optional fields:
+/// - `cache_dir` (string, optional): custom cache directory path
+#[rustler::nif]
+fn configure(config_json: String) -> NifResult<()> {
+    let config: tree_sitter_language_pack::PackConfig = serde_json::from_str(&config_json)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("invalid config JSON: {e}")))))?;
+    tree_sitter_language_pack::configure(&config)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))
+}
+
+/// Download specific languages to the local cache.
+///
+/// Returns the number of newly downloaded languages.
+#[rustler::nif]
+fn download(names: Vec<String>) -> NifResult<usize> {
+    let refs: Vec<&str> = names.iter().map(String::as_str).collect();
+    tree_sitter_language_pack::download(&refs)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))
+}
+
+/// Download all available languages from the remote manifest.
+///
+/// Returns the number of newly downloaded languages.
+#[rustler::nif]
+fn download_all() -> NifResult<usize> {
+    tree_sitter_language_pack::download_all()
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))
+}
+
+/// Return all language names available in the remote manifest.
+///
+/// Fetches (and caches) the remote manifest to discover the full list of
+/// downloadable languages.
+#[rustler::nif]
+fn manifest_languages() -> NifResult<Vec<String>> {
+    tree_sitter_language_pack::manifest_languages()
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))
+}
+
+/// Return languages that are already downloaded and cached locally.
+///
+/// Does not perform any network requests.
+#[rustler::nif]
+fn downloaded_languages() -> Vec<String> {
+    tree_sitter_language_pack::downloaded_languages()
+}
+
+/// Delete all cached parser shared libraries.
+///
+/// Resets the cache registration so the next call to get_language or
+/// a download function will re-register the (now empty) cache directory.
+#[rustler::nif]
+fn clean_cache() -> NifResult<()> {
+    tree_sitter_language_pack::clean_cache()
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))
+}
+
+/// Return the effective cache directory path as a string.
+///
+/// This is either the custom path set via configure/init or the default.
+#[rustler::nif]
+fn cache_dir() -> NifResult<String> {
+    tree_sitter_language_pack::cache_dir()
+        .map(|p| p.to_string_lossy().to_string())
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))
+}
+
 /// Process source code and extract metadata + chunks as an Elixir map.
 ///
 /// `config_json` is a JSON string with fields:

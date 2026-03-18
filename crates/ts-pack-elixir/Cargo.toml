@@ -12,7 +12,10 @@ name = "ts_pack_elixir"
 crate-type = ["cdylib"]
 
 [dependencies]
-tree-sitter-language-pack = { path = "../ts-pack-core", features = ["serde"] }
+tree-sitter-language-pack = { path = "../ts-pack-core", features = [
+  "serde",
+  "download",
+] }
 serde_json = { workspace = true }
 tree-sitter = { workspace = true }
 rustler = { workspace = true }

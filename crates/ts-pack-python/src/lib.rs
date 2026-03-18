@@ -12,6 +12,12 @@ pyo3::create_exception!(tree_sitter_language_pack, ParseError, pyo3::exceptions:
 
 pyo3::create_exception!(tree_sitter_language_pack, QueryError, pyo3::exceptions::PyValueError);
 
+pyo3::create_exception!(
+    tree_sitter_language_pack,
+    DownloadError,
+    pyo3::exceptions::PyRuntimeError
+);
+
 /// The PyCapsule name used by the tree-sitter Python package.
 const CAPSULE_NAME: &std::ffi::CStr = c"tree_sitter.Language";
 
@@ -422,6 +428,118 @@ fn process(py: Python<'_>, source: &str, config: &ProcessConfig) -> PyResult<Py<
 }
 
 // ---------------------------------------------------------------------------
+// Download API
+// ---------------------------------------------------------------------------
+
+/// Helper to convert a Python dict to a PackConfig.
+fn dict_to_pack_config(dict: &pyo3::Bound<'_, PyDict>) -> PyResult<tree_sitter_language_pack::PackConfig> {
+    let mut config = tree_sitter_language_pack::PackConfig::default();
+
+    // Parse cache_dir if present
+    if let Ok(Some(cache_dir_obj)) = dict.get_item("cache_dir")
+        && !cache_dir_obj.is_none()
+    {
+        let path_str: String = cache_dir_obj.extract()?;
+        config.cache_dir = Some(std::path::PathBuf::from(path_str));
+    }
+
+    // Parse languages if present
+    if let Ok(Some(languages_obj)) = dict.get_item("languages")
+        && !languages_obj.is_none()
+    {
+        let langs: Vec<String> = languages_obj.extract()?;
+        config.languages = Some(langs);
+    }
+
+    // Parse groups if present
+    if let Ok(Some(groups_obj)) = dict.get_item("groups")
+        && !groups_obj.is_none()
+    {
+        let grps: Vec<String> = groups_obj.extract()?;
+        config.groups = Some(grps);
+    }
+
+    Ok(config)
+}
+
+/// Initialize the language pack with configuration.
+///
+/// Applies cache directory settings and downloads languages/groups specified.
+/// Accepts a dict with optional keys: cache_dir (str), languages (list[str]), groups (list[str]).
+#[pyfunction]
+fn init(_py: Python<'_>, config: &pyo3::Bound<'_, PyDict>) -> PyResult<()> {
+    let pack_config = dict_to_pack_config(config)?;
+    tree_sitter_language_pack::init(&pack_config).map_err(|e| DownloadError::new_err(e.to_string()))
+}
+
+/// Configure the language pack without downloading.
+///
+/// Sets a custom cache directory (or resets to default if None).
+/// Keyword-only argument: cache_dir (str | None).
+#[pyfunction]
+#[pyo3(signature = (*, cache_dir = None))]
+fn configure(_py: Python<'_>, cache_dir: Option<String>) -> PyResult<()> {
+    let config = tree_sitter_language_pack::PackConfig {
+        cache_dir: cache_dir.map(std::path::PathBuf::from),
+        languages: None,
+        groups: None,
+    };
+    tree_sitter_language_pack::configure(&config).map_err(|e| DownloadError::new_err(e.to_string()))
+}
+
+/// Download specific languages to the local cache.
+///
+/// Returns the number of newly downloaded languages.
+#[pyfunction]
+fn download(_py: Python<'_>, names: Vec<String>) -> PyResult<usize> {
+    let refs: Vec<&str> = names.iter().map(String::as_str).collect();
+    tree_sitter_language_pack::download(&refs).map_err(|e| DownloadError::new_err(e.to_string()))
+}
+
+/// Download all available languages from the remote manifest.
+///
+/// Returns the number of newly downloaded languages.
+#[pyfunction]
+fn download_all(_py: Python<'_>) -> PyResult<usize> {
+    tree_sitter_language_pack::download_all().map_err(|e| DownloadError::new_err(e.to_string()))
+}
+
+/// Fetch all language names available in the remote manifest.
+///
+/// Returns a sorted list of all 170+ downloadable languages.
+#[pyfunction]
+fn manifest_languages(py: Python<'_>) -> PyResult<Py<PyAny>> {
+    let langs = tree_sitter_language_pack::manifest_languages().map_err(|e| DownloadError::new_err(e.to_string()))?;
+    let py_list = PyList::new(py, &langs)?;
+    Ok(py_list.into_any().unbind())
+}
+
+/// List languages that are already downloaded and cached locally.
+///
+/// Does not perform any network requests.
+#[pyfunction]
+fn downloaded_languages(py: Python<'_>) -> PyResult<Py<PyAny>> {
+    let langs = tree_sitter_language_pack::downloaded_languages();
+    let py_list = PyList::new(py, &langs)?;
+    Ok(py_list.into_any().unbind())
+}
+
+/// Delete all cached parser shared libraries.
+#[pyfunction]
+fn clean_cache(_py: Python<'_>) -> PyResult<()> {
+    tree_sitter_language_pack::clean_cache().map_err(|e| DownloadError::new_err(e.to_string()))
+}
+
+/// Return the effective cache directory path.
+///
+/// Returns either the custom path set via configure() or the default.
+#[pyfunction]
+fn cache_dir(_py: Python<'_>) -> PyResult<String> {
+    let dir = tree_sitter_language_pack::cache_dir().map_err(|e| DownloadError::new_err(e.to_string()))?;
+    Ok(dir.to_string_lossy().to_string())
+}
+
+// ---------------------------------------------------------------------------
 // Module registration
 // ---------------------------------------------------------------------------
 
@@ -430,6 +548,7 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("LanguageNotFoundError", py.get_type::<LanguageNotFoundError>())?;
     m.add("ParseError", py.get_type::<ParseError>())?;
     m.add("QueryError", py.get_type::<QueryError>())?;
+    m.add("DownloadError", py.get_type::<DownloadError>())?;
     m.add_class::<TreeHandle>()?;
     m.add_class::<ProcessConfig>()?;
     m.add_function(wrap_pyfunction!(get_binding, m)?)?;
@@ -440,5 +559,13 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(language_count, m)?)?;
     m.add_function(wrap_pyfunction!(parse_string, m)?)?;
     m.add_function(wrap_pyfunction!(process, m)?)?;
+    m.add_function(wrap_pyfunction!(init, m)?)?;
+    m.add_function(wrap_pyfunction!(configure, m)?)?;
+    m.add_function(wrap_pyfunction!(download, m)?)?;
+    m.add_function(wrap_pyfunction!(download_all, m)?)?;
+    m.add_function(wrap_pyfunction!(manifest_languages, m)?)?;
+    m.add_function(wrap_pyfunction!(downloaded_languages, m)?)?;
+    m.add_function(wrap_pyfunction!(clean_cache, m)?)?;
+    m.add_function(wrap_pyfunction!(cache_dir, m)?)?;
     Ok(())
 }

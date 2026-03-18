@@ -170,6 +170,65 @@ internal static partial class NativeMethods
     [DllImport(LibraryName, EntryPoint = "ts_pack_free_string", CallingConvention = CallingConvention.Cdecl)]
     internal static extern void FreeString(IntPtr ptr);
 
+    /// <summary>
+    /// Free a string array allocated by the native library.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_free_string_array", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void FreeStringArray(IntPtr arr);
+
+    // -----------------------------------------------------------------------
+    // Configuration and download
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Initialize the language pack with configuration.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_init", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int Init(IntPtr configJson);
+
+    /// <summary>
+    /// Configure the language pack cache directory without downloading.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_configure", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int Configure(IntPtr configJson);
+
+    /// <summary>
+    /// Download specific languages to the cache.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_download", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int Download(IntPtr names, UIntPtr count);
+
+    /// <summary>
+    /// Download all available languages from the remote manifest.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_download_all", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int DownloadAll();
+
+    /// <summary>
+    /// Get all language names available in the remote manifest.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_manifest_languages", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr ManifestLanguages(out UIntPtr outCount);
+
+    /// <summary>
+    /// Get all languages that are already downloaded and cached locally.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_downloaded_languages", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr DownloadedLanguages(out UIntPtr outCount);
+
+    /// <summary>
+    /// Delete all cached parser shared libraries.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_clean_cache", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int CleanCache();
+
+    /// <summary>
+    /// Get the effective cache directory path as a C string.
+    /// The caller must free the returned string with <see cref="FreeString"/>.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_cache_dir", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr CacheDir();
+
     // -----------------------------------------------------------------------
     // Library resolution
     // -----------------------------------------------------------------------
