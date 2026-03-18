@@ -80,16 +80,28 @@ def update_pyproject_toml(file_path: Path, version: str) -> tuple[bool, str, str
 
 
 def update_package_json(file_path: Path, version: str) -> tuple[bool, str, str]:
-    """Update package.json version field."""
+    """Update package.json version field and @kreuzberg/* optionalDependencies."""
     data = json.loads(file_path.read_text())
     old_version = data.get("version", "N/A")
+    changed = False
 
-    if data.get("version") == version:
-        return False, old_version, version
+    if data.get("version") != version:
+        data["version"] = version
+        changed = True
 
-    data["version"] = version
-    file_path.write_text(json.dumps(data, indent=2) + "\n")
-    return True, old_version, version
+    # Also update @kreuzberg/* optionalDependencies to match
+    for section in ("optionalDependencies", "dependencies"):
+        deps = data.get(section, {})
+        for key in list(deps):
+            if key.startswith("@kreuzberg/tree-sitter-language-pack-") and deps[key] != version:
+                deps[key] = version
+                changed = True
+
+    if changed:
+        file_path.write_text(json.dumps(data, indent=2) + "\n")
+        return True, old_version, version
+
+    return False, old_version, version
 
 
 def update_mix_exs(file_path: Path, version: str) -> tuple[bool, str, str]:
