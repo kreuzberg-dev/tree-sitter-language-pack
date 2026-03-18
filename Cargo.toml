@@ -44,3 +44,13 @@ dirs = "6"
 tempfile = "3"
 rayon = "1"
 walkdir = "2.5"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+opt-level = 3
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true
