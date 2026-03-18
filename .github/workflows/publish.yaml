@@ -405,6 +405,8 @@ jobs:
             label: macos-arm64
           - os: windows-latest
             label: windows-x86_64
+          - os: windows-11-arm
+            label: windows-aarch64
     steps:
       - name: Checkout
         uses: actions/checkout@v6
