@@ -426,6 +426,16 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
+      - name: Install zstd (if missing)
+        shell: bash
+        run: |
+          if ! command -v zstd &>/dev/null; then
+            echo "zstd not found, installing via cargo..."
+            cargo install --locked zstd-cli
+          else
+            echo "zstd already available: $(zstd --version)"
+          fi
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
