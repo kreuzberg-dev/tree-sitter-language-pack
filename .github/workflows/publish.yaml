@@ -2216,6 +2216,155 @@ jobs:
           version: ${{ needs.prepare.outputs.version }}
           tap-repo: kreuzberg-dev/homebrew-tap
 
+  # ─── Build CLI binaries ───────────────────────────────────────────
+  build-cli:
+    name: Build CLI (${{ matrix.label }})
+    needs: [prepare, validate-versions, clone-vendors]
+    if: needs.prepare.outputs.release_homebrew == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x86_64
+            target: x86_64-unknown-linux-gnu
+            artifact: ts-pack-linux-x86_64
+          - os: ubuntu-24.04-arm
+            label: linux-aarch64
+            target: aarch64-unknown-linux-gnu
+            artifact: ts-pack-linux-aarch64
+          - os: ubuntu-latest
+            label: linux-x86_64-musl
+            target: x86_64-unknown-linux-musl
+            artifact: ts-pack-linux-x86_64-musl
+            cross: true
+          - os: macos-latest
+            label: macos-arm64
+            target: aarch64-apple-darwin
+            artifact: ts-pack-macos-arm64
+          - os: windows-latest
+            label: windows-x86_64
+            target: x86_64-pc-windows-msvc
+            artifact: ts-pack-windows-x86_64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          target: ${{ matrix.target }}
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Install cross (musl)
+        if: matrix.cross
+        run: cargo install cross --locked
+
+      - name: Install musl tools
+        if: matrix.label == 'linux-x86_64-musl' && !matrix.cross
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Get all language names
+        id: langs
+        shell: bash
+        run: |
+          LANGS=$(python3 -c "import json; d=json.load(open('sources/language_definitions.json')); print(','.join(sorted(d.keys())))")
+          echo "names=$LANGS" >> "$GITHUB_OUTPUT"
+
+      - name: Build CLI (native)
+        if: ${{ !matrix.cross }}
+        run: cargo build --release -p ts-pack-cli --target ${{ matrix.target }}
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: ${{ steps.langs.outputs.names }}
+          TSLP_LINK_MODE: static
+
+      - name: Build CLI (cross)
+        if: ${{ matrix.cross }}
+        run: cross build --release -p ts-pack-cli --target ${{ matrix.target }}
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: ${{ steps.langs.outputs.names }}
+          TSLP_LINK_MODE: static
+
+      - name: Package CLI (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p staging
+          cp target/${{ matrix.target }}/release/ts-pack staging/
+          cd staging && tar -czf "../${{ matrix.artifact }}.tar.gz" ts-pack
+
+      - name: Package CLI (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p staging
+          cp target/${{ matrix.target }}/release/ts-pack.exe staging/
+          cd staging && 7z a "../${{ matrix.artifact }}.zip" ts-pack.exe
+
+      - name: Upload CLI binary
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            ${{ matrix.artifact }}.tar.gz
+            ${{ matrix.artifact }}.zip
+          retention-days: 14
+
+  # ─── Upload CLI binaries to GitHub Release ──────────────────────────
+  upload-cli-release:
+    name: Upload CLI binaries to GitHub Release
+    needs: [prepare, build-cli]
+    if: |
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.build-cli.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download CLI artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: ts-pack-*
+          path: dist/cli
+          merge-multiple: true
+
+      - name: Upload to GitHub Release
+        uses: kreuzberg-dev/actions/publish-github-release@v1
+        with:
+          tag: ${{ inputs.tag }}
+          title: "Release ${{ inputs.tag }}"
+          artifacts: |
+            dist/cli/ts-pack-*.tar.gz
+            dist/cli/ts-pack-*.zip
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+
   # ─── Build Homebrew bottle ─────────────────────────────────────────
   homebrew-bottles:
     name: Build Homebrew bottle
@@ -2396,6 +2545,7 @@ jobs:
       - check-nuget
       - check-homebrew
       - upload-homebrew-bottles
+      - upload-cli-release
       - publish-homebrew
     if: always()
     runs-on: ubuntu-latest
