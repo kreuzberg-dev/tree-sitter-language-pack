@@ -1,0 +1,53 @@
+# tree-sitter-language-pack
+
+> Universal code parser for 170+ programming languages with code intelligence, syntax-aware chunking, and polyglot bindings.
+
+## About
+
+tree-sitter-language-pack provides pre-compiled tree-sitter grammars for 170+ programming languages with a unified API for parsing, structure extraction, import/export detection, and intelligent code chunking for LLMs. Built in Rust with thin bindings for every major platform.
+
+Parsers are downloaded on demand and cached locally — the initial package is small (~3MB) and parsers (~50KB each) are fetched automatically on first use.
+
+## Organization
+
+Part of the kreuzberg.dev ecosystem:
+- **Kreuzberg** — Document intelligence: https://github.com/kreuzberg-dev/kreuzberg
+- **html-to-markdown** — HTML to Markdown converter: https://github.com/kreuzberg-dev/html-to-markdown
+- **tree-sitter-language-pack** — Universal code parser (this repo): https://github.com/kreuzberg-dev/tree-sitter-language-pack
+
+## Links
+
+- Website: https://kreuzberg.dev
+- Documentation: https://docs.tree-sitter-language-pack.kreuzberg.dev
+- Discord: https://discord.gg/xt9WY3GnKR
+- Contact: naaman@kreuzberg.dev
+
+## Key APIs
+
+- `init(config)` — Configure and pre-download parsers
+- `download(languages)` — Download specific parser libraries
+- `get_language(name)` — Get a tree-sitter Language (auto-downloads if needed)
+- `process(source, config)` — Extract code intelligence (structure, imports, exports, comments, symbols, chunks)
+- `parse_string(language, source)` — Parse source code into a syntax tree
+- `available_languages()` — List locally available languages
+- `manifest_languages()` — List all 170+ available from remote manifest
+- `ProcessConfig` — Configure which analysis features to enable and chunking parameters
+- `PackConfig` — Configure cache directory and languages to pre-download
+
+## CLI
+
+The `ts-pack` CLI bundles all 170+ parsers into a single static binary:
+- `ts-pack download [languages]` — Download parser libraries
+- `ts-pack parse <file> --language <lang>` — Parse source code
+- `ts-pack process <file> --all` — Run full code intelligence pipeline
+- `ts-pack list --manifest` — List all available languages
+
+Install: `curl -fsSL https://raw.githubusercontent.com/kreuzberg-dev/tree-sitter-language-pack/main/install.sh | bash`
+
+## Available From
+
+Rust (crates.io), Python (PyPI), Node.js (npm), Ruby (RubyGems), Go (pkg.go.dev), Java (Maven Central), C# (NuGet), Elixir (Hex.pm), PHP (Packagist), WebAssembly (npm), C FFI, CLI (Homebrew, Docker)
+
+## Supported Languages
+
+173 languages including: Python, JavaScript, TypeScript, Rust, Go, Java, C, C++, C#, Ruby, PHP, Swift, Kotlin, Scala, Haskell, Elixir, Erlang, Lua, R, Julia, Dart, Zig, Nim, and 150+ more.

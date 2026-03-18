@@ -14,7 +14,7 @@ keywords = [
   "tree-sitter",
 ]
 license = "MIT OR Apache-2.0"
-authors = [ { name = "Na'aman Hirschfeld", email = "nhirschfeld@gmail.com" } ]
+authors = [ { name = "Na'aman Hirschfeld", email = "naaman@kreuzberg.dev" } ]
 requires-python = ">=3.10.0"
 classifiers = [
   "Development Status :: 4 - Beta",
