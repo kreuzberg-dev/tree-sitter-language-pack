@@ -44,4 +44,13 @@ RSpec.describe "TreeSitterLanguagePack comprehensive tests" do
       end
     end
   end
+
+  describe "setup" do
+    it "initializes with multiple languages" do
+      config_str = '{"languages":["python","javascript","rust","go","ruby","java","c","cpp"]}'
+      expect {
+        TreeSitterLanguagePack.init(config_str)
+      }.not_to raise_error
+    end
+  end
 end

@@ -103,3 +103,58 @@ func TestParseValidation(t *testing.T) {
 		}
 	})
 }
+
+func TestDownloadAPI(t *testing.T) {
+	t.Run("downloaded_languages_returns_list", func(t *testing.T) {
+		langs, err := tslp.DownloadedLanguages()
+		if err != nil {
+			t.Fatalf("DownloadedLanguages failed: %v", err)
+		}
+		if len(langs) == 0 {
+			t.Error("downloaded_languages returned empty list")
+		}
+	})
+
+	t.Run("cache_dir_returns_string", func(t *testing.T) {
+		cacheDir, err := tslp.CacheDir()
+		if err != nil {
+			t.Fatalf("CacheDir failed: %v", err)
+		}
+		if cacheDir == "" {
+			t.Error("cache_dir returned empty string")
+		}
+	})
+
+	t.Run("manifest_languages_returns_170_plus", func(t *testing.T) {
+		langs, err := tslp.ManifestLanguages()
+		if err != nil {
+			t.Fatalf("ManifestLanguages failed: %v", err)
+		}
+		if len(langs) < 170 {
+			t.Errorf("manifest_languages returned %d items, expected >= 170", len(langs))
+		}
+	})
+}
+
+func TestErrorHandling(t *testing.T) {
+	registry, err := tslp.NewRegistry()
+	if err != nil {
+		t.Fatalf("Failed to create registry: %v", err)
+	}
+	defer registry.Free()
+
+	t.Run("process_with_invalid_language_errors", func(t *testing.T) {
+		configJSON := `{"language":"nonexistent_xyz"}`
+		_, err := registry.Process("code", configJSON)
+		if err == nil {
+			t.Error("expected error for invalid language in process, got nil")
+		}
+	})
+
+	t.Run("has_language_nonexistent_returns_false", func(t *testing.T) {
+		result := registry.HasLanguage("nonexistent_lang_xyz_123")
+		if result {
+			t.Error("has_language for nonexistent language should return false")
+		}
+	})
+}

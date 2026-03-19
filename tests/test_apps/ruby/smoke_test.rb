@@ -41,4 +41,37 @@ RSpec.describe "TreeSitterLanguagePack smoke tests" do
       }.to raise_error
     end
   end
+
+  describe "download API" do
+    it "downloaded_languages returns array" do
+      langs = TreeSitterLanguagePack.downloaded_languages
+      expect(langs).to be_a(Array)
+      expect(langs.length).to be > 0
+    end
+
+    it "cache_dir returns non-empty string" do
+      cache_dir = TreeSitterLanguagePack.cache_dir
+      expect(cache_dir).to be_a(String)
+      expect(cache_dir.length).to be > 0
+    end
+
+    it "manifest_languages returns 170+ items" do
+      manifest_langs = TreeSitterLanguagePack.manifest_languages
+      expect(manifest_langs).to be_a(Array)
+      expect(manifest_langs.length).to be >= 170
+    end
+
+    it "process with invalid language raises" do
+      expect {
+        TreeSitterLanguagePack.process("code", '{"language":"nonexistent_xyz"}')
+      }.to raise_error
+    end
+  end
+
+  describe "error handling" do
+    it "has_language for nonexistent language returns false" do
+      result = TreeSitterLanguagePack.has_language("nonexistent_lang_xyz_123")
+      expect(result).to be false
+    end
+  end
 end

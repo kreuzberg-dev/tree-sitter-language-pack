@@ -105,3 +105,13 @@ func TestChunkingFixtures(t *testing.T) {
 		})
 	}
 }
+
+func TestSetup(t *testing.T) {
+	t.Run("init_with_multiple_languages", func(t *testing.T) {
+		configJSON := `{"languages":["python","javascript","rust","go","ruby","java","c","cpp"]}`
+		err := tslp.Init(configJSON)
+		if err != nil {
+			t.Fatalf("Init with multiple languages failed: %v", err)
+		}
+	})
+}
