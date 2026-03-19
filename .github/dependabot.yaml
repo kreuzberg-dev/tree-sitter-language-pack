@@ -1,6 +1,59 @@
 version: 2
 updates:
-- package-ecosystem: github-actions
-  directory: /
-  schedule:
-    interval: daily
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "cargo"
+    directories:
+      - "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "pip"
+    directories:
+      - "/"
+      - "/crates/ts-pack-python"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "npm"
+    directories:
+      - "/"
+      - "/crates/ts-pack-node"
+      - "/crates/ts-pack-wasm"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "bundler"
+    directory: "/crates/ts-pack-ruby"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "composer"
+    directories:
+      - "/"
+      - "/packages/php"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "gomod"
+    directory: "/packages/go/v1"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "maven"
+    directory: "/crates/ts-pack-java"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/packages/csharp"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "mix"
+    directory: "/crates/ts-pack-elixir"
+    schedule:
+      interval: "weekly"
