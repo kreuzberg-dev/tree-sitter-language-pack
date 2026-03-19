@@ -39,6 +39,10 @@ packages/csharp/**/runtimes/
 packages/go/v1/include/
 packages/go/v1/lib/
 
+# Elixir build artifacts
+crates/ts-pack-elixir/deps/
+crates/ts-pack-elixir/_build/
+
 # Ruby
 crates/ts-pack-ruby/tmp/
 
