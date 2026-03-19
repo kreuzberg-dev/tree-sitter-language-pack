@@ -8,7 +8,7 @@
     "test:smoke": "vitest run smoke.spec.ts"
   },
   "dependencies": {
-    "@kreuzberg/tree-sitter-language-pack-wasm": "1.0.0-rc.10"
+    "@kreuzberg/tree-sitter-language-pack-wasm": "1.0.0-rc.11"
   },
   "devDependencies": {
     "vitest": "^3.0.0",

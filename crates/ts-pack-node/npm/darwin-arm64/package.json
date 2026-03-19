@@ -1,6 +1,6 @@
 {
   "name": "@kreuzberg/tree-sitter-language-pack-darwin-arm64",
-  "version": "1.0.0-rc.10",
+  "version": "1.0.0-rc.11",
   "description": "macOS arm64 native binding for @kreuzberg/tree-sitter-language-pack",
   "main": "ts-pack-node.darwin-arm64.node",
   "files": [

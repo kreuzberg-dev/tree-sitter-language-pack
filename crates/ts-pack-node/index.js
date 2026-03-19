@@ -81,12 +81,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-android-arm64/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -104,12 +104,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-android-arm-eabi/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -137,12 +137,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/tree-sitter-language-pack-win32-x64-gnu/package.json").version;
 					if (
-						bindingPackageVersion !== "1.0.0-rc.10" &&
+						bindingPackageVersion !== "1.0.0-rc.11" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -160,12 +160,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/tree-sitter-language-pack-win32-x64-msvc/package.json").version;
 					if (
-						bindingPackageVersion !== "1.0.0-rc.10" &&
+						bindingPackageVersion !== "1.0.0-rc.11" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -184,12 +184,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-win32-ia32-msvc/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -207,12 +207,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-win32-arm64-msvc/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -235,12 +235,12 @@ function requireNative() {
 			const bindingPackageVersion =
 				require("@kreuzberg/tree-sitter-language-pack-darwin-universal/package.json").version;
 			if (
-				bindingPackageVersion !== "1.0.0-rc.10" &&
+				bindingPackageVersion !== "1.0.0-rc.11" &&
 				process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 				process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 			) {
 				throw new Error(
-					`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+					`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 				);
 			}
 			return binding;
@@ -258,12 +258,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-darwin-x64/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -281,12 +281,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-darwin-arm64/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -310,12 +310,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-freebsd-x64/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -333,12 +333,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-freebsd-arm64/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -363,12 +363,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/tree-sitter-language-pack-linux-x64-musl/package.json").version;
 					if (
-						bindingPackageVersion !== "1.0.0-rc.10" &&
+						bindingPackageVersion !== "1.0.0-rc.11" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -386,12 +386,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/tree-sitter-language-pack-linux-x64-gnu/package.json").version;
 					if (
-						bindingPackageVersion !== "1.0.0-rc.10" &&
+						bindingPackageVersion !== "1.0.0-rc.11" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -411,12 +411,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/tree-sitter-language-pack-linux-arm64-musl/package.json").version;
 					if (
-						bindingPackageVersion !== "1.0.0-rc.10" &&
+						bindingPackageVersion !== "1.0.0-rc.11" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -434,12 +434,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/tree-sitter-language-pack-linux-arm64-gnu/package.json").version;
 					if (
-						bindingPackageVersion !== "1.0.0-rc.10" &&
+						bindingPackageVersion !== "1.0.0-rc.11" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -459,12 +459,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/tree-sitter-language-pack-linux-arm-musleabihf/package.json").version;
 					if (
-						bindingPackageVersion !== "1.0.0-rc.10" &&
+						bindingPackageVersion !== "1.0.0-rc.11" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -482,12 +482,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/tree-sitter-language-pack-linux-arm-gnueabihf/package.json").version;
 					if (
-						bindingPackageVersion !== "1.0.0-rc.10" &&
+						bindingPackageVersion !== "1.0.0-rc.11" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -507,12 +507,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/tree-sitter-language-pack-linux-loong64-musl/package.json").version;
 					if (
-						bindingPackageVersion !== "1.0.0-rc.10" &&
+						bindingPackageVersion !== "1.0.0-rc.11" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -530,12 +530,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/tree-sitter-language-pack-linux-loong64-gnu/package.json").version;
 					if (
-						bindingPackageVersion !== "1.0.0-rc.10" &&
+						bindingPackageVersion !== "1.0.0-rc.11" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -555,12 +555,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/tree-sitter-language-pack-linux-riscv64-musl/package.json").version;
 					if (
-						bindingPackageVersion !== "1.0.0-rc.10" &&
+						bindingPackageVersion !== "1.0.0-rc.11" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -578,12 +578,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/tree-sitter-language-pack-linux-riscv64-gnu/package.json").version;
 					if (
-						bindingPackageVersion !== "1.0.0-rc.10" &&
+						bindingPackageVersion !== "1.0.0-rc.11" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -602,12 +602,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-linux-ppc64-gnu/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -625,12 +625,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-linux-s390x-gnu/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -654,12 +654,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-openharmony-arm64/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -677,12 +677,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-openharmony-x64/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -700,12 +700,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/tree-sitter-language-pack-openharmony-arm/package.json").version;
 				if (
-					bindingPackageVersion !== "1.0.0-rc.10" &&
+					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.10 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
