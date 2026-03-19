@@ -1736,26 +1736,15 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Determine npm tag
-        id: npm-tag
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          if [[ "$VERSION" == *"-"* ]]; then
-            echo "tag=next" >> "$GITHUB_OUTPUT"
-          else
-            echo "tag=latest" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Publish platform packages to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
         working-directory: crates/ts-pack-node
         run: |
-          TAG="${{ steps.npm-tag.outputs.tag }}"
           for pkg_dir in npm/*/; do
             if [[ -f "$pkg_dir/package.json" ]] && find "$pkg_dir" -name '*.node' -print -quit | grep -q .; then
               echo "Publishing $(basename "$pkg_dir")..."
               cd "$pkg_dir"
-              npm publish --access public --tag "$TAG" || echo "  (already published or failed)"
+              npm publish --access public --tag latest || echo "  (already published or failed)"
               cd ../..
             else
               echo "Skipping $(basename "$pkg_dir") (no .node binary)"
@@ -1767,9 +1756,7 @@ jobs:
       - name: Publish main package to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
         working-directory: crates/ts-pack-node
-        run: |
-          TAG="${{ steps.npm-tag.outputs.tag }}"
-          npm publish --access public --tag "$TAG"
+        run: npm publish --access public --tag latest
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -1830,22 +1817,12 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Determine npm tag
-        id: wasm-npm-tag
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          if [[ "$VERSION" == *"-"* ]]; then
-            echo "tag=next" >> "$GITHUB_OUTPUT"
-          else
-            echo "tag=latest" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Publish to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
         uses: kreuzberg-dev/actions/publish-npm@v1
         with:
           package-dir: crates/ts-pack-wasm/pkg
-          npm-tag: ${{ steps.wasm-npm-tag.outputs.tag }}
+          npm-tag: latest
           provenance: "true"
           dry-run: ${{ inputs.dry_run }}
         env:
