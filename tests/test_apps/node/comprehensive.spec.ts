@@ -17,6 +17,7 @@ function loadFixtures<T>(name: string): T[] {
 	return JSON.parse(readFileSync(resolve(fixturesDir, name), "utf-8"));
 }
 
+
 describe("process tests", () => {
 	beforeAll(() => {
 		download(["python", "javascript", "rust", "go"]);
@@ -43,7 +44,7 @@ describe("process tests", () => {
 				);
 			}
 			if ("error_count" in expected) {
-				expect(result.metrics.error_count).toBe(expected.error_count);
+				expect(result.metrics.errorCount).toBe(expected.error_count);
 			}
 		});
 	}
