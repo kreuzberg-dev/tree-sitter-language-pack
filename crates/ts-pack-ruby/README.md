@@ -9,33 +9,37 @@
     <img src="https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6" alt="Python">
   </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack">
     <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack?label=Node.js&color=007ec6" alt="Node">
-  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1">
-    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6" alt="Go">
-  </a>  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack">
-    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
-  </a>  <a href="https://hex.pm/packages/tree_sitter_language_pack">
-    <img src="https://img.shields.io/hexpm/v/tree_sitter_language_pack?label=Elixir&color=007ec6" alt="Elixir">
-  </a>  <a href="https://rubygems.org/gems/tree_sitter_language_pack">
-    <img src="https://img.shields.io/gem/v/tree_sitter_language_pack?label=Ruby&color=007ec6" alt="Ruby">
   </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm">
     <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack-wasm?label=WASM&color=007ec6" alt="Wasm">
-  </a>  <a href="https://packagist.org/packages/kreuzberg/tree-sitter-language-pack">
-    <img src="https://img.shields.io/packagist/v/kreuzberg/tree-sitter-language-pack?label=PHP&color=007ec6" alt="Php">
+  </a>  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack">
+    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
+  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1">
+    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6" alt="Go">
   </a>  <a href="https://www.nuget.org/packages/TreeSitterLanguagePack">
     <img src="https://img.shields.io/nuget/v/TreeSitterLanguagePack?label=C%23&color=007ec6" alt="Csharp">
+  </a>  <a href="https://packagist.org/packages/kreuzberg/tree-sitter-language-pack">
+    <img src="https://img.shields.io/packagist/v/kreuzberg/tree-sitter-language-pack?label=PHP&color=007ec6" alt="Php">
+  </a>  <a href="https://rubygems.org/gems/tree_sitter_language_pack">
+    <img src="https://img.shields.io/gem/v/tree_sitter_language_pack?label=Ruby&color=007ec6" alt="Ruby">
+  </a>  <a href="https://hex.pm/packages/tree_sitter_language_pack">
+    <img src="https://img.shields.io/hexpm/v/tree_sitter_language_pack?label=Elixir&color=007ec6" alt="Elixir">
+  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/pkgs/container/tree-sitter-language-pack">
+    <img src="https://img.shields.io/badge/Docker-007ec6?logo=docker&logoColor=white" alt="Docker">
+  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-ffi">
+    <img src="https://img.shields.io/badge/C-FFI-007ec6" alt="Ffi">
   </a>
   <!-- Project Info -->
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions">
     <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI" alt="CI">
   </a>
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue" alt="License">
+    <img src="https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue.svg" alt="License">
   </a>
   <a href="https://github.com/kreuzberg-dev/homebrew-tap">
     <img src="https://img.shields.io/badge/homebrew-ts--pack-FBB040?logo=homebrew" alt="Homebrew">
   </a>
-  <a href="https://docs.rs/tree-sitter-language-pack">
-    <img src="https://img.shields.io/badge/docs-crates.io-blue" alt="Docs">
+  <a href="https://docs.tree-sitter-language-pack.kreuzberg.dev">
+    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-blue" alt="Docs">
   </a>
 </div>
 

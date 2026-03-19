@@ -9,18 +9,7 @@ project:
   banner_url: "https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8"
 
 badges:
-  ci:
-    url: "https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI"
-    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions"
-  license:
-    url: "https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue"
-    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE"
-  homebrew:
-    url: "https://img.shields.io/badge/homebrew-ts--pack-FBB040?logo=homebrew"
-    link: "https://github.com/kreuzberg-dev/homebrew-tap"
-  docs:
-    url: "https://img.shields.io/badge/docs-crates.io-blue"
-    link: "https://docs.rs/tree-sitter-language-pack"
+  # Language Bindings
   rust:
     url: "https://img.shields.io/crates/v/tree-sitter-language-pack?label=Rust&color=007ec6"
     link: "https://crates.io/crates/tree-sitter-language-pack"
@@ -30,27 +19,46 @@ badges:
   node:
     url: "https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack?label=Node.js&color=007ec6"
     link: "https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack"
-  go:
-    url: "https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6"
-    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1"
-  java:
-    url: "https://img.shields.io/maven-central/v/dev.kreuzberg/tree-sitter-language-pack?label=Java&color=007ec6"
-    link: "https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack"
-  elixir:
-    url: "https://img.shields.io/hexpm/v/tree_sitter_language_pack?label=Elixir&color=007ec6"
-    link: "https://hex.pm/packages/tree_sitter_language_pack"
-  ruby:
-    url: "https://img.shields.io/gem/v/tree_sitter_language_pack?label=Ruby&color=007ec6"
-    link: "https://rubygems.org/gems/tree_sitter_language_pack"
   wasm:
     url: "https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack-wasm?label=WASM&color=007ec6"
     link: "https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm"
-  php:
-    url: "https://img.shields.io/packagist/v/kreuzberg/tree-sitter-language-pack?label=PHP&color=007ec6"
-    link: "https://packagist.org/packages/kreuzberg/tree-sitter-language-pack"
+  java:
+    url: "https://img.shields.io/maven-central/v/dev.kreuzberg/tree-sitter-language-pack?label=Java&color=007ec6"
+    link: "https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack"
+  go:
+    url: "https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6"
+    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1"
   csharp:
     url: "https://img.shields.io/nuget/v/TreeSitterLanguagePack?label=C%23&color=007ec6"
     link: "https://www.nuget.org/packages/TreeSitterLanguagePack"
+  php:
+    url: "https://img.shields.io/packagist/v/kreuzberg/tree-sitter-language-pack?label=PHP&color=007ec6"
+    link: "https://packagist.org/packages/kreuzberg/tree-sitter-language-pack"
+  ruby:
+    url: "https://img.shields.io/gem/v/tree_sitter_language_pack?label=Ruby&color=007ec6"
+    link: "https://rubygems.org/gems/tree_sitter_language_pack"
+  elixir:
+    url: "https://img.shields.io/hexpm/v/tree_sitter_language_pack?label=Elixir&color=007ec6"
+    link: "https://hex.pm/packages/tree_sitter_language_pack"
+  docker:
+    url: "https://img.shields.io/badge/Docker-007ec6?logo=docker&logoColor=white"
+    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/pkgs/container/tree-sitter-language-pack"
+  ffi:
+    url: "https://img.shields.io/badge/C-FFI-007ec6"
+    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-ffi"
+  # Project Info
+  ci:
+    url: "https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI"
+    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions"
+  license:
+    url: "https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue.svg"
+    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE"
+  homebrew:
+    url: "https://img.shields.io/badge/homebrew-ts--pack-FBB040?logo=homebrew"
+    link: "https://github.com/kreuzberg-dev/homebrew-tap"
+  docs:
+    url: "https://img.shields.io/badge/docs-kreuzberg.dev-blue"
+    link: "https://docs.tree-sitter-language-pack.kreuzberg.dev"
 
 languages:
   rust:
