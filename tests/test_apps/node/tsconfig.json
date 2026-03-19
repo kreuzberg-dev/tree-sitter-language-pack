@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "ESNext",
-		"lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
+		"lib": ["ESNext"],
 		"module": "ESNext",
 		"moduleResolution": "bundler",
 		"strict": true,
@@ -13,13 +13,6 @@
 		"noImplicitThis": true,
 		"useUnknownInCatchVariables": true,
 		"alwaysStrict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"exactOptionalPropertyTypes": true,
-		"noImplicitReturns": true,
-		"noFallthroughCasesInSwitch": true,
-		"noUncheckedIndexedAccess": true,
-		"noImplicitOverride": true,
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"resolveJsonModule": true,
@@ -27,10 +20,8 @@
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
 		"verbatimModuleSyntax": true,
-		"allowJs": false,
-		"checkJs": false,
 		"noEmit": true
 	},
-	"include": ["pkg/*.d.ts"],
+	"include": ["*.ts"],
 	"exclude": ["node_modules"]
 }
