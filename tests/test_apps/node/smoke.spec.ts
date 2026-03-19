@@ -81,10 +81,6 @@ describe("smoke tests", () => {
 	});
 
 	describe("download API", () => {
-		beforeAll(() => {
-			// Initialize the download system before running download tests
-			init();
-		});
 
 		it("exposes all download functions", async () => {
 			const functions = [
