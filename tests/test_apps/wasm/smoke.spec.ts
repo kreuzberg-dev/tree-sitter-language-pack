@@ -6,6 +6,9 @@ import init, {
 	parseString,
 	treeRootNodeType,
 	treeHasErrorNodes,
+	treeRootChildCount,
+	treeContainsNodeType,
+	process,
 } from "@kreuzberg/tree-sitter-language-pack-wasm";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -17,6 +20,14 @@ interface BasicFixture {
 	expected?: boolean;
 	expected_min?: number;
 	expected_contains?: string[];
+}
+
+interface ProcessFixture {
+	name: string;
+	test: string;
+	source: string;
+	config: Record<string, unknown>;
+	expected: Record<string, unknown>;
 }
 
 const fixturesDir = resolve(import.meta.dirname, "..", "fixtures");
@@ -69,5 +80,94 @@ describe("wasm smoke tests", () => {
 		it("throws on invalid language", () => {
 			expect(() => parseString("nonexistent_xyz_123", "code")).toThrow();
 		});
+
+		it("parses JavaScript code", () => {
+			const tree = parseString("javascript", "function test() { return 1; }\n");
+			expect(treeRootNodeType(tree)).toBe("program");
+			expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+			expect(treeHasErrorNodes(tree)).toBe(false);
+		});
+
+		it("parses Rust code", () => {
+			const tree = parseString("rust", "fn main() { println!(\"hello\"); }\n");
+			expect(treeRootNodeType(tree)).toBe("source_file");
+			expect(treeHasErrorNodes(tree)).toBe(false);
+		});
+
+		it("contains function_definition in Python", () => {
+			const tree = parseString("python", "def test():\n    pass\n");
+			expect(treeContainsNodeType(tree, "function_definition")).toBe(true);
+		});
+
+		it("returns error count for invalid syntax", () => {
+			const tree = parseString("python", "def broken(:\n");
+			expect(treeHasErrorNodes(tree)).toBe(true);
+		});
+	});
+
+	describe("process API tests", () => {
+		const fixtures = loadFixtures<ProcessFixture>("process.json");
+
+		for (const fixture of fixtures) {
+			it(fixture.name, () => {
+				const result = process(fixture.source, fixture.config);
+
+				// Check if result is a valid object
+				expect(result).toBeTruthy();
+				expect(typeof result).toBe("object");
+
+				// Verify language matches
+				if (fixture.expected.language) {
+					expect(result.language).toBe(fixture.expected.language);
+				}
+
+				// Verify structure count
+				if (typeof fixture.expected.structure_min === "number") {
+					expect((result.structure || []).length).toBeGreaterThanOrEqual(
+						fixture.expected.structure_min
+					);
+				}
+
+				// Verify error count
+				if (typeof fixture.expected.error_count === "number") {
+					expect(result.error_count || 0).toBe(fixture.expected.error_count);
+				}
+
+				// Verify metrics if present
+				if (fixture.expected.metrics_total_lines_min) {
+					expect(result.metrics?.total_lines || 0).toBeGreaterThanOrEqual(
+						fixture.expected.metrics_total_lines_min as number
+					);
+				}
+
+				// Verify imports if expected
+				if (typeof fixture.expected.imports_min === "number") {
+					expect((result.imports || []).length).toBeGreaterThanOrEqual(
+						fixture.expected.imports_min
+					);
+				}
+			});
+		}
+	});
+
+	describe("chunking tests", () => {
+		const fixtures = loadFixtures<ProcessFixture>("chunking.json");
+
+		for (const fixture of fixtures) {
+			it(fixture.name, () => {
+				const result = process(fixture.source, fixture.config);
+
+				// Check if result is a valid object
+				expect(result).toBeTruthy();
+				expect(typeof result).toBe("object");
+
+				// Verify chunks exist and meet minimum count
+				if (typeof fixture.expected.chunks_min === "number") {
+					expect((result.chunks || []).length).toBeGreaterThanOrEqual(
+						fixture.expected.chunks_min
+					);
+				}
+			});
+		}
 	});
 });
