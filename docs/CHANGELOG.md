@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-rc.13] - 2026-03-19
+
+### Fixed
+
+- Docs: mermaid diagrams now render (fixed broken code fence closings in architecture.md)
+- Docs: Elixir icon renders in Supported Ecosystems table (`:simple-elixir:`)
+- Docs: mkdocs.yaml aligned with kreuzberg (custom palette, toc.integrate, repo icons)
+- Publish: Ruby platform-specific native gems (build-native-gem.rb)
+- Publish: PHP extension binaries uploaded to GitHub release
+- Publish: Elixir uses rustler_precompiled for binary NIF distribution
+- Publish: workflow triggers on release event (not just workflow_dispatch)
+- Publish: npm tag computed in prepare job (rc→next, stable→latest)
+
 ## [1.0.0-rc.12] - 2026-03-19
 
 ### Added

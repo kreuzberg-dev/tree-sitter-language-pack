@@ -18,7 +18,7 @@
         <dependency>
             <groupId>dev.kreuzberg</groupId>
             <artifactId>tree-sitter-language-pack</artifactId>
-            <version>1.0.0-rc.12</version>
+            <version>1.0.0-rc.13</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
