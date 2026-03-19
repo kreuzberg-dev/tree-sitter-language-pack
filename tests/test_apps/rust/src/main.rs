@@ -1,6 +1,9 @@
 use serde::Deserialize;
 use std::fs;
-use tree_sitter_language_pack::{DownloadManager, LanguageRegistry, ProcessConfig};
+use tree_sitter_language_pack::{
+    cache_dir, downloaded_languages, manifest_languages, DownloadManager, LanguageRegistry,
+    ProcessConfig,
+};
 
 const VERSION: &str = "1.0.0-rc.10";
 
@@ -64,12 +67,12 @@ fn setup_registry() -> LanguageRegistry {
     dm.ensure_languages(needed)
         .expect("Failed to download parsers");
 
-    let cache_dir = dm.cache_dir().to_path_buf();
-    println!("Parsers cached at: {}", cache_dir.display());
+    let cache = dm.cache_dir().to_path_buf();
+    println!("Parsers cached at: {}", cache.display());
 
     // Create registry with the download cache as an extra lib dir
     let mut registry = LanguageRegistry::new();
-    registry.add_extra_libs_dir(cache_dir);
+    registry.add_extra_libs_dir(cache);
     registry
 }
 
@@ -181,6 +184,64 @@ fn run_process_tests(registry: &LanguageRegistry, fixture_path: &str) {
     }
 }
 
+fn run_download_api_tests() {
+    // Test: download() is callable (already done in setup, verify via downloaded_languages)
+    let langs = downloaded_languages();
+    assert!(
+        langs.iter().any(|l| l == "python"),
+        "downloaded_languages() should include 'python' after setup"
+    );
+    println!("  PASS: download_callable (download completed, python present)");
+
+    // Test: downloaded_languages() returns a list
+    let dl = downloaded_languages();
+    assert!(
+        !dl.is_empty(),
+        "downloaded_languages() should return non-empty list after download"
+    );
+    println!("  PASS: downloaded_languages_returns_list (count={})", dl.len());
+
+    // Test: cache_dir() returns a string
+    let dir = cache_dir().expect("cache_dir() should succeed");
+    let dir_str = dir.to_string_lossy();
+    assert!(!dir_str.is_empty(), "cache_dir() should return non-empty path");
+    println!("  PASS: cache_dir_returns_string ({})", dir_str);
+
+    // Test: manifest_languages() returns 170+ languages (network)
+    match manifest_languages() {
+        Ok(manifest) => {
+            assert!(
+                manifest.len() >= 170,
+                "manifest_languages() count {} < expected 170",
+                manifest.len()
+            );
+            println!(
+                "  PASS: manifest_languages_returns_170_plus (count={})",
+                manifest.len()
+            );
+        }
+        Err(e) => {
+            println!("  SKIP: manifest_languages_returns_170_plus (network unavailable: {})", e);
+        }
+    }
+}
+
+fn run_error_handling_tests(registry: &LanguageRegistry) {
+    // Test: invalid language throws an error from process()
+    let config = ProcessConfig::new("nonexistent_xyz_123");
+    let result = registry.process("some code", &config);
+    assert!(
+        result.is_err(),
+        "process() with invalid language should return Err"
+    );
+    println!("  PASS: invalid_language_throws");
+
+    // Test: has_language returns false for nonexistent language
+    let found = registry.has_language("nonexistent_xyz_123");
+    assert!(!found, "has_language(nonexistent) should return false");
+    println!("  PASS: has_language_nonexistent_false");
+}
+
 fn main() {
     let registry = setup_registry();
 
@@ -192,6 +253,12 @@ fn main() {
 
     println!("\n=== Chunking Tests ===");
     run_process_tests(&registry, "../fixtures/chunking.json");
+
+    println!("\n=== Download API Tests ===");
+    run_download_api_tests();
+
+    println!("\n=== Error Handling Tests ===");
+    run_error_handling_tests(&registry);
 
     println!("\nAll tests passed!");
 }
