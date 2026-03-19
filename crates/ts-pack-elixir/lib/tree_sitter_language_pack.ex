@@ -206,4 +206,76 @@ defmodule TreeSitterLanguagePack do
   """
   @spec process(String.t(), String.t()) :: map()
   def process(_source, _config_json), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Initializes the language pack with the given configuration JSON.
+
+  Downloads specified languages/groups and applies cache settings.
+
+  ## Parameters
+
+    * `config_json` - JSON string with optional `cache_dir`, `languages`, `groups`
+  """
+  @spec init(String.t()) :: :ok | {:error, term()}
+  def init(_config_json), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Applies download configuration without downloading anything.
+
+  Use to set a custom cache directory before first language load.
+
+  ## Parameters
+
+    * `config_json` - JSON string with optional `cache_dir`
+  """
+  @spec configure(String.t()) :: :ok | {:error, term()}
+  def configure(_config_json), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Downloads specific languages to the local cache.
+
+  Returns the number of newly downloaded languages.
+
+  ## Parameters
+
+    * `names` - list of language name strings
+  """
+  @spec download([String.t()]) :: non_neg_integer()
+  def download(_names), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Downloads all available languages from the remote manifest.
+
+  Returns the number of newly downloaded languages.
+  """
+  @spec download_all() :: non_neg_integer()
+  def download_all(), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Returns all language names available in the remote manifest.
+
+  Fetches and caches the remote manifest to discover downloadable languages.
+  """
+  @spec manifest_languages() :: [String.t()]
+  def manifest_languages(), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Returns languages that are already downloaded and cached locally.
+
+  Does not perform any network requests.
+  """
+  @spec downloaded_languages() :: [String.t()]
+  def downloaded_languages(), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Deletes all cached parser shared libraries.
+  """
+  @spec clean_cache() :: :ok | {:error, term()}
+  def clean_cache(), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Returns the effective cache directory path as a string.
+  """
+  @spec cache_dir() :: String.t()
+  def cache_dir(), do: :erlang.nif_error(:nif_not_loaded)
 end

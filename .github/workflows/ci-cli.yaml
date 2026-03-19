@@ -42,9 +42,58 @@ env:
   BUILD_PROFILE: ci
 
 jobs:
+  clone-vendors:
+    name: Clone vendors
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: uv sync --no-install-project
+
+      - name: Cache parsers
+        uses: actions/cache@v5
+        with:
+          path: parsers
+          key: parsers-${{ hashFiles('sources/language_definitions.json') }}
+          restore-keys: |
+            parsers-
+
+      - name: Clone vendors
+        run: |
+          mkdir -p parsers
+          uv run --no-sync scripts/clone_vendors.py
+
+      - name: Upload parsers
+        uses: actions/upload-artifact@v7
+        with:
+          name: language-parsers
+          path: parsers
+          retention-days: 1
+
   build-cli:
     name: CLI Build & Test (${{ matrix.os }})
     if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
+    needs: clone-vendors
     timeout-minutes: 30
     strategy:
       fail-fast: true
@@ -55,18 +104,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           cache-key-prefix: cli-${{ matrix.os }}
           use-sccache: true
-
-      - name: Clone grammar vendors
-        shell: bash
-        run: |
-          if command -v node &>/dev/null; then
-            node scripts/clone_vendors.mjs || true
-          fi
 
       - name: Build CLI (release)
         shell: bash

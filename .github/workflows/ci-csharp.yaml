@@ -188,7 +188,7 @@ jobs:
           TSLP_LINK_MODE: static
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -248,7 +248,7 @@ jobs:
         uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
