@@ -2152,6 +2152,20 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Upload PHP extension binaries to GitHub release
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+        run: |
+          echo "Uploading PHP extension binaries to GitHub release ${TAG}..."
+          for file in dist/php/php-ext-*.tar.gz; do
+            if [ -f "$file" ]; then
+              echo "Uploading: $file"
+              gh release upload "$TAG" "$file" --clobber
+            fi
+          done
+
       - name: Publish to Packagist
         if: ${{ !inputs.dry_run }}
         uses: kreuzberg-dev/actions/publish-packagist@v1
