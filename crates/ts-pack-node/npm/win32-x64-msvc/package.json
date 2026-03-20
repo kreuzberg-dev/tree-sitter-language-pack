@@ -1,6 +1,6 @@
 {
 	"name": "@kreuzberg/tree-sitter-language-pack-win32-x64-msvc",
-	"version": "1.0.0-rc.14",
+	"version": "1.0.0-rc.15",
 	"description": "Windows x64 (MSVC) native binding for @kreuzberg/tree-sitter-language-pack",
 	"main": "ts-pack-node.win32-x64-msvc.node",
 	"files": [
@@ -19,5 +19,5 @@
 		"type": "git",
 		"url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
 	},
-	"license": "MIT OR Apache-2.0"
+	"license": "MIT"
 }

@@ -151,7 +151,7 @@ def _update_workspace_inheritance(core_toml: Path, core_version: str) -> None:
     replacements = {
         r"^version\.workspace = true$": f'version = "{core_version}"',
         r"^edition\.workspace = true$": 'edition = "2024"',
-        r"^license\.workspace = true$": 'license = "MIT OR Apache-2.0"',
+        r"^license\.workspace = true$": 'license = "MIT"',
         r"^authors\.workspace = true$": 'authors = ["Na\'aman Hirschfeld <naaman@kreuzberg.dev>"]',
         r"^repository\.workspace = true$": 'repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"',
     }
@@ -205,7 +205,7 @@ def main() -> None:
         f"[workspace.package]\n"
         f'version = "{core_version}"\n'
         f'edition = "2024"\n'
-        f'license = "MIT OR Apache-2.0"\n'
+        f'license = "MIT"\n'
         f'authors = ["Na\'aman Hirschfeld <naaman@kreuzberg.dev>"]\n'
         f'repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"\n'
         f'homepage = "https://kreuzberg.dev"\n\n'

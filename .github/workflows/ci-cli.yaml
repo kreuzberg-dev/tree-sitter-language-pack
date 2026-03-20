@@ -119,6 +119,10 @@ jobs:
       - name: Build CLI (release)
         shell: bash
         run: cargo build --release --package ts-pack-cli
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+          TSLP_LINK_MODE: static
 
       - name: Verify CLI binary exists
         shell: bash
@@ -140,11 +144,11 @@ jobs:
           chmod +x tests/test_apps/cli/smoke_test.sh
           TS_PACK_BIN=./target/release/ts-pack tests/test_apps/cli/smoke_test.sh
 
-      - name: Run grammar test (subset)
+      - name: Run grammar test (static subset)
         shell: bash
         run: |
           chmod +x tests/test_apps/cli/test_all_grammars.sh
-          TS_PACK_BIN=./target/release/ts-pack tests/test_apps/cli/test_all_grammars.sh
+          TS_PACK_BIN=./target/release/ts-pack TS_PACK_LANGUAGES="python,rust,javascript,typescript,go,html,css,json" tests/test_apps/cli/test_all_grammars.sh
 
       - name: Upload CLI binary (artifact)
         if: success()

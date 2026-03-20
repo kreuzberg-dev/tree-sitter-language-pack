@@ -4,9 +4,9 @@ exclude = ["packages/go/v1", "crates/ts-pack-java"]
 resolver = "2"
 
 [workspace.package]
-version = "1.0.0-rc.14"
+version = "1.0.0-rc.15"
 edition = "2024"
-license = "MIT OR Apache-2.0"
+license = "MIT"
 repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
 homepage = "https://kreuzberg.dev"
 authors = ["Na'aman Hirschfeld <naaman@kreuzberg.dev>"]

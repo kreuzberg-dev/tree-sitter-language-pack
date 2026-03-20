@@ -106,7 +106,7 @@ For detailed API documentation, see the [CLI package](https://github.com/kreuzbe
 
 ## License
 
-MIT OR Apache-2.0 -- see [LICENSE](https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE) for details.
+MIT -- see [LICENSE](https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE) for details.
 
 ---
 

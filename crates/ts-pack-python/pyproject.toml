@@ -4,7 +4,7 @@ requires = [ "maturin>=1,<2" ]
 
 [project]
 name = "tree-sitter-language-pack"
-version = "1.0.0rc14"
+version = "1.0.0rc15"
 description = """\
   Pre-compiled tree-sitter parsers for 170+ programming languages with a unified process() API for parsing, analysis, \
   and intelligent code chunking.\
@@ -20,7 +20,7 @@ keywords = [
   "syntax",
   "tree-sitter",
 ]
-license = "MIT OR Apache-2.0"
+license = "MIT"
 requires-python = ">=3.10"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",

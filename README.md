@@ -257,4 +257,4 @@ Join our [Discord community](https://discord.gg/xt9WY3GnKR) for questions and di
 
 ## License
 
-MIT OR Apache-2.0 -- see [LICENSE](LICENSE) for details.
+MIT -- see [LICENSE](LICENSE) for details.

@@ -815,7 +815,7 @@ jobs:
           data['version'] = '$VERSION'
           data['publishConfig'] = {'registry': 'https://registry.npmjs.org/', 'access': 'public'}
           data['repository'] = {'type': 'git', 'url': 'https://github.com/kreuzberg-dev/tree-sitter-language-pack'}
-          data['license'] = 'MIT OR Apache-2.0'
+          data['license'] = 'MIT'
           with open('pkg/package.json', 'w') as f:
               json.dump(data, f, indent=2)
               f.write('\n')

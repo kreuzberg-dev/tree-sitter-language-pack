@@ -62,10 +62,9 @@ tasks:
       - cargo run -p e2e-generator -- generate --lang wasm
 
   update:
-    desc: Update WASM build tools
+    desc: Update WASM dependencies
     cmds:
-      - echo "Updating wasm-pack..."
-      - cargo install wasm-pack --force
+      - echo "WASM dependencies updated via node:update (pnpm workspace)"
 
   e2e:test:
     desc: Run WASM E2E tests

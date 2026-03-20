@@ -37,11 +37,15 @@ tasks:
       - mix credo --strict || true
 
   update:
-    desc: Update Elixir dependencies
+    desc: Update Elixir dependencies to latest versions
     dir: crates/ts-pack-elixir
     cmds:
-      - echo "Updating Elixir dependencies..."
+      - echo "Updating Elixir dependencies to latest versions..."
+      - cmd: echo "Note - Elixir requires manual mix.exs edits for major version updates"
+      - mix hex.outdated
       - mix deps.update --all
+      - echo "Checking remaining outdated dependencies..."
+      - mix hex.outdated || true
 
   clean:
     desc: Clean Elixir build artifacts

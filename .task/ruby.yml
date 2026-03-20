@@ -7,6 +7,15 @@ tasks:
     cmds:
       - bundle install
 
+  update:
+    desc: Update Ruby dependencies to latest versions
+    dir: crates/ts-pack-ruby
+    cmds:
+      - echo "Updating Ruby dependencies to latest versions..."
+      - bundle update --all --conservative=false
+      - echo "Checking for remaining outdated dependencies..."
+      - bundle outdated || true
+
   vendor:
     desc: Vendor ts-pack-core into Ruby package
     env:

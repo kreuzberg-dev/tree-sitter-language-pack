@@ -133,9 +133,9 @@ tasks:
       - echo "Updating Python dependencies..."
       - task: python:update
       - echo "Updating Ruby dependencies..."
-      - task: ruby:deps
-      - echo "Updating Node.js dependencies..."
-      - task: node:deps
+      - task: ruby:update
+      - echo "Updating TypeScript dependencies..."
+      - task: node:update
       - echo "Updating Go dependencies..."
       - task: go:update
       - echo "Updating Java dependencies..."
@@ -150,9 +150,9 @@ tasks:
       - task: csharp:update
       - echo "Updating language grammar revisions..."
       - uv run --no-sync scripts/pin_vendors.py
-      - echo "All dependencies updated"
-      - echo "Updating pre-commit hooks..."
+      - echo "Updating prek dependencies..."
       - prek autoupdate
+      - echo "All dependencies updated"
 
   update:grammars:
     desc: Update language grammar revisions

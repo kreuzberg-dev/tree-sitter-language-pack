@@ -44,11 +44,16 @@ tasks:
       - rm -rf crates/ts-pack-php/vendor crates/ts-pack-php/target
 
   update:
-    desc: Update PHP dependencies to latest versions
+    desc: Update PHP dependencies to latest versions (including major versions)
     cmds:
-      - echo "Updating packages/php dependencies..."
-      - cd packages/php && composer update --with-all-dependencies 2>/dev/null || true
-      - echo "PHP dependencies updated"
+      - echo "Updating root composer.json dependencies..."
+      - composer update --with-all-dependencies || true
+      - echo "Updating packages/php dependencies to latest versions..."
+      - cd packages/php && composer update --with-all-dependencies
+      - cd packages/php && echo "Checking remaining outdated dependencies..." && composer outdated --direct || true
+      - echo "Updating e2e/php dependencies to latest versions..."
+      - cd e2e/php && composer update --with-all-dependencies || true
+      - cd e2e/php && echo "Checking remaining outdated dependencies..." && composer outdated --direct || true
 
   e2e:generate:
     desc: Generate PHP E2E tests from fixtures

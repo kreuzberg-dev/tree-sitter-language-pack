@@ -62,11 +62,14 @@ tasks:
       - dotnet format TreeSitterLanguagePack.sln
 
   update:
-    desc: Update NuGet dependencies
+    desc: Update C# dependencies to latest versions (including major versions)
     dir: packages/csharp
     cmds:
-      - echo "Updating NuGet dependencies..."
-      - dotnet restore TreeSitterLanguagePack.sln
+      - echo "Updating C# dependencies to latest versions..."
+      - dotnet tool install --global dotnet-outdated-tool || dotnet tool update --global dotnet-outdated-tool
+      - dotnet outdated TreeSitterLanguagePack.sln --upgrade
+      - echo "Checking remaining outdated packages..."
+      - dotnet list TreeSitterLanguagePack.sln package --outdated || true
 
   clean:
     desc: Clean C# build artifacts

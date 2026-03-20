@@ -1,6 +1,6 @@
 {
 	"name": "@kreuzberg/tree-sitter-language-pack-linux-arm64-gnu",
-	"version": "1.0.0-rc.14",
+	"version": "1.0.0-rc.15",
 	"description": "Linux arm64 (glibc) native binding for @kreuzberg/tree-sitter-language-pack",
 	"main": "ts-pack-node.linux-arm64-gnu.node",
 	"files": [
@@ -19,5 +19,5 @@
 		"type": "git",
 		"url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
 	},
-	"license": "MIT OR Apache-2.0"
+	"license": "MIT"
 }

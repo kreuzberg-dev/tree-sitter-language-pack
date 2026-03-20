@@ -17,7 +17,7 @@ echo "Fixtures: $FIXTURES"
 echo ""
 
 python3 -c "
-import json, subprocess, sys
+import json, subprocess, sys, os
 
 fixtures = json.load(open('$FIXTURES'))
 binary = '$BINARY'
@@ -26,13 +26,22 @@ failed = 0
 skipped = 0
 errors = []
 
+# Optional filter: only test specific languages (comma-separated)
+filter_langs = os.environ.get('TS_PACK_LANGUAGES', '')
+allowed = set(filter_langs.split(',')) if filter_langs else None
+
 print(f'Testing {len(fixtures)} languages...')
+if allowed:
+    print(f'Filtered to: {sorted(allowed)}')
 print()
 
 for f in fixtures:
     lang = f['language']
     source = f['source']
     if f.get('skip'):
+        skipped += 1
+        continue
+    if allowed and lang not in allowed:
         skipped += 1
         continue
     try:

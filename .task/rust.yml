@@ -109,8 +109,10 @@ tasks:
     desc: Update Rust dependencies
     cmds:
       - echo "Updating Rust dependencies (workspace)..."
+      - cargo upgrade --incompatible
       - cargo update
       - echo "Updating Rust dependencies (e2e)..."
+      - cargo upgrade --incompatible --manifest-path e2e/rust/Cargo.toml
       - cargo update --manifest-path e2e/rust/Cargo.toml
 
   e2e:generate:

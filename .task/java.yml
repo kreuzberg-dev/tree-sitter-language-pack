@@ -46,12 +46,17 @@ tasks:
       - mvn com.spotify.fmt:fmt-maven-plugin:check || true
 
   update:
-    desc: Update Java/Maven dependencies
+    desc: Update Java dependencies and plugins (including linters)
     dir: crates/ts-pack-java
     cmds:
-      - echo "Updating Maven dependencies..."
-      - mvn versions:use-latest-releases -DgenerateBackupPoms=false -q
-      - mvn versions:update-properties -DgenerateBackupPoms=false -q || true
+      - echo "Updating Java dependencies and plugins..."
+      - mvn -DallowSnapshots=false versions:use-latest-releases -DprocessDependencies=true -DprocessParent=false -DgenerateBackupPoms=false
+      - echo "Updating plugin versions in properties..."
+      - mvn -DallowSnapshots=false versions:update-properties -DgenerateBackupPoms=false || true
+      - echo "Displaying final dependency updates..."
+      - mvn -DallowSnapshots=false versions:display-dependency-updates
+      - echo "Displaying final plugin updates..."
+      - mvn -DallowSnapshots=false versions:display-plugin-updates
 
   clean:
     desc: Clean Java build artifacts

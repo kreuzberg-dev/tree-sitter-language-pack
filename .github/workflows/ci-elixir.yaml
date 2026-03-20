@@ -160,12 +160,14 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           MIX_ENV: test
+          TSLP_BUILD: "1"
         run: mix compile --warnings-as-errors
 
       - name: Run Elixir tests
         run: task elixir:test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_BUILD: "1"
 
   e2e-elixir:
     name: Elixir E2E Tests

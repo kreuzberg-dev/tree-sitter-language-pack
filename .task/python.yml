@@ -38,7 +38,9 @@ tasks:
       - rm -rf build/ dist/ *.egg-info __pycache__
 
   update:
-    desc: Update Python dependencies
+    desc: Update Python dependencies to latest versions (including major versions)
     cmds:
-      - echo "Updating Python dependencies..."
-      - uv lock --upgrade
+      - echo "Updating Python dependencies to latest versions..."
+      - uv sync --all-packages --all-extras --upgrade --no-install-workspace --no-install-project
+      - echo "Checking remaining outdated dependencies..."
+      - uv pip list --outdated || true

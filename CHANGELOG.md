@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-rc.15] - 2026-03-20
+
+### Fixed
+
+- CI: CLI built with 0 static languages — added `TSLP_LANGUAGES` and `TSLP_LINK_MODE` to build step
+- CI: CLI grammar test now filters to statically compiled subset via `TS_PACK_LANGUAGES` env var
+- CI: Elixir `mix compile` tried downloading precompiled NIFs (404) — added `TSLP_BUILD=1` to force local build
+- CI: Node.js lockfile mismatch — removed hardcoded `optionalDependencies` from ts-pack-node package.json (NAPI-RS adds them during publish)
+- CI: Java E2E pom.xml updated (maven-compiler 3.15.0, surefire 3.5.5, JUnit 6.1.0-M1, gson 2.13.2)
+
+### Changed
+
+- License: unified to MIT only across all ecosystems (removed Apache-2.0 dual license)
+- Task update commands aligned with kreuzberg across all bindings (Ruby, Node, Elixir, C#, Java, Go, PHP, Rust, Python, WASM)
+- Maven plugins updated: compiler 3.15.0, surefire 3.5.5, source 3.4.0, javadoc 3.12.0, gpg 3.2.8, central-publishing 0.10.0
+- Dependabot: added ignore rules for GitHub Actions artifact actions and internal crates
+- Dependencies updated across all ecosystems via `task update`
+
+## [1.0.0-rc.14] - 2026-03-20
+
+### Fixed
+
+- CI failures from rc.13 release
+- Remove darwin-x64 target (not available in CI)
+- Add linux-arm64-gnu target
+
 ## [1.0.0-rc.13] - 2026-03-19
 
 ### Fixed

@@ -7,6 +7,14 @@ tasks:
     cmds:
       - pnpm install
 
+  update:
+    desc: Update Node/TypeScript dependencies (all workspace packages)
+    cmds:
+      - echo "Updating Node/TypeScript dependencies across workspace..."
+      - corepack up
+      - pnpm up --latest -r
+      - pnpm up --latest -w
+
   build:
     desc: Build NAPI-RS native module (release)
     dir: crates/ts-pack-node
