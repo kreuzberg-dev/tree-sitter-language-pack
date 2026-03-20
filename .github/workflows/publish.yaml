@@ -984,7 +984,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '25'
+          java-version: '25.0.2'
           cache: 'maven'
 
       - name: Setup Maven
@@ -2013,7 +2013,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 25
+          java-version: '25.0.2'
           cache: maven
           server-id: ossrh
           server-username: MAVEN_USERNAME
