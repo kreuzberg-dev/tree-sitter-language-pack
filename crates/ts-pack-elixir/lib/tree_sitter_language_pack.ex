@@ -34,14 +34,18 @@ defmodule TreeSitterLanguagePack do
   check availability before calling these functions if you want to avoid handling errors.
   """
 
+  @version "1.0.0-rc.15"
+
+  @force_build System.get_env("TSLP_BUILD") in ["1", "true"]
+
   use RustlerPrecompiled,
     otp_app: :tree_sitter_language_pack,
     crate: "ts_pack_elixir",
-    path: ".",
     base_url:
-      "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v#{Mix.Project.config()[:version]}",
-    version: Mix.Project.config()[:version],
-    force_build: System.get_env("TSLP_BUILD") in ["1", "true"],
+      "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v#{@version}",
+    version: @version,
+    force_build: @force_build,
+    skip_compilation?: @force_build,
     targets: ~w(
       aarch64-apple-darwin
       aarch64-unknown-linux-gnu

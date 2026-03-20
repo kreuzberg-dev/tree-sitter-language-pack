@@ -480,6 +480,7 @@ def main() -> None:
         (repo_root / "crates/ts-pack-node/package.json", "package_json"),
         (repo_root / "crates/ts-pack-wasm/package.json", "package_json"),
         (repo_root / "crates/ts-pack-elixir/mix.exs", "mix_exs"),
+        (repo_root / "crates/ts-pack-elixir/lib/tree_sitter_language_pack.ex", "mix_exs"),
         (repo_root / "crates/ts-pack-java/pom.xml", "pom_xml"),
         (repo_root / "crates/ts-pack-ruby/tree_sitter_language_pack.gemspec", "gemspec"),
         (repo_root / "crates/ts-pack-node/index.js", "napi_index_js"),
