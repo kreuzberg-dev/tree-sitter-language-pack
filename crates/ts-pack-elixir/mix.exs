@@ -1,7 +1,7 @@
 defmodule TreeSitterLanguagePack.MixProject do
   use Mix.Project
 
-  @version "1.0.0-rc.16"
+  @version "1.0.0-rc.17"
 
   def project do
     [
@@ -32,7 +32,7 @@ defmodule TreeSitterLanguagePack.MixProject do
         mix.exs
         README.md
         LICENSE
-        checksum-Elixir.TreeSitterLanguagePack.Native.exs
+        checksum-Elixir.TreeSitterLanguagePack.exs
       )
     ]
   end

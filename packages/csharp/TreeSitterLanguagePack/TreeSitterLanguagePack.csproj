@@ -7,7 +7,7 @@
     <LangVersion>latest</LangVersion>
 
     <PackageId>TreeSitterLanguagePack</PackageId>
-    <Version>1.0.0-rc.16</Version>
+    <Version>1.0.0-rc.17</Version>
     <Authors>kreuzberg-dev</Authors>
     <Company>kreuzberg-dev</Company>
     <Description>Tree-sitter language pack - pre-compiled parsers for 170+ languages (.NET P/Invoke bindings)</Description>

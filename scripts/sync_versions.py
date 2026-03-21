@@ -288,6 +288,36 @@ def update_gemfile(file_path: Path, version: str) -> tuple[bool, str, str]:
     return False, old_version, gem_version
 
 
+def update_gemfile_lock(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update Ruby gem version in Gemfile.lock for path gems.
+
+    Handles the PATH/specs section where the gem version appears.
+    Ruby gem versions use dots instead of hyphens for pre-release.
+    """
+    content = file_path.read_text()
+    original_content = content
+    gem_version = version.replace("-", ".")
+
+    match = re.search(
+        r"tree_sitter_language_pack\s+\(([\d.]+[\w.]*)\)",
+        content,
+    )
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    if old_version != gem_version:
+        content = re.sub(
+            r"(tree_sitter_language_pack\s+\()[\d.]+[\w.]*(\))",
+            lambda m: f"{m.group(1)}{gem_version}{m.group(2)}",
+            content,
+        )
+
+    if content != original_content:
+        file_path.write_text(content)
+        return True, old_version, gem_version
+
+    return False, old_version, gem_version
+
+
 def update_go_mod_require(file_path: Path, version: str) -> tuple[bool, str, str]:
     """Update Go require directive version in go.mod."""
     content = file_path.read_text()
@@ -483,6 +513,7 @@ def main() -> None:
         (repo_root / "crates/ts-pack-elixir/lib/tree_sitter_language_pack.ex", "mix_exs"),
         (repo_root / "crates/ts-pack-java/pom.xml", "pom_xml"),
         (repo_root / "crates/ts-pack-ruby/tree_sitter_language_pack.gemspec", "gemspec"),
+        (repo_root / "crates/ts-pack-ruby/Gemfile.lock", "gemfile_lock"),
         (repo_root / "crates/ts-pack-node/index.js", "napi_index_js"),
         (repo_root / "crates/ts-pack-wasm/Cargo.toml", "cargo_toml_version"),
         (repo_root / "composer.json", "composer_json"),
@@ -523,6 +554,7 @@ def main() -> None:
         "composer_json": update_composer_json,
         "csproj": update_csproj,
         "gemfile": update_gemfile,
+        "gemfile_lock": update_gemfile_lock,
         "go_mod_require": update_go_mod_require,
         "cargo_dep": update_cargo_dep_version,
         "pyproject_dep": update_pyproject_dep_version,

@@ -12,7 +12,7 @@ set -euo pipefail
 
 VERSION="${1:?Usage: $0 <version>}"
 REPO="kreuzberg-dev/tree-sitter-language-pack"
-CHECKSUM_FILE="crates/ts-pack-elixir/checksum-Elixir.TreeSitterLanguagePack.Native.exs"
+CHECKSUM_FILE="crates/ts-pack-elixir/checksum-Elixir.TreeSitterLanguagePack.exs"
 
 TARGETS=(
   "aarch64-apple-darwin"

@@ -1,6 +1,6 @@
 {
 	"name": "@kreuzberg/tree-sitter-language-pack-linux-x64-gnu",
-	"version": "1.0.0-rc.16",
+	"version": "1.0.0-rc.17",
 	"description": "Linux x64 (glibc) native binding for @kreuzberg/tree-sitter-language-pack",
 	"main": "ts-pack-node.linux-x64-gnu.node",
 	"files": [
