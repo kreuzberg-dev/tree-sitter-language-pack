@@ -5,7 +5,7 @@ use tree_sitter_language_pack::{
     DownloadManager, LanguageRegistry, ProcessConfig,
 };
 
-const VERSION: &str = "1.0.0-rc.17";
+const VERSION: &str = "1.0.0";
 
 #[derive(Deserialize)]
 struct BasicFixture {

@@ -16,14 +16,14 @@ echo "--- Platform detection ---"
 PLATFORM=$(bash -c 'source '"$REPO_ROOT"'/install.sh 2>/dev/null; detect_platform' 2>/dev/null || true)
 if [[ -z "$PLATFORM" ]]; then
   # Can't source — test the script output instead
-  PLATFORM=$(TS_PACK_VERSION=1.0.0-rc.8 TS_PACK_INSTALL_DIR="$TMP_DIR" bash "$REPO_ROOT/install.sh" 2>&1 | grep "Platform:" | awk '{print $NF}')
+  PLATFORM=$(TS_PACK_VERSION=1.0.0 TS_PACK_INSTALL_DIR="$TMP_DIR" bash "$REPO_ROOT/install.sh" 2>&1 | grep "Platform:" | awk '{print $NF}')
 fi
 echo "  Detected: $PLATFORM"
 [[ -n "$PLATFORM" ]] && echo "  PASS: platform detected"
 
 # Test 2: Install to custom dir
 echo "--- Install to custom dir ---"
-TS_PACK_VERSION=1.0.0-rc.8 TS_PACK_INSTALL_DIR="$TMP_DIR" bash "$REPO_ROOT/install.sh" 2>&1 || {
+TS_PACK_VERSION=1.0.0 TS_PACK_INSTALL_DIR="$TMP_DIR" bash "$REPO_ROOT/install.sh" 2>&1 || {
   echo "  SKIP: version not published yet (expected for pre-release)"
   echo ""
   echo "All install script tests completed (some skipped — binaries not yet published)."

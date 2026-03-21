@@ -170,6 +170,86 @@ def update_gemspec(file_path: Path, version: str) -> tuple[bool, str, str]:
     return False, old_version, gem_version
 
 
+def update_readme_config_yaml(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update version field in scripts/readme_config.yaml."""
+    content = file_path.read_text()
+    original_content = content
+    match = re.search(r'^(\s*version:\s*")[^"]+(")', content, re.MULTILINE)
+    old_version = match.group(0).split('"')[1] if match else "NOT FOUND"
+
+    if old_version != version:
+        content = re.sub(
+            r'^(\s*version:\s*")[^"]+(")',
+            rf"\g<1>{version}\g<2>",
+            content,
+            count=1,
+            flags=re.MULTILINE,
+        )
+
+    if content != original_content:
+        file_path.write_text(content)
+        return True, old_version, version
+
+    return False, old_version, version
+
+
+def update_rust_version_const(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update VERSION const in Rust source files."""
+    content = file_path.read_text()
+    original_content = content
+    match = re.search(r'const VERSION:\s*&str\s*=\s*"([^"]+)"', content)
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    if old_version != version:
+        content = re.sub(
+            r'(const VERSION:\s*&str\s*=\s*")[^"]+(")',
+            rf"\g<1>{version}\g<2>",
+            content,
+        )
+
+    if content != original_content:
+        file_path.write_text(content)
+        return True, old_version, version
+
+    return False, old_version, version
+
+
+def update_test_app_version_json(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update version field in a test app package.json (the app's own version)."""
+    data = json.loads(file_path.read_text())
+    old_version = data.get("version", "N/A")
+
+    if old_version == version:
+        return False, old_version, version
+
+    data["version"] = version
+    file_path.write_text(json.dumps(data, indent=2) + "\n")
+    return True, old_version, version
+
+
+def update_test_app_version_toml(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update version field in a test app Cargo.toml (the app's own version)."""
+    content = file_path.read_text()
+    original_content = content
+    match = re.search(r'^version\s*=\s*"([^"]+)"', content, re.MULTILINE)
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    if old_version != version:
+        content = re.sub(
+            r'^(version\s*=\s*)"[^"]+"',
+            rf'\1"{version}"',
+            content,
+            count=1,
+            flags=re.MULTILINE,
+        )
+
+    if content != original_content:
+        file_path.write_text(content)
+        return True, old_version, version
+
+    return False, old_version, version
+
+
 def update_napi_index_js(file_path: Path, version: str) -> tuple[bool, str, str]:
     """Update hardcoded version strings in NAPI-RS auto-generated index.js."""
     content = file_path.read_text()
@@ -535,6 +615,13 @@ def main() -> None:
         (repo_root / "tests/test_apps/elixir/mix.exs", "mix_exs_dep"),
         (repo_root / "tests/test_apps/php/composer.json", "composer_json_dep"),
         (repo_root / "tests/test_apps/csharp/TestApp.csproj", "csproj_dep"),
+        # Additional version references
+        (repo_root / "scripts/readme_config.yaml", "readme_config_yaml"),
+        (repo_root / "tests/test_apps/rust/src/main.rs", "rust_version_const"),
+        # Test app own-version fields
+        (repo_root / "tests/test_apps/node/package.json", "test_app_version_json"),
+        (repo_root / "tests/test_apps/wasm/package.json", "test_app_version_json"),
+        (repo_root / "tests/test_apps/rust/Cargo.toml", "test_app_version_toml"),
     ]
 
     def update_pyproject_pep440(file_path: Path, version: str) -> tuple[bool, str, str]:
@@ -563,6 +650,10 @@ def main() -> None:
         "pom_xml_dep": update_pom_xml_dep,
         "composer_json_dep": update_composer_json_dep,
         "csproj_dep": update_csproj_dep,
+        "readme_config_yaml": update_readme_config_yaml,
+        "rust_version_const": update_rust_version_const,
+        "test_app_version_json": update_test_app_version_json,
+        "test_app_version_toml": update_test_app_version_toml,
     }
 
     for file_path, file_type in targets:
