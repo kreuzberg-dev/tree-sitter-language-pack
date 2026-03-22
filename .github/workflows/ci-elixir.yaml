@@ -148,7 +148,8 @@ jobs:
         run: task elixir:deps
 
       - name: Build NIF library
-        run: cargo build -p ts-pack-elixir --release
+        working-directory: crates/ts-pack-elixir
+        run: cargo build --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
@@ -156,7 +157,7 @@ jobs:
       - name: Stage NIF for Elixir
         run: |
           mkdir -p crates/ts-pack-elixir/priv/native
-          cp target/release/libts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts_pack_elixir.so
+          cp crates/ts-pack-elixir/target/release/libts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts_pack_elixir.so
 
       - name: Compile Elixir (warnings as errors)
         working-directory: crates/ts-pack-elixir
@@ -206,7 +207,8 @@ jobs:
         uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Build NIF library
-        run: cargo build -p ts-pack-elixir --release
+        working-directory: crates/ts-pack-elixir
+        run: cargo build --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
@@ -214,7 +216,7 @@ jobs:
       - name: Stage NIF for Elixir
         run: |
           mkdir -p crates/ts-pack-elixir/priv/native
-          cp target/release/libts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts_pack_elixir.so
+          cp crates/ts-pack-elixir/target/release/libts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts_pack_elixir.so
 
       - name: Cache Elixir dependencies
         uses: actions/cache@v5
