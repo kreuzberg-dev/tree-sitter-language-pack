@@ -31,8 +31,29 @@ tasks:
     cmds:
       - php examples/php_smoke/convert.php
 
+  format:
+    desc: Format PHP code
+    dir: packages/php
+    cmds:
+      - cmd: composer exec -- php-cs-fixer fix
+        platforms: [linux, darwin]
+
+  format:check:
+    desc: Check PHP formatting (CI)
+    dir: packages/php
+    cmds:
+      - cmd: composer exec -- php-cs-fixer fix --dry-run --diff
+        platforms: [linux, darwin]
+
   lint:
     desc: Lint PHP code
+    dir: packages/php
+    cmds:
+      - cmd: composer exec -- phpstan analyse --memory-limit=512M
+        platforms: [linux, darwin]
+
+  lint:check:
+    desc: Check PHP linting without modifications (CI)
     dir: packages/php
     cmds:
       - cmd: composer exec -- phpstan analyse --memory-limit=512M

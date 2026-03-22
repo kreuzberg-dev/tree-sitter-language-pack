@@ -1,6 +1,6 @@
 [workspace]
 members = ["crates/*", "tools/e2e-generator", "tools/snippet-runner"]
-exclude = ["packages/go/v1", "crates/ts-pack-java"]
+exclude = ["crates/ts-pack-java", "packages/go/v1"]
 resolver = "2"
 
 [workspace.package]
@@ -14,36 +14,36 @@ description = "A comprehensive tree-sitter language pack with polyglot bindings"
 keywords = ["tree-sitter", "parser", "syntax", "language-pack", "kreuzberg"]
 
 [workspace.dependencies]
-tree-sitter-language-pack = { path = "crates/ts-pack-core" }
-tree-sitter = "0.26"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-toml = "1.0"
-thiserror = "2"
-cc = "1"
-libloading = "0.9"
 cbindgen = "0.29"
+cc = "1"
 clap = { version = "4", features = ["derive"] }
 clap_complete = "4"
-toml_edit = "0.25"
-napi = { version = "3", features = ["napi4", "serde-json"] }
-napi-derive = "3"
-napi-build = "2"
-pyo3 = { version = "0.28", features = ["abi3-py310"] }
-rustler = "0.37"
-magnus = "0.8"
-rb-sys = "0.9"
-wasm-bindgen = "0.2"
-wasm-bindgen-test = "0.3"
+dirs = "6"
 js-sys = "0.3"
-ureq = "3"
+libloading = "0.9"
+magnus = "0.8"
+napi = { version = "3", features = ["napi4", "serde-json"] }
+napi-build = "2"
+napi-derive = "3"
+pyo3 = { version = "0.28", features = ["abi3-py310"] }
+rayon = "1"
+rb-sys = "0.9"
+rustler = "0.37"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 sha2 = "0.10"
 tar = "0.4"
-zstd = "0.13"
-dirs = "6"
 tempfile = "3"
-rayon = "1"
+thiserror = "2"
+toml = "1.0"
+toml_edit = "0.25"
+tree-sitter = "0.26"
+tree-sitter-language-pack = { path = "crates/ts-pack-core" }
+ureq = "3"
 walkdir = "2.5"
+wasm-bindgen = "0.2"
+wasm-bindgen-test = "0.3"
+zstd = "0.13"
 
 [profile.release]
 lto = "thin"

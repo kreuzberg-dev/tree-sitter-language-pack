@@ -14,14 +14,14 @@ wasm-opt = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+js-sys = { workspace = true }
+serde_json = { workspace = true }
+tree-sitter = { workspace = true }
 tree-sitter-language-pack = { path = "../ts-pack-core", default-features = false, features = [
     "all",
     "serde",
 ] }
-serde_json = { workspace = true }
-tree-sitter = { workspace = true }
 wasm-bindgen = { workspace = true }
-js-sys = { workspace = true }
 
 [dev-dependencies]
 wasm-bindgen-test = { workspace = true }

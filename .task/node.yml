@@ -37,6 +37,28 @@ tasks:
     cmds:
       - node -e "const m = require('./'); console.log('Languages:', m.availableLanguages().length)"
 
+  lint:
+    desc: Lint TypeScript/JavaScript code
+    cmds:
+      - npx biome lint --fix .
+      - npx oxlint --fix .
+
+  lint:check:
+    desc: Check TypeScript/JavaScript linting (CI)
+    cmds:
+      - npx biome lint .
+      - npx oxlint .
+
+  format:
+    desc: Format TypeScript/JavaScript code
+    cmds:
+      - npx biome format --write .
+
+  format:check:
+    desc: Check TypeScript/JavaScript formatting (CI)
+    cmds:
+      - npx biome format .
+
   clean:
     desc: Clean Node.js build artifacts
     dir: crates/ts-pack-node

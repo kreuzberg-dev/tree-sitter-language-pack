@@ -46,8 +46,15 @@ external-default-features = "allow"
 allow = []
 deny = []
 
+# Polyglot binding frameworks (ext-php-rs, napi-rs, magnus/rb-sys, rustler,
+# wasm-bindgen) each bring their own transitive dependency trees, causing
+# unavoidable duplicate crate versions. These are safe to skip.
 skip = []
-skip-tree = []
+skip-tree = [
+    { crate = "ext-php-rs@0.15", reason = "PHP binding framework, brings own dep versions" },
+    { crate = "rb-sys@0.9", reason = "Ruby binding framework, brings own dep versions" },
+    { crate = "cbindgen@0.29", reason = "FFI header generator, brings older toml/winnow" },
+]
 
 [sources]
 unknown-registry = "warn"

@@ -37,13 +37,25 @@ tasks:
     desc: Format Java code
     dir: crates/ts-pack-java
     cmds:
-      - mvn com.spotify.fmt:fmt-maven-plugin:format || true
+      - mvn com.spotify.fmt:fmt-maven-plugin:format
+
+  format:check:
+    desc: Check Java formatting (CI)
+    dir: crates/ts-pack-java
+    cmds:
+      - mvn com.spotify.fmt:fmt-maven-plugin:check
 
   lint:
     desc: Lint Java code
     dir: crates/ts-pack-java
     cmds:
-      - mvn com.spotify.fmt:fmt-maven-plugin:check || true
+      - mvn com.spotify.fmt:fmt-maven-plugin:check
+
+  lint:check:
+    desc: Check Java linting without modifications (CI)
+    dir: crates/ts-pack-java
+    cmds:
+      - mvn com.spotify.fmt:fmt-maven-plugin:check
 
   update:
     desc: Update Java dependencies and plugins (including linters)

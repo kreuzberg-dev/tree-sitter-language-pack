@@ -61,6 +61,18 @@ tasks:
     cmds:
       - dotnet format TreeSitterLanguagePack.sln
 
+  format:check:
+    desc: Check C# formatting (CI)
+    dir: packages/csharp
+    cmds:
+      - dotnet format TreeSitterLanguagePack.sln --verify-no-changes
+
+  lint:check:
+    desc: Check C# linting without modifications (CI)
+    dir: packages/csharp
+    cmds:
+      - dotnet build TreeSitterLanguagePack.sln -c Release -warnaserror
+
   update:
     desc: Update C# dependencies to latest versions (including major versions)
     dir: packages/csharp

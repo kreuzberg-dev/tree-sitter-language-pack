@@ -925,7 +925,7 @@ wheels = [
 
 [[package]]
 name = "tree-sitter-language-pack"
-version = "1.0.0rc14"
+version = "1.0.0"
 source = { virtual = "." }
 
 [package.dev-dependencies]

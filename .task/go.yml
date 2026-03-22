@@ -31,6 +31,13 @@ tasks:
     cmds:
       - go vet -tags tspack_dev ./...
 
+  lint:check:
+    desc: Check Go linting without modifications (CI)
+    deps: [build:ffi]
+    dir: packages/go/v1
+    cmds:
+      - go vet -tags tspack_dev ./...
+
   format:
     desc: Format Go code
     dir: packages/go/v1

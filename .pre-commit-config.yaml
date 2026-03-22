@@ -31,15 +31,21 @@ repos:
 
   # TOML formatting
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.20.0
+    rev: "v2.20.0"
     hooks:
       - id: pyproject-fmt
+
+  - repo: https://github.com/DevinR528/cargo-sort
+    rev: "v2.1.3"
+    hooks:
+      - id: cargo-sort
+        args: [-w]
 
   - repo: https://github.com/ComPWA/taplo-pre-commit
     rev: v0.9.3
     hooks:
       - id: taplo-format
-        exclude: "pyproject.toml"
+        exclude: "pyproject.toml|Cargo.toml"
 
   # Python: ruff (linting + formatting) + mypy (type checking)
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -81,6 +87,12 @@ repos:
     hooks:
       - id: cargo-machete
 
+  - repo: https://github.com/EmbarkStudios/cargo-deny
+    rev: 0.19.0
+    hooks:
+      - id: cargo-deny
+        args: ["check"]
+
   # Shell scripts: formatting and linting
   - repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.12.0-2
@@ -118,6 +130,12 @@ repos:
     hooks:
       - id: biome-format
       - id: biome-lint
+
+  - repo: https://github.com/oxc-project/mirrors-oxlint
+    rev: v1.56.0
+    hooks:
+      - id: oxlint
+        args: ["--fix"]
 
   # C/C++: formatting and linting (FFI code)
   - repo: https://github.com/pocc/pre-commit-hooks
@@ -161,6 +179,22 @@ repos:
         pass_filenames: false
         require_serial: true
 
+      - id: rbs-validate
+        name: RBS type signature validation
+        entry: task ruby:rbs-validate
+        language: system
+        files: \.(rb|rbs)$
+        pass_filenames: false
+        require_serial: true
+
+      - id: ruby-typecheck
+        name: Ruby type checking (steep)
+        entry: task ruby:typecheck
+        language: system
+        files: \.(rb|rbs)$
+        pass_filenames: false
+        require_serial: true
+
       # Java - formatting and linting
       - id: java-format
         name: Java formatting (google-java-format)
@@ -178,10 +212,27 @@ repos:
         pass_filenames: false
         require_serial: true
 
-      # Elixir - mix format
+      # C# - dotnet format
+      - id: csharp-format
+        name: C# formatting (dotnet format)
+        entry: task csharp:format
+        language: system
+        files: \.cs$
+        pass_filenames: false
+        require_serial: true
+
+      # Elixir - mix format and credo
       - id: elixir-format
         name: Elixir formatting (mix format)
         entry: task elixir:format
+        language: system
+        files: \.(ex|exs)$
+        pass_filenames: false
+        require_serial: true
+
+      - id: elixir-lint
+        name: Elixir linting (mix credo)
+        entry: "bash -c 'task elixir:lint 2>&1 || echo WARN - Elixir lint skipped'"
         language: system
         files: \.(ex|exs)$
         pass_filenames: false

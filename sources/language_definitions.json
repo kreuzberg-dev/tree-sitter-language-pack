@@ -22,7 +22,7 @@
 	"arduino": {
 		"branch": "master",
 		"repo": "https://github.com/ObserverOfTime/tree-sitter-arduino",
-		"rev": "53eb391da4c6c5857f8defa2c583c46c2594f565"
+		"rev": "11dd46c9ae25135c473c0003a133bb06a484af0c"
 	},
 	"asm": {
 		"repo": "https://github.com/rush-rs/tree-sitter-asm",
@@ -46,7 +46,7 @@
 	"beancount": {
 		"branch": "master",
 		"repo": "https://github.com/polarmutex/tree-sitter-beancount",
-		"rev": "d7a03a7506fbbbc4b16a9a2054ff7c2b337744b8"
+		"rev": "429cff869513cf9e34a2cf604fbfaaedc467e809"
 	},
 	"bibtex": {
 		"branch": "master",
@@ -196,7 +196,7 @@
 	"fortran": {
 		"branch": "master",
 		"repo": "https://github.com/stadelmanma/tree-sitter-fortran",
-		"rev": "2880b7aab4fb7cc618de1ef3d4c6d93b2396c031"
+		"rev": "be30d90dc7dfa4080b9c4abed3f400c9163a88df"
 	},
 	"fsharp": {
 		"branch": "main",
@@ -364,7 +364,7 @@
 	},
 	"kotlin": {
 		"repo": "https://github.com/fwcd/tree-sitter-kotlin",
-		"rev": "fce5f0c5f932bf6fdfea7d90da562b704b15b38a"
+		"rev": "802fd920c153b02b9d266369a3ef061622f2bbf0"
 	},
 	"latex": {
 		"branch": "master",
@@ -438,7 +438,7 @@
 	"nim": {
 		"repo": "https://github.com/alaviss/tree-sitter-nim",
 		"branch": "main",
-		"rev": "9b4ede21a6ca866d29263f6b66c070961bc622b4"
+		"rev": "3878440d9398515ae053c6f6024986e69868bb74"
 	},
 	"ninja": {
 		"repo": "https://github.com/alemuller/tree-sitter-ninja",
@@ -461,13 +461,13 @@
 		"branch": "master",
 		"directory": "grammars/ocaml",
 		"repo": "https://github.com/tree-sitter/tree-sitter-ocaml",
-		"rev": "3ef7c00b29e41e3a0c1d18e82ea37c64d72b93fc"
+		"rev": "d2dfccf04e5cbe738399c84d788a385bb1809b52"
 	},
 	"ocaml_interface": {
 		"branch": "master",
 		"directory": "grammars/interface",
 		"repo": "https://github.com/tree-sitter/tree-sitter-ocaml",
-		"rev": "3ef7c00b29e41e3a0c1d18e82ea37c64d72b93fc"
+		"rev": "d2dfccf04e5cbe738399c84d788a385bb1809b52"
 	},
 	"odin": {
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-odin",
@@ -489,7 +489,7 @@
 	"perl": {
 		"branch": "release",
 		"repo": "https://github.com/tree-sitter-perl/tree-sitter-perl",
-		"rev": "0c24d001dd1921e418fb933d208a7bd7dd3f923a"
+		"rev": "1d5d6972b6c0958fc26ead7287aafada5facf75b"
 	},
 	"pgn": {
 		"branch": "master",
@@ -665,7 +665,7 @@
 	"swift": {
 		"generate": true,
 		"repo": "https://github.com/alex-pinkus/tree-sitter-swift",
-		"rev": "30e18c7b0210b33ffd6e8a7028e170a9dc90825b"
+		"rev": "8abb3e8b33256d89127a35e87480736f74755ff9"
 	},
 	"tablegen": {
 		"branch": "master",

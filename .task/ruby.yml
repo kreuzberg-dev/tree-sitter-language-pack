@@ -46,7 +46,15 @@ tasks:
     env:
       RBENV_VERSION: "3.4.8"
     cmds:
-      - eval "$(rbenv init - bash)" && bundle exec rubocop -a || true
+      - eval "$(rbenv init - bash)" && bundle exec rubocop -a
+
+  format:check:
+    desc: Check Ruby formatting (CI)
+    dir: crates/ts-pack-ruby
+    env:
+      RBENV_VERSION: "3.4.8"
+    cmds:
+      - eval "$(rbenv init - bash)" && bundle exec rubocop --format simple
 
   lint:
     desc: Lint Ruby code
@@ -55,6 +63,30 @@ tasks:
       RBENV_VERSION: "3.4.8"
     cmds:
       - eval "$(rbenv init - bash)" && bundle exec rubocop
+
+  lint:check:
+    desc: Check Ruby linting without modifications (CI)
+    dir: crates/ts-pack-ruby
+    env:
+      RBENV_VERSION: "3.4.8"
+    cmds:
+      - eval "$(rbenv init - bash)" && bundle exec rubocop --format simple
+
+  typecheck:
+    desc: Run Steep type checking
+    dir: crates/ts-pack-ruby
+    env:
+      RBENV_VERSION: "3.4.8"
+    cmds:
+      - eval "$(rbenv init - bash)" && bundle exec steep check
+
+  rbs-validate:
+    desc: Validate RBS type signatures
+    dir: crates/ts-pack-ruby
+    env:
+      RBENV_VERSION: "3.4.8"
+    cmds:
+      - eval "$(rbenv init - bash)" && bundle exec rbs validate
 
   clean:
     desc: Clean Ruby build artifacts

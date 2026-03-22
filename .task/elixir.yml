@@ -30,11 +30,27 @@ tasks:
     cmds:
       - mix format
 
-  lint:
-    desc: Lint Elixir code (credo)
+  format:check:
+    desc: Check Elixir formatting (CI)
     dir: crates/ts-pack-elixir
     cmds:
-      - mix credo --strict || true
+      - mix format --check-formatted
+
+  lint:
+    desc: Lint Elixir code (credo, requires NIF built first)
+    dir: crates/ts-pack-elixir
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - mix credo --strict
+
+  lint:check:
+    desc: Check Elixir linting without modifications (CI)
+    dir: crates/ts-pack-elixir
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - mix credo --strict
 
   update:
     desc: Update Elixir dependencies to latest versions

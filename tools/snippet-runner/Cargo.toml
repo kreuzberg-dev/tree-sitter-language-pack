@@ -5,21 +5,21 @@ edition.workspace = true
 license.workspace = true
 publish = false
 
-[[bin]]
-name = "snippet-runner"
-path = "src/main.rs"
-
 [lib]
 name = "snippet_runner"
 path = "src/lib.rs"
 
+[[bin]]
+name = "snippet-runner"
+path = "src/main.rs"
+
 [dependencies]
 clap = { workspace = true }
+rayon = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+tempfile = { workspace = true }
 thiserror = { workspace = true }
 toml = { workspace = true }
-tempfile = { workspace = true }
-rayon = { workspace = true }
 walkdir = { workspace = true }
 which = "8"

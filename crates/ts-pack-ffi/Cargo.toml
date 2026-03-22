@@ -10,14 +10,14 @@ publish = false
 [lib]
 crate-type = ["cdylib", "staticlib", "rlib"]
 
-[dependencies]
-tree-sitter-language-pack = { path = "../ts-pack-core", features = ["serde", "download"] }
-serde_json = { workspace = true }
-tree-sitter = { workspace = true }
-
 [features]
 default = ["download"]
 download = ["tree-sitter-language-pack/download"]
+
+[dependencies]
+serde_json = { workspace = true }
+tree-sitter = { workspace = true }
+tree-sitter-language-pack = { path = "../ts-pack-core", features = ["serde", "download"] }
 
 [build-dependencies]
 cbindgen = { workspace = true }

@@ -7,15 +7,15 @@ repository.workspace = true
 description = "PHP ext-php-rs bindings for tree-sitter language pack"
 publish = false
 
+[package.metadata.cargo-machete]
+ignored = ["serde_json"]
+
 [lib]
 name = "ts_pack_php"
 crate-type = ["cdylib"]
 test = false
 
 [dependencies]
-tree-sitter-language-pack = { workspace = true, features = ["serde", "download"] }
-serde_json = { workspace = true }
 ext-php-rs = "0.15"
-
-[package.metadata.cargo-machete]
-ignored = ["serde_json"]
+serde_json = { workspace = true }
+tree-sitter-language-pack = { workspace = true, features = ["serde", "download"] }

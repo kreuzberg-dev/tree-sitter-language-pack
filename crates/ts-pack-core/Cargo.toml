@@ -6,24 +6,6 @@ license.workspace = true
 repository.workspace = true
 description = "Core library for tree-sitter language pack - provides compiled parsers for 170+ languages"
 
-[dependencies]
-tree-sitter = { workspace = true }
-thiserror = { workspace = true }
-libloading = { workspace = true, optional = true }
-serde = { workspace = true, optional = true }
-serde_json = { workspace = true, optional = true }
-toml = { workspace = true, optional = true }
-ureq = { workspace = true, optional = true }
-sha2 = { workspace = true, optional = true }
-tar = { workspace = true, optional = true }
-zstd = { workspace = true, optional = true }
-dirs = { workspace = true, optional = true }
-
-[build-dependencies]
-cc = { workspace = true }
-serde = { workspace = true }
-serde_json = { workspace = true }
-
 [features]
 default = ["dynamic-loading", "download"]
 dynamic-loading = ["dep:libloading"]
@@ -465,3 +447,21 @@ lang-xcompose = []
 lang-xml = []
 lang-yuck = []
 lang-zig = []
+
+[dependencies]
+dirs = { workspace = true, optional = true }
+libloading = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+sha2 = { workspace = true, optional = true }
+tar = { workspace = true, optional = true }
+thiserror = { workspace = true }
+toml = { workspace = true, optional = true }
+tree-sitter = { workspace = true }
+ureq = { workspace = true, optional = true }
+zstd = { workspace = true, optional = true }
+
+[build-dependencies]
+cc = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
