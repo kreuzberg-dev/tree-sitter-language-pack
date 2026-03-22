@@ -595,6 +595,7 @@ def main() -> None:
         (repo_root / "crates/ts-pack-ruby/tree_sitter_language_pack.gemspec", "gemspec"),
         (repo_root / "crates/ts-pack-ruby/Gemfile.lock", "gemfile_lock"),
         (repo_root / "crates/ts-pack-node/index.js", "napi_index_js"),
+        (repo_root / "crates/ts-pack-elixir/Cargo.toml", "cargo_toml_version"),
         (repo_root / "crates/ts-pack-wasm/Cargo.toml", "cargo_toml_version"),
         (repo_root / "composer.json", "composer_json"),
         (repo_root / "packages/php/composer.json", "composer_json"),

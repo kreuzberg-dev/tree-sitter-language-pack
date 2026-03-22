@@ -33,13 +33,13 @@
     <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI" alt="CI">
   </a>
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-007ec6" alt="License">
+    <img src="https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue.svg" alt="License">
   </a>
   <a href="https://github.com/kreuzberg-dev/homebrew-tap">
-    <img src="https://img.shields.io/badge/homebrew-ts--pack-007ec6?logo=homebrew" alt="Homebrew">
+    <img src="https://img.shields.io/badge/homebrew-ts--pack-FBB040?logo=homebrew" alt="Homebrew">
   </a>
   <a href="https://docs.tree-sitter-language-pack.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Docs">
+    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-blue" alt="Docs">
   </a>
 </div>
 
