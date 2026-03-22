@@ -309,7 +309,7 @@ languages:
     output_path: crates/ts-pack-wasm/README.md
     package_name: "@kreuzberg/tree-sitter-language-pack-wasm"
     package_manager: [npm, pnpm, yarn]
-    description: "WebAssembly bindings for tree-sitter-language-pack. Includes a curated subset of 55 languages optimized for browser and edge runtimes. For all 173 languages, use native bindings (Python, Node.js, etc.)."
+    description: "WebAssembly bindings for tree-sitter-language-pack. Includes a curated subset of 30 languages optimized for browser and edge runtimes. For all 173 languages, use native bindings (Python, Node.js, etc.)."
     install_commands:
       npm: "npm install @kreuzberg/tree-sitter-language-pack-wasm"
       pnpm: "pnpm add @kreuzberg/tree-sitter-language-pack-wasm"

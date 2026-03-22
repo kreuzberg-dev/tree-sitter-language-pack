@@ -535,19 +535,18 @@ function analyze() {
 
 ## Language Support
 
-The WASM package includes a curated subset of **55 languages** optimized for browser and edge runtime use cases. This subset covers web development, popular backend languages, data formats, and common scripting languages.
+The WASM package includes a curated subset of **30 languages** optimized for browser and edge runtime use cases. This covers the most popular web, systems, scripting, and data format languages.
 
 Compiling all 173 supported languages into a single WASM binary exceeds the memory limits of standard build environments. Native bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP, CLI) include **all 173 languages**.
 
-**Included language categories:**
+**Included languages:**
 
-- **Web**: HTML, CSS, JavaScript, TypeScript, TSX, JSON, Vue, Svelte, Astro, GraphQL, SCSS, JSDoc, Twig, Prisma
-- **Data formats**: TOML, XML, CSV, TSV, PSV, INI, Properties, RON, SQL, Protocol Buffers, KDL
-- **JVM**: Java, Kotlin, Scala, Groovy, Clojure
-- **Systems**: C, C++, Rust, Go, Zig, Swift
-- **Scripting**: Python, Ruby, Lua, Bash, PHP, Elixir
-- **Functional**: Haskell, OCaml, Elm, Gleam, Scheme
-- **Other**: Dart, Markdown, Dockerfile, HCL, Git configs
+- **Web**: HTML, CSS, JavaScript, TypeScript, TSX, JSON, GraphQL, SCSS
+- **Data formats**: TOML, XML, SQL, Markdown
+- **Systems**: C, C++, Rust, Go, Swift
+- **Scripting**: Python, Ruby, Bash, PHP, Lua, Elixir
+- **JVM**: Java, Kotlin, Scala
+- **Other**: Dart, Dockerfile, HCL
 
 Use `availableLanguages()` at runtime to get the exact list of supported languages.
 
@@ -555,7 +554,7 @@ Use `availableLanguages()` at runtime to get the exact list of supported languag
 
 WASM builds have some limitations:
 
-1. **Language subset**: 55 of 173 languages are included (see above). For all languages, use native bindings.
+1. **Language subset**: 30 of 173 languages are included (see above). For all languages, use native bindings.
 2. **No download API**: Grammars are pre-bundled. For dynamic downloading, use platform-specific bindings (Python, Node.js, etc.)
 3. **Single-threaded**: Run CPU-intensive parsing in Web Workers
 4. **No file I/O**: Read files from memory or streams

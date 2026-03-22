@@ -2069,6 +2069,8 @@ jobs:
 
       - name: Generate checksums from GitHub release
         run: ./scripts/publish/elixir/generate_checksums.sh "${{ needs.prepare.outputs.version }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Install Elixir dependencies
         working-directory: crates/ts-pack-elixir

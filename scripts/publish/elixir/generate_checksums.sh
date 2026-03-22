@@ -3,7 +3,7 @@
 # Generate checksum file for Elixir NIF binaries from GitHub release.
 #
 # Usage: ./generate_checksums.sh <version>
-# Example: ./generate_checksums.sh 1.0.0-rc.12
+# Example: ./generate_checksums.sh 1.0.0
 #
 # Must be run BEFORE `mix hex.publish` because RustlerPrecompiled
 # validates checksums during compilation.
@@ -14,6 +14,7 @@ VERSION="${1:?Usage: $0 <version>}"
 REPO="kreuzberg-dev/tree-sitter-language-pack"
 CHECKSUM_FILE="crates/ts-pack-elixir/checksum-Elixir.TreeSitterLanguagePack.exs"
 
+# Targets that are built in CI (from publish.yaml build-elixir-nifs matrix)
 TARGETS=(
   "aarch64-apple-darwin"
   "aarch64-unknown-linux-gnu"
@@ -26,6 +27,14 @@ TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
 echo "Generating checksums for v${VERSION}..."
+echo "Download directory: $TMPDIR"
+
+# Build curl auth header if GH_TOKEN or GITHUB_TOKEN is available
+CURL_OPTS=(-fsSL)
+if [[ -n "${GH_TOKEN:-${GITHUB_TOKEN:-}}" ]]; then
+  CURL_OPTS+=(-H "Authorization: token ${GH_TOKEN:-${GITHUB_TOKEN}}")
+  echo "Using authenticated GitHub API access"
+fi
 
 CHECKSUMS=()
 
@@ -35,8 +44,20 @@ for TARGET in "${TARGETS[@]}"; do
     URL="https://github.com/${REPO}/releases/download/v${VERSION}/${FILENAME}"
 
     echo "Downloading: $FILENAME"
+    echo "  URL: $URL"
 
-    if curl -fsSL -o "${TMPDIR}/${FILENAME}" "$URL"; then
+    # Retry with backoff -- assets may not be immediately available after upload
+    DOWNLOADED=false
+    for ATTEMPT in 1 2 3 4 5; do
+      if curl "${CURL_OPTS[@]}" -o "${TMPDIR}/${FILENAME}" "$URL"; then
+        DOWNLOADED=true
+        break
+      fi
+      echo "  Attempt $ATTEMPT failed, waiting $((ATTEMPT * 10))s..."
+      sleep $((ATTEMPT * 10))
+    done
+
+    if $DOWNLOADED; then
       if command -v sha256sum &>/dev/null; then
         CHECKSUM=$(sha256sum "${TMPDIR}/${FILENAME}" | cut -d' ' -f1)
       elif command -v shasum &>/dev/null; then
@@ -49,16 +70,13 @@ for TARGET in "${TARGETS[@]}"; do
       echo "  Checksum: sha256:${CHECKSUM}"
       CHECKSUMS+=("  \"${FILENAME}\" => \"sha256:${CHECKSUM}\",")
     else
-      echo "  WARNING: Failed to download $FILENAME (may not exist for this target/nif combo)"
+      echo "  ERROR: Failed to download $FILENAME"
+      exit 1
     fi
   done
 done
 
-if [[ ${#CHECKSUMS[@]} -eq 0 ]]; then
-  echo "ERROR: No checksums generated"
-  exit 1
-fi
-
+# Sort checksums for consistent output
 mapfile -t SORTED_CHECKSUMS < <(printf '%s\n' "${CHECKSUMS[@]}" | sort)
 
 echo "Writing checksum file: $CHECKSUM_FILE"
@@ -72,4 +90,6 @@ echo "Writing checksum file: $CHECKSUM_FILE"
 
 echo ""
 echo "Done! Generated checksums for ${#SORTED_CHECKSUMS[@]} files."
+echo ""
+echo "Contents of $CHECKSUM_FILE:"
 cat "$CHECKSUM_FILE"

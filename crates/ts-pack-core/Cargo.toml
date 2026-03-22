@@ -277,72 +277,46 @@ functional = [
     "lang-janet",
     "lang-agda",
 ]
-# Curated subset for WASM builds (~55 languages). The full "all" feature (173 languages)
-# exceeds GitHub Actions runner memory limits when compiled to wasm32-unknown-unknown.
+# Curated subset for WASM builds (~30 languages). Compiling all 173 languages
+# to wasm32-unknown-unknown exceeds GitHub Actions runner memory (7GB).
 # Native bindings (Python, Node.js, Ruby, etc.) use "all" and support every language.
 wasm = [
-    # Web (full group)
+    # Web essentials
     "lang-html",
     "lang-css",
     "lang-javascript",
     "lang-typescript",
     "lang-tsx",
     "lang-json",
-    "lang-vue",
-    "lang-svelte",
-    "lang-astro",
     "lang-graphql",
-    "lang-scss",
-    "lang-jsdoc",
-    "lang-twig",
-    "lang-prisma",
-    # Data formats (full group)
+    # Data formats
     "lang-toml",
     "lang-xml",
-    "lang-csv",
-    "lang-tsv",
-    "lang-psv",
-    "lang-ini",
-    "lang-properties",
-    "lang-ron",
     "lang-sql",
-    "lang-proto",
-    "lang-kdl",
-    # JVM (full group)
-    "lang-java",
-    "lang-kotlin",
-    "lang-scala",
-    "lang-groovy",
-    "lang-clojure",
-    # Systems (popular)
+    "lang-markdown",
+    "lang-markdown_inline",
+    # Top systems languages
     "lang-c",
     "lang-cpp",
     "lang-rust",
     "lang-go",
-    "lang-zig",
     "lang-swift",
-    # Scripting (popular)
+    # Top scripting languages
     "lang-python",
     "lang-ruby",
-    "lang-lua",
     "lang-bash",
     "lang-php",
-    "lang-elixir",
-    # Functional (popular)
-    "lang-haskell",
-    "lang-ocaml",
-    "lang-elm",
-    "lang-gleam",
-    "lang-scheme",
-    # Additional popular languages
+    # JVM
+    "lang-java",
+    "lang-kotlin",
+    # Other popular
     "lang-dart",
-    "lang-markdown",
-    "lang-markdown_inline",
     "lang-dockerfile",
     "lang-hcl",
-    "lang-gitcommit",
-    "lang-gitignore",
-    "lang-gitattributes",
+    "lang-scss",
+    "lang-lua",
+    "lang-elixir",
+    "lang-scala",
 ]
 lang-actionscript = []
 lang-ada = []
