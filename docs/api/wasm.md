@@ -533,14 +533,33 @@ function analyze() {
 </script>
 ```text
 
+## Language Support
+
+The WASM package includes a curated subset of **55 languages** optimized for browser and edge runtime use cases. This subset covers web development, popular backend languages, data formats, and common scripting languages.
+
+Compiling all 173 supported languages into a single WASM binary exceeds the memory limits of standard build environments. Native bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP, CLI) include **all 173 languages**.
+
+**Included language categories:**
+
+- **Web**: HTML, CSS, JavaScript, TypeScript, TSX, JSON, Vue, Svelte, Astro, GraphQL, SCSS, JSDoc, Twig, Prisma
+- **Data formats**: TOML, XML, CSV, TSV, PSV, INI, Properties, RON, SQL, Protocol Buffers, KDL
+- **JVM**: Java, Kotlin, Scala, Groovy, Clojure
+- **Systems**: C, C++, Rust, Go, Zig, Swift
+- **Scripting**: Python, Ruby, Lua, Bash, PHP, Elixir
+- **Functional**: Haskell, OCaml, Elm, Gleam, Scheme
+- **Other**: Dart, Markdown, Dockerfile, HCL, Git configs
+
+Use `availableLanguages()` at runtime to get the exact list of supported languages.
+
 ## Limitations
 
 WASM builds have some limitations:
 
-1. **No download API**: Use pre-bundled grammars only. For dynamic downloading, use platform-specific bindings (Python, Node.js, etc.)
-2. **Single-threaded**: Run CPU-intensive parsing in Web Workers
-3. **No file I/O**: Read files from memory or streams
-4. **Module size**: ~5-10MB for all grammars
+1. **Language subset**: 55 of 173 languages are included (see above). For all languages, use native bindings.
+2. **No download API**: Grammars are pre-bundled. For dynamic downloading, use platform-specific bindings (Python, Node.js, etc.)
+3. **Single-threaded**: Run CPU-intensive parsing in Web Workers
+4. **No file I/O**: Read files from memory or streams
+5. **Module size**: ~5-10MB for bundled grammars
 
 ## Performance Tips
 

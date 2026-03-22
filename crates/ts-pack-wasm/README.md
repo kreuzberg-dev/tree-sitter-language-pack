@@ -49,7 +49,7 @@
   </a>
 </div>
 
-WebAssembly bindings for tree-sitter-language-pack with browser caching support.
+WebAssembly bindings for tree-sitter-language-pack. Includes a curated subset of 55 languages optimized for browser and edge runtimes. For all 173 languages, use native bindings (Python, Node.js, etc.).
 
 ## Installation
 
