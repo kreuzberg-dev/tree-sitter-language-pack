@@ -782,6 +782,7 @@ jobs:
           TSLP_LINK_MODE: static
           CARGO_PROFILE_RELEASE_LTO: "false"
           CARGO_PROFILE_RELEASE_CODEGEN_UNITS: "16"
+          NUM_JOBS: "2"
 
       - name: Verify WASM build output
         working-directory: crates/ts-pack-wasm
