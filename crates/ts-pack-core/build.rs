@@ -269,6 +269,16 @@ fn find_wasi_sysroot() -> Option<PathBuf> {
     None
 }
 
+/// Optimize cc::Build for wasm32 targets to reduce memory usage on CI runners.
+/// Disables debug info to reduce object file sizes.
+fn apply_wasm32_optimizations(build: &mut cc::Build) {
+    if env::var("CARGO_CFG_TARGET_ARCH").unwrap_or_default() == "wasm32" {
+        build.cargo_warnings(false);
+        build.debug(false);
+        build.opt_level(2);
+    }
+}
+
 /// Apply wasi-sysroot includes to a cc::Build for wasm32 targets.
 ///
 /// Use `-isystem` to add the wasm32-wasi include dir which has stdlib.h etc.
@@ -317,6 +327,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
         .warnings(false);
     build.std("c11");
     apply_wasm32_sysroot(&mut build);
+    apply_wasm32_optimizations(&mut build);
     if common_dir.exists() {
         build.include(&common_dir);
     }
@@ -344,6 +355,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
             .warnings(false);
         scanner_build.std("c11");
         apply_wasm32_sysroot(&mut scanner_build);
+        apply_wasm32_optimizations(&mut scanner_build);
         if common_dir.exists() {
             scanner_build.include(&common_dir);
         }
@@ -368,6 +380,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
             .warnings(false)
             .cpp(true);
         apply_wasm32_sysroot(&mut cpp_build);
+        apply_wasm32_optimizations(&mut cpp_build);
         if common_dir.exists() {
             cpp_build.include(&common_dir);
         }
