@@ -309,6 +309,18 @@ public class SmokeTests
     }
 
     [Fact]
+    public void SmokeCsharp()
+    {
+        // Smoke test: load csharp and parse a simple snippet
+        if (!TsPackClient.HasLanguage("csharp"))
+        {
+            return; // Language 'csharp' not available
+        }
+        var langPtr = TsPackClient.GetLanguage("csharp");
+        Assert.True(langPtr != IntPtr.Zero, "Language pointer should not be null");
+    }
+
+    [Fact]
     public void SmokeCss()
     {
         // Smoke test: load css and parse a simple snippet
@@ -437,6 +449,18 @@ public class SmokeTests
             return; // Language 'elm' not available
         }
         var langPtr = TsPackClient.GetLanguage("elm");
+        Assert.True(langPtr != IntPtr.Zero, "Language pointer should not be null");
+    }
+
+    [Fact]
+    public void SmokeEmbeddedtemplate()
+    {
+        // Smoke test: load embeddedtemplate and parse a simple snippet
+        if (!TsPackClient.HasLanguage("embeddedtemplate"))
+        {
+            return; // Language 'embeddedtemplate' not available
+        }
+        var langPtr = TsPackClient.GetLanguage("embeddedtemplate");
         Assert.True(langPtr != IntPtr.Zero, "Language pointer should not be null");
     }
 
@@ -1521,6 +1545,18 @@ public class SmokeTests
     }
 
     [Fact]
+    public void SmokeRegex()
+    {
+        // Smoke test: load regex and parse a simple snippet
+        if (!TsPackClient.HasLanguage("regex"))
+        {
+            return; // Language 'regex' not available
+        }
+        var langPtr = TsPackClient.GetLanguage("regex");
+        Assert.True(langPtr != IntPtr.Zero, "Language pointer should not be null");
+    }
+
+    [Fact]
     public void SmokeRego()
     {
         // Smoke test: load rego and parse a simple snippet
@@ -2021,6 +2057,18 @@ public class SmokeTests
             return; // Language 'xml' not available
         }
         var langPtr = TsPackClient.GetLanguage("xml");
+        Assert.True(langPtr != IntPtr.Zero, "Language pointer should not be null");
+    }
+
+    [Fact]
+    public void SmokeYaml()
+    {
+        // Smoke test: load yaml and parse a simple snippet
+        if (!TsPackClient.HasLanguage("yaml"))
+        {
+            return; // Language 'yaml' not available
+        }
+        var langPtr = TsPackClient.GetLanguage("yaml");
         Assert.True(langPtr != IntPtr.Zero, "Language pointer should not be null");
     }
 

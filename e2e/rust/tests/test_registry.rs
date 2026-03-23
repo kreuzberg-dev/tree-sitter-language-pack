@@ -3,19 +3,19 @@
 
 #[test]
 fn registry_has_language_false() {
-    // has_language('nonexistent') should return false
+    // has_language('nonexistent') should return false.
     assert_eq!(tree_sitter_language_pack::has_language("nonexistent"), false);
 }
 
 #[test]
 fn registry_has_language_true() {
-    // has_language('python') should return true
+    // has_language('python') should return true.
     assert_eq!(tree_sitter_language_pack::has_language("python"), true);
 }
 
 #[test]
 fn registry_list_languages() {
-    // available_languages should return a non-empty list
+    // available_languages should return a non-empty list.
     let langs = tree_sitter_language_pack::available_languages();
     assert!(!langs.is_empty(), "available_languages() should not be empty");
 }

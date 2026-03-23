@@ -5,7 +5,7 @@ package e2e_tests
 import "testing"
 
 func TestRegistryHasLanguageFalse(t *testing.T) {
-	// has_language('nonexistent') should return false
+	// has_language('nonexistent') should return false.
 	reg := newTestRegistry(t)
 	got := reg.HasLanguage("nonexistent")
 	if got != false {
@@ -14,7 +14,7 @@ func TestRegistryHasLanguageFalse(t *testing.T) {
 }
 
 func TestRegistryHasLanguageTrue(t *testing.T) {
-	// has_language('python') should return true
+	// has_language('python') should return true.
 	reg := newTestRegistry(t)
 	got := reg.HasLanguage("python")
 	if got != true {
@@ -23,7 +23,7 @@ func TestRegistryHasLanguageTrue(t *testing.T) {
 }
 
 func TestRegistryListLanguages(t *testing.T) {
-	// available_languages should return a non-empty list
+	// available_languages should return a non-empty list.
 	reg := newTestRegistry(t)
 	langs := reg.AvailableLanguages()
 	if len(langs) == 0 {

@@ -9,9 +9,9 @@ defmodule E2eTests.TreeInspectionTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree = TreeSitterLanguagePack.parse_string("python", "def (broken syntax @@@ !!!")
-      assert is_reference(tree), "Parse tree should be a reference"
-      assert TreeSitterLanguagePack.tree_has_error_nodes(tree), "Tree should contain error nodes"
+    tree = TreeSitterLanguagePack.parse_string("python", "def (broken syntax @@@ !!!")
+    assert is_reference(tree), "Parse tree should be a reference"
+    assert TreeSitterLanguagePack.tree_has_error_nodes(tree), "Tree should contain error nodes"
     end
   end
 
@@ -21,8 +21,8 @@ defmodule E2eTests.TreeInspectionTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree = TreeSitterLanguagePack.parse_string("python", "x = 1\ny = 2\n")
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("python", "x = 1\ny = 2\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -32,13 +32,8 @@ defmodule E2eTests.TreeInspectionTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "python",
-          "def foo():\n    pass\n\ndef bar():\n    pass\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("python", "def foo():\n    pass\n\ndef bar():\n    pass\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -48,13 +43,8 @@ defmodule E2eTests.TreeInspectionTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "python",
-          "class Foo:\n    pass\n\ndef bar():\n    pass\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("python", "class Foo:\n    pass\n\ndef bar():\n    pass\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -64,8 +54,9 @@ defmodule E2eTests.TreeInspectionTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree = TreeSitterLanguagePack.parse_string("python", "def hello():\n    pass\n")
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("python", "def hello():\n    pass\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
+
 end

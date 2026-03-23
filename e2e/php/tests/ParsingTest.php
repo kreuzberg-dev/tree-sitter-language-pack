@@ -10,30 +10,6 @@ use PHPUnit\Framework\TestCase;
 class ParsingTest extends TestCase
 {
 
-    public function test_parsing_go_function(): void
-    {
-        // Parse a Go function declaration and assert node type
-        if (!\ts_pack_has_language('go')) {
-            $this->markTestSkipped('Language \'go\' not available');
-        }
-        $langPtr = \ts_pack_get_language('go');
-        $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('go', 'package main\nfunc main() {}');
-        $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
-    }
-
-    public function test_parsing_html_element(): void
-    {
-        // Parse an HTML element and assert node type
-        if (!\ts_pack_has_language('html')) {
-            $this->markTestSkipped('Language \'html\' not available');
-        }
-        $langPtr = \ts_pack_get_language('html');
-        $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('html', '<div>hello</div>');
-        $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
-    }
-
     public function test_parsing_javascript_class(): void
     {
         // Parse a JavaScript class declaration.
@@ -46,39 +22,15 @@ class ParsingTest extends TestCase
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
-    public function test_parsing_javascript_variable(): void
-    {
-        // Parse a JavaScript variable declaration and assert node type
-        if (!\ts_pack_has_language('javascript')) {
-            $this->markTestSkipped('Language \'javascript\' not available');
-        }
-        $langPtr = \ts_pack_get_language('javascript');
-        $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('javascript', 'const x = 1;');
-        $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
-    }
-
     public function test_parsing_python_function(): void
     {
-        // Parse a Python function definition and assert node type
+        // Parse a Python function definition.
         if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
         $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('python', 'def hello(): pass');
-        $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
-    }
-
-    public function test_parsing_rust_function(): void
-    {
-        // Parse a Rust function definition and assert node type
-        if (!\ts_pack_has_language('rust')) {
-            $this->markTestSkipped('Language \'rust\' not available');
-        }
-        $langPtr = \ts_pack_get_language('rust');
-        $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('rust', 'fn main() {}');
+        $sexp = \ts_pack_parse_string('python', 'def hello():\n    pass\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 

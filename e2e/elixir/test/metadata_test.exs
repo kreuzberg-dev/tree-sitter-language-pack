@@ -9,13 +9,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("go") do
       IO.puts("Skipping: language 'go' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "go",
-          "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("go", "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -25,13 +20,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("javascript") do
       IO.puts("Skipping: language 'javascript' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "javascript",
-          "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("javascript", "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -41,13 +31,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("javascript") do
       IO.puts("Skipping: language 'javascript' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "javascript",
-          "export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("javascript", "export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -57,13 +42,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "python",
-          "\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("python", "\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -73,13 +53,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "python",
-          "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("python", "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -89,13 +64,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "python",
-          "\# module docstring\nimport os\n\ndef hello():\n    \# greeting\n    print('hello')\n\ndef world():\n    print('world')\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("python", "\# module docstring\nimport os\n\ndef hello():\n    \# greeting\n    print('hello')\n\ndef world():\n    print('world')\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -105,13 +75,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("rust") do
       IO.puts("Skipping: language 'rust' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "rust",
-          "pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("rust", "pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -121,13 +86,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "python",
-          "def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("python", "def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -137,13 +97,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "python",
-          "class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("python", "class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -153,13 +108,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "python",
-          "def greet(name):\n    return f'Hello, {name}!'\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("python", "def greet(name):\n    return f'Hello, {name}!'\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -169,8 +119,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree = TreeSitterLanguagePack.parse_string("python", "def broken(\n    return\nclass")
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("python", "def broken(\n    return\nclass")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -180,13 +130,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "python",
-          "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("python", "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -196,13 +141,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("rust") do
       IO.puts("Skipping: language 'rust' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "rust",
-          "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("rust", "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -212,13 +152,8 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("rust") do
       IO.puts("Skipping: language 'rust' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "rust",
-          "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("rust", "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -228,13 +163,9 @@ defmodule E2eTests.MetadataTest do
     unless TreeSitterLanguagePack.has_language("typescript") do
       IO.puts("Skipping: language 'typescript' not available")
     else
-      tree =
-        TreeSitterLanguagePack.parse_string(
-          "typescript",
-          "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n"
-        )
-
-      assert is_reference(tree), "Parse tree should be a reference"
+    tree = TreeSitterLanguagePack.parse_string("typescript", "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n")
+    assert is_reference(tree), "Parse tree should be a reference"
     end
   end
+
 end

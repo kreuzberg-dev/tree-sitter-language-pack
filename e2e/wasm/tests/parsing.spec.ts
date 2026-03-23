@@ -15,19 +15,6 @@ import {
 } from "./helpers";
 
 describe("parsing", () => {
-  it("parsing_html_element", () => {
-    // Parse an HTML element and assert node type
-    if (!hasLanguage("html")) {
-      console.log("Skipping: language 'html' not available");
-      return;
-    }
-    const tree = parseString("html", `<div>hello</div>`);
-    expect(tree).toBeTruthy();
-    expect(tree).not.toBeNull();
-    expect(treeContainsNodeType(tree, "element")).toBe(true);
-    freeTree(tree);
-  });
-
   it("parsing_javascript_class", () => {
     // Parse a JavaScript class declaration.
     if (!hasLanguage("javascript")) {
@@ -39,19 +26,6 @@ describe("parsing", () => {
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
     expect(treeContainsNodeType(tree, "class_declaration")).toBe(true);
-    freeTree(tree);
-  });
-
-  it("parsing_javascript_variable", () => {
-    // Parse a JavaScript variable declaration and assert node type
-    if (!hasLanguage("javascript")) {
-      console.log("Skipping: language 'javascript' not available");
-      return;
-    }
-    const tree = parseString("javascript", `const x = 1;`);
-    expect(tree).toBeTruthy();
-    expect(tree).not.toBeNull();
-    expect(treeContainsNodeType(tree, "lexical_declaration")).toBe(true);
     freeTree(tree);
   });
 

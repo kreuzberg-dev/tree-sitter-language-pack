@@ -12,19 +12,19 @@ class RegistryTest extends TestCase
 
     public function test_registry_has_language_false(): void
     {
-        // has_language('nonexistent') should return false
+        // has_language('nonexistent') should return false.
         $this->assertFalse(\ts_pack_has_language('nonexistent'));
     }
 
     public function test_registry_has_language_true(): void
     {
-        // has_language('python') should return true
+        // has_language('python') should return true.
         $this->assertTrue(\ts_pack_has_language('python'));
     }
 
     public function test_registry_list_languages(): void
     {
-        // available_languages should return a non-empty list
+        // available_languages should return a non-empty list.
         $langs = \ts_pack_available_languages();
         $this->assertNotEmpty($langs, 'available_languages() should not be empty');
     }

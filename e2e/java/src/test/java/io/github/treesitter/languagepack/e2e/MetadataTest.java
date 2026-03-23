@@ -4,202 +4,189 @@ package io.github.treesitter.languagepack.e2e;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import io.github.treesitter.languagepack.TsPackRegistry;
 import org.junit.jupiter.api.Test;
 
 class MetadataTest {
 
-  @Test
-  void go_function_metadata() {
-    // Intel: extract structure from Go function definition
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("go"), "Language 'go' not available");
+    @Test
+    void go_function_metadata() {
+        // Intel: extract structure from Go function definition
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("go"), "Language 'go' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("go");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("go");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void javascript_multi_import_metadata() {
-    // Intel: detect multiple imports and function in JavaScript
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("javascript"), "Language 'javascript' not available");
+    @Test
+    void javascript_multi_import_metadata() {
+        // Intel: detect multiple imports and function in JavaScript
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("javascript"), "Language 'javascript' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("javascript");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("javascript");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void meta_javascript_exports_detail() {
-    // JavaScript with exports, verify export count
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("javascript"), "Language 'javascript' not available");
+    @Test
+    void meta_javascript_exports_detail() {
+        // JavaScript with exports, verify export count
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("javascript"), "Language 'javascript' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("javascript");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("javascript");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void meta_python_comments() {
-    // Python with comments, verify comment count
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void meta_python_comments() {
+        // Python with comments, verify comment count
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void meta_python_imports_detail() {
-    // Python with multiple imports, verify imports contain specific source
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void meta_python_imports_detail() {
+        // Python with multiple imports, verify imports contain specific source
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void meta_python_metrics_detail() {
-    // Python code with metrics assertions
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void meta_python_metrics_detail() {
+        // Python code with metrics assertions
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void meta_rust_structure_name() {
-    // Rust struct with name, verify structure name contains value
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("rust"), "Language 'rust' not available");
+    @Test
+    void meta_rust_structure_name() {
+        // Rust struct with name, verify structure name contains value
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("rust"), "Language 'rust' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("rust");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("rust");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void python_chunking_metadata() {
-    // Intel: chunk multi-function Python source into multiple pieces
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void python_chunking_metadata() {
+        // Intel: chunk multi-function Python source into multiple pieces
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void python_class_with_methods_metadata() {
-    // Intel: extract nested structure from Python class with methods
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void python_class_with_methods_metadata() {
+        // Intel: extract nested structure from Python class with methods
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void python_function_metadata() {
-    // Intel: extract structure from Python function definition
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void python_function_metadata() {
+        // Intel: extract structure from Python function definition
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void python_malformed_code_metadata() {
-    // Intel: detect diagnostics in malformed Python code
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void python_malformed_code_metadata() {
+        // Intel: detect diagnostics in malformed Python code
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void python_multi_import_metadata() {
-    // Intel: detect multiple Python imports
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void python_multi_import_metadata() {
+        // Intel: detect multiple Python imports
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void rust_chunking_metadata() {
-    // Intel: chunk multi-function Rust source into pieces
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("rust"), "Language 'rust' not available");
+    @Test
+    void rust_chunking_metadata() {
+        // Intel: chunk multi-function Rust source into pieces
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("rust"), "Language 'rust' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("rust");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("rust");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void rust_function_metadata() {
-    // Intel: extract structure from Rust function definition
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("rust"), "Language 'rust' not available");
+    @Test
+    void rust_function_metadata() {
+        // Intel: extract structure from Rust function definition
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("rust"), "Language 'rust' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("rust");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("rust");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void typescript_function_metadata() {
-    // Intel: extract structure from TypeScript function
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("typescript"), "Language 'typescript' not available");
+    @Test
+    void typescript_function_metadata() {
+        // Intel: extract structure from TypeScript function
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("typescript"), "Language 'typescript' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("typescript");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("typescript");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
+
 }
