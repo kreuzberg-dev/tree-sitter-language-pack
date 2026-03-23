@@ -47,6 +47,7 @@ all = [
     "lang-commonlisp",
     "lang-cpon",
     "lang-cpp",
+    "lang-csharp",
     "lang-css",
     "lang-csv",
     "lang-cuda",
@@ -343,6 +344,7 @@ lang-comment = []
 lang-commonlisp = []
 lang-cpon = []
 lang-cpp = []
+lang-csharp = []
 lang-css = []
 lang-csv = []
 lang-cuda = []
