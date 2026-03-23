@@ -1,10 +1,10 @@
 ---
-description: "All 177 languages supported by tree-sitter-language-pack."
+description: "All 197 languages supported by tree-sitter-language-pack."
 ---
 
 # Supported Languages
 
-tree-sitter-language-pack supports **177 languages**. All parsers are available for download on demand via `ts-pack download <language>` or automatically on first use.
+tree-sitter-language-pack supports **197 languages**. All parsers are available for download on demand via `ts-pack download <language>` or automatically on first use.
 
 ## Language List
 
@@ -197,7 +197,7 @@ tree-sitter-language-pack supports **177 languages**. All parsers are available 
 
     print(has_language("python"))      # True
     print(has_language("brainfuck"))   # False
-    print(language_count())            # 173
+    print(language_count())            # 197
 
     for lang in sorted(available_languages()):
         print(lang)
@@ -220,7 +220,7 @@ tree-sitter-language-pack supports **177 languages**. All parsers are available 
 
     ```bash
     ts-pack list
-    ts-pack list | wc -l   # 173
+    ts-pack list | wc -l   # 197
     ```
 
 ## Requesting a Language

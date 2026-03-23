@@ -57,7 +57,7 @@ A comprehensive collection of tree-sitter language parsers with polyglot binding
 
 ## Overview
 
-**tree-sitter-language-pack** bundles 170+ tree-sitter language parsers into a single package with native bindings for multiple programming languages. Ship syntax analysis in your application without managing individual parser dependencies.
+**tree-sitter-language-pack** bundles 197+ tree-sitter language parsers into a single package with native bindings for multiple programming languages. Ship syntax analysis in your application without managing individual parser dependencies.
 
 ## Architecture
 
@@ -129,12 +129,12 @@ See [Go README](packages/go/v1/README.md) for full documentation.
 <dependency>
   <groupId>dev.kreuzberg</groupId>
   <artifactId>tree-sitter-language-pack</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
 ```groovy
-implementation("dev.kreuzberg:tree-sitter-language-pack:1.0.0")
+implementation("dev.kreuzberg:tree-sitter-language-pack:1.1.0")
 ```
 
 See [Java README](crates/ts-pack-java/README.md) for full documentation.
@@ -223,7 +223,7 @@ The `process()` function returns structured analysis including functions, classe
 
 | Feature | Description |
 | --- | --- |
-| **170+ Languages** | Pre-compiled parsers for 170+ programming languages |
+| **197+ Languages** | Pre-compiled parsers for 197+ programming languages |
 | **On-Demand Downloads** | Parsers are downloaded on-demand and cached locally for fast reuse |
 | **Selective Installation** | Download only the languages you need; unused parsers never downloaded |
 | **Polyglot Bindings** | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++ |
@@ -232,7 +232,7 @@ The `process()` function returns structured analysis including functions, classe
 
 ## Supported Languages
 
-This pack includes 170+ languages. See the [Rust core Cargo.toml](crates/ts-pack-core/Cargo.toml) for the full list of available language features.
+This pack includes 197+ languages. See the [Rust core Cargo.toml](crates/ts-pack-core/Cargo.toml) for the full list of available language features.
 
 ## Package READMEs
 

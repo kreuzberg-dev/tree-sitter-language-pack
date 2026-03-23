@@ -1,10 +1,10 @@
 ---
-description: "Pre-compiled tree-sitter parsers for 170+ languages with code intelligence, chunking, and polyglot bindings."
+description: "Pre-compiled tree-sitter parsers for 197 languages with code intelligence, chunking, and polyglot bindings."
 ---
 
 # tree-sitter-language-pack
 
-**Universal code parser for 170+ languages** — parse, analyze, and intelligently chunk source code across every major programming language.
+**Universal code parser for 197 languages** — parse, analyze, and intelligently chunk source code across every major programming language.
 
 <div class="hero-badges" markdown>
 [:material-lightning-bolt: Quick Start](getting-started/quickstart.md){ .md-button .md-button--primary }
@@ -16,7 +16,7 @@ description: "Pre-compiled tree-sitter parsers for 170+ languages with code inte
 
 <div class="grid cards" markdown>
 
-- :material-language-python:{ .lg .middle } **170+ Languages**
+- :material-language-python:{ .lg .middle } **197 Languages**
 
     ---
 

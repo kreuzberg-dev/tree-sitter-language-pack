@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Core library for tree-sitter language pack - provides compiled parsers for 170+ languages"
+description = "Core library for tree-sitter language pack - provides compiled parsers for 197 languages"
 
 [features]
 default = ["dynamic-loading", "download"]
@@ -301,7 +301,7 @@ functional = [
     "lang-janet",
     "lang-agda",
 ]
-# Curated subset for WASM builds (~30 languages). Compiling all 173 languages
+# Curated subset for WASM builds (~30 languages). Compiling all 197 languages
 # to wasm32-unknown-unknown exceeds GitHub Actions runner memory (7GB).
 # Native bindings (Python, Node.js, Ruby, etc.) use "all" and support every language.
 wasm = [

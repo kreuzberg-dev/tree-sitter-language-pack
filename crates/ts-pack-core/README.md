@@ -97,7 +97,7 @@ println!("Chunks: {}", result.chunks.len());
 
 | Feature | Description |
 | --- | --- |
-| **170+ Languages** | Pre-compiled parsers for 170+ programming languages |
+| **197+ Languages** | Pre-compiled parsers for 197+ programming languages |
 | **On-Demand Downloads** | Parsers are downloaded on-demand and cached locally for fast reuse |
 | **Selective Installation** | Download only the languages you need; unused parsers never downloaded |
 | **Polyglot Bindings** | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++ |
@@ -110,7 +110,7 @@ Enable curated language sets instead of individual languages:
 
 ```toml
 [dependencies]
-ts-pack-core = { version = "1.0.0", default-features = false, features = ["web"] }
+ts-pack-core = { version = "1.1.0", default-features = false, features = ["web"] }
 ```
 
 Available groups: `all` (default), `web`, `systems`, `scripting`, `data`, `jvm`, `functional`.

@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.email = ['dev@kreuzberg.dev']
 
   spec.summary = 'Ruby bindings for tree-sitter-language-pack'
-  spec.description = '170+ pre-compiled tree-sitter language parsers with Ruby bindings via Magnus native extensions.'
+  spec.description = '197 pre-compiled tree-sitter language parsers with Ruby bindings via Magnus native extensions.'
   spec.homepage = 'https://github.com/kreuzberg-dev/tree-sitter-language-pack'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.4.0'

@@ -4,7 +4,7 @@ project:
   description: "A comprehensive collection of tree-sitter language parsers with polyglot bindings"
   repository: "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
   license: "MIT"
-  language_count: 170
+  language_count: 197
   discord: "https://discord.gg/xt9WY3GnKR"
   banner_url: "https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8"
 

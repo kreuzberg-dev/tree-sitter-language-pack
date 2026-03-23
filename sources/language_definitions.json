@@ -30,6 +30,7 @@
 		"rev": "11dd46c9ae25135c473c0003a133bb06a484af0c"
 	},
 	"asciidoc": {
+		"directory": "tree-sitter-asciidoc",
 		"extensions": ["adoc", "asciidoc"],
 		"repo": "https://github.com/cathaysia/tree-sitter-asciidoc",
 		"rev": "8b7488e4a92133c9adacc49e97652007e1b6621a"
@@ -101,6 +102,7 @@
 	},
 	"caddy": {
 		"extensions": ["caddyfile"],
+		"generate": true,
 		"repo": "https://github.com/Samonitari/tree-sitter-caddy",
 		"rev": "65b60437983933d00809c8927e7d8a29ca26dfa3"
 	},
@@ -115,13 +117,13 @@
 		"rev": "7b0883c03e5edd34ef7bcf703194204299d7099f"
 	},
 	"cedar": {
-		"directory": "tree-sitter-cedar",
+		"directory": "cedar",
 		"extensions": ["cedar"],
 		"repo": "https://github.com/DuskSystems/tree-sitter-cedar",
 		"rev": "ac1fe619df3d4af9f797903d4b8852f12082a0d5"
 	},
 	"cedarschema": {
-		"directory": "tree-sitter-cedarschema",
+		"directory": "cedarschema",
 		"extensions": ["cedarschema"],
 		"repo": "https://github.com/DuskSystems/tree-sitter-cedar",
 		"rev": "ac1fe619df3d4af9f797903d4b8852f12082a0d5"
@@ -213,6 +215,7 @@
 	},
 	"devicetree": {
 		"extensions": ["dts", "dtsi"],
+		"generate": true,
 		"repo": "https://github.com/joelspadin/tree-sitter-devicetree",
 		"rev": "e685f1f6ac1702b046415efb476444167d63e41a"
 	},
@@ -229,6 +232,7 @@
 	},
 	"dot": {
 		"extensions": ["dot", "gv"],
+		"generate": true,
 		"repo": "https://github.com/rydesun/tree-sitter-dot",
 		"rev": "80327abbba6f47530edeb0df9f11bd5d5c93c14d"
 	},
@@ -470,11 +474,13 @@
 	},
 	"jinja2": {
 		"extensions": ["j2", "jinja2"],
+		"generate": true,
 		"repo": "https://github.com/dbt-labs/tree-sitter-jinja2",
 		"rev": "a82ed374f4cb58a1358dd6b26a7157bde1bca3b7"
 	},
 	"jq": {
 		"extensions": ["jq"],
+		"generate": true,
 		"repo": "https://github.com/flurie/tree-sitter-jq",
 		"rev": "c204e36d2c3c6fce1f57950b12cabcc24e5cc4d9"
 	},
@@ -729,6 +735,7 @@
 		"rev": "f1c30d82a5bf0b70ce33ef431f4acd7fd69968a3"
 	},
 	"prolog": {
+		"directory": "grammars/prolog",
 		"extensions": ["pro"],
 		"repo": "https://codeberg.org/foxy/tree-sitter-prolog",
 		"rev": "d8d415f6a1cf80ca138524bcc395810b176d40fa"

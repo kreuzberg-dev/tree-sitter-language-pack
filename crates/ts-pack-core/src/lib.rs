@@ -1,6 +1,6 @@
 //! # tree-sitter-language-pack
 //!
-//! Pre-compiled tree-sitter grammars for 170+ programming languages with
+//! Pre-compiled tree-sitter grammars for 197 programming languages with
 //! a unified API for parsing, analysis, and intelligent code chunking.
 //!
 //! ## Quick Start
@@ -396,7 +396,7 @@ pub fn download_all() -> Result<usize, Error> {
     download(&refs)
 }
 
-/// Return all language names available in the remote manifest (170+).
+/// Return all language names available in the remote manifest (197).
 ///
 /// Fetches (and caches) the remote manifest to discover the full list of
 /// downloadable languages. Use [`downloaded_languages`] to list what is

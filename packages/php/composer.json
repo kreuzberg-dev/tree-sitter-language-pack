@@ -1,6 +1,6 @@
 {
 	"name": "kreuzberg/tree-sitter-language-pack",
-	"description": "Tree-sitter language pack - pre-compiled parsers for 170+ languages (PHP extension)",
+	"description": "Tree-sitter language pack - pre-compiled parsers for 197 languages (PHP extension)",
 	"type": "php-ext",
 	"license": "MIT",
 	"require": {
