@@ -47,6 +47,7 @@ all = [
     "lang-commonlisp",
     "lang-cpon",
     "lang-cpp",
+    "lang-csharp",
     "lang-css",
     "lang-csv",
     "lang-cuda",
@@ -58,6 +59,7 @@ all = [
     "lang-elisp",
     "lang-elixir",
     "lang-elm",
+    "lang-embeddedtemplate",
     "lang-erlang",
     "lang-fennel",
     "lang-firrtl",
@@ -148,6 +150,7 @@ all = [
     "lang-racket",
     "lang-re2c",
     "lang-readline",
+    "lang-regex",
     "lang-rego",
     "lang-requirements",
     "lang-ron",
@@ -190,6 +193,7 @@ all = [
     "lang-wgsl",
     "lang-xcompose",
     "lang-xml",
+    "lang-yaml",
     "lang-yuck",
     "lang-zig",
 ]
@@ -343,6 +347,7 @@ lang-comment = []
 lang-commonlisp = []
 lang-cpon = []
 lang-cpp = []
+lang-csharp = []
 lang-css = []
 lang-csv = []
 lang-cuda = []
@@ -354,6 +359,7 @@ lang-dtd = []
 lang-elisp = []
 lang-elixir = []
 lang-elm = []
+lang-embeddedtemplate = []
 lang-erlang = []
 lang-fennel = []
 lang-firrtl = []
@@ -444,6 +450,7 @@ lang-r = []
 lang-racket = []
 lang-re2c = []
 lang-readline = []
+lang-regex = []
 lang-rego = []
 lang-requirements = []
 lang-ron = []
@@ -486,6 +493,7 @@ lang-wat = []
 lang-wgsl = []
 lang-xcompose = []
 lang-xml = []
+lang-yaml = []
 lang-yuck = []
 lang-zig = []
 

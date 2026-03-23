@@ -1,10 +1,10 @@
 ---
-description: "All 173 languages supported by tree-sitter-language-pack."
+description: "All 177 languages supported by tree-sitter-language-pack."
 ---
 
 # Supported Languages
 
-tree-sitter-language-pack supports **173 languages**. All parsers are available for download on demand via `ts-pack download <language>` or automatically on first use.
+tree-sitter-language-pack supports **177 languages**. All parsers are available for download on demand via `ts-pack download <language>` or automatically on first use.
 
 ## Language List
 
@@ -36,6 +36,7 @@ tree-sitter-language-pack supports **173 languages**. All parsers are available 
 | Common Lisp | `commonlisp` | [tree-sitter-grammars/tree-sitter-commonlisp](https://github.com/tree-sitter-grammars/tree-sitter-commonlisp) |
 | CPON | `cpon` | [tree-sitter-grammars/tree-sitter-cpon](https://github.com/tree-sitter-grammars/tree-sitter-cpon) |
 | C++ | `cpp` | [tree-sitter/tree-sitter-cpp](https://github.com/tree-sitter/tree-sitter-cpp) |
+| C# | `csharp` | [tree-sitter/tree-sitter-c-sharp](https://github.com/tree-sitter/tree-sitter-c-sharp) |
 | CSS | `css` | [tree-sitter/tree-sitter-css](https://github.com/tree-sitter/tree-sitter-css) |
 | CSV | `csv` | [tree-sitter-grammars/tree-sitter-csv](https://github.com/tree-sitter-grammars/tree-sitter-csv) |
 | CUDA | `cuda` | [tree-sitter-grammars/tree-sitter-cuda](https://github.com/tree-sitter-grammars/tree-sitter-cuda) |
@@ -48,6 +49,7 @@ tree-sitter-language-pack supports **173 languages**. All parsers are available 
 | Emacs Lisp | `elisp` | [Wilfred/tree-sitter-elisp](https://github.com/Wilfred/tree-sitter-elisp) |
 | Elixir | `elixir` | [elixir-lang/tree-sitter-elixir](https://github.com/elixir-lang/tree-sitter-elixir) |
 | Elm | `elm` | [elm-tooling/tree-sitter-elm](https://github.com/elm-tooling/tree-sitter-elm) |
+| Embedded Template | `embeddedtemplate` | [tree-sitter/tree-sitter-embedded-template](https://github.com/tree-sitter/tree-sitter-embedded-template) |
 | Erlang | `erlang` | [WhatsApp/tree-sitter-erlang](https://github.com/WhatsApp/tree-sitter-erlang) |
 | Fennel | `fennel` | [alexmozaidze/tree-sitter-fennel](https://github.com/alexmozaidze/tree-sitter-fennel) |
 | FIRRTL | `firrtl` | [tree-sitter-grammars/tree-sitter-firrtl](https://github.com/tree-sitter-grammars/tree-sitter-firrtl) |
@@ -139,6 +141,7 @@ tree-sitter-language-pack supports **173 languages**. All parsers are available 
 | Racket | `racket` | [nickel-lang/tree-sitter-racket](https://github.com/nickel-lang/tree-sitter-racket) |
 | re2c | `re2c` | [nickel-lang/tree-sitter-re2c](https://github.com/nickel-lang/tree-sitter-re2c) |
 | Readline | `readline` | [nickel-lang/tree-sitter-readline](https://github.com/nickel-lang/tree-sitter-readline) |
+| Regex | `regex` | [tree-sitter/tree-sitter-regex](https://github.com/tree-sitter/tree-sitter-regex) |
 | Rego (OPA) | `rego` | [nickel-lang/tree-sitter-rego](https://github.com/nickel-lang/tree-sitter-rego) |
 | Requirements.txt | `requirements` | [nickel-lang/tree-sitter-requirements](https://github.com/nickel-lang/tree-sitter-requirements) |
 | RON | `ron` | [nickel-lang/tree-sitter-ron](https://github.com/nickel-lang/tree-sitter-ron) |
@@ -181,6 +184,7 @@ tree-sitter-language-pack supports **173 languages**. All parsers are available 
 | WGSL | `wgsl` | [nickel-lang/tree-sitter-wgsl](https://github.com/nickel-lang/tree-sitter-wgsl) |
 | XCompose | `xcompose` | [nickel-lang/tree-sitter-xcompose](https://github.com/nickel-lang/tree-sitter-xcompose) |
 | XML | `xml` | [tree-sitter-grammars/tree-sitter-xml](https://github.com/tree-sitter-grammars/tree-sitter-xml) |
+| YAML | `yaml` | [tree-sitter-grammars/tree-sitter-yaml](https://github.com/tree-sitter-grammars/tree-sitter-yaml) |
 | Yuck | `yuck` | [Aylur/tree-sitter-yuck](https://github.com/Aylur/tree-sitter-yuck) |
 | Zig | `zig` | [maxxnino/tree-sitter-zig](https://github.com/maxxnino/tree-sitter-zig) |
 
