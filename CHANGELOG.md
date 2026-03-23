@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-03-23
+
+### Fixed
+
+- Elixir NIF: fix Rustler crate name mismatch (`ts_pack_elixir` → `ts-pack-elixir`) causing compilation failure
+- Rust crate publish: embed query file contents at build time instead of using `include_str!` with relative paths that break in the cargo package tarball
+
 ## [1.1.1] - 2026-03-23
 
 ### Fixed

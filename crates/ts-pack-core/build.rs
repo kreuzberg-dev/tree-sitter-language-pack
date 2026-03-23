@@ -655,7 +655,10 @@ fn generate_queries_registry(definitions: &BTreeMap<String, LanguageDefinition>,
         }
     }
 
-    // Helper: generate a query lookup function, or just return None if empty
+    // Helper: generate a query lookup function, or just return None if empty.
+    // We read query file contents at build time and embed them as string literals
+    // instead of using include_str! with relative paths, because the relative paths
+    // (../../parsers/) break when the crate is packaged for cargo publish.
     let gen_query_fn = |f: &mut fs::File, name: &str, langs: &[String], query_file: &str| {
         writeln!(f, "pub(crate) fn {name}(lang: &str) -> Option<&'static str> {{").unwrap();
         if langs.is_empty() {
@@ -664,10 +667,11 @@ fn generate_queries_registry(definitions: &BTreeMap<String, LanguageDefinition>,
         } else {
             writeln!(f, "    match lang {{").unwrap();
             for lang in langs {
-                writeln!(
-                    f,
-                    "        \"{lang}\" => Some(include_str!(concat!(env!(\"CARGO_MANIFEST_DIR\"), \"/../../parsers/{lang}/queries/{query_file}\"))),",
-                ).unwrap();
+                let query_path = parsers_dir.join(lang).join("queries").join(query_file);
+                let contents = fs::read_to_string(&query_path)
+                    .unwrap_or_else(|e| panic!("Failed to read {}: {e}", query_path.display()));
+                let escaped = contents.replace('\\', "\\\\").replace('"', "\\\"").replace('\n', "\\n");
+                writeln!(f, "        \"{lang}\" => Some(\"{escaped}\"),",).unwrap();
             }
             writeln!(f, "        _ => None,").unwrap();
             writeln!(f, "    }}").unwrap();

@@ -1,6 +1,6 @@
 {
 	"name": "test-app-node",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -9,7 +9,7 @@
 		"test:comprehensive": "vitest run comprehensive.spec.ts"
 	},
 	"dependencies": {
-		"@kreuzberg/tree-sitter-language-pack": "1.1.1"
+		"@kreuzberg/tree-sitter-language-pack": "1.1.2"
 	},
 	"devDependencies": {
 		"vitest": "^3.0.0",
