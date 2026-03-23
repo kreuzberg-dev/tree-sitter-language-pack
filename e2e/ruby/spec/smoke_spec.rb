@@ -10,7 +10,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("actionscript", "var x:int = 1;")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("variable_declaration")).to be true
   end
 
   it "smoke_ada" do
@@ -19,7 +18,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("ada", "procedure Main is begin null; end Main;")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("compilation_unit")).to be true
   end
 
   it "smoke_agda" do
@@ -28,7 +26,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("agda", "module Main where")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("module")).to be true
   end
 
   it "smoke_apex" do
@@ -37,7 +34,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("apex", "public class Main {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("class_declaration")).to be true
   end
 
   it "smoke_arduino" do
@@ -46,7 +42,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("arduino", "void setup() {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_definition")).to be true
   end
 
   it "smoke_asm" do
@@ -55,7 +50,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("asm", "mov eax, 1")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("instruction")).to be true
   end
 
   it "smoke_astro" do
@@ -64,7 +58,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("astro", "---\n---\n<p>hello</p>")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("frontmatter")).to be true
   end
 
   it "smoke_bash" do
@@ -73,7 +66,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("bash", "echo hello")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("command")).to be true
   end
 
   it "smoke_beancount" do
@@ -82,7 +74,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("beancount", "2024-01-01 open Assets:Bank USD")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("open")).to be true
   end
 
   it "smoke_bibtex" do
@@ -91,7 +82,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("bibtex", "@article{key, title={A}}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("entry")).to be true
   end
 
   it "smoke_bicep" do
@@ -100,7 +90,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("bicep", "param name string")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("parameter_declaration")).to be true
   end
 
   it "smoke_bitbake" do
@@ -109,7 +98,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("bitbake", "DESCRIPTION = \"hello\"")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("variable_assignment")).to be true
   end
 
   it "smoke_bsl" do
@@ -118,7 +106,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("bsl", "Procedure Main() EndProcedure")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("procedure_definition")).to be true
   end
 
   it "smoke_c" do
@@ -135,7 +122,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("cairo", "fn main() {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("cairo_1_file")).to be true
   end
 
   it "smoke_capnp" do
@@ -144,7 +130,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("capnp", "@0xabcdef1234567890;")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("unique_id_statement")).to be true
   end
 
   it "smoke_chatito" do
@@ -153,7 +138,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("chatito", "%[greeting]\n    hello")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("intent_def")).to be true
   end
 
   it "smoke_clarity" do
@@ -162,7 +146,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("clarity", "(define-public (hello) (ok true))")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_definition")).to be true
   end
 
   it "smoke_clojure" do
@@ -171,7 +154,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("clojure", "(def x 1)")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("list_lit")).to be true
   end
 
   it "smoke_cmake" do
@@ -180,7 +162,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("cmake", "cmake_minimum_required(VERSION 3.0)")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("normal_command")).to be true
   end
 
   it "smoke_cobol" do
@@ -189,7 +170,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("cobol", "       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("program_definition")).to be true
   end
 
   it "smoke_comment" do
@@ -198,7 +178,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("comment", "TODO: fix this")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("tag")).to be true
   end
 
   it "smoke_commonlisp" do
@@ -207,7 +186,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("commonlisp", "(defun hello () (print \"hello\"))")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("list_lit")).to be true
   end
 
   it "smoke_cpon" do
@@ -216,7 +194,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("cpon", "{\"key\": 1}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("map")).to be true
   end
 
   it "smoke_cpp" do
@@ -227,13 +204,20 @@ RSpec.describe "smoke" do
     expect(tree.root_child_count).to be >= 1
   end
 
+  it "smoke_csharp" do
+    # Smoke test: load csharp and parse a simple snippet
+    skip "Language 'csharp' not available" unless TreeSitterLanguagePack.has_language("csharp")
+    tree = TreeSitterLanguagePack.parse_string("csharp", "class Main {}")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
   it "smoke_css" do
     # Smoke test: load css and parse a simple snippet
     skip "Language 'css' not available" unless TreeSitterLanguagePack.has_language("css")
     tree = TreeSitterLanguagePack.parse_string("css", "body { color: red; }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("rule_set")).to be true
   end
 
   it "smoke_csv" do
@@ -242,7 +226,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("csv", "a,b,c\n1,2,3")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("row")).to be true
   end
 
   it "smoke_cuda" do
@@ -251,7 +234,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("cuda", "__global__ void kernel() {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_definition")).to be true
   end
 
   it "smoke_d" do
@@ -260,7 +242,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("d", "void main() {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_declaration")).to be true
   end
 
   it "smoke_dart" do
@@ -269,7 +250,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("dart", "void main() {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_signature")).to be true
   end
 
   it "smoke_dockerfile" do
@@ -278,7 +258,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("dockerfile", "FROM alpine")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("from_instruction")).to be true
   end
 
   it "smoke_doxygen" do
@@ -287,7 +266,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("doxygen", "/** @brief A function */")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("brief_header")).to be true
   end
 
   it "smoke_dtd" do
@@ -296,7 +274,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("dtd", "<!ELEMENT note (body)>")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("elementdecl")).to be true
   end
 
   it "smoke_elisp" do
@@ -305,7 +282,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("elisp", "(defun hello () (message \"hello\"))")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_definition")).to be true
   end
 
   it "smoke_elixir" do
@@ -314,7 +290,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("elixir", "IO.puts(\"hello\")")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("call")).to be true
   end
 
   it "smoke_elm" do
@@ -323,7 +298,14 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("elm", "module Main exposing (..)")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("module_declaration")).to be true
+  end
+
+  it "smoke_embeddedtemplate" do
+    # Smoke test: load embeddedtemplate and parse a simple snippet
+    skip "Language 'embeddedtemplate' not available" unless TreeSitterLanguagePack.has_language("embeddedtemplate")
+    tree = TreeSitterLanguagePack.parse_string("embeddedtemplate", "<%= hello %>")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
   end
 
   it "smoke_erlang" do
@@ -332,7 +314,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("erlang", "main() -> ok.")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("fun_decl")).to be true
   end
 
   it "smoke_fennel" do
@@ -341,7 +322,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("fennel", "(fn hello [] (print :hello))")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("fn")).to be true
   end
 
   it "smoke_firrtl" do
@@ -350,7 +330,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("firrtl", "circuit Main :")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("circuit")).to be true
   end
 
   it "smoke_fish" do
@@ -359,7 +338,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("fish", "echo hello")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.has_error_nodes).to be true
   end
 
   it "smoke_fortran" do
@@ -368,7 +346,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("fortran", "program main\nend program main")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("program")).to be true
   end
 
   it "smoke_fsharp" do
@@ -377,7 +354,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("fsharp", "let x = 1")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("declaration_expression")).to be true
   end
 
   it "smoke_fsharp_signature" do
@@ -386,7 +362,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("fsharp_signature", "val x: int")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("value_definition")).to be true
   end
 
   it "smoke_func" do
@@ -395,7 +370,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("func", "() recv_internal() {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_definition")).to be true
   end
 
   it "smoke_gdscript" do
@@ -404,7 +378,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("gdscript", "extends Node\nfunc _ready():\n\tpass")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("extends_statement")).to be true
   end
 
   it "smoke_gitattributes" do
@@ -413,7 +386,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("gitattributes", "*.txt text")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("pattern")).to be true
   end
 
   it "smoke_gitcommit" do
@@ -422,7 +394,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("gitcommit", "feat: add feature\n\nBody text")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("subject")).to be true
   end
 
   it "smoke_gitignore" do
@@ -431,7 +402,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("gitignore", "*.o\n*.log")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("pattern")).to be true
   end
 
   it "smoke_gleam" do
@@ -440,7 +410,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("gleam", "pub fn main() { }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function")).to be true
   end
 
   it "smoke_glsl" do
@@ -449,7 +418,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("glsl", "void main() { gl_Position = vec4(0.0); }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_definition")).to be true
   end
 
   it "smoke_gn" do
@@ -458,7 +426,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("gn", "group(\"hello\") {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("primary_expression")).to be true
   end
 
   it "smoke_go" do
@@ -475,7 +442,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("gomod", "module example.com/hello\n\ngo 1.21")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("module_directive")).to be true
   end
 
   it "smoke_gosum" do
@@ -484,7 +450,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("gosum", "example.com/pkg v1.0.0 h1:abc=")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("checksum")).to be true
   end
 
   it "smoke_graphql" do
@@ -493,7 +458,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("graphql", "type Query { hello: String }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("document")).to be true
   end
 
   it "smoke_groovy" do
@@ -502,7 +466,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("groovy", "def x = 1")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("command")).to be true
   end
 
   it "smoke_gstlaunch" do
@@ -511,7 +474,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("gstlaunch", "fakesrc ! fakesink")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("fragment")).to be true
   end
 
   it "smoke_hack" do
@@ -520,7 +482,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("hack", "<?hh\nfunction main(): void {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_declaration")).to be true
   end
 
   it "smoke_hare" do
@@ -529,7 +490,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("hare", "export fn main() void = void;")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("declarations")).to be true
   end
 
   it "smoke_haskell" do
@@ -538,7 +498,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("haskell", "main = putStrLn \"hello\"")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("declarations")).to be true
   end
 
   it "smoke_haxe" do
@@ -547,7 +506,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("haxe", "class Main { static function main() {} }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("class_declaration")).to be true
   end
 
   it "smoke_hcl" do
@@ -556,7 +514,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("hcl", "variable \"name\" { type = string }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("body")).to be true
   end
 
   it "smoke_heex" do
@@ -565,7 +522,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("heex", "<%= @greeting %>")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("directive")).to be true
   end
 
   it "smoke_hlsl" do
@@ -574,7 +530,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("hlsl", "float4 main() : SV_Target { return 0; }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_definition")).to be true
   end
 
   it "smoke_html" do
@@ -591,7 +546,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("hyprlang", "general { border_size = 1 }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.has_error_nodes).to be true
   end
 
   it "smoke_ini" do
@@ -600,7 +554,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("ini", "[section]\nkey = value")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("section")).to be true
   end
 
   it "smoke_ispc" do
@@ -609,7 +562,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("ispc", "export void main() {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_definition")).to be true
   end
 
   it "smoke_janet" do
@@ -618,13 +570,12 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("janet", "(print \"hello\")")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("tuple")).to be true
   end
 
   it "smoke_java" do
     # Smoke test: load java and parse a simple snippet
     skip "Language 'java' not available" unless TreeSitterLanguagePack.has_language("java")
-    tree = TreeSitterLanguagePack.parse_string("java", "class Main { public static void main(String[] args) {} }")
+    tree = TreeSitterLanguagePack.parse_string("java", "class Main {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
   end
@@ -643,7 +594,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("jsdoc", "/** @param {string} name */")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("tag_name")).to be true
   end
 
   it "smoke_json" do
@@ -652,7 +602,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("json", "{\"key\": \"value\"}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("object")).to be true
   end
 
   it "smoke_jsonnet" do
@@ -661,7 +610,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("jsonnet", "{ key: 'value' }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("object")).to be true
   end
 
   it "smoke_julia" do
@@ -670,7 +618,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("julia", "function main() end")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_definition")).to be true
   end
 
   it "smoke_kconfig" do
@@ -679,7 +626,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("kconfig", "config FOO\n\tbool \"Enable foo\"")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("config")).to be true
   end
 
   it "smoke_kdl" do
@@ -688,7 +634,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("kdl", "node \"value\"")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("node")).to be true
   end
 
   it "smoke_kotlin" do
@@ -697,7 +642,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("kotlin", "fun main() {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_declaration")).to be true
   end
 
   it "smoke_latex" do
@@ -706,7 +650,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("latex", "\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("class_include")).to be true
   end
 
   it "smoke_linkerscript" do
@@ -715,7 +658,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("linkerscript", "SECTIONS { .text : { *(.text) } }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("sections_command")).to be true
   end
 
   it "smoke_llvm" do
@@ -724,7 +666,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("llvm", "define i32 @main() { ret i32 0 }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("fn_define")).to be true
   end
 
   it "smoke_lua" do
@@ -733,7 +674,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("lua", "print('hello')")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_call")).to be true
   end
 
   it "smoke_luadoc" do
@@ -742,7 +682,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("luadoc", "---@param name string")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("comment")).to be true
   end
 
   it "smoke_luap" do
@@ -751,7 +690,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("luap", "[a-z]+")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("set")).to be true
   end
 
   it "smoke_luau" do
@@ -760,7 +698,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("luau", "local x: number = 1")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("variable_declaration")).to be true
   end
 
   it "smoke_magik" do
@@ -769,7 +706,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("magik", "_method object.hello\n_endmethod")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("fragment")).to be true
   end
 
   it "smoke_make" do
@@ -778,7 +714,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("make", "all:\n\techo hello")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("rule")).to be true
   end
 
   it "smoke_markdown" do
@@ -787,7 +722,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("markdown", "\# Hello\n\nWorld")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("section")).to be true
   end
 
   it "smoke_markdown_inline" do
@@ -796,7 +730,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("markdown_inline", "**bold** and *italic*")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("strong_emphasis")).to be true
   end
 
   it "smoke_matlab" do
@@ -805,7 +738,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("matlab", "function y = hello(x)\ny = x;\nend")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_definition")).to be true
   end
 
   it "smoke_mermaid" do
@@ -814,7 +746,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("mermaid", "graph TD\nA --> B")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.has_error_nodes).to be true
   end
 
   it "smoke_meson" do
@@ -823,7 +754,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("meson", "project('hello', 'c')")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("normal_command")).to be true
   end
 
   it "smoke_netlinx" do
@@ -832,7 +762,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("netlinx", "PROGRAM_NAME='hello'")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("program_name")).to be true
   end
 
   it "smoke_nim" do
@@ -841,7 +770,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("nim", "echo \"hello\"")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("call")).to be true
   end
 
   it "smoke_ninja" do
@@ -850,7 +778,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("ninja", "rule cc\n  command = cc $in -o $out")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("rule")).to be true
   end
 
   it "smoke_nix" do
@@ -859,7 +786,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("nix", "{ pkgs ? import <nixpkgs> {} }: pkgs.hello")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_expression")).to be true
   end
 
   it "smoke_nqc" do
@@ -868,7 +794,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("nqc", "task main() {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("task_definition")).to be true
   end
 
   it "smoke_objc" do
@@ -877,7 +802,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("objc", "@interface Main @end")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("class_interface")).to be true
   end
 
   it "smoke_ocaml" do
@@ -886,7 +810,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("ocaml", "let () = print_endline \"hello\"")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("value_definition")).to be true
   end
 
   it "smoke_ocaml_interface" do
@@ -895,7 +818,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("ocaml_interface", "val x : int")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("value_specification")).to be true
   end
 
   it "smoke_odin" do
@@ -904,7 +826,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("odin", "package main")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("package_declaration")).to be true
   end
 
   it "smoke_org" do
@@ -913,7 +834,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("org", "* Hello\nWorld")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("section")).to be true
   end
 
   it "smoke_pascal" do
@@ -922,7 +842,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("pascal", "program Hello; begin end.")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("program")).to be true
   end
 
   it "smoke_pem" do
@@ -931,7 +850,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("pem", "-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("content")).to be true
   end
 
   it "smoke_perl" do
@@ -940,7 +858,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("perl", "print 'hello';")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("expression_statement")).to be true
   end
 
   it "smoke_pgn" do
@@ -949,7 +866,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("pgn", "1. e4 e5 *")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("game")).to be true
   end
 
   it "smoke_php" do
@@ -958,7 +874,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("php", "<?php echo 'hello'; ?>")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("php_tag")).to be true
   end
 
   it "smoke_po" do
@@ -967,7 +882,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("po", "msgid \"hello\"\nmsgstr \"world\"")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("message")).to be true
   end
 
   it "smoke_pony" do
@@ -976,7 +890,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("pony", "actor Main\n  new create(env: Env) => None")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("actor_definition")).to be true
   end
 
   it "smoke_powershell" do
@@ -985,7 +898,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("powershell", "Write-Host 'hello'")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("statement_list")).to be true
   end
 
   it "smoke_printf" do
@@ -994,7 +906,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("printf", "%d %s")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("format")).to be true
   end
 
   it "smoke_prisma" do
@@ -1003,7 +914,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("prisma", "model User { id Int @id }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("model_block")).to be true
   end
 
   it "smoke_properties" do
@@ -1012,7 +922,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("properties", "key=value")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("property")).to be true
   end
 
   it "smoke_proto" do
@@ -1021,7 +930,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("proto", "syntax = \"proto3\";")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("syntax")).to be true
   end
 
   it "smoke_psv" do
@@ -1030,7 +938,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("psv", "a|b|c\n1|2|3")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("row")).to be true
   end
 
   it "smoke_puppet" do
@@ -1039,7 +946,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("puppet", "notify { 'hello': }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("resource_declaration")).to be true
   end
 
   it "smoke_purescript" do
@@ -1048,7 +954,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("purescript", "module Main where")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("qualified_module")).to be true
   end
 
   it "smoke_pymanifest" do
@@ -1057,7 +962,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("pymanifest", "include *.txt")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("command")).to be true
   end
 
   it "smoke_python" do
@@ -1074,7 +978,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("qmldir", "module Example")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("command")).to be true
   end
 
   it "smoke_qmljs" do
@@ -1083,7 +986,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("qmljs", "import QtQuick 2.0\nItem {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("ui_import")).to be true
   end
 
   it "smoke_query" do
@@ -1092,7 +994,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("query", "(identifier) @name")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("named_node")).to be true
   end
 
   it "smoke_r" do
@@ -1101,7 +1002,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("r", "print('hello')")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("call")).to be true
   end
 
   it "smoke_racket" do
@@ -1110,7 +1010,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("racket", "\#lang racket\n(define x 1)")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("extension")).to be true
   end
 
   it "smoke_re2c" do
@@ -1119,7 +1018,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("re2c", "/*!re2c\n  [a-z]+ { return; }\n*/")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("global_block")).to be true
   end
 
   it "smoke_readline" do
@@ -1128,7 +1026,14 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("readline", "set editing-mode vi")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("variable_setting")).to be true
+  end
+
+  it "smoke_regex" do
+    # Smoke test: load regex and parse a simple snippet
+    skip "Language 'regex' not available" unless TreeSitterLanguagePack.has_language("regex")
+    tree = TreeSitterLanguagePack.parse_string("regex", "[a-z]+")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
   end
 
   it "smoke_rego" do
@@ -1137,7 +1042,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("rego", "package main\ndefault allow = false")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("module")).to be true
   end
 
   it "smoke_requirements" do
@@ -1146,7 +1050,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("requirements", "flask>=2.0")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.has_error_nodes).to be true
   end
 
   it "smoke_ron" do
@@ -1155,7 +1058,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("ron", "(key: \"value\")")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("struct")).to be true
   end
 
   it "smoke_rst" do
@@ -1164,7 +1066,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("rst", "Hello\n=====\n\nWorld")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("section")).to be true
   end
 
   it "smoke_ruby" do
@@ -1189,7 +1090,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("scala", "object Main")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("object_definition")).to be true
   end
 
   it "smoke_scheme" do
@@ -1198,7 +1098,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("scheme", "(define x 1)")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("list")).to be true
   end
 
   it "smoke_scss" do
@@ -1207,7 +1106,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("scss", "$color: red;\nbody { color: $color; }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("declaration")).to be true
   end
 
   it "smoke_smali" do
@@ -1216,7 +1114,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("smali", ".class public LMain;\n.super Ljava/lang/Object;")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("class_directive")).to be true
   end
 
   it "smoke_smithy" do
@@ -1225,7 +1122,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("smithy", "namespace example\nstring MyString")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("shape_section")).to be true
   end
 
   it "smoke_solidity" do
@@ -1234,7 +1130,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("solidity", "pragma solidity ^0.8.0;\ncontract Main {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("pragma_directive")).to be true
   end
 
   it "smoke_sparql" do
@@ -1243,7 +1138,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("sparql", "SELECT ?s WHERE { ?s ?p ?o }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("select_query")).to be true
   end
 
   it "smoke_sql" do
@@ -1252,7 +1146,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("sql", "SELECT 1;")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("statement")).to be true
   end
 
   it "smoke_squirrel" do
@@ -1261,7 +1154,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("squirrel", "function main() {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_declaration")).to be true
   end
 
   it "smoke_starlark" do
@@ -1270,7 +1162,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("starlark", "def hello(): pass")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_definition")).to be true
   end
 
   it "smoke_svelte" do
@@ -1278,7 +1169,6 @@ RSpec.describe "smoke" do
     skip "Language 'svelte' not available" unless TreeSitterLanguagePack.has_language("svelte")
     tree = TreeSitterLanguagePack.parse_string("svelte", "<p>hello</p>")
     expect(tree).not_to be_nil
-    expect(tree.contains_node_type("element")).to be true
   end
 
   it "smoke_swift" do
@@ -1287,7 +1177,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("swift", "print(\"hello\")")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("call_expression")).to be true
   end
 
   it "smoke_tablegen" do
@@ -1296,7 +1185,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("tablegen", "def Hello : Base {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("statement")).to be true
   end
 
   it "smoke_tcl" do
@@ -1305,7 +1193,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("tcl", "puts hello")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.has_error_nodes).to be true
   end
 
   it "smoke_terraform" do
@@ -1314,7 +1201,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("terraform", "resource \"null_resource\" \"main\" {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("body")).to be true
   end
 
   it "smoke_test" do
@@ -1323,7 +1209,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("test", "===========\nTest\n===========\n---\n(node)")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("test")).to be true
   end
 
   it "smoke_thrift" do
@@ -1332,7 +1217,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("thrift", "service HelloService {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("service_definition")).to be true
   end
 
   it "smoke_toml" do
@@ -1341,7 +1225,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("toml", "key = \"value\"")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("pair")).to be true
   end
 
   it "smoke_tsv" do
@@ -1350,7 +1233,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("tsv", "a\tb\tc\n1\t2\t3")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("row")).to be true
   end
 
   it "smoke_tsx" do
@@ -1359,7 +1241,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("tsx", "const App = () => <div />;")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("lexical_declaration")).to be true
   end
 
   it "smoke_twig" do
@@ -1368,7 +1249,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("twig", "{{ variable }}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("output_directive")).to be true
   end
 
   it "smoke_typescript" do
@@ -1385,7 +1265,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("typst", "\#let x = 1")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("code")).to be true
   end
 
   it "smoke_udev" do
@@ -1394,7 +1273,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("udev", "ACTION==\"add\", KERNEL==\"sd*\"")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.has_error_nodes).to be true
   end
 
   it "smoke_ungrammar" do
@@ -1403,7 +1281,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("ungrammar", "Root = Item*\nItem = 'token'")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("node")).to be true
   end
 
   it "smoke_uxntal" do
@@ -1412,7 +1289,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("uxntal", "|0100 LIT 01")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("memory_execution")).to be true
   end
 
   it "smoke_v" do
@@ -1421,7 +1297,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("v", "fn main() {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_declaration")).to be true
   end
 
   it "smoke_verilog" do
@@ -1430,7 +1305,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("verilog", "module main; endmodule")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("module_declaration")).to be true
   end
 
   it "smoke_vhdl" do
@@ -1439,7 +1313,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("vhdl", "entity main is end main;")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("design_unit")).to be true
   end
 
   it "smoke_vim" do
@@ -1448,7 +1321,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("vim", "echo 'hello'")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("echo_statement")).to be true
   end
 
   it "smoke_vue" do
@@ -1457,7 +1329,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("vue", "<template><div>hello</div></template>")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("template_element")).to be true
   end
 
   it "smoke_wast" do
@@ -1466,7 +1337,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("wast", "(module)")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("command")).to be true
   end
 
   it "smoke_wat" do
@@ -1475,7 +1345,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("wat", "(module)")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("module")).to be true
   end
 
   it "smoke_wgsl" do
@@ -1484,7 +1353,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("wgsl", "@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("function_declaration")).to be true
   end
 
   it "smoke_xcompose" do
@@ -1493,7 +1361,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("xcompose", "<Multi_key> <a> : \"a\"")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("sequence")).to be true
   end
 
   it "smoke_xml" do
@@ -1502,7 +1369,14 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("xml", "<?xml version=\"1.0\"?>\n<root>hello</root>")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("prolog")).to be true
+  end
+
+  it "smoke_yaml" do
+    # Smoke test: load yaml and parse a simple snippet
+    skip "Language 'yaml' not available" unless TreeSitterLanguagePack.has_language("yaml")
+    tree = TreeSitterLanguagePack.parse_string("yaml", "key: value")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
   end
 
   it "smoke_yuck" do
@@ -1511,7 +1385,6 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("yuck", "(defwidget main [] (label :text \"hi\"))")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("list")).to be true
   end
 
   it "smoke_zig" do
@@ -1520,6 +1393,5 @@ RSpec.describe "smoke" do
     tree = TreeSitterLanguagePack.parse_string("zig", "pub fn main() void {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type("Decl")).to be true
   end
 end

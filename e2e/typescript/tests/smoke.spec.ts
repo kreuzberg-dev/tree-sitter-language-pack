@@ -254,6 +254,16 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
+  it("smoke_csharp", () => {
+    // Smoke test: load csharp and parse a simple snippet
+    if (!hasLanguage("csharp")) {
+      console.log("Skipping: language 'csharp' not available");
+      return;
+    }
+    const ptr = getLanguagePtr("csharp");
+    expect(ptr).toBeTruthy();
+  });
+
   it("smoke_css", () => {
     // Smoke test: load css and parse a simple snippet
     if (!hasLanguage("css")) {
@@ -361,6 +371,16 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("elm");
+    expect(ptr).toBeTruthy();
+  });
+
+  it("smoke_embeddedtemplate", () => {
+    // Smoke test: load embeddedtemplate and parse a simple snippet
+    if (!hasLanguage("embeddedtemplate")) {
+      console.log("Skipping: language 'embeddedtemplate' not available");
+      return;
+    }
+    const ptr = getLanguagePtr("embeddedtemplate");
     expect(ptr).toBeTruthy();
   });
 
@@ -1264,6 +1284,16 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
+  it("smoke_regex", () => {
+    // Smoke test: load regex and parse a simple snippet
+    if (!hasLanguage("regex")) {
+      console.log("Skipping: language 'regex' not available");
+      return;
+    }
+    const ptr = getLanguagePtr("regex");
+    expect(ptr).toBeTruthy();
+  });
+
   it("smoke_rego", () => {
     // Smoke test: load rego and parse a simple snippet
     if (!hasLanguage("rego")) {
@@ -1681,6 +1711,16 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("xml");
+    expect(ptr).toBeTruthy();
+  });
+
+  it("smoke_yaml", () => {
+    // Smoke test: load yaml and parse a simple snippet
+    if (!hasLanguage("yaml")) {
+      console.log("Skipping: language 'yaml' not available");
+      return;
+    }
+    const ptr = getLanguagePtr("yaml");
     expect(ptr).toBeTruthy();
   });
 

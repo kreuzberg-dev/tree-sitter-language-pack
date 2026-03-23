@@ -120,6 +120,11 @@
 		"repo": "https://github.com/tree-sitter/tree-sitter-cpp",
 		"rev": "8b5b49eb196bec7040441bee33b2c9a4838d6967"
 	},
+	"csharp": {
+		"repo": "https://github.com/tree-sitter/tree-sitter-c-sharp",
+		"rev": "88366631d598ce6595ec655ce1591b315cffb14c",
+		"branch": "master"
+	},
 	"css": {
 		"branch": "master",
 		"repo": "https://github.com/tree-sitter/tree-sitter-css",
@@ -174,6 +179,11 @@
 	"elm": {
 		"repo": "https://github.com/razzeee/tree-sitter-elm",
 		"rev": "6d9511c28181db66daee4e883f811f6251220943"
+	},
+	"embeddedtemplate": {
+		"repo": "https://github.com/tree-sitter/tree-sitter-embedded-template",
+		"rev": "3499d85f0a0d937c507a4a65368f2f63772786e1",
+		"branch": "master"
 	},
 	"erlang": {
 		"repo": "https://github.com/WhatsApp/tree-sitter-erlang",
@@ -587,6 +597,11 @@
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-readline",
 		"rev": "6b744c527aebd12e46a5ecb3aebdb8d621a8e83e"
 	},
+	"regex": {
+		"repo": "https://github.com/tree-sitter/tree-sitter-regex",
+		"rev": "b2ac15e27fce703d2f37a79ccd94a5c0cbe9720b",
+		"branch": "master"
+	},
 	"rego": {
 		"generate": true,
 		"repo": "https://github.com/FallenAngel97/tree-sitter-rego",
@@ -775,6 +790,11 @@
 		"directory": "xml",
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-xml",
 		"rev": "5000ae8f22d11fbe93939b05c1e37cf21117162d"
+	},
+	"yaml": {
+		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-yaml",
+		"rev": "4463985dfccc640f3d6991e3396a2047610cf5f8",
+		"branch": "master"
 	},
 	"yuck": {
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-yuck",

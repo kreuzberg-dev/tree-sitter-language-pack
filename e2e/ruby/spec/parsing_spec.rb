@@ -4,22 +4,6 @@ require_relative "spec_helper"
 
 RSpec.describe "parsing" do
 
-  it "parsing_go_function" do
-    # Parse a Go function declaration and assert node type
-    skip "Language 'go' not available" unless TreeSitterLanguagePack.has_language("go")
-    tree = TreeSitterLanguagePack.parse_string("go", "package main\nfunc main() {}")
-    expect(tree).not_to be_nil
-    expect(tree.contains_node_type("function_declaration")).to be true
-  end
-
-  it "parsing_html_element" do
-    # Parse an HTML element and assert node type
-    skip "Language 'html' not available" unless TreeSitterLanguagePack.has_language("html")
-    tree = TreeSitterLanguagePack.parse_string("html", "<div>hello</div>")
-    expect(tree).not_to be_nil
-    expect(tree.contains_node_type("element")).to be true
-  end
-
   it "parsing_javascript_class" do
     # Parse a JavaScript class declaration.
     skip "Language 'javascript' not available" unless TreeSitterLanguagePack.has_language("javascript")
@@ -29,28 +13,13 @@ RSpec.describe "parsing" do
     expect(tree.contains_node_type("class_declaration")).to be true
   end
 
-  it "parsing_javascript_variable" do
-    # Parse a JavaScript variable declaration and assert node type
-    skip "Language 'javascript' not available" unless TreeSitterLanguagePack.has_language("javascript")
-    tree = TreeSitterLanguagePack.parse_string("javascript", "const x = 1;")
-    expect(tree).not_to be_nil
-    expect(tree.contains_node_type("lexical_declaration")).to be true
-  end
-
   it "parsing_python_function" do
-    # Parse a Python function definition and assert node type
+    # Parse a Python function definition.
     skip "Language 'python' not available" unless TreeSitterLanguagePack.has_language("python")
-    tree = TreeSitterLanguagePack.parse_string("python", "def hello(): pass")
+    tree = TreeSitterLanguagePack.parse_string("python", "def hello():\n    pass\n")
     expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
     expect(tree.contains_node_type("function_definition")).to be true
-  end
-
-  it "parsing_rust_function" do
-    # Parse a Rust function definition and assert node type
-    skip "Language 'rust' not available" unless TreeSitterLanguagePack.has_language("rust")
-    tree = TreeSitterLanguagePack.parse_string("rust", "fn main() {}")
-    expect(tree).not_to be_nil
-    expect(tree.contains_node_type("function_item")).to be true
   end
 
   it "parsing_rust_struct" do

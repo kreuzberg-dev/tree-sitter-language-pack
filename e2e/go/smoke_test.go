@@ -329,6 +329,19 @@ func TestSmokeCpp(t *testing.T) {
 	}
 }
 
+func TestSmokeCsharp(t *testing.T) {
+	// Smoke test: load csharp and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "csharp")
+	ptr, err := reg.GetLanguage("csharp")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "csharp", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "csharp")
+	}
+}
+
 func TestSmokeCss(t *testing.T) {
 	// Smoke test: load css and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -469,6 +482,19 @@ func TestSmokeElm(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "elm")
+	}
+}
+
+func TestSmokeEmbeddedtemplate(t *testing.T) {
+	// Smoke test: load embeddedtemplate and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "embeddedtemplate")
+	ptr, err := reg.GetLanguage("embeddedtemplate")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "embeddedtemplate", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "embeddedtemplate")
 	}
 }
 
@@ -1642,6 +1668,19 @@ func TestSmokeReadline(t *testing.T) {
 	}
 }
 
+func TestSmokeRegex(t *testing.T) {
+	// Smoke test: load regex and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "regex")
+	ptr, err := reg.GetLanguage("regex")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "regex", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "regex")
+	}
+}
+
 func TestSmokeRego(t *testing.T) {
 	// Smoke test: load rego and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -2185,6 +2224,19 @@ func TestSmokeXml(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "xml")
+	}
+}
+
+func TestSmokeYaml(t *testing.T) {
+	// Smoke test: load yaml and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "yaml")
+	ptr, err := reg.GetLanguage("yaml")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "yaml", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "yaml")
 	}
 }
 
