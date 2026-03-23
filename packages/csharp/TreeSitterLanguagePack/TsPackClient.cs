@@ -96,6 +96,156 @@ public static class TsPackClient
     }
 
     /// <summary>
+    /// Detect language name from file content using shebang-based detection.
+    /// Returns null if no shebang is recognized.
+    /// </summary>
+    public static string? DetectLanguageFromContent(string content)
+    {
+        var contentPtr = InteropUtilities.StringToUtf8Ptr(content);
+        try
+        {
+            var resultPtr = NativeMethods.DetectLanguageFromContent(contentPtr);
+            if (resultPtr == IntPtr.Zero)
+            {
+                return null;
+            }
+            try
+            {
+                return InteropUtilities.Utf8PtrToString(resultPtr);
+            }
+            finally
+            {
+                NativeMethods.FreeString(resultPtr);
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(contentPtr);
+        }
+    }
+
+    /// <summary>
+    /// Returns ambiguity information for the given file extension.
+    /// Returns null if the extension is not ambiguous.
+    /// </summary>
+    public static ExtensionAmbiguityResult? ExtensionAmbiguity(string ext)
+    {
+        var extPtr = InteropUtilities.StringToUtf8Ptr(ext);
+        try
+        {
+            var resultPtr = NativeMethods.ExtensionAmbiguity(extPtr);
+            if (resultPtr == IntPtr.Zero)
+            {
+                return null;
+            }
+            try
+            {
+                var json = InteropUtilities.Utf8PtrToString(resultPtr);
+                if (json is null)
+                {
+                    return null;
+                }
+                return JsonSerializer.Deserialize<ExtensionAmbiguityResult>(json);
+            }
+            finally
+            {
+                NativeMethods.FreeString(resultPtr);
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(extPtr);
+        }
+    }
+
+    /// <summary>
+    /// Returns the bundled highlights query for the given language.
+    /// Returns null if no bundled query is available.
+    /// </summary>
+    public static string? GetHighlightsQuery(string language)
+    {
+        var langPtr = InteropUtilities.StringToUtf8Ptr(language);
+        try
+        {
+            var resultPtr = NativeMethods.GetHighlightsQuery(langPtr);
+            if (resultPtr == IntPtr.Zero)
+            {
+                return null;
+            }
+            try
+            {
+                return InteropUtilities.Utf8PtrToString(resultPtr);
+            }
+            finally
+            {
+                NativeMethods.FreeString(resultPtr);
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(langPtr);
+        }
+    }
+
+    /// <summary>
+    /// Returns the bundled injections query for the given language.
+    /// Returns null if no bundled query is available.
+    /// </summary>
+    public static string? GetInjectionsQuery(string language)
+    {
+        var langPtr = InteropUtilities.StringToUtf8Ptr(language);
+        try
+        {
+            var resultPtr = NativeMethods.GetInjectionsQuery(langPtr);
+            if (resultPtr == IntPtr.Zero)
+            {
+                return null;
+            }
+            try
+            {
+                return InteropUtilities.Utf8PtrToString(resultPtr);
+            }
+            finally
+            {
+                NativeMethods.FreeString(resultPtr);
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(langPtr);
+        }
+    }
+
+    /// <summary>
+    /// Returns the bundled locals query for the given language.
+    /// Returns null if no bundled query is available.
+    /// </summary>
+    public static string? GetLocalsQuery(string language)
+    {
+        var langPtr = InteropUtilities.StringToUtf8Ptr(language);
+        try
+        {
+            var resultPtr = NativeMethods.GetLocalsQuery(langPtr);
+            if (resultPtr == IntPtr.Zero)
+            {
+                return null;
+            }
+            try
+            {
+                return InteropUtilities.Utf8PtrToString(resultPtr);
+            }
+            finally
+            {
+                NativeMethods.FreeString(resultPtr);
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(langPtr);
+        }
+    }
+
+    /// <summary>
     /// Get a raw TSLanguage pointer for the given language name.
     /// </summary>
     /// <exception cref="TsPackException">Thrown when the language is not available.</exception>

@@ -102,6 +102,42 @@ fn language_count() -> usize {
     tree_sitter_language_pack::language_count()
 }
 
+/// Detect language name from file content (shebang-based detection).
+///
+/// Returns None if the content does not contain a recognized shebang.
+#[pyfunction]
+fn detect_language_from_content(content: &str) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_content(content).map(String::from)
+}
+
+/// Returns extension ambiguity information for the given file extension.
+///
+/// Returns a tuple of (assigned_language, alternative_languages) if the extension
+/// is ambiguous, or None if the extension is not ambiguous.
+#[pyfunction]
+fn extension_ambiguity(ext: &str) -> Option<(String, Vec<String>)> {
+    tree_sitter_language_pack::extension_ambiguity(ext)
+        .map(|(assigned, alts)| (assigned.to_string(), alts.iter().map(|s| s.to_string()).collect()))
+}
+
+/// Returns the bundled highlights query for the given language, or None.
+#[pyfunction]
+fn get_highlights_query(language: &str) -> Option<String> {
+    tree_sitter_language_pack::get_highlights_query(language).map(String::from)
+}
+
+/// Returns the bundled injections query for the given language, or None.
+#[pyfunction]
+fn get_injections_query(language: &str) -> Option<String> {
+    tree_sitter_language_pack::get_injections_query(language).map(String::from)
+}
+
+/// Returns the bundled locals query for the given language, or None.
+#[pyfunction]
+fn get_locals_query(language: &str) -> Option<String> {
+    tree_sitter_language_pack::get_locals_query(language).map(String::from)
+}
+
 // ---------------------------------------------------------------------------
 // Opaque tree handle
 // ---------------------------------------------------------------------------
@@ -611,6 +647,11 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(has_language, m)?)?;
     m.add_function(wrap_pyfunction!(detect_language, m)?)?;
     m.add_function(wrap_pyfunction!(language_count, m)?)?;
+    m.add_function(wrap_pyfunction!(detect_language_from_content, m)?)?;
+    m.add_function(wrap_pyfunction!(extension_ambiguity, m)?)?;
+    m.add_function(wrap_pyfunction!(get_highlights_query, m)?)?;
+    m.add_function(wrap_pyfunction!(get_injections_query, m)?)?;
+    m.add_function(wrap_pyfunction!(get_locals_query, m)?)?;
     m.add_function(wrap_pyfunction!(parse_string, m)?)?;
     m.add_function(wrap_pyfunction!(process, m)?)?;
     m.add_function(wrap_pyfunction!(init, m)?)?;

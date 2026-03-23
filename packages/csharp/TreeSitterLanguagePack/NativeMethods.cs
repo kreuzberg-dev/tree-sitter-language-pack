@@ -78,6 +78,41 @@ internal static partial class NativeMethods
     internal static extern IntPtr DetectLanguage(IntPtr path);
 
     /// <summary>
+    /// Detect language name from file content (shebang-based). Returns IntPtr.Zero if not recognized.
+    /// Caller must free the result with FreeString.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_detect_language_from_content", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr DetectLanguageFromContent(IntPtr content);
+
+    /// <summary>
+    /// Returns extension ambiguity information as a JSON C string, or IntPtr.Zero if not ambiguous.
+    /// Caller must free the result with FreeString.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_extension_ambiguity", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr ExtensionAmbiguity(IntPtr ext);
+
+    /// <summary>
+    /// Returns the bundled highlights query for the language, or IntPtr.Zero if unavailable.
+    /// Caller must free the result with FreeString.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_get_highlights_query", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr GetHighlightsQuery(IntPtr language);
+
+    /// <summary>
+    /// Returns the bundled injections query for the language, or IntPtr.Zero if unavailable.
+    /// Caller must free the result with FreeString.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_get_injections_query", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr GetInjectionsQuery(IntPtr language);
+
+    /// <summary>
+    /// Returns the bundled locals query for the language, or IntPtr.Zero if unavailable.
+    /// Caller must free the result with FreeString.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_get_locals_query", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr GetLocalsQuery(IntPtr language);
+
+    /// <summary>
     /// Get a raw TSLanguage pointer for the given language name.
     /// Returns <see cref="IntPtr.Zero"/> on error.
     /// </summary>

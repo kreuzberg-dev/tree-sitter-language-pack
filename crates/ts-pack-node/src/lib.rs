@@ -26,6 +26,44 @@ pub fn language_count() -> u32 {
     tree_sitter_language_pack::language_count() as u32
 }
 
+/// Detect language name from file content (shebang-based detection).
+/// Returns null if the content does not contain a recognized shebang.
+#[napi(js_name = "detectLanguageFromContent")]
+pub fn detect_language_from_content(content: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_content(&content).map(String::from)
+}
+
+/// Returns extension ambiguity information for the given file extension.
+/// Returns null if the extension is not ambiguous.
+/// When non-null, returns an object with "assigned" (string) and "alternatives" (string[]) fields.
+#[napi(js_name = "extensionAmbiguity")]
+pub fn extension_ambiguity(ext: String) -> Option<serde_json::Value> {
+    tree_sitter_language_pack::extension_ambiguity(&ext).map(|(assigned, alts)| {
+        serde_json::json!({
+            "assigned": assigned,
+            "alternatives": alts,
+        })
+    })
+}
+
+/// Returns the bundled highlights query for the given language, or null.
+#[napi(js_name = "getHighlightsQuery")]
+pub fn get_highlights_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_highlights_query(&language).map(String::from)
+}
+
+/// Returns the bundled injections query for the given language, or null.
+#[napi(js_name = "getInjectionsQuery")]
+pub fn get_injections_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_injections_query(&language).map(String::from)
+}
+
+/// Returns the bundled locals query for the given language, or null.
+#[napi(js_name = "getLocalsQuery")]
+pub fn get_locals_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_locals_query(&language).map(String::from)
+}
+
 /// Returns the raw TSLanguage pointer for interop with node-tree-sitter.
 ///
 /// Throws an error if the language is not found.

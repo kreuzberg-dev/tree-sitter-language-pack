@@ -55,6 +55,45 @@ pub fn language_count() -> u32 {
     tree_sitter_language_pack::language_count() as u32
 }
 
+/// Detect language name from file content (shebang-based detection).
+/// Returns null if the content does not contain a recognized shebang.
+#[wasm_bindgen(js_name = "detectLanguageFromContent")]
+pub fn detect_language_from_content(content: &str) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_content(content).map(String::from)
+}
+
+/// Returns extension ambiguity information for the given file extension as a JSON string.
+/// Returns null if the extension is not ambiguous.
+/// When non-null, parses to an object with "assigned" (string) and "alternatives" (string[]) fields.
+#[wasm_bindgen(js_name = "extensionAmbiguity")]
+pub fn extension_ambiguity(ext: &str) -> Option<String> {
+    tree_sitter_language_pack::extension_ambiguity(ext).and_then(|(assigned, alts)| {
+        let val = serde_json::json!({
+            "assigned": assigned,
+            "alternatives": alts,
+        });
+        serde_json::to_string(&val).ok()
+    })
+}
+
+/// Returns the bundled highlights query for the given language, or null.
+#[wasm_bindgen(js_name = "getHighlightsQuery")]
+pub fn get_highlights_query(language: &str) -> Option<String> {
+    tree_sitter_language_pack::get_highlights_query(language).map(String::from)
+}
+
+/// Returns the bundled injections query for the given language, or null.
+#[wasm_bindgen(js_name = "getInjectionsQuery")]
+pub fn get_injections_query(language: &str) -> Option<String> {
+    tree_sitter_language_pack::get_injections_query(language).map(String::from)
+}
+
+/// Returns the bundled locals query for the given language, or null.
+#[wasm_bindgen(js_name = "getLocalsQuery")]
+pub fn get_locals_query(language: &str) -> Option<String> {
+    tree_sitter_language_pack::get_locals_query(language).map(String::from)
+}
+
 /// Returns the raw TSLanguage pointer as a u32 for wasm32 interop.
 ///
 /// Throws an error if the language is not found.

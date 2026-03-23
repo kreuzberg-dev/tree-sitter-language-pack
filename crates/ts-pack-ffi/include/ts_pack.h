@@ -107,6 +107,68 @@ bool ts_pack_has_language(const struct TsPackRegistry *registry, const char *nam
 char *ts_pack_detect_language(const char *path);
 
 /**
+ * Detect language name from file content using shebang-based detection.
+ *
+ * Returns a newly allocated null-terminated UTF-8 string with the language name,
+ * or null if no shebang is recognized. The caller must free the returned
+ * pointer with `ts_pack_free_string`.
+ *
+ * # Safety
+ *
+ * `content` must be a valid null-terminated UTF-8 C string, or null.
+ */
+char *ts_pack_detect_language_from_content(const char *content);
+
+/**
+ * Returns extension ambiguity information for the given file extension as a JSON C string.
+ *
+ * Returns null if the extension is not ambiguous.
+ * When non-null, the JSON object has "assigned" (string) and "alternatives" (string[]) fields.
+ * The caller must free the returned pointer with `ts_pack_free_string`.
+ *
+ * # Safety
+ *
+ * `ext` must be a valid null-terminated UTF-8 C string, or null.
+ */
+char *ts_pack_extension_ambiguity(const char *ext);
+
+/**
+ * Returns the bundled highlights query for the given language as a C string.
+ *
+ * Returns null if no bundled query is available for the language.
+ * The caller must free the returned pointer with `ts_pack_free_string`.
+ *
+ * # Safety
+ *
+ * `language` must be a valid null-terminated UTF-8 C string, or null.
+ */
+char *ts_pack_get_highlights_query(const char *language);
+
+/**
+ * Returns the bundled injections query for the given language as a C string.
+ *
+ * Returns null if no bundled query is available for the language.
+ * The caller must free the returned pointer with `ts_pack_free_string`.
+ *
+ * # Safety
+ *
+ * `language` must be a valid null-terminated UTF-8 C string, or null.
+ */
+char *ts_pack_get_injections_query(const char *language);
+
+/**
+ * Returns the bundled locals query for the given language as a C string.
+ *
+ * Returns null if no bundled query is available for the language.
+ * The caller must free the returned pointer with `ts_pack_free_string`.
+ *
+ * # Safety
+ *
+ * `language` must be a valid null-terminated UTF-8 C string, or null.
+ */
+char *ts_pack_get_locals_query(const char *language);
+
+/**
  * Get the last error message, or null if no error occurred.
  *
  * The returned pointer is valid until the next FFI call on the same thread.

@@ -1,4 +1,4 @@
-from typing import Literal, TypeAlias
+from typing import Literal, TypeAlias, TypedDict
 
 from tree_sitter import Language, Parser
 
@@ -190,6 +190,118 @@ SupportedLanguage: TypeAlias = Literal[
 class ParseError(RuntimeError): ...
 class QueryError(ValueError): ...
 
+class Span(TypedDict):
+    start_byte: int
+    end_byte: int
+    start_row: int
+    start_col: int
+    end_row: int
+    end_col: int
+
+class NodeInfo(TypedDict):
+    kind: str
+    is_named: bool
+    start_byte: int
+    end_byte: int
+    start_row: int
+    start_col: int
+    end_row: int
+    end_col: int
+    named_child_count: int
+    is_error: bool
+    is_missing: bool
+
+class FileMetrics(TypedDict):
+    total_lines: int
+    total_bytes: int
+    blank_lines: int
+    comment_lines: int
+    code_lines: int
+    error_count: int
+
+class StructureItem(TypedDict):
+    kind: str  # "Function", "Class", "Method", etc.
+    name: str
+    span: Span
+    parent: str | None
+
+class ImportInfo(TypedDict):
+    module: str
+    names: list[str]
+    span: Span
+
+class ExportInfo(TypedDict):
+    name: str
+    kind: str
+    span: Span
+
+class CommentInfo(TypedDict):
+    text: str
+    kind: str  # "Line", "Block", "Doc"
+    span: Span
+    associated_node: str | None
+
+class DocstringInfo(TypedDict):
+    text: str
+    format: str
+    span: Span
+    associated_item: str | None
+    sections: list[dict[str, str]]
+
+class SymbolInfo(TypedDict):
+    name: str
+    kind: str
+    span: Span
+    type_annotation: str | None
+
+class Diagnostic(TypedDict):
+    message: str
+    severity: str
+    span: Span
+
+class ChunkContext(TypedDict):
+    language: str
+    chunk_index: int
+    total_chunks: int
+    start_line: int
+    end_line: int
+    node_types: list[str]
+    symbols_defined: list[str]
+    comments: list[str]
+    docstrings: list[str]
+    has_error_nodes: bool
+    context_path: list[str]
+
+class CodeChunk(TypedDict):
+    content: str
+    start_byte: int
+    end_byte: int
+    metadata: ChunkContext
+
+class ProcessResult(TypedDict):
+    language: str
+    metrics: FileMetrics
+    structure: list[StructureItem]
+    imports: list[ImportInfo]
+    exports: list[ExportInfo]
+    comments: list[CommentInfo]
+    docstrings: list[DocstringInfo]
+    symbols: list[SymbolInfo]
+    diagnostics: list[Diagnostic]
+    chunks: list[CodeChunk]
+
+class QueryCapture(TypedDict):
+    capture_name: str
+    node: NodeInfo
+
+class QueryMatch(TypedDict):
+    pattern_index: int
+    captures: list[QueryCapture]
+
+class AmbiguityResult(TypedDict):
+    assigned: str
+    alternatives: list[str]
+
 class ProcessConfig:
     language: str
     structure: bool
@@ -226,29 +338,50 @@ class TreeHandle:
     def has_error_nodes(self) -> bool: ...
     def to_sexp(self) -> str: ...
     def error_count(self) -> int: ...
-    def root_node_info(self) -> dict[str, object]: ...
-    def find_nodes_by_type(self, node_type: str) -> list[dict[str, object]]: ...
-    def named_children_info(self) -> list[dict[str, object]]: ...
+    def root_node_info(self) -> NodeInfo: ...
+    def find_nodes_by_type(self, node_type: str) -> list[NodeInfo]: ...
+    def named_children_info(self) -> list[NodeInfo]: ...
     def extract_text(self, start_byte: int, end_byte: int) -> str: ...
-    def run_query(self, language: str, query_source: str) -> list[dict[str, object]]: ...
+    def run_query(self, language: str, query_source: str) -> list[QueryMatch]: ...
 
 __all__ = [
+    "AmbiguityResult",
+    "ChunkContext",
+    "CodeChunk",
+    "CommentInfo",
+    "Diagnostic",
+    "DocstringInfo",
     "DownloadError",
+    "ExportInfo",
+    "FileMetrics",
+    "ImportInfo",
     "LanguageNotFoundError",
+    "NodeInfo",
     "ParseError",
     "ProcessConfig",
+    "ProcessResult",
+    "QueryCapture",
     "QueryError",
+    "QueryMatch",
+    "Span",
+    "StructureItem",
     "SupportedLanguage",
+    "SymbolInfo",
     "TreeHandle",
     "available_languages",
     "cache_dir",
     "clean_cache",
     "configure",
+    "detect_language_from_content",
     "download",
     "download_all",
     "downloaded_languages",
+    "extension_ambiguity",
     "get_binding",
+    "get_highlights_query",
+    "get_injections_query",
     "get_language",
+    "get_locals_query",
     "get_parser",
     "has_language",
     "init",
@@ -265,7 +398,7 @@ def available_languages() -> list[str]: ...
 def has_language(name: str) -> bool: ...
 def language_count() -> int: ...
 def parse_string(language: str, source: str) -> TreeHandle: ...
-def process(source: str, config: ProcessConfig) -> dict[str, object]: ...
+def process(source: str, config: ProcessConfig) -> ProcessResult: ...
 def init(config: dict[str, object]) -> None: ...
 def configure(*, cache_dir: str | None = None) -> None: ...
 def download(names: list[str]) -> int: ...
@@ -274,3 +407,8 @@ def manifest_languages() -> list[str]: ...
 def downloaded_languages() -> list[str]: ...
 def clean_cache() -> None: ...
 def cache_dir() -> str: ...
+def detect_language_from_content(content: str) -> str | None: ...
+def extension_ambiguity(ext: str) -> AmbiguityResult | None: ...
+def get_highlights_query(language: str) -> str | None: ...
+def get_injections_query(language: str) -> str | None: ...
+def get_locals_query(language: str) -> str | None: ...

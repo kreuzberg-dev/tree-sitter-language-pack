@@ -32,6 +32,38 @@ fn detect_language(path: String) -> Option<String> {
 }
 
 #[rustler::nif]
+fn detect_language_from_content(content: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_content(&content).map(String::from)
+}
+
+/// Returns extension ambiguity as a JSON string, or nil.
+#[rustler::nif]
+fn extension_ambiguity(ext: String) -> Option<String> {
+    tree_sitter_language_pack::extension_ambiguity(&ext).and_then(|(assigned, alts)| {
+        let val = serde_json::json!({
+            "assigned": assigned,
+            "alternatives": alts,
+        });
+        serde_json::to_string(&val).ok()
+    })
+}
+
+#[rustler::nif]
+fn get_highlights_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_highlights_query(&language).map(String::from)
+}
+
+#[rustler::nif]
+fn get_injections_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_injections_query(&language).map(String::from)
+}
+
+#[rustler::nif]
+fn get_locals_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_locals_query(&language).map(String::from)
+}
+
+#[rustler::nif]
 fn language_count() -> usize {
     tree_sitter_language_pack::language_count()
 }

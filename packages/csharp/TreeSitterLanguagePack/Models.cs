@@ -1,8 +1,82 @@
-using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace TreeSitterLanguagePack;
+
+/// <summary>Structural item kind (function, class, method, etc.).</summary>
+public static class StructureKind
+{
+    public const string Function = "Function";
+    public const string Class = "Class";
+    public const string Method = "Method";
+    public const string Struct = "Struct";
+    public const string Enum = "Enum";
+    public const string Interface = "Interface";
+    public const string Module = "Module";
+    public const string Namespace = "Namespace";
+    public const string Trait = "Trait";
+    public const string TypeAlias = "TypeAlias";
+    public const string Constant = "Constant";
+    public const string Field = "Field";
+    public const string Property = "Property";
+    public const string Other = "Other";
+}
+
+/// <summary>Export item kind.</summary>
+public static class ExportKind
+{
+    public const string Function = "Function";
+    public const string Class = "Class";
+    public const string Constant = "Constant";
+    public const string Type = "Type";
+    public const string Default = "Default";
+    public const string Namespace = "Namespace";
+    public const string Other = "Other";
+}
+
+/// <summary>Comment kind.</summary>
+public static class CommentKind
+{
+    public const string Line = "Line";
+    public const string Block = "Block";
+    public const string Doc = "Doc";
+}
+
+/// <summary>Docstring format.</summary>
+public static class DocstringFormat
+{
+    public const string Markdown = "Markdown";
+    public const string ReStructuredText = "ReStructuredText";
+    public const string GoogleStyle = "GoogleStyle";
+    public const string NumpyStyle = "NumpyStyle";
+    public const string Javadoc = "Javadoc";
+    public const string XmlDoc = "XmlDoc";
+    public const string Plain = "Plain";
+    public const string Other = "Other";
+}
+
+/// <summary>Symbol kind.</summary>
+public static class SymbolKind
+{
+    public const string Variable = "Variable";
+    public const string Function = "Function";
+    public const string Class = "Class";
+    public const string Constant = "Constant";
+    public const string Parameter = "Parameter";
+    public const string Field = "Field";
+    public const string Property = "Property";
+    public const string Type = "Type";
+    public const string Other = "Other";
+}
+
+/// <summary>Diagnostic severity.</summary>
+public static class DiagnosticSeverity
+{
+    public const string Error = "Error";
+    public const string Warning = "Warning";
+    public const string Information = "Information";
+    public const string Hint = "Hint";
+}
 
 /// <summary>
 /// Configuration for the <see cref="TsPackClient.Process"/> method.
@@ -154,7 +228,7 @@ public sealed class Span
 public sealed class StructureItem
 {
     [JsonPropertyName("kind")]
-    public object Kind { get; set; } = string.Empty;
+    public string Kind { get; set; } = string.Empty;
 
     [JsonPropertyName("name")]
     public string? Name { get; set; }
@@ -211,7 +285,7 @@ public sealed class ExportInfo
     public string Name { get; set; } = string.Empty;
 
     [JsonPropertyName("kind")]
-    public object Kind { get; set; } = string.Empty;
+    public string Kind { get; set; } = string.Empty;
 
     [JsonPropertyName("span")]
     public Span Span { get; set; } = new();
@@ -226,7 +300,7 @@ public sealed class CommentInfo
     public string Text { get; set; } = string.Empty;
 
     [JsonPropertyName("kind")]
-    public object Kind { get; set; } = string.Empty;
+    public string Kind { get; set; } = string.Empty;
 
     [JsonPropertyName("span")]
     public Span Span { get; set; } = new();
@@ -244,7 +318,7 @@ public sealed class DocstringInfo
     public string Text { get; set; } = string.Empty;
 
     [JsonPropertyName("format")]
-    public object Format { get; set; } = string.Empty;
+    public string Format { get; set; } = string.Empty;
 
     [JsonPropertyName("span")]
     public Span Span { get; set; } = new();
@@ -280,7 +354,7 @@ public sealed class SymbolInfo
     public string Name { get; set; } = string.Empty;
 
     [JsonPropertyName("kind")]
-    public object Kind { get; set; } = string.Empty;
+    public string Kind { get; set; } = string.Empty;
 
     [JsonPropertyName("span")]
     public Span Span { get; set; } = new();
@@ -301,7 +375,7 @@ public sealed class Diagnostic
     public string Message { get; set; } = string.Empty;
 
     [JsonPropertyName("severity")]
-    public object Severity { get; set; } = string.Empty;
+    public string Severity { get; set; } = string.Empty;
 
     [JsonPropertyName("span")]
     public Span Span { get; set; } = new();

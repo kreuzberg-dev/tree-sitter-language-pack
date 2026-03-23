@@ -225,6 +225,103 @@ func DetectLanguage(path string) string {
 	return C.GoString(result)
 }
 
+// DetectLanguageFromContent detects a language name from file content using
+// shebang-based detection. Returns an empty string if no shebang is recognized.
+func DetectLanguageFromContent(content string) string {
+	ccontent := C.CString(content)
+	defer C.free(unsafe.Pointer(ccontent))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	result := C.ts_pack_detect_language_from_content(ccontent)
+	if result == nil {
+		return ""
+	}
+	defer C.ts_pack_free_string(result)
+	return C.GoString(result)
+}
+
+// ExtensionAmbiguityResult holds the result of an extension ambiguity lookup.
+type ExtensionAmbiguityResult struct {
+	Assigned     string   `json:"assigned"`
+	Alternatives []string `json:"alternatives"`
+}
+
+// ExtensionAmbiguity returns ambiguity information for the given file extension.
+// Returns nil if the extension is not ambiguous.
+func ExtensionAmbiguity(ext string) (*ExtensionAmbiguityResult, error) {
+	cext := C.CString(ext)
+	defer C.free(unsafe.Pointer(cext))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	result := C.ts_pack_extension_ambiguity(cext)
+	if result == nil {
+		return nil, nil
+	}
+	defer C.ts_pack_free_string(result)
+
+	rawJSON := C.GoString(result)
+	var out ExtensionAmbiguityResult
+	if err := json.Unmarshal([]byte(rawJSON), &out); err != nil {
+		return nil, fmt.Errorf("tspack: failed to deserialize extension ambiguity: %w", err)
+	}
+	return &out, nil
+}
+
+// GetHighlightsQuery returns the bundled highlights query for the given language.
+// Returns an empty string if no bundled query is available.
+func GetHighlightsQuery(language string) string {
+	clang := C.CString(language)
+	defer C.free(unsafe.Pointer(clang))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	result := C.ts_pack_get_highlights_query(clang)
+	if result == nil {
+		return ""
+	}
+	defer C.ts_pack_free_string(result)
+	return C.GoString(result)
+}
+
+// GetInjectionsQuery returns the bundled injections query for the given language.
+// Returns an empty string if no bundled query is available.
+func GetInjectionsQuery(language string) string {
+	clang := C.CString(language)
+	defer C.free(unsafe.Pointer(clang))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	result := C.ts_pack_get_injections_query(clang)
+	if result == nil {
+		return ""
+	}
+	defer C.ts_pack_free_string(result)
+	return C.GoString(result)
+}
+
+// GetLocalsQuery returns the bundled locals query for the given language.
+// Returns an empty string if no bundled query is available.
+func GetLocalsQuery(language string) string {
+	clang := C.CString(language)
+	defer C.free(unsafe.Pointer(clang))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	result := C.ts_pack_get_locals_query(clang)
+	if result == nil {
+		return ""
+	}
+	defer C.ts_pack_free_string(result)
+	return C.GoString(result)
+}
+
 // AvailableLanguages returns a slice of all language names in the registry.
 // Returns nil if the registry is closed.
 func (r *Registry) AvailableLanguages() []string {

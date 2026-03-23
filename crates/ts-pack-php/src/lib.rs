@@ -78,6 +78,89 @@ pub fn ts_pack_detect_language(path: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
 }
 
+/// Detect language name from file content using shebang-based detection.
+///
+/// Returns null if the content does not contain a recognized shebang.
+///
+/// # Example
+///
+/// ```php
+/// $lang = ts_pack_detect_language_from_content("#!/usr/bin/env python3\nprint('hello')\n");
+/// echo "Detected: $lang\n"; // "python"
+/// ```
+#[php_function]
+pub fn ts_pack_detect_language_from_content(content: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_content(&content).map(String::from)
+}
+
+/// Returns extension ambiguity information for the given file extension as a JSON string.
+///
+/// Returns null if the extension is not ambiguous. When non-null, the JSON decodes to
+/// an object with "assigned" (string) and "alternatives" (string[]) fields.
+///
+/// # Example
+///
+/// ```php
+/// $info = ts_pack_extension_ambiguity("h");
+/// $data = json_decode($info, true);
+/// echo "Assigned: " . $data["assigned"] . "\n";
+/// ```
+#[php_function]
+pub fn ts_pack_extension_ambiguity(ext: String) -> Option<String> {
+    tree_sitter_language_pack::extension_ambiguity(&ext).and_then(|(assigned, alts)| {
+        let val = serde_json::json!({
+            "assigned": assigned,
+            "alternatives": alts,
+        });
+        serde_json::to_string(&val).ok()
+    })
+}
+
+/// Returns the bundled highlights query for the given language, or null.
+///
+/// # Example
+///
+/// ```php
+/// $query = ts_pack_get_highlights_query("python");
+/// if ($query !== null) {
+///     echo "Got highlights query (" . strlen($query) . " bytes)\n";
+/// }
+/// ```
+#[php_function]
+pub fn ts_pack_get_highlights_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_highlights_query(&language).map(String::from)
+}
+
+/// Returns the bundled injections query for the given language, or null.
+///
+/// # Example
+///
+/// ```php
+/// $query = ts_pack_get_injections_query("markdown");
+/// if ($query !== null) {
+///     echo "Got injections query\n";
+/// }
+/// ```
+#[php_function]
+pub fn ts_pack_get_injections_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_injections_query(&language).map(String::from)
+}
+
+/// Returns the bundled locals query for the given language, or null.
+///
+/// # Example
+///
+/// ```php
+/// $query = ts_pack_get_locals_query("python");
+/// if ($query !== null) {
+///     echo "Got locals query\n";
+/// }
+/// ```
+#[php_function]
+pub fn ts_pack_get_locals_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_locals_query(&language).map(String::from)
+}
+
 /// Get the number of available languages.
 ///
 /// # Returns
@@ -405,6 +488,11 @@ pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
         .function(wrap_function!(ts_pack_available_languages))
         .function(wrap_function!(ts_pack_has_language))
         .function(wrap_function!(ts_pack_detect_language))
+        .function(wrap_function!(ts_pack_detect_language_from_content))
+        .function(wrap_function!(ts_pack_extension_ambiguity))
+        .function(wrap_function!(ts_pack_get_highlights_query))
+        .function(wrap_function!(ts_pack_get_injections_query))
+        .function(wrap_function!(ts_pack_get_locals_query))
         .function(wrap_function!(ts_pack_language_count))
         .function(wrap_function!(ts_pack_get_language))
         .function(wrap_function!(ts_pack_parse_string))

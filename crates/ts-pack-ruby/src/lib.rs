@@ -46,6 +46,33 @@ fn detect_language(path: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
 }
 
+fn detect_language_from_content(content: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_content(&content).map(String::from)
+}
+
+/// Returns extension ambiguity information as a JSON string, or nil.
+fn extension_ambiguity(ext: String) -> Option<String> {
+    tree_sitter_language_pack::extension_ambiguity(&ext).and_then(|(assigned, alts)| {
+        let val = serde_json::json!({
+            "assigned": assigned,
+            "alternatives": alts,
+        });
+        serde_json::to_string(&val).ok()
+    })
+}
+
+fn get_highlights_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_highlights_query(&language).map(String::from)
+}
+
+fn get_injections_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_injections_query(&language).map(String::from)
+}
+
+fn get_locals_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_locals_query(&language).map(String::from)
+}
+
 fn language_count() -> usize {
     tree_sitter_language_pack::language_count()
 }
@@ -154,6 +181,14 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_module_function("available_languages", function!(available_languages, 0))?;
     module.define_module_function("has_language", function!(has_language, 1))?;
     module.define_module_function("detect_language", function!(detect_language, 1))?;
+    module.define_module_function(
+        "detect_language_from_content",
+        function!(detect_language_from_content, 1),
+    )?;
+    module.define_module_function("extension_ambiguity", function!(extension_ambiguity, 1))?;
+    module.define_module_function("get_highlights_query", function!(get_highlights_query, 1))?;
+    module.define_module_function("get_injections_query", function!(get_injections_query, 1))?;
+    module.define_module_function("get_locals_query", function!(get_locals_query, 1))?;
     module.define_module_function("language_count", function!(language_count, 0))?;
     module.define_module_function("get_language_ptr", function!(get_language_ptr, 1))?;
     module.define_module_function("parse_string", function!(parse_string, 2))?;

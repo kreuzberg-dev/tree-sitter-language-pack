@@ -7,6 +7,151 @@ export declare class ExternalObject<T> {
 		[K: symbol]: T;
 	};
 }
+
+/** Byte and line/column span within source code. */
+export interface Span {
+	startByte: number;
+	endByte: number;
+	startRow: number;
+	startCol: number;
+	endRow: number;
+	endCol: number;
+}
+
+/** Information about a single syntax tree node. */
+export interface NodeInfo {
+	kind: string;
+	isNamed: boolean;
+	startByte: number;
+	endByte: number;
+	startRow: number;
+	startCol: number;
+	endRow: number;
+	endCol: number;
+	namedChildCount: number;
+	isError: boolean;
+	isMissing: boolean;
+}
+
+/** Aggregate metrics for a source file. */
+export interface FileMetrics {
+	totalLines: number;
+	totalBytes: number;
+	blankLines: number;
+	commentLines: number;
+	codeLines: number;
+	errorCount: number;
+}
+
+/** A structural item (function, class, method, etc.) in source code. */
+export interface StructureItem {
+	kind: string;
+	name: string;
+	span: Span;
+	parent: string | null;
+}
+
+/** An import statement extracted from source code. */
+export interface ImportInfo {
+	module: string;
+	names: string[];
+	span: Span;
+}
+
+/** An export statement extracted from source code. */
+export interface ExportInfo {
+	name: string;
+	kind: string;
+	span: Span;
+}
+
+/** A comment extracted from source code. */
+export interface CommentInfo {
+	text: string;
+	kind: string;
+	span: Span;
+	associatedNode: string | null;
+}
+
+/** A docstring extracted from source code. */
+export interface DocstringInfo {
+	text: string;
+	format: string;
+	span: Span;
+	associatedItem: string | null;
+	sections: Array<Record<string, string>>;
+}
+
+/** A symbol (variable, function, type, etc.) extracted from source code. */
+export interface SymbolInfo {
+	name: string;
+	kind: string;
+	span: Span;
+	typeAnnotation: string | null;
+}
+
+/** A diagnostic (syntax error, missing node, etc.) from parsing. */
+export interface Diagnostic {
+	message: string;
+	severity: string;
+	span: Span;
+}
+
+/** Metadata for a single chunk of source code. */
+export interface ChunkContext {
+	language: string;
+	chunkIndex: number;
+	totalChunks: number;
+	startLine: number;
+	endLine: number;
+	nodeTypes: string[];
+	symbolsDefined: string[];
+	comments: string[];
+	docstrings: string[];
+	hasErrorNodes: boolean;
+	contextPath: string[];
+}
+
+/** A chunk of source code with rich metadata. */
+export interface CodeChunk {
+	content: string;
+	startByte: number;
+	endByte: number;
+	metadata: ChunkContext;
+}
+
+/** Complete analysis result from processing a source file. */
+export interface ProcessResult {
+	language: string;
+	metrics: FileMetrics;
+	structure: StructureItem[];
+	imports: ImportInfo[];
+	exports: ExportInfo[];
+	comments: CommentInfo[];
+	docstrings: DocstringInfo[];
+	symbols: SymbolInfo[];
+	diagnostics: Diagnostic[];
+	chunks: CodeChunk[];
+}
+
+/** A single query capture pairing a capture name with a node. */
+export interface QueryCapture {
+	captureName: string;
+	node: NodeInfo;
+}
+
+/** A single pattern match from a tree-sitter query. */
+export interface QueryMatch {
+	patternIndex: number;
+	captures: QueryCapture[];
+}
+
+/** Result of resolving a file-extension ambiguity. */
+export interface AmbiguityResult {
+	assigned: string;
+	alternatives: string[];
+}
+
 /** Returns an array of all available language names. */
 export declare function availableLanguages(): Array<string>;
 
@@ -109,12 +254,12 @@ export declare function manifestLanguages(): Array<string>;
 export declare function parseString(language: string, source: string): ExternalObject<Tree>;
 
 /**
- * Process source code using a config and return a JavaScript object with metadata and chunks.
+ * Process source code using a config and return a result object with metadata and chunks.
  *
  * Accepts both camelCase and snake_case config keys (auto-normalized to snake_case).
  * Returns camelCase keys in the result for JavaScript convention.
  */
-export declare function process(source: string, config: any): any;
+export declare function process(source: string, config: JsProcessConfig): ProcessResult;
 
 /** Check whether any node in the tree has the given type name. */
 export declare function treeContainsNodeType(tree: ExternalObject<Tree>, nodeType: string): boolean;
@@ -127,3 +272,38 @@ export declare function treeRootChildCount(tree: ExternalObject<Tree>): number;
 
 /** Get the type name of the root node. */
 export declare function treeRootNodeType(tree: ExternalObject<Tree>): string;
+
+/**
+ * Detect language from source content using heuristics.
+ *
+ * Returns the detected language name, or null if detection fails.
+ */
+export declare function detectLanguageFromContent(content: string): string | null;
+
+/**
+ * Resolve ambiguity for a file extension that maps to multiple languages.
+ *
+ * Returns the assigned language and alternatives, or null if no ambiguity exists.
+ */
+export declare function extensionAmbiguity(ext: string): AmbiguityResult | null;
+
+/**
+ * Get the highlights query string for a language.
+ *
+ * Returns the query source, or null if no highlights query is available.
+ */
+export declare function getHighlightsQuery(language: string): string | null;
+
+/**
+ * Get the injections query string for a language.
+ *
+ * Returns the query source, or null if no injections query is available.
+ */
+export declare function getInjectionsQuery(language: string): string | null;
+
+/**
+ * Get the locals query string for a language.
+ *
+ * Returns the query source, or null if no locals query is available.
+ */
+export declare function getLocalsQuery(language: string): string | null;

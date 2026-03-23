@@ -291,6 +291,170 @@ pub unsafe extern "C" fn ts_pack_detect_language(path: *const c_char) -> *mut c_
     })
 }
 
+/// Detect language name from file content using shebang-based detection.
+///
+/// Returns a newly allocated null-terminated UTF-8 string with the language name,
+/// or null if no shebang is recognized. The caller must free the returned
+/// pointer with `ts_pack_free_string`.
+///
+/// # Safety
+///
+/// `content` must be a valid null-terminated UTF-8 C string, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_detect_language_from_content(content: *const c_char) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if content.is_null() {
+            set_last_error("content pointer is null");
+            return ptr::null_mut();
+        }
+        let content_str = unsafe { CStr::from_ptr(content) };
+        match content_str.to_str() {
+            Ok(s) => match tree_sitter_language_pack::detect_language_from_content(s) {
+                Some(lang) => CString::new(lang).map(CString::into_raw).unwrap_or(ptr::null_mut()),
+                None => ptr::null_mut(),
+            },
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in content: {e}"));
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
+/// Returns extension ambiguity information for the given file extension as a JSON C string.
+///
+/// Returns null if the extension is not ambiguous.
+/// When non-null, the JSON object has "assigned" (string) and "alternatives" (string[]) fields.
+/// The caller must free the returned pointer with `ts_pack_free_string`.
+///
+/// # Safety
+///
+/// `ext` must be a valid null-terminated UTF-8 C string, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_extension_ambiguity(ext: *const c_char) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if ext.is_null() {
+            set_last_error("ext pointer is null");
+            return ptr::null_mut();
+        }
+        let ext_str = unsafe { CStr::from_ptr(ext) };
+        match ext_str.to_str() {
+            Ok(s) => match tree_sitter_language_pack::extension_ambiguity(s) {
+                Some((assigned, alts)) => {
+                    let val = serde_json::json!({
+                        "assigned": assigned,
+                        "alternatives": alts,
+                    });
+                    match serde_json::to_string(&val) {
+                        Ok(json) => CString::new(json).map(CString::into_raw).unwrap_or(ptr::null_mut()),
+                        Err(e) => {
+                            set_last_error(&format!("serialization failed: {e}"));
+                            ptr::null_mut()
+                        }
+                    }
+                }
+                None => ptr::null_mut(),
+            },
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in ext: {e}"));
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
+/// Returns the bundled highlights query for the given language as a C string.
+///
+/// Returns null if no bundled query is available for the language.
+/// The caller must free the returned pointer with `ts_pack_free_string`.
+///
+/// # Safety
+///
+/// `language` must be a valid null-terminated UTF-8 C string, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_get_highlights_query(language: *const c_char) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if language.is_null() {
+            set_last_error("language pointer is null");
+            return ptr::null_mut();
+        }
+        let lang_str = unsafe { CStr::from_ptr(language) };
+        match lang_str.to_str() {
+            Ok(s) => match tree_sitter_language_pack::get_highlights_query(s) {
+                Some(q) => CString::new(q).map(CString::into_raw).unwrap_or(ptr::null_mut()),
+                None => ptr::null_mut(),
+            },
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in language: {e}"));
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
+/// Returns the bundled injections query for the given language as a C string.
+///
+/// Returns null if no bundled query is available for the language.
+/// The caller must free the returned pointer with `ts_pack_free_string`.
+///
+/// # Safety
+///
+/// `language` must be a valid null-terminated UTF-8 C string, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_get_injections_query(language: *const c_char) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if language.is_null() {
+            set_last_error("language pointer is null");
+            return ptr::null_mut();
+        }
+        let lang_str = unsafe { CStr::from_ptr(language) };
+        match lang_str.to_str() {
+            Ok(s) => match tree_sitter_language_pack::get_injections_query(s) {
+                Some(q) => CString::new(q).map(CString::into_raw).unwrap_or(ptr::null_mut()),
+                None => ptr::null_mut(),
+            },
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in language: {e}"));
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
+/// Returns the bundled locals query for the given language as a C string.
+///
+/// Returns null if no bundled query is available for the language.
+/// The caller must free the returned pointer with `ts_pack_free_string`.
+///
+/// # Safety
+///
+/// `language` must be a valid null-terminated UTF-8 C string, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_get_locals_query(language: *const c_char) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if language.is_null() {
+            set_last_error("language pointer is null");
+            return ptr::null_mut();
+        }
+        let lang_str = unsafe { CStr::from_ptr(language) };
+        match lang_str.to_str() {
+            Ok(s) => match tree_sitter_language_pack::get_locals_query(s) {
+                Some(q) => CString::new(q).map(CString::into_raw).unwrap_or(ptr::null_mut()),
+                None => ptr::null_mut(),
+            },
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in language: {e}"));
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
 /// Get the last error message, or null if no error occurred.
 ///
 /// The returned pointer is valid until the next FFI call on the same thread.
