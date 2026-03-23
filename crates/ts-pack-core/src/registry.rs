@@ -1,4 +1,3 @@
-use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
 #[cfg(feature = "dynamic-loading")]
 use std::path::PathBuf;
@@ -308,7 +307,7 @@ impl LanguageRegistry {
                 if let Ok(entries) = std::fs::read_dir(extra_dir) {
                     for entry in entries.flatten() {
                         let filename = entry.file_name();
-                        let name: Cow<'_, str> = filename.to_string_lossy();
+                        let name = filename.to_string_lossy();
                         let stripped = name.strip_prefix("lib").unwrap_or(&name);
                         if let Some(lang) = stripped.strip_prefix("tree_sitter_") {
                             let lang = lang

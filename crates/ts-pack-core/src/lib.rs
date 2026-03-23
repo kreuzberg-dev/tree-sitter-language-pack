@@ -74,7 +74,9 @@ pub use tree_sitter::{Language, Parser, Tree};
 #[cfg(feature = "download")]
 pub use download::DownloadManager;
 
-use std::sync::{LazyLock, RwLock};
+use std::sync::LazyLock;
+#[cfg(feature = "download")]
+use std::sync::RwLock;
 
 static REGISTRY: LazyLock<LanguageRegistry> = LazyLock::new(LanguageRegistry::new);
 
