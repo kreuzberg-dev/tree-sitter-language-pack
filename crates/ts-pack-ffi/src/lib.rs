@@ -260,6 +260,37 @@ pub unsafe extern "C" fn ts_pack_has_language(registry: *const TsPackRegistry, n
     })
 }
 
+/// Detect language name from a file path.
+///
+/// Returns a newly allocated null-terminated UTF-8 string with the language name,
+/// or null if the extension is not recognized. The caller must free the returned
+/// pointer with `ts_pack_free_string`.
+///
+/// # Safety
+///
+/// `path` must be a valid null-terminated UTF-8 C string, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_detect_language(path: *const c_char) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if path.is_null() {
+            set_last_error("path pointer is null");
+            return ptr::null_mut();
+        }
+        let path_str = unsafe { CStr::from_ptr(path) };
+        match path_str.to_str() {
+            Ok(s) => match tree_sitter_language_pack::detect_language_from_path(s) {
+                Some(lang) => CString::new(lang).map(CString::into_raw).unwrap_or(ptr::null_mut()),
+                None => ptr::null_mut(),
+            },
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in path: {e}"));
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
 /// Get the last error message, or null if no error occurred.
 ///
 /// The returned pointer is valid until the next FFI call on the same thread.

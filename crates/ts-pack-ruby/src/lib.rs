@@ -42,6 +42,10 @@ fn has_language(name: String) -> bool {
     tree_sitter_language_pack::has_language(&name)
 }
 
+fn detect_language(path: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
+}
+
 fn language_count() -> usize {
     tree_sitter_language_pack::language_count()
 }
@@ -149,6 +153,7 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     // Registry and parsing functions
     module.define_module_function("available_languages", function!(available_languages, 0))?;
     module.define_module_function("has_language", function!(has_language, 1))?;
+    module.define_module_function("detect_language", function!(detect_language, 1))?;
     module.define_module_function("language_count", function!(language_count, 0))?;
     module.define_module_function("get_language_ptr", function!(get_language_ptr, 1))?;
     module.define_module_function("parse_string", function!(parse_string, 2))?;

@@ -27,6 +27,11 @@ fn has_language(name: String) -> bool {
 }
 
 #[rustler::nif]
+fn detect_language(path: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
+}
+
+#[rustler::nif]
 fn language_count() -> usize {
     tree_sitter_language_pack::language_count()
 }

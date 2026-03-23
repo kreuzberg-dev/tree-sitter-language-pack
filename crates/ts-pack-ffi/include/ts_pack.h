@@ -94,6 +94,19 @@ const char *ts_pack_language_name_at(const struct TsPackRegistry *registry, uint
 bool ts_pack_has_language(const struct TsPackRegistry *registry, const char *name);
 
 /**
+ * Detect language name from a file path.
+ *
+ * Returns a newly allocated null-terminated UTF-8 string with the language name,
+ * or null if the extension is not recognized. The caller must free the returned
+ * pointer with `ts_pack_free_string`.
+ *
+ * # Safety
+ *
+ * `path` must be a valid null-terminated UTF-8 C string, or null.
+ */
+char *ts_pack_detect_language(const char *path);
+
+/**
  * Get the last error message, or null if no error occurred.
  *
  * The returned pointer is valid until the next FFI call on the same thread.

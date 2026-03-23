@@ -208,6 +208,23 @@ func (r *Registry) HasLanguage(name string) bool {
 	return bool(C.ts_pack_has_language(r.ptr, cname))
 }
 
+// DetectLanguage detects a language name from a file path or extension.
+// Returns an empty string if the extension is not recognized.
+func DetectLanguage(path string) string {
+	cpath := C.CString(path)
+	defer C.free(unsafe.Pointer(cpath))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	result := C.ts_pack_detect_language(cpath)
+	if result == nil {
+		return ""
+	}
+	defer C.ts_pack_free_string(result)
+	return C.GoString(result)
+}
+
 // AvailableLanguages returns a slice of all language names in the registry.
 // Returns nil if the registry is closed.
 func (r *Registry) AvailableLanguages() []string {

@@ -88,6 +88,14 @@ fn has_language(name: &str) -> bool {
     tree_sitter_language_pack::has_language(name)
 }
 
+/// Detect language name from a file path or extension.
+///
+/// Returns None if the extension is not recognized.
+#[pyfunction]
+fn detect_language(path: &str) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_path(path).map(String::from)
+}
+
 /// Returns the number of available languages.
 #[pyfunction]
 fn language_count() -> usize {
@@ -601,6 +609,7 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_parser, m)?)?;
     m.add_function(wrap_pyfunction!(available_languages, m)?)?;
     m.add_function(wrap_pyfunction!(has_language, m)?)?;
+    m.add_function(wrap_pyfunction!(detect_language, m)?)?;
     m.add_function(wrap_pyfunction!(language_count, m)?)?;
     m.add_function(wrap_pyfunction!(parse_string, m)?)?;
     m.add_function(wrap_pyfunction!(process, m)?)?;

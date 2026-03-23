@@ -120,49 +120,8 @@ enum ParseFormat {
     Json,
 }
 
-fn detect_language(path: &str) -> Option<&str> {
-    let ext = std::path::Path::new(path).extension()?.to_str()?;
-    match ext {
-        "py" => Some("python"),
-        "js" | "mjs" | "cjs" => Some("javascript"),
-        "ts" | "mts" => Some("typescript"),
-        "tsx" => Some("tsx"),
-        "rs" => Some("rust"),
-        "go" => Some("go"),
-        "rb" => Some("ruby"),
-        "java" => Some("java"),
-        "c" | "h" => Some("c"),
-        "cpp" | "cc" | "cxx" | "hpp" => Some("cpp"),
-        "cs" => Some("csharp"),
-        "php" => Some("php"),
-        "ex" | "exs" => Some("elixir"),
-        "swift" => Some("swift"),
-        "kt" | "kts" => Some("kotlin"),
-        "scala" => Some("scala"),
-        "lua" => Some("lua"),
-        "sh" | "bash" => Some("bash"),
-        "zsh" => Some("bash"),
-        "r" => Some("r"),
-        "jl" => Some("julia"),
-        "hs" => Some("haskell"),
-        "ml" | "mli" => Some("ocaml"),
-        "elm" => Some("elm"),
-        "erl" => Some("erlang"),
-        "dart" => Some("dart"),
-        "zig" => Some("zig"),
-        "nim" => Some("nim"),
-        "toml" => Some("toml"),
-        "yaml" | "yml" => Some("yaml"),
-        "json" => Some("json"),
-        "xml" => Some("xml"),
-        "html" | "htm" => Some("html"),
-        "css" => Some("css"),
-        "scss" => Some("scss"),
-        "sql" => Some("sql"),
-        "md" | "markdown" => Some("markdown"),
-        "dockerfile" | "Dockerfile" => Some("dockerfile"),
-        _ => None,
-    }
+fn detect_language(path: &str) -> Option<&'static str> {
+    tree_sitter_language_pack::detect_language_from_path(path)
 }
 
 fn read_source(file: &str) -> Result<Vec<u8>, String> {
