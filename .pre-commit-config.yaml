@@ -68,19 +68,23 @@ repos:
       - id: cargo-fmt
         args: ["--all"]
       - id: cargo-clippy
-        args: [
-          "--fix",
-          "--allow-dirty",
-          "--allow-staged",
-          "--workspace",
-          "--exclude", "ts-pack-ruby",
-          "--exclude", "ts-pack-php",
-          "--exclude", "ts-pack-wasm",
-          "--all-targets",
-          "--",
-          "-D",
-          "warnings",
-        ]
+        args:
+          [
+            "--fix",
+            "--allow-dirty",
+            "--allow-staged",
+            "--workspace",
+            "--exclude",
+            "ts-pack-ruby",
+            "--exclude",
+            "ts-pack-php",
+            "--exclude",
+            "ts-pack-wasm",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings",
+          ]
 
   - repo: https://github.com/bnjbvr/cargo-machete
     rev: v0.9.1
@@ -146,7 +150,12 @@ repos:
         files: (^crates/ts-pack-ffi/)
         exclude: (include/)
       - id: cppcheck
-        args: ["--std=c11", "--enable=warning,style,performance", "--suppress=missingIncludeSystem"]
+        args:
+          [
+            "--std=c11",
+            "--enable=warning,style,performance",
+            "--suppress=missingIncludeSystem",
+          ]
         files: (^crates/ts-pack-ffi/)
 
   # Go: formatting and linting via Taskfile
@@ -243,6 +252,6 @@ repos:
     rev: v2.4.2
     hooks:
       - id: codespell
-        exclude: ^tests|^parsers|^vendors|^target|^e2e|^\.ai-rulez|pnpm-lock\.yaml|docs/css/
+        exclude: ^tests|^parsers|^vendors|^target|^e2e|^\.ai-rulez|pnpm-lock\.yaml|docs/css/|sources
         additional_dependencies:
           - tomli

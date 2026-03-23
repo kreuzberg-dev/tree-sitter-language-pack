@@ -196,6 +196,26 @@ all = [
     "lang-yaml",
     "lang-yuck",
     "lang-zig",
+    "lang-zsh",
+    "lang-asciidoc",
+    "lang-awk",
+    "lang-caddy",
+    "lang-cedar",
+    "lang-cedarschema",
+    "lang-devicetree",
+    "lang-dot",
+    "lang-idris",
+    "lang-jinja2",
+    "lang-jq",
+    "lang-lean",
+    "lang-postscript",
+    "lang-prolog",
+    "lang-rescript",
+    "lang-ssh_config",
+    "lang-textproto",
+    "lang-tlaplus",
+    "lang-vb",
+    "lang-wit",
 ]
 web = [
     "lang-html",
@@ -496,6 +516,26 @@ lang-xml = []
 lang-yaml = []
 lang-yuck = []
 lang-zig = []
+lang-zsh = []
+lang-asciidoc = []
+lang-awk = []
+lang-caddy = []
+lang-cedar = []
+lang-cedarschema = []
+lang-devicetree = []
+lang-dot = []
+lang-idris = []
+lang-jinja2 = []
+lang-jq = []
+lang-lean = []
+lang-postscript = []
+lang-prolog = []
+lang-rescript = []
+lang-ssh_config = []
+lang-textproto = []
+lang-tlaplus = []
+lang-vb = []
+lang-wit = []
 
 [dependencies]
 dirs = { workspace = true, optional = true }
