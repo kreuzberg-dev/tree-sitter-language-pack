@@ -13,6 +13,13 @@ pub fn has_language(name: String) -> bool {
     tree_sitter_language_pack::has_language(&name)
 }
 
+/// Detect language name from a file path or extension.
+/// Returns null if the extension is not recognized.
+#[napi(js_name = "detectLanguage")]
+pub fn detect_language(path: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
+}
+
 /// Returns the number of available languages.
 #[napi(js_name = "languageCount")]
 pub fn language_count() -> u32 {

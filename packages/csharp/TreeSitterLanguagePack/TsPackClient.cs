@@ -66,6 +66,36 @@ public static class TsPackClient
     }
 
     /// <summary>
+    /// Detect language name from a file path or extension.
+    /// Returns null if the extension is not recognized.
+    /// </summary>
+    public static string? DetectLanguage(string path)
+    {
+        var pathPtr = InteropUtilities.StringToUtf8Ptr(path);
+        try
+        {
+            var resultPtr = NativeMethods.DetectLanguage(pathPtr);
+            if (resultPtr == IntPtr.Zero)
+            {
+                InteropUtilities.ThrowIfError();
+                return null;
+            }
+            try
+            {
+                return InteropUtilities.Utf8PtrToString(resultPtr);
+            }
+            finally
+            {
+                NativeMethods.FreeString(resultPtr);
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(pathPtr);
+        }
+    }
+
+    /// <summary>
     /// Get a raw TSLanguage pointer for the given language name.
     /// </summary>
     /// <exception cref="TsPackException">Thrown when the language is not available.</exception>

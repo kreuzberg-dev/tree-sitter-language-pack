@@ -70,6 +70,14 @@ pub fn ts_pack_has_language(name: String) -> bool {
     tree_sitter_language_pack::has_language(&name)
 }
 
+/// Detect language name from a file path or extension.
+///
+/// Returns null if the extension is not recognized.
+#[php_function]
+pub fn ts_pack_detect_language(path: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
+}
+
 /// Get the number of available languages.
 ///
 /// # Returns
@@ -396,6 +404,7 @@ pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
         .function(wrap_function!(ts_pack_version))
         .function(wrap_function!(ts_pack_available_languages))
         .function(wrap_function!(ts_pack_has_language))
+        .function(wrap_function!(ts_pack_detect_language))
         .function(wrap_function!(ts_pack_language_count))
         .function(wrap_function!(ts_pack_get_language))
         .function(wrap_function!(ts_pack_parse_string))

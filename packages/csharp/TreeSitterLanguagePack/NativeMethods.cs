@@ -71,6 +71,13 @@ internal static partial class NativeMethods
     internal static extern bool HasLanguage(IntPtr registry, IntPtr name);
 
     /// <summary>
+    /// Detect language name from a file path. Returns IntPtr.Zero if not recognized.
+    /// Caller must free the result with FreeString.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_detect_language", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr DetectLanguage(IntPtr path);
+
+    /// <summary>
     /// Get a raw TSLanguage pointer for the given language name.
     /// Returns <see cref="IntPtr.Zero"/> on error.
     /// </summary>
