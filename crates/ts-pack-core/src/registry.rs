@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use ahash::{AHashMap, AHashSet};
 #[cfg(feature = "dynamic-loading")]
 use std::path::PathBuf;
 #[cfg(feature = "dynamic-loading")]
@@ -182,7 +182,7 @@ mod dynamic {
 /// println!("Structure: {:?}", result.structure);
 /// ```
 pub struct LanguageRegistry {
-    static_lookup: HashMap<&'static str, fn() -> Language>,
+    static_lookup: AHashMap<&'static str, fn() -> Language>,
     #[cfg(feature = "dynamic-loading")]
     dynamic_loader: dynamic::DynamicLoader,
     /// Additional library directories to search (e.g. download cache).
@@ -198,7 +198,7 @@ impl LanguageRegistry {
     /// When the `dynamic-loading` feature is enabled, the registry also knows
     /// about dynamically loadable grammars and will load them on demand.
     pub fn new() -> Self {
-        let mut static_lookup = HashMap::with_capacity(STATIC_LANGUAGES.len());
+        let mut static_lookup = AHashMap::with_capacity(STATIC_LANGUAGES.len());
         for &(name, loader) in STATIC_LANGUAGES {
             static_lookup.insert(name, loader);
         }
@@ -290,7 +290,7 @@ impl LanguageRegistry {
     /// Includes statically compiled languages, dynamically loadable languages
     /// (if the `dynamic-loading` feature is enabled), and all configured aliases.
     pub fn available_languages(&self) -> Vec<String> {
-        let mut seen: HashSet<String> = self.static_lookup.keys().map(|s| s.to_string()).collect();
+        let mut seen: AHashSet<String> = self.static_lookup.keys().map(|s| s.to_string()).collect();
 
         #[cfg(feature = "dynamic-loading")]
         {

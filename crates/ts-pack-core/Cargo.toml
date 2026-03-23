@@ -538,6 +538,7 @@ lang-vb = []
 lang-wit = []
 
 [dependencies]
+ahash = { workspace = true }
 dirs = { workspace = true, optional = true }
 libloading = { workspace = true, optional = true }
 memchr = { workspace = true }
