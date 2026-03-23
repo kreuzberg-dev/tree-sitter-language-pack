@@ -48,16 +48,16 @@ badges:
     link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-ffi"
   # Project Info
   ci:
-    url: "https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI"
+    url: "https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI&color=007ec6"
     link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions"
   license:
-    url: "https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue.svg"
+    url: "https://img.shields.io/badge/License-MIT-007ec6.svg"
     link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE"
   homebrew:
-    url: "https://img.shields.io/badge/homebrew-ts--pack-FBB040?logo=homebrew"
+    url: "https://img.shields.io/badge/homebrew-ts--pack-007ec6?logo=homebrew"
     link: "https://github.com/kreuzberg-dev/homebrew-tap"
   docs:
-    url: "https://img.shields.io/badge/docs-kreuzberg.dev-blue"
+    url: "https://img.shields.io/badge/docs-kreuzberg.dev-007ec6"
     link: "https://docs.tree-sitter-language-pack.kreuzberg.dev"
 
 languages:

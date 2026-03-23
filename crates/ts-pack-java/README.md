@@ -30,17 +30,21 @@
   </a>
   <!-- Project Info -->
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI" alt="CI">
+    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI&color=007ec6" alt="CI">
   </a>
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue.svg" alt="License">
+    <img src="https://img.shields.io/badge/License-MIT-007ec6.svg" alt="License">
   </a>
   <a href="https://github.com/kreuzberg-dev/homebrew-tap">
-    <img src="https://img.shields.io/badge/homebrew-ts--pack-FBB040?logo=homebrew" alt="Homebrew">
+    <img src="https://img.shields.io/badge/homebrew-ts--pack-007ec6?logo=homebrew" alt="Homebrew">
   </a>
   <a href="https://docs.tree-sitter-language-pack.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-blue" alt="Docs">
+    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Docs">
   </a>
+</div>
+
+<div align="center">
+  <img width="3384" height="573" alt="Banner" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
 </div>
 
 <div align="center">
@@ -57,12 +61,12 @@ Java bindings for tree-sitter-language-pack with on-demand parser downloads (JDK
 <dependency>
   <groupId>dev.kreuzberg</groupId>
   <artifactId>tree-sitter-language-pack</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
 </dependency>
 ```
 
 ```groovy
-implementation("dev.kreuzberg:tree-sitter-language-pack:1.1.0")
+implementation("dev.kreuzberg:tree-sitter-language-pack:1.1.1")
 ```
 
 ## Quick Start
@@ -97,6 +101,12 @@ try (var registry = new TsPackRegistry()) {
 - `has_language(name)` -- check if a language is available
 - `language_count()` -- total number of supported languages
 
+### Language Detection
+
+- `detect_language(path)` -- detect language from file path
+- `detect_language_from_content(content)` -- detect language from shebang line
+- `extension_ambiguity(ext)` -- check if an extension is ambiguous (returns assigned language + alternatives)
+
 ### Parsing
 
 - `get_parser(name)` / `parse_string(source, language)` -- parse source code into a syntax tree
@@ -110,7 +120,13 @@ try (var registry = new TsPackRegistry()) {
 
 - `process(source, config)` -- extract structured analysis (functions, classes, imports, comments, chunks) from source code
 
-For detailed API documentation, see the [Java package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-java).
+### Syntax Highlighting Queries
+
+- `get_highlights_query(language)` -- get bundled highlights.scm query for a language
+- `get_injections_query(language)` -- get bundled injections.scm query
+- `get_locals_query(language)` -- get bundled locals.scm query
+
+For full documentation, see [kreuzberg.dev](https://docs.tree-sitter-language-pack.kreuzberg.dev).
 
 ## License
 

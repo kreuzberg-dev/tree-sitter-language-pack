@@ -30,17 +30,21 @@
   </a>
   <!-- Project Info -->
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI" alt="CI">
+    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI&color=007ec6" alt="CI">
   </a>
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue.svg" alt="License">
+    <img src="https://img.shields.io/badge/License-MIT-007ec6.svg" alt="License">
   </a>
   <a href="https://github.com/kreuzberg-dev/homebrew-tap">
-    <img src="https://img.shields.io/badge/homebrew-ts--pack-FBB040?logo=homebrew" alt="Homebrew">
+    <img src="https://img.shields.io/badge/homebrew-ts--pack-007ec6?logo=homebrew" alt="Homebrew">
   </a>
   <a href="https://docs.tree-sitter-language-pack.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-blue" alt="Docs">
+    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Docs">
   </a>
+</div>
+
+<div align="center">
+  <img width="3384" height="573" alt="Banner" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
 </div>
 
 <div align="center">
@@ -95,6 +99,12 @@ func main() {
 - `Registry.HasLanguage(name)` -- check if a language is available
 - `Registry.LanguageCount()` -- total number of supported languages
 
+### Language Detection
+
+- `DetectLanguage(path)` -- detect language from file path
+- `DetectLanguageFromContent(content)` -- detect language from shebang line
+- `ExtensionAmbiguity(ext)` -- check if an extension is ambiguous
+
 ### Parsing
 
 - `Registry.GetParser(name)` / `Registry.ParseString(source, language)` -- parse source code into a syntax tree
@@ -108,7 +118,13 @@ func main() {
 
 - `Registry.Process(source, config)` -- extract structured analysis (functions, classes, imports, comments, chunks) from source code
 
-For detailed API documentation, see the [Go package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1).
+### Syntax Highlighting Queries
+
+- `GetHighlightsQuery(language)` -- get bundled highlights.scm query for a language
+- `GetInjectionsQuery(language)` -- get bundled injections.scm query
+- `GetLocalsQuery(language)` -- get bundled locals.scm query
+
+For full documentation, see [kreuzberg.dev](https://docs.tree-sitter-language-pack.kreuzberg.dev).
 
 ## License
 

@@ -30,17 +30,21 @@
   </a>
   <!-- Project Info -->
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI" alt="CI">
+    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI&color=007ec6" alt="CI">
   </a>
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue.svg" alt="License">
+    <img src="https://img.shields.io/badge/License-MIT-007ec6.svg" alt="License">
   </a>
   <a href="https://github.com/kreuzberg-dev/homebrew-tap">
-    <img src="https://img.shields.io/badge/homebrew-ts--pack-FBB040?logo=homebrew" alt="Homebrew">
+    <img src="https://img.shields.io/badge/homebrew-ts--pack-007ec6?logo=homebrew" alt="Homebrew">
   </a>
   <a href="https://docs.tree-sitter-language-pack.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-blue" alt="Docs">
+    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Docs">
   </a>
+</div>
+
+<div align="center">
+  <img width="3384" height="573" alt="Banner" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
 </div>
 
 <div align="center">
@@ -95,6 +99,8 @@ ts-pack clone
 - `ts-pack status` -- show download status of all configured languages
 - `ts-pack add <lang>...` -- add languages to `language-pack.toml`
 - `ts-pack clone` -- clone parser source repositories (for development)
+- `ts-pack parse <file>` -- parse a file and print the syntax tree
+- `ts-pack process <file>` -- extract code intelligence from a file
 
 ### Global Flags
 
@@ -102,7 +108,7 @@ ts-pack clone
 - `--verbose` / `-v` -- enable verbose output
 - `--help` -- show help for any command
 
-For detailed API documentation, see the [CLI package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-cli).
+For full documentation, see [kreuzberg.dev](https://docs.tree-sitter-language-pack.kreuzberg.dev).
 
 ## License
 

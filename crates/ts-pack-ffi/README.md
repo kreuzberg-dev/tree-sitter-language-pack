@@ -30,17 +30,21 @@
   </a>
   <!-- Project Info -->
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI" alt="CI">
+    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI&color=007ec6" alt="CI">
   </a>
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue.svg" alt="License">
+    <img src="https://img.shields.io/badge/License-MIT-007ec6.svg" alt="License">
   </a>
   <a href="https://github.com/kreuzberg-dev/homebrew-tap">
-    <img src="https://img.shields.io/badge/homebrew-ts--pack-FBB040?logo=homebrew" alt="Homebrew">
+    <img src="https://img.shields.io/badge/homebrew-ts--pack-007ec6?logo=homebrew" alt="Homebrew">
   </a>
   <a href="https://docs.tree-sitter-language-pack.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-blue" alt="Docs">
+    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Docs">
   </a>
+</div>
+
+<div align="center">
+  <img width="3384" height="573" alt="Banner" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
 </div>
 
 <div align="center">
@@ -82,17 +86,35 @@ int main() {
 
 ## API Reference
 
-### Functions
+### Registry
 
 - `ts_pack_registry_new()` / `ts_pack_registry_free(reg)` -- create and destroy a registry handle
 - `ts_pack_language_count(reg)` -- total number of supported languages
 - `ts_pack_get_language(reg, name)` -- get a language pointer by name
+
+### Language Detection
+
+- `ts_pack_detect_language(path)` -- detect language from file path
+- `ts_pack_detect_language_from_content(content)` -- detect from shebang line
+- `ts_pack_extension_ambiguity(ext)` -- check if an extension is ambiguous (returns JSON)
+
+### Download API
+
 - `ts_pack_init(reg, languages, count)` -- pre-download specific languages for offline use
 - `ts_pack_download(reg, languages, count)` -- download parsers on demand
-- `ts_pack_process(reg, source, len, config_json)` -- extract structured analysis from source code
-- `ts_pack_free_string(ptr)` -- free a string returned by `ts_pack_process`
 
-For detailed API documentation, see the [C/C++ (FFI) package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-ffi).
+### Intelligence
+
+- `ts_pack_process(reg, source, len, config_json)` -- extract structured analysis from source code
+- `ts_pack_free_string(ptr)` -- free a string returned by FFI functions
+
+### Syntax Highlighting Queries
+
+- `ts_pack_get_highlights_query(language)` -- get bundled highlights.scm query
+- `ts_pack_get_injections_query(language)` -- get bundled injections.scm query
+- `ts_pack_get_locals_query(language)` -- get bundled locals.scm query
+
+For full documentation, see [kreuzberg.dev](https://docs.tree-sitter-language-pack.kreuzberg.dev).
 
 ## License
 
