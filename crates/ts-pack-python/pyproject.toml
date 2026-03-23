@@ -44,6 +44,12 @@ features = [ "pyo3/extension-module" ]
 python-source = "python"
 module-name = "tree_sitter_language_pack._native"
 include = [
-  { path = "python/tree_sitter_language_pack/__init__.pyi" },
-  { path = "python/tree_sitter_language_pack/py.typed" },
+  { path = "python/tree_sitter_language_pack/__init__.pyi", format = [
+    "sdist",
+    "wheel",
+  ] },
+  { path = "python/tree_sitter_language_pack/py.typed", format = [
+    "sdist",
+    "wheel",
+  ] },
 ]

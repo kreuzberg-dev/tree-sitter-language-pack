@@ -79,6 +79,18 @@ public static class DiagnosticSeverity
 }
 
 /// <summary>
+/// Result of extension ambiguity check.
+/// </summary>
+public sealed class ExtensionAmbiguityResult
+{
+    [JsonPropertyName("assigned")]
+    public string Assigned { get; set; } = "";
+
+    [JsonPropertyName("alternatives")]
+    public string[] Alternatives { get; set; } = [];
+}
+
+/// <summary>
 /// Configuration for the <see cref="TsPackClient.Process"/> method.
 /// Serialized to JSON before passing to the FFI layer.
 /// </summary>
