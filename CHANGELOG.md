@@ -11,23 +11,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Centralized extension-to-language mapping: `sources/language_definitions.json` is now the single source of truth for file extensions (213 extensions across 177 languages)
-- Build-time code generation: `build.rs` generates the extension lookup from JSON with strict validation (panics on duplicates, non-ASCII, uppercase, dots, or invalid characters)
-- `extension_ambiguity(ext)` API: query whether a file extension is ambiguous (e.g. `.m` could be Objective-C or MATLAB, `.h` could be C, C++, or Objective-C)
+- 20 new languages from arborium: asciidoc, awk, caddy, cedar, cedarschema, devicetree, dot, idris, jinja2, jq, lean, postscript, prolog, rescript, ssh_config, textproto, tlaplus, vb, wasm-interface-types, zsh (197 total)
+- Centralized extension-to-language mapping: `sources/language_definitions.json` is the single source of truth for 239 file extensions across 197 languages
+- Build-time code generation: `build.rs` generates extension lookup with strict validation (panics on duplicates, non-ASCII, uppercase, dots)
+- `detect_language_from_content(content)`: shebang-based language detection (`#!/usr/bin/env python3` → "python")
+- `extension_ambiguity(ext)`: query whether a file extension is ambiguous (e.g. `.m` → objc with matlab alternative)
+- Highlight query bundling: `get_highlights_query(lang)`, `get_injections_query(lang)`, `get_locals_query(lang)` — embed .scm queries at build time
 - `ambiguous` field in `language_definitions.json` for declaring known extension ambiguities
-- Round-trip test that validates every extension in the JSON resolves correctly through the generated code
-- New extensions: `.cts` (TypeScript), `.pyw` (Python), `.f08` (Fortran), `.erb` (embedded template), `.heex` (HEEx), `.agda`, `.qml`, `.tal` (Uxntal), `.yuck`, `.td` (TableGen), and more
-- New language support: C#, YAML, regex, embedded template (#77)
+- E2E test fixtures and generators for detect-language, ambiguity, and highlights across all 11 language targets
+- New APIs exposed in all bindings: Python, Node.js, Ruby, WASM, Elixir, PHP, C FFI, Go, C#
 
 ### Changed
 
-- `detect_language_from_extension()` and `detect_language_from_path()` are now generated from JSON at build time instead of a handwritten match statement
-- `LanguageDefinition` struct gains `extensions: Vec<String>` and `ambiguous: BTreeMap<String, Vec<String>>` fields
+- `LanguageRegistry` uses `Arc<RwLock<Vec<PathBuf>>>` for interior mutability — no more global `RwLock` wrapper, eliminates lock poisoning risk
+- `ProcessConfig.language`: `String` → `Cow<'static, str>` (zero allocation for string literals)
+- `NodeInfo.kind`, `QueryMatch.captures`: `String` → `Cow<'static, str>`
+- `available_languages()` uses `HashSet` for O(1) dedup instead of O(n) Vec contains
+- Chunking line counting uses precomputed newline table with binary search (O(log n) per chunk vs O(n))
+- Added `memchr` dependency for fast byte scanning in text splitter and chunking
+- Extension/ambiguity lookups generated from JSON at build time
+- `clone_vendors.py` now copies `queries/` directories alongside `src/`
 
 ### Fixed
 
-- Pre-existing test failures: registry tests (`test_registry_process`, `test_registry_process_with_chunking`) no longer fail when run alongside other tests due to global `RwLock` poisoning
-- Test helpers in `intel::chunking`, `intel::intelligence`, and `registry` now use local `LanguageRegistry::new()` instead of the global singleton
+- Strong types in all binding stubs: Python `.pyi` (TypedDicts), TypeScript `.d.ts` (interfaces), Ruby `.rbs` (record types), C# `Models.cs` (string enums replace `object`)
+- Pre-existing registry test failures from global `RwLock` poisoning — test helpers now use local `LanguageRegistry::new()`
+- Removed ambiguous `.os` (bsl) and `.cls` (apex/LaTeX conflict) extensions
 
 ## [1.0.0] - 2026-03-21
 

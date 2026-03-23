@@ -209,7 +209,7 @@ tree-sitter-language-pack supports **197 languages**. All parsers are available 
     import { hasLanguage, availableLanguages, languageCount } from "@kreuzberg/tree-sitter-language-pack";
 
     console.log(hasLanguage("python"));     // true
-    console.log(languageCount());           // 173
+    console.log(languageCount());           // 197
 
     for (const lang of availableLanguages().sort()) {
       console.log(lang);
