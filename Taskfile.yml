@@ -100,6 +100,11 @@ tasks:
     cmds:
       - prek run --all-files
 
+  lint:licenses:
+    desc: Verify all grammar repositories use permissive licenses (no GPL/AGPL/copyleft)
+    cmds:
+      - uv run --no-sync python scripts/lint_grammar_licenses.py --update-cache
+
   check:
     desc: Run all checks (lint + test)
     cmds:
