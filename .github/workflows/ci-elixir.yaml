@@ -147,6 +147,11 @@ jobs:
       - name: Install Elixir dependencies
         run: task elixir:deps
 
+      - name: Patch Rustler --cfg flag placement
+        working-directory: crates/ts-pack-elixir
+        run: |
+          sed -i 's/args ++ \["--cfg", "build_#{System.system_time(:millisecond)}"\]/args ++ ["--", "--cfg", "build_#{System.system_time(:millisecond)}"]/' deps/rustler/lib/rustler/compiler.ex
+
       - name: Build NIF library
         working-directory: crates/ts-pack-elixir
         run: cargo build --release
@@ -159,17 +164,26 @@ jobs:
           mkdir -p crates/ts-pack-elixir/priv/native
           cp crates/ts-pack-elixir/target/release/libts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts_pack_elixir.so
 
+      - name: Patch Rustler --cfg flag placement
+        working-directory: crates/ts-pack-elixir
+        run: |
+          # Fix Rustler 0.37.3 --cfg argument incompatibility with newer cargo
+          # by moving --cfg after -- separator (rustc flags, not cargo flags)
+          sed -i 's/args ++ \["--cfg", "build_#{System.system_time(:millisecond)}"\]/args ++ ["--", "--cfg", "build_#{System.system_time(:millisecond)}"]/' deps/rustler/lib/rustler/compiler.ex
+
       - name: Compile Elixir (warnings as errors)
         working-directory: crates/ts-pack-elixir
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           MIX_ENV: test
+          TSLP_BUILD: "1"
         run: mix compile --warnings-as-errors
 
       - name: Run Elixir tests
         run: task elixir:test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_BUILD: "1"
 
   e2e-elixir:
     name: Elixir E2E Tests
@@ -229,6 +243,11 @@ jobs:
       - name: Install Elixir dependencies
         run: task elixir:deps
 
+      - name: Patch Rustler --cfg flag placement
+        working-directory: crates/ts-pack-elixir
+        run: |
+          sed -i 's/args ++ \["--cfg", "build_#{System.system_time(:millisecond)}"\]/args ++ ["--", "--cfg", "build_#{System.system_time(:millisecond)}"]/' deps/rustler/lib/rustler/compiler.ex
+
       - name: Generate E2E tests
         run: task elixir:e2e:generate
         env:
@@ -239,4 +258,5 @@ jobs:
         run: task elixir:e2e:test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_BUILD: "1"
           MIX_ENV: test
