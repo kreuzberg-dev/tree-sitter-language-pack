@@ -9,6 +9,30 @@ public class ParsingTests
 {
 
     [Fact]
+    public void ParsingGoFunction()
+    {
+        // Parse a Go function declaration and assert node type
+        if (!TsPackClient.HasLanguage("go"))
+        {
+            return; // Language 'go' not available
+        }
+        var langPtr = TsPackClient.GetLanguage("go");
+        Assert.True(langPtr != IntPtr.Zero, "Language pointer should not be null");
+    }
+
+    [Fact]
+    public void ParsingHtmlElement()
+    {
+        // Parse an HTML element and assert node type
+        if (!TsPackClient.HasLanguage("html"))
+        {
+            return; // Language 'html' not available
+        }
+        var langPtr = TsPackClient.GetLanguage("html");
+        Assert.True(langPtr != IntPtr.Zero, "Language pointer should not be null");
+    }
+
+    [Fact]
     public void ParsingJavascriptClass()
     {
         // Parse a JavaScript class declaration.
@@ -21,14 +45,38 @@ public class ParsingTests
     }
 
     [Fact]
+    public void ParsingJavascriptVariable()
+    {
+        // Parse a JavaScript variable declaration and assert node type
+        if (!TsPackClient.HasLanguage("javascript"))
+        {
+            return; // Language 'javascript' not available
+        }
+        var langPtr = TsPackClient.GetLanguage("javascript");
+        Assert.True(langPtr != IntPtr.Zero, "Language pointer should not be null");
+    }
+
+    [Fact]
     public void ParsingPythonFunction()
     {
-        // Parse a Python function definition.
+        // Parse a Python function definition and assert node type
         if (!TsPackClient.HasLanguage("python"))
         {
             return; // Language 'python' not available
         }
         var langPtr = TsPackClient.GetLanguage("python");
+        Assert.True(langPtr != IntPtr.Zero, "Language pointer should not be null");
+    }
+
+    [Fact]
+    public void ParsingRustFunction()
+    {
+        // Parse a Rust function definition and assert node type
+        if (!TsPackClient.HasLanguage("rust"))
+        {
+            return; // Language 'rust' not available
+        }
+        var langPtr = TsPackClient.GetLanguage("rust");
         Assert.True(langPtr != IntPtr.Zero, "Language pointer should not be null");
     }
 

@@ -181,7 +181,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             } else {
                 writeln!(
                     out,
-                    "    intel = TreeSitterLanguagePack.process(\"{}\", ~s({{\"language\":\"{}\"}}))",
+                    "    intel = TreeSitterLanguagePack.process(\"{}\", ~s({{\"language\":\"{}\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}}))",
                     escape_elixir_string(source),
                     escape_elixir_string(lang)
                 )

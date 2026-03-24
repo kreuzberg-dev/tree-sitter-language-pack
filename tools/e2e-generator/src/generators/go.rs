@@ -302,7 +302,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             } else {
                 writeln!(
                     out,
-                    "\tresultJSON, err := reg.Process(\"{}\", tspack.ProcessConfig{{Language: \"{}\"}})",
+                    "\tresultJSON, err := reg.Process(\"{}\", tspack.ProcessConfig{{Language: \"{}\", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true}})",
                     escape_go_string(source),
                     escape_go_string(lang)
                 )

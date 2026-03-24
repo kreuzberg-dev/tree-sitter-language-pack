@@ -16,8 +16,8 @@ defmodule E2eTests.ErrorHandlingTest do
     unless TreeSitterLanguagePack.has_language("javascript") do
       IO.puts("Skipping: language 'javascript' not available")
     else
-    tree = TreeSitterLanguagePack.parse_string("javascript", "")
-    assert is_reference(tree), "Parse tree should be a reference"
+      tree = TreeSitterLanguagePack.parse_string("javascript", "")
+      assert is_reference(tree), "Parse tree should be a reference"
     end
   end
 
@@ -27,9 +27,11 @@ defmodule E2eTests.ErrorHandlingTest do
     unless TreeSitterLanguagePack.has_language("javascript") do
       IO.puts("Skipping: language 'javascript' not available")
     else
-    tree = TreeSitterLanguagePack.parse_string("javascript", "function function function @@@ %%%")
-    assert is_reference(tree), "Parse tree should be a reference"
-    assert TreeSitterLanguagePack.tree_has_error_nodes(tree), "Tree should contain error nodes"
+      tree =
+        TreeSitterLanguagePack.parse_string("javascript", "function function function @@@ %%%")
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      assert TreeSitterLanguagePack.tree_has_error_nodes(tree), "Tree should contain error nodes"
     end
   end
 
@@ -39,5 +41,4 @@ defmodule E2eTests.ErrorHandlingTest do
       TreeSitterLanguagePack.get_language_ptr("nonexistent_xyz")
     end
   end
-
 end

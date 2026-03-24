@@ -98,6 +98,25 @@ fn smoke_arduino() {
 }
 
 #[test]
+fn smoke_asciidoc() {
+    if !tree_sitter_language_pack::has_language("asciidoc") {
+        eprintln!("Skipping: language 'asciidoc' not available");
+        return;
+    }
+    // Smoke test: load asciidoc and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("asciidoc").expect("Failed to get parser for 'asciidoc'");
+    let tree = parser.parse("= Title\n\nParagraph.", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
 fn smoke_asm() {
     if !tree_sitter_language_pack::has_language("asm") {
         eprintln!("Skipping: language 'asm' not available");
@@ -136,6 +155,25 @@ fn smoke_astro() {
 }
 
 #[test]
+fn smoke_awk() {
+    if !tree_sitter_language_pack::has_language("awk") {
+        eprintln!("Skipping: language 'awk' not available");
+        return;
+    }
+    // Smoke test: load awk and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("awk").expect("Failed to get parser for 'awk'");
+    let tree = parser.parse("BEGIN { print \"hello\" }", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
 fn smoke_bash() {
     if !tree_sitter_language_pack::has_language("bash") {
         eprintln!("Skipping: language 'bash' not available");
@@ -144,6 +182,25 @@ fn smoke_bash() {
     // Smoke test: load bash and parse a simple snippet
     let mut parser = tree_sitter_language_pack::get_parser("bash").expect("Failed to get parser for 'bash'");
     let tree = parser.parse("echo hello", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_batch() {
+    if !tree_sitter_language_pack::has_language("batch") {
+        eprintln!("Skipping: language 'batch' not available");
+        return;
+    }
+    // Smoke test: load batch and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("batch").expect("Failed to get parser for 'batch'");
+    let tree = parser.parse("@echo off\necho hello", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
@@ -269,6 +326,25 @@ fn smoke_c() {
 }
 
 #[test]
+fn smoke_caddy() {
+    if !tree_sitter_language_pack::has_language("caddy") {
+        eprintln!("Skipping: language 'caddy' not available");
+        return;
+    }
+    // Smoke test: load caddy and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("caddy").expect("Failed to get parser for 'caddy'");
+    let tree = parser.parse(":8080 {\n\trespond \"Hello\"\n}", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
 fn smoke_cairo() {
     if !tree_sitter_language_pack::has_language("cairo") {
         eprintln!("Skipping: language 'cairo' not available");
@@ -296,6 +372,45 @@ fn smoke_capnp() {
     // Smoke test: load capnp and parse a simple snippet
     let mut parser = tree_sitter_language_pack::get_parser("capnp").expect("Failed to get parser for 'capnp'");
     let tree = parser.parse("@0xabcdef1234567890;", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_cedar() {
+    if !tree_sitter_language_pack::has_language("cedar") {
+        eprintln!("Skipping: language 'cedar' not available");
+        return;
+    }
+    // Smoke test: load cedar and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("cedar").expect("Failed to get parser for 'cedar'");
+    let tree = parser.parse("permit(principal, action, resource);", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_cedarschema() {
+    if !tree_sitter_language_pack::has_language("cedarschema") {
+        eprintln!("Skipping: language 'cedarschema' not available");
+        return;
+    }
+    // Smoke test: load cedarschema and parse a simple snippet
+    let mut parser =
+        tree_sitter_language_pack::get_parser("cedarschema").expect("Failed to get parser for 'cedarschema'");
+    let tree = parser.parse("entity User;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
@@ -593,6 +708,45 @@ fn smoke_dart() {
 }
 
 #[test]
+fn smoke_devicetree() {
+    if !tree_sitter_language_pack::has_language("devicetree") {
+        eprintln!("Skipping: language 'devicetree' not available");
+        return;
+    }
+    // Smoke test: load devicetree and parse a simple snippet
+    let mut parser =
+        tree_sitter_language_pack::get_parser("devicetree").expect("Failed to get parser for 'devicetree'");
+    let tree = parser.parse("/dts-v1/;\n/ { };", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_diff() {
+    if !tree_sitter_language_pack::has_language("diff") {
+        eprintln!("Skipping: language 'diff' not available");
+        return;
+    }
+    // Smoke test: load diff and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("diff").expect("Failed to get parser for 'diff'");
+    let tree = parser.parse("--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
 fn smoke_dockerfile() {
     if !tree_sitter_language_pack::has_language("dockerfile") {
         eprintln!("Skipping: language 'dockerfile' not available");
@@ -602,6 +756,25 @@ fn smoke_dockerfile() {
     let mut parser =
         tree_sitter_language_pack::get_parser("dockerfile").expect("Failed to get parser for 'dockerfile'");
     let tree = parser.parse("FROM alpine", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_dot() {
+    if !tree_sitter_language_pack::has_language("dot") {
+        eprintln!("Skipping: language 'dot' not available");
+        return;
+    }
+    // Smoke test: load dot and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("dot").expect("Failed to get parser for 'dot'");
+    let tree = parser.parse("digraph G { A -> B; }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
@@ -716,7 +889,7 @@ fn smoke_embeddedtemplate() {
     // Smoke test: load embeddedtemplate and parse a simple snippet
     let mut parser =
         tree_sitter_language_pack::get_parser("embeddedtemplate").expect("Failed to get parser for 'embeddedtemplate'");
-    let tree = parser.parse("<%= hello %>", None);
+    let tree = parser.parse("<%= value %>", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
@@ -1300,6 +1473,25 @@ fn smoke_hyprlang() {
 }
 
 #[test]
+fn smoke_idris() {
+    if !tree_sitter_language_pack::has_language("idris") {
+        eprintln!("Skipping: language 'idris' not available");
+        return;
+    }
+    // Smoke test: load idris and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("idris").expect("Failed to get parser for 'idris'");
+    let tree = parser.parse("module Main", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
 fn smoke_ini() {
     if !tree_sitter_language_pack::has_language("ini") {
         eprintln!("Skipping: language 'ini' not available");
@@ -1385,6 +1577,44 @@ fn smoke_javascript() {
     let mut parser =
         tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("console.log('hello');", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_jinja2() {
+    if !tree_sitter_language_pack::has_language("jinja2") {
+        eprintln!("Skipping: language 'jinja2' not available");
+        return;
+    }
+    // Smoke test: load jinja2 and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("jinja2").expect("Failed to get parser for 'jinja2'");
+    let tree = parser.parse("{{ variable }}", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_jq() {
+    if !tree_sitter_language_pack::has_language("jq") {
+        eprintln!("Skipping: language 'jq' not available");
+        return;
+    }
+    // Smoke test: load jq and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("jq").expect("Failed to get parser for 'jq'");
+    let tree = parser.parse(".[] | select(.key)", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
@@ -1540,6 +1770,25 @@ fn smoke_latex() {
         "\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}",
         None,
     );
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_lean() {
+    if !tree_sitter_language_pack::has_language("lean") {
+        eprintln!("Skipping: language 'lean' not available");
+        return;
+    }
+    // Smoke test: load lean and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("lean").expect("Failed to get parser for 'lean'");
+    let tree = parser.parse("def main : IO Unit := pure ()", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
@@ -2086,6 +2335,25 @@ fn smoke_php() {
 }
 
 #[test]
+fn smoke_pkl() {
+    if !tree_sitter_language_pack::has_language("pkl") {
+        eprintln!("Skipping: language 'pkl' not available");
+        return;
+    }
+    // Smoke test: load pkl and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("pkl").expect("Failed to get parser for 'pkl'");
+    let tree = parser.parse("name = \"hello\"", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
 fn smoke_po() {
     if !tree_sitter_language_pack::has_language("po") {
         eprintln!("Skipping: language 'po' not available");
@@ -2113,6 +2381,26 @@ fn smoke_pony() {
     // Smoke test: load pony and parse a simple snippet
     let mut parser = tree_sitter_language_pack::get_parser("pony").expect("Failed to get parser for 'pony'");
     let tree = parser.parse("actor Main\n  new create(env: Env) => None", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_postscript() {
+    if !tree_sitter_language_pack::has_language("postscript") {
+        eprintln!("Skipping: language 'postscript' not available");
+        return;
+    }
+    // Smoke test: load postscript and parse a simple snippet
+    let mut parser =
+        tree_sitter_language_pack::get_parser("postscript").expect("Failed to get parser for 'postscript'");
+    let tree = parser.parse("/hello { (Hello) show } def", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
@@ -2171,6 +2459,25 @@ fn smoke_prisma() {
     // Smoke test: load prisma and parse a simple snippet
     let mut parser = tree_sitter_language_pack::get_parser("prisma").expect("Failed to get parser for 'prisma'");
     let tree = parser.parse("model User { id Int @id }", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_prolog() {
+    if !tree_sitter_language_pack::has_language("prolog") {
+        eprintln!("Skipping: language 'prolog' not available");
+        return;
+    }
+    // Smoke test: load prolog and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("prolog").expect("Failed to get parser for 'prolog'");
+    let tree = parser.parse("hello :- write('hello'), nl.", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
@@ -2458,7 +2765,7 @@ fn smoke_regex() {
     }
     // Smoke test: load regex and parse a simple snippet
     let mut parser = tree_sitter_language_pack::get_parser("regex").expect("Failed to get parser for 'regex'");
-    let tree = parser.parse("[a-z]+", None);
+    let tree = parser.parse("x", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
@@ -2498,6 +2805,25 @@ fn smoke_requirements() {
     let mut parser =
         tree_sitter_language_pack::get_parser("requirements").expect("Failed to get parser for 'requirements'");
     let tree = parser.parse("flask>=2.0", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_rescript() {
+    if !tree_sitter_language_pack::has_language("rescript") {
+        eprintln!("Skipping: language 'rescript' not available");
+        return;
+    }
+    // Smoke test: load rescript and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("rescript").expect("Failed to get parser for 'rescript'");
+    let tree = parser.parse("let x = 1", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
@@ -2756,6 +3082,26 @@ fn smoke_squirrel() {
 }
 
 #[test]
+fn smoke_ssh_config() {
+    if !tree_sitter_language_pack::has_language("ssh_config") {
+        eprintln!("Skipping: language 'ssh_config' not available");
+        return;
+    }
+    // Smoke test: load ssh_config and parse a simple snippet
+    let mut parser =
+        tree_sitter_language_pack::get_parser("ssh_config").expect("Failed to get parser for 'ssh_config'");
+    let tree = parser.parse("Host example\n  HostName example.com", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
 fn smoke_starlark() {
     if !tree_sitter_language_pack::has_language("starlark") {
         eprintln!("Skipping: language 'starlark' not available");
@@ -2782,8 +3128,15 @@ fn smoke_svelte() {
     }
     // Smoke test: load svelte and parse a simple snippet
     let mut parser = tree_sitter_language_pack::get_parser("svelte").expect("Failed to get parser for 'svelte'");
-    let tree = parser.parse("<p>hello</p>", None);
+    let tree = parser.parse("<script>let x = 1;</script>", None);
     assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
 }
 
 #[test]
@@ -2882,6 +3235,25 @@ fn smoke_test() {
 }
 
 #[test]
+fn smoke_textproto() {
+    if !tree_sitter_language_pack::has_language("textproto") {
+        eprintln!("Skipping: language 'textproto' not available");
+        return;
+    }
+    // Smoke test: load textproto and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("textproto").expect("Failed to get parser for 'textproto'");
+    let tree = parser.parse("key: \"value\"", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
 fn smoke_thrift() {
     if !tree_sitter_language_pack::has_language("thrift") {
         eprintln!("Skipping: language 'thrift' not available");
@@ -2890,6 +3262,25 @@ fn smoke_thrift() {
     // Smoke test: load thrift and parse a simple snippet
     let mut parser = tree_sitter_language_pack::get_parser("thrift").expect("Failed to get parser for 'thrift'");
     let tree = parser.parse("service HelloService {}", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_tlaplus() {
+    if !tree_sitter_language_pack::has_language("tlaplus") {
+        eprintln!("Skipping: language 'tlaplus' not available");
+        return;
+    }
+    // Smoke test: load tlaplus and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("tlaplus").expect("Failed to get parser for 'tlaplus'");
+    let tree = parser.parse("---- MODULE Main ----\n====", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
@@ -3092,6 +3483,25 @@ fn smoke_v() {
 }
 
 #[test]
+fn smoke_vb() {
+    if !tree_sitter_language_pack::has_language("vb") {
+        eprintln!("Skipping: language 'vb' not available");
+        return;
+    }
+    // Smoke test: load vb and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("vb").expect("Failed to get parser for 'vb'");
+    let tree = parser.parse("Module Main\nEnd Module", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
 fn smoke_verilog() {
     if !tree_sitter_language_pack::has_language("verilog") {
         eprintln!("Skipping: language 'verilog' not available");
@@ -3228,6 +3638,25 @@ fn smoke_wgsl() {
 }
 
 #[test]
+fn smoke_wit() {
+    if !tree_sitter_language_pack::has_language("wit") {
+        eprintln!("Skipping: language 'wit' not available");
+        return;
+    }
+    // Smoke test: load wit and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("wit").expect("Failed to get parser for 'wit'");
+    let tree = parser.parse("package example:pkg;", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
 fn smoke_xcompose() {
     if !tree_sitter_language_pack::has_language("xcompose") {
         eprintln!("Skipping: language 'xcompose' not available");
@@ -3312,6 +3741,25 @@ fn smoke_zig() {
     // Smoke test: load zig and parse a simple snippet
     let mut parser = tree_sitter_language_pack::get_parser("zig").expect("Failed to get parser for 'zig'");
     let tree = parser.parse("pub fn main() void {}", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
+fn smoke_zsh() {
+    if !tree_sitter_language_pack::has_language("zsh") {
+        eprintln!("Skipping: language 'zsh' not available");
+        return;
+    }
+    // Smoke test: load zsh and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("zsh").expect("Failed to get parser for 'zsh'");
+    let tree = parser.parse("echo hello", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();

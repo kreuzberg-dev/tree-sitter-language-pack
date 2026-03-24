@@ -159,7 +159,7 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
     } else {
         writeln!(
             out,
-            "    let config = tree_sitter_language_pack::ProcessConfig::new(\"{}\");",
+            "    let config = tree_sitter_language_pack::ProcessConfig::new(\"{}\").all();",
             escape_rust_string(lang)
         )
         .unwrap();

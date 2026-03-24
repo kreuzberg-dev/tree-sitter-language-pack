@@ -347,6 +347,32 @@ fn default_source_snippets() -> std::collections::HashMap<&'static str, &'static
         "wgsl",
         "@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }",
     );
+    // Languages added for full coverage
+    m.insert("asciidoc", "= Title\n\nParagraph.");
+    m.insert("awk", "BEGIN { print \"hello\" }");
+    m.insert("batch", "@echo off\necho hello");
+    m.insert("caddy", ":8080 {\n\trespond \"Hello\"\n}");
+    m.insert("cedar", "permit(principal, action, resource);");
+    m.insert("cedarschema", "entity User;");
+    m.insert("csharp", "class Main {}");
+    m.insert("devicetree", "/dts-v1/;\n/ { };");
+    m.insert("diff", "--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new");
+    m.insert("dot", "digraph G { A -> B; }");
+    m.insert("embeddedtemplate", "<%= value %>");
+    m.insert("idris", "module Main");
+    m.insert("jinja2", "{{ variable }}");
+    m.insert("jq", ".[] | select(.key)");
+    m.insert("lean", "def main : IO Unit := pure ()");
+    m.insert("pkl", "name = \"hello\"");
+    m.insert("postscript", "/hello { (Hello) show } def");
+    m.insert("prolog", "hello :- write('hello'), nl.");
+    m.insert("rescript", "let x = 1");
+    m.insert("ssh_config", "Host example\n  HostName example.com");
+    m.insert("textproto", "key: \"value\"");
+    m.insert("tlaplus", "---- MODULE Main ----\n====");
+    m.insert("vb", "Module Main\nEnd Module");
+    m.insert("wit", "package example:pkg;");
+    m.insert("zsh", "echo hello");
     m.insert("xcompose", "<Multi_key> <a> : \"a\"");
     m.insert("xml", "<?xml version=\"1.0\"?>\n<root>hello</root>");
     m.insert("yuck", "(defwidget main [] (label :text \"hi\"))");

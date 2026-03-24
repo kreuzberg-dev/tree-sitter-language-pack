@@ -422,7 +422,7 @@
 	"heex": {
 		"extensions": ["heex"],
 		"repo": "https://github.com/phoenixframework/tree-sitter-heex",
-		"rev": "3968d6e20b3c4cc234f339eddd6b7d118516e281"
+		"rev": "5842537f734d7c12685bf27d6005313e3e5a47a0"
 	},
 	"hlsl": {
 		"branch": "master",
@@ -572,7 +572,7 @@
 		"extensions": ["magik"],
 		"generate": true,
 		"repo": "https://github.com/krn-robin/tree-sitter-magik",
-		"rev": "297345ebd36fa9c1a3cfd1b22293e272c765a8a4"
+		"rev": "06fe02c76aef09faead56cdf9495bb9d5fc477b0"
 	},
 	"make": {
 		"extensions": ["mk", "makefile"],

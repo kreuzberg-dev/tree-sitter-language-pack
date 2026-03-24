@@ -291,7 +291,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             } else {
                 writeln!(
                     out,
-                    "    const intel = process(\"{}\", {{ language: \"{}\" }});",
+                    "    const intel = process(\"{}\", {{ language: \"{}\", structure: true, imports: true, exports: true, comments: true, docstrings: true, symbols: true, diagnostics: true }});",
                     escape_js_string(source),
                     escape_js_string(lang)
                 )

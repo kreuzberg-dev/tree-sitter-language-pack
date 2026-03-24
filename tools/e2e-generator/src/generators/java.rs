@@ -270,7 +270,7 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
             } else {
                 writeln!(
                     out,
-                    "            String configJson = \"{{\\\"language\\\":\\\"{}\\\"}}\";",
+                    "            String configJson = \"{{\\\"language\\\":\\\"{}\\\",\\\"structure\\\":true,\\\"imports\\\":true,\\\"exports\\\":true,\\\"comments\\\":true,\\\"docstrings\\\":true,\\\"symbols\\\":true,\\\"diagnostics\\\":true}}\";",
                     escape_java_string(lang)
                 )
                 .unwrap();

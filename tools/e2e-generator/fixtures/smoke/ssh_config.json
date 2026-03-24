@@ -1,0 +1,12 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load ssh_config and parse a simple snippet",
+	"id": "smoke_ssh_config",
+	"language": "ssh_config",
+	"source_code": "Host example\n  HostName example.com",
+	"tags": ["smoke"]
+}

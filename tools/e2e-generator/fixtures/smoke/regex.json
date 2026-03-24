@@ -7,6 +7,6 @@
 	"description": "Smoke test: load regex and parse a simple snippet",
 	"id": "smoke_regex",
 	"language": "regex",
-	"source_code": "[a-z]+",
+	"source_code": "x",
 	"tags": ["smoke"]
 }

@@ -163,7 +163,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             } else {
                 writeln!(
                     out,
-                    "        $intel = json_decode(\\ts_pack_process('{}', json_encode(['language' => '{}'])), true);",
+                    "        $intel = json_decode(\\ts_pack_process('{}', json_encode(['language' => '{}', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);",
                     escape_php_string(source),
                     escape_php_string(lang)
                 )

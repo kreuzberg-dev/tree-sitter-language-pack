@@ -14,4 +14,9 @@ export {
   treeHasErrorNodes,
   freeTree,
   process,
+  detectLanguageFromExtension,
+  detectLanguageFromPath,
+  detectLanguageFromContent,
+  extensionAmbiguity,
+  getHighlightsQuery,
 } from "@kreuzberg/tree-sitter-language-pack-wasm";

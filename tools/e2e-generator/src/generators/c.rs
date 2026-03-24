@@ -370,7 +370,7 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
         } else {
             writeln!(
                 out,
-                "    char *result = ts_pack_process(reg, \"{}\", {}, \"{{\\\"language\\\":\\\"{}\\\"}}\");",
+                "    char *result = ts_pack_process(reg, \"{}\", {}, \"{{\\\"language\\\":\\\"{}\\\",\\\"structure\\\":true,\\\"imports\\\":true,\\\"exports\\\":true,\\\"comments\\\":true,\\\"docstrings\\\":true,\\\"symbols\\\":true,\\\"diagnostics\\\":true}}\");",
                 source_escaped,
                 source.len(),
                 escape_c_string(lang)

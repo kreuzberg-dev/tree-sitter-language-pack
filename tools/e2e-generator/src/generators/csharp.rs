@@ -150,7 +150,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             } else {
                 writeln!(
                     out,
-                    "        var config = new ProcessConfig {{ Language = \"{}\" }};",
+                    "        var config = new ProcessConfig {{ Language = \"{}\", Structure = true, Imports = true, Exports = true, Comments = true, Docstrings = true, Symbols = true, Diagnostics = true }};",
                     escape_csharp_string(lang)
                 )
                 .unwrap();

@@ -475,6 +475,22 @@ fn generate_registry(
         libs_dir.display().to_string()
     )
     .unwrap();
+    writeln!(f).unwrap();
+
+    // C symbol overrides: language name -> C symbol (only for languages where they differ)
+    writeln!(
+        f,
+        "#[allow(unused)]\npub(crate) static C_SYMBOL_OVERRIDES: &[(&str, &str)] = &["
+    )
+    .unwrap();
+    for name in static_langs.iter().chain(dynamic_langs.iter()) {
+        if let Some(def) = definitions.get(name.as_str())
+            && let Some(c_sym) = &def.c_symbol
+        {
+            writeln!(f, "    (\"{name}\", \"{c_sym}\"),").unwrap();
+        }
+    }
+    writeln!(f, "];").unwrap();
 }
 
 /// Emit rerun-if-changed for specific source files in a parser directory.

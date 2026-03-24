@@ -10,6 +10,11 @@ import {
   treeContainsNodeType as _treeContainsNodeType,
   treeHasErrorNodes as _treeHasErrorNodes,
   process as _process,
+  detectLanguageFromExtension as _detectLanguageFromExtension,
+  detectLanguageFromPath as _detectLanguageFromPath,
+  detectLanguageFromContent as _detectLanguageFromContent,
+  extensionAmbiguity as _extensionAmbiguity,
+  getHighlightsQuery as _getHighlightsQuery,
 } from "@kreuzberg/tree-sitter-language-pack";
 
 /**
@@ -60,3 +65,8 @@ export const hasLanguage = _hasLanguage;
 export const getLanguagePtr = _getLanguagePtr;
 export const parseString = _parseString;
 export const process = _process;
+export const detectLanguageFromExtension = _detectLanguageFromExtension;
+export const detectLanguageFromPath = _detectLanguageFromPath;
+export const detectLanguageFromContent = _detectLanguageFromContent;
+export const extensionAmbiguity = _extensionAmbiguity;
+export const getHighlightsQuery = _getHighlightsQuery;

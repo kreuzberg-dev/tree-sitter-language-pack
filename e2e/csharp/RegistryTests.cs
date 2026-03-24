@@ -11,21 +11,21 @@ public class RegistryTests
     [Fact]
     public void RegistryHasLanguageFalse()
     {
-        // has_language('nonexistent') should return false.
+        // has_language('nonexistent') should return false
         Assert.False(TsPackClient.HasLanguage("nonexistent"));
     }
 
     [Fact]
     public void RegistryHasLanguageTrue()
     {
-        // has_language('python') should return true.
+        // has_language('python') should return true
         Assert.True(TsPackClient.HasLanguage("python"));
     }
 
     [Fact]
     public void RegistryListLanguages()
     {
-        // available_languages should return a non-empty list.
+        // available_languages should return a non-empty list
         var langs = TsPackClient.AvailableLanguages();
         Assert.NotEmpty(langs);
     }

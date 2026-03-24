@@ -18,5 +18,4 @@ defmodule E2eTests.RegistryTest do
     langs = TreeSitterLanguagePack.available_languages()
     assert length(langs) > 0, "available_languages() should not be empty"
   end
-
 end

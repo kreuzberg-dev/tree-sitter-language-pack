@@ -12,6 +12,11 @@ import {
   treeHasErrorNodes,
   freeTree,
   process,
+  detectLanguageFromExtension,
+  detectLanguageFromPath,
+  detectLanguageFromContent,
+  extensionAmbiguity,
+  getHighlightsQuery,
 } from "./helpers";
 
 describe("metadata", () => {

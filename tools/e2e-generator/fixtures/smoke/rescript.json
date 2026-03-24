@@ -1,0 +1,12 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load rescript and parse a simple snippet",
+	"id": "smoke_rescript",
+	"language": "rescript",
+	"source_code": "let x = 1",
+	"tags": ["smoke"]
+}

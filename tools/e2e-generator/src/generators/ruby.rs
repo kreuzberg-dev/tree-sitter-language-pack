@@ -139,7 +139,7 @@ fn write_spec_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             } else {
                 writeln!(
                     out,
-                    "    intel = TreeSitterLanguagePack.process(\"{}\", '{{\"language\":\"{}\"}}')",
+                    "    intel = TreeSitterLanguagePack.process(\"{}\", '{{\"language\":\"{}\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}}')",
                     escape_ruby_string(source),
                     escape_ruby_string(lang)
                 )

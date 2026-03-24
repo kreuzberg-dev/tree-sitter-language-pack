@@ -136,6 +136,14 @@ tasks:
     cmds:
       - cargo test --manifest-path e2e/rust/Cargo.toml
 
+  e2e:all-grammars:
+    desc: Run Rust E2E tests with all grammars (no TSLP_LANGUAGES filter)
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LINK_MODE: static
+    cmds:
+      - cargo test --manifest-path e2e/rust/Cargo.toml
+
   e2e:verify:
     desc: Regenerate and validate Rust E2E suite (generate + format + test)
     cmds:

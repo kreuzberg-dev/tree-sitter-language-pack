@@ -460,7 +460,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             } else {
                 writeln!(
                     out,
-                    "    intel = process(\"{}\", ProcessConfig(language=\"{}\"))",
+                    "    intel = process(\"{}\", ProcessConfig(language=\"{}\", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))",
                     escape_python_string(source),
                     escape_python_string(lang)
                 )

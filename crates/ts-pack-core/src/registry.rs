@@ -20,6 +20,19 @@ const LANGUAGE_ALIASES: &[(&str, &str)] = &[
     ("shell", "bash"),
 ];
 
+/// Resolve a language name to its C symbol name (e.g. "csharp" -> "c_sharp").
+/// Falls back to the language name itself if no override exists.
+#[cfg(feature = "dynamic-loading")]
+#[inline(always)]
+fn c_symbol_for(name: &str) -> &str {
+    for &(lang, sym) in C_SYMBOL_OVERRIDES {
+        if lang == name {
+            return sym;
+        }
+    }
+    name
+}
+
 #[inline(always)]
 fn resolve_alias(name: &str) -> &str {
     for &(alias, target) in LANGUAGE_ALIASES {
@@ -78,7 +91,7 @@ mod dynamic {
         }
 
         fn lib_path(&self, name: &str) -> PathBuf {
-            let lib_name = format!("tree_sitter_{name}");
+            let lib_name = format!("tree_sitter_{}", super::c_symbol_for(name));
             let (prefix, ext) = if cfg!(target_os = "macos") {
                 ("lib", "dylib")
             } else if cfg!(target_os = "windows") {
@@ -92,7 +105,7 @@ mod dynamic {
         /// Load a language from a specific directory (e.g. download cache).
         /// The loaded library is stored in the shared cache.
         pub(crate) fn load_from_dir(&self, name: &str, dir: &std::path::Path) -> Result<Language, Error> {
-            let lib_name = format!("tree_sitter_{name}");
+            let lib_name = format!("tree_sitter_{}", super::c_symbol_for(name));
             let (prefix, ext) = if cfg!(target_os = "macos") {
                 ("lib", "dylib")
             } else if cfg!(target_os = "windows") {
@@ -131,7 +144,7 @@ mod dynamic {
                 return Ok(lang.clone());
             }
 
-            let func_name = format!("tree_sitter_{name}");
+            let func_name = format!("tree_sitter_{}", super::c_symbol_for(name));
 
             // SAFETY: We are loading a known tree-sitter grammar shared library that exports
             // a `tree_sitter_<name>` function returning a pointer to a TSLanguage struct.
@@ -351,7 +364,7 @@ impl LanguageRegistry {
 
             let extra_dirs: Vec<PathBuf> = self.extra_lib_dirs.read().map(|dirs| dirs.clone()).unwrap_or_default();
             for extra_dir in &extra_dirs {
-                let lib_name = format!("tree_sitter_{name}");
+                let lib_name = format!("tree_sitter_{}", c_symbol_for(name));
                 let (prefix, ext) = if cfg!(target_os = "macos") {
                     ("lib", "dylib")
                 } else if cfg!(target_os = "windows") {

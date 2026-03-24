@@ -11,21 +11,25 @@ from tree_sitter_language_pack import (
 def test_go_function_metadata():
     """Intel: extract structure from Go function definition"""
     parser = get_parser("go")
-    tree = parser.parse(b"package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n")
+    tree = parser.parse(b'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n')
 
 
 @pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
 def test_javascript_multi_import_metadata():
     """Intel: detect multiple imports and function in JavaScript"""
     parser = get_parser("javascript")
-    tree = parser.parse(b"import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n")
+    tree = parser.parse(
+        b"import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n"
+    )
 
 
 @pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
 def test_meta_javascript_exports_detail():
     """JavaScript with exports, verify export count"""
     parser = get_parser("javascript")
-    tree = parser.parse(b"export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n")
+    tree = parser.parse(
+        b"export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n"
+    )
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
 
@@ -52,7 +56,9 @@ def test_meta_python_imports_detail():
 def test_meta_python_metrics_detail():
     """Python code with metrics assertions"""
     parser = get_parser("python")
-    tree = parser.parse(b"# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n")
+    tree = parser.parse(
+        b"# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n"
+    )
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
 
@@ -61,7 +67,9 @@ def test_meta_python_metrics_detail():
 def test_meta_rust_structure_name():
     """Rust struct with name, verify structure name contains value"""
     parser = get_parser("rust")
-    tree = parser.parse(b"pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n")
+    tree = parser.parse(
+        b"pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n"
+    )
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
 
@@ -70,7 +78,9 @@ def test_meta_rust_structure_name():
 def test_python_chunking_metadata():
     """Intel: chunk multi-function Python source into multiple pieces"""
     parser = get_parser("python")
-    tree = parser.parse(b"def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n")
+    tree = parser.parse(
+        b"def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n"
+    )
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
 
@@ -79,7 +89,9 @@ def test_python_chunking_metadata():
 def test_python_class_with_methods_metadata():
     """Intel: extract nested structure from Python class with methods"""
     parser = get_parser("python")
-    tree = parser.parse(b"class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n")
+    tree = parser.parse(
+        b"class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n"
+    )
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
@@ -125,4 +137,6 @@ def test_rust_function_metadata():
 def test_typescript_function_metadata():
     """Intel: extract structure from TypeScript function"""
     parser = get_parser("typescript")
-    tree = parser.parse(b"import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n")
+    tree = parser.parse(
+        b"import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n"
+    )

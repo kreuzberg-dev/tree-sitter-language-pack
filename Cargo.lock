@@ -1871,9 +1871,9 @@ dependencies = [
 
 [[package]]
 name = "serde_spanned"
-version = "1.0.4"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f8bbf91e5a4d6315eee45e704372590b30e260ee83af6639d64557f51b067776"
+checksum = "876ac351060d4f882bb1032b6369eb0aef79ad9df1ea8bc404874d8cc3d0cd98"
 dependencies = [
  "serde_core",
 ]
@@ -1947,7 +1947,7 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
 name = "snippet-runner"
-version = "1.1.2"
+version = "1.1.3"
 dependencies = [
  "clap",
  "rayon",
@@ -1955,7 +1955,7 @@ dependencies = [
  "serde_json",
  "tempfile",
  "thiserror",
- "toml 1.0.7+spec-1.1.0",
+ "toml 1.1.0+spec-1.1.0",
  "walkdir",
  "which",
 ]
@@ -2085,14 +2085,14 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "1.0.7+spec-1.1.0"
+version = "1.1.0+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd28d57d8a6f6e458bc0b8784f8fdcc4b99a437936056fa122cb234f18656a96"
+checksum = "f8195ca05e4eb728f4ba94f3e3291661320af739c4e43779cbdfae82ab239fcc"
 dependencies = [
  "indexmap",
  "serde_core",
  "serde_spanned",
- "toml_datetime 1.0.1+spec-1.1.0",
+ "toml_datetime 1.1.0+spec-1.1.0",
  "toml_parser",
  "toml_writer",
  "winnow 1.0.0",
@@ -2109,27 +2109,27 @@ dependencies = [
 
 [[package]]
 name = "toml_datetime"
-version = "1.0.1+spec-1.1.0"
+version = "1.1.0+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b320e741db58cac564e26c607d3cc1fdc4a88fd36c879568c07856ed83ff3e9"
+checksum = "97251a7c317e03ad83774a8752a7e81fb6067740609f75ea2b585b569a59198f"
 dependencies = [
  "serde_core",
 ]
 
 [[package]]
 name = "toml_parser"
-version = "1.0.10+spec-1.1.0"
+version = "1.1.0+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7df25b4befd31c4816df190124375d5a20c6b6921e2cad937316de3fccd63420"
+checksum = "2334f11ee363607eb04df9b8fc8a13ca1715a72ba8662a26ac285c98aabb4011"
 dependencies = [
  "winnow 1.0.0",
 ]
 
 [[package]]
 name = "toml_writer"
-version = "1.0.7+spec-1.1.0"
+version = "1.1.0+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f17aaa1c6e3dc22b1da4b6bba97d066e354c7945cac2f7852d4e4e7ca7a6b56d"
+checksum = "d282ade6016312faf3e41e57ebbba0c073e4056dab1232ab1cb624199648f8ed"
 
 [[package]]
 name = "tree-sitter"
@@ -2153,7 +2153,7 @@ checksum = "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
 
 [[package]]
 name = "tree-sitter-language-pack"
-version = "1.1.2"
+version = "1.1.3"
 dependencies = [
  "ahash",
  "cc",
@@ -2165,7 +2165,7 @@ dependencies = [
  "sha2",
  "tar",
  "thiserror",
- "toml 1.0.7+spec-1.1.0",
+ "toml 1.1.0+spec-1.1.0",
  "tree-sitter",
  "ureq",
  "zstd",
@@ -2173,7 +2173,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-cli"
-version = "1.1.2"
+version = "1.1.3"
 dependencies = [
  "clap",
  "clap_complete",
@@ -2183,7 +2183,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-ffi"
-version = "1.1.2"
+version = "1.1.3"
 dependencies = [
  "cbindgen",
  "serde_json",
@@ -2193,7 +2193,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-node"
-version = "1.1.2"
+version = "1.1.3"
 dependencies = [
  "napi",
  "napi-build",
@@ -2205,7 +2205,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-php"
-version = "1.1.2"
+version = "1.1.3"
 dependencies = [
  "ext-php-rs",
  "serde_json",
@@ -2214,7 +2214,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-python"
-version = "1.1.2"
+version = "1.1.3"
 dependencies = [
  "pyo3",
  "serde_json",
@@ -2224,7 +2224,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-ruby"
-version = "1.1.2"
+version = "1.1.3"
 dependencies = [
  "magnus",
  "rb-sys",
@@ -2235,7 +2235,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-wasm"
-version = "1.1.2"
+version = "1.1.3"
 dependencies = [
  "js-sys",
  "serde_json",

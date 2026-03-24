@@ -1,0 +1,12 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load postscript and parse a simple snippet",
+	"id": "smoke_postscript",
+	"language": "postscript",
+	"source_code": "/hello { (Hello) show } def",
+	"tags": ["smoke"]
+}

@@ -12,11 +12,16 @@ import {
   treeHasErrorNodes,
   freeTree,
   process,
+  detectLanguageFromExtension,
+  detectLanguageFromPath,
+  detectLanguageFromContent,
+  extensionAmbiguity,
+  getHighlightsQuery,
 } from "./helpers";
 
 describe("registry", () => {
   it("registry_list_languages", () => {
-    // available_languages should return a non-empty list.
+    // available_languages should return a non-empty list
     const langs = availableLanguages();
     expect(langs.length).toBeGreaterThan(0);
   });

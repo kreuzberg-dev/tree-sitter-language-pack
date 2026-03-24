@@ -13,7 +13,7 @@ defmodule TestAppElixir.MixProject do
 
   defp deps do
     [
-      {:tree_sitter_language_pack, "~> 1.1.2"},
+      {:tree_sitter_language_pack, "~> 1.1.3"},
       {:jason, "~> 1.4"}
     ]
   end

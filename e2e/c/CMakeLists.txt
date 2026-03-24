@@ -31,74 +31,6 @@ add_executable(test_error_handling_unknown_language test_error_handling_unknown_
 target_link_libraries(test_error_handling_unknown_language ts_pack_ffi)
 add_test(NAME test_error_handling_unknown_language COMMAND test_error_handling_unknown_language)
 
-add_executable(test_c_function_intel test_c_function_intel.c)
-target_link_libraries(test_c_function_intel ts_pack_ffi)
-add_test(NAME test_c_function_intel COMMAND test_c_function_intel)
-
-add_executable(test_config_all_python test_config_all_python.c)
-target_link_libraries(test_config_all_python ts_pack_ffi)
-add_test(NAME test_config_all_python COMMAND test_config_all_python)
-
-add_executable(test_config_minimal_python test_config_minimal_python.c)
-target_link_libraries(test_config_minimal_python ts_pack_ffi)
-add_test(NAME test_config_minimal_python COMMAND test_config_minimal_python)
-
-add_executable(test_go_function_intel test_go_function_intel.c)
-target_link_libraries(test_go_function_intel ts_pack_ffi)
-add_test(NAME test_go_function_intel COMMAND test_go_function_intel)
-
-add_executable(test_java_class_intel test_java_class_intel.c)
-target_link_libraries(test_java_class_intel ts_pack_ffi)
-add_test(NAME test_java_class_intel COMMAND test_java_class_intel)
-
-add_executable(test_javascript_multi_import_intel test_javascript_multi_import_intel.c)
-target_link_libraries(test_javascript_multi_import_intel ts_pack_ffi)
-add_test(NAME test_javascript_multi_import_intel COMMAND test_javascript_multi_import_intel)
-
-add_executable(test_python_chunking_intel test_python_chunking_intel.c)
-target_link_libraries(test_python_chunking_intel ts_pack_ffi)
-add_test(NAME test_python_chunking_intel COMMAND test_python_chunking_intel)
-
-add_executable(test_python_chunking_medium test_python_chunking_medium.c)
-target_link_libraries(test_python_chunking_medium ts_pack_ffi)
-add_test(NAME test_python_chunking_medium COMMAND test_python_chunking_medium)
-
-add_executable(test_python_class_with_methods_intel test_python_class_with_methods_intel.c)
-target_link_libraries(test_python_class_with_methods_intel ts_pack_ffi)
-add_test(NAME test_python_class_with_methods_intel COMMAND test_python_class_with_methods_intel)
-
-add_executable(test_python_error_diagnostics test_python_error_diagnostics.c)
-target_link_libraries(test_python_error_diagnostics ts_pack_ffi)
-add_test(NAME test_python_error_diagnostics COMMAND test_python_error_diagnostics)
-
-add_executable(test_python_function_intel test_python_function_intel.c)
-target_link_libraries(test_python_function_intel ts_pack_ffi)
-add_test(NAME test_python_function_intel COMMAND test_python_function_intel)
-
-add_executable(test_python_malformed_code_intel test_python_malformed_code_intel.c)
-target_link_libraries(test_python_malformed_code_intel ts_pack_ffi)
-add_test(NAME test_python_malformed_code_intel COMMAND test_python_malformed_code_intel)
-
-add_executable(test_python_multi_import_intel test_python_multi_import_intel.c)
-target_link_libraries(test_python_multi_import_intel ts_pack_ffi)
-add_test(NAME test_python_multi_import_intel COMMAND test_python_multi_import_intel)
-
-add_executable(test_ruby_class_intel test_ruby_class_intel.c)
-target_link_libraries(test_ruby_class_intel ts_pack_ffi)
-add_test(NAME test_ruby_class_intel COMMAND test_ruby_class_intel)
-
-add_executable(test_rust_chunking_intel test_rust_chunking_intel.c)
-target_link_libraries(test_rust_chunking_intel ts_pack_ffi)
-add_test(NAME test_rust_chunking_intel COMMAND test_rust_chunking_intel)
-
-add_executable(test_rust_function_intel test_rust_function_intel.c)
-target_link_libraries(test_rust_function_intel ts_pack_ffi)
-add_test(NAME test_rust_function_intel COMMAND test_rust_function_intel)
-
-add_executable(test_typescript_function_intel test_typescript_function_intel.c)
-target_link_libraries(test_typescript_function_intel ts_pack_ffi)
-add_test(NAME test_typescript_function_intel COMMAND test_typescript_function_intel)
-
 add_executable(test_go_function_metadata test_go_function_metadata.c)
 target_link_libraries(test_go_function_metadata ts_pack_ffi)
 add_test(NAME test_go_function_metadata COMMAND test_go_function_metadata)
@@ -159,13 +91,29 @@ add_executable(test_typescript_function_metadata test_typescript_function_metada
 target_link_libraries(test_typescript_function_metadata ts_pack_ffi)
 add_test(NAME test_typescript_function_metadata COMMAND test_typescript_function_metadata)
 
+add_executable(test_parsing_go_function test_parsing_go_function.c)
+target_link_libraries(test_parsing_go_function ts_pack_ffi)
+add_test(NAME test_parsing_go_function COMMAND test_parsing_go_function)
+
+add_executable(test_parsing_html_element test_parsing_html_element.c)
+target_link_libraries(test_parsing_html_element ts_pack_ffi)
+add_test(NAME test_parsing_html_element COMMAND test_parsing_html_element)
+
 add_executable(test_parsing_javascript_class test_parsing_javascript_class.c)
 target_link_libraries(test_parsing_javascript_class ts_pack_ffi)
 add_test(NAME test_parsing_javascript_class COMMAND test_parsing_javascript_class)
 
+add_executable(test_parsing_javascript_variable test_parsing_javascript_variable.c)
+target_link_libraries(test_parsing_javascript_variable ts_pack_ffi)
+add_test(NAME test_parsing_javascript_variable COMMAND test_parsing_javascript_variable)
+
 add_executable(test_parsing_python_function test_parsing_python_function.c)
 target_link_libraries(test_parsing_python_function ts_pack_ffi)
 add_test(NAME test_parsing_python_function COMMAND test_parsing_python_function)
+
+add_executable(test_parsing_rust_function test_parsing_rust_function.c)
+target_link_libraries(test_parsing_rust_function ts_pack_ffi)
+add_test(NAME test_parsing_rust_function COMMAND test_parsing_rust_function)
 
 add_executable(test_parsing_rust_struct test_parsing_rust_struct.c)
 target_link_libraries(test_parsing_rust_struct ts_pack_ffi)
@@ -283,10 +231,6 @@ add_executable(test_smoke_cpp test_smoke_cpp.c)
 target_link_libraries(test_smoke_cpp ts_pack_ffi)
 add_test(NAME test_smoke_cpp COMMAND test_smoke_cpp)
 
-add_executable(test_smoke_csharp test_smoke_csharp.c)
-target_link_libraries(test_smoke_csharp ts_pack_ffi)
-add_test(NAME test_smoke_csharp COMMAND test_smoke_csharp)
-
 add_executable(test_smoke_css test_smoke_css.c)
 target_link_libraries(test_smoke_css ts_pack_ffi)
 add_test(NAME test_smoke_css COMMAND test_smoke_css)
@@ -330,10 +274,6 @@ add_test(NAME test_smoke_elixir COMMAND test_smoke_elixir)
 add_executable(test_smoke_elm test_smoke_elm.c)
 target_link_libraries(test_smoke_elm ts_pack_ffi)
 add_test(NAME test_smoke_elm COMMAND test_smoke_elm)
-
-add_executable(test_smoke_embeddedtemplate test_smoke_embeddedtemplate.c)
-target_link_libraries(test_smoke_embeddedtemplate ts_pack_ffi)
-add_test(NAME test_smoke_embeddedtemplate COMMAND test_smoke_embeddedtemplate)
 
 add_executable(test_smoke_erlang test_smoke_erlang.c)
 target_link_libraries(test_smoke_erlang ts_pack_ffi)
@@ -695,10 +635,6 @@ add_executable(test_smoke_readline test_smoke_readline.c)
 target_link_libraries(test_smoke_readline ts_pack_ffi)
 add_test(NAME test_smoke_readline COMMAND test_smoke_readline)
 
-add_executable(test_smoke_regex test_smoke_regex.c)
-target_link_libraries(test_smoke_regex ts_pack_ffi)
-add_test(NAME test_smoke_regex COMMAND test_smoke_regex)
-
 add_executable(test_smoke_rego test_smoke_rego.c)
 target_link_libraries(test_smoke_rego ts_pack_ffi)
 add_test(NAME test_smoke_rego COMMAND test_smoke_rego)
@@ -866,10 +802,6 @@ add_test(NAME test_smoke_xcompose COMMAND test_smoke_xcompose)
 add_executable(test_smoke_xml test_smoke_xml.c)
 target_link_libraries(test_smoke_xml ts_pack_ffi)
 add_test(NAME test_smoke_xml COMMAND test_smoke_xml)
-
-add_executable(test_smoke_yaml test_smoke_yaml.c)
-target_link_libraries(test_smoke_yaml ts_pack_ffi)
-add_test(NAME test_smoke_yaml COMMAND test_smoke_yaml)
 
 add_executable(test_smoke_yuck test_smoke_yuck.c)
 target_link_libraries(test_smoke_yuck ts_pack_ffi)

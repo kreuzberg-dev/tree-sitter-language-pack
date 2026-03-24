@@ -9,11 +9,13 @@ defmodule E2eTests.ParsingTest do
     unless TreeSitterLanguagePack.has_language("javascript") do
       IO.puts("Skipping: language 'javascript' not available")
     else
-    tree = TreeSitterLanguagePack.parse_string("javascript", "class Foo { bar() {} }")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
-    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "class_declaration"), "Tree should contain a 'class_declaration' node"
+      tree = TreeSitterLanguagePack.parse_string("javascript", "class Foo { bar() {} }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+
+      assert TreeSitterLanguagePack.tree_contains_node_type(tree, "class_declaration"),
+             "Tree should contain a 'class_declaration' node"
     end
   end
 
@@ -23,11 +25,13 @@ defmodule E2eTests.ParsingTest do
     unless TreeSitterLanguagePack.has_language("python") do
       IO.puts("Skipping: language 'python' not available")
     else
-    tree = TreeSitterLanguagePack.parse_string("python", "def hello():\n    pass\n")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
-    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_definition"), "Tree should contain a 'function_definition' node"
+      tree = TreeSitterLanguagePack.parse_string("python", "def hello():\n    pass\n")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+
+      assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_definition"),
+             "Tree should contain a 'function_definition' node"
     end
   end
 
@@ -37,11 +41,10 @@ defmodule E2eTests.ParsingTest do
     unless TreeSitterLanguagePack.has_language("rust") do
       IO.puts("Skipping: language 'rust' not available")
     else
-    tree = TreeSitterLanguagePack.parse_string("rust", "struct Point { x: f64, y: f64 }")
-    assert is_reference(tree), "Parse tree should be a reference"
-    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
-    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+      tree = TreeSitterLanguagePack.parse_string("rust", "struct Point { x: f64, y: f64 }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
     end
   end
-
 end

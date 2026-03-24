@@ -12,6 +12,11 @@ import {
   treeHasErrorNodes,
   freeTree,
   process,
+  detectLanguageFromExtension,
+  detectLanguageFromPath,
+  detectLanguageFromContent,
+  extensionAmbiguity,
+  getHighlightsQuery,
 } from "./helpers";
 
 describe("smoke", () => {
@@ -25,6 +30,7 @@ describe("smoke", () => {
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "frontmatter")).toBe(true);
     freeTree(tree);
   });
 
@@ -38,6 +44,7 @@ describe("smoke", () => {
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "rule_set")).toBe(true);
     freeTree(tree);
   });
 
@@ -51,6 +58,7 @@ describe("smoke", () => {
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "document")).toBe(true);
     freeTree(tree);
   });
 
@@ -90,6 +98,7 @@ describe("smoke", () => {
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "tag_name")).toBe(true);
     freeTree(tree);
   });
 
@@ -103,6 +112,7 @@ describe("smoke", () => {
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "object")).toBe(true);
     freeTree(tree);
   });
 
@@ -116,6 +126,7 @@ describe("smoke", () => {
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "model_block")).toBe(true);
     freeTree(tree);
   });
 
@@ -129,6 +140,7 @@ describe("smoke", () => {
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "declaration")).toBe(true);
     freeTree(tree);
   });
 
@@ -141,6 +153,7 @@ describe("smoke", () => {
     const tree = parseString("svelte", `<p>hello</p>`);
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
+    expect(treeContainsNodeType(tree, "element")).toBe(true);
     freeTree(tree);
   });
 
@@ -154,6 +167,7 @@ describe("smoke", () => {
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "lexical_declaration")).toBe(true);
     freeTree(tree);
   });
 
@@ -167,6 +181,7 @@ describe("smoke", () => {
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "output_directive")).toBe(true);
     freeTree(tree);
   });
 
@@ -193,6 +208,7 @@ describe("smoke", () => {
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "template_element")).toBe(true);
     freeTree(tree);
   });
 
