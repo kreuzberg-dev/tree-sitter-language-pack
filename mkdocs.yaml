@@ -1,9 +1,9 @@
 site_name: tree-sitter-language-pack
 site_description: "Pre-compiled tree-sitter parsers for 197 languages with code intelligence, chunking, and polyglot bindings."
-site_author: "Na'aman Hirschfeld"
 site_url: https://docs.tree-sitter-language-pack.kreuzberg.dev
-repo_url: https://github.com/kreuzberg-dev/tree-sitter-language-pack
+site_author: kreuzberg.dev
 repo_name: kreuzberg-dev/tree-sitter-language-pack
+repo_url: https://github.com/kreuzberg-dev/tree-sitter-language-pack
 edit_uri: edit/main/docs/
 copyright: Copyright &copy; 2024-2026 Kreuzberg.dev
 
@@ -12,9 +12,6 @@ theme:
   custom_dir: docs/overrides
   logo: assets/logo.svg
   favicon: assets/favicon.ico
-  font:
-    text: Inter
-    code: JetBrains Mono
   palette:
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
@@ -30,16 +27,13 @@ theme:
       toggle:
         icon: moon
         name: Switch to dark mode
-  icon:
-    repo: github
-    search: search
-  language: en
+  font:
+    text: Inter
+    code: JetBrains Mono
   features:
     - content.code.copy
     - content.code.annotate
     - content.tabs.link
-    - content.action.edit
-    - content.action.view
     - navigation.instant
     - navigation.instant.progress
     - navigation.path
@@ -57,6 +51,56 @@ theme:
     - toc.follow
     - toc.integrate
     - announce.dismiss
+    - content.action.edit
+    - content.action.view
+  icon:
+    repo: github
+    search: search
+  language: en
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      options:
+        custom_icons:
+          - docs/overrides/.icons
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      linenums: false
+      use_pygments: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      base_path: ["docs", "."]
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
 
 plugins:
   - search
@@ -66,8 +110,8 @@ plugins:
   - minify:
       minify_html: true
   - git-revision-date-localized:
-      type: timeago
       enable_creation_date: true
+      type: timeago
       fallback_to_build_date: true
 
 extra:
@@ -96,52 +140,6 @@ extra:
 
 extra_css:
   - css/extra.css
-
-markdown_extensions:
-  - admonition
-  - attr_list
-  - def_list
-  - footnotes
-  - md_in_html
-  - tables
-  - toc:
-      permalink: true
-      toc_depth: 3
-  - pymdownx.details
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
-      options:
-        custom_icons:
-          - docs/overrides/.icons
-  - pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
-      pygments_lang_class: true
-      linenums: false
-      use_pygments: true
-  - pymdownx.inlinehilite
-  - pymdownx.keys
-  - pymdownx.mark
-  - pymdownx.smartsymbols
-  - pymdownx.snippets:
-      base_path:
-        - docs
-        - "."
-      check_paths: true
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.tabbed:
-      alternate_style: true
-      combine_header_slug: true
-      slugify: !!python/object/apply:pymdownx.slugs.slugify
-        kwds:
-          case: lower
-  - pymdownx.tasklist:
-      custom_checkbox: true
 
 nav:
   - Home: index.md
