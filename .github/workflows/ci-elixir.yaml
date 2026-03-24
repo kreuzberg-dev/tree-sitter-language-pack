@@ -177,6 +177,7 @@ jobs:
           PROJECT_ROOT: ${{ github.workspace }}
           MIX_ENV: test
           TSLP_BUILD: "1"
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
         run: mix compile --warnings-as-errors
 
       - name: Run Elixir tests
@@ -184,6 +185,7 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_BUILD: "1"
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
   e2e-elixir:
     name: Elixir E2E Tests
@@ -261,4 +263,5 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_BUILD: "1"
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
           MIX_ENV: test
