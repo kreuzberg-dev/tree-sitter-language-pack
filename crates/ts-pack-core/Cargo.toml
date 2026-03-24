@@ -24,6 +24,7 @@ download = [
 all = [
     "lang-actionscript",
     "lang-ada",
+    "lang-al",
     "lang-agda",
     "lang-apex",
     "lang-arduino",
@@ -344,6 +345,7 @@ wasm = [
 ]
 lang-actionscript = []
 lang-ada = []
+lang-al = []
 lang-agda = []
 lang-apex = []
 lang-arduino = []

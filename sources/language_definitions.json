@@ -10,6 +10,11 @@
 		"repo": "https://github.com/briot/tree-sitter-ada",
 		"rev": "6b58259a08b1a22ba0247a7ce30be384db618da6"
 	},
+	"al": {
+		"extensions": ["al"],
+		"repo": "https://github.com/SShadowS/tree-sitter-al",
+		"rev": "5cd40930e508f007173554d58f99ec4749fb3d46"
+	},
 	"agda": {
 		"branch": "master",
 		"extensions": ["agda"],
