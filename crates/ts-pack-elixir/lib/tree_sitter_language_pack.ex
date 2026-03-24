@@ -101,6 +101,52 @@ defmodule TreeSitterLanguagePack do
   def language_count(), do: :erlang.nif_error(:nif_not_loaded)
 
   @doc """
+  Detect language from a file path based on its extension.
+
+  Returns `nil` if the language cannot be determined.
+  """
+  @spec detect_language(String.t()) :: String.t() | nil
+  def detect_language(_path), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Detect language from source code content (e.g. shebang lines).
+
+  Returns `nil` if the language cannot be determined.
+  """
+  @spec detect_language_from_content(String.t()) :: String.t() | nil
+  def detect_language_from_content(_content), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Returns extension ambiguity info as a JSON string, or `nil`.
+  """
+  @spec extension_ambiguity(String.t()) :: String.t() | nil
+  def extension_ambiguity(_ext), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Get the bundled highlights.scm query for a language.
+
+  Returns `nil` if no highlights query is available.
+  """
+  @spec get_highlights_query(String.t()) :: String.t() | nil
+  def get_highlights_query(_language), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Get the bundled injections.scm query for a language.
+
+  Returns `nil` if no injections query is available.
+  """
+  @spec get_injections_query(String.t()) :: String.t() | nil
+  def get_injections_query(_language), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Get the bundled locals.scm query for a language.
+
+  Returns `nil` if no locals query is available.
+  """
+  @spec get_locals_query(String.t()) :: String.t() | nil
+  def get_locals_query(_language), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
   Returns the raw `TSLanguage` pointer as a non-negative integer.
 
   This is useful for interop with Elixir tree-sitter bindings that
