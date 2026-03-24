@@ -230,6 +230,14 @@ TSLP_CACHE_DIR=/tmp/tslp-parsers task clone
 
 ## Adding Languages
 
+### License Requirements
+
+All included grammars **must** be released under a permissive open-source license such as MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, or Unlicense. We do **not** accept grammars licensed under GPL, AGPL, LGPL, MPL, or any other copyleft license. This policy ensures that tree-sitter-language-pack can be freely used in any project — commercial or otherwise — without imposing license obligations on downstream users.
+
+Before proposing a new grammar, verify its license by checking the `LICENSE` file in the grammar repository.
+
+### Steps
+
 1. **Add a language definition** to `sources/language_definitions.json`:
 
     ```json

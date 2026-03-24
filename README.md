@@ -258,3 +258,5 @@ Join our [Discord community](https://discord.gg/xt9WY3GnKR) for questions and di
 ## License
 
 MIT -- see [LICENSE](LICENSE) for details.
+
+All included tree-sitter grammars are permissively licensed (MIT, Apache-2.0, BSD, ISC, or similar). Copyleft licenses (GPL, AGPL, LGPL, MPL) are not accepted. See [CONTRIBUTING.md](CONTRIBUTING.md) for grammar inclusion criteria.

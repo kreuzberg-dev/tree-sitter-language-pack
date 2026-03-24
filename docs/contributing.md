@@ -52,6 +52,7 @@ The most common contribution is adding a new tree-sitter grammar.
 
 The grammar must:
 
+- **Be permissively licensed** (MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, or Unlicense). We do **not** accept grammars under GPL, AGPL, LGPL, MPL, or any other copyleft license. This ensures tree-sitter-language-pack can be freely used in any project without imposing license obligations on downstream users.
 - Have a public Git repository.
 - Produce valid `parser.c` output from `tree-sitter generate`.
 - Compile cleanly on Linux, macOS, and Windows.
