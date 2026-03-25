@@ -40,7 +40,7 @@ defmodule TreeSitterLanguagePack do
 
   use RustlerPrecompiled,
     otp_app: :tree_sitter_language_pack,
-    crate: "ts-pack-elixir",
+    crate: "ts_pack_elixir",
     path: ".",
     base_url:
       "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v#{@version}",

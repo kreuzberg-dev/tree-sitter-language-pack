@@ -2088,6 +2088,11 @@ jobs:
           echo "Contents:"
           cat "$CHECKSUM_FILE"
 
+      - name: Patch Rustler --cfg flag placement
+        working-directory: crates/ts-pack-elixir
+        run: |
+          sed -i 's/args ++ \["--cfg", "build_#{System.system_time(:millisecond)}"\]/args ++ ["--", "--cfg", "build_#{System.system_time(:millisecond)}"]/' deps/rustler/lib/rustler/compiler.ex
+
       - name: Compile project
         working-directory: crates/ts-pack-elixir
         env:

@@ -163,7 +163,6 @@ jobs:
         run: |
           mkdir -p crates/ts-pack-elixir/priv/native
           cp crates/ts-pack-elixir/target/release/libts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts_pack_elixir.so
-          ln -sf ts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts-pack-elixir.so
 
       - name: Patch Rustler --cfg flag placement
         working-directory: crates/ts-pack-elixir
@@ -231,7 +230,6 @@ jobs:
         run: |
           mkdir -p crates/ts-pack-elixir/priv/native
           cp crates/ts-pack-elixir/target/release/libts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts_pack_elixir.so
-          ln -sf ts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts-pack-elixir.so
 
       - name: Cache Elixir dependencies
         uses: actions/cache@v5
