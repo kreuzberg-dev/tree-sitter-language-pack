@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-03-25
+
+### Fixed
+
+- Nushell grammar `c_symbol` override — linker error `undefined symbol: tree_sitter_nushell`
+- E2E generator calling `.as_deref()` on `String` type (compile error on CI)
+- WASM build: gate `c_symbol_for` behind `dynamic-loading`/`download` features (dead code warning)
+- Elixir publish: align RustlerPrecompiled `crate:` field with Cargo `[lib]` name (underscores, not hyphens)
+- Elixir publish: add `--cfg` flag patch to publish workflow for Rustler 0.37.3 compatibility
+- Python `without_gil()`: add `catch_unwind` to ensure GIL is reacquired on panic
+- Text splitter: prevent zero-width chunks in pathological UTF-8 edge case
+- Comment kind detection: handle `//!`, `/*!`, and `doc_comment` node types
+- Import detection: restrict fallback to explicitly supported languages only
+- Export detection: use field-based AST matching instead of fragile `text.contains()`
+
+### Changed
+
+- Registry: `Arc<Vec<PathBuf>>` for extra lib dirs (avoids Vec clone per language lookup)
+- Registry: `AHashSet<&str>` in `available_languages()` (avoids 248+ String allocations)
+- `NodeInfo.kind` uses `Cow::Borrowed` (zero-copy from tree-sitter's `&'static str`)
+- Python: `with_tree()`/`try_with_tree()` helpers replace 9 duplicate lock patterns
+- Python: `without_gil()` helper replaces 5 duplicate GIL release patterns
+- Core: `extension_ambiguity_json()` helper replaces duplicated JSON serialization in 4 bindings
+- Chunking: `MetadataCollector` struct reduces function from 11 to 7 parameters
+- FFI: 25 SAFETY comments added to unsafe blocks
+- Docs: rewrite all 12 API references to match actual binding source code
+- Docs: add JSON-LD structured data and Open Graph metadata for crawlers
+
 ## [1.2.0] - 2026-03-25
 
 ### Added

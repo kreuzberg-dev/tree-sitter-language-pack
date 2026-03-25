@@ -1,6 +1,6 @@
 [project]
 name = "tree-sitter-language-pack"
-version = "1.2.0"
+version = "1.2.1"
 description = "Comprehensive collection of 248 tree-sitter language parsers with polyglot bindings"
 readme = "README.md"
 keywords = [
