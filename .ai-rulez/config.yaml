@@ -10,10 +10,13 @@ builtins:
   - pyo3
   - typescript
   - napi-rs
-  - ruby
-  - magnus
   - go
   - java
+  - ruby
+  - magnus
+  - php
+  - ext-php-rs
+  - csharp
   - elixir
   - rustler
   - wasm
