@@ -38,20 +38,15 @@ pub fn chunk_source(
             let mut has_error_nodes = false;
             let mut context_path = Vec::new();
 
-            collect_chunk_metadata(
-                &root,
-                source,
-                language,
-                start_byte,
-                end_byte,
-                &mut node_types,
-                &mut symbols_defined,
-                &mut comments,
-                &mut docstrings,
-                &mut has_error_nodes,
-                &mut context_path,
-                0,
-            );
+            let mut collector = MetadataCollector {
+                node_types: &mut node_types,
+                symbols: &mut symbols_defined,
+                comments: &mut comments,
+                docstrings: &mut docstrings,
+                has_errors: &mut has_error_nodes,
+                context_path: &mut context_path,
+            };
+            collect_chunk_metadata(&root, source, language, start_byte, end_byte, &mut collector, 0);
 
             CodeChunk {
                 content: content.to_string(),
@@ -92,19 +87,24 @@ fn node_text<'a>(node: &tree_sitter::Node, source: &'a str) -> &'a str {
     &source[node.start_byte()..node.end_byte()]
 }
 
-#[allow(clippy::only_used_in_recursion, clippy::too_many_arguments)]
+#[allow(dead_code)]
+struct MetadataCollector<'a> {
+    node_types: &'a mut Vec<String>,
+    symbols: &'a mut Vec<String>,
+    comments: &'a mut Vec<CommentInfo>,
+    docstrings: &'a mut Vec<DocstringInfo>,
+    has_errors: &'a mut bool,
+    context_path: &'a mut Vec<String>,
+}
+
+#[allow(clippy::only_used_in_recursion)]
 fn collect_chunk_metadata(
     node: &tree_sitter::Node,
     source: &str,
     language: &str,
     chunk_start: usize,
     chunk_end: usize,
-    node_types: &mut Vec<String>,
-    symbols: &mut Vec<String>,
-    comments: &mut Vec<CommentInfo>,
-    docstrings: &mut Vec<DocstringInfo>,
-    has_errors: &mut bool,
-    context_path: &mut Vec<String>,
+    collector: &mut MetadataCollector<'_>,
     depth: usize,
 ) {
     // Skip nodes entirely outside the chunk range
@@ -118,14 +118,14 @@ fn collect_chunk_metadata(
     if depth <= 1
         && node.start_byte() >= chunk_start
         && node.end_byte() <= chunk_end
-        && !node_types.contains(&kind.to_string())
+        && !collector.node_types.contains(&kind.to_string())
     {
-        node_types.push(kind.to_string());
+        collector.node_types.push(kind.to_string());
     }
 
     // Track errors
     if node.is_error() || node.is_missing() {
-        *has_errors = true;
+        *collector.has_errors = true;
     }
 
     // Track symbols defined in this chunk
@@ -145,12 +145,18 @@ fn collect_chunk_metadata(
             | "trait_item"
             | "impl_item"
     );
-    if is_definition && let Some(name_node) = node.child_by_field_name("name") {
-        let name = node_text(&name_node, source).to_string();
-        symbols.push(name.clone());
-        // Build context path for enclosing scopes
-        if node.start_byte() < chunk_start {
-            context_path.push(name);
+    if is_definition {
+        let name_node = node
+            .child_by_field_name("name")
+            .or_else(|| node.child_by_field_name("declarator"))
+            .or_else(|| node.child_by_field_name("binding"));
+        if let Some(name_node) = name_node {
+            let name = node_text(&name_node, source).to_string();
+            collector.symbols.push(name.clone());
+            // Build context path for enclosing scopes
+            if node.start_byte() < chunk_start {
+                collector.context_path.push(name);
+            }
         }
     }
 
@@ -162,12 +168,18 @@ fn collect_chunk_metadata(
         let text = node_text(node, source).to_string();
         let comment_kind = if kind == "block_comment" {
             CommentKind::Block
-        } else if text.starts_with("///") || text.starts_with("/**") {
+        } else if kind == "doc_comment"
+            || kind == "documentation_comment"
+            || text.starts_with("///")
+            || text.starts_with("//!")
+            || text.starts_with("/**")
+            || text.starts_with("/*!")
+        {
             CommentKind::Doc
         } else {
             CommentKind::Line
         };
-        comments.push(CommentInfo {
+        collector.comments.push(CommentInfo {
             text,
             kind: comment_kind,
             span: span_from_node(node),
@@ -177,20 +189,7 @@ fn collect_chunk_metadata(
 
     let mut cursor = node.walk();
     for child in node.children(&mut cursor) {
-        collect_chunk_metadata(
-            &child,
-            source,
-            language,
-            chunk_start,
-            chunk_end,
-            node_types,
-            symbols,
-            comments,
-            docstrings,
-            has_errors,
-            context_path,
-            depth + 1,
-        );
+        collect_chunk_metadata(&child, source, language, chunk_start, chunk_end, collector, depth + 1);
     }
 }
 

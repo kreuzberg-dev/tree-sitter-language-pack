@@ -53,6 +53,8 @@ pub mod definitions;
 pub mod download;
 
 pub use error::Error;
+#[cfg(feature = "serde")]
+pub use extensions::extension_ambiguity_json;
 pub use extensions::{
     detect_language_from_content, detect_language_from_extension, detect_language_from_path, extension_ambiguity,
 };

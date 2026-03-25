@@ -49,7 +49,11 @@ pub fn run_query(
 ) -> Result<Vec<QueryMatch>, Error> {
     let lang = crate::get_language(language)?;
     let query = tree_sitter::Query::new(&lang, query_source).map_err(|e| Error::QueryError(format!("{e}")))?;
-    let capture_names: Vec<String> = query.capture_names().iter().map(|s| s.to_string()).collect();
+    let capture_names: Vec<Cow<'static, str>> = query
+        .capture_names()
+        .iter()
+        .map(|s| Cow::Owned(s.to_string()))
+        .collect();
 
     let mut cursor = tree_sitter::QueryCursor::new();
     let mut matches = cursor.matches(&query, tree.root_node(), source);
@@ -60,7 +64,7 @@ pub fn run_query(
             .captures
             .iter()
             .map(|c| {
-                let name = Cow::Owned(capture_names[c.index as usize].clone());
+                let name = capture_names[c.index as usize].clone();
                 let info = node_info_from_node(c.node);
                 (name, info)
             })

@@ -220,7 +220,7 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
     if let Some(import_source) = &assertions.process_imports_contains_source {
         writeln!(
             out,
-            "    assert!(intel.imports.iter().any(|i| i.source.as_deref().unwrap_or(\"\") == \"{}\"), \"Imports should contain source '{}'\");",
+            "    assert!(intel.imports.iter().any(|i| i.source == \"{}\"), \"Imports should contain source '{}'\");",
             escape_rust_string(import_source),
             escape_rust_string(import_source)
         )

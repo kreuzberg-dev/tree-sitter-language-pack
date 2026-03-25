@@ -107,13 +107,7 @@ pub fn ts_pack_detect_language_from_content(content: String) -> Option<String> {
 /// ```
 #[php_function]
 pub fn ts_pack_extension_ambiguity(ext: String) -> Option<String> {
-    tree_sitter_language_pack::extension_ambiguity(&ext).and_then(|(assigned, alts)| {
-        let val = serde_json::json!({
-            "assigned": assigned,
-            "alternatives": alts,
-        });
-        serde_json::to_string(&val).ok()
-    })
+    tree_sitter_language_pack::extension_ambiguity_json(&ext)
 }
 
 /// Returns the bundled highlights query for the given language, or null.

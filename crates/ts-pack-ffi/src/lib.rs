@@ -155,6 +155,7 @@ pub unsafe extern "C" fn ts_pack_get_language(
         }
         // SAFETY: caller guarantees valid pointer from ts_pack_registry_new
         let reg = unsafe { &*registry };
+        // SAFETY: caller guarantees valid null-terminated string; null check above
         let name_str = unsafe { CStr::from_ptr(name) };
         let name_str = match name_str.to_str() {
             Ok(s) => s,
@@ -188,6 +189,7 @@ pub unsafe extern "C" fn ts_pack_language_count(registry: *const TsPackRegistry)
             set_last_error("registry pointer is null");
             return 0;
         }
+        // SAFETY: caller guarantees valid pointer; null check above
         let reg = unsafe { &*registry };
         reg.cached_names.len()
     })
@@ -210,6 +212,7 @@ pub unsafe extern "C" fn ts_pack_language_name_at(registry: *const TsPackRegistr
             set_last_error("registry pointer is null");
             return ptr::null();
         }
+        // SAFETY: caller guarantees valid pointer; null check above
         let reg = unsafe { &*registry };
         match reg.cached_names.get(index) {
             Some(name) => {
@@ -248,7 +251,9 @@ pub unsafe extern "C" fn ts_pack_has_language(registry: *const TsPackRegistry, n
             set_last_error("name pointer is null");
             return false;
         }
+        // SAFETY: caller guarantees valid pointer; null check above
         let reg = unsafe { &*registry };
+        // SAFETY: caller guarantees valid null-terminated string; null check above
         let name_str = unsafe { CStr::from_ptr(name) };
         match name_str.to_str() {
             Ok(s) => reg.inner.has_language(s),
@@ -277,6 +282,7 @@ pub unsafe extern "C" fn ts_pack_detect_language(path: *const c_char) -> *mut c_
             set_last_error("path pointer is null");
             return ptr::null_mut();
         }
+        // SAFETY: caller guarantees valid null-terminated string; null check above
         let path_str = unsafe { CStr::from_ptr(path) };
         match path_str.to_str() {
             Ok(s) => match tree_sitter_language_pack::detect_language_from_path(s) {
@@ -308,6 +314,7 @@ pub unsafe extern "C" fn ts_pack_detect_language_from_content(content: *const c_
             set_last_error("content pointer is null");
             return ptr::null_mut();
         }
+        // SAFETY: caller guarantees valid null-terminated string; null check above
         let content_str = unsafe { CStr::from_ptr(content) };
         match content_str.to_str() {
             Ok(s) => match tree_sitter_language_pack::detect_language_from_content(s) {
@@ -339,6 +346,7 @@ pub unsafe extern "C" fn ts_pack_extension_ambiguity(ext: *const c_char) -> *mut
             set_last_error("ext pointer is null");
             return ptr::null_mut();
         }
+        // SAFETY: caller guarantees valid null-terminated string; null check above
         let ext_str = unsafe { CStr::from_ptr(ext) };
         match ext_str.to_str() {
             Ok(s) => match tree_sitter_language_pack::extension_ambiguity(s) {
@@ -381,6 +389,7 @@ pub unsafe extern "C" fn ts_pack_get_highlights_query(language: *const c_char) -
             set_last_error("language pointer is null");
             return ptr::null_mut();
         }
+        // SAFETY: caller guarantees valid null-terminated string; null check above
         let lang_str = unsafe { CStr::from_ptr(language) };
         match lang_str.to_str() {
             Ok(s) => match tree_sitter_language_pack::get_highlights_query(s) {
@@ -411,6 +420,7 @@ pub unsafe extern "C" fn ts_pack_get_injections_query(language: *const c_char) -
             set_last_error("language pointer is null");
             return ptr::null_mut();
         }
+        // SAFETY: caller guarantees valid null-terminated string; null check above
         let lang_str = unsafe { CStr::from_ptr(language) };
         match lang_str.to_str() {
             Ok(s) => match tree_sitter_language_pack::get_injections_query(s) {
@@ -441,6 +451,7 @@ pub unsafe extern "C" fn ts_pack_get_locals_query(language: *const c_char) -> *m
             set_last_error("language pointer is null");
             return ptr::null_mut();
         }
+        // SAFETY: caller guarantees valid null-terminated string; null check above
         let lang_str = unsafe { CStr::from_ptr(language) };
         match lang_str.to_str() {
             Ok(s) => match tree_sitter_language_pack::get_locals_query(s) {
@@ -534,7 +545,9 @@ pub unsafe extern "C" fn ts_pack_parse_string(
             set_last_error("source pointer is null");
             return ptr::null_mut();
         }
+        // SAFETY: caller guarantees valid pointer; null check above
         let reg = unsafe { &*registry };
+        // SAFETY: caller guarantees valid null-terminated string; null check above
         let name_str = match unsafe { CStr::from_ptr(name) }.to_str() {
             Ok(s) => s,
             Err(e) => {
@@ -542,6 +555,7 @@ pub unsafe extern "C" fn ts_pack_parse_string(
                 return ptr::null_mut();
             }
         };
+        // SAFETY: caller guarantees valid buffer with correct length
         let source_bytes = unsafe { std::slice::from_raw_parts(source as *const u8, source_len) };
         let lang = match reg.inner.get_language(name_str) {
             Ok(l) => l,
@@ -576,6 +590,7 @@ pub unsafe extern "C" fn ts_pack_parse_string(
 pub unsafe extern "C" fn ts_pack_tree_free(tree: *mut TsPackTree) {
     ffi_guard!((), {
         if !tree.is_null() {
+            // SAFETY: pointer was created by Box::into_raw in ts_pack_parse_string
             unsafe {
                 drop(Box::from_raw(tree));
             }
@@ -599,6 +614,7 @@ pub unsafe extern "C" fn ts_pack_tree_root_node_type(tree: *const TsPackTree) ->
             set_last_error("tree pointer is null");
             return ptr::null_mut();
         }
+        // SAFETY: caller guarantees valid pointer; null check above
         let t = unsafe { &*tree };
         let kind = t.inner.root_node().kind();
         match CString::new(kind) {
@@ -626,6 +642,7 @@ pub unsafe extern "C" fn ts_pack_tree_root_child_count(tree: *const TsPackTree) 
             set_last_error("tree pointer is null");
             return 0;
         }
+        // SAFETY: caller guarantees valid pointer; null check above
         let t = unsafe { &*tree };
         t.inner.root_node().named_child_count() as u32
     })
@@ -651,7 +668,9 @@ pub unsafe extern "C" fn ts_pack_tree_contains_node_type(tree: *const TsPackTree
             set_last_error("node_type pointer is null");
             return false;
         }
+        // SAFETY: caller guarantees valid pointer; null check above
         let t = unsafe { &*tree };
+        // SAFETY: caller guarantees valid null-terminated string; null check above
         let target = match unsafe { CStr::from_ptr(node_type) }.to_str() {
             Ok(s) => s,
             Err(e) => {
@@ -676,6 +695,7 @@ pub unsafe extern "C" fn ts_pack_tree_has_error_nodes(tree: *const TsPackTree) -
             set_last_error("tree pointer is null");
             return false;
         }
+        // SAFETY: caller guarantees valid pointer; null check above
         let t = unsafe { &*tree };
         tree_sitter_language_pack::tree_has_error_nodes(&t.inner)
     })
@@ -697,6 +717,7 @@ pub unsafe extern "C" fn ts_pack_tree_to_sexp(tree: *const TsPackTree) -> *mut c
             set_last_error("tree pointer is null");
             return ptr::null_mut();
         }
+        // SAFETY: caller guarantees valid pointer; null check above
         let t = unsafe { &*tree };
         let sexp = tree_sitter_language_pack::tree_to_sexp(&t.inner);
         match CString::new(sexp) {
@@ -724,6 +745,7 @@ pub unsafe extern "C" fn ts_pack_tree_error_count(tree: *const TsPackTree) -> us
             set_last_error("tree pointer is null");
             return 0;
         }
+        // SAFETY: caller guarantees valid pointer; null check above
         let t = unsafe { &*tree };
         tree_sitter_language_pack::tree_error_count(&t.inner)
     })
@@ -760,7 +782,9 @@ pub unsafe extern "C" fn ts_pack_process(
             set_last_error("null pointer argument");
             return ptr::null_mut();
         }
+        // SAFETY: caller guarantees valid pointer; null check above
         let reg = unsafe { &*registry };
+        // SAFETY: caller guarantees valid null-terminated string; null check above
         let config_str = match unsafe { CStr::from_ptr(config_json) }.to_str() {
             Ok(s) => s,
             Err(e) => {
@@ -782,6 +806,7 @@ pub unsafe extern "C" fn ts_pack_process(
                 return ptr::null_mut();
             }
         };
+        // SAFETY: caller guarantees valid buffer with correct length
         let source_bytes = unsafe { std::slice::from_raw_parts(source as *const u8, source_len) };
         let source_str = match std::str::from_utf8(source_bytes) {
             Ok(s) => s,
@@ -836,6 +861,7 @@ pub unsafe extern "C" fn ts_pack_init(config_json: *const c_char) -> i32 {
         let config_str = if config_json.is_null() {
             "{}"
         } else {
+            // SAFETY: caller guarantees valid null-terminated string; null check above
             match unsafe { CStr::from_ptr(config_json) }.to_str() {
                 Ok(s) => s,
                 Err(e) => {
@@ -879,6 +905,7 @@ pub unsafe extern "C" fn ts_pack_configure(config_json: *const c_char) -> i32 {
         let config_str = if config_json.is_null() {
             "{}"
         } else {
+            // SAFETY: caller guarantees valid null-terminated string; null check above
             match unsafe { CStr::from_ptr(config_json) }.to_str() {
                 Ok(s) => s,
                 Err(e) => {

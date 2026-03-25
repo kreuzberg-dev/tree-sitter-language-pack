@@ -43,6 +43,19 @@ fn resolve_alias(name: &str) -> &str {
 }
 
 #[cfg(feature = "dynamic-loading")]
+fn lib_path_in(dir: &std::path::Path, name: &str) -> PathBuf {
+    let lib_name = format!("tree_sitter_{}", c_symbol_for(name));
+    let (prefix, ext) = if cfg!(target_os = "macos") {
+        ("lib", "dylib")
+    } else if cfg!(target_os = "windows") {
+        ("", "dll")
+    } else {
+        ("lib", "so")
+    };
+    dir.join(format!("{prefix}{lib_name}.{ext}"))
+}
+
+#[cfg(feature = "dynamic-loading")]
 mod dynamic {
     use std::collections::HashMap;
     use std::path::PathBuf;
@@ -90,29 +103,13 @@ mod dynamic {
         }
 
         fn lib_path(&self, name: &str) -> PathBuf {
-            let lib_name = format!("tree_sitter_{}", super::c_symbol_for(name));
-            let (prefix, ext) = if cfg!(target_os = "macos") {
-                ("lib", "dylib")
-            } else if cfg!(target_os = "windows") {
-                ("", "dll")
-            } else {
-                ("lib", "so")
-            };
-            self.libs_dir.join(format!("{prefix}{lib_name}.{ext}"))
+            super::lib_path_in(&self.libs_dir, name)
         }
 
         /// Load a language from a specific directory (e.g. download cache).
         /// The loaded library is stored in the shared cache.
         pub(crate) fn load_from_dir(&self, name: &str, dir: &std::path::Path) -> Result<Language, Error> {
-            let lib_name = format!("tree_sitter_{}", super::c_symbol_for(name));
-            let (prefix, ext) = if cfg!(target_os = "macos") {
-                ("lib", "dylib")
-            } else if cfg!(target_os = "windows") {
-                ("", "dll")
-            } else {
-                ("lib", "so")
-            };
-            let lib_path = dir.join(format!("{prefix}{lib_name}.{ext}"));
+            let lib_path = super::lib_path_in(dir, name);
             if !lib_path.exists() {
                 return Err(Error::LanguageNotFound(format!(
                     "Dynamic library for '{}' not found at {}",
@@ -201,7 +198,7 @@ pub struct LanguageRegistry {
     /// Wrapped in Arc<RwLock<...>> so the outer struct is Send+Sync without
     /// requiring &mut self for mutation — interior mutability via the inner lock.
     #[cfg(feature = "dynamic-loading")]
-    extra_lib_dirs: Arc<std::sync::RwLock<Vec<PathBuf>>>,
+    extra_lib_dirs: Arc<std::sync::RwLock<Arc<Vec<PathBuf>>>>,
 }
 
 impl LanguageRegistry {
@@ -220,7 +217,7 @@ impl LanguageRegistry {
             #[cfg(feature = "dynamic-loading")]
             dynamic_loader: dynamic::DynamicLoader::new(PathBuf::from(LIBS_DIR), DYNAMIC_LANGUAGE_NAMES.to_vec()),
             #[cfg(feature = "dynamic-loading")]
-            extra_lib_dirs: Arc::new(std::sync::RwLock::new(Vec::new())),
+            extra_lib_dirs: Arc::new(std::sync::RwLock::new(Arc::new(Vec::new()))),
         }
     }
 
@@ -249,7 +246,9 @@ impl LanguageRegistry {
         if let Ok(mut dirs) = self.extra_lib_dirs.write()
             && !dirs.contains(&dir)
         {
-            dirs.push(dir);
+            let mut new_dirs = (**dirs).clone();
+            new_dirs.push(dir);
+            *dirs = Arc::new(new_dirs);
         }
     }
 
@@ -283,8 +282,12 @@ impl LanguageRegistry {
             }
 
             // Try loading from extra dirs (e.g. download cache)
-            let extra_dirs: Vec<PathBuf> = self.extra_lib_dirs.read().map(|dirs| dirs.clone()).unwrap_or_default();
-            for extra_dir in &extra_dirs {
+            let extra_dirs: Arc<Vec<PathBuf>> = self
+                .extra_lib_dirs
+                .read()
+                .map(|dirs| Arc::clone(&dirs))
+                .unwrap_or_default();
+            for extra_dir in extra_dirs.iter() {
                 if self.dynamic_loader.load_from_dir(name, extra_dir).is_ok() {
                     // Re-fetch from cache — load_from_dir inserted it
                     if let Some(lang) = self.dynamic_loader.get_cached(name)? {
@@ -302,20 +305,27 @@ impl LanguageRegistry {
     /// Includes statically compiled languages, dynamically loadable languages
     /// (if the `dynamic-loading` feature is enabled), and all configured aliases.
     pub fn available_languages(&self) -> Vec<String> {
-        let mut seen: AHashSet<String> = self.static_lookup.keys().map(|s| s.to_string()).collect();
+        let mut seen: AHashSet<&str> = self.static_lookup.keys().copied().collect();
+
+        // Owned strings from dynamic sources; kept alive so we can borrow into `seen`.
+        #[cfg(feature = "dynamic-loading")]
+        let _owned_names: Vec<String>;
 
         #[cfg(feature = "dynamic-loading")]
         {
             for name in self.dynamic_loader.dynamic_names.iter() {
-                seen.insert(name.to_string());
-            }
-            for name in self.dynamic_loader.cached_names() {
                 seen.insert(name);
             }
 
+            let mut owned = self.dynamic_loader.cached_names();
+
             // Scan extra library directories for downloadable/cached libraries
-            let extra_dirs: Vec<PathBuf> = self.extra_lib_dirs.read().map(|dirs| dirs.clone()).unwrap_or_default();
-            for extra_dir in &extra_dirs {
+            let extra_dirs: Arc<Vec<PathBuf>> = self
+                .extra_lib_dirs
+                .read()
+                .map(|dirs| Arc::clone(&dirs))
+                .unwrap_or_default();
+            for extra_dir in extra_dirs.iter() {
                 if let Ok(entries) = std::fs::read_dir(extra_dir) {
                     for entry in entries.flatten() {
                         let filename = entry.file_name();
@@ -327,20 +337,25 @@ impl LanguageRegistry {
                                 .or_else(|| lang.strip_suffix(".dylib"))
                                 .or_else(|| lang.strip_suffix(".dll"));
                             if let Some(lang) = lang {
-                                seen.insert(lang.to_string());
+                                owned.push(lang.to_string());
                             }
                         }
                     }
                 }
             }
+
+            _owned_names = owned;
+            for name in &_owned_names {
+                seen.insert(name.as_str());
+            }
         }
         for &(alias, target) in LANGUAGE_ALIASES {
             if seen.contains(target) {
-                seen.insert(alias.to_string());
+                seen.insert(alias);
             }
         }
 
-        let mut langs: Vec<String> = seen.into_iter().collect();
+        let mut langs: Vec<String> = seen.into_iter().map(String::from).collect();
         langs.sort_unstable();
         langs
     }
@@ -361,17 +376,13 @@ impl LanguageRegistry {
                 return true;
             }
 
-            let extra_dirs: Vec<PathBuf> = self.extra_lib_dirs.read().map(|dirs| dirs.clone()).unwrap_or_default();
-            for extra_dir in &extra_dirs {
-                let lib_name = format!("tree_sitter_{}", c_symbol_for(name));
-                let (prefix, ext) = if cfg!(target_os = "macos") {
-                    ("lib", "dylib")
-                } else if cfg!(target_os = "windows") {
-                    ("", "dll")
-                } else {
-                    ("lib", "so")
-                };
-                if extra_dir.join(format!("{prefix}{lib_name}.{ext}")).exists() {
+            let extra_dirs: Arc<Vec<PathBuf>> = self
+                .extra_lib_dirs
+                .read()
+                .map(|dirs| Arc::clone(&dirs))
+                .unwrap_or_default();
+            for extra_dir in extra_dirs.iter() {
+                if lib_path_in(extra_dir, name).exists() {
                     return true;
                 }
             }

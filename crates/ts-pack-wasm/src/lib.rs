@@ -67,13 +67,7 @@ pub fn detect_language_from_content(content: &str) -> Option<String> {
 /// When non-null, parses to an object with "assigned" (string) and "alternatives" (string[]) fields.
 #[wasm_bindgen(js_name = "extensionAmbiguity")]
 pub fn extension_ambiguity(ext: &str) -> Option<String> {
-    tree_sitter_language_pack::extension_ambiguity(ext).and_then(|(assigned, alts)| {
-        let val = serde_json::json!({
-            "assigned": assigned,
-            "alternatives": alts,
-        });
-        serde_json::to_string(&val).ok()
-    })
+    tree_sitter_language_pack::extension_ambiguity_json(ext)
 }
 
 /// Returns the bundled highlights query for the given language, or null.

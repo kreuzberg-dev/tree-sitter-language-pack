@@ -52,13 +52,7 @@ fn detect_language_from_content(content: String) -> Option<String> {
 
 /// Returns extension ambiguity information as a JSON string, or nil.
 fn extension_ambiguity(ext: String) -> Option<String> {
-    tree_sitter_language_pack::extension_ambiguity(&ext).and_then(|(assigned, alts)| {
-        let val = serde_json::json!({
-            "assigned": assigned,
-            "alternatives": alts,
-        });
-        serde_json::to_string(&val).ok()
-    })
+    tree_sitter_language_pack::extension_ambiguity_json(&ext)
 }
 
 fn get_highlights_query(language: String) -> Option<String> {

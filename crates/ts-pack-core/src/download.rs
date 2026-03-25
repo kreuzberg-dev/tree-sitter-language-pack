@@ -79,7 +79,7 @@ impl DownloadManager {
         let mut langs = Vec::new();
         if let Ok(entries) = fs::read_dir(&self.cache_dir) {
             for entry in entries.flatten() {
-                let name = entry.file_name().to_string_lossy().to_string();
+                let name = entry.file_name().to_string_lossy().into_owned();
                 // Extract language name from library filename: libtree_sitter_<name>.so
                 if let Some(lang) = Self::lang_from_lib_filename(&name) {
                     langs.push(lang);
@@ -281,7 +281,7 @@ impl DownloadManager {
 
             let filename = path
                 .file_name()
-                .map(|f| f.to_string_lossy().to_string())
+                .map(|f| f.to_string_lossy().into_owned())
                 .unwrap_or_default();
 
             if expected_files.contains_key(&filename) {

@@ -38,7 +38,7 @@ pub fn node_info_from_node(node: tree_sitter::Node) -> NodeInfo {
     let start = node.start_position();
     let end = node.end_position();
     NodeInfo {
-        kind: Cow::Owned(node.kind().to_string()),
+        kind: Cow::Borrowed(node.kind()),
         is_named: node.is_named(),
         start_byte: node.start_byte(),
         end_byte: node.end_byte(),

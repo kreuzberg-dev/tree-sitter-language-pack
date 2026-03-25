@@ -372,7 +372,7 @@ fn process_python_imports_detail() {
         intel.imports.len()
     );
     assert!(
-        intel.imports.iter().any(|i| i.source.as_deref().unwrap_or("") == "os"),
+        intel.imports.iter().any(|i| i.source == "os"),
         "Imports should contain source 'os'"
     );
 }

@@ -35,10 +35,11 @@ fn node_text<'a>(node: &tree_sitter::Node, source: &'a str) -> &'a str {
 }
 
 pub(crate) fn compute_metrics(source: &str, root: &tree_sitter::Node) -> FileMetrics {
-    let total_lines = source.lines().count().max(1);
+    let mut total_lines = 0usize;
     let mut blank_lines = 0;
     let mut comment_lines = 0;
     for line in source.lines() {
+        total_lines += 1;
         let trimmed = line.trim();
         if trimmed.is_empty() {
             blank_lines += 1;
@@ -50,6 +51,7 @@ pub(crate) fn compute_metrics(source: &str, root: &tree_sitter::Node) -> FileMet
             comment_lines += 1;
         }
     }
+    total_lines = total_lines.max(1);
     let code_lines = total_lines.saturating_sub(blank_lines + comment_lines);
     let mut node_count = 0;
     let mut error_count = 0;
@@ -83,18 +85,30 @@ fn count_nodes(node: &tree_sitter::Node, depth: usize, count: &mut usize, errors
 }
 
 pub(crate) fn extract_comments(root: &tree_sitter::Node, source: &str, _language: &str) -> Vec<CommentInfo> {
-    let mut comments = Vec::new();
+    let mut comments = Vec::with_capacity(16);
     collect_comments(root, source, &mut comments);
     comments
 }
 
 fn collect_comments(node: &tree_sitter::Node, source: &str, comments: &mut Vec<CommentInfo>) {
     let kind = node.kind();
-    if kind == "comment" || kind == "line_comment" || kind == "block_comment" {
+    if kind == "comment"
+        || kind == "line_comment"
+        || kind == "block_comment"
+        || kind == "doc_comment"
+        || kind == "documentation_comment"
+    {
         let text = node_text(node, source).to_string();
-        let comment_kind = if kind == "block_comment" {
+        let comment_kind = if kind == "doc_comment" || kind == "documentation_comment" {
+            CommentKind::Doc
+        } else if kind == "block_comment" {
             CommentKind::Block
-        } else if text.starts_with("///") || text.starts_with("/**") || text.starts_with("##") {
+        } else if text.starts_with("///")
+            || text.starts_with("//!")
+            || text.starts_with("/**")
+            || text.starts_with("/*!")
+            || text.starts_with("##")
+        {
             CommentKind::Doc
         } else {
             CommentKind::Line
@@ -113,7 +127,7 @@ fn collect_comments(node: &tree_sitter::Node, source: &str, comments: &mut Vec<C
 }
 
 pub(crate) fn extract_docstrings(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<DocstringInfo> {
-    let mut docstrings = Vec::new();
+    let mut docstrings = Vec::with_capacity(16);
     collect_docstrings(root, source, language, &mut docstrings);
     docstrings
 }
@@ -153,7 +167,7 @@ fn collect_docstrings(node: &tree_sitter::Node, source: &str, language: &str, do
 }
 
 pub(crate) fn extract_imports(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<ImportInfo> {
-    let mut imports = Vec::new();
+    let mut imports = Vec::with_capacity(16);
     collect_imports(root, source, language, &mut imports);
     imports
 }
@@ -166,7 +180,7 @@ fn collect_imports(node: &tree_sitter::Node, source: &str, language: &str, impor
         "rust" => kind == "use_declaration",
         "go" => kind == "import_declaration" || kind == "import_spec",
         "java" | "kotlin" => kind == "import_declaration",
-        _ => kind.contains("import"),
+        _ => false,
     };
     if is_import {
         let text = node_text(node, source);
@@ -185,7 +199,7 @@ fn collect_imports(node: &tree_sitter::Node, source: &str, language: &str, impor
 }
 
 pub(crate) fn extract_exports(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<ExportInfo> {
-    let mut exports = Vec::new();
+    let mut exports = Vec::with_capacity(16);
     collect_exports(root, source, language, &mut exports);
     exports
 }
@@ -197,14 +211,14 @@ fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, expor
         _ => false,
     };
     if is_export {
-        let text = node_text(node, source);
-        let export_kind = if text.contains("default") {
+        let export_kind = if node.child_by_field_name("default").is_some() {
             ExportKind::Default
-        } else if text.contains("from") {
+        } else if node.child_by_field_name("source").is_some() {
             ExportKind::ReExport
         } else {
             ExportKind::Named
         };
+        let text = node_text(node, source);
         exports.push(ExportInfo {
             name: text.lines().next().unwrap_or("").to_string(),
             kind: export_kind,
@@ -218,7 +232,7 @@ fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, expor
 }
 
 pub(crate) fn extract_structure(root: &tree_sitter::Node, source: &str) -> Vec<StructureItem> {
-    let mut items = Vec::new();
+    let mut items = Vec::with_capacity(32);
     collect_structure(root, source, &mut items);
     items
 }
@@ -269,7 +283,7 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, items: &mut Vec<Str
 }
 
 pub(crate) fn extract_symbols(root: &tree_sitter::Node, source: &str, _language: &str) -> Vec<SymbolInfo> {
-    let mut symbols = Vec::new();
+    let mut symbols = Vec::with_capacity(32);
     collect_symbols(root, source, &mut symbols);
     symbols
 }
@@ -306,7 +320,7 @@ fn collect_symbols(node: &tree_sitter::Node, source: &str, symbols: &mut Vec<Sym
 }
 
 pub(crate) fn extract_diagnostics(root: &tree_sitter::Node, source: &str) -> Vec<Diagnostic> {
-    let mut diags = Vec::new();
+    let mut diags = Vec::with_capacity(16);
     collect_diagnostics(root, source, &mut diags);
     diags
 }

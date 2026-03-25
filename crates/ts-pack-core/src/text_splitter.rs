@@ -312,10 +312,11 @@ fn split_at_bytes(
         }
         if end == pos {
             // Pathological case: max_chunk_size is smaller than a single
-            // multi-byte character. Force include at least one char.
-            end = pos;
-            for ch in source[pos..region_end].chars().take(1) {
-                end += ch.len_utf8();
+            // multi-byte character. Force include at least one char to
+            // guarantee forward progress.
+            match source[pos..region_end].chars().next() {
+                Some(ch) => end = pos + ch.len_utf8(),
+                None => return, // pos >= region_end covered by while guard
             }
         }
         out.push((pos, end));

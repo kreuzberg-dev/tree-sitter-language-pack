@@ -69,6 +69,17 @@ pub fn extension_ambiguity(ext: &str) -> Option<(&'static str, &'static [&'stati
     include!(concat!(env!("OUT_DIR"), "/ambiguities_generated.rs"))
 }
 
+#[cfg(feature = "serde")]
+pub fn extension_ambiguity_json(ext: &str) -> Option<String> {
+    extension_ambiguity(ext).map(|(assigned, alts)| {
+        serde_json::json!({
+            "assigned": assigned,
+            "alternatives": alts,
+        })
+        .to_string()
+    })
+}
+
 /// Detect language name from file content using the shebang line (`#!`).
 ///
 /// Inspects only the first line of `content`. If it begins with `#!`, the

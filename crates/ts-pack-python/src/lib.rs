@@ -2,6 +2,26 @@ use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
 use std::sync::Mutex;
 
+/// Execute a closure with the Python GIL released.
+fn without_gil<F, R>(f: F) -> R
+where
+    F: FnOnce() -> R,
+{
+    // SAFETY: GIL is held on entry (we're in a #[pyfunction]).
+    // We release it so blocking Rust I/O doesn't stall Python threads,
+    // then reacquire before returning to Python.
+    // catch_unwind ensures GIL is restored even if f() panics.
+    unsafe {
+        let state = pyo3::ffi::PyEval_SaveThread();
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(f));
+        pyo3::ffi::PyEval_RestoreThread(state);
+        match result {
+            Ok(v) => v,
+            Err(e) => std::panic::resume_unwind(e),
+        }
+    }
+}
+
 pyo3::create_exception!(
     tree_sitter_language_pack,
     LanguageNotFoundError,
@@ -149,73 +169,90 @@ struct TreeHandle {
     source: Vec<u8>,
 }
 
+impl TreeHandle {
+    /// Acquire the tree lock and apply a closure, converting poison errors.
+    fn with_tree<F, R>(&self, f: F) -> PyResult<R>
+    where
+        F: FnOnce(&tree_sitter::Tree) -> R,
+    {
+        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
+        Ok(f(&guard))
+    }
+
+    /// Acquire the tree lock and apply a fallible closure, converting poison errors.
+    fn try_with_tree<F, R>(&self, f: F) -> PyResult<R>
+    where
+        F: FnOnce(&tree_sitter::Tree) -> PyResult<R>,
+    {
+        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
+        f(&guard)
+    }
+}
+
 #[pymethods]
 impl TreeHandle {
     /// Returns the type name of the root node.
     fn root_node_type(&self) -> PyResult<String> {
-        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        Ok(guard.root_node().kind().to_string())
+        self.with_tree(|tree| tree.root_node().kind().to_string())
     }
 
     /// Returns the number of named children of the root node.
     fn root_child_count(&self) -> PyResult<u32> {
-        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        Ok(guard.root_node().named_child_count() as u32)
+        self.with_tree(|tree| tree.root_node().named_child_count() as u32)
     }
 
     /// Check whether any node in the tree has the given type name.
     fn contains_node_type(&self, node_type: &str) -> PyResult<bool> {
-        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        Ok(tree_sitter_language_pack::tree_contains_node_type(&guard, node_type))
+        self.with_tree(|tree| tree_sitter_language_pack::tree_contains_node_type(tree, node_type))
     }
 
     /// Check whether the tree contains any ERROR or MISSING nodes.
     fn has_error_nodes(&self) -> PyResult<bool> {
-        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        Ok(tree_sitter_language_pack::tree_has_error_nodes(&guard))
+        self.with_tree(tree_sitter_language_pack::tree_has_error_nodes)
     }
 
     /// Returns the S-expression representation of the tree.
     fn to_sexp(&self) -> PyResult<String> {
-        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        Ok(tree_sitter_language_pack::tree_to_sexp(&guard))
+        self.with_tree(tree_sitter_language_pack::tree_to_sexp)
     }
 
     /// Returns the count of ERROR and MISSING nodes in the tree.
     fn error_count(&self) -> PyResult<usize> {
-        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        Ok(tree_sitter_language_pack::tree_error_count(&guard))
+        self.with_tree(tree_sitter_language_pack::tree_error_count)
     }
 
     /// Returns information about the root node as a dict.
     fn root_node_info(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
-        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        let info = tree_sitter_language_pack::root_node_info(&guard);
-        node_info_to_dict(py, &info)
+        self.try_with_tree(|tree| {
+            let info = tree_sitter_language_pack::root_node_info(tree);
+            node_info_to_dict(py, &info)
+        })
     }
 
     /// Finds all nodes matching the given type and returns their info as a list of dicts.
     fn find_nodes_by_type(&self, py: Python<'_>, node_type: &str) -> PyResult<Py<PyAny>> {
-        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        let nodes = tree_sitter_language_pack::find_nodes_by_type(&guard, node_type);
-        let py_list: Vec<Py<PyAny>> = nodes
-            .iter()
-            .map(|info| node_info_to_dict(py, info))
-            .collect::<PyResult<_>>()?;
-        let list = PyList::new(py, &py_list)?;
-        Ok(list.into_any().unbind())
+        self.try_with_tree(|tree| {
+            let nodes = tree_sitter_language_pack::find_nodes_by_type(tree, node_type);
+            let py_list: Vec<Py<PyAny>> = nodes
+                .iter()
+                .map(|info| node_info_to_dict(py, info))
+                .collect::<PyResult<_>>()?;
+            let list = PyList::new(py, &py_list)?;
+            Ok(list.into_any().unbind())
+        })
     }
 
     /// Returns info for all named children of the root node.
     fn named_children_info(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
-        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        let nodes = tree_sitter_language_pack::named_children_info(&guard);
-        let py_list: Vec<Py<PyAny>> = nodes
-            .iter()
-            .map(|info| node_info_to_dict(py, info))
-            .collect::<PyResult<_>>()?;
-        let list = PyList::new(py, &py_list)?;
-        Ok(list.into_any().unbind())
+        self.try_with_tree(|tree| {
+            let nodes = tree_sitter_language_pack::named_children_info(tree);
+            let py_list: Vec<Py<PyAny>> = nodes
+                .iter()
+                .map(|info| node_info_to_dict(py, info))
+                .collect::<PyResult<_>>()?;
+            let list = PyList::new(py, &py_list)?;
+            Ok(list.into_any().unbind())
+        })
     }
 
     /// Extracts source text for a node given its start_byte and end_byte.
@@ -240,16 +277,17 @@ impl TreeHandle {
 
     /// Runs a tree-sitter query and returns matches as a list of dicts.
     fn run_query(&self, py: Python<'_>, language: &str, query_source: &str) -> PyResult<Py<PyAny>> {
-        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        let matches = tree_sitter_language_pack::run_query(&guard, language, query_source, &self.source)
-            .map_err(|e| QueryError::new_err(format!("{e}")))?;
+        self.try_with_tree(|tree| {
+            let matches = tree_sitter_language_pack::run_query(tree, language, query_source, &self.source)
+                .map_err(|e| QueryError::new_err(format!("{e}")))?;
 
-        let py_matches: Vec<Py<PyAny>> = matches
-            .iter()
-            .map(|m| query_match_to_dict(py, m))
-            .collect::<PyResult<_>>()?;
-        let list = PyList::new(py, &py_matches)?;
-        Ok(list.into_any().unbind())
+            let py_matches: Vec<Py<PyAny>> = matches
+                .iter()
+                .map(|m| query_match_to_dict(py, m))
+                .collect::<PyResult<_>>()?;
+            let list = PyList::new(py, &py_matches)?;
+            Ok(list.into_any().unbind())
+        })
     }
 }
 
@@ -440,6 +478,8 @@ fn json_value_to_py(py: Python<'_>, value: &serde_json::Value) -> PyResult<Py<Py
         serde_json::Value::Number(n) => {
             if let Some(i) = n.as_i64() {
                 Ok(i.into_pyobject(py)?.into_any().unbind())
+            } else if let Some(u) = n.as_u64() {
+                Ok(u.into_pyobject(py)?.into_any().unbind())
             } else if let Some(f) = n.as_f64() {
                 Ok(f.into_pyobject(py)?.into_any().unbind())
             } else {
@@ -513,15 +553,7 @@ fn dict_to_pack_config(dict: &pyo3::Bound<'_, PyDict>) -> PyResult<tree_sitter_l
 #[pyfunction]
 fn init(_py: Python<'_>, config: &pyo3::Bound<'_, PyDict>) -> PyResult<()> {
     let pack_config = dict_to_pack_config(config)?;
-    // Release GIL during blocking network I/O
-    // SAFETY: We release the GIL before calling blocking Rust code and reacquire it before returning to Python.
-    // PyEval_SaveThread returns a pointer that must be passed to PyEval_RestoreThread.
-    let result = unsafe {
-        let state = pyo3::ffi::PyEval_SaveThread();
-        let r = tree_sitter_language_pack::init(&pack_config);
-        pyo3::ffi::PyEval_RestoreThread(state);
-        r
-    };
+    let result = without_gil(|| tree_sitter_language_pack::init(&pack_config));
     result.map_err(|e| DownloadError::new_err(e.to_string()))
 }
 
@@ -546,15 +578,7 @@ fn configure(_py: Python<'_>, cache_dir: Option<String>) -> PyResult<()> {
 #[pyfunction]
 fn download(_py: Python<'_>, names: Vec<String>) -> PyResult<usize> {
     let refs: Vec<&str> = names.iter().map(String::as_str).collect();
-    // Release GIL during blocking network I/O
-    // SAFETY: We release the GIL before calling blocking Rust code and reacquire it before returning to Python.
-    // PyEval_SaveThread returns a pointer that must be passed to PyEval_RestoreThread.
-    let result = unsafe {
-        let state = pyo3::ffi::PyEval_SaveThread();
-        let r = tree_sitter_language_pack::download(&refs);
-        pyo3::ffi::PyEval_RestoreThread(state);
-        r
-    };
+    let result = without_gil(|| tree_sitter_language_pack::download(&refs));
     result.map_err(|e| DownloadError::new_err(e.to_string()))
 }
 
@@ -563,15 +587,7 @@ fn download(_py: Python<'_>, names: Vec<String>) -> PyResult<usize> {
 /// Returns the number of newly downloaded languages.
 #[pyfunction]
 fn download_all(_py: Python<'_>) -> PyResult<usize> {
-    // Release GIL during blocking network I/O
-    // SAFETY: We release the GIL before calling blocking Rust code and reacquire it before returning to Python.
-    // PyEval_SaveThread returns a pointer that must be passed to PyEval_RestoreThread.
-    let result = unsafe {
-        let state = pyo3::ffi::PyEval_SaveThread();
-        let r = tree_sitter_language_pack::download_all();
-        pyo3::ffi::PyEval_RestoreThread(state);
-        r
-    };
+    let result = without_gil(tree_sitter_language_pack::download_all);
     result.map_err(|e| DownloadError::new_err(e.to_string()))
 }
 
@@ -580,16 +596,8 @@ fn download_all(_py: Python<'_>) -> PyResult<usize> {
 /// Returns a sorted list of all 248 downloadable languages.
 #[pyfunction]
 fn manifest_languages(py: Python<'_>) -> PyResult<Py<PyAny>> {
-    // Release GIL during blocking network I/O
-    // SAFETY: We release the GIL before calling blocking Rust code and reacquire it before returning to Python.
-    // PyEval_SaveThread returns a pointer that must be passed to PyEval_RestoreThread.
-    let langs = unsafe {
-        let state = pyo3::ffi::PyEval_SaveThread();
-        let r = tree_sitter_language_pack::manifest_languages();
-        pyo3::ffi::PyEval_RestoreThread(state);
-        r
-    }
-    .map_err(|e| DownloadError::new_err(e.to_string()))?;
+    let langs = without_gil(tree_sitter_language_pack::manifest_languages)
+        .map_err(|e| DownloadError::new_err(e.to_string()))?;
     let py_list = PyList::new(py, &langs)?;
     Ok(py_list.into_any().unbind())
 }
@@ -607,15 +615,7 @@ fn downloaded_languages(py: Python<'_>) -> PyResult<Py<PyAny>> {
 /// Delete all cached parser shared libraries.
 #[pyfunction]
 fn clean_cache(_py: Python<'_>) -> PyResult<()> {
-    // Release GIL during blocking I/O (filesystem operations)
-    // SAFETY: We release the GIL before calling blocking Rust code and reacquire it before returning to Python.
-    // PyEval_SaveThread returns a pointer that must be passed to PyEval_RestoreThread.
-    let result = unsafe {
-        let state = pyo3::ffi::PyEval_SaveThread();
-        let r = tree_sitter_language_pack::clean_cache();
-        pyo3::ffi::PyEval_RestoreThread(state);
-        r
-    };
+    let result = without_gil(tree_sitter_language_pack::clean_cache);
     result.map_err(|e| DownloadError::new_err(e.to_string()))
 }
 
@@ -625,7 +625,7 @@ fn clean_cache(_py: Python<'_>) -> PyResult<()> {
 #[pyfunction]
 fn cache_dir(_py: Python<'_>) -> PyResult<String> {
     let dir = tree_sitter_language_pack::cache_dir().map_err(|e| DownloadError::new_err(e.to_string()))?;
-    Ok(dir.to_string_lossy().to_string())
+    Ok(dir.to_string_lossy().into_owned())
 }
 
 // ---------------------------------------------------------------------------
