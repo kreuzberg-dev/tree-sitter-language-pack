@@ -1153,8 +1153,8 @@ jobs:
           echo "Created: dist/elixir/${ARTIFACT_UNDERSCORE}.tar.gz"
 
           cp "$LIB_PATH" "${ARTIFACT_HYPHEN}"
-          tar -czf "dist/elixir/${TARBALL}" "${ARTIFACT_NAME}"
-          echo "Created: dist/elixir/${TARBALL}"
+          tar -czf "dist/elixir/${ARTIFACT_HYPHEN}.tar.gz" "${ARTIFACT_HYPHEN}"
+          echo "Created: dist/elixir/${ARTIFACT_HYPHEN}.tar.gz"
 
       - name: Upload NIF artifacts
         uses: actions/upload-artifact@v7
