@@ -15,6 +15,7 @@ tasks:
       - task: smoke:php
       - task: smoke:csharp
       - task: smoke:c
+      - task: smoke:homebrew
 
   smoke:rust:
     desc: Run Rust test_app smoke test
@@ -59,15 +60,19 @@ tasks:
 
   smoke:java:
     desc: Run Java test_app smoke test
-    dir: tests/test_apps/java
     env:
       TSPACK_LIB_PATH: "{{.PROJECT_ROOT}}/target/release/libts_pack_ffi.dylib"
     cmds:
-      - mvn test -Dtest=SmokeTest
+      - mvn -f {{.PROJECT_ROOT}}/crates/ts-pack-java/pom.xml install -DskipTests -q
+      - cmd: mvn -f {{.PROJECT_ROOT}}/tests/test_apps/java/pom.xml test -Dtest=SmokeTest
 
   smoke:elixir:
     desc: Run Elixir test_app smoke test
     dir: tests/test_apps/elixir
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_BUILD: "1"
+      TSLP_LANGUAGES: "python,javascript,rust,go"
     cmds:
       - mix deps.get
       - mix test
@@ -77,11 +82,13 @@ tasks:
     dir: tests/test_apps/php
     cmds:
       - composer install
-      - vendor/bin/phpunit smoke_test.php
+      - vendor/bin/phpunit SmokeTest.php
 
   smoke:csharp:
     desc: Run C# test_app smoke test
     dir: tests/test_apps/csharp
+    env:
+      TSPACK_FFI_DIR: "{{.PROJECT_ROOT}}/target/release"
     cmds:
       - dotnet restore
       - dotnet test
@@ -93,6 +100,14 @@ tasks:
       - cmake -B build -DCMAKE_PREFIX_PATH=${TS_PACK_FFI_PREFIX:-/usr/local}
       - cmake --build build
       - ./build/smoke_test
+
+  smoke:homebrew:
+    desc: Run Homebrew CLI smoke test
+    dir: tests/test_apps/homebrew
+    env:
+      TS_PACK_BIN: "{{.TS_PACK_BIN | default (printf \"%s/target/release/ts-pack\" .PROJECT_ROOT)}}"
+    cmds:
+      - bash smoke_test.sh
 
   comprehensive:
     desc: Run all test_app comprehensive tests

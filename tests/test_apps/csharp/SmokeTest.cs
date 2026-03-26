@@ -47,11 +47,6 @@ public class SmokeTest
         };
     }
 
-    public static void SetupLanguages()
-    {
-        LanguagePack.Download(new[] { "python", "javascript", "rust", "go", "ruby", "java", "c", "cpp" });
-    }
-
     // Basic fixtures tests
     [Theory]
     [MemberData(nameof(BasicFixtures))]
@@ -62,7 +57,7 @@ public class SmokeTest
         {
             case "language_count":
                 {
-                    var count = LanguagePack.LanguageCount();
+                    var count = TsPackClient.LanguageCount();
                     var expectedMin = Convert.ToInt32(fixture["expected_min"]);
                     Assert.True(count >= expectedMin,
                         $"language_count {count} < expected min {expectedMin}");
@@ -71,14 +66,14 @@ public class SmokeTest
             case "has_language":
                 {
                     var language = (string)fixture["language"]!;
-                    var result = LanguagePack.HasLanguage(language);
+                    var result = TsPackClient.HasLanguage(language);
                     var expected = (bool)fixture["expected"]!;
                     Assert.Equal(expected, result);
                     break;
                 }
             case "available_languages":
                 {
-                    var langs = LanguagePack.AvailableLanguages();
+                    var langs = TsPackClient.AvailableLanguages();
                     var expectedContains = (List<object?>)fixture["expected_contains"]!;
                     foreach (var lang in expectedContains)
                     {
@@ -93,7 +88,6 @@ public class SmokeTest
 
     public static IEnumerable<object[]> BasicFixtures()
     {
-        SetupLanguages();
         var fixtures = LoadFixtures("basic.json");
         foreach (var fixture in fixtures)
         {
@@ -109,52 +103,66 @@ public class SmokeTest
     {
         var source = (string)fixture["source"]!;
         var configMap = (Dictionary<string, object?>)fixture["config"]!;
+
+        var config = new ProcessConfig
+        {
+            Language = (string)configMap["language"]!
+        };
+
+        if (configMap.TryGetValue("structure", out var structureVal))
+        {
+            config.Structure = (bool)structureVal!;
+        }
+        if (configMap.TryGetValue("imports", out var importsVal))
+        {
+            config.Imports = (bool)importsVal!;
+        }
+        if (configMap.TryGetValue("exports", out var exportsVal))
+        {
+            config.Exports = (bool)exportsVal!;
+        }
+        if (configMap.TryGetValue("comments", out var commentsVal))
+        {
+            config.Comments = (bool)commentsVal!;
+        }
+        if (configMap.TryGetValue("chunk_max_size", out var chunkVal))
+        {
+            config.ChunkMaxSize = Convert.ToInt32(chunkVal);
+        }
+
         var expected = (Dictionary<string, object?>)fixture["expected"]!;
+        var result = TsPackClient.Process(source, config);
 
-        var configJson = JsonSerializer.Serialize(configMap);
-        var result = LanguagePack.Process(source, configJson);
-
-        if (expected.ContainsKey("language"))
+        if (expected.TryGetValue("language", out var expectedLang))
         {
-            var resultDict = JsonElementToDictionary((JsonElement)result);
-            Assert.Equal(expected["language"], resultDict["language"]);
+            Assert.Equal((string)expectedLang!, result.Language);
         }
 
-        if (expected.ContainsKey("structure_min"))
+        if (expected.TryGetValue("structure_min", out var structureMin))
         {
-            var resultDict = JsonElementToDictionary((JsonElement)result);
-            var structure = (List<object?>)resultDict["structure"]!;
-            var min = Convert.ToInt32(expected["structure_min"]);
-            Assert.True(structure.Count >= min,
-                $"structure count {structure.Count} < min {min}");
+            var min = Convert.ToInt32(structureMin);
+            Assert.True(result.Structure.Count >= min,
+                $"structure count {result.Structure.Count} < min {min}");
         }
 
-        if (expected.ContainsKey("imports_min"))
+        if (expected.TryGetValue("imports_min", out var importsMin))
         {
-            var resultDict = JsonElementToDictionary((JsonElement)result);
-            var imports = (List<object?>)resultDict["imports"]!;
-            var min = Convert.ToInt32(expected["imports_min"]);
-            Assert.True(imports.Count >= min,
-                $"imports count {imports.Count} < min {min}");
+            var min = Convert.ToInt32(importsMin);
+            Assert.True(result.Imports.Count >= min,
+                $"imports count {result.Imports.Count} < min {min}");
         }
 
-        if (expected.ContainsKey("error_count"))
+        if (expected.TryGetValue("error_count", out var errorCount))
         {
-            var resultDict = JsonElementToDictionary((JsonElement)result);
-            var metrics = (Dictionary<string, object?>)resultDict["metrics"]!;
-            var errorCount = Convert.ToInt32(metrics["error_count"]);
-            var expectedCount = Convert.ToInt32(expected["error_count"]);
-            Assert.Equal(expectedCount, errorCount);
+            var expectedCount = Convert.ToInt32(errorCount);
+            Assert.Equal(expectedCount, result.Metrics.ErrorCount);
         }
 
-        if (expected.ContainsKey("metrics_total_lines_min"))
+        if (expected.TryGetValue("metrics_total_lines_min", out var totalLinesMin))
         {
-            var resultDict = JsonElementToDictionary((JsonElement)result);
-            var metrics = (Dictionary<string, object?>)resultDict["metrics"]!;
-            var totalLines = Convert.ToInt32(metrics["total_lines"]);
-            var min = Convert.ToInt32(expected["metrics_total_lines_min"]);
-            Assert.True(totalLines >= min,
-                $"total_lines {totalLines} < min {min}");
+            var min = Convert.ToInt32(totalLinesMin);
+            Assert.True(result.Metrics.TotalLines >= min,
+                $"total_lines {result.Metrics.TotalLines} < min {min}");
         }
     }
 
@@ -177,16 +185,27 @@ public class SmokeTest
         var configMap = (Dictionary<string, object?>)fixture["config"]!;
         var expected = (Dictionary<string, object?>)fixture["expected"]!;
 
-        var configJson = JsonSerializer.Serialize(configMap);
-        var result = LanguagePack.Process(source, configJson);
-
-        if (expected.ContainsKey("chunks_min"))
+        var config = new ProcessConfig
         {
-            var resultDict = JsonElementToDictionary((JsonElement)result);
-            var chunks = (List<object?>)resultDict["chunks"]!;
-            var min = Convert.ToInt32(expected["chunks_min"]);
-            Assert.True(chunks.Count >= min,
-                $"chunks count {chunks.Count} < min {min}");
+            Language = (string)configMap["language"]!
+        };
+
+        if (configMap.TryGetValue("structure", out var structureVal))
+        {
+            config.Structure = (bool)structureVal!;
+        }
+        if (configMap.TryGetValue("chunk_max_size", out var chunkVal))
+        {
+            config.ChunkMaxSize = Convert.ToInt32(chunkVal);
+        }
+
+        var result = TsPackClient.Process(source, config);
+
+        if (expected.TryGetValue("chunks_min", out var chunksMin))
+        {
+            var min = Convert.ToInt32(chunksMin);
+            Assert.True(result.Chunks.Count >= min,
+                $"chunks count {result.Chunks.Count} < min {min}");
         }
     }
 
@@ -200,42 +219,11 @@ public class SmokeTest
         }
     }
 
-    // Download API tests
-    [Fact]
-    public void DownloadedLanguagesReturnsArray()
-    {
-        var langs = LanguagePack.DownloadedLanguages();
-        Assert.NotNull(langs);
-        Assert.IsAssignableFrom<List<string>>(langs);
-    }
-
-    [Fact]
-    public void ManifestLanguagesReturnsArrayWith50Plus()
-    {
-        var langs = LanguagePack.ManifestLanguages();
-        Assert.NotNull(langs);
-        Assert.True(langs.Count > 50, "manifestLanguages should return 50+ languages");
-    }
-
-    [Fact]
-    public void CacheDirReturnsNonEmptyString()
-    {
-        var dir = LanguagePack.CacheDir();
-        Assert.NotNull(dir);
-        Assert.True(dir.Length > 0, "cacheDir should return non-empty string");
-    }
-
-    [Fact]
-    public void InitDoesNotThrow()
-    {
-        LanguagePack.Init();
-    }
-
     // Parse validation tests
     [Fact]
     public void ParsesPythonCode()
     {
-        var tree = LanguagePack.ParseString("python", "def hello(): pass\n");
+        using var tree = TsPackClient.Parse("python", "def hello(): pass\n");
         Assert.NotNull(tree);
         Assert.Equal("module", tree.RootNodeType());
         Assert.True(tree.RootChildCount() >= 1);
@@ -245,14 +233,65 @@ public class SmokeTest
     [Fact]
     public void ErrorsOnInvalidLanguage()
     {
-        Assert.Throws<Exception>(() =>
-            LanguagePack.ParseString("nonexistent_xyz_123", "code"));
+        Assert.Throws<TsPackException>(() =>
+            TsPackClient.Parse("nonexistent_xyz_123", "code"));
     }
 
     [Fact]
     public void HasLanguageReturnsFalseForNonexistent()
     {
-        var result = LanguagePack.HasLanguage("nonexistent_xyz_123");
+        var result = TsPackClient.HasLanguage("nonexistent_xyz_123");
         Assert.False(result);
+    }
+
+    [Fact]
+    public void AvailableLanguagesReturnsNonEmptyArray()
+    {
+        var langs = TsPackClient.AvailableLanguages();
+        Assert.NotNull(langs);
+        Assert.True(langs.Length > 0, "AvailableLanguages should return at least one language");
+        Assert.Contains("python", langs);
+        Assert.Contains("javascript", langs);
+    }
+
+    [Fact]
+    public void LanguageCountIsPositive()
+    {
+        var count = TsPackClient.LanguageCount();
+        Assert.True(count > 0, "LanguageCount should be positive");
+    }
+
+    [Fact]
+    public void ParseTreeDisposesCleanly()
+    {
+        var tree = TsPackClient.Parse("python", "x = 1\n");
+        tree.Dispose();
+        // Second dispose should be a safe no-op
+        tree.Dispose();
+    }
+
+    [Fact]
+    public void ParseTreeHasErrorNodesForInvalidSyntax()
+    {
+        using var tree = TsPackClient.Parse("python", "def ():\n");
+        Assert.True(tree.HasErrorNodes(), "Invalid Python syntax should produce error nodes");
+        Assert.True(tree.ErrorCount() > 0, "ErrorCount should be positive for invalid syntax");
+    }
+
+    [Fact]
+    public void ParseTreeContainsNodeType()
+    {
+        using var tree = TsPackClient.Parse("python", "def hello(): pass\n");
+        Assert.True(tree.ContainsNodeType("function_definition"),
+            "Python function should contain function_definition node");
+    }
+
+    [Fact]
+    public void ParseTreeToSexpReturnsNonEmpty()
+    {
+        using var tree = TsPackClient.Parse("python", "x = 1\n");
+        var sexp = tree.ToSexp();
+        Assert.NotNull(sexp);
+        Assert.True(sexp!.Length > 0, "S-expression should be non-empty");
     }
 }

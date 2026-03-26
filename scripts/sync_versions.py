@@ -614,7 +614,8 @@ def main() -> None:
         (repo_root / "tests/test_apps/go/go.mod", "go_mod_require"),
         (repo_root / "tests/test_apps/java/pom.xml", "pom_xml_dep"),
         (repo_root / "tests/test_apps/elixir/mix.exs", "mix_exs_dep"),
-        (repo_root / "tests/test_apps/php/composer.json", "composer_json_dep"),
+        # PHP test_app excluded: the binding is a native extension loaded via
+        # php.ini, not a Composer package, so there is no dependency to version-sync.
         (repo_root / "tests/test_apps/csharp/TestApp.csproj", "csproj_dep"),
         # Additional version references
         (repo_root / "scripts/readme_config.yaml", "readme_config_yaml"),
