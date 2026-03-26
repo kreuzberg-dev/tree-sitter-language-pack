@@ -54,12 +54,14 @@ tasks:
     desc: Run Go test_app smoke test
     dir: tests/test_apps/go
     cmds:
-      - go test -v -run TestBasicFixtures
-      - go test -v -run TestParseValidation
+      - go test -tags tspack_dev -v -run TestBasicFixtures
+      - go test -tags tspack_dev -v -run TestParseValidation
 
   smoke:java:
     desc: Run Java test_app smoke test
     dir: tests/test_apps/java
+    env:
+      TSPACK_LIB_PATH: "{{.PROJECT_ROOT}}/target/release/libts_pack_ffi.dylib"
     cmds:
       - mvn test -Dtest=SmokeTest
 
@@ -125,5 +127,5 @@ tasks:
     desc: Run Go test_app comprehensive tests
     dir: tests/test_apps/go
     cmds:
-      - go test -v -run TestProcessFixtures
-      - go test -v -run TestChunkingFixtures
+      - go test -tags tspack_dev -v -run TestProcessFixtures
+      - go test -tags tspack_dev -v -run TestChunkingFixtures

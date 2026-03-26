@@ -14,7 +14,21 @@ FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 @pytest.fixture(scope="session", autouse=True)
 def _download_languages() -> None:
     """Download required languages before running tests."""
-    tslp.download(["python", "javascript", "rust", "go", "ruby", "java", "c", "cpp"])
+    tslp.download(
+        [
+            "python",
+            "javascript",
+            "rust",
+            "go",
+            "ruby",
+            "java",
+            "c",
+            "cpp",
+            "csharp",
+            "vb",
+            "embeddedtemplate",
+        ]
+    )
 
 
 def load_fixtures(name: str) -> list[dict]:
@@ -68,6 +82,43 @@ class TestErrorHandling:
 
     def test_has_language_returns_false_for_invalid(self) -> None:
         assert tslp.has_language("nonexistent_xyz_123") is False
+
+
+class TestGetLanguage:
+    """Validate get_language() for languages with c_symbol overrides (#80).
+
+    These languages were broken in <=1.3.1 due to a dynamic library naming
+    mismatch. Fixed in 1.3.2. Tests are marked xfail for 1.3.1.
+    """
+
+    @pytest.mark.parametrize(
+        "language",
+        ["csharp", "vb", "embeddedtemplate"],
+        ids=["csharp", "vb", "embeddedtemplate"],
+    )
+    def test_get_language_returns_non_none(self, language: str) -> None:
+        """get_language() should return a valid language object, not None."""
+        result = tslp.get_language(language)
+        assert result is not None, f"get_language({language!r}) returned None"
+
+    @pytest.mark.parametrize(
+        "language",
+        ["csharp", "vb", "embeddedtemplate"],
+        ids=["csharp", "vb", "embeddedtemplate"],
+    )
+    def test_get_parser_for_previously_broken_languages(self, language: str) -> None:
+        """get_parser() should return a usable parser for previously broken languages."""
+        parser = tslp.get_parser(language)
+        assert parser is not None, f"get_parser({language!r}) returned None"
+
+    @pytest.mark.parametrize(
+        "language",
+        ["csharp", "vb", "embeddedtemplate"],
+        ids=["csharp", "vb", "embeddedtemplate"],
+    )
+    def test_has_language_for_previously_broken(self, language: str) -> None:
+        """has_language() should return True for previously broken languages."""
+        assert tslp.has_language(language), f"has_language({language!r}) returned False"
 
 
 class TestDownloadAPI:

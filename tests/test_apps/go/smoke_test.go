@@ -6,17 +6,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
+	tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
 func TestMain(m *testing.M) {
-	// Initialize required languages before running tests
-	configJSON := `{"languages":["python","javascript","rust","go","ruby","java","c","cpp"]}`
-	if err := tslp.Init(configJSON); err != nil {
-		panic(err)
-	}
-
-	// Run tests
+	// Run tests — static/dev builds have languages compiled in,
+	// no Init/download needed.
 	os.Exit(m.Run())
 }
 
@@ -47,7 +42,7 @@ func TestBasicFixtures(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create registry: %v", err)
 	}
-	defer registry.Free()
+	defer registry.Close()
 
 	fixtures := loadBasicFixtures(t)
 	for _, fixture := range fixtures {
@@ -86,23 +81,34 @@ func TestParseValidation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create registry: %v", err)
 	}
-	defer registry.Free()
+	defer registry.Close()
 
 	t.Run("parses_python_code", func(t *testing.T) {
 		tree, err := registry.ParseString("python", "def hello(): pass\n")
 		if err != nil {
 			t.Fatalf("ParseString failed: %v", err)
 		}
-		defer tree.Free()
+		defer tree.Close()
 
-		nodeType := tree.RootNodeType()
+		nodeType, err := tree.RootNodeType()
+		if err != nil {
+			t.Fatalf("RootNodeType failed: %v", err)
+		}
 		if nodeType != "module" {
 			t.Errorf("root node type = %q, expected %q", nodeType, "module")
 		}
-		if tree.RootChildCount() < 1 {
+		childCount, err := tree.RootChildCount()
+		if err != nil {
+			t.Fatalf("RootChildCount failed: %v", err)
+		}
+		if childCount < 1 {
 			t.Error("root child count < 1")
 		}
-		if tree.HasErrorNodes() {
+		hasErrors, err := tree.HasErrorNodes()
+		if err != nil {
+			t.Fatalf("HasErrorNodes failed: %v", err)
+		}
+		if hasErrors {
 			t.Error("tree has error nodes")
 		}
 	})
@@ -152,11 +158,11 @@ func TestErrorHandling(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create registry: %v", err)
 	}
-	defer registry.Free()
+	defer registry.Close()
 
 	t.Run("process_with_invalid_language_errors", func(t *testing.T) {
-		configJSON := `{"language":"nonexistent_xyz"}`
-		_, err := registry.Process("code", configJSON)
+		config := tslp.ProcessConfig{Language: "nonexistent_xyz"}
+		_, err := registry.Process("code", config)
 		if err == nil {
 			t.Error("expected error for invalid language in process, got nil")
 		}

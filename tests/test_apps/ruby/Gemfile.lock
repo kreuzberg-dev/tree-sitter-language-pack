@@ -16,9 +16,9 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.7)
-    tree_sitter_language_pack (1.0.0.rc.15-aarch64-linux)
-    tree_sitter_language_pack (1.0.0.rc.15-arm64-darwin)
-    tree_sitter_language_pack (1.0.0.rc.15-x86_64-linux)
+    tree_sitter_language_pack (1.3.1-aarch64-linux)
+    tree_sitter_language_pack (1.3.1-arm64-darwin)
+    tree_sitter_language_pack (1.3.1-x86_64-linux)
 
 PLATFORMS
   aarch64-linux
@@ -28,7 +28,7 @@ PLATFORMS
 DEPENDENCIES
   json
   rspec (~> 3.13)
-  tree_sitter_language_pack (= 1.0.0.rc.15)
+  tree_sitter_language_pack (= 1.3.1)
 
 CHECKSUMS
   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
@@ -38,9 +38,9 @@ CHECKSUMS
   rspec-expectations (3.13.5) sha256=33a4d3a1d95060aea4c94e9f237030a8f9eae5615e9bd85718fe3a09e4b58836
   rspec-mocks (3.13.8) sha256=086ad3d3d17533f4237643de0b5c42f04b66348c28bf6b9c2d3f4a3b01af1d47
   rspec-support (3.13.7) sha256=0640e5570872aafefd79867901deeeeb40b0c9875a36b983d85f54fb7381c47c
-  tree_sitter_language_pack (1.0.0.rc.15-aarch64-linux) sha256=b228748db5e45947be8e44344c7c7ac8004d9643a7a82d47409fc8dfbcb3926e
-  tree_sitter_language_pack (1.0.0.rc.15-arm64-darwin) sha256=6c98e71afda32ed690ce88892e2b473038d00bfceef2c17abc3e856f8087e3b6
-  tree_sitter_language_pack (1.0.0.rc.15-x86_64-linux) sha256=557242973972a050a0116569c13e20ce1aab908a063c61ce17b442dd56653fc1
+  tree_sitter_language_pack (1.3.1-aarch64-linux) sha256=1060227a33bf9587ec32ab5f5b3d94f93abfb3b0ba572a47b922a5593ee489dd
+  tree_sitter_language_pack (1.3.1-arm64-darwin) sha256=c8b0ed1a35f6905b67e97e26395d2a248921f738307deacb8e303cbf2c650eee
+  tree_sitter_language_pack (1.3.1-x86_64-linux) sha256=3b4b1320b9ce89ec7b3217c1ac86514edf1849fc5b44212e565693ac41b12e62
 
 BUNDLED WITH
   4.0.7

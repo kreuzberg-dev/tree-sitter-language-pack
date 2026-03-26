@@ -16,8 +16,11 @@ classifiers = [
 ]
 dependencies = [
   "pytest>=8",
-  "tree-sitter-language-pack==1.3.2",
+  "tree-sitter-language-pack>=1.3.1",
 ]
+
+[tool.hatch]
+build.targets.wheel.packages = [ "." ]
 
 [tool.ruff]
 lint.ignore = [ "D100", "D101", "D102", "D103", "INP001", "S101" ]

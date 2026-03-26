@@ -1,6 +1,11 @@
 [workspace]
 members = ["crates/*", "tools/e2e-generator", "tools/snippet-runner"]
-exclude = ["crates/ts-pack-elixir", "crates/ts-pack-java", "packages/go/v1"]
+exclude = [
+    "crates/ts-pack-elixir",
+    "crates/ts-pack-java",
+    "packages/go/v1",
+    "tests/test_apps/rust",
+]
 resolver = "2"
 
 [workspace.package]

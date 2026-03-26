@@ -1,11 +1,11 @@
 use serde::Deserialize;
 use std::fs;
 use tree_sitter_language_pack::{
-    cache_dir, downloaded_languages, manifest_languages, parse_string, tree_has_error_nodes,
-    DownloadManager, LanguageRegistry, ProcessConfig,
+    cache_dir, configure, downloaded_languages, manifest_languages, parse_string,
+    tree_has_error_nodes, DownloadManager, LanguageRegistry, PackConfig, ProcessConfig,
 };
 
-const VERSION: &str = "1.3.2";
+const VERSION: &str = "1.3.1";
 
 #[derive(Deserialize)]
 struct BasicFixture {
@@ -70,8 +70,16 @@ fn setup_registry() -> LanguageRegistry {
     let cache = dm.cache_dir().to_path_buf();
     println!("Parsers cached at: {}", cache.display());
 
+    // Also configure the global registry so parse_string() can find downloaded parsers
+    let config = PackConfig {
+        cache_dir: Some(cache.clone()),
+        languages: None,
+        groups: None,
+    };
+    tree_sitter_language_pack::configure(&config).expect("Failed to configure global registry");
+
     // Create registry with the download cache as an extra lib dir
-    let mut registry = LanguageRegistry::new();
+    let registry = LanguageRegistry::new();
     registry.add_extra_libs_dir(cache);
     registry
 }

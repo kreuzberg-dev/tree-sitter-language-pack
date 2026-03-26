@@ -56,6 +56,8 @@ tests/test_apps/*/.venv/
 tests/test_apps/*/vendor/
 tests/test_apps/*/_build/
 tests/test_apps/*/deps/
+tests/test_apps/*/obj/
+tests/test_apps/*/bin/
 tests/test_apps/c/build/
 
 # E2E build artifacts
