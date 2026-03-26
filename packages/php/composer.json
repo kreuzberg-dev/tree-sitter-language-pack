@@ -1,15 +1,50 @@
 {
 	"name": "kreuzberg/tree-sitter-language-pack",
 	"description": "Tree-sitter language pack - pre-compiled parsers for 248 languages (PHP extension)",
+	"version": "1.3.2",
 	"type": "php-ext",
 	"license": "MIT",
+	"keywords": ["tree-sitter", "parser", "syntax", "language-pack", "code-analysis", "ast", "php8", "rust"],
+	"homepage": "https://github.com/kreuzberg-dev/tree-sitter-language-pack",
+	"support": {
+		"issues": "https://github.com/kreuzberg-dev/tree-sitter-language-pack/issues",
+		"source": "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+	},
+	"authors": [
+		{
+			"name": "Na'aman Hirschfeld",
+			"email": "naaman@kreuzberg.dev",
+			"role": "creator"
+		}
+	],
 	"require": {
 		"php": ">=8.2"
+	},
+	"replace": {
+		"ext-ts_pack_php": "*"
 	},
 	"autoload": {
 		"psr-4": {
 			"TreeSitterLanguagePack\\": "src/"
 		}
 	},
-	"version": "1.3.2"
+	"config": {
+		"sort-packages": true
+	},
+	"minimum-stability": "stable",
+	"prefer-stable": true,
+	"php-ext": {
+		"extension-name": "ts_pack_php",
+		"priority": 50,
+		"configure-options": [
+			{
+				"name": "enable-ts-pack-php",
+				"description": "Enable tree-sitter language pack PHP extension"
+			}
+		],
+		"support": {
+			"source-url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack",
+			"download-url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases"
+		}
+	}
 }

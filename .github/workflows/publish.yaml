@@ -1233,9 +1233,9 @@ jobs:
           path: c-ffi-${{ matrix.label }}.tar.gz
           retention-days: 14
 
-  # ─── Build PHP extension ────────────────────────────────────────────
+  # ─── Build PHP PIE package ──────────────────────────────────────────
   build-php-extension:
-    name: Build PHP extension (${{ matrix.label }})
+    name: Build PHP PIE package (${{ matrix.label }})
     needs: [prepare, validate-versions, clone-vendors]
     if: needs.prepare.outputs.release_php == 'true'
     runs-on: ${{ matrix.os }}
@@ -1246,10 +1246,13 @@ jobs:
         include:
           - os: ubuntu-latest
             label: linux-x86_64
+            platform: linux-x86_64
           - os: ubuntu-24.04-arm
             label: linux-aarch64
+            platform: linux-aarch64
           - os: macos-latest
             label: macos-arm64
+            platform: macos-arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -1286,18 +1289,17 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
 
-      - name: Stage PHP extension artifacts
-        run: |
-          mkdir -p staging
-          cp target/release/libts_pack_php.so staging/ 2>/dev/null || true
-          cp target/release/libts_pack_php.dylib staging/ 2>/dev/null || true
-          cd staging && tar -czf "../php-ext-${{ matrix.label }}.tar.gz" .
+      - name: Build PIE package
+        shell: bash
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: scripts/publish/php/build-pie-package.sh "${{ matrix.platform }}" "dist/php"
 
-      - name: Upload PHP extension artifact
+      - name: Upload PHP PIE package artifact
         uses: actions/upload-artifact@v7
         with:
-          name: php-ext-${{ matrix.label }}
-          path: php-ext-${{ matrix.label }}.tar.gz
+          name: php-pie-${{ matrix.label }}
+          path: dist/php/tree-sitter-language-pack-*.tar.gz*
           retention-days: 14
 
   # ─── Build C# native libraries ──────────────────────────────────────
@@ -2139,10 +2141,10 @@ jobs:
         with:
           ref: ${{ needs.prepare.outputs.tag }}
 
-      - name: Download PHP extension artifacts
+      - name: Download PHP PIE package artifacts
         uses: actions/download-artifact@v8
         with:
-          pattern: php-ext-*
+          pattern: php-pie-*
           path: dist/php
           merge-multiple: true
 
@@ -2151,20 +2153,20 @@ jobs:
         run: |
           {
             echo "## Packagist Dry Run"
-            echo "PHP extension artifacts staged:"
+            echo "PHP PIE package artifacts staged:"
             echo '```'
             ls -1 dist/php/ 2>/dev/null || echo "(no artifacts)"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload PHP extension binaries to GitHub release
+      - name: Upload PHP PIE packages to GitHub release
         if: ${{ !inputs.dry_run }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.prepare.outputs.tag }}
         run: |
-          echo "Uploading PHP extension binaries to GitHub release ${TAG}..."
-          for file in dist/php/php-ext-*.tar.gz; do
+          echo "Uploading PHP PIE packages to GitHub release ${TAG}..."
+          for file in dist/php/tree-sitter-language-pack-*.tar.gz*; do
             if [ -f "$file" ]; then
               echo "Uploading: $file"
               gh release upload "$TAG" "$file" --clobber

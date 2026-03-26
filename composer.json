@@ -54,6 +54,12 @@
 	"php-ext": {
 		"extension-name": "ts_pack_php",
 		"priority": 50,
+		"configure-options": [
+			{
+				"name": "enable-ts-pack-php",
+				"description": "Enable tree-sitter language pack PHP extension"
+			}
+		],
 		"support": {
 			"source-url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack",
 			"download-url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases"
