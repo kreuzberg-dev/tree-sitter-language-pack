@@ -1,6 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_php_string, group_by_category, has_chunk_assertions, has_detect_assertions, has_process_assertions,
-    sanitize_name,
+    Fixture, escape_php_source, escape_php_string, group_by_category, has_chunk_assertions, has_detect_assertions,
+    has_process_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -154,8 +154,8 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 let max_chunk_size = assertions.process_chunk_max_size.unwrap_or(512);
                 writeln!(
                     out,
-                    "        $intel = json_decode(\\ts_pack_process('{}', json_encode(['language' => '{}', 'chunk_max_size' => {}])), true);",
-                    escape_php_string(source),
+                    "        $intel = json_decode(\\ts_pack_process(\"{}\", json_encode(['language' => '{}', 'chunk_max_size' => {}])), true);",
+                    escape_php_source(source),
                     escape_php_string(lang),
                     max_chunk_size
                 )
@@ -163,8 +163,8 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             } else {
                 writeln!(
                     out,
-                    "        $intel = json_decode(\\ts_pack_process('{}', json_encode(['language' => '{}', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);",
-                    escape_php_string(source),
+                    "        $intel = json_decode(\\ts_pack_process(\"{}\", json_encode(['language' => '{}', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);",
+                    escape_php_source(source),
                     escape_php_string(lang)
                 )
                 .unwrap();
@@ -403,8 +403,8 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(content) = &assertions.detect_from_content {
                 writeln!(
                     out,
-                    "        $detectResult = \\TreeSitterLanguagePack::detect_language_from_content('{}');",
-                    escape_php_string(content)
+                    "        $detectResult = \\TreeSitterLanguagePack::detect_language_from_content(\"{}\");",
+                    escape_php_source(content)
                 )
                 .unwrap();
                 if assertions.detect_result_none == Some(true) {
@@ -519,9 +519,9 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 // Use ts_pack_parse_string for tree-related assertions
                 writeln!(
                     out,
-                    "        $sexp = \\ts_pack_parse_string('{}', '{}');",
+                    "        $sexp = \\ts_pack_parse_string('{}', \"{}\");",
                     escape_php_string(lang),
-                    escape_php_string(source)
+                    escape_php_source(source)
                 )
                 .unwrap();
                 writeln!(

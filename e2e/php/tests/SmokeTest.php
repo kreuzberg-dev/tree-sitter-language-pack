@@ -18,7 +18,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('actionscript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('actionscript', 'var x:int = 1;');
+        $sexp = \ts_pack_parse_string('actionscript', "var x:int = 1;");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -30,7 +30,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('ada');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('ada', 'procedure Main is begin null; end Main;');
+        $sexp = \ts_pack_parse_string('ada', "procedure Main is begin null; end Main;");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -42,7 +42,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('agda');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('agda', 'module Main where');
+        $sexp = \ts_pack_parse_string('agda', "module Main where");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -54,7 +54,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('apex');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('apex', 'public class Main {}');
+        $sexp = \ts_pack_parse_string('apex', "public class Main {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -66,7 +66,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('arduino');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('arduino', 'void setup() {}');
+        $sexp = \ts_pack_parse_string('arduino', "void setup() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -78,7 +78,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('asm');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('asm', 'mov eax, 1');
+        $sexp = \ts_pack_parse_string('asm', "mov eax, 1");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -90,7 +90,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('astro');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('astro', '---\n---\n<p>hello</p>');
+        $sexp = \ts_pack_parse_string('astro', "---\n---\n<p>hello</p>");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -102,7 +102,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('bash');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('bash', 'echo hello');
+        $sexp = \ts_pack_parse_string('bash', "echo hello");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -114,7 +114,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('beancount');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('beancount', '2024-01-01 open Assets:Bank USD');
+        $sexp = \ts_pack_parse_string('beancount', "2024-01-01 open Assets:Bank USD");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -126,7 +126,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('bibtex');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('bibtex', '@article{key, title={A}}');
+        $sexp = \ts_pack_parse_string('bibtex', "@article{key, title={A}}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -138,7 +138,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('bicep');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('bicep', 'param name string');
+        $sexp = \ts_pack_parse_string('bicep', "param name string");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -150,7 +150,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('bitbake');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('bitbake', 'DESCRIPTION = "hello"');
+        $sexp = \ts_pack_parse_string('bitbake', "DESCRIPTION = \"hello\"");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -162,7 +162,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('bsl');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('bsl', 'Procedure Main() EndProcedure');
+        $sexp = \ts_pack_parse_string('bsl', "Procedure Main() EndProcedure");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -174,7 +174,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('c');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('c', 'int main() { return 0; }');
+        $sexp = \ts_pack_parse_string('c', "int main() { return 0; }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -186,7 +186,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('cairo');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('cairo', 'fn main() {}');
+        $sexp = \ts_pack_parse_string('cairo', "fn main() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -198,7 +198,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('capnp');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('capnp', '@0xabcdef1234567890;');
+        $sexp = \ts_pack_parse_string('capnp', "@0xabcdef1234567890;");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -210,7 +210,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('chatito');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('chatito', '%[greeting]\n    hello');
+        $sexp = \ts_pack_parse_string('chatito', "%[greeting]\n    hello");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -222,7 +222,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('clarity');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('clarity', '(define-public (hello) (ok true))');
+        $sexp = \ts_pack_parse_string('clarity', "(define-public (hello) (ok true))");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -234,7 +234,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('clojure');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('clojure', '(def x 1)');
+        $sexp = \ts_pack_parse_string('clojure', "(def x 1)");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -246,7 +246,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('cmake');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('cmake', 'cmake_minimum_required(VERSION 3.0)');
+        $sexp = \ts_pack_parse_string('cmake', "cmake_minimum_required(VERSION 3.0)");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -258,7 +258,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('cobol');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('cobol', '       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.');
+        $sexp = \ts_pack_parse_string('cobol', "       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -270,7 +270,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('comment');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('comment', 'TODO: fix this');
+        $sexp = \ts_pack_parse_string('comment', "TODO: fix this");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -282,7 +282,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('commonlisp');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('commonlisp', '(defun hello () (print "hello"))');
+        $sexp = \ts_pack_parse_string('commonlisp', "(defun hello () (print \"hello\"))");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -294,7 +294,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('cpon');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('cpon', '{"key": 1}');
+        $sexp = \ts_pack_parse_string('cpon', "{\"key\": 1}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -306,7 +306,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('cpp');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('cpp', 'int main() { return 0; }');
+        $sexp = \ts_pack_parse_string('cpp', "int main() { return 0; }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -318,7 +318,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('css');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('css', 'body { color: red; }');
+        $sexp = \ts_pack_parse_string('css', "body { color: red; }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -330,7 +330,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('csv');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('csv', 'a,b,c\n1,2,3');
+        $sexp = \ts_pack_parse_string('csv', "a,b,c\n1,2,3");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -342,7 +342,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('cuda');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('cuda', '__global__ void kernel() {}');
+        $sexp = \ts_pack_parse_string('cuda', "__global__ void kernel() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -354,7 +354,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('d');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('d', 'void main() {}');
+        $sexp = \ts_pack_parse_string('d', "void main() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -366,7 +366,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('dart');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('dart', 'void main() {}');
+        $sexp = \ts_pack_parse_string('dart', "void main() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -378,7 +378,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('dockerfile');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('dockerfile', 'FROM alpine');
+        $sexp = \ts_pack_parse_string('dockerfile', "FROM alpine");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -390,7 +390,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('doxygen');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('doxygen', '/** @brief A function */');
+        $sexp = \ts_pack_parse_string('doxygen', "/** @brief A function */");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -402,7 +402,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('dtd');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('dtd', '<!ELEMENT note (body)>');
+        $sexp = \ts_pack_parse_string('dtd', "<!ELEMENT note (body)>");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -414,7 +414,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('elisp');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('elisp', '(defun hello () (message "hello"))');
+        $sexp = \ts_pack_parse_string('elisp', "(defun hello () (message \"hello\"))");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -426,7 +426,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('elixir');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('elixir', 'IO.puts("hello")');
+        $sexp = \ts_pack_parse_string('elixir', "IO.puts(\"hello\")");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -438,7 +438,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('elm');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('elm', 'module Main exposing (..)');
+        $sexp = \ts_pack_parse_string('elm', "module Main exposing (..)");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -450,7 +450,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('erlang');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('erlang', 'main() -> ok.');
+        $sexp = \ts_pack_parse_string('erlang', "main() -> ok.");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -462,7 +462,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('fennel');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('fennel', '(fn hello [] (print :hello))');
+        $sexp = \ts_pack_parse_string('fennel', "(fn hello [] (print :hello))");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -474,7 +474,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('firrtl');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('firrtl', 'circuit Main :');
+        $sexp = \ts_pack_parse_string('firrtl', "circuit Main :");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -486,7 +486,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('fish');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('fish', 'echo hello');
+        $sexp = \ts_pack_parse_string('fish', "echo hello");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -498,7 +498,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('fortran');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('fortran', 'program main\nend program main');
+        $sexp = \ts_pack_parse_string('fortran', "program main\nend program main");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -510,7 +510,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('fsharp');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('fsharp', 'let x = 1');
+        $sexp = \ts_pack_parse_string('fsharp', "let x = 1");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -522,7 +522,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('fsharp_signature');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('fsharp_signature', 'val x: int');
+        $sexp = \ts_pack_parse_string('fsharp_signature', "val x: int");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -534,7 +534,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('func');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('func', '() recv_internal() {}');
+        $sexp = \ts_pack_parse_string('func', "() recv_internal() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -546,7 +546,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('gdscript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('gdscript', 'extends Node\nfunc _ready():\n\tpass');
+        $sexp = \ts_pack_parse_string('gdscript', "extends Node\nfunc _ready():\n\tpass");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -558,7 +558,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('gitattributes');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('gitattributes', '*.txt text');
+        $sexp = \ts_pack_parse_string('gitattributes', "*.txt text");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -570,7 +570,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('gitcommit');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('gitcommit', 'feat: add feature\n\nBody text');
+        $sexp = \ts_pack_parse_string('gitcommit', "feat: add feature\n\nBody text");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -582,7 +582,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('gitignore');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('gitignore', '*.o\n*.log');
+        $sexp = \ts_pack_parse_string('gitignore', "*.o\n*.log");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -594,7 +594,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('gleam');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('gleam', 'pub fn main() { }');
+        $sexp = \ts_pack_parse_string('gleam', "pub fn main() { }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -606,7 +606,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('glsl');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('glsl', 'void main() { gl_Position = vec4(0.0); }');
+        $sexp = \ts_pack_parse_string('glsl', "void main() { gl_Position = vec4(0.0); }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -618,7 +618,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('gn');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('gn', 'group("hello") {}');
+        $sexp = \ts_pack_parse_string('gn', "group(\"hello\") {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -630,7 +630,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('go');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('go', 'package main');
+        $sexp = \ts_pack_parse_string('go', "package main");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -642,7 +642,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('gomod');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('gomod', 'module example.com/hello\n\ngo 1.21');
+        $sexp = \ts_pack_parse_string('gomod', "module example.com/hello\n\ngo 1.21");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -654,7 +654,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('gosum');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('gosum', 'example.com/pkg v1.0.0 h1:abc=');
+        $sexp = \ts_pack_parse_string('gosum', "example.com/pkg v1.0.0 h1:abc=");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -666,7 +666,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('graphql');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('graphql', 'type Query { hello: String }');
+        $sexp = \ts_pack_parse_string('graphql', "type Query { hello: String }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -678,7 +678,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('groovy');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('groovy', 'def x = 1');
+        $sexp = \ts_pack_parse_string('groovy', "def x = 1");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -690,7 +690,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('gstlaunch');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('gstlaunch', 'fakesrc ! fakesink');
+        $sexp = \ts_pack_parse_string('gstlaunch', "fakesrc ! fakesink");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -702,7 +702,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('hack');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('hack', '<?hh\nfunction main(): void {}');
+        $sexp = \ts_pack_parse_string('hack', "<?hh\nfunction main(): void {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -714,7 +714,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('hare');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('hare', 'export fn main() void = void;');
+        $sexp = \ts_pack_parse_string('hare', "export fn main() void = void;");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -726,7 +726,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('haskell');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('haskell', 'main = putStrLn "hello"');
+        $sexp = \ts_pack_parse_string('haskell', "main = putStrLn \"hello\"");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -738,7 +738,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('haxe');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('haxe', 'class Main { static function main() {} }');
+        $sexp = \ts_pack_parse_string('haxe', "class Main { static function main() {} }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -750,7 +750,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('hcl');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('hcl', 'variable "name" { type = string }');
+        $sexp = \ts_pack_parse_string('hcl', "variable \"name\" { type = string }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -762,7 +762,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('heex');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('heex', '<%= @greeting %>');
+        $sexp = \ts_pack_parse_string('heex', "<%= @greeting %>");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -774,7 +774,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('hlsl');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('hlsl', 'float4 main() : SV_Target { return 0; }');
+        $sexp = \ts_pack_parse_string('hlsl', "float4 main() : SV_Target { return 0; }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -786,7 +786,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('html');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('html', '<p>hello</p>');
+        $sexp = \ts_pack_parse_string('html', "<p>hello</p>");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -798,7 +798,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('hyprlang');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('hyprlang', 'general { border_size = 1 }');
+        $sexp = \ts_pack_parse_string('hyprlang', "general { border_size = 1 }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -810,7 +810,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('ini');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('ini', '[section]\nkey = value');
+        $sexp = \ts_pack_parse_string('ini', "[section]\nkey = value");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -822,7 +822,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('ispc');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('ispc', 'export void main() {}');
+        $sexp = \ts_pack_parse_string('ispc', "export void main() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -834,7 +834,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('janet');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('janet', '(print "hello")');
+        $sexp = \ts_pack_parse_string('janet', "(print \"hello\")");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -846,7 +846,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('java');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('java', 'class Main { public static void main(String[] args) {} }');
+        $sexp = \ts_pack_parse_string('java', "class Main { public static void main(String[] args) {} }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -858,7 +858,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('javascript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('javascript', 'console.log(\'hello\');');
+        $sexp = \ts_pack_parse_string('javascript', "console.log('hello');");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -870,7 +870,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('jsdoc');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('jsdoc', '/** @param {string} name */');
+        $sexp = \ts_pack_parse_string('jsdoc', "/** @param {string} name */");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -882,7 +882,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('json');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('json', '{"key": "value"}');
+        $sexp = \ts_pack_parse_string('json', "{\"key\": \"value\"}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -894,7 +894,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('jsonnet');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('jsonnet', '{ key: \'value\' }');
+        $sexp = \ts_pack_parse_string('jsonnet', "{ key: 'value' }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -906,7 +906,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('julia');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('julia', 'function main() end');
+        $sexp = \ts_pack_parse_string('julia', "function main() end");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -918,7 +918,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('kconfig');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('kconfig', 'config FOO\n\tbool "Enable foo"');
+        $sexp = \ts_pack_parse_string('kconfig', "config FOO\n\tbool \"Enable foo\"");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -930,7 +930,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('kdl');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('kdl', 'node "value"');
+        $sexp = \ts_pack_parse_string('kdl', "node \"value\"");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -942,7 +942,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('kotlin');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('kotlin', 'fun main() {}');
+        $sexp = \ts_pack_parse_string('kotlin', "fun main() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -954,7 +954,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('latex');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('latex', '\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}');
+        $sexp = \ts_pack_parse_string('latex', "\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -966,7 +966,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('linkerscript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('linkerscript', 'SECTIONS { .text : { *(.text) } }');
+        $sexp = \ts_pack_parse_string('linkerscript', "SECTIONS { .text : { *(.text) } }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -978,7 +978,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('llvm');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('llvm', 'define i32 @main() { ret i32 0 }');
+        $sexp = \ts_pack_parse_string('llvm', "define i32 @main() { ret i32 0 }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -990,7 +990,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('lua');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('lua', 'print(\'hello\')');
+        $sexp = \ts_pack_parse_string('lua', "print('hello')");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1002,7 +1002,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('luadoc');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('luadoc', '---@param name string');
+        $sexp = \ts_pack_parse_string('luadoc', "---@param name string");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1014,7 +1014,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('luap');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('luap', '[a-z]+');
+        $sexp = \ts_pack_parse_string('luap', "[a-z]+");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1026,7 +1026,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('luau');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('luau', 'local x: number = 1');
+        $sexp = \ts_pack_parse_string('luau', "local x: number = 1");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1038,7 +1038,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('magik');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('magik', '_method object.hello\n_endmethod');
+        $sexp = \ts_pack_parse_string('magik', "_method object.hello\n_endmethod");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1050,7 +1050,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('make');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('make', 'all:\n\techo hello');
+        $sexp = \ts_pack_parse_string('make', "all:\n\techo hello");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1062,7 +1062,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('markdown');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('markdown', '# Hello\n\nWorld');
+        $sexp = \ts_pack_parse_string('markdown', "# Hello\n\nWorld");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1074,7 +1074,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('markdown_inline');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('markdown_inline', '**bold** and *italic*');
+        $sexp = \ts_pack_parse_string('markdown_inline', "**bold** and *italic*");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1086,7 +1086,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('matlab');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('matlab', 'function y = hello(x)\ny = x;\nend');
+        $sexp = \ts_pack_parse_string('matlab', "function y = hello(x)\ny = x;\nend");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1098,7 +1098,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('mermaid');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('mermaid', 'graph TD\nA --> B');
+        $sexp = \ts_pack_parse_string('mermaid', "graph TD\nA --> B");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1110,7 +1110,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('meson');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('meson', 'project(\'hello\', \'c\')');
+        $sexp = \ts_pack_parse_string('meson', "project('hello', 'c')");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1122,7 +1122,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('netlinx');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('netlinx', 'PROGRAM_NAME=\'hello\'');
+        $sexp = \ts_pack_parse_string('netlinx', "PROGRAM_NAME='hello'");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1134,7 +1134,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('nim');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('nim', 'echo "hello"');
+        $sexp = \ts_pack_parse_string('nim', "echo \"hello\"");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1146,7 +1146,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('ninja');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('ninja', 'rule cc\n  command = cc $in -o $out');
+        $sexp = \ts_pack_parse_string('ninja', "rule cc\n  command = cc \$in -o \$out");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1158,7 +1158,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('nix');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('nix', '{ pkgs ? import <nixpkgs> {} }: pkgs.hello');
+        $sexp = \ts_pack_parse_string('nix', "{ pkgs ? import <nixpkgs> {} }: pkgs.hello");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1170,7 +1170,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('nqc');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('nqc', 'task main() {}');
+        $sexp = \ts_pack_parse_string('nqc', "task main() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1182,7 +1182,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('objc');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('objc', '@interface Main @end');
+        $sexp = \ts_pack_parse_string('objc', "@interface Main @end");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1194,7 +1194,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('ocaml');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('ocaml', 'let () = print_endline "hello"');
+        $sexp = \ts_pack_parse_string('ocaml', "let () = print_endline \"hello\"");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1206,7 +1206,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('ocaml_interface');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('ocaml_interface', 'val x : int');
+        $sexp = \ts_pack_parse_string('ocaml_interface', "val x : int");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1218,7 +1218,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('odin');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('odin', 'package main');
+        $sexp = \ts_pack_parse_string('odin', "package main");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1230,7 +1230,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('org');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('org', '* Hello\nWorld');
+        $sexp = \ts_pack_parse_string('org', "* Hello\nWorld");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1242,7 +1242,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('pascal');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('pascal', 'program Hello; begin end.');
+        $sexp = \ts_pack_parse_string('pascal', "program Hello; begin end.");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1254,7 +1254,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('pem');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('pem', '-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----');
+        $sexp = \ts_pack_parse_string('pem', "-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1266,7 +1266,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('perl');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('perl', 'print \'hello\';');
+        $sexp = \ts_pack_parse_string('perl', "print 'hello';");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1278,7 +1278,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('pgn');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('pgn', '1. e4 e5 *');
+        $sexp = \ts_pack_parse_string('pgn', "1. e4 e5 *");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1290,7 +1290,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('php');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('php', '<?php echo \'hello\'; ?>');
+        $sexp = \ts_pack_parse_string('php', "<?php echo 'hello'; ?>");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1302,7 +1302,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('po');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('po', 'msgid "hello"\nmsgstr "world"');
+        $sexp = \ts_pack_parse_string('po', "msgid \"hello\"\nmsgstr \"world\"");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1314,7 +1314,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('pony');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('pony', 'actor Main\n  new create(env: Env) => None');
+        $sexp = \ts_pack_parse_string('pony', "actor Main\n  new create(env: Env) => None");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1326,7 +1326,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('powershell');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('powershell', 'Write-Host \'hello\'');
+        $sexp = \ts_pack_parse_string('powershell', "Write-Host 'hello'");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1338,7 +1338,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('printf');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('printf', '%d %s');
+        $sexp = \ts_pack_parse_string('printf', "%d %s");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1350,7 +1350,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('prisma');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('prisma', 'model User { id Int @id }');
+        $sexp = \ts_pack_parse_string('prisma', "model User { id Int @id }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1362,7 +1362,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('properties');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('properties', 'key=value');
+        $sexp = \ts_pack_parse_string('properties', "key=value");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1374,7 +1374,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('proto');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('proto', 'syntax = "proto3";');
+        $sexp = \ts_pack_parse_string('proto', "syntax = \"proto3\";");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1386,7 +1386,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('psv');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('psv', 'a|b|c\n1|2|3');
+        $sexp = \ts_pack_parse_string('psv', "a|b|c\n1|2|3");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1398,7 +1398,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('puppet');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('puppet', 'notify { \'hello\': }');
+        $sexp = \ts_pack_parse_string('puppet', "notify { 'hello': }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1410,7 +1410,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('purescript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('purescript', 'module Main where');
+        $sexp = \ts_pack_parse_string('purescript', "module Main where");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1422,7 +1422,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('pymanifest');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('pymanifest', 'include *.txt');
+        $sexp = \ts_pack_parse_string('pymanifest', "include *.txt");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1434,7 +1434,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('python', 'print(\'hello\')');
+        $sexp = \ts_pack_parse_string('python', "print('hello')");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1446,7 +1446,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('qmldir');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('qmldir', 'module Example');
+        $sexp = \ts_pack_parse_string('qmldir', "module Example");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1458,7 +1458,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('qmljs');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('qmljs', 'import QtQuick 2.0\nItem {}');
+        $sexp = \ts_pack_parse_string('qmljs', "import QtQuick 2.0\nItem {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1470,7 +1470,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('query');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('query', '(identifier) @name');
+        $sexp = \ts_pack_parse_string('query', "(identifier) @name");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1482,7 +1482,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('r');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('r', 'print(\'hello\')');
+        $sexp = \ts_pack_parse_string('r', "print('hello')");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1494,7 +1494,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('racket');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('racket', '#lang racket\n(define x 1)');
+        $sexp = \ts_pack_parse_string('racket', "#lang racket\n(define x 1)");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1506,7 +1506,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('re2c');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('re2c', '/*!re2c\n  [a-z]+ { return; }\n*/');
+        $sexp = \ts_pack_parse_string('re2c', "/*!re2c\n  [a-z]+ { return; }\n*/");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1518,7 +1518,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('readline');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('readline', 'set editing-mode vi');
+        $sexp = \ts_pack_parse_string('readline', "set editing-mode vi");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1530,7 +1530,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('rego');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('rego', 'package main\ndefault allow = false');
+        $sexp = \ts_pack_parse_string('rego', "package main\ndefault allow = false");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1542,7 +1542,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('requirements');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('requirements', 'flask>=2.0');
+        $sexp = \ts_pack_parse_string('requirements', "flask>=2.0");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1554,7 +1554,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('ron');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('ron', '(key: "value")');
+        $sexp = \ts_pack_parse_string('ron', "(key: \"value\")");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1566,7 +1566,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('rst');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('rst', 'Hello\n=====\n\nWorld');
+        $sexp = \ts_pack_parse_string('rst', "Hello\n=====\n\nWorld");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1578,7 +1578,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('ruby');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('ruby', 'puts \'hello\'');
+        $sexp = \ts_pack_parse_string('ruby', "puts 'hello'");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1590,7 +1590,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('rust');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('rust', 'fn main() {}');
+        $sexp = \ts_pack_parse_string('rust', "fn main() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1602,7 +1602,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('scala');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('scala', 'object Main');
+        $sexp = \ts_pack_parse_string('scala', "object Main");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1614,7 +1614,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('scheme');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('scheme', '(define x 1)');
+        $sexp = \ts_pack_parse_string('scheme', "(define x 1)");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1626,7 +1626,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('scss');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('scss', '$color: red;\nbody { color: $color; }');
+        $sexp = \ts_pack_parse_string('scss', "\$color: red;\nbody { color: \$color; }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1638,7 +1638,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('smali');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('smali', '.class public LMain;\n.super Ljava/lang/Object;');
+        $sexp = \ts_pack_parse_string('smali', ".class public LMain;\n.super Ljava/lang/Object;");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1650,7 +1650,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('smithy');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('smithy', 'namespace example\nstring MyString');
+        $sexp = \ts_pack_parse_string('smithy', "namespace example\nstring MyString");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1662,7 +1662,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('solidity');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('solidity', 'pragma solidity ^0.8.0;\ncontract Main {}');
+        $sexp = \ts_pack_parse_string('solidity', "pragma solidity ^0.8.0;\ncontract Main {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1674,7 +1674,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('sparql');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('sparql', 'SELECT ?s WHERE { ?s ?p ?o }');
+        $sexp = \ts_pack_parse_string('sparql', "SELECT ?s WHERE { ?s ?p ?o }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1686,7 +1686,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('sql');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('sql', 'SELECT 1;');
+        $sexp = \ts_pack_parse_string('sql', "SELECT 1;");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1698,7 +1698,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('squirrel');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('squirrel', 'function main() {}');
+        $sexp = \ts_pack_parse_string('squirrel', "function main() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1710,7 +1710,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('starlark');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('starlark', 'def hello(): pass');
+        $sexp = \ts_pack_parse_string('starlark', "def hello(): pass");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1722,7 +1722,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('svelte');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('svelte', '<p>hello</p>');
+        $sexp = \ts_pack_parse_string('svelte', "<p>hello</p>");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1734,7 +1734,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('swift');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('swift', 'print("hello")');
+        $sexp = \ts_pack_parse_string('swift', "print(\"hello\")");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1746,7 +1746,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('tablegen');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('tablegen', 'def Hello : Base {}');
+        $sexp = \ts_pack_parse_string('tablegen', "def Hello : Base {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1758,7 +1758,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('tcl');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('tcl', 'puts hello');
+        $sexp = \ts_pack_parse_string('tcl', "puts hello");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1770,7 +1770,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('terraform');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('terraform', 'resource "null_resource" "main" {}');
+        $sexp = \ts_pack_parse_string('terraform', "resource \"null_resource\" \"main\" {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1782,7 +1782,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('test');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('test', '===========\nTest\n===========\n---\n(node)');
+        $sexp = \ts_pack_parse_string('test', "===========\nTest\n===========\n---\n(node)");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1794,7 +1794,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('thrift');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('thrift', 'service HelloService {}');
+        $sexp = \ts_pack_parse_string('thrift', "service HelloService {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1806,7 +1806,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('toml');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('toml', 'key = "value"');
+        $sexp = \ts_pack_parse_string('toml', "key = \"value\"");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1818,7 +1818,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('tsv');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('tsv', 'a\tb\tc\n1\t2\t3');
+        $sexp = \ts_pack_parse_string('tsv', "a\tb\tc\n1\t2\t3");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1830,7 +1830,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('tsx');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('tsx', 'const App = () => <div />;');
+        $sexp = \ts_pack_parse_string('tsx', "const App = () => <div />;");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1842,7 +1842,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('twig');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('twig', '{{ variable }}');
+        $sexp = \ts_pack_parse_string('twig', "{{ variable }}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1854,7 +1854,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('typescript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('typescript', 'const x: number = 42;');
+        $sexp = \ts_pack_parse_string('typescript', "const x: number = 42;");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1866,7 +1866,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('typst');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('typst', '#let x = 1');
+        $sexp = \ts_pack_parse_string('typst', "#let x = 1");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1878,7 +1878,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('udev');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('udev', 'ACTION=="add", KERNEL=="sd*"');
+        $sexp = \ts_pack_parse_string('udev', "ACTION==\"add\", KERNEL==\"sd*\"");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1890,7 +1890,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('ungrammar');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('ungrammar', 'Root = Item*\nItem = \'token\'');
+        $sexp = \ts_pack_parse_string('ungrammar', "Root = Item*\nItem = 'token'");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1902,7 +1902,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('uxntal');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('uxntal', '|0100 LIT 01');
+        $sexp = \ts_pack_parse_string('uxntal', "|0100 LIT 01");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1914,7 +1914,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('v');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('v', 'fn main() {}');
+        $sexp = \ts_pack_parse_string('v', "fn main() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1926,7 +1926,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('verilog');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('verilog', 'module main; endmodule');
+        $sexp = \ts_pack_parse_string('verilog', "module main; endmodule");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1938,7 +1938,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('vhdl');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('vhdl', 'entity main is end main;');
+        $sexp = \ts_pack_parse_string('vhdl', "entity main is end main;");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1950,7 +1950,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('vim');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('vim', 'echo \'hello\'');
+        $sexp = \ts_pack_parse_string('vim', "echo 'hello'");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1962,7 +1962,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('vue');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('vue', '<template><div>hello</div></template>');
+        $sexp = \ts_pack_parse_string('vue', "<template><div>hello</div></template>");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1974,7 +1974,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('wast');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('wast', '(module)');
+        $sexp = \ts_pack_parse_string('wast', "(module)");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1986,7 +1986,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('wat');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('wat', '(module)');
+        $sexp = \ts_pack_parse_string('wat', "(module)");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1998,7 +1998,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('wgsl');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('wgsl', '@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }');
+        $sexp = \ts_pack_parse_string('wgsl', "@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -2010,7 +2010,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('xcompose');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('xcompose', '<Multi_key> <a> : "a"');
+        $sexp = \ts_pack_parse_string('xcompose', "<Multi_key> <a> : \"a\"");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -2022,7 +2022,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('xml');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('xml', '<?xml version="1.0"?>\n<root>hello</root>');
+        $sexp = \ts_pack_parse_string('xml', "<?xml version=\"1.0\"?>\n<root>hello</root>");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -2034,7 +2034,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('yuck');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('yuck', '(defwidget main [] (label :text "hi"))');
+        $sexp = \ts_pack_parse_string('yuck', "(defwidget main [] (label :text \"hi\"))");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -2046,7 +2046,7 @@ class SmokeTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('zig');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('zig', 'pub fn main() void {}');
+        $sexp = \ts_pack_parse_string('zig', "pub fn main() void {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 }

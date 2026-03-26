@@ -2,11 +2,7 @@
 
 package e2e_tests
 
-import (
-	"testing"
-
-	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
-)
+import "testing"
 
 func TestTreeErrorCountBroken(t *testing.T) {
 	// Parse broken Python code and verify error count >= 1

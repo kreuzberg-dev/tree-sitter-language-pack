@@ -92,9 +92,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             .as_ref()
             .is_some_and(|a| a.process_structure_name_contains.is_some() || a.process_imports_contains_source.is_some())
     });
-    let needs_tspack = fixtures
-        .iter()
-        .any(|f| has_process_assertions(f) || f.language.is_some());
+    let needs_tspack = fixtures.iter().any(|f| has_process_assertions(f));
 
     let mut out = String::new();
 

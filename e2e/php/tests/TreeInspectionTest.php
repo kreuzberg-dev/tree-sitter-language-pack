@@ -18,7 +18,7 @@ class TreeInspectionTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('python', 'def (broken syntax @@@ !!!');
+        $sexp = \ts_pack_parse_string('python', "def (broken syntax @@@ !!!");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -30,7 +30,7 @@ class TreeInspectionTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('python', 'x = 1\ny = 2\n');
+        $sexp = \ts_pack_parse_string('python', "x = 1\ny = 2\n");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -42,7 +42,7 @@ class TreeInspectionTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('python', 'def foo():\n    pass\n\ndef bar():\n    pass\n');
+        $sexp = \ts_pack_parse_string('python', "def foo():\n    pass\n\ndef bar():\n    pass\n");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -54,7 +54,7 @@ class TreeInspectionTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('python', 'class Foo:\n    pass\n\ndef bar():\n    pass\n');
+        $sexp = \ts_pack_parse_string('python', "class Foo:\n    pass\n\ndef bar():\n    pass\n");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -66,7 +66,7 @@ class TreeInspectionTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('python', 'def hello():\n    pass\n');
+        $sexp = \ts_pack_parse_string('python', "def hello():\n    pass\n");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 }

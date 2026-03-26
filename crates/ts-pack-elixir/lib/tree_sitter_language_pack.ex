@@ -268,6 +268,35 @@ defmodule TreeSitterLanguagePack do
   def process(_source, _config_json), do: :erlang.nif_error(:nif_not_loaded)
 
   @doc """
+  Extract patterns from source code using a JSON extraction config.
+
+  ## Parameters
+
+    * `source` - the source code string to process
+    * `config_json` - a JSON string with `"language"` and `"patterns"` fields
+
+  ## Returns
+
+  A map containing the extraction results.
+  """
+  @spec extract(String.t(), String.t()) :: map()
+  def extract(_source, _config_json), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Validate extraction patterns without running them.
+
+  ## Parameters
+
+    * `config_json` - a JSON string with `"language"` and `"patterns"` fields
+
+  ## Returns
+
+  A map containing validation results per pattern.
+  """
+  @spec validate_extraction(String.t()) :: map()
+  def validate_extraction(_config_json), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
   Initializes the language pack with the given configuration JSON.
 
   Downloads specified languages/groups and applies cache settings.

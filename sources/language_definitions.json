@@ -771,8 +771,8 @@
 	},
 	"nim": {
 		"extensions": ["nim", "nims"],
-		"repo": "https://github.com/paranim/tree-sitter-nim",
-		"rev": "8b63677f5372b452881aac3aeb18b2b56c432554"
+		"repo": "https://github.com/alaviss/tree-sitter-nim",
+		"rev": "3878440d9398515ae053c6f6024986e69868bb74"
 	},
 	"ninja": {
 		"extensions": ["ninja"],

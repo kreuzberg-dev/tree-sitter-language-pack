@@ -18,7 +18,7 @@ class ParsingTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('go');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('go', 'package main\nfunc main() {}');
+        $sexp = \ts_pack_parse_string('go', "package main\nfunc main() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -30,7 +30,7 @@ class ParsingTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('html');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('html', '<div>hello</div>');
+        $sexp = \ts_pack_parse_string('html', "<div>hello</div>");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -42,7 +42,7 @@ class ParsingTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('javascript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('javascript', 'class Foo { bar() {} }');
+        $sexp = \ts_pack_parse_string('javascript', "class Foo { bar() {} }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -54,7 +54,7 @@ class ParsingTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('javascript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('javascript', 'const x = 1;');
+        $sexp = \ts_pack_parse_string('javascript', "const x = 1;");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -66,7 +66,7 @@ class ParsingTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('python', 'def hello(): pass');
+        $sexp = \ts_pack_parse_string('python', "def hello(): pass");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -78,7 +78,7 @@ class ParsingTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('rust');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('rust', 'fn main() {}');
+        $sexp = \ts_pack_parse_string('rust', "fn main() {}");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -90,7 +90,7 @@ class ParsingTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('rust');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('rust', 'struct Point { x: f64, y: f64 }');
+        $sexp = \ts_pack_parse_string('rust', "struct Point { x: f64, y: f64 }");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 }

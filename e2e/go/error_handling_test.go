@@ -2,11 +2,7 @@
 
 package e2e_tests
 
-import (
-	"testing"
-
-	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
-)
+import "testing"
 
 func TestErrorEmptyLanguageName(t *testing.T) {
 	// Parsing with empty language name should error

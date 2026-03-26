@@ -266,10 +266,22 @@ pub fn escape_c_string(s: &str) -> String {
         .replace('\t', "\\t")
 }
 
-/// Escape a string for embedding in a PHP string literal.
+/// Escape a string for embedding in a PHP single-quoted string literal.
+///
+/// Only `\` and `'` need escaping in single-quoted PHP strings.
+/// Do NOT use for source code with newlines — use `escape_php_source` instead.
 pub fn escape_php_string(s: &str) -> String {
+    s.replace('\\', "\\\\").replace('\'', "\\'")
+}
+
+/// Escape a string for embedding in a PHP double-quoted string literal.
+///
+/// PHP single-quoted strings do NOT interpret `\n`, `\t`, etc.
+/// Use double-quoted strings for source code that contains newlines.
+pub fn escape_php_source(s: &str) -> String {
     s.replace('\\', "\\\\")
-        .replace('\'', "\\'")
+        .replace('"', "\\\"")
+        .replace('$', "\\$")
         .replace('\n', "\\n")
         .replace('\r', "\\r")
         .replace('\t', "\\t")

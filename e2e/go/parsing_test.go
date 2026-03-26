@@ -2,11 +2,7 @@
 
 package e2e_tests
 
-import (
-	"testing"
-
-	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
-)
+import "testing"
 
 func TestParsingGoFunction(t *testing.T) {
 	// Parse a Go function declaration and assert node type

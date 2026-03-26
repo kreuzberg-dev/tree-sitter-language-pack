@@ -25,7 +25,7 @@ class ErrorHandlingTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('javascript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('javascript', '');
+        $sexp = \ts_pack_parse_string('javascript', "");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -37,7 +37,7 @@ class ErrorHandlingTest extends TestCase
         }
         $langPtr = \ts_pack_get_language('javascript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = \ts_pack_parse_string('javascript', 'function function function @@@ %%%');
+        $sexp = \ts_pack_parse_string('javascript', "function function function @@@ %%%");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 

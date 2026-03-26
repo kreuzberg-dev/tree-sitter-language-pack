@@ -57,7 +57,7 @@ A comprehensive collection of tree-sitter language parsers with polyglot binding
 
 ## Overview
 
-**tree-sitter-language-pack** bundles 248 tree-sitter language parsers into a single package with native bindings for multiple programming languages. Ship syntax analysis in your application without managing individual parser dependencies.
+**tree-sitter-language-pack** bundles 248+ tree-sitter language parsers into a single package with native bindings for multiple programming languages. Ship syntax analysis in your application without managing individual parser dependencies.
 
 ## Architecture
 
@@ -129,12 +129,12 @@ See [Go README](packages/go/v1/README.md) for full documentation.
 <dependency>
   <groupId>dev.kreuzberg</groupId>
   <artifactId>tree-sitter-language-pack</artifactId>
-  <version>1.1.4</version>
+  <version>1.3.1</version>
 </dependency>
 ```
 
 ```groovy
-implementation("dev.kreuzberg:tree-sitter-language-pack:1.1.4")
+implementation("dev.kreuzberg:tree-sitter-language-pack:1.3.1")
 ```
 
 See [Java README](crates/ts-pack-java/README.md) for full documentation.
@@ -223,7 +223,7 @@ The `process()` function returns structured analysis including functions, classe
 
 | Feature | Description |
 | --- | --- |
-| **248 Languages** | Pre-compiled parsers for 248 programming languages |
+| **248+ Languages** | Pre-compiled parsers for 248+ programming languages |
 | **On-Demand Downloads** | Parsers are downloaded on-demand and cached locally for fast reuse |
 | **Selective Installation** | Download only the languages you need; unused parsers never downloaded |
 | **Polyglot Bindings** | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++ |
@@ -232,7 +232,7 @@ The `process()` function returns structured analysis including functions, classe
 
 ## Supported Languages
 
-This pack includes 248 languages. See the [Rust core Cargo.toml](crates/ts-pack-core/Cargo.toml) for the full list of available language features.
+This pack includes 248+ languages. See the [full language list](docs/supported-languages.md) for all supported grammars with extensions and repository links.
 
 ## Package READMEs
 
