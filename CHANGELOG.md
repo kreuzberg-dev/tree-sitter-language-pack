@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-03-26
+
+### Fixed
+
+- Ruby binding: `process()`, `extract()`, `validate_extraction()` now return native Ruby Hash instead of raw JSON string
+- WASM binding: output keys now use camelCase (matching Node.js binding convention), input config accepts both camelCase and snake_case
+- Go E2E generator: use typed `*ProcessResult` struct fields instead of invalid `json.Unmarshal` on non-string return
+- Elixir CI: stage NIF with both hyphenated and underscored filenames to satisfy Rustler force-build check and `load_from` loader
+
 ## [1.3.0] - 2026-03-26
 
 ### Added

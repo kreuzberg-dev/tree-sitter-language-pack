@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = 'tree_sitter_language_pack'
-  spec.version = '1.3.0'
+  spec.version = '1.3.1'
   spec.authors = ['kreuzberg.dev']
   spec.email = ['dev@kreuzberg.dev']
 

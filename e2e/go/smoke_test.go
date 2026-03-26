@@ -2,7 +2,11 @@
 
 package e2e_tests
 
-import "testing"
+import (
+	"testing"
+
+	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
+)
 
 func TestSmokeActionscript(t *testing.T) {
 	// Smoke test: load actionscript and parse a simple snippet

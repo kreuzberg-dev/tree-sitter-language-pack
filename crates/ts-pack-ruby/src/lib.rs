@@ -1,4 +1,4 @@
-use magnus::{Error, Ruby, function, method, prelude::*};
+use magnus::{Error, IntoValue, Ruby, Value as RbValue, function, method, prelude::*};
 use std::sync::Mutex;
 
 /// Wraps a tree-sitter Tree for safe sharing across the Ruby boundary.
@@ -84,20 +84,55 @@ fn parse_string(ruby: &Ruby, language: String, source: String) -> Result<TreeWra
     Ok(TreeWrapper(Mutex::new(tree)))
 }
 
-/// Unified process method that accepts a JSON config string and returns a JSON result string.
+/// Convert a serde_json::Value to a native Ruby object (Hash, Array, String, Integer, Float, true/false, nil).
+fn json_value_to_ruby(ruby: &Ruby, value: &serde_json::Value) -> Result<RbValue, Error> {
+    Ok(match value {
+        serde_json::Value::Null => ruby.qnil().as_value(),
+        serde_json::Value::Bool(b) => (*b).into_value_with(ruby),
+        serde_json::Value::Number(n) => {
+            if let Some(i) = n.as_i64() {
+                i.into_value_with(ruby)
+            } else if let Some(u) = n.as_u64() {
+                u.into_value_with(ruby)
+            } else if let Some(f) = n.as_f64() {
+                f.into_value_with(ruby)
+            } else {
+                ruby.qnil().as_value()
+            }
+        }
+        serde_json::Value::String(s) => s.as_str().into_value_with(ruby),
+        serde_json::Value::Array(arr) => {
+            let ary = ruby.ary_new_capa(arr.len());
+            for item in arr {
+                ary.push(json_value_to_ruby(ruby, item)?)?;
+            }
+            ary.as_value()
+        }
+        serde_json::Value::Object(map) => {
+            let hash = ruby.hash_new();
+            for (k, v) in map {
+                hash.aset(k.as_str(), json_value_to_ruby(ruby, v)?)?;
+            }
+            hash.as_value()
+        }
+    })
+}
+
+/// Unified process method that accepts a JSON config string and returns a native Ruby Hash.
 ///
 /// The config JSON must contain at least `"language"`. Optional fields:
 /// - `structure`, `imports`, `exports`, `comments`, `docstrings`, `symbols`, `diagnostics` (booleans, default true)
 /// - `chunk_max_size` (integer or null, default null meaning no chunking)
-fn process(ruby: &Ruby, source: String, config_json: String) -> Result<String, Error> {
+fn process(ruby: &Ruby, source: String, config_json: String) -> Result<RbValue, Error> {
     let core_config: tree_sitter_language_pack::ProcessConfig = serde_json::from_str(&config_json)
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("invalid config JSON: {e}")))?;
 
     let result = tree_sitter_language_pack::process(&source, &core_config)
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
 
-    serde_json::to_string(&result)
-        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))
+    let json_value = serde_json::to_value(&result)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))?;
+    json_value_to_ruby(ruby, &json_value)
 }
 
 /// Extract patterns from source code using a JSON configuration.
@@ -106,16 +141,17 @@ fn process(ruby: &Ruby, source: String, config_json: String) -> Result<String, E
 /// - `language` (string): the language name
 /// - `patterns` (object): named patterns to run, each with a `query` field
 ///
-/// Returns a JSON string with extraction results.
-fn extract(ruby: &Ruby, source: String, config_json: String) -> Result<String, Error> {
+/// Returns a native Ruby Hash with extraction results.
+fn extract(ruby: &Ruby, source: String, config_json: String) -> Result<RbValue, Error> {
     let config: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json)
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("invalid config JSON: {e}")))?;
 
     let result = tree_sitter_language_pack::extract_patterns(&source, &config)
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
 
-    serde_json::to_string(&result)
-        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))
+    let json_value = serde_json::to_value(&result)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))?;
+    json_value_to_ruby(ruby, &json_value)
 }
 
 /// Validate extraction patterns without running them.
@@ -124,16 +160,17 @@ fn extract(ruby: &Ruby, source: String, config_json: String) -> Result<String, E
 /// - `language` (string): the language name
 /// - `patterns` (object): named patterns to validate
 ///
-/// Returns a JSON string with validation results.
-fn validate_extraction(ruby: &Ruby, config_json: String) -> Result<String, Error> {
+/// Returns a native Ruby Hash with validation results.
+fn validate_extraction(ruby: &Ruby, config_json: String) -> Result<RbValue, Error> {
     let config: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json)
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("invalid config JSON: {e}")))?;
 
     let result = tree_sitter_language_pack::validate_extraction(&config)
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
 
-    serde_json::to_string(&result)
-        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))
+    let json_value = serde_json::to_value(&result)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))?;
+    json_value_to_ruby(ruby, &json_value)
 }
 
 /// Initialize the language pack with configuration.

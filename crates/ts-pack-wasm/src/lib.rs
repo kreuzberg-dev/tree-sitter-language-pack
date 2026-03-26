@@ -183,29 +183,46 @@ pub fn free_tree(_tree: WasmTree) {
 // Process: unified API
 // ---------------------------------------------------------------------------
 
-/// Process source code and extract metadata + chunks as a JavaScript object.
-///
-/// `config` is a JS object with fields:
-/// - `language` (string, required): the language name
-/// - `chunk_max_size` (number, optional): maximum chunk size in bytes (default: 1500)
-#[wasm_bindgen(js_name = "process")]
-pub fn process(source: &str, config: JsValue) -> Result<JsValue, JsValue> {
-    let config_json: serde_json::Value = js_sys::JSON::stringify(&config)
+/// Parse a JS config object into a serde_json::Value, normalizing camelCase keys to snake_case.
+fn parse_js_config(config: &JsValue) -> Result<serde_json::Value, JsValue> {
+    let config_json: serde_json::Value = js_sys::JSON::stringify(config)
         .map_err(|e| JsValue::from_str(&format!("failed to stringify config: {e:?}")))?
         .as_string()
         .ok_or_else(|| JsValue::from_str("config stringify returned non-string"))
         .and_then(|s| {
             serde_json::from_str(&s).map_err(|e| JsValue::from_str(&format!("failed to parse config JSON: {e}")))
         })?;
+    Ok(tree_sitter_language_pack::json_utils::camel_to_snake(config_json))
+}
+
+/// Convert a snake_case serde_json::Value to a camelCase JS object.
+fn snake_value_to_js_camel(json_value: serde_json::Value) -> Result<JsValue, JsValue> {
+    let camel_json = tree_sitter_language_pack::json_utils::snake_to_camel(json_value);
+    let json_str =
+        serde_json::to_string(&camel_json).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
+    js_sys::JSON::parse(&json_str)
+}
+
+/// Process source code and extract metadata + chunks as a JavaScript object.
+///
+/// `config` is a JS object with fields:
+/// - `language` (string, required): the language name
+/// - `chunkMaxSize` (number, optional): maximum chunk size in bytes (default: 1500)
+///
+/// Accepts both camelCase and snake_case config keys (auto-normalized to snake_case).
+/// Returns camelCase keys in the result for JavaScript convention.
+#[wasm_bindgen(js_name = "process")]
+pub fn process(source: &str, config: JsValue) -> Result<JsValue, JsValue> {
+    let normalized = parse_js_config(&config)?;
 
     let core_config: tree_sitter_language_pack::ProcessConfig =
-        serde_json::from_value(config_json).map_err(|e| JsValue::from_str(&format!("invalid config: {e}")))?;
+        serde_json::from_value(normalized).map_err(|e| JsValue::from_str(&format!("invalid config: {e}")))?;
 
     let result =
         tree_sitter_language_pack::process(source, &core_config).map_err(|e| JsValue::from_str(&format!("{e}")))?;
-    let json_str =
-        serde_json::to_string(&result).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
-    js_sys::JSON::parse(&json_str)
+    let json_value =
+        serde_json::to_value(&result).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
+    snake_value_to_js_camel(json_value)
 }
 
 // ---------------------------------------------------------------------------
@@ -218,50 +235,40 @@ pub fn process(source: &str, config: JsValue) -> Result<JsValue, JsValue> {
 /// - `language` (string, required): the language name
 /// - `patterns` (object, required): named patterns to extract
 ///
-/// Returns a JavaScript object with the extraction results.
+/// Accepts both camelCase and snake_case config keys.
+/// Returns camelCase keys in the result for JavaScript convention.
 #[wasm_bindgen(js_name = "extract")]
 pub fn extract(source: &str, config: JsValue) -> Result<JsValue, JsValue> {
-    let config_json: serde_json::Value = js_sys::JSON::stringify(&config)
-        .map_err(|e| JsValue::from_str(&format!("failed to stringify config: {e:?}")))?
-        .as_string()
-        .ok_or_else(|| JsValue::from_str("config stringify returned non-string"))
-        .and_then(|s| {
-            serde_json::from_str(&s).map_err(|e| JsValue::from_str(&format!("failed to parse config JSON: {e}")))
-        })?;
+    let normalized = parse_js_config(&config)?;
 
     let extraction_config: tree_sitter_language_pack::ExtractionConfig =
-        serde_json::from_value(config_json).map_err(|e| JsValue::from_str(&format!("invalid config: {e}")))?;
+        serde_json::from_value(normalized).map_err(|e| JsValue::from_str(&format!("invalid config: {e}")))?;
 
     let result = tree_sitter_language_pack::extract_patterns(source, &extraction_config)
         .map_err(|e| JsValue::from_str(&format!("{e}")))?;
-    let json_str =
-        serde_json::to_string(&result).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
-    js_sys::JSON::parse(&json_str)
+    let json_value =
+        serde_json::to_value(&result).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
+    snake_value_to_js_camel(json_value)
 }
 
 /// Validate extraction patterns without running them.
 ///
 /// `config` is a JS object with the same shape as for `extract`.
 ///
-/// Returns a JavaScript object with validation results.
+/// Accepts both camelCase and snake_case config keys.
+/// Returns camelCase keys in the result for JavaScript convention.
 #[wasm_bindgen(js_name = "validateExtraction")]
 pub fn validate_extraction(config: JsValue) -> Result<JsValue, JsValue> {
-    let config_json: serde_json::Value = js_sys::JSON::stringify(&config)
-        .map_err(|e| JsValue::from_str(&format!("failed to stringify config: {e:?}")))?
-        .as_string()
-        .ok_or_else(|| JsValue::from_str("config stringify returned non-string"))
-        .and_then(|s| {
-            serde_json::from_str(&s).map_err(|e| JsValue::from_str(&format!("failed to parse config JSON: {e}")))
-        })?;
+    let normalized = parse_js_config(&config)?;
 
     let extraction_config: tree_sitter_language_pack::ExtractionConfig =
-        serde_json::from_value(config_json).map_err(|e| JsValue::from_str(&format!("invalid config: {e}")))?;
+        serde_json::from_value(normalized).map_err(|e| JsValue::from_str(&format!("invalid config: {e}")))?;
 
     let result = tree_sitter_language_pack::validate_extraction(&extraction_config)
         .map_err(|e| JsValue::from_str(&format!("{e}")))?;
-    let json_str =
-        serde_json::to_string(&result).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
-    js_sys::JSON::parse(&json_str)
+    let json_value =
+        serde_json::to_value(&result).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
+    snake_value_to_js_camel(json_value)
 }
 
 // ---------------------------------------------------------------------------

@@ -2,7 +2,11 @@
 
 package e2e_tests
 
-import "testing"
+import (
+	"testing"
+
+	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
+)
 
 func TestRegistryHasLanguageFalse(t *testing.T) {
 	// has_language('nonexistent') should return false

@@ -3,7 +3,6 @@
 package e2e_tests
 
 import (
-	"encoding/json"
 	"strings"
 	"testing"
 
@@ -14,47 +13,36 @@ func TestCFunctionProcess(t *testing.T) {
 	// Intel: C function with include
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "c")
-	resultJSON, err := reg.Process("#include <stdio.h>\n\nint main() {\n    printf(\"hello\");\n    return 0;\n}\n", tspack.ProcessConfig{Language: "c", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("#include <stdio.h>\n\nint main() {\n    printf(\"hello\");\n    return 0;\n}\n", tspack.ProcessConfig{Language: "c", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "c" {
+		t.Fatalf("expected language %q, got %q", "c", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "c" {
-		t.Fatalf("expected language %q, got %q", "c", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Function" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Function" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -62,52 +50,40 @@ func TestConfigAllPython(t *testing.T) {
 	// Intel: process with all features enabled
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Function" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Function" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	imports, _ := intel["imports"].([]interface{})
-	if len(imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(imports))
+	if len(result.Metadata.Imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(result.Metadata.Imports))
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -115,24 +91,17 @@ func TestConfigMinimalPython(t *testing.T) {
 	// Intel: process with minimal config - only metrics
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("def hello():\n    pass\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("def hello():\n    pass\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
-	}
-
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 2 {
-		t.Fatalf("expected at least 2 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 2 {
+		t.Fatalf("expected at least 2 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
 }
 
@@ -140,52 +109,40 @@ func TestGoFunctionProcess(t *testing.T) {
 	// Intel: extract structure from Go function definition
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "go")
-	resultJSON, err := reg.Process("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", tspack.ProcessConfig{Language: "go", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", tspack.ProcessConfig{Language: "go", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "go" {
+		t.Fatalf("expected language %q, got %q", "go", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "go" {
-		t.Fatalf("expected language %q, got %q", "go", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Function" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Function" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	imports, _ := intel["imports"].([]interface{})
-	if len(imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(imports))
+	if len(result.Metadata.Imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(result.Metadata.Imports))
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -193,52 +150,40 @@ func TestGoFunctionProcessDetail(t *testing.T) {
 	// Intel: extract structure from Go function definition
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "go")
-	resultJSON, err := reg.Process("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", tspack.ProcessConfig{Language: "go", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", tspack.ProcessConfig{Language: "go", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "go" {
+		t.Fatalf("expected language %q, got %q", "go", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "go" {
-		t.Fatalf("expected language %q, got %q", "go", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Function" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Function" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	imports, _ := intel["imports"].([]interface{})
-	if len(imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(imports))
+	if len(result.Metadata.Imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(result.Metadata.Imports))
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -246,52 +191,40 @@ func TestJavaClassProcess(t *testing.T) {
 	// Intel: Java class with methods and imports
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "java")
-	resultJSON, err := reg.Process("import java.util.List;\n\npublic class Greeter {\n    public String greet(String name) {\n        return \"Hello \" + name;\n    }\n}\n", tspack.ProcessConfig{Language: "java", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("import java.util.List;\n\npublic class Greeter {\n    public String greet(String name) {\n        return \"Hello \" + name;\n    }\n}\n", tspack.ProcessConfig{Language: "java", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "java" {
+		t.Fatalf("expected language %q, got %q", "java", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "java" {
-		t.Fatalf("expected language %q, got %q", "java", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Class" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Class" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Class' kind node")
 	}
 
-	imports, _ := intel["imports"].([]interface{})
-	if len(imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(imports))
+	if len(result.Metadata.Imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(result.Metadata.Imports))
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -299,52 +232,40 @@ func TestJavascriptMultiImportProcess(t *testing.T) {
 	// Intel: detect multiple imports and function in JavaScript
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "javascript")
-	resultJSON, err := reg.Process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", tspack.ProcessConfig{Language: "javascript", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", tspack.ProcessConfig{Language: "javascript", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "javascript" {
+		t.Fatalf("expected language %q, got %q", "javascript", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "javascript" {
-		t.Fatalf("expected language %q, got %q", "javascript", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Function" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Function" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	imports, _ := intel["imports"].([]interface{})
-	if len(imports) < 2 {
-		t.Fatalf("expected at least 2 import(s), got %d", len(imports))
+	if len(result.Metadata.Imports) < 2 {
+		t.Fatalf("expected at least 2 import(s), got %d", len(result.Metadata.Imports))
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -352,52 +273,40 @@ func TestJavascriptMultiImportProcessDetail(t *testing.T) {
 	// Intel: detect multiple imports and function in JavaScript
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "javascript")
-	resultJSON, err := reg.Process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", tspack.ProcessConfig{Language: "javascript", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", tspack.ProcessConfig{Language: "javascript", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "javascript" {
+		t.Fatalf("expected language %q, got %q", "javascript", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "javascript" {
-		t.Fatalf("expected language %q, got %q", "javascript", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Function" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Function" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	imports, _ := intel["imports"].([]interface{})
-	if len(imports) < 2 {
-		t.Fatalf("expected at least 2 import(s), got %d", len(imports))
+	if len(result.Metadata.Imports) < 2 {
+		t.Fatalf("expected at least 2 import(s), got %d", len(result.Metadata.Imports))
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -405,23 +314,17 @@ func TestProcessJavascriptExportsDetail(t *testing.T) {
 	// JavaScript with exports, verify export count
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "javascript")
-	resultJSON, err := reg.Process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", tspack.ProcessConfig{Language: "javascript", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", tspack.ProcessConfig{Language: "javascript", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "javascript" {
+		t.Fatalf("expected language %q, got %q", "javascript", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "javascript" {
-		t.Fatalf("expected language %q, got %q", "javascript", lang)
-	}
-
-	exports, _ := intel["exports"].([]interface{})
-	if len(exports) < 1 {
-		t.Fatalf("expected at least 1 export(s), got %d", len(exports))
+	if len(result.Metadata.Exports) < 1 {
+		t.Fatalf("expected at least 1 export(s), got %d", len(result.Metadata.Exports))
 	}
 }
 
@@ -429,23 +332,17 @@ func TestProcessPythonComments(t *testing.T) {
 	// Python with comments, verify comment count
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
-	}
-
-	comments, _ := intel["comments"].([]interface{})
-	if len(comments) < 1 {
-		t.Fatalf("expected at least 1 comment(s), got %d", len(comments))
+	if len(result.Metadata.Comments) < 1 {
+		t.Fatalf("expected at least 1 comment(s), got %d", len(result.Metadata.Comments))
 	}
 }
 
@@ -453,33 +350,24 @@ func TestProcessPythonImportsDetail(t *testing.T) {
 	// Python with multiple imports, verify imports contain specific source
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
+	if len(result.Metadata.Imports) < 2 {
+		t.Fatalf("expected at least 2 import(s), got %d", len(result.Metadata.Imports))
 	}
 
-	imports, _ := intel["imports"].([]interface{})
-	if len(imports) < 2 {
-		t.Fatalf("expected at least 2 import(s), got %d", len(imports))
-	}
-
-	importsList, _ := intel["imports"].([]interface{})
 	foundImport := false
-	for _, imp := range importsList {
-		if m, ok := imp.(map[string]interface{}); ok {
-			if src, _ := m["source"].(string); strings.Contains(src, "os") {
-				foundImport = true
-				break
-			}
+	for _, imp := range result.Metadata.Imports {
+		if strings.Contains(imp.Source, "os") {
+			foundImport = true
+			break
 		}
 	}
 	if !foundImport {
@@ -491,32 +379,25 @@ func TestProcessPythonMetricsDetail(t *testing.T) {
 	// Python code with metrics assertions
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
+	if result.Metadata.Metrics.CodeLines < 4 {
+		t.Fatalf("expected at least 4 code line(s), got %d", result.Metadata.Metrics.CodeLines)
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	codeLines, _ := metrics["code_lines"].(float64)
-	if int(codeLines) < 4 {
-		t.Fatalf("expected at least 4 code line(s), got %v", codeLines)
+	if result.Metadata.Metrics.CommentLines < 1 {
+		t.Fatalf("expected at least 1 comment line(s), got %d", result.Metadata.Metrics.CommentLines)
 	}
-	commentLines, _ := metrics["comment_lines"].(float64)
-	if int(commentLines) < 1 {
-		t.Fatalf("expected at least 1 comment line(s), got %v", commentLines)
-	}
-	maxDepth, _ := metrics["max_depth"].(float64)
-	if int(maxDepth) < 1 {
-		t.Fatalf("expected max_depth >= 1, got %v", maxDepth)
+
+	if result.Metadata.Metrics.MaxDepth < 1 {
+		t.Fatalf("expected max_depth >= 1, got %d", result.Metadata.Metrics.MaxDepth)
 	}
 }
 
@@ -524,33 +405,24 @@ func TestProcessRustStructureName(t *testing.T) {
 	// Rust struct with name, verify structure name contains value
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "rust")
-	resultJSON, err := reg.Process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", tspack.ProcessConfig{Language: "rust", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", tspack.ProcessConfig{Language: "rust", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "rust" {
+		t.Fatalf("expected language %q, got %q", "rust", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureListN, _ := intel["structure"].([]interface{})
 	foundName := false
-	for _, s := range structureListN {
-		if m, ok := s.(map[string]interface{}); ok {
-			if n, _ := m["name"].(string); strings.Contains(n, "MyConfig") {
-				foundName = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Name != nil && strings.Contains(*s.Name, "MyConfig") {
+			foundName = true
+			break
 		}
 	}
 	if !foundName {
@@ -562,35 +434,26 @@ func TestPythonChunkingMedium(t *testing.T) {
 	// Intel: Python code with medium chunk size
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	chunkSize := uint32(50)
-	resultJSON, err := reg.Process("def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n", tspack.ProcessConfig{Language: "python", ChunkMaxSize: &chunkSize})
+	chunkSize := 50
+	result, err := reg.Process("def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n", tspack.ProcessConfig{Language: "python", ChunkMaxSize: &chunkSize})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if len(result.Chunks) < 2 {
+		t.Fatalf("expected at least 2 chunk(s), got %d", len(result.Chunks))
 	}
 
-	chunks, _ := intel["chunks"].([]interface{})
-	if len(chunks) < 2 {
-		t.Fatalf("expected at least 2 chunk(s), got %d", len(chunks))
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
+	if len(result.Metadata.Structure) < 3 {
+		t.Fatalf("expected at least 3 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 3 {
-		t.Fatalf("expected at least 3 structure(s), got %d", len(structure))
-	}
-
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -598,30 +461,22 @@ func TestPythonChunkingProcessDetail(t *testing.T) {
 	// Intel: chunk multi-function Python source into multiple pieces
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	chunkSize := uint32(30)
-	resultJSON, err := reg.Process("def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n", tspack.ProcessConfig{Language: "python", ChunkMaxSize: &chunkSize})
+	chunkSize := 30
+	result, err := reg.Process("def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n", tspack.ProcessConfig{Language: "python", ChunkMaxSize: &chunkSize})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if len(result.Chunks) < 2 {
+		t.Fatalf("expected at least 2 chunk(s), got %d", len(result.Chunks))
 	}
 
-	chunks, _ := intel["chunks"].([]interface{})
-	if len(chunks) < 2 {
-		t.Fatalf("expected at least 2 chunk(s), got %d", len(chunks))
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
-	}
-
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 8 {
-		t.Fatalf("expected at least 8 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 8 {
+		t.Fatalf("expected at least 8 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
 }
 
@@ -629,47 +484,36 @@ func TestPythonClassWithMethodsProcess(t *testing.T) {
 	// Intel: extract nested structure from Python class with methods
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Class" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Class" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Class' kind node")
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -677,47 +521,36 @@ func TestPythonClassWithMethodsProcessDetail(t *testing.T) {
 	// Intel: extract nested structure from Python class with methods
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Class" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Class" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Class' kind node")
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -725,28 +558,20 @@ func TestPythonErrorDiagnostics(t *testing.T) {
 	// Intel: Python code with syntax errors should report diagnostics
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("def broken(\n    pass\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("def broken(\n    pass\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
+	if result.Metadata.Metrics.ErrorCount != 1 {
+		t.Fatalf("expected error_count 1, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 1 {
-		t.Fatalf("expected error_count 1, got %v", errorCount)
-	}
-
-	diagnostics, _ := intel["diagnostics"].([]interface{})
-	if len(diagnostics) == 0 {
+	if len(result.Metadata.Diagnostics) == 0 {
 		t.Fatal("diagnostics should not be empty")
 	}
 }
@@ -755,47 +580,36 @@ func TestPythonFunctionProcess(t *testing.T) {
 	// Intel: extract structure from Python function definition
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("def greet(name):\n    return f'Hello, {name}!'\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("def greet(name):\n    return f'Hello, {name}!'\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Function" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Function" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 2 {
-		t.Fatalf("expected at least 2 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 2 {
+		t.Fatalf("expected at least 2 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -803,47 +617,36 @@ func TestPythonFunctionProcessDetail(t *testing.T) {
 	// Intel: extract structure from Python function definition
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("def greet(name):\n    return f'Hello, {name}!'\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("def greet(name):\n    return f'Hello, {name}!'\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Function" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Function" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 2 {
-		t.Fatalf("expected at least 2 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 2 {
+		t.Fatalf("expected at least 2 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -851,22 +654,16 @@ func TestPythonMalformedCodeProcess(t *testing.T) {
 	// Intel: detect diagnostics in malformed Python code
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("def broken(\n    return\nclass", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("def broken(\n    return\nclass", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
-	}
-
-	diagnostics, _ := intel["diagnostics"].([]interface{})
-	if len(diagnostics) == 0 {
+	if len(result.Metadata.Diagnostics) == 0 {
 		t.Fatal("diagnostics should not be empty")
 	}
 }
@@ -875,22 +672,16 @@ func TestPythonMalformedCodeProcessDetail(t *testing.T) {
 	// Intel: detect diagnostics in malformed Python code
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("def broken(\n    return\nclass", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("def broken(\n    return\nclass", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
-	}
-
-	diagnostics, _ := intel["diagnostics"].([]interface{})
-	if len(diagnostics) == 0 {
+	if len(result.Metadata.Diagnostics) == 0 {
 		t.Fatal("diagnostics should not be empty")
 	}
 }
@@ -899,38 +690,29 @@ func TestPythonMultiImportProcess(t *testing.T) {
 	// Intel: detect multiple Python imports
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
+	if len(result.Metadata.Imports) < 3 {
+		t.Fatalf("expected at least 3 import(s), got %d", len(result.Metadata.Imports))
 	}
 
-	imports, _ := intel["imports"].([]interface{})
-	if len(imports) < 3 {
-		t.Fatalf("expected at least 3 import(s), got %d", len(imports))
+	if result.Metadata.Metrics.TotalLines < 5 {
+		t.Fatalf("expected at least 5 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 5 {
-		t.Fatalf("expected at least 5 total line(s), got %v", totalLines)
-	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -938,38 +720,29 @@ func TestPythonMultiImportProcessDetail(t *testing.T) {
 	// Intel: detect multiple Python imports
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	resultJSON, err := reg.Process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", tspack.ProcessConfig{Language: "python", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "python" {
-		t.Fatalf("expected language %q, got %q", "python", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
+	if len(result.Metadata.Imports) < 3 {
+		t.Fatalf("expected at least 3 import(s), got %d", len(result.Metadata.Imports))
 	}
 
-	imports, _ := intel["imports"].([]interface{})
-	if len(imports) < 3 {
-		t.Fatalf("expected at least 3 import(s), got %d", len(imports))
+	if result.Metadata.Metrics.TotalLines < 5 {
+		t.Fatalf("expected at least 5 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 5 {
-		t.Fatalf("expected at least 5 total line(s), got %v", totalLines)
-	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -977,47 +750,36 @@ func TestRubyClassProcess(t *testing.T) {
 	// Intel: Ruby class with method
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "ruby")
-	resultJSON, err := reg.Process("require 'json'\n\nclass Greeter\n  def greet(name)\n    \"Hello #{name}\"\n  end\nend\n", tspack.ProcessConfig{Language: "ruby", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("require 'json'\n\nclass Greeter\n  def greet(name)\n    \"Hello #{name}\"\n  end\nend\n", tspack.ProcessConfig{Language: "ruby", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "ruby" {
+		t.Fatalf("expected language %q, got %q", "ruby", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "ruby" {
-		t.Fatalf("expected language %q, got %q", "ruby", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Class" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Class" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Class' kind node")
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -1025,30 +787,22 @@ func TestRustChunkingProcess(t *testing.T) {
 	// Intel: chunk multi-function Rust source into pieces
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "rust")
-	chunkSize := uint32(30)
-	resultJSON, err := reg.Process("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", tspack.ProcessConfig{Language: "rust", ChunkMaxSize: &chunkSize})
+	chunkSize := 30
+	result, err := reg.Process("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", tspack.ProcessConfig{Language: "rust", ChunkMaxSize: &chunkSize})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if len(result.Chunks) < 2 {
+		t.Fatalf("expected at least 2 chunk(s), got %d", len(result.Chunks))
 	}
 
-	chunks, _ := intel["chunks"].([]interface{})
-	if len(chunks) < 2 {
-		t.Fatalf("expected at least 2 chunk(s), got %d", len(chunks))
+	if result.Metadata.Language != "rust" {
+		t.Fatalf("expected language %q, got %q", "rust", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", lang)
-	}
-
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
 }
 
@@ -1056,30 +810,22 @@ func TestRustChunkingProcessDetail(t *testing.T) {
 	// Intel: chunk multi-function Rust source into pieces
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "rust")
-	chunkSize := uint32(30)
-	resultJSON, err := reg.Process("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", tspack.ProcessConfig{Language: "rust", ChunkMaxSize: &chunkSize})
+	chunkSize := 30
+	result, err := reg.Process("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", tspack.ProcessConfig{Language: "rust", ChunkMaxSize: &chunkSize})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if len(result.Chunks) < 2 {
+		t.Fatalf("expected at least 2 chunk(s), got %d", len(result.Chunks))
 	}
 
-	chunks, _ := intel["chunks"].([]interface{})
-	if len(chunks) < 2 {
-		t.Fatalf("expected at least 2 chunk(s), got %d", len(chunks))
+	if result.Metadata.Language != "rust" {
+		t.Fatalf("expected language %q, got %q", "rust", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", lang)
-	}
-
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
 }
 
@@ -1087,47 +833,36 @@ func TestRustFunctionProcess(t *testing.T) {
 	// Intel: extract structure from Rust function definition
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "rust")
-	resultJSON, err := reg.Process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", tspack.ProcessConfig{Language: "rust", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", tspack.ProcessConfig{Language: "rust", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "rust" {
+		t.Fatalf("expected language %q, got %q", "rust", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Function" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Function" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 3 {
-		t.Fatalf("expected at least 3 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 3 {
+		t.Fatalf("expected at least 3 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -1135,47 +870,36 @@ func TestRustFunctionProcessDetail(t *testing.T) {
 	// Intel: extract structure from Rust function definition
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "rust")
-	resultJSON, err := reg.Process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", tspack.ProcessConfig{Language: "rust", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", tspack.ProcessConfig{Language: "rust", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "rust" {
+		t.Fatalf("expected language %q, got %q", "rust", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Function" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Function" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 3 {
-		t.Fatalf("expected at least 3 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 3 {
+		t.Fatalf("expected at least 3 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -1183,52 +907,40 @@ func TestTypescriptFunctionProcess(t *testing.T) {
 	// Intel: extract structure from TypeScript function
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "typescript")
-	resultJSON, err := reg.Process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", tspack.ProcessConfig{Language: "typescript", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", tspack.ProcessConfig{Language: "typescript", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "typescript" {
+		t.Fatalf("expected language %q, got %q", "typescript", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "typescript" {
-		t.Fatalf("expected language %q, got %q", "typescript", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Function" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Function" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	imports, _ := intel["imports"].([]interface{})
-	if len(imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(imports))
+	if len(result.Metadata.Imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(result.Metadata.Imports))
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 5 {
-		t.Fatalf("expected at least 5 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 5 {
+		t.Fatalf("expected at least 5 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }
 
@@ -1236,51 +948,39 @@ func TestTypescriptFunctionProcessDetail(t *testing.T) {
 	// Intel: extract structure from TypeScript function
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "typescript")
-	resultJSON, err := reg.Process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", tspack.ProcessConfig{Language: "typescript", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
+	result, err := reg.Process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", tspack.ProcessConfig{Language: "typescript", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	var intel map[string]interface{}
-	if err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %v", err)
+	if result.Metadata.Language != "typescript" {
+		t.Fatalf("expected language %q, got %q", "typescript", result.Metadata.Language)
 	}
 
-	if lang, _ := intel["language"].(string); lang != "typescript" {
-		t.Fatalf("expected language %q, got %q", "typescript", lang)
+	if len(result.Metadata.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
 	}
 
-	structure, _ := intel["structure"].([]interface{})
-	if len(structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(structure))
-	}
-
-	structureList, _ := intel["structure"].([]interface{})
 	foundKind := false
-	for _, s := range structureList {
-		if m, ok := s.(map[string]interface{}); ok {
-			if k, _ := m["kind"].(string); k == "Function" {
-				foundKind = true
-				break
-			}
+	for _, s := range result.Metadata.Structure {
+		if s.Kind == "Function" {
+			foundKind = true
+			break
 		}
 	}
 	if !foundKind {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	imports, _ := intel["imports"].([]interface{})
-	if len(imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(imports))
+	if len(result.Metadata.Imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(result.Metadata.Imports))
 	}
 
-	metrics, _ := intel["metrics"].(map[string]interface{})
-	totalLines, _ := metrics["total_lines"].(float64)
-	if int(totalLines) < 5 {
-		t.Fatalf("expected at least 5 total line(s), got %v", totalLines)
+	if result.Metadata.Metrics.TotalLines < 5 {
+		t.Fatalf("expected at least 5 total line(s), got %d", result.Metadata.Metrics.TotalLines)
 	}
-	errorCount, _ := metrics["error_count"].(float64)
-	if int(errorCount) != 0 {
-		t.Fatalf("expected error_count 0, got %v", errorCount)
+
+	if result.Metadata.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
 	}
 }

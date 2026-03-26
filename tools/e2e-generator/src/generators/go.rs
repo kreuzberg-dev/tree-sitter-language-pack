@@ -87,12 +87,14 @@ func skipIfLanguageUnavailable(t *testing.T, reg *tspack.Registry, lang string) 
 }
 
 fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {
-    let needs_json = fixtures.iter().any(|f| has_process_assertions(f));
     let needs_strings = fixtures.iter().any(|f| {
         f.assertions
             .as_ref()
             .is_some_and(|a| a.process_structure_name_contains.is_some() || a.process_imports_contains_source.is_some())
     });
+    let needs_tspack = fixtures
+        .iter()
+        .any(|f| has_process_assertions(f) || f.language.is_some());
 
     let mut out = String::new();
 
@@ -100,9 +102,8 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
     writeln!(out).unwrap();
     writeln!(out, "package e2e_tests").unwrap();
     writeln!(out).unwrap();
-    if needs_json {
+    if needs_tspack || needs_strings {
         writeln!(out, "import (").unwrap();
-        writeln!(out, "\t\"encoding/json\"").unwrap();
         if needs_strings {
             writeln!(out, "\t\"strings\"").unwrap();
         }
@@ -299,10 +300,10 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if has_chunk_assertions(fixture) {
                 let max_chunk_size = assertions.process_chunk_max_size.unwrap_or(512);
-                writeln!(out, "\tchunkSize := uint32({})", max_chunk_size).unwrap();
+                writeln!(out, "\tchunkSize := {}", max_chunk_size).unwrap();
                 writeln!(
                     out,
-                    "\tresultJSON, err := reg.Process(\"{}\", tspack.ProcessConfig{{Language: \"{}\", ChunkMaxSize: &chunkSize}})",
+                    "\tresult, err := reg.Process(\"{}\", tspack.ProcessConfig{{Language: \"{}\", ChunkMaxSize: &chunkSize}})",
                     escape_go_string(source),
                     escape_go_string(lang),
                 )
@@ -310,7 +311,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             } else {
                 writeln!(
                     out,
-                    "\tresultJSON, err := reg.Process(\"{}\", tspack.ProcessConfig{{Language: \"{}\", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true}})",
+                    "\tresult, err := reg.Process(\"{}\", tspack.ProcessConfig{{Language: \"{}\", Structure: true, Imports: true, Exports: true, Comments: true, Docstrings: true, Symbols: true, Diagnostics: true}})",
                     escape_go_string(source),
                     escape_go_string(lang)
                 )
@@ -319,25 +320,15 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             writeln!(out, "\tif err != nil {{").unwrap();
             writeln!(out, "\t\tt.Fatalf(\"process failed: %v\", err)").unwrap();
             writeln!(out, "\t}}").unwrap();
-            writeln!(out).unwrap();
-            writeln!(out, "\tvar intel map[string]interface{{}}").unwrap();
-            writeln!(
-                out,
-                "\tif err := json.Unmarshal([]byte(resultJSON), &intel); err != nil {{"
-            )
-            .unwrap();
-            writeln!(out, "\t\tt.Fatalf(\"failed to unmarshal JSON: %v\", err)").unwrap();
-            writeln!(out, "\t}}").unwrap();
 
             if has_chunk_assertions(fixture)
                 && let Some(min_chunks) = assertions.process_chunk_count_min
             {
                 writeln!(out).unwrap();
-                writeln!(out, "\tchunks, _ := intel[\"chunks\"].([]interface{{}})").unwrap();
-                writeln!(out, "\tif len(chunks) < {} {{", min_chunks).unwrap();
+                writeln!(out, "\tif len(result.Chunks) < {} {{", min_chunks).unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"expected at least {} chunk(s), got %d\", len(chunks))",
+                    "\t\tt.Fatalf(\"expected at least {} chunk(s), got %d\", len(result.Chunks))",
                     min_chunks
                 )
                 .unwrap();
@@ -348,13 +339,13 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out).unwrap();
                 writeln!(
                     out,
-                    "\tif lang, _ := intel[\"language\"].(string); lang != \"{}\" {{",
+                    "\tif result.Metadata.Language != \"{}\" {{",
                     escape_go_string(expected_lang)
                 )
                 .unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"expected language %q, got %q\", \"{}\", lang)",
+                    "\t\tt.Fatalf(\"expected language %q, got %q\", \"{}\", result.Metadata.Language)",
                     escape_go_string(expected_lang)
                 )
                 .unwrap();
@@ -363,11 +354,10 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if let Some(min_structures) = assertions.process_structure_count_min {
                 writeln!(out).unwrap();
-                writeln!(out, "\tstructure, _ := intel[\"structure\"].([]interface{{}})").unwrap();
-                writeln!(out, "\tif len(structure) < {} {{", min_structures).unwrap();
+                writeln!(out, "\tif len(result.Metadata.Structure) < {} {{", min_structures).unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"expected at least {} structure(s), got %d\", len(structure))",
+                    "\t\tt.Fatalf(\"expected at least {} structure(s), got %d\", len(result.Metadata.Structure))",
                     min_structures
                 )
                 .unwrap();
@@ -376,19 +366,11 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if let Some(expected_kind) = &assertions.process_structure_contains_kind {
                 writeln!(out).unwrap();
-                writeln!(out, "\tstructureList, _ := intel[\"structure\"].([]interface{{}})").unwrap();
                 writeln!(out, "\tfoundKind := false").unwrap();
-                writeln!(out, "\tfor _, s := range structureList {{").unwrap();
-                writeln!(out, "\t\tif m, ok := s.(map[string]interface{{}}); ok {{").unwrap();
-                writeln!(
-                    out,
-                    "\t\t\tif k, _ := m[\"kind\"].(string); k == \"{}\" {{",
-                    escape_go_string(expected_kind)
-                )
-                .unwrap();
-                writeln!(out, "\t\t\t\tfoundKind = true").unwrap();
-                writeln!(out, "\t\t\t\tbreak").unwrap();
-                writeln!(out, "\t\t\t}}").unwrap();
+                writeln!(out, "\tfor _, s := range result.Metadata.Structure {{").unwrap();
+                writeln!(out, "\t\tif s.Kind == \"{}\" {{", escape_go_string(expected_kind)).unwrap();
+                writeln!(out, "\t\t\tfoundKind = true").unwrap();
+                writeln!(out, "\t\t\tbreak").unwrap();
                 writeln!(out, "\t\t}}").unwrap();
                 writeln!(out, "\t}}").unwrap();
                 writeln!(out, "\tif !foundKind {{").unwrap();
@@ -403,19 +385,16 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if let Some(name_fragment) = &assertions.process_structure_name_contains {
                 writeln!(out).unwrap();
-                writeln!(out, "\tstructureListN, _ := intel[\"structure\"].([]interface{{}})").unwrap();
                 writeln!(out, "\tfoundName := false").unwrap();
-                writeln!(out, "\tfor _, s := range structureListN {{").unwrap();
-                writeln!(out, "\t\tif m, ok := s.(map[string]interface{{}}); ok {{").unwrap();
+                writeln!(out, "\tfor _, s := range result.Metadata.Structure {{").unwrap();
                 writeln!(
                     out,
-                    "\t\t\tif n, _ := m[\"name\"].(string); strings.Contains(n, \"{}\") {{",
+                    "\t\tif s.Name != nil && strings.Contains(*s.Name, \"{}\") {{",
                     escape_go_string(name_fragment)
                 )
                 .unwrap();
-                writeln!(out, "\t\t\t\tfoundName = true").unwrap();
-                writeln!(out, "\t\t\t\tbreak").unwrap();
-                writeln!(out, "\t\t\t}}").unwrap();
+                writeln!(out, "\t\t\tfoundName = true").unwrap();
+                writeln!(out, "\t\t\tbreak").unwrap();
                 writeln!(out, "\t\t}}").unwrap();
                 writeln!(out, "\t}}").unwrap();
                 writeln!(out, "\tif !foundName {{").unwrap();
@@ -430,11 +409,10 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if let Some(min_imports) = assertions.process_imports_count_min {
                 writeln!(out).unwrap();
-                writeln!(out, "\timports, _ := intel[\"imports\"].([]interface{{}})").unwrap();
-                writeln!(out, "\tif len(imports) < {} {{", min_imports).unwrap();
+                writeln!(out, "\tif len(result.Metadata.Imports) < {} {{", min_imports).unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"expected at least {} import(s), got %d\", len(imports))",
+                    "\t\tt.Fatalf(\"expected at least {} import(s), got %d\", len(result.Metadata.Imports))",
                     min_imports
                 )
                 .unwrap();
@@ -443,19 +421,16 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if let Some(import_source) = &assertions.process_imports_contains_source {
                 writeln!(out).unwrap();
-                writeln!(out, "\timportsList, _ := intel[\"imports\"].([]interface{{}})").unwrap();
                 writeln!(out, "\tfoundImport := false").unwrap();
-                writeln!(out, "\tfor _, imp := range importsList {{").unwrap();
-                writeln!(out, "\t\tif m, ok := imp.(map[string]interface{{}}); ok {{").unwrap();
+                writeln!(out, "\tfor _, imp := range result.Metadata.Imports {{").unwrap();
                 writeln!(
                     out,
-                    "\t\t\tif src, _ := m[\"source\"].(string); strings.Contains(src, \"{}\") {{",
+                    "\t\tif strings.Contains(imp.Source, \"{}\") {{",
                     escape_go_string(import_source)
                 )
                 .unwrap();
-                writeln!(out, "\t\t\t\tfoundImport = true").unwrap();
-                writeln!(out, "\t\t\t\tbreak").unwrap();
-                writeln!(out, "\t\t\t}}").unwrap();
+                writeln!(out, "\t\t\tfoundImport = true").unwrap();
+                writeln!(out, "\t\t\tbreak").unwrap();
                 writeln!(out, "\t\t}}").unwrap();
                 writeln!(out, "\t}}").unwrap();
                 writeln!(out, "\tif !foundImport {{").unwrap();
@@ -470,11 +445,10 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if let Some(min_exports) = assertions.process_exports_count_min {
                 writeln!(out).unwrap();
-                writeln!(out, "\texports, _ := intel[\"exports\"].([]interface{{}})").unwrap();
-                writeln!(out, "\tif len(exports) < {} {{", min_exports).unwrap();
+                writeln!(out, "\tif len(result.Metadata.Exports) < {} {{", min_exports).unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"expected at least {} export(s), got %d\", len(exports))",
+                    "\t\tt.Fatalf(\"expected at least {} export(s), got %d\", len(result.Metadata.Exports))",
                     min_exports
                 )
                 .unwrap();
@@ -483,34 +457,22 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if let Some(min_comments) = assertions.process_comments_count_min {
                 writeln!(out).unwrap();
-                writeln!(out, "\tcomments, _ := intel[\"comments\"].([]interface{{}})").unwrap();
-                writeln!(out, "\tif len(comments) < {} {{", min_comments).unwrap();
+                writeln!(out, "\tif len(result.Metadata.Comments) < {} {{", min_comments).unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"expected at least {} comment(s), got %d\", len(comments))",
+                    "\t\tt.Fatalf(\"expected at least {} comment(s), got %d\", len(result.Metadata.Comments))",
                     min_comments
                 )
                 .unwrap();
                 writeln!(out, "\t}}").unwrap();
             }
 
-            // Emit metrics variable once if any metrics assertion is present
-            let needs_metrics = assertions.process_metrics_total_lines_min.is_some()
-                || assertions.process_metrics_error_count.is_some()
-                || assertions.process_metrics_code_lines_min.is_some()
-                || assertions.process_metrics_comment_lines_min.is_some()
-                || assertions.process_metrics_max_depth_min.is_some();
-            if needs_metrics {
-                writeln!(out).unwrap();
-                writeln!(out, "\tmetrics, _ := intel[\"metrics\"].(map[string]interface{{}})").unwrap();
-            }
-
             if let Some(min_lines) = assertions.process_metrics_total_lines_min {
-                writeln!(out, "\ttotalLines, _ := metrics[\"total_lines\"].(float64)").unwrap();
-                writeln!(out, "\tif int(totalLines) < {} {{", min_lines).unwrap();
+                writeln!(out).unwrap();
+                writeln!(out, "\tif result.Metadata.Metrics.TotalLines < {} {{", min_lines).unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"expected at least {} total line(s), got %v\", totalLines)",
+                    "\t\tt.Fatalf(\"expected at least {} total line(s), got %d\", result.Metadata.Metrics.TotalLines)",
                     min_lines
                 )
                 .unwrap();
@@ -518,11 +480,11 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             }
 
             if let Some(min_code_lines) = assertions.process_metrics_code_lines_min {
-                writeln!(out, "\tcodeLines, _ := metrics[\"code_lines\"].(float64)").unwrap();
-                writeln!(out, "\tif int(codeLines) < {} {{", min_code_lines).unwrap();
+                writeln!(out).unwrap();
+                writeln!(out, "\tif result.Metadata.Metrics.CodeLines < {} {{", min_code_lines).unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"expected at least {} code line(s), got %v\", codeLines)",
+                    "\t\tt.Fatalf(\"expected at least {} code line(s), got %d\", result.Metadata.Metrics.CodeLines)",
                     min_code_lines
                 )
                 .unwrap();
@@ -530,11 +492,16 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             }
 
             if let Some(min_comment_lines) = assertions.process_metrics_comment_lines_min {
-                writeln!(out, "\tcommentLines, _ := metrics[\"comment_lines\"].(float64)").unwrap();
-                writeln!(out, "\tif int(commentLines) < {} {{", min_comment_lines).unwrap();
+                writeln!(out).unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"expected at least {} comment line(s), got %v\", commentLines)",
+                    "\tif result.Metadata.Metrics.CommentLines < {} {{",
+                    min_comment_lines
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "\t\tt.Fatalf(\"expected at least {} comment line(s), got %d\", result.Metadata.Metrics.CommentLines)",
                     min_comment_lines
                 )
                 .unwrap();
@@ -542,11 +509,11 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             }
 
             if let Some(min_depth) = assertions.process_metrics_max_depth_min {
-                writeln!(out, "\tmaxDepth, _ := metrics[\"max_depth\"].(float64)").unwrap();
-                writeln!(out, "\tif int(maxDepth) < {} {{", min_depth).unwrap();
+                writeln!(out).unwrap();
+                writeln!(out, "\tif result.Metadata.Metrics.MaxDepth < {} {{", min_depth).unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"expected max_depth >= {}, got %v\", maxDepth)",
+                    "\t\tt.Fatalf(\"expected max_depth >= {}, got %d\", result.Metadata.Metrics.MaxDepth)",
                     min_depth
                 )
                 .unwrap();
@@ -554,11 +521,16 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             }
 
             if let Some(expected_error_count) = assertions.process_metrics_error_count {
-                writeln!(out, "\terrorCount, _ := metrics[\"error_count\"].(float64)").unwrap();
-                writeln!(out, "\tif int(errorCount) != {} {{", expected_error_count).unwrap();
+                writeln!(out).unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"expected error_count {}, got %v\", errorCount)",
+                    "\tif result.Metadata.Metrics.ErrorCount != {} {{",
+                    expected_error_count
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "\t\tt.Fatalf(\"expected error_count {}, got %d\", result.Metadata.Metrics.ErrorCount)",
                     expected_error_count
                 )
                 .unwrap();
@@ -567,8 +539,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if assertions.process_diagnostics_not_empty == Some(true) {
                 writeln!(out).unwrap();
-                writeln!(out, "\tdiagnostics, _ := intel[\"diagnostics\"].([]interface{{}})").unwrap();
-                writeln!(out, "\tif len(diagnostics) == 0 {{").unwrap();
+                writeln!(out, "\tif len(result.Metadata.Diagnostics) == 0 {{").unwrap();
                 writeln!(out, "\t\tt.Fatal(\"diagnostics should not be empty\")").unwrap();
                 writeln!(out, "\t}}").unwrap();
             }
