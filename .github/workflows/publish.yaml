@@ -2093,10 +2093,8 @@ jobs:
         run: |
           sed -i 's/args ++ \["--cfg", "build_#{System.system_time(:millisecond)}"\]/args ++ ["--", "--cfg", "build_#{System.system_time(:millisecond)}"]/' deps/rustler/lib/rustler/compiler.ex
 
-      - name: Compile project
+      - name: Compile project (precompiled mode — checksums already generated)
         working-directory: crates/ts-pack-elixir
-        env:
-          TSLP_BUILD: "1"
         run: mix compile
 
       - name: Re-check Hex.pm before publish
