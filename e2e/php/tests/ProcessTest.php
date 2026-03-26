@@ -18,13 +18,13 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('#include <stdio.h>\n\nint main() {\n    printf("hello");\n    return 0;\n}\n', json_encode(['language' => 'c', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('c', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Function') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Function\' kind node');
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(6, $metrics['total_lines'], 'Should have at least 6 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -37,14 +37,14 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('# A comment\ndef greet(name):\n    """Say hello."""\n    return f\'Hi {name}\'\n\nimport os\n', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Function') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Function\' kind node');
-        $this->assertGreaterThanOrEqual(1, count($intel['imports']), 'Should have at least 1 import(s)');
-        $metrics = $intel['metrics'];
+        $this->assertGreaterThanOrEqual(1, count($intel['imports'] ?? []), 'Should have at least 1 import(s)');
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(6, $metrics['total_lines'], 'Should have at least 6 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -57,7 +57,7 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('def hello():\n    pass\n', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(2, $metrics['total_lines'], 'Should have at least 2 total line(s)');
     }
 
@@ -69,14 +69,14 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n', json_encode(['language' => 'go', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('go', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Function') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Function\' kind node');
-        $this->assertGreaterThanOrEqual(1, count($intel['imports']), 'Should have at least 1 import(s)');
-        $metrics = $intel['metrics'];
+        $this->assertGreaterThanOrEqual(1, count($intel['imports'] ?? []), 'Should have at least 1 import(s)');
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(7, $metrics['total_lines'], 'Should have at least 7 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -89,14 +89,14 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n', json_encode(['language' => 'go', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('go', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Function') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Function\' kind node');
-        $this->assertGreaterThanOrEqual(1, count($intel['imports']), 'Should have at least 1 import(s)');
-        $metrics = $intel['metrics'];
+        $this->assertGreaterThanOrEqual(1, count($intel['imports'] ?? []), 'Should have at least 1 import(s)');
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(7, $metrics['total_lines'], 'Should have at least 7 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -109,14 +109,14 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('import java.util.List;\n\npublic class Greeter {\n    public String greet(String name) {\n        return "Hello " + name;\n    }\n}\n', json_encode(['language' => 'java', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('java', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Class') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Class\' kind node');
-        $this->assertGreaterThanOrEqual(1, count($intel['imports']), 'Should have at least 1 import(s)');
-        $metrics = $intel['metrics'];
+        $this->assertGreaterThanOrEqual(1, count($intel['imports'] ?? []), 'Should have at least 1 import(s)');
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(7, $metrics['total_lines'], 'Should have at least 7 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -129,14 +129,14 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('import fs from \'fs\';\nimport path from \'path\';\n\nfunction process(input) {\n    return input.trim();\n}\n', json_encode(['language' => 'javascript', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('javascript', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Function') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Function\' kind node');
-        $this->assertGreaterThanOrEqual(2, count($intel['imports']), 'Should have at least 2 import(s)');
-        $metrics = $intel['metrics'];
+        $this->assertGreaterThanOrEqual(2, count($intel['imports'] ?? []), 'Should have at least 2 import(s)');
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(6, $metrics['total_lines'], 'Should have at least 6 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -149,14 +149,14 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('import fs from \'fs\';\nimport path from \'path\';\n\nfunction process(input) {\n    return input.trim();\n}\n', json_encode(['language' => 'javascript', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('javascript', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Function') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Function\' kind node');
-        $this->assertGreaterThanOrEqual(2, count($intel['imports']), 'Should have at least 2 import(s)');
-        $metrics = $intel['metrics'];
+        $this->assertGreaterThanOrEqual(2, count($intel['imports'] ?? []), 'Should have at least 2 import(s)');
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(6, $metrics['total_lines'], 'Should have at least 6 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -169,7 +169,7 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = \'1.0\';\n', json_encode(['language' => 'javascript', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('javascript', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['exports']), 'Should have at least 1 export(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['exports'] ?? []), 'Should have at least 1 export(s)');
     }
 
     public function test_process_python_comments(): void
@@ -180,7 +180,7 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['comments']), 'Should have at least 1 comment(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['comments'] ?? []), 'Should have at least 1 comment(s)');
     }
 
     public function test_process_python_imports_detail(): void
@@ -191,9 +191,9 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $this->assertGreaterThanOrEqual(2, count($intel['imports']), 'Should have at least 2 import(s)');
+        $this->assertGreaterThanOrEqual(2, count($intel['imports'] ?? []), 'Should have at least 2 import(s)');
         $foundImport = false;
-        foreach ($intel['imports'] as $i) {
+        foreach ($intel['imports'] ?? [] as $i) {
             if (str_contains(($i['source'] ?? ''), 'os')) { $foundImport = true; break; }
         }
         $this->assertTrue($foundImport, 'Imports should contain source \'os\' ');
@@ -207,7 +207,7 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print(\'hello\')\n\ndef world():\n    print(\'world\')\n', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(4, $metrics['code_lines'], 'Should have at least 4 code line(s)');
         $this->assertGreaterThanOrEqual(1, $metrics['comment_lines'], 'Should have at least 1 comment line(s)');
         $this->assertGreaterThanOrEqual(1, $metrics['max_depth'], 'Should have max_depth >= 1');
@@ -221,9 +221,9 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n', json_encode(['language' => 'rust', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('rust', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundName = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if (str_contains((string)($s['name'] ?? ''), 'MyConfig')) { $foundName = true; break; }
         }
         $this->assertTrue($foundName, 'Structure should contain a node with name containing \'MyConfig\' ');
@@ -237,10 +237,10 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n', json_encode(['language' => 'python', 'chunk_max_size' => 50])), true);
         $this->assertSame('python', $intel['language']);
-        $this->assertGreaterThanOrEqual(3, count($intel['structure']), 'Should have at least 3 structure(s)');
-        $metrics = $intel['metrics'];
+        $this->assertGreaterThanOrEqual(3, count($intel['structure'] ?? []), 'Should have at least 3 structure(s)');
+        $metrics = $intel['metrics'] ?? [];
         $this->assertSame(0, $metrics['error_count']);
-        $this->assertGreaterThanOrEqual(2, count($intel['chunks']), 'Should have at least 2 chunk(s)');
+        $this->assertGreaterThanOrEqual(2, count($intel['chunks'] ?? []), 'Should have at least 2 chunk(s)');
     }
 
     public function test_python_chunking_process_detail(): void
@@ -251,9 +251,9 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n', json_encode(['language' => 'python', 'chunk_max_size' => 30])), true);
         $this->assertSame('python', $intel['language']);
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(8, $metrics['total_lines'], 'Should have at least 8 total line(s)');
-        $this->assertGreaterThanOrEqual(2, count($intel['chunks']), 'Should have at least 2 chunk(s)');
+        $this->assertGreaterThanOrEqual(2, count($intel['chunks'] ?? []), 'Should have at least 2 chunk(s)');
     }
 
     public function test_python_class_with_methods_process(): void
@@ -264,13 +264,13 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Class') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Class\' kind node');
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(6, $metrics['total_lines'], 'Should have at least 6 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -283,13 +283,13 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Class') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Class\' kind node');
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(6, $metrics['total_lines'], 'Should have at least 6 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -302,9 +302,9 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('def broken(\n    pass\n', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertSame(1, $metrics['error_count']);
-        $this->assertNotEmpty($intel['diagnostics'], 'Diagnostics should not be empty');
+        $this->assertNotEmpty($intel['diagnostics'] ?? [], 'Diagnostics should not be empty');
     }
 
     public function test_python_function_process(): void
@@ -315,13 +315,13 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('def greet(name):\n    return f\'Hello, {name}!\'\n', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Function') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Function\' kind node');
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(2, $metrics['total_lines'], 'Should have at least 2 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -334,13 +334,13 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('def greet(name):\n    return f\'Hello, {name}!\'\n', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Function') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Function\' kind node');
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(2, $metrics['total_lines'], 'Should have at least 2 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -353,7 +353,7 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('def broken(\n    return\nclass', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $this->assertNotEmpty($intel['diagnostics'], 'Diagnostics should not be empty');
+        $this->assertNotEmpty($intel['diagnostics'] ?? [], 'Diagnostics should not be empty');
     }
 
     public function test_python_malformed_code_process_detail(): void
@@ -364,7 +364,7 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('def broken(\n    return\nclass', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $this->assertNotEmpty($intel['diagnostics'], 'Diagnostics should not be empty');
+        $this->assertNotEmpty($intel['diagnostics'] ?? [], 'Diagnostics should not be empty');
     }
 
     public function test_python_multi_import_process(): void
@@ -375,9 +375,9 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
-        $this->assertGreaterThanOrEqual(3, count($intel['imports']), 'Should have at least 3 import(s)');
-        $metrics = $intel['metrics'];
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(3, count($intel['imports'] ?? []), 'Should have at least 3 import(s)');
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(5, $metrics['total_lines'], 'Should have at least 5 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -390,9 +390,9 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n', json_encode(['language' => 'python', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('python', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
-        $this->assertGreaterThanOrEqual(3, count($intel['imports']), 'Should have at least 3 import(s)');
-        $metrics = $intel['metrics'];
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(3, count($intel['imports'] ?? []), 'Should have at least 3 import(s)');
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(5, $metrics['total_lines'], 'Should have at least 5 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -405,13 +405,13 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('require \'json\'\n\nclass Greeter\n  def greet(name)\n    "Hello #{name}"\n  end\nend\n', json_encode(['language' => 'ruby', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('ruby', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Class') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Class\' kind node');
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(7, $metrics['total_lines'], 'Should have at least 7 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -424,9 +424,9 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n', json_encode(['language' => 'rust', 'chunk_max_size' => 30])), true);
         $this->assertSame('rust', $intel['language']);
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(7, $metrics['total_lines'], 'Should have at least 7 total line(s)');
-        $this->assertGreaterThanOrEqual(2, count($intel['chunks']), 'Should have at least 2 chunk(s)');
+        $this->assertGreaterThanOrEqual(2, count($intel['chunks'] ?? []), 'Should have at least 2 chunk(s)');
     }
 
     public function test_rust_chunking_process_detail(): void
@@ -437,9 +437,9 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n', json_encode(['language' => 'rust', 'chunk_max_size' => 30])), true);
         $this->assertSame('rust', $intel['language']);
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(7, $metrics['total_lines'], 'Should have at least 7 total line(s)');
-        $this->assertGreaterThanOrEqual(2, count($intel['chunks']), 'Should have at least 2 chunk(s)');
+        $this->assertGreaterThanOrEqual(2, count($intel['chunks'] ?? []), 'Should have at least 2 chunk(s)');
     }
 
     public function test_rust_function_process(): void
@@ -450,13 +450,13 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n', json_encode(['language' => 'rust', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('rust', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Function') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Function\' kind node');
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(3, $metrics['total_lines'], 'Should have at least 3 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -469,13 +469,13 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n', json_encode(['language' => 'rust', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('rust', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Function') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Function\' kind node');
-        $metrics = $intel['metrics'];
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(3, $metrics['total_lines'], 'Should have at least 3 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -488,14 +488,14 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('import { readFile } from \'fs\';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n', json_encode(['language' => 'typescript', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('typescript', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Function') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Function\' kind node');
-        $this->assertGreaterThanOrEqual(1, count($intel['imports']), 'Should have at least 1 import(s)');
-        $metrics = $intel['metrics'];
+        $this->assertGreaterThanOrEqual(1, count($intel['imports'] ?? []), 'Should have at least 1 import(s)');
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(5, $metrics['total_lines'], 'Should have at least 5 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }
@@ -508,14 +508,14 @@ class ProcessTest extends TestCase
         }
         $intel = json_decode(\ts_pack_process('import { readFile } from \'fs\';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n', json_encode(['language' => 'typescript', 'structure' => true, 'imports' => true, 'exports' => true, 'comments' => true, 'docstrings' => true, 'symbols' => true, 'diagnostics' => true])), true);
         $this->assertSame('typescript', $intel['language']);
-        $this->assertGreaterThanOrEqual(1, count($intel['structure']), 'Should have at least 1 structure(s)');
+        $this->assertGreaterThanOrEqual(1, count($intel['structure'] ?? []), 'Should have at least 1 structure(s)');
         $foundKind = false;
-        foreach ($intel['structure'] as $s) {
+        foreach ($intel['structure'] ?? [] as $s) {
             if ($s['kind'] === 'Function') { $foundKind = true; break; }
         }
         $this->assertTrue($foundKind, 'Structure should contain a \'Function\' kind node');
-        $this->assertGreaterThanOrEqual(1, count($intel['imports']), 'Should have at least 1 import(s)');
-        $metrics = $intel['metrics'];
+        $this->assertGreaterThanOrEqual(1, count($intel['imports'] ?? []), 'Should have at least 1 import(s)');
+        $metrics = $intel['metrics'] ?? [];
         $this->assertGreaterThanOrEqual(5, $metrics['total_lines'], 'Should have at least 5 total line(s)');
         $this->assertSame(0, $metrics['error_count']);
     }

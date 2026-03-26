@@ -20,6 +20,19 @@ import {
 } from "./helpers";
 
 describe("parsing", () => {
+  it("parsing_go_function", () => {
+    // Parse a Go function declaration and assert node type
+    if (!hasLanguage("go")) {
+      console.log("Skipping: language 'go' not available");
+      return;
+    }
+    const tree = parseString("go", `package main\nfunc main() {}`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeContainsNodeType(tree, "function_declaration")).toBe(true);
+    freeTree(tree);
+  });
+
   it("parsing_html_element", () => {
     // Parse an HTML element and assert node type
     if (!hasLanguage("html")) {
@@ -57,6 +70,45 @@ describe("parsing", () => {
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeContainsNodeType(tree, "lexical_declaration")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("parsing_python_function", () => {
+    // Parse a Python function definition and assert node type
+    if (!hasLanguage("python")) {
+      console.log("Skipping: language 'python' not available");
+      return;
+    }
+    const tree = parseString("python", `def hello(): pass`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeContainsNodeType(tree, "function_definition")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("parsing_rust_function", () => {
+    // Parse a Rust function definition and assert node type
+    if (!hasLanguage("rust")) {
+      console.log("Skipping: language 'rust' not available");
+      return;
+    }
+    const tree = parseString("rust", `fn main() {}`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeContainsNodeType(tree, "function_item")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("parsing_rust_struct", () => {
+    // Parse a Rust struct definition.
+    if (!hasLanguage("rust")) {
+      console.log("Skipping: language 'rust' not available");
+      return;
+    }
+    const tree = parseString("rust", `struct Point { x: f64, y: f64 }`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
     freeTree(tree);
   });
 

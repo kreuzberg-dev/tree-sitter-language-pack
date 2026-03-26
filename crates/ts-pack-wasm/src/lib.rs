@@ -49,6 +49,20 @@ pub fn detect_language(path: &str) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_path(path).map(String::from)
 }
 
+/// Detect language name from a file path.
+/// Returns null if the path has no extension or the extension is not recognized.
+#[wasm_bindgen(js_name = "detectLanguageFromPath")]
+pub fn detect_language_from_path(path: &str) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_path(path).map(String::from)
+}
+
+/// Detect language name from a file extension (without leading dot).
+/// Returns null if the extension is not recognized.
+#[wasm_bindgen(js_name = "detectLanguageFromExtension")]
+pub fn detect_language_from_extension(ext: &str) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_extension(ext).map(String::from)
+}
+
 /// Returns the number of available languages.
 #[wasm_bindgen(js_name = "languageCount")]
 pub fn language_count() -> u32 {

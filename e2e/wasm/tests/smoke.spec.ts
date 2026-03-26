@@ -20,17 +20,43 @@ import {
 } from "./helpers";
 
 describe("smoke", () => {
-  it("smoke_astro", () => {
-    // Smoke test: load astro and parse a simple snippet
-    if (!hasLanguage("astro")) {
-      console.log("Skipping: language 'astro' not available");
+  it("smoke_bash", () => {
+    // Smoke test: load bash and parse a simple snippet
+    if (!hasLanguage("bash")) {
+      console.log("Skipping: language 'bash' not available");
       return;
     }
-    const tree = parseString("astro", `---\n---\n<p>hello</p>`);
+    const tree = parseString("bash", `echo hello`);
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
-    expect(treeContainsNodeType(tree, "frontmatter")).toBe(true);
+    expect(treeContainsNodeType(tree, "command")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("smoke_c", () => {
+    // Smoke test: load c and parse a simple snippet
+    if (!hasLanguage("c")) {
+      console.log("Skipping: language 'c' not available");
+      return;
+    }
+    const tree = parseString("c", `int main() { return 0; }`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_cpp", () => {
+    // Smoke test: load cpp and parse a simple snippet
+    if (!hasLanguage("cpp")) {
+      console.log("Skipping: language 'cpp' not available");
+      return;
+    }
+    const tree = parseString("cpp", `int main() { return 0; }`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
     freeTree(tree);
   });
 
@@ -48,6 +74,61 @@ describe("smoke", () => {
     freeTree(tree);
   });
 
+  it("smoke_dart", () => {
+    // Smoke test: load dart and parse a simple snippet
+    if (!hasLanguage("dart")) {
+      console.log("Skipping: language 'dart' not available");
+      return;
+    }
+    const tree = parseString("dart", `void main() {}`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "function_signature")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("smoke_dockerfile", () => {
+    // Smoke test: load dockerfile and parse a simple snippet
+    if (!hasLanguage("dockerfile")) {
+      console.log("Skipping: language 'dockerfile' not available");
+      return;
+    }
+    const tree = parseString("dockerfile", `FROM alpine`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "from_instruction")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("smoke_elixir", () => {
+    // Smoke test: load elixir and parse a simple snippet
+    if (!hasLanguage("elixir")) {
+      console.log("Skipping: language 'elixir' not available");
+      return;
+    }
+    const tree = parseString("elixir", `IO.puts(\"hello\")`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "call")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("smoke_go", () => {
+    // Smoke test: load go and parse a simple snippet
+    if (!hasLanguage("go")) {
+      console.log("Skipping: language 'go' not available");
+      return;
+    }
+    const tree = parseString("go", `package main`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
   it("smoke_graphql", () => {
     // Smoke test: load graphql and parse a simple snippet
     if (!hasLanguage("graphql")) {
@@ -62,6 +143,20 @@ describe("smoke", () => {
     freeTree(tree);
   });
 
+  it("smoke_hcl", () => {
+    // Smoke test: load hcl and parse a simple snippet
+    if (!hasLanguage("hcl")) {
+      console.log("Skipping: language 'hcl' not available");
+      return;
+    }
+    const tree = parseString("hcl", `variable \"name\" { type = string }`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "body")).toBe(true);
+    freeTree(tree);
+  });
+
   it("smoke_html", () => {
     // Smoke test: load html and parse a simple snippet
     if (!hasLanguage("html")) {
@@ -69,6 +164,19 @@ describe("smoke", () => {
       return;
     }
     const tree = parseString("html", `<p>hello</p>`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_java", () => {
+    // Smoke test: load java and parse a simple snippet
+    if (!hasLanguage("java")) {
+      console.log("Skipping: language 'java' not available");
+      return;
+    }
+    const tree = parseString("java", `class Main { public static void main(String[] args) {} }`);
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
@@ -88,20 +196,6 @@ describe("smoke", () => {
     freeTree(tree);
   });
 
-  it("smoke_jsdoc", () => {
-    // Smoke test: load jsdoc and parse a simple snippet
-    if (!hasLanguage("jsdoc")) {
-      console.log("Skipping: language 'jsdoc' not available");
-      return;
-    }
-    const tree = parseString("jsdoc", `/** @param {string} name */`);
-    expect(tree).toBeTruthy();
-    expect(tree).not.toBeNull();
-    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
-    expect(treeContainsNodeType(tree, "tag_name")).toBe(true);
-    freeTree(tree);
-  });
-
   it("smoke_json", () => {
     // Smoke test: load json and parse a simple snippet
     if (!hasLanguage("json")) {
@@ -116,17 +210,126 @@ describe("smoke", () => {
     freeTree(tree);
   });
 
-  it("smoke_prisma", () => {
-    // Smoke test: load prisma and parse a simple snippet
-    if (!hasLanguage("prisma")) {
-      console.log("Skipping: language 'prisma' not available");
+  it("smoke_kotlin", () => {
+    // Smoke test: load kotlin and parse a simple snippet
+    if (!hasLanguage("kotlin")) {
+      console.log("Skipping: language 'kotlin' not available");
       return;
     }
-    const tree = parseString("prisma", `model User { id Int @id }`);
+    const tree = parseString("kotlin", `fun main() {}`);
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
-    expect(treeContainsNodeType(tree, "model_block")).toBe(true);
+    expect(treeContainsNodeType(tree, "function_declaration")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("smoke_lua", () => {
+    // Smoke test: load lua and parse a simple snippet
+    if (!hasLanguage("lua")) {
+      console.log("Skipping: language 'lua' not available");
+      return;
+    }
+    const tree = parseString("lua", `print('hello')`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "function_call")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("smoke_markdown", () => {
+    // Smoke test: load markdown and parse a simple snippet
+    if (!hasLanguage("markdown")) {
+      console.log("Skipping: language 'markdown' not available");
+      return;
+    }
+    const tree = parseString("markdown", `# Hello\n\nWorld`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "section")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("smoke_markdown_inline", () => {
+    // Smoke test: load markdown_inline and parse a simple snippet
+    if (!hasLanguage("markdown_inline")) {
+      console.log("Skipping: language 'markdown_inline' not available");
+      return;
+    }
+    const tree = parseString("markdown_inline", `**bold** and *italic*`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "strong_emphasis")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("smoke_php", () => {
+    // Smoke test: load php and parse a simple snippet
+    if (!hasLanguage("php")) {
+      console.log("Skipping: language 'php' not available");
+      return;
+    }
+    const tree = parseString("php", `<?php echo 'hello'; ?>`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "php_tag")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("smoke_python", () => {
+    // Smoke test: load python and parse a simple snippet
+    if (!hasLanguage("python")) {
+      console.log("Skipping: language 'python' not available");
+      return;
+    }
+    const tree = parseString("python", `print('hello')`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_ruby", () => {
+    // Smoke test: load ruby and parse a simple snippet
+    if (!hasLanguage("ruby")) {
+      console.log("Skipping: language 'ruby' not available");
+      return;
+    }
+    const tree = parseString("ruby", `puts 'hello'`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_rust", () => {
+    // Smoke test: load rust and parse a simple snippet
+    if (!hasLanguage("rust")) {
+      console.log("Skipping: language 'rust' not available");
+      return;
+    }
+    const tree = parseString("rust", `fn main() {}`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_scala", () => {
+    // Smoke test: load scala and parse a simple snippet
+    if (!hasLanguage("scala")) {
+      console.log("Skipping: language 'scala' not available");
+      return;
+    }
+    const tree = parseString("scala", `object Main`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "object_definition")).toBe(true);
     freeTree(tree);
   });
 
@@ -144,16 +347,45 @@ describe("smoke", () => {
     freeTree(tree);
   });
 
-  it("smoke_svelte", () => {
-    // Smoke test: load svelte and parse a simple snippet
-    if (!hasLanguage("svelte")) {
-      console.log("Skipping: language 'svelte' not available");
+  it("smoke_sql", () => {
+    // Smoke test: load sql and parse a simple snippet
+    if (!hasLanguage("sql")) {
+      console.log("Skipping: language 'sql' not available");
       return;
     }
-    const tree = parseString("svelte", `<p>hello</p>`);
+    const tree = parseString("sql", `SELECT 1;`);
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
-    expect(treeContainsNodeType(tree, "element")).toBe(true);
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "statement")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("smoke_swift", () => {
+    // Smoke test: load swift and parse a simple snippet
+    if (!hasLanguage("swift")) {
+      console.log("Skipping: language 'swift' not available");
+      return;
+    }
+    const tree = parseString("swift", `print(\"hello\")`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "call_expression")).toBe(true);
+    freeTree(tree);
+  });
+
+  it("smoke_toml", () => {
+    // Smoke test: load toml and parse a simple snippet
+    if (!hasLanguage("toml")) {
+      console.log("Skipping: language 'toml' not available");
+      return;
+    }
+    const tree = parseString("toml", `key = \"value\"`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    expect(treeContainsNodeType(tree, "pair")).toBe(true);
     freeTree(tree);
   });
 
@@ -171,20 +403,6 @@ describe("smoke", () => {
     freeTree(tree);
   });
 
-  it("smoke_twig", () => {
-    // Smoke test: load twig and parse a simple snippet
-    if (!hasLanguage("twig")) {
-      console.log("Skipping: language 'twig' not available");
-      return;
-    }
-    const tree = parseString("twig", `{{ variable }}`);
-    expect(tree).toBeTruthy();
-    expect(tree).not.toBeNull();
-    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
-    expect(treeContainsNodeType(tree, "output_directive")).toBe(true);
-    freeTree(tree);
-  });
-
   it("smoke_typescript", () => {
     // Smoke test: load typescript and parse a simple snippet
     if (!hasLanguage("typescript")) {
@@ -198,17 +416,17 @@ describe("smoke", () => {
     freeTree(tree);
   });
 
-  it("smoke_vue", () => {
-    // Smoke test: load vue and parse a simple snippet
-    if (!hasLanguage("vue")) {
-      console.log("Skipping: language 'vue' not available");
+  it("smoke_xml", () => {
+    // Smoke test: load xml and parse a simple snippet
+    if (!hasLanguage("xml")) {
+      console.log("Skipping: language 'xml' not available");
       return;
     }
-    const tree = parseString("vue", `<template><div>hello</div></template>`);
+    const tree = parseString("xml", `<?xml version=\"1.0\"?>\n<root>hello</root>`);
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
-    expect(treeContainsNodeType(tree, "template_element")).toBe(true);
+    expect(treeContainsNodeType(tree, "prolog")).toBe(true);
     freeTree(tree);
   });
 

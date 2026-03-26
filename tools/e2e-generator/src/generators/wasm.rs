@@ -6,22 +6,44 @@ use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
 use std::path::Path;
 
-/// Languages available in the WASM build (matches ts-pack-core "web" feature group).
-const WEB_LANGUAGES: &[&str] = &[
+/// Languages available in the WASM build (matches ts-pack-core "wasm" feature group).
+const WASM_LANGUAGES: &[&str] = &[
+    // Web essentials
     "html",
     "css",
     "javascript",
     "typescript",
     "tsx",
     "json",
-    "vue",
-    "svelte",
-    "astro",
     "graphql",
+    // Data formats
+    "toml",
+    "xml",
+    "sql",
+    "markdown",
+    "markdown_inline",
+    // Top systems languages
+    "c",
+    "cpp",
+    "rust",
+    "go",
+    "swift",
+    // Top scripting languages
+    "python",
+    "ruby",
+    "bash",
+    "php",
+    // JVM
+    "java",
+    "kotlin",
+    // Other popular
+    "dart",
+    "dockerfile",
+    "hcl",
     "scss",
-    "jsdoc",
-    "twig",
-    "prisma",
+    "lua",
+    "elixir",
+    "scala",
 ];
 
 pub struct WasmGenerator;
@@ -54,7 +76,7 @@ impl Generator for WasmGenerator {
                 // Otherwise filter to web-available languages only
                 f.language
                     .as_ref()
-                    .map(|lang| WEB_LANGUAGES.contains(&lang.as_str()))
+                    .map(|lang| WASM_LANGUAGES.contains(&lang.as_str()))
                     .unwrap_or(true)
             })
             .collect();

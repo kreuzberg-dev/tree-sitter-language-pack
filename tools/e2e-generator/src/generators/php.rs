@@ -182,7 +182,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(min_structures) = assertions.process_structure_count_min {
                 writeln!(
                     out,
-                    "        $this->assertGreaterThanOrEqual({}, count($intel['structure']), 'Should have at least {} structure(s)');",
+                    "        $this->assertGreaterThanOrEqual({}, count($intel['structure'] ?? []), 'Should have at least {} structure(s)');",
                     min_structures, min_structures
                 )
                 .unwrap();
@@ -190,7 +190,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if let Some(expected_kind) = &assertions.process_structure_contains_kind {
                 writeln!(out, "        $foundKind = false;").unwrap();
-                writeln!(out, "        foreach ($intel['structure'] as $s) {{").unwrap();
+                writeln!(out, "        foreach ($intel['structure'] ?? [] as $s) {{").unwrap();
                 writeln!(
                     out,
                     "            if ($s['kind'] === '{}') {{ $foundKind = true; break; }}",
@@ -208,7 +208,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if let Some(name_fragment) = &assertions.process_structure_name_contains {
                 writeln!(out, "        $foundName = false;").unwrap();
-                writeln!(out, "        foreach ($intel['structure'] as $s) {{").unwrap();
+                writeln!(out, "        foreach ($intel['structure'] ?? [] as $s) {{").unwrap();
                 writeln!(
                     out,
                     "            if (str_contains((string)($s['name'] ?? ''), '{}')) {{ $foundName = true; break; }}",
@@ -227,7 +227,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(min_imports) = assertions.process_imports_count_min {
                 writeln!(
                     out,
-                    "        $this->assertGreaterThanOrEqual({}, count($intel['imports']), 'Should have at least {} import(s)');",
+                    "        $this->assertGreaterThanOrEqual({}, count($intel['imports'] ?? []), 'Should have at least {} import(s)');",
                     min_imports, min_imports
                 )
                 .unwrap();
@@ -235,7 +235,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if let Some(import_source) = &assertions.process_imports_contains_source {
                 writeln!(out, "        $foundImport = false;").unwrap();
-                writeln!(out, "        foreach ($intel['imports'] as $i) {{").unwrap();
+                writeln!(out, "        foreach ($intel['imports'] ?? [] as $i) {{").unwrap();
                 writeln!(
                     out,
                     "            if (str_contains(($i['source'] ?? ''), '{}')) {{ $foundImport = true; break; }}",
@@ -254,7 +254,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(min_exports) = assertions.process_exports_count_min {
                 writeln!(
                     out,
-                    "        $this->assertGreaterThanOrEqual({}, count($intel['exports']), 'Should have at least {} export(s)');",
+                    "        $this->assertGreaterThanOrEqual({}, count($intel['exports'] ?? []), 'Should have at least {} export(s)');",
                     min_exports, min_exports
                 )
                 .unwrap();
@@ -263,7 +263,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(min_comments) = assertions.process_comments_count_min {
                 writeln!(
                     out,
-                    "        $this->assertGreaterThanOrEqual({}, count($intel['comments']), 'Should have at least {} comment(s)');",
+                    "        $this->assertGreaterThanOrEqual({}, count($intel['comments'] ?? []), 'Should have at least {} comment(s)');",
                     min_comments, min_comments
                 )
                 .unwrap();
@@ -275,7 +275,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 || assertions.process_metrics_comment_lines_min.is_some()
                 || assertions.process_metrics_max_depth_min.is_some();
             if needs_metrics {
-                writeln!(out, "        $metrics = $intel['metrics'];").unwrap();
+                writeln!(out, "        $metrics = $intel['metrics'] ?? [];").unwrap();
             }
 
             if let Some(min_lines) = assertions.process_metrics_total_lines_min {
@@ -326,7 +326,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if assertions.process_diagnostics_not_empty == Some(true) {
                 writeln!(
                     out,
-                    "        $this->assertNotEmpty($intel['diagnostics'], 'Diagnostics should not be empty');"
+                    "        $this->assertNotEmpty($intel['diagnostics'] ?? [], 'Diagnostics should not be empty');"
                 )
                 .unwrap();
             }
@@ -336,7 +336,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             {
                 writeln!(
                     out,
-                    "        $this->assertGreaterThanOrEqual({}, count($intel['chunks']), 'Should have at least {} chunk(s)');",
+                    "        $this->assertGreaterThanOrEqual({}, count($intel['chunks'] ?? []), 'Should have at least {} chunk(s)');",
                     min_chunks, min_chunks
                 )
                 .unwrap();
