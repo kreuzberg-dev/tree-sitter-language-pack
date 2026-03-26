@@ -1,10 +1,10 @@
 [package]
 name = "test-app-rust"
-version = "1.3.1"
+version = "1.3.2"
 edition = "2024"
 publish = false
 
 [dependencies]
-tree-sitter-language-pack = "1.3.1"
+tree-sitter-language-pack = "1.3.2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

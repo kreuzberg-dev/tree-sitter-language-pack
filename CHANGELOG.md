@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-03-26
+
+### Fixed
+
+- Dynamic parser loading for languages with `c_symbol` overrides (`csharp`, `vb`, `embeddedtemplate`, `nushell`) — build was naming libraries with the raw name but runtime loader expected the `c_symbol` name (#80)
+- Go E2E generator: unused `tspack` import in non-process test files
+- Elixir: add missing `extract/2` and `validate_extraction/1` NIF declarations
+- PHP E2E generator: use double-quoted strings for source code so `\n` is interpreted correctly
+- Nim grammar: switch from abandoned `paranim/tree-sitter-nim` (ABI v11) to `aMOPel/tree-sitter-nim` (MIT, ABI v14)
+
+### Added
+
+- Smoke test fixtures for all `c_symbol` override languages (csharp, vb, embeddedtemplate, nushell)
+- Dynamic-linking CI step in `ci-all-grammars.yaml` to catch `c_symbol` naming mismatches
+
 ## [1.3.1] - 2026-03-26
 
 ### Fixed

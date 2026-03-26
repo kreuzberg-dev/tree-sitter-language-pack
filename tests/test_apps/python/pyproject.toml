@@ -16,7 +16,7 @@ classifiers = [
 ]
 dependencies = [
   "pytest>=8",
-  "tree-sitter-language-pack==1.3.1",
+  "tree-sitter-language-pack==1.3.2",
 ]
 
 [tool.ruff]

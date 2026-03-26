@@ -307,7 +307,13 @@ impl DownloadManager {
     fn sha256_hex(data: &[u8]) -> String {
         let mut hasher = Sha256::new();
         hasher.update(data);
-        format!("{:x}", hasher.finalize())
+        let hash = hasher.finalize();
+        let mut hex = String::with_capacity(hash.len() * 2);
+        for byte in hash {
+            use std::fmt::Write;
+            write!(hex, "{byte:02x}").unwrap();
+        }
+        hex
     }
 
     /// Platform key for the current OS/arch, e.g. "linux-x86_64", "macos-arm64".
