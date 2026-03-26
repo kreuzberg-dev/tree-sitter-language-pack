@@ -462,6 +462,7 @@ impl From<&ProcessConfig> for tree_sitter_language_pack::ProcessConfig {
             symbols: py_config.symbols,
             diagnostics: py_config.diagnostics,
             chunk_max_size: py_config.chunk_max_size,
+            extractions: None,
         }
     }
 }
@@ -509,6 +510,52 @@ fn process(py: Python<'_>, source: &str, config: &ProcessConfig) -> PyResult<Py<
         tree_sitter_language_pack::process(source, &core_config).map_err(|e| ParseError::new_err(format!("{e}")))?;
     let value = serde_json::to_value(&result).map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))?;
     json_value_to_py(py, &value)
+}
+
+// ---------------------------------------------------------------------------
+// Extraction API
+// ---------------------------------------------------------------------------
+
+/// Extract patterns from source code using an ExtractionConfig dict.
+///
+/// The config dict should have keys: "language" (str), "patterns" (dict of pattern dicts).
+/// Each pattern dict has: "query" (str), optional "capture_output" (str),
+/// optional "child_fields" (list[str]), optional "max_results" (int),
+/// optional "byte_range" (tuple[int, int]).
+///
+/// Returns the extraction result as a Python dict.
+#[pyfunction]
+fn extract(py: Python<'_>, source: &str, config: &pyo3::Bound<'_, PyDict>) -> PyResult<Py<PyAny>> {
+    let config_json = py_dict_to_json_value(config)?;
+    let extraction_config: tree_sitter_language_pack::ExtractionConfig =
+        serde_json::from_value(config_json).map_err(|e| ParseError::new_err(format!("invalid config: {e}")))?;
+    let result = tree_sitter_language_pack::extract_patterns(source, &extraction_config)
+        .map_err(|e| ParseError::new_err(format!("{e}")))?;
+    let value = serde_json::to_value(&result).map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))?;
+    json_value_to_py(py, &value)
+}
+
+/// Validate extraction patterns without running them.
+///
+/// The config dict has the same shape as for `extract`.
+/// Returns a dict with "valid" (bool) and "patterns" (dict of validation details).
+#[pyfunction]
+fn validate_extraction(py: Python<'_>, config: &pyo3::Bound<'_, PyDict>) -> PyResult<Py<PyAny>> {
+    let config_json = py_dict_to_json_value(config)?;
+    let extraction_config: tree_sitter_language_pack::ExtractionConfig =
+        serde_json::from_value(config_json).map_err(|e| ParseError::new_err(format!("invalid config: {e}")))?;
+    let result = tree_sitter_language_pack::validate_extraction(&extraction_config)
+        .map_err(|e| ParseError::new_err(format!("{e}")))?;
+    let value = serde_json::to_value(&result).map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))?;
+    json_value_to_py(py, &value)
+}
+
+/// Convert a Python dict to a serde_json::Value.
+fn py_dict_to_json_value(dict: &pyo3::Bound<'_, PyDict>) -> PyResult<serde_json::Value> {
+    let py = dict.py();
+    let json_mod = py.import("json")?;
+    let json_str: String = json_mod.call_method1("dumps", (dict,))?.extract()?;
+    serde_json::from_str(&json_str).map_err(|e| ParseError::new_err(format!("JSON conversion failed: {e}")))
 }
 
 // ---------------------------------------------------------------------------
@@ -654,6 +701,8 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_locals_query, m)?)?;
     m.add_function(wrap_pyfunction!(parse_string, m)?)?;
     m.add_function(wrap_pyfunction!(process, m)?)?;
+    m.add_function(wrap_pyfunction!(extract, m)?)?;
+    m.add_function(wrap_pyfunction!(validate_extraction, m)?)?;
     m.add_function(wrap_pyfunction!(init, m)?)?;
     m.add_function(wrap_pyfunction!(configure, m)?)?;
     m.add_function(wrap_pyfunction!(download, m)?)?;

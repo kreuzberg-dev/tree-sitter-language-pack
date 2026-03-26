@@ -273,6 +273,81 @@ pub fn ts_pack_process(source: String, config_json: String) -> PhpResult<String>
     serde_json::to_string(&result).map_err(|e| PhpException::default(format!("serialization failed: {e}")))
 }
 
+/// Extract patterns from source code using a JSON configuration.
+///
+/// The config JSON must contain:
+/// - `language` (string): the language name
+/// - `patterns` (object): named patterns to run, each with a `query` field
+///
+/// # Arguments
+///
+/// * `source` - The source code to extract from.
+/// * `config_json` - JSON string with extraction configuration.
+///
+/// # Returns
+///
+/// JSON string with extraction results.
+///
+/// # Throws
+///
+/// Throws an exception if the config JSON is invalid, the language is unknown,
+/// or extraction fails.
+///
+/// # Example
+///
+/// ```php
+/// $config = '{"language":"python","patterns":{"fns":{"query":"(function_definition name: (identifier) @fn_name)"}}}';
+/// $result = ts_pack_extract("def hello(): pass", $config);
+/// $data = json_decode($result, true);
+/// ```
+#[php_function]
+pub fn ts_pack_extract(source: String, config_json: String) -> PhpResult<String> {
+    let config: tree_sitter_language_pack::ExtractionConfig =
+        serde_json::from_str(&config_json).map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
+
+    let result = tree_sitter_language_pack::extract_patterns(&source, &config)
+        .map_err(|e| PhpException::default(format!("{e}")))?;
+
+    serde_json::to_string(&result).map_err(|e| PhpException::default(format!("serialization failed: {e}")))
+}
+
+/// Validate extraction patterns without running them.
+///
+/// The config JSON must contain:
+/// - `language` (string): the language name
+/// - `patterns` (object): named patterns to validate
+///
+/// # Arguments
+///
+/// * `config_json` - JSON string with extraction configuration.
+///
+/// # Returns
+///
+/// JSON string with validation results.
+///
+/// # Throws
+///
+/// Throws an exception if the config JSON is invalid or the language is unknown.
+///
+/// # Example
+///
+/// ```php
+/// $config = '{"language":"python","patterns":{"fns":{"query":"(function_definition name: (identifier) @fn_name)"}}}';
+/// $result = ts_pack_validate_extraction($config);
+/// $data = json_decode($result, true);
+/// echo $data['valid'] ? "Valid\n" : "Invalid\n";
+/// ```
+#[php_function]
+pub fn ts_pack_validate_extraction(config_json: String) -> PhpResult<String> {
+    let config: tree_sitter_language_pack::ExtractionConfig =
+        serde_json::from_str(&config_json).map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
+
+    let result =
+        tree_sitter_language_pack::validate_extraction(&config).map_err(|e| PhpException::default(format!("{e}")))?;
+
+    serde_json::to_string(&result).map_err(|e| PhpException::default(format!("serialization failed: {e}")))
+}
+
 /// Initialize the language pack with the given configuration (JSON string).
 ///
 /// Applies cache directory settings and downloads specified languages/groups.
@@ -491,6 +566,8 @@ pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
         .function(wrap_function!(ts_pack_get_language))
         .function(wrap_function!(ts_pack_parse_string))
         .function(wrap_function!(ts_pack_process))
+        .function(wrap_function!(ts_pack_extract))
+        .function(wrap_function!(ts_pack_validate_extraction))
         .function(wrap_function!(ts_pack_init))
         .function(wrap_function!(ts_pack_configure))
         .function(wrap_function!(ts_pack_download))

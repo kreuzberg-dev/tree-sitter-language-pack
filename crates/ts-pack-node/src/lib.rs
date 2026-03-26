@@ -157,6 +157,7 @@ impl From<JsProcessConfig> for tree_sitter_language_pack::ProcessConfig {
             symbols: js.symbols.unwrap_or(true),
             diagnostics: js.diagnostics.unwrap_or(true),
             chunk_max_size: js.chunk_max_size.map(|v| v as usize),
+            extractions: None,
         }
     }
 }
@@ -176,6 +177,47 @@ pub fn process(source: String, config: serde_json::Value) -> napi::Result<serde_
     let json =
         serde_json::to_value(&result).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))?;
     // Convert result keys to camelCase for JS convention
+    Ok(tree_sitter_language_pack::json_utils::snake_to_camel(json))
+}
+
+// ---------------------------------------------------------------------------
+// Extraction API
+// ---------------------------------------------------------------------------
+
+/// Extract patterns from source code using an extraction config.
+///
+/// The config object should have: "language" (string), "patterns" (object of pattern configs).
+/// Each pattern config has: "query" (string), optional "captureOutput"/"capture_output" (string),
+/// optional "childFields"/"child_fields" (string[]), optional "maxResults"/"max_results" (number),
+/// optional "byteRange"/"byte_range" ([number, number]).
+///
+/// Accepts both camelCase and snake_case config keys.
+/// Returns camelCase keys in the result for JavaScript convention.
+#[napi(js_name = "extract")]
+pub fn extract(source: String, config: serde_json::Value) -> napi::Result<serde_json::Value> {
+    let normalized = tree_sitter_language_pack::json_utils::camel_to_snake(config);
+    let extraction_config: tree_sitter_language_pack::ExtractionConfig =
+        serde_json::from_value(normalized).map_err(|e| napi::Error::from_reason(format!("invalid config: {e}")))?;
+    let result = tree_sitter_language_pack::extract_patterns(&source, &extraction_config)
+        .map_err(|e| napi::Error::from_reason(format!("{e}")))?;
+    let json =
+        serde_json::to_value(&result).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))?;
+    Ok(tree_sitter_language_pack::json_utils::snake_to_camel(json))
+}
+
+/// Validate extraction patterns without running them.
+///
+/// Accepts the same config shape as `extract`.
+/// Returns validation details per pattern.
+#[napi(js_name = "validateExtraction")]
+pub fn validate_extraction(config: serde_json::Value) -> napi::Result<serde_json::Value> {
+    let normalized = tree_sitter_language_pack::json_utils::camel_to_snake(config);
+    let extraction_config: tree_sitter_language_pack::ExtractionConfig =
+        serde_json::from_value(normalized).map_err(|e| napi::Error::from_reason(format!("invalid config: {e}")))?;
+    let result = tree_sitter_language_pack::validate_extraction(&extraction_config)
+        .map_err(|e| napi::Error::from_reason(format!("{e}")))?;
+    let json =
+        serde_json::to_value(&result).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))?;
     Ok(tree_sitter_language_pack::json_utils::snake_to_camel(json))
 }
 

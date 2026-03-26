@@ -8,6 +8,7 @@ use crate::Error;
 /// This is an owned type that can be passed across FFI boundaries, unlike
 /// `tree_sitter::Node` which borrows from the tree.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct NodeInfo {
     /// The grammar type name (e.g., "function_definition", "identifier").
     pub kind: Cow<'static, str>,

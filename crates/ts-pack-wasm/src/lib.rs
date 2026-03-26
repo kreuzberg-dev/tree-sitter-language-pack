@@ -195,6 +195,62 @@ pub fn process(source: &str, config: JsValue) -> Result<JsValue, JsValue> {
 }
 
 // ---------------------------------------------------------------------------
+// Extraction API
+// ---------------------------------------------------------------------------
+
+/// Extract patterns from source code using a JavaScript config object.
+///
+/// `config` is a JS object with fields:
+/// - `language` (string, required): the language name
+/// - `patterns` (object, required): named patterns to extract
+///
+/// Returns a JavaScript object with the extraction results.
+#[wasm_bindgen(js_name = "extract")]
+pub fn extract(source: &str, config: JsValue) -> Result<JsValue, JsValue> {
+    let config_json: serde_json::Value = js_sys::JSON::stringify(&config)
+        .map_err(|e| JsValue::from_str(&format!("failed to stringify config: {e:?}")))?
+        .as_string()
+        .ok_or_else(|| JsValue::from_str("config stringify returned non-string"))
+        .and_then(|s| {
+            serde_json::from_str(&s).map_err(|e| JsValue::from_str(&format!("failed to parse config JSON: {e}")))
+        })?;
+
+    let extraction_config: tree_sitter_language_pack::ExtractionConfig =
+        serde_json::from_value(config_json).map_err(|e| JsValue::from_str(&format!("invalid config: {e}")))?;
+
+    let result = tree_sitter_language_pack::extract_patterns(source, &extraction_config)
+        .map_err(|e| JsValue::from_str(&format!("{e}")))?;
+    let json_str =
+        serde_json::to_string(&result).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
+    js_sys::JSON::parse(&json_str)
+}
+
+/// Validate extraction patterns without running them.
+///
+/// `config` is a JS object with the same shape as for `extract`.
+///
+/// Returns a JavaScript object with validation results.
+#[wasm_bindgen(js_name = "validateExtraction")]
+pub fn validate_extraction(config: JsValue) -> Result<JsValue, JsValue> {
+    let config_json: serde_json::Value = js_sys::JSON::stringify(&config)
+        .map_err(|e| JsValue::from_str(&format!("failed to stringify config: {e:?}")))?
+        .as_string()
+        .ok_or_else(|| JsValue::from_str("config stringify returned non-string"))
+        .and_then(|s| {
+            serde_json::from_str(&s).map_err(|e| JsValue::from_str(&format!("failed to parse config JSON: {e}")))
+        })?;
+
+    let extraction_config: tree_sitter_language_pack::ExtractionConfig =
+        serde_json::from_value(config_json).map_err(|e| JsValue::from_str(&format!("invalid config: {e}")))?;
+
+    let result = tree_sitter_language_pack::validate_extraction(&extraction_config)
+        .map_err(|e| JsValue::from_str(&format!("{e}")))?;
+    let json_str =
+        serde_json::to_string(&result).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
+    js_sys::JSON::parse(&json_str)
+}
+
+// ---------------------------------------------------------------------------
 // Download/configure API (not supported in WASM)
 // ---------------------------------------------------------------------------
 

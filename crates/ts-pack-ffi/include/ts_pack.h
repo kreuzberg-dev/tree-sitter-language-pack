@@ -316,6 +316,42 @@ char *ts_pack_process(const struct TsPackRegistry *registry,
                       const char *config_json);
 
 /**
+ * Extract patterns from source code using a JSON extraction config.
+ *
+ * `source` is a pointer to the source code bytes (not necessarily null-terminated).
+ * `source_len` is the number of bytes in the source buffer.
+ * `config_json` is a null-terminated JSON string with fields:
+ * - `language` (string, required): the language name
+ * - `patterns` (object, required): named patterns to extract
+ *
+ * Returns a newly-allocated JSON C string with the extraction results.
+ * The caller must free the returned pointer with `ts_pack_free_string`.
+ * Returns null on error (check `ts_pack_last_error`).
+ *
+ * # Safety
+ *
+ * `source` must be a valid pointer to `source_len` bytes.
+ * `config_json` must be a valid null-terminated UTF-8 C string.
+ */
+char *ts_pack_extract(const char *source, uintptr_t source_len, const char *config_json);
+
+/**
+ * Validate extraction patterns without running them.
+ *
+ * `config_json` is a null-terminated JSON string with the same shape as for
+ * `ts_pack_extract` (language + patterns).
+ *
+ * Returns a newly-allocated JSON C string with validation results.
+ * The caller must free the returned pointer with `ts_pack_free_string`.
+ * Returns null on error (check `ts_pack_last_error`).
+ *
+ * # Safety
+ *
+ * `config_json` must be a valid null-terminated UTF-8 C string.
+ */
+char *ts_pack_validate_extraction(const char *config_json);
+
+/**
  * Initialize the language pack with configuration.
  *
  * `config_json` is a null-terminated JSON string with optional fields:

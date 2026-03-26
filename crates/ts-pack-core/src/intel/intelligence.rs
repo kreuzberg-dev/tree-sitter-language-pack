@@ -14,6 +14,7 @@ pub fn extract_intelligence(source: &str, language: &str, tree: &tree_sitter::Tr
         symbols: extract_symbols(&root, source, language),
         diagnostics: extract_diagnostics(&root, source),
         chunks: Vec::new(),
+        extractions: ahash::AHashMap::new(),
     }
 }
 

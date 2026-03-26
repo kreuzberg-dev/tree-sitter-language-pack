@@ -250,4 +250,40 @@ fn process<'a>(env: Env<'a>, source: String, config_json: String) -> NifResult<T
     Ok(json_to_term(env, &value))
 }
 
+/// Extract patterns from source code using a JSON configuration.
+///
+/// The config JSON must contain:
+/// - `language` (string): the language name
+/// - `patterns` (object): named patterns to run, each with a `query` field
+///
+/// Returns an Elixir map with extraction results.
+#[rustler::nif]
+fn extract<'a>(env: Env<'a>, source: String, config_json: String) -> NifResult<Term<'a>> {
+    let config: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("invalid config JSON: {e}")))))?;
+    let result = tree_sitter_language_pack::extract_patterns(&source, &config)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
+    let value = serde_json::to_value(&result)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("serialization failed: {e}")))))?;
+    Ok(json_to_term(env, &value))
+}
+
+/// Validate extraction patterns without running them.
+///
+/// The config JSON must contain:
+/// - `language` (string): the language name
+/// - `patterns` (object): named patterns to validate
+///
+/// Returns an Elixir map with validation results.
+#[rustler::nif]
+fn validate_extraction<'a>(env: Env<'a>, config_json: String) -> NifResult<Term<'a>> {
+    let config: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("invalid config JSON: {e}")))))?;
+    let result = tree_sitter_language_pack::validate_extraction(&config)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
+    let value = serde_json::to_value(&result)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("serialization failed: {e}")))))?;
+    Ok(json_to_term(env, &value))
+}
+
 rustler::init!("Elixir.TreeSitterLanguagePack");

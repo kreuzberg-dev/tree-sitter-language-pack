@@ -838,6 +838,159 @@ pub unsafe extern "C" fn ts_pack_process(
 }
 
 // ---------------------------------------------------------------------------
+// Extraction API
+// ---------------------------------------------------------------------------
+
+/// Extract patterns from source code using a JSON extraction config.
+///
+/// `source` is a pointer to the source code bytes (not necessarily null-terminated).
+/// `source_len` is the number of bytes in the source buffer.
+/// `config_json` is a null-terminated JSON string with fields:
+/// - `language` (string, required): the language name
+/// - `patterns` (object, required): named patterns to extract
+///
+/// Returns a newly-allocated JSON C string with the extraction results.
+/// The caller must free the returned pointer with `ts_pack_free_string`.
+/// Returns null on error (check `ts_pack_last_error`).
+///
+/// # Safety
+///
+/// `source` must be a valid pointer to `source_len` bytes.
+/// `config_json` must be a valid null-terminated UTF-8 C string.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_extract(
+    source: *const c_char,
+    source_len: usize,
+    config_json: *const c_char,
+) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if source.is_null() {
+            set_last_error("source pointer is null");
+            return ptr::null_mut();
+        }
+        if config_json.is_null() {
+            set_last_error("config_json pointer is null");
+            return ptr::null_mut();
+        }
+        // SAFETY: caller guarantees valid null-terminated string; null check above
+        let config_str = match unsafe { CStr::from_ptr(config_json) }.to_str() {
+            Ok(s) => s,
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in config_json: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        let config: serde_json::Value = match serde_json::from_str(config_str) {
+            Ok(v) => v,
+            Err(e) => {
+                set_last_error(&format!("invalid JSON in config: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        let extraction_config: tree_sitter_language_pack::ExtractionConfig = match serde_json::from_value(config) {
+            Ok(c) => c,
+            Err(e) => {
+                set_last_error(&format!("invalid config: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        // SAFETY: caller guarantees valid buffer with correct length
+        let source_bytes = unsafe { std::slice::from_raw_parts(source as *const u8, source_len) };
+        let source_str = match std::str::from_utf8(source_bytes) {
+            Ok(s) => s,
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in source: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        match tree_sitter_language_pack::extract_patterns(source_str, &extraction_config) {
+            Ok(result) => match serde_json::to_string(&result) {
+                Ok(json) => match CString::new(json) {
+                    Ok(c) => CString::into_raw(c),
+                    Err(e) => {
+                        set_last_error(&format!("null byte in JSON: {e}"));
+                        ptr::null_mut()
+                    }
+                },
+                Err(e) => {
+                    set_last_error(&format!("serialization failed: {e}"));
+                    ptr::null_mut()
+                }
+            },
+            Err(e) => {
+                set_last_error(&e.to_string());
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
+/// Validate extraction patterns without running them.
+///
+/// `config_json` is a null-terminated JSON string with the same shape as for
+/// `ts_pack_extract` (language + patterns).
+///
+/// Returns a newly-allocated JSON C string with validation results.
+/// The caller must free the returned pointer with `ts_pack_free_string`.
+/// Returns null on error (check `ts_pack_last_error`).
+///
+/// # Safety
+///
+/// `config_json` must be a valid null-terminated UTF-8 C string.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_validate_extraction(config_json: *const c_char) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if config_json.is_null() {
+            set_last_error("config_json pointer is null");
+            return ptr::null_mut();
+        }
+        // SAFETY: caller guarantees valid null-terminated string; null check above
+        let config_str = match unsafe { CStr::from_ptr(config_json) }.to_str() {
+            Ok(s) => s,
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in config_json: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        let config: serde_json::Value = match serde_json::from_str(config_str) {
+            Ok(v) => v,
+            Err(e) => {
+                set_last_error(&format!("invalid JSON in config: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        let extraction_config: tree_sitter_language_pack::ExtractionConfig = match serde_json::from_value(config) {
+            Ok(c) => c,
+            Err(e) => {
+                set_last_error(&format!("invalid config: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        match tree_sitter_language_pack::validate_extraction(&extraction_config) {
+            Ok(result) => match serde_json::to_string(&result) {
+                Ok(json) => match CString::new(json) {
+                    Ok(c) => CString::into_raw(c),
+                    Err(e) => {
+                        set_last_error(&format!("null byte in JSON: {e}"));
+                        ptr::null_mut()
+                    }
+                },
+                Err(e) => {
+                    set_last_error(&format!("serialization failed: {e}"));
+                    ptr::null_mut()
+                }
+            },
+            Err(e) => {
+                set_last_error(&e.to_string());
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
+// ---------------------------------------------------------------------------
 // Download API
 // ---------------------------------------------------------------------------
 

@@ -58,6 +58,12 @@ pub fn run_query(
     let mut cursor = tree_sitter::QueryCursor::new();
     let mut matches = cursor.matches(&query, tree.root_node(), source);
 
+    // Tree-sitter 0.26+ evaluates standard text predicates (`#eq?`, `#not-eq?`,
+    // `#match?`, `#not-match?`, `#any-of?`, `#not-any-of?`) internally via
+    // `satisfies_text_predicates()` during `QueryCursor::matches()` iteration.
+    // The `general_predicates()` method only returns predicates with operators
+    // that tree-sitter does NOT recognize (i.e., custom predicates). Since we
+    // don't define any custom predicates, no additional filtering is needed.
     let mut results = Vec::new();
     while let Some(m) = matches.next() {
         let captures = m

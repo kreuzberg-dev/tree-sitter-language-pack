@@ -115,6 +115,14 @@ tasks:
       - cargo upgrade --incompatible --manifest-path e2e/rust/Cargo.toml
       - cargo update --manifest-path e2e/rust/Cargo.toml
 
+  bench:
+    desc: Run criterion benchmarks
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LINK_MODE: "{{.LINK_MODE}}"
+    cmds:
+      - cargo bench -p tree-sitter-language-pack
+
   e2e:generate:
     desc: Generate and format Rust E2E tests from fixtures
     env:

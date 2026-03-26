@@ -33,6 +33,7 @@
 
 pub mod error;
 pub mod extensions;
+pub mod extract;
 pub mod intel;
 #[cfg(feature = "serde")]
 pub mod json_utils;
@@ -57,6 +58,10 @@ pub use error::Error;
 pub use extensions::extension_ambiguity_json;
 pub use extensions::{
     detect_language_from_content, detect_language_from_extension, detect_language_from_path, extension_ambiguity,
+};
+pub use extract::{
+    CaptureOutput, CaptureResult, CompiledExtraction, ExtractionConfig, ExtractionPattern, ExtractionResult,
+    MatchResult, PatternResult, PatternValidation, ValidationResult,
 };
 pub use intel::types::{
     ChunkContext, CodeChunk, CommentInfo, CommentKind, Diagnostic, DiagnosticSeverity, DocSection, DocstringFormat,
@@ -238,6 +243,47 @@ pub fn process(source: &str, config: &ProcessConfig) -> Result<ProcessResult, Er
     ensure_cache_registered()?;
 
     REGISTRY.process(source, config)
+}
+
+/// Run extraction patterns against source code.
+///
+/// Convenience wrapper around [`extract::extract`].
+///
+/// # Errors
+///
+/// Returns an error if the language is not found, parsing fails, or a query
+/// pattern is invalid.
+///
+/// # Example
+///
+/// ```no_run
+/// use ahash::AHashMap;
+/// use tree_sitter_language_pack::{ExtractionConfig, ExtractionPattern, CaptureOutput, extract_patterns};
+///
+/// let mut patterns = AHashMap::new();
+/// patterns.insert("fns".to_string(), ExtractionPattern {
+///     query: "(function_definition name: (identifier) @fn_name)".to_string(),
+///     capture_output: CaptureOutput::default(),
+///     child_fields: Vec::new(),
+///     max_results: None,
+///     byte_range: None,
+/// });
+/// let config = ExtractionConfig { language: "python".to_string(), patterns };
+/// let result = extract_patterns("def hello(): pass", &config).unwrap();
+/// ```
+pub fn extract_patterns(source: &str, config: &ExtractionConfig) -> Result<ExtractionResult, Error> {
+    extract::extract(source, config)
+}
+
+/// Validate extraction patterns without running them.
+///
+/// Convenience wrapper around [`extract::validate_extraction`].
+///
+/// # Errors
+///
+/// Returns an error if the language cannot be loaded.
+pub fn validate_extraction(config: &ExtractionConfig) -> Result<ValidationResult, Error> {
+    extract::validate_extraction(config)
 }
 
 // ──────────────────────────────────────────────────────────────────────────────

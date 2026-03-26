@@ -100,6 +100,42 @@ fn process(ruby: &Ruby, source: String, config_json: String) -> Result<String, E
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))
 }
 
+/// Extract patterns from source code using a JSON configuration.
+///
+/// The config JSON must contain:
+/// - `language` (string): the language name
+/// - `patterns` (object): named patterns to run, each with a `query` field
+///
+/// Returns a JSON string with extraction results.
+fn extract(ruby: &Ruby, source: String, config_json: String) -> Result<String, Error> {
+    let config: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("invalid config JSON: {e}")))?;
+
+    let result = tree_sitter_language_pack::extract_patterns(&source, &config)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
+
+    serde_json::to_string(&result)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))
+}
+
+/// Validate extraction patterns without running them.
+///
+/// The config JSON must contain:
+/// - `language` (string): the language name
+/// - `patterns` (object): named patterns to validate
+///
+/// Returns a JSON string with validation results.
+fn validate_extraction(ruby: &Ruby, config_json: String) -> Result<String, Error> {
+    let config: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("invalid config JSON: {e}")))?;
+
+    let result = tree_sitter_language_pack::validate_extraction(&config)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
+
+    serde_json::to_string(&result)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))
+}
+
 /// Initialize the language pack with configuration.
 ///
 /// Accepts a JSON string with optional fields:
@@ -187,6 +223,8 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_module_function("get_language_ptr", function!(get_language_ptr, 1))?;
     module.define_module_function("parse_string", function!(parse_string, 2))?;
     module.define_module_function("process", function!(process, 2))?;
+    module.define_module_function("extract", function!(extract, 2))?;
+    module.define_module_function("validate_extraction", function!(validate_extraction, 1))?;
 
     // Download API functions
     module.define_module_function("init", function!(rb_init, 1))?;
