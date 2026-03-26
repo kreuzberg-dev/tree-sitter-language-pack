@@ -1080,8 +1080,10 @@ jobs:
           fi
 
           mkdir -p dist/elixir
-          ARTIFACT_NAME="libts_pack_elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
-          TARBALL="${ARTIFACT_NAME}.tar.gz"
+          # Underscore name (matches Cargo output)
+          ARTIFACT_UNDERSCORE="libts_pack_elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
+          # Hyphen name (matches what RustlerPrecompiled expects from crate: "ts-pack-elixir")
+          ARTIFACT_HYPHEN="libts-pack-elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
 
           # ts-pack-elixir is a standalone workspace, output is in crates/ts-pack-elixir/target/
           LIB_PATH="crates/ts-pack-elixir/target/${TARGET}/release/${LIB_NAME}"
@@ -1101,9 +1103,14 @@ jobs:
             exit 1
           fi
 
-          cp "$LIB_PATH" "${ARTIFACT_NAME}"
-          tar -czf "dist/elixir/${TARBALL}" "${ARTIFACT_NAME}"
-          echo "Created: dist/elixir/${TARBALL}"
+          # Create both underscore and hyphen tarballs
+          cp "$LIB_PATH" "${ARTIFACT_UNDERSCORE}"
+          tar -czf "dist/elixir/${ARTIFACT_UNDERSCORE}.tar.gz" "${ARTIFACT_UNDERSCORE}"
+          echo "Created: dist/elixir/${ARTIFACT_UNDERSCORE}.tar.gz"
+
+          cp "$LIB_PATH" "${ARTIFACT_HYPHEN}"
+          tar -czf "dist/elixir/${ARTIFACT_HYPHEN}.tar.gz" "${ARTIFACT_HYPHEN}"
+          echo "Created: dist/elixir/${ARTIFACT_HYPHEN}.tar.gz"
 
       - name: Package NIF libraries (NIF 2.17)
         shell: bash
@@ -1120,8 +1127,8 @@ jobs:
             LIB_NAME="libts_pack_elixir.so"
           fi
 
-          ARTIFACT_NAME="libts_pack_elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
-          TARBALL="${ARTIFACT_NAME}.tar.gz"
+          ARTIFACT_UNDERSCORE="libts_pack_elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
+          ARTIFACT_HYPHEN="libts-pack-elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
 
           # ts-pack-elixir is a standalone workspace, output is in crates/ts-pack-elixir/target/
           LIB_PATH="crates/ts-pack-elixir/target/${TARGET}/release/${LIB_NAME}"
@@ -1141,7 +1148,11 @@ jobs:
             exit 1
           fi
 
-          cp "$LIB_PATH" "${ARTIFACT_NAME}"
+          cp "$LIB_PATH" "${ARTIFACT_UNDERSCORE}"
+          tar -czf "dist/elixir/${ARTIFACT_UNDERSCORE}.tar.gz" "${ARTIFACT_UNDERSCORE}"
+          echo "Created: dist/elixir/${ARTIFACT_UNDERSCORE}.tar.gz"
+
+          cp "$LIB_PATH" "${ARTIFACT_HYPHEN}"
           tar -czf "dist/elixir/${TARBALL}" "${ARTIFACT_NAME}"
           echo "Created: dist/elixir/${TARBALL}"
 

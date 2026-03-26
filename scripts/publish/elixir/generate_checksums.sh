@@ -40,39 +40,43 @@ CHECKSUMS=()
 
 for TARGET in "${TARGETS[@]}"; do
   for NIF_VERSION in "${NIF_VERSIONS[@]}"; do
-    FILENAME="libts_pack_elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.so.tar.gz"
-    URL="https://github.com/${REPO}/releases/download/v${VERSION}/${FILENAME}"
+    # Upload both underscore and hyphen variants; RustlerPrecompiled uses hyphens
+    # (from crate: "ts-pack-elixir"), Cargo output uses underscores.
+    for PREFIX in "libts_pack_elixir" "libts-pack-elixir"; do
+      FILENAME="${PREFIX}-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.so.tar.gz"
+      URL="https://github.com/${REPO}/releases/download/v${VERSION}/${FILENAME}"
 
-    echo "Downloading: $FILENAME"
-    echo "  URL: $URL"
+      echo "Downloading: $FILENAME"
+      echo "  URL: $URL"
 
-    # Retry with backoff -- assets may not be immediately available after upload
-    DOWNLOADED=false
-    for ATTEMPT in 1 2 3 4 5 6 7 8 9 10; do
-      if curl "${CURL_OPTS[@]}" -o "${TMPDIR}/${FILENAME}" "$URL"; then
-        DOWNLOADED=true
-        break
-      fi
-      echo "  Attempt $ATTEMPT failed, waiting 15s..."
-      sleep 15
-    done
+      # Retry with backoff -- assets may not be immediately available after upload
+      DOWNLOADED=false
+      for ATTEMPT in 1 2 3 4 5 6 7 8 9 10; do
+        if curl "${CURL_OPTS[@]}" -o "${TMPDIR}/${FILENAME}" "$URL"; then
+          DOWNLOADED=true
+          break
+        fi
+        echo "  Attempt $ATTEMPT failed, waiting 15s..."
+        sleep 15
+      done
 
-    if $DOWNLOADED; then
-      if command -v sha256sum &>/dev/null; then
-        CHECKSUM=$(sha256sum "${TMPDIR}/${FILENAME}" | cut -d' ' -f1)
-      elif command -v shasum &>/dev/null; then
-        CHECKSUM=$(shasum -a 256 "${TMPDIR}/${FILENAME}" | cut -d' ' -f1)
+      if $DOWNLOADED; then
+        if command -v sha256sum &>/dev/null; then
+          CHECKSUM=$(sha256sum "${TMPDIR}/${FILENAME}" | cut -d' ' -f1)
+        elif command -v shasum &>/dev/null; then
+          CHECKSUM=$(shasum -a 256 "${TMPDIR}/${FILENAME}" | cut -d' ' -f1)
+        else
+          echo "ERROR: No sha256sum or shasum command found"
+          exit 1
+        fi
+
+        echo "  Checksum: sha256:${CHECKSUM}"
+        CHECKSUMS+=("  \"${FILENAME}\" => \"sha256:${CHECKSUM}\",")
       else
-        echo "ERROR: No sha256sum or shasum command found"
+        echo "  ERROR: Failed to download $FILENAME"
         exit 1
       fi
-
-      echo "  Checksum: sha256:${CHECKSUM}"
-      CHECKSUMS+=("  \"${FILENAME}\" => \"sha256:${CHECKSUM}\",")
-    else
-      echo "  ERROR: Failed to download $FILENAME"
-      exit 1
-    fi
+    done
   done
 done
 
