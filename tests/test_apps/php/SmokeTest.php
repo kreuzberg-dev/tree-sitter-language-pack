@@ -15,14 +15,14 @@ final class SmokeTest extends TestCase
 {
     protected function setUp(): void
     {
-        if (!extension_loaded('ts_pack_php')) {
+        if (!extension_loaded('ts-pack-php')) {
             $this->markTestSkipped('Extension ts_pack_php is not loaded');
         }
     }
 
     public function testExtensionIsLoaded(): void
     {
-        $this->assertTrue(extension_loaded('ts_pack_php'), 'Extension ts_pack_php should be loaded');
+        $this->assertTrue(extension_loaded('ts-pack-php'), 'Extension ts_pack_php should be loaded');
     }
 
     public function testVersionReturnsNonEmptyString(): void

@@ -55,8 +55,7 @@ tasks:
     desc: Run Go test_app smoke test
     dir: tests/test_apps/go
     cmds:
-      - go test -tags tspack_dev -v -run TestBasicFixtures
-      - go test -tags tspack_dev -v -run TestParseValidation
+      - go test -tags tspack_dev -v -run "TestBasicFixtures|TestParseValidation|TestErrorHandling|TestDownloadAPI"
 
   smoke:java:
     desc: Run Java test_app smoke test
@@ -82,7 +81,7 @@ tasks:
     dir: tests/test_apps/php
     cmds:
       - composer install
-      - vendor/bin/phpunit SmokeTest.php
+      - php -d "extension={{.PROJECT_ROOT}}/target/release/libts_pack_php.dylib" vendor/bin/phpunit SmokeTest.php
 
   smoke:csharp:
     desc: Run C# test_app smoke test
