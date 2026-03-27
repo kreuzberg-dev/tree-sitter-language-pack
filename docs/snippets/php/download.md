@@ -1,9 +1,8 @@
 ```php title="PHP"
 <?php
-use TreeSitterLanguagePack\LanguagePack;
+\ts_pack_init('{"languages":["php","javascript"]}');
+\ts_pack_download(["python", "rust"]);
 
-LanguagePack::init(json_encode(['languages' => ['php', 'javascript']]));
-LanguagePack::download(['python', 'rust']);
-
-print_r(LanguagePack::downloadedLanguages());
+$cached = \ts_pack_downloaded_languages();
+print_r($cached);
 ```

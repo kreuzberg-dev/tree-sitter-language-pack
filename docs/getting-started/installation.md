@@ -244,9 +244,7 @@ Requires PHP 8.2+.
 
 ```php
 <?php
-use Kreuzberg\TreeSitterLanguagePack;
-
-echo TreeSitterLanguagePack::languageCount(); // 248
+echo \ts_pack_language_count(); // 248
 ```
 
 ## WebAssembly

@@ -61,12 +61,12 @@ Java bindings for tree-sitter-language-pack with on-demand parser downloads (JDK
 <dependency>
   <groupId>dev.kreuzberg</groupId>
   <artifactId>tree-sitter-language-pack</artifactId>
-  <version>1.3.2</version>
+  <version>1.3.3</version>
 </dependency>
 ```
 
 ```groovy
-implementation("dev.kreuzberg:tree-sitter-language-pack:1.3.2")
+implementation("dev.kreuzberg:tree-sitter-language-pack:1.3.3")
 ```
 
 ## Quick Start

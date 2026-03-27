@@ -1,10 +1,9 @@
 ```php title="PHP"
 <?php
-use TreeSitterLanguagePack\LanguagePack;
-
-$result = LanguagePack::process(
+$resultJson = \ts_pack_process(
     '<?php namespace App; class Controller { public function index() {} }',
-    json_encode(['language' => 'php', 'structure' => true, 'imports' => true])
+    '{"language":"php","structure":true,"imports":true}'
 );
-echo $result;
+$result = json_decode($resultJson, true);
+print_r($result);
 ```

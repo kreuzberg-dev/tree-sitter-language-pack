@@ -3,16 +3,21 @@ package main
 
 import (
     "fmt"
+    "log"
     tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
 )
 
 func main() {
     registry, _ := tslp.NewRegistry()
-    defer registry.Free()
+    defer registry.Close()
 
     tree, _ := registry.ParseString("go", "package main\nfunc hello() {}")
-    defer tree.Free()
+    defer tree.Close()
 
-    fmt.Println("Root:", tree.RootNodeType())
+    rootType, err := tree.RootNodeType()
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Println("Root:", rootType)
 }
 ```

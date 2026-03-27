@@ -5,5 +5,12 @@ result = TreeSitterLanguagePack.process(
   "require 'json'\ndef parse(data)\n  JSON.parse(data)\nend",
   '{"language": "ruby", "structure": true, "imports": true}'
 )
-puts result
+
+result["structure"].each do |item|
+  puts "#{item['kind']}: #{item['name']}"
+end
+
+result["imports"].each do |imp|
+  puts "import: #{imp}"
+end
 ```

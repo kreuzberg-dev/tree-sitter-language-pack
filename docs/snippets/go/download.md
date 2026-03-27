@@ -9,6 +9,7 @@ import (
 func main() {
     tslp.Init(`{"languages": ["go", "python"]}`)
     tslp.Download([]string{"rust", "javascript"})
-    fmt.Println(tslp.DownloadedLanguages())
+    languages, _ := tslp.DownloadedLanguages()
+    fmt.Println(languages)
 }
 ```

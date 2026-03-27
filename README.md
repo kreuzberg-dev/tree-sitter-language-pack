@@ -129,12 +129,12 @@ See [Go README](packages/go/v1/README.md) for full documentation.
 <dependency>
   <groupId>dev.kreuzberg</groupId>
   <artifactId>tree-sitter-language-pack</artifactId>
-  <version>1.3.2</version>
+  <version>1.3.3</version>
 </dependency>
 ```
 
 ```groovy
-implementation("dev.kreuzberg:tree-sitter-language-pack:1.3.2")
+implementation("dev.kreuzberg:tree-sitter-language-pack:1.3.3")
 ```
 
 See [Java README](crates/ts-pack-java/README.md) for full documentation.

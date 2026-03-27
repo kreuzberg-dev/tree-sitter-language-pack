@@ -8,12 +8,19 @@ import (
 
 func main() {
     registry, _ := tslp.NewRegistry()
-    defer registry.Free()
+    defer registry.Close()
 
+    config := tslp.ProcessConfig{
+        Language:  "go",
+        Structure: true,
+        Imports:   true,
+    }
     result, _ := registry.Process(
         "package main\nimport \"fmt\"\nfunc hello() { fmt.Println(\"hi\") }",
-        `{"language": "go", "structure": true, "imports": true}`,
+        config,
     )
-    fmt.Println(result)
+    fmt.Println("Language:", result.Language)
+    fmt.Println("Structure:", result.Structure)
+    fmt.Println("Metrics:", result.Metrics)
 }
 ```

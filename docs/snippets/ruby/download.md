@@ -2,7 +2,7 @@
 require "tree_sitter_language_pack"
 
 TreeSitterLanguagePack.init('{"languages": ["ruby", "python"]}')
-TreeSitterLanguagePack.download(["rust", "javascript"])
+TreeSitterLanguagePack.download('{"languages": ["rust", "javascript"]}')
 
 puts TreeSitterLanguagePack.downloaded_languages
 ```

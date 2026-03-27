@@ -1,9 +1,7 @@
 ```php title="PHP"
 <?php
-use TreeSitterLanguagePack\LanguagePack;
-
-LanguagePack::init(json_encode(['languages' => ['php']]));
-
-$tree = LanguagePack::parseString('php', '<?php function hello() { echo "world"; } ?>');
-echo "Root: " . $tree->rootNodeType() . "\n";
+if (\ts_pack_has_language("php")) {
+    $sexp = \ts_pack_parse_string("php", '<?php function hello() { echo "world"; } ?>');
+    echo "Tree: $sexp\n";
+}
 ```
