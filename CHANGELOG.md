@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-03-27
+
+### Fixed
+
+- `C_SYMBOL_OVERRIDES` table now includes ALL languages from `language_definitions.json`, not just compiled ones — fixes download and loading of `csharp`, `vb`, `embeddedtemplate`, `nushell` from PyPI/npm/RubyGems packages
+- `downloaded_languages()` returns canonical names (`csharp`) instead of c_symbol names (`c_sharp`)
+- Elixir NIF publish: upload both hyphen and underscore artifact names so RustlerPrecompiled can find them
+- Elixir NIF 2.17 packaging: fix stale variable names from dual-name refactor
+- Ruby comprehensive test: remove `JSON.parse` on native Hash return from `process()`
+- Go comprehensive test: access flat `ProcessResult` fields directly (no `metadata` wrapper)
+- Homebrew bottle and PHP PIE packages now included in release artifacts
+
+### Changed
+
+- Dependency updates across all language ecosystems
+- `rustler_precompiled` updated to 0.9.0 (Elixir)
+
 ## [1.3.2] - 2026-03-26
 
 ### Fixed

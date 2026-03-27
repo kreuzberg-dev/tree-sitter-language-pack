@@ -481,16 +481,16 @@ fn generate_registry(
     .unwrap();
     writeln!(f).unwrap();
 
-    // C symbol overrides: language name -> C symbol (only for languages where they differ)
+    // C symbol overrides: language name -> C symbol for ALL languages in definitions,
+    // not just compiled ones. The download/runtime path needs these to construct
+    // correct library filenames even for languages that aren't compiled into the binary.
     writeln!(
         f,
         "#[allow(unused)]\npub(crate) static C_SYMBOL_OVERRIDES: &[(&str, &str)] = &["
     )
     .unwrap();
-    for name in static_langs.iter().chain(dynamic_langs.iter()) {
-        if let Some(def) = definitions.get(name.as_str())
-            && let Some(c_sym) = &def.c_symbol
-        {
+    for (name, def) in definitions.iter() {
+        if let Some(c_sym) = &def.c_symbol {
             writeln!(f, "    (\"{name}\", \"{c_sym}\"),").unwrap();
         }
     }

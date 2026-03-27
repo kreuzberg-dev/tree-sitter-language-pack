@@ -33,6 +33,19 @@ pub(crate) fn c_symbol_for(name: &str) -> &str {
     name
 }
 
+/// Reverse lookup: given a c_symbol (e.g. "c_sharp"), return the language name ("csharp").
+/// If no override matches, returns the input as-is.
+#[cfg(any(feature = "dynamic-loading", feature = "download"))]
+#[inline(always)]
+pub(crate) fn lang_name_for_symbol(symbol: &str) -> &str {
+    for &(lang, sym) in C_SYMBOL_OVERRIDES {
+        if sym == symbol {
+            return lang;
+        }
+    }
+    symbol
+}
+
 #[inline(always)]
 fn resolve_alias(name: &str) -> &str {
     for &(alias, target) in LANGUAGE_ALIASES {

@@ -59,23 +59,20 @@ func TestProcessFixtures(t *testing.T) {
 				t.Fatalf("Failed to parse result: %v", err)
 			}
 
-			// Check metadata sub-fields
-			metadata, _ := resultMap["metadata"].(map[string]interface{})
-
 			if lang, ok := fixture.Expected["language"]; ok {
-				if metadata["language"] != lang {
-					t.Errorf("language = %v, expected %v", metadata["language"], lang)
+				if resultMap["language"] != lang {
+					t.Errorf("language = %v, expected %v", resultMap["language"], lang)
 				}
 			}
 			if minVal, ok := fixture.Expected["structure_min"]; ok {
-				structures, _ := metadata["structure"].([]interface{})
+				structures, _ := resultMap["structure"].([]interface{})
 				min := int(minVal.(float64))
 				if len(structures) < min {
 					t.Errorf("structure count %d < min %d", len(structures), min)
 				}
 			}
 			if minVal, ok := fixture.Expected["imports_min"]; ok {
-				imports, _ := metadata["imports"].([]interface{})
+				imports, _ := resultMap["imports"].([]interface{})
 				min := int(minVal.(float64))
 				if len(imports) < min {
 					t.Errorf("imports count %d < min %d", len(imports), min)

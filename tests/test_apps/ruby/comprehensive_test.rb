@@ -10,8 +10,7 @@ RSpec.describe "TreeSitterLanguagePack comprehensive tests" do
     process_fixtures.each do |fixture|
       it fixture["name"] do
         config_json = JSON.generate(fixture["config"])
-        result_json = TreeSitterLanguagePack.process(fixture["source"], config_json)
-        result = JSON.parse(result_json)
+        result = TreeSitterLanguagePack.process(fixture["source"], config_json)
         expected = fixture["expected"]
 
         expect(result["language"]).to eq(expected["language"]) if expected.key?("language")
@@ -34,8 +33,7 @@ RSpec.describe "TreeSitterLanguagePack comprehensive tests" do
     chunking_fixtures.each do |fixture|
       it fixture["name"] do
         config_json = JSON.generate(fixture["config"])
-        result_json = TreeSitterLanguagePack.process(fixture["source"], config_json)
-        result = JSON.parse(result_json)
+        result = TreeSitterLanguagePack.process(fixture["source"], config_json)
         expected = fixture["expected"]
 
         if expected.key?("chunks_min")

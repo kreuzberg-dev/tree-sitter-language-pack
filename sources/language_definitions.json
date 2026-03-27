@@ -680,7 +680,7 @@
 	"kotlin": {
 		"extensions": ["kt", "kts"],
 		"repo": "https://github.com/fwcd/tree-sitter-kotlin",
-		"rev": "802fd920c153b02b9d266369a3ef061622f2bbf0"
+		"rev": "93bfeee1555d2b1442d68c44b0afde2a3b069e46"
 	},
 	"latex": {
 		"branch": "master",
@@ -712,7 +712,7 @@
 	"liquid": {
 		"extensions": ["liquid"],
 		"repo": "https://github.com/hankthetank27/tree-sitter-liquid",
-		"rev": "fa11c7ba45038b61e03a8a00ad667fb5f3d72088"
+		"rev": "9566ca79911052919fce09d26f1f655b5e093857"
 	},
 	"llvm": {
 		"extensions": ["ll"],
@@ -1096,7 +1096,7 @@
 	"scss": {
 		"extensions": ["scss"],
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-scss",
-		"rev": "554fea6db093c5c370ebdfe30c336fc45da91d30"
+		"rev": "2ef6d42e3ad7a8208900f9346f4529806ae0f9f9"
 	},
 	"smali": {
 		"extensions": ["smali"],

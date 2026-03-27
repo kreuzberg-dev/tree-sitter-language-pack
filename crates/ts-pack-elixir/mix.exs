@@ -1,7 +1,7 @@
 defmodule TreeSitterLanguagePack.MixProject do
   use Mix.Project
 
-  @version "1.3.2"
+  @version "1.3.3"
 
   def project do
     [
@@ -46,7 +46,7 @@ defmodule TreeSitterLanguagePack.MixProject do
   defp deps do
     [
       {:rustler, "~> 0.37", optional: true, runtime: false},
-      {:rustler_precompiled, "~> 0.8"},
+      {:rustler_precompiled, "~> 0.9"},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false}
     ]
   end

@@ -91,6 +91,8 @@ impl DownloadManager {
     }
 
     /// Extract language name from a shared library filename.
+    ///
+    /// Reverses the `c_symbol_for` mapping: e.g. `libtree_sitter_c_sharp.dylib` → `"csharp"`.
     fn lang_from_lib_filename(filename: &str) -> Option<String> {
         let name = filename.strip_prefix("lib").unwrap_or(filename);
         let name = name
@@ -100,7 +102,9 @@ impl DownloadManager {
             .strip_suffix(".so")
             .or_else(|| name.strip_suffix(".dylib"))
             .or_else(|| name.strip_suffix(".dll"))?;
-        Some(name.to_string())
+        // Reverse c_symbol mapping: if the stripped name is a c_symbol value,
+        // return the original language name instead.
+        Some(crate::registry::lang_name_for_symbol(name).to_string())
     }
 
     /// Ensure the specified languages are available in the cache.
