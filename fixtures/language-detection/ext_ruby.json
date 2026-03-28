@@ -1,0 +1,10 @@
+{
+	"id": "detect_ext_ruby",
+	"category": "language-detection",
+	"description": "detect_language_from_extension recognizes .rb as ruby",
+	"assertions": {
+		"detect_from_extension": "rb",
+		"detect_result": "ruby"
+	},
+	"tags": ["language-detection", "extension"]
+}

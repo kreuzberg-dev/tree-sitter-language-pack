@@ -299,7 +299,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(ext) = &assertions.detect_from_extension {
                 writeln!(
                     out,
-                    "        var detectResult = TsPackClient.DetectLanguageFromExtension(\"{}\");",
+                    "        var detectResult = TsPackClient.DetectLanguage(\"file.{}\");",
                     escape_csharp_string(ext)
                 )
                 .unwrap();
@@ -320,7 +320,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(path) = &assertions.detect_from_path {
                 writeln!(
                     out,
-                    "        var detectResult = TsPackClient.DetectLanguageFromPath(\"{}\");",
+                    "        var detectResult = TsPackClient.DetectLanguage(\"{}\");",
                     escape_csharp_string(path)
                 )
                 .unwrap();

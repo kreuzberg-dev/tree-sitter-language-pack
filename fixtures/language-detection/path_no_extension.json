@@ -1,0 +1,10 @@
+{
+	"id": "detect_path_no_extension",
+	"category": "language-detection",
+	"description": "detect_language_from_path returns None for extensionless file Makefile",
+	"assertions": {
+		"detect_from_path": "Makefile",
+		"detect_result_none": true
+	},
+	"tags": ["language-detection", "path"]
+}

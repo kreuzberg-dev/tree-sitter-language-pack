@@ -1,0 +1,10 @@
+{
+	"id": "detect_ext_java",
+	"category": "language-detection",
+	"description": "detect_language_from_extension recognizes .java as java",
+	"assertions": {
+		"detect_from_extension": "java",
+		"detect_result": "java"
+	},
+	"tags": ["language-detection", "extension"]
+}

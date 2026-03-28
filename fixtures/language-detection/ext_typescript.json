@@ -1,0 +1,10 @@
+{
+	"id": "detect_ext_typescript",
+	"category": "language-detection",
+	"description": "detect_language_from_extension recognizes .ts as typescript",
+	"assertions": {
+		"detect_from_extension": "ts",
+		"detect_result": "typescript"
+	},
+	"tags": ["language-detection", "extension"]
+}

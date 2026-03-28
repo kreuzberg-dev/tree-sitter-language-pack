@@ -92,7 +92,9 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             .as_ref()
             .is_some_and(|a| a.process_structure_name_contains.is_some() || a.process_imports_contains_source.is_some())
     });
-    let needs_tspack = fixtures.iter().any(|f| has_process_assertions(f));
+    let needs_tspack = fixtures
+        .iter()
+        .any(|f| has_process_assertions(f) || has_detect_assertions(f));
 
     let mut out = String::new();
 
@@ -124,7 +126,12 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
         writeln!(out, "func {fn_name}(t *testing.T) {{").unwrap();
         writeln!(out, "\t// {}", fixture.description).unwrap();
-        writeln!(out, "\treg := newTestRegistry(t)").unwrap();
+
+        // Detect tests use package-level functions, not registry methods
+        let is_detect_only = has_detect_assertions(fixture);
+        if !is_detect_only {
+            writeln!(out, "\treg := newTestRegistry(t)").unwrap();
+        }
 
         // Auto-skip: guard any test that requires a specific language.
         let is_availability_agnostic = assertions.is_some_and(|a| {
@@ -185,42 +192,37 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(ext) = &assertions.detect_from_extension {
                 writeln!(
                     out,
-                    "\tresult := reg.DetectLanguageFromExtension(\"{}\")",
+                    "\tresult := tspack.DetectLanguage(\"file.{}\")",
                     escape_go_string(ext)
                 )
                 .unwrap();
             } else if let Some(path) = &assertions.detect_from_path {
-                writeln!(
-                    out,
-                    "\tresult := reg.DetectLanguageFromPath(\"{}\")",
-                    escape_go_string(path)
-                )
-                .unwrap();
+                writeln!(out, "\tresult := tspack.DetectLanguage(\"{}\")", escape_go_string(path)).unwrap();
             } else if let Some(content) = &assertions.detect_from_content {
                 writeln!(
                     out,
-                    "\tresult := reg.DetectLanguageFromContent(\"{}\")",
+                    "\tresult := tspack.DetectLanguageFromContent(\"{}\")",
                     escape_go_string(content)
                 )
                 .unwrap();
             }
             if assertions.detect_result_none == Some(true) {
-                writeln!(out, "\tif result != nil {{").unwrap();
-                writeln!(out, "\t\tt.Fatalf(\"Expected nil result, got %q\", *result)").unwrap();
+                writeln!(out, "\tif result != \"\" {{").unwrap();
+                writeln!(out, "\t\tt.Fatalf(\"Expected empty result, got %q\", result)").unwrap();
                 writeln!(out, "\t}}").unwrap();
             } else if let Some(expected) = &assertions.detect_result {
-                writeln!(out, "\tif result == nil {{").unwrap();
+                writeln!(out, "\tif result == \"\" {{").unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"Expected %q, got nil\", \"{}\")",
+                    "\t\tt.Fatalf(\"Expected %q, got empty string\", \"{}\")",
                     escape_go_string(expected)
                 )
                 .unwrap();
                 writeln!(out, "\t}}").unwrap();
-                writeln!(out, "\tif *result != \"{}\" {{", escape_go_string(expected)).unwrap();
+                writeln!(out, "\tif result != \"{}\" {{", escape_go_string(expected)).unwrap();
                 writeln!(
                     out,
-                    "\t\tt.Fatalf(\"Expected %q, got %q\", \"{}\", *result)",
+                    "\t\tt.Fatalf(\"Expected %q, got %q\", \"{}\", result)",
                     escape_go_string(expected)
                 )
                 .unwrap();

@@ -135,12 +135,10 @@ fn fixture_needs_has_language(f: &Fixture) -> bool {
         || f.assertions.as_ref().is_some_and(|a| a.language_available.is_some())
 }
 
-fn fixture_needs_detect_from_extension(f: &Fixture) -> bool {
-    f.assertions.as_ref().is_some_and(|a| a.detect_from_extension.is_some())
-}
-
-fn fixture_needs_detect_from_path(f: &Fixture) -> bool {
-    f.assertions.as_ref().is_some_and(|a| a.detect_from_path.is_some())
+fn fixture_needs_detect_language(f: &Fixture) -> bool {
+    f.assertions
+        .as_ref()
+        .is_some_and(|a| a.detect_from_extension.is_some() || a.detect_from_path.is_some())
 }
 
 fn fixture_needs_detect_from_content(f: &Fixture) -> bool {
@@ -172,8 +170,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
     let need_get_parser = needs_import(fixtures, fixture_needs_get_parser);
     let need_get_language = needs_import(fixtures, fixture_needs_get_language);
     let need_available_languages = needs_import(fixtures, fixture_needs_available_languages);
-    let need_detect_from_extension = needs_import(fixtures, fixture_needs_detect_from_extension);
-    let need_detect_from_path = needs_import(fixtures, fixture_needs_detect_from_path);
+    let need_detect_language = needs_import(fixtures, fixture_needs_detect_language);
     let need_detect_from_content = needs_import(fixtures, fixture_needs_detect_from_content);
     let need_extension_ambiguity = needs_import(fixtures, fixture_needs_extension_ambiguity);
     let need_get_highlights_query = needs_import(fixtures, fixture_needs_get_highlights_query);
@@ -212,14 +209,11 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
     if need_available_languages {
         pack_imports.push("available_languages");
     }
+    if need_detect_language {
+        pack_imports.push("detect_language");
+    }
     if need_detect_from_content {
         pack_imports.push("detect_language_from_content");
-    }
-    if need_detect_from_extension {
-        pack_imports.push("detect_language_from_extension");
-    }
-    if need_detect_from_path {
-        pack_imports.push("detect_language_from_path");
     }
     if need_extension_ambiguity {
         pack_imports.push("extension_ambiguity");
@@ -341,17 +335,12 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(ext) = &assertions.detect_from_extension {
                 writeln!(
                     out,
-                    "    result = detect_language_from_extension(\"{}\")",
+                    "    result = detect_language(\"file.{}\")",
                     escape_python_string(ext)
                 )
                 .unwrap();
             } else if let Some(path) = &assertions.detect_from_path {
-                writeln!(
-                    out,
-                    "    result = detect_language_from_path(\"{}\")",
-                    escape_python_string(path)
-                )
-                .unwrap();
+                writeln!(out, "    result = detect_language(\"{}\")", escape_python_string(path)).unwrap();
             } else if let Some(content) = &assertions.detect_from_content {
                 writeln!(
                     out,

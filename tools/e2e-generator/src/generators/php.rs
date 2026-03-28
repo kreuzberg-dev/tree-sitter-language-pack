@@ -347,7 +347,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(ext) = &assertions.detect_from_extension {
                 writeln!(
                     out,
-                    "        $detectResult = \\TreeSitterLanguagePack::detect_language_from_extension('{}');",
+                    "        $detectResult = \\ts_pack_detect_language('file.{}');",
                     escape_php_string(ext)
                 )
                 .unwrap();
@@ -373,7 +373,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(path) = &assertions.detect_from_path {
                 writeln!(
                     out,
-                    "        $detectResult = \\TreeSitterLanguagePack::detect_language_from_path('{}');",
+                    "        $detectResult = \\ts_pack_detect_language('{}');",
                     escape_php_string(path)
                 )
                 .unwrap();
@@ -403,7 +403,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(content) = &assertions.detect_from_content {
                 writeln!(
                     out,
-                    "        $detectResult = \\TreeSitterLanguagePack::detect_language_from_content(\"{}\");",
+                    "        $detectResult = \\ts_pack_detect_language_from_content(\"{}\");",
                     escape_php_source(content)
                 )
                 .unwrap();

@@ -1,0 +1,10 @@
+{
+	"id": "detect_ext_unknown",
+	"category": "language-detection",
+	"description": "detect_language_from_extension returns None for unknown extension .xyz",
+	"assertions": {
+		"detect_from_extension": "xyz",
+		"detect_result_none": true
+	},
+	"tags": ["language-detection", "extension"]
+}

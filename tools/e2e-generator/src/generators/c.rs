@@ -501,7 +501,7 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
         if let Some(ext) = &assertions.detect_from_extension {
             writeln!(
                 out,
-                "    const char *detect_result = ts_pack_detect_language_from_extension(reg, \"{}\");",
+                "    char *detect_result = ts_pack_detect_language(\"file.{}\");",
                 escape_c_string(ext)
             )
             .unwrap();
@@ -524,19 +524,21 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
                     escape_c_string(expected)
                 )
                 .unwrap();
+                writeln!(out, "    ts_pack_free_string(detect_result);").unwrap();
             } else {
                 writeln!(
                     out,
                     "    ASSERT_NOT_NULL(detect_result, \"Expected a language to be detected from extension\");"
                 )
                 .unwrap();
+                writeln!(out, "    ts_pack_free_string(detect_result);").unwrap();
             }
         }
 
         if let Some(path) = &assertions.detect_from_path {
             writeln!(
                 out,
-                "    const char *detect_result = ts_pack_detect_language_from_path(reg, \"{}\");",
+                "    char *detect_result = ts_pack_detect_language(\"{}\");",
                 escape_c_string(path)
             )
             .unwrap();
@@ -559,19 +561,21 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
                     escape_c_string(expected)
                 )
                 .unwrap();
+                writeln!(out, "    ts_pack_free_string(detect_result);").unwrap();
             } else {
                 writeln!(
                     out,
                     "    ASSERT_NOT_NULL(detect_result, \"Expected a language to be detected from path\");"
                 )
                 .unwrap();
+                writeln!(out, "    ts_pack_free_string(detect_result);").unwrap();
             }
         }
 
         if let Some(content) = &assertions.detect_from_content {
             writeln!(
                 out,
-                "    const char *detect_result = ts_pack_detect_language_from_content(reg, \"{}\");",
+                "    char *detect_result = ts_pack_detect_language_from_content(\"{}\");",
                 escape_c_string(content)
             )
             .unwrap();
@@ -594,12 +598,14 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
                     escape_c_string(expected)
                 )
                 .unwrap();
+                writeln!(out, "    ts_pack_free_string(detect_result);").unwrap();
             } else {
                 writeln!(
                     out,
                     "    ASSERT_NOT_NULL(detect_result, \"Expected a language to be detected from content\");"
                 )
                 .unwrap();
+                writeln!(out, "    ts_pack_free_string(detect_result);").unwrap();
             }
         }
 
