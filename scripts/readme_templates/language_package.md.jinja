@@ -82,6 +82,8 @@ Available groups: `all` (default), `web`, `systems`, `scripting`, `data`, `jvm`,
 ### Language Detection
 
 - `detectLanguage(path)` -- detect language from file path
+- `detectLanguageFromExtension(ext)` -- detect language from a bare file extension
+- `detectLanguageFromPath(path)` -- detect language from a file path
 - `detectLanguageFromContent(content)` -- detect language from shebang line
 - `extensionAmbiguity(ext)` -- check if an extension is ambiguous (returns assigned language + alternatives)
 
@@ -114,6 +116,8 @@ Available groups: `all` (default), `web`, `systems`, `scripting`, `data`, `jvm`,
 ### Language Detection
 
 - `DetectLanguage(path)` -- detect language from file path
+- `DetectLanguageFromExtension(ext)` -- detect language from a bare file extension
+- `DetectLanguageFromPath(path)` -- detect language from a file path
 - `DetectLanguageFromContent(content)` -- detect language from shebang line
 - `ExtensionAmbiguity(ext)` -- check if an extension is ambiguous
 
@@ -146,6 +150,8 @@ Available groups: `all` (default), `web`, `systems`, `scripting`, `data`, `jvm`,
 ### Language Detection
 
 - `TsPackClient.DetectLanguage(path)` -- detect language from file path
+- `TsPackClient.DetectLanguageFromExtension(ext)` -- detect language from a bare file extension
+- `TsPackClient.DetectLanguageFromPath(path)` -- detect language from a file path
 - `TsPackClient.DetectLanguageFromContent(content)` -- detect language from shebang line
 - `TsPackClient.ExtensionAmbiguity(ext)` -- check if an extension is ambiguous
 
@@ -178,6 +184,8 @@ Available groups: `all` (default), `web`, `systems`, `scripting`, `data`, `jvm`,
 ### Language Detection
 
 - `ts_pack_detect_language(path)` -- detect language from file path
+- `ts_pack_detect_language_from_extension(ext)` -- detect language from a bare file extension
+- `ts_pack_detect_language_from_path(path)` -- detect language from a file path
 - `ts_pack_detect_language_from_content(content)` -- detect from shebang line
 - `ts_pack_extension_ambiguity(ext)` -- check if an extension is ambiguous (returns JSON)
 
@@ -197,6 +205,47 @@ Available groups: `all` (default), `web`, `systems`, `scripting`, `data`, `jvm`,
 - `ts_pack_get_injections_query(language)` -- get bundled injections.scm query
 - `ts_pack_get_locals_query(language)` -- get bundled locals.scm query
 
+{% elif language == "java" %}
+### Language Discovery
+
+- `registry.availableLanguages()` -- list all supported language names
+- `registry.hasLanguage(name)` -- check if a language is available
+- `registry.languageCount()` -- total number of supported languages
+
+### Language Detection
+
+- `TsPackRegistry.detectLanguage(path)` -- static, detect language from file path
+- `TsPackRegistry.detectLanguageFromExtension(ext)` -- static, detect language from bare extension
+- `TsPackRegistry.detectLanguageFromPath(path)` -- static, detect language from file path
+- `TsPackRegistry.detectLanguageFromContent(content)` -- static, detect language from content/shebang line
+- `TsPackRegistry.extensionAmbiguity(ext)` -- static, check if an extension is ambiguous (returns JSON)
+
+### Parsing
+
+- `registry.parseString(source, language)` -- parse source code into a syntax tree
+- `TsPackTree.toSexp()` -- get S-expression representation of parsed tree
+- `TsPackTree.errorCount()` -- get count of error nodes in parsed tree
+
+### Download API
+
+- `TsPackRegistry.init(configJson)` -- static, pre-download specific languages for offline use
+- `TsPackRegistry.download(languages)` -- static, download parsers on demand
+
+### Intelligence
+
+- `registry.process(source, configJson)` -- extract structured analysis (functions, classes, imports, comments, chunks) from source code
+
+### Extraction Queries
+
+- `TsPackRegistry.extract(source, configJson)` -- static, run extraction queries against source code
+- `TsPackRegistry.validateExtraction(configJson)` -- static, validate extraction patterns without executing
+
+### Syntax Highlighting Queries
+
+- `TsPackRegistry.getHighlightsQuery(language)` -- static, get bundled highlights.scm query for a language
+- `TsPackRegistry.getInjectionsQuery(language)` -- static, get bundled injections.scm query
+- `TsPackRegistry.getLocalsQuery(language)` -- static, get bundled locals.scm query
+
 {% else %}
 ### Language Discovery
 
@@ -207,6 +256,8 @@ Available groups: `all` (default), `web`, `systems`, `scripting`, `data`, `jvm`,
 ### Language Detection
 
 - `detect_language(path)` -- detect language from file path
+- `detect_language_from_extension(ext)` -- detect language from a bare file extension
+- `detect_language_from_path(path)` -- detect language from a file path
 - `detect_language_from_content(content)` -- detect language from shebang line
 - `extension_ambiguity(ext)` -- check if an extension is ambiguous (returns assigned language + alternatives)
 

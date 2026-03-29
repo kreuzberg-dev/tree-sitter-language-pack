@@ -102,8 +102,8 @@ func main() {
 ### Language Detection
 
 - `DetectLanguage(path)` -- detect language from file path
-- `DetectLanguageFromExtension(ext)` -- detect language from bare extension
-- `DetectLanguageFromPath(path)` -- detect language from file path
+- `DetectLanguageFromExtension(ext)` -- detect language from a bare file extension
+- `DetectLanguageFromPath(path)` -- detect language from a file path
 - `DetectLanguageFromContent(content)` -- detect language from shebang line
 - `ExtensionAmbiguity(ext)` -- check if an extension is ambiguous
 

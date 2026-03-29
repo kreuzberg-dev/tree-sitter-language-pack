@@ -95,8 +95,8 @@ int main() {
 ### Language Detection
 
 - `ts_pack_detect_language(path)` -- detect language from file path
-- `ts_pack_detect_language_from_extension(ext)` -- detect language from bare extension
-- `ts_pack_detect_language_from_path(path)` -- detect language from file path
+- `ts_pack_detect_language_from_extension(ext)` -- detect language from a bare file extension
+- `ts_pack_detect_language_from_path(path)` -- detect language from a file path
 - `ts_pack_detect_language_from_content(content)` -- detect from shebang line
 - `ts_pack_extension_ambiguity(ext)` -- check if an extension is ambiguous (returns JSON)
 

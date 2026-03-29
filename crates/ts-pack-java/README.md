@@ -61,12 +61,12 @@ Java bindings for tree-sitter-language-pack with on-demand parser downloads (JDK
 <dependency>
   <groupId>dev.kreuzberg</groupId>
   <artifactId>tree-sitter-language-pack</artifactId>
-  <version>1.3.3</version>
+  <version>1.4.0</version>
 </dependency>
 ```
 
 ```groovy
-implementation("dev.kreuzberg:tree-sitter-language-pack:1.3.3")
+implementation("dev.kreuzberg:tree-sitter-language-pack:1.4.0")
 ```
 
 ## Quick Start
@@ -97,16 +97,16 @@ try (var registry = new TsPackRegistry()) {
 
 ### Language Discovery
 
-- `available_languages()` -- list all supported language names
-- `has_language(name)` -- check if a language is available
-- `language_count()` -- total number of supported languages
+- `registry.availableLanguages()` -- list all supported language names
+- `registry.hasLanguage(name)` -- check if a language is available
+- `registry.languageCount()` -- total number of supported languages
 
 ### Language Detection
 
 - `TsPackRegistry.detectLanguage(path)` -- static, detect language from file path
-- `TsPackRegistry.detectLanguageFromContent(content)` -- static, detect language from content/shebang line
 - `TsPackRegistry.detectLanguageFromExtension(ext)` -- static, detect language from bare extension
 - `TsPackRegistry.detectLanguageFromPath(path)` -- static, detect language from file path
+- `TsPackRegistry.detectLanguageFromContent(content)` -- static, detect language from content/shebang line
 - `TsPackRegistry.extensionAmbiguity(ext)` -- static, check if an extension is ambiguous (returns JSON)
 
 ### Parsing

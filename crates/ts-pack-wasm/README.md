@@ -102,6 +102,8 @@ download(["python", "javascript"]);
 ### Language Detection
 
 - `detect_language(path)` -- detect language from file path
+- `detect_language_from_extension(ext)` -- detect language from a bare file extension
+- `detect_language_from_path(path)` -- detect language from a file path
 - `detect_language_from_content(content)` -- detect language from shebang line
 - `extension_ambiguity(ext)` -- check if an extension is ambiguous (returns assigned language + alternatives)
 

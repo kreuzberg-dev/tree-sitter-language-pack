@@ -103,8 +103,8 @@ console.log('Chunks:', result2.chunks.length);
 ### Language Detection
 
 - `detectLanguage(path)` -- detect language from file path
-- `detectLanguageFromExtension(ext)` -- detect language from bare extension
-- `detectLanguageFromPath(path)` -- detect language from file path
+- `detectLanguageFromExtension(ext)` -- detect language from a bare file extension
+- `detectLanguageFromPath(path)` -- detect language from a file path
 - `detectLanguageFromContent(content)` -- detect language from shebang line
 - `extensionAmbiguity(ext)` -- check if an extension is ambiguous (returns assigned language + alternatives)
 
