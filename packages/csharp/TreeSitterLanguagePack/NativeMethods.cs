@@ -85,6 +85,20 @@ internal static partial class NativeMethods
     internal static extern IntPtr DetectLanguageFromContent(IntPtr content);
 
     /// <summary>
+    /// Detect language name from a bare file extension (without leading dot).
+    /// Returns IntPtr.Zero if not recognized. Caller must free the result with FreeString.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_detect_language_from_extension", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr DetectLanguageFromExtension(IntPtr ext);
+
+    /// <summary>
+    /// Detect language name from a file path based on its extension.
+    /// Returns IntPtr.Zero if not recognized. Caller must free the result with FreeString.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_detect_language_from_path", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr DetectLanguageFromPath(IntPtr path);
+
+    /// <summary>
     /// Returns extension ambiguity information as a JSON C string, or IntPtr.Zero if not ambiguous.
     /// Caller must free the result with FreeString.
     /// </summary>

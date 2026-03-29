@@ -103,28 +103,37 @@ try (var registry = new TsPackRegistry()) {
 
 ### Language Detection
 
-- `detect_language(path)` -- detect language from file path
-- `detect_language_from_content(content)` -- detect language from shebang line
-- `extension_ambiguity(ext)` -- check if an extension is ambiguous (returns assigned language + alternatives)
+- `TsPackRegistry.detectLanguage(path)` -- static, detect language from file path
+- `TsPackRegistry.detectLanguageFromContent(content)` -- static, detect language from content/shebang line
+- `TsPackRegistry.detectLanguageFromExtension(ext)` -- static, detect language from bare extension
+- `TsPackRegistry.detectLanguageFromPath(path)` -- static, detect language from file path
+- `TsPackRegistry.extensionAmbiguity(ext)` -- static, check if an extension is ambiguous (returns JSON)
 
 ### Parsing
 
-- `get_parser(name)` / `parse_string(source, language)` -- parse source code into a syntax tree
+- `registry.parseString(source, language)` -- parse source code into a syntax tree
+- `TsPackTree.toSexp()` -- get S-expression representation of parsed tree
+- `TsPackTree.errorCount()` -- get count of error nodes in parsed tree
 
 ### Download API
 
-- `init(languages)` -- pre-download specific languages for offline use
-- `download(languages)` -- download parsers on demand
+- `TsPackRegistry.init(configJson)` -- static, pre-download specific languages for offline use
+- `TsPackRegistry.download(languages)` -- static, download parsers on demand
 
 ### Intelligence
 
-- `process(source, config)` -- extract structured analysis (functions, classes, imports, comments, chunks) from source code
+- `registry.process(source, configJson)` -- extract structured analysis (functions, classes, imports, comments, chunks) from source code
+
+### Extraction Queries
+
+- `TsPackRegistry.extract(source, configJson)` -- static, run extraction queries against source code
+- `TsPackRegistry.validateExtraction(configJson)` -- static, validate extraction patterns without executing
 
 ### Syntax Highlighting Queries
 
-- `get_highlights_query(language)` -- get bundled highlights.scm query for a language
-- `get_injections_query(language)` -- get bundled injections.scm query
-- `get_locals_query(language)` -- get bundled locals.scm query
+- `TsPackRegistry.getHighlightsQuery(language)` -- static, get bundled highlights.scm query for a language
+- `TsPackRegistry.getInjectionsQuery(language)` -- static, get bundled injections.scm query
+- `TsPackRegistry.getLocalsQuery(language)` -- static, get bundled locals.scm query
 
 For full documentation, see [kreuzberg.dev](https://docs.tree-sitter-language-pack.kreuzberg.dev).
 

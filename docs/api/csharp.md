@@ -123,6 +123,40 @@ Detect language name from file content using shebang-based detection. Returns nu
 
 **Returns:** string?
 
+#### `DetectLanguageFromExtension(string ext): string?`
+
+Detect language name from a bare file extension (without the leading dot). Returns null if not recognized.
+
+**Parameters:**
+
+- `ext` (string): File extension (e.g., `"rs"`, `"py"`)
+
+**Returns:** string?
+
+**Example:**
+
+```csharp
+string? lang = TsPackClient.DetectLanguageFromExtension("rs");
+// lang == "rust"
+```
+
+#### `DetectLanguageFromPath(string path): string?`
+
+Detect language name from a file path. Returns null if not recognized.
+
+**Parameters:**
+
+- `path` (string): File path
+
+**Returns:** string?
+
+**Example:**
+
+```csharp
+string? lang = TsPackClient.DetectLanguageFromPath("/home/user/project/main.py");
+// lang == "python"
+```
+
 #### `ExtensionAmbiguity(string ext): ExtensionAmbiguityResult?`
 
 Return ambiguity information for the given file extension. Returns null if the extension is not ambiguous.

@@ -47,6 +47,12 @@ defmodule E2eTests.LanguageDetectionTest do
     assert detect_result == "javascript", "Expected language 'javascript' detected from extension"
   end
 
+  test "detect_ext_php" do
+    # detect_language_from_extension recognizes .php as php
+    detect_result = TreeSitterLanguagePack.detect_language("file.php")
+    assert detect_result == "php", "Expected language 'php' detected from extension"
+  end
+
   test "detect_ext_python" do
     # detect_language_from_extension recognizes .py as python
     detect_result = TreeSitterLanguagePack.detect_language("file.py")
@@ -77,6 +83,30 @@ defmodule E2eTests.LanguageDetectionTest do
     assert detect_result == nil, "Expected no language detected for extension"
   end
 
+  test "detect_path_dotfile" do
+    # detect_language_from_path returns None for dotfile .gitignore (no standard extension)
+    detect_result = TreeSitterLanguagePack.detect_language(".gitignore")
+    assert detect_result == nil, "Expected no language detected for path"
+  end
+
+  test "detect_path_go_nested" do
+    # detect_language_from_path extracts extension from nested path lib/server.go
+    detect_result = TreeSitterLanguagePack.detect_language("lib/server.go")
+    assert detect_result == "go", "Expected language 'go' detected from path"
+  end
+
+  test "detect_path_java_root" do
+    # detect_language_from_path recognizes Main.java in root directory
+    detect_result = TreeSitterLanguagePack.detect_language("Main.java")
+    assert detect_result == "java", "Expected language 'java' detected from path"
+  end
+
+  test "detect_path_js_root" do
+    # detect_language_from_path recognizes app.js in root directory
+    detect_result = TreeSitterLanguagePack.detect_language("app.js")
+    assert detect_result == "javascript", "Expected language 'javascript' detected from path"
+  end
+
   test "detect_path_nested" do
     # detect_language_from_path extracts extension from nested path src/main.py
     detect_result = TreeSitterLanguagePack.detect_language("src/main.py")
@@ -87,5 +117,11 @@ defmodule E2eTests.LanguageDetectionTest do
     # detect_language_from_path returns None for extensionless file Makefile
     detect_result = TreeSitterLanguagePack.detect_language("Makefile")
     assert detect_result == nil, "Expected no language detected for path"
+  end
+
+  test "detect_path_rust_src" do
+    # detect_language_from_path extracts extension from nested path src/main.rs
+    detect_result = TreeSitterLanguagePack.detect_language("src/main.rs")
+    assert detect_result == "rust", "Expected language 'rust' detected from path"
   end
 end

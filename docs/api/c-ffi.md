@@ -151,6 +151,46 @@ Detect language name from a file path based on its extension.
 
 **Returns:** `char*` -- newly-allocated language name string, or null if the extension is not recognized. The caller must free the returned string with `ts_pack_free_string`.
 
+### `char* ts_pack_detect_language_from_extension(const char* ext)`
+
+Detect language name from a bare file extension (without the leading dot).
+
+**Parameters:**
+
+- `ext` (`const char*`): null-terminated file extension (e.g., `"rs"`, `"py"`).
+
+**Returns:** `char*` -- newly-allocated language name string, or null if the extension is not recognized. The caller must free the returned string with `ts_pack_free_string`.
+
+**Example:**
+
+```c
+char* lang = ts_pack_detect_language_from_extension("rs");
+if (lang) {
+    printf("Language: %s\n", lang); // "rust"
+    ts_pack_free_string(lang);
+}
+```
+
+### `char* ts_pack_detect_language_from_path(const char* path)`
+
+Detect language name from a file path.
+
+**Parameters:**
+
+- `path` (`const char*`): null-terminated file path.
+
+**Returns:** `char*` -- newly-allocated language name string, or null if the path's extension is not recognized. The caller must free the returned string with `ts_pack_free_string`.
+
+**Example:**
+
+```c
+char* lang = ts_pack_detect_language_from_path("/home/user/project/main.py");
+if (lang) {
+    printf("Language: %s\n", lang); // "python"
+    ts_pack_free_string(lang);
+}
+```
+
 ### `char* ts_pack_detect_language_from_content(const char* content)`
 
 Detect language name from file content using shebang-based detection.

@@ -1,0 +1,10 @@
+{
+	"id": "detect_path_go_nested",
+	"category": "language-detection",
+	"description": "detect_language_from_path extracts extension from nested path lib/server.go",
+	"assertions": {
+		"detect_from_path": "lib/server.go",
+		"detect_result": "go"
+	},
+	"tags": ["language-detection", "path"]
+}

@@ -130,6 +130,22 @@ fn detect_language_from_content(content: &str) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_content(content).map(String::from)
 }
 
+/// Detect language name from a bare file extension (without leading dot).
+///
+/// Returns None if the extension is not recognized.
+#[pyfunction]
+fn detect_language_from_extension(ext: &str) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_extension(ext).map(String::from)
+}
+
+/// Detect language name from a file path based on its extension.
+///
+/// Returns None if the extension is not recognized.
+#[pyfunction]
+fn detect_language_from_path(path: &str) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_path(path).map(String::from)
+}
+
 /// Returns extension ambiguity information for the given file extension.
 ///
 /// Returns a tuple of (assigned_language, alternative_languages) if the extension
@@ -695,6 +711,8 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(detect_language, m)?)?;
     m.add_function(wrap_pyfunction!(language_count, m)?)?;
     m.add_function(wrap_pyfunction!(detect_language_from_content, m)?)?;
+    m.add_function(wrap_pyfunction!(detect_language_from_extension, m)?)?;
+    m.add_function(wrap_pyfunction!(detect_language_from_path, m)?)?;
     m.add_function(wrap_pyfunction!(extension_ambiguity, m)?)?;
     m.add_function(wrap_pyfunction!(get_highlights_query, m)?)?;
     m.add_function(wrap_pyfunction!(get_injections_query, m)?)?;

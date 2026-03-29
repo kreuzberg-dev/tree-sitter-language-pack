@@ -59,6 +59,10 @@ add_executable(test_detect_ext_javascript test_detect_ext_javascript.c)
 target_link_libraries(test_detect_ext_javascript ts_pack_ffi)
 add_test(NAME test_detect_ext_javascript COMMAND test_detect_ext_javascript)
 
+add_executable(test_detect_ext_php test_detect_ext_php.c)
+target_link_libraries(test_detect_ext_php ts_pack_ffi)
+add_test(NAME test_detect_ext_php COMMAND test_detect_ext_php)
+
 add_executable(test_detect_ext_python test_detect_ext_python.c)
 target_link_libraries(test_detect_ext_python ts_pack_ffi)
 add_test(NAME test_detect_ext_python COMMAND test_detect_ext_python)
@@ -79,6 +83,22 @@ add_executable(test_detect_ext_unknown test_detect_ext_unknown.c)
 target_link_libraries(test_detect_ext_unknown ts_pack_ffi)
 add_test(NAME test_detect_ext_unknown COMMAND test_detect_ext_unknown)
 
+add_executable(test_detect_path_dotfile test_detect_path_dotfile.c)
+target_link_libraries(test_detect_path_dotfile ts_pack_ffi)
+add_test(NAME test_detect_path_dotfile COMMAND test_detect_path_dotfile)
+
+add_executable(test_detect_path_go_nested test_detect_path_go_nested.c)
+target_link_libraries(test_detect_path_go_nested ts_pack_ffi)
+add_test(NAME test_detect_path_go_nested COMMAND test_detect_path_go_nested)
+
+add_executable(test_detect_path_java_root test_detect_path_java_root.c)
+target_link_libraries(test_detect_path_java_root ts_pack_ffi)
+add_test(NAME test_detect_path_java_root COMMAND test_detect_path_java_root)
+
+add_executable(test_detect_path_js_root test_detect_path_js_root.c)
+target_link_libraries(test_detect_path_js_root ts_pack_ffi)
+add_test(NAME test_detect_path_js_root COMMAND test_detect_path_js_root)
+
 add_executable(test_detect_path_nested test_detect_path_nested.c)
 target_link_libraries(test_detect_path_nested ts_pack_ffi)
 add_test(NAME test_detect_path_nested COMMAND test_detect_path_nested)
@@ -86,6 +106,10 @@ add_test(NAME test_detect_path_nested COMMAND test_detect_path_nested)
 add_executable(test_detect_path_no_extension test_detect_path_no_extension.c)
 target_link_libraries(test_detect_path_no_extension ts_pack_ffi)
 add_test(NAME test_detect_path_no_extension COMMAND test_detect_path_no_extension)
+
+add_executable(test_detect_path_rust_src test_detect_path_rust_src.c)
+target_link_libraries(test_detect_path_rust_src ts_pack_ffi)
+add_test(NAME test_detect_path_rust_src COMMAND test_detect_path_rust_src)
 
 add_executable(test_parsing_go_function test_parsing_go_function.c)
 target_link_libraries(test_parsing_go_function ts_pack_ffi)

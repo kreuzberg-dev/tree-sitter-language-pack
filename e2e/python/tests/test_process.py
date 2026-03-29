@@ -11,10 +11,24 @@ from tree_sitter_language_pack import (
 @pytest.mark.skipif(not has_language("c"), reason="Language 'c' not available")
 def test_c_function_process():
     """Intel: C function with include"""
-    intel = process("#include <stdio.h>\n\nint main() {\n    printf(\"hello\");\n    return 0;\n}\n", ProcessConfig(language="c", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        '#include <stdio.h>\n\nint main() {\n    printf("hello");\n    return 0;\n}\n',
+        ProcessConfig(
+            language="c",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "c", f"Expected language 'c', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), "Structure should contain a 'Function' kind node"
+    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Function' kind node"
+    )
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 6, "Should have at least 6 total line(s)"
     assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
@@ -23,10 +37,24 @@ def test_c_function_process():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_config_all_python():
     """Intel: process with all features enabled"""
-    intel = process("# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        '# A comment\ndef greet(name):\n    """Say hello."""\n    return f\'Hi {name}\'\n\nimport os\n',
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), "Structure should contain a 'Function' kind node"
+    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Function' kind node"
+    )
     assert len(intel.get("imports", [])) >= 1, "Should have at least 1 import(s)"
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 6, "Should have at least 6 total line(s)"
@@ -36,7 +64,19 @@ def test_config_all_python():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_config_minimal_python():
     """Intel: process with minimal config - only metrics"""
-    intel = process("def hello():\n    pass\n", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "def hello():\n    pass\n",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 2, "Should have at least 2 total line(s)"
@@ -45,10 +85,24 @@ def test_config_minimal_python():
 @pytest.mark.skipif(not has_language("go"), reason="Language 'go' not available")
 def test_go_function_process():
     """Intel: extract structure from Go function definition"""
-    intel = process("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", ProcessConfig(language="go", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n',
+        ProcessConfig(
+            language="go",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "go", f"Expected language 'go', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), "Structure should contain a 'Function' kind node"
+    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Function' kind node"
+    )
     assert len(intel.get("imports", [])) >= 1, "Should have at least 1 import(s)"
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 7, "Should have at least 7 total line(s)"
@@ -58,10 +112,24 @@ def test_go_function_process():
 @pytest.mark.skipif(not has_language("go"), reason="Language 'go' not available")
 def test_go_function_process_detail():
     """Intel: extract structure from Go function definition"""
-    intel = process("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", ProcessConfig(language="go", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n',
+        ProcessConfig(
+            language="go",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "go", f"Expected language 'go', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), "Structure should contain a 'Function' kind node"
+    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Function' kind node"
+    )
     assert len(intel.get("imports", [])) >= 1, "Should have at least 1 import(s)"
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 7, "Should have at least 7 total line(s)"
@@ -71,10 +139,24 @@ def test_go_function_process_detail():
 @pytest.mark.skipif(not has_language("java"), reason="Language 'java' not available")
 def test_java_class_process():
     """Intel: Java class with methods and imports"""
-    intel = process("import java.util.List;\n\npublic class Greeter {\n    public String greet(String name) {\n        return \"Hello \" + name;\n    }\n}\n", ProcessConfig(language="java", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        'import java.util.List;\n\npublic class Greeter {\n    public String greet(String name) {\n        return "Hello " + name;\n    }\n}\n',
+        ProcessConfig(
+            language="java",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "java", f"Expected language 'java', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Class" for s in intel.get("structure", [])), "Structure should contain a 'Class' kind node"
+    assert any(s.get("kind") == "Class" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Class' kind node"
+    )
     assert len(intel.get("imports", [])) >= 1, "Should have at least 1 import(s)"
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 7, "Should have at least 7 total line(s)"
@@ -84,10 +166,24 @@ def test_java_class_process():
 @pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
 def test_javascript_multi_import_process():
     """Intel: detect multiple imports and function in JavaScript"""
-    intel = process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", ProcessConfig(language="javascript", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n",
+        ProcessConfig(
+            language="javascript",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "javascript", f"Expected language 'javascript', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), "Structure should contain a 'Function' kind node"
+    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Function' kind node"
+    )
     assert len(intel.get("imports", [])) >= 2, "Should have at least 2 import(s)"
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 6, "Should have at least 6 total line(s)"
@@ -97,10 +193,24 @@ def test_javascript_multi_import_process():
 @pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
 def test_javascript_multi_import_process_detail():
     """Intel: detect multiple imports and function in JavaScript"""
-    intel = process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", ProcessConfig(language="javascript", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n",
+        ProcessConfig(
+            language="javascript",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "javascript", f"Expected language 'javascript', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), "Structure should contain a 'Function' kind node"
+    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Function' kind node"
+    )
     assert len(intel.get("imports", [])) >= 2, "Should have at least 2 import(s)"
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 6, "Should have at least 6 total line(s)"
@@ -110,7 +220,19 @@ def test_javascript_multi_import_process_detail():
 @pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
 def test_process_javascript_exports_detail():
     """JavaScript with exports, verify export count"""
-    intel = process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", ProcessConfig(language="javascript", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n",
+        ProcessConfig(
+            language="javascript",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "javascript", f"Expected language 'javascript', got {intel.get('language')}"
     assert len(intel.get("exports", [])) >= 1, "Should have at least 1 export(s)"
 
@@ -118,7 +240,19 @@ def test_process_javascript_exports_detail():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_process_python_comments():
     """Python with comments, verify comment count"""
-    intel = process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     assert len(intel.get("comments", [])) >= 1, "Should have at least 1 comment(s)"
 
@@ -126,7 +260,19 @@ def test_process_python_comments():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_process_python_imports_detail():
     """Python with multiple imports, verify imports contain specific source"""
-    intel = process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     assert len(intel.get("imports", [])) >= 2, "Should have at least 2 import(s)"
     assert any("os" in (i.get("source") or "") for i in intel.get("imports", [])), "Imports should contain source 'os'"
@@ -135,7 +281,19 @@ def test_process_python_imports_detail():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_process_python_metrics_detail():
     """Python code with metrics assertions"""
-    intel = process("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     metrics = intel.get("metrics", {})
     assert metrics.get("code_lines", 0) >= 4, "Should have at least 4 code line(s)"
@@ -146,16 +304,33 @@ def test_process_python_metrics_detail():
 @pytest.mark.skipif(not has_language("rust"), reason="Language 'rust' not available")
 def test_process_rust_structure_name():
     """Rust struct with name, verify structure name contains value"""
-    intel = process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", ProcessConfig(language="rust", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n",
+        ProcessConfig(
+            language="rust",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "rust", f"Expected language 'rust', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any("MyConfig" in (s.get("name") or "") for s in intel.get("structure", [])), "Structure should contain an item with name containing 'MyConfig'"
+    assert any("MyConfig" in (s.get("name") or "") for s in intel.get("structure", [])), (
+        "Structure should contain an item with name containing 'MyConfig'"
+    )
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_chunking_medium():
     """Intel: Python code with medium chunk size"""
-    intel = process("def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n", ProcessConfig(language="python", chunk_max_size=50))
+    intel = process(
+        "def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n",
+        ProcessConfig(language="python", chunk_max_size=50),
+    )
     chunks = intel.get("chunks", [])
     assert len(chunks) >= 2, f"Should have at least 2 chunk(s), got {len(chunks)}"
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
@@ -167,7 +342,10 @@ def test_python_chunking_medium():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_chunking_process_detail():
     """Intel: chunk multi-function Python source into multiple pieces"""
-    intel = process("def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n", ProcessConfig(language="python", chunk_max_size=30))
+    intel = process(
+        "def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n",
+        ProcessConfig(language="python", chunk_max_size=30),
+    )
     chunks = intel.get("chunks", [])
     assert len(chunks) >= 2, f"Should have at least 2 chunk(s), got {len(chunks)}"
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
@@ -178,10 +356,24 @@ def test_python_chunking_process_detail():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_class_with_methods_process():
     """Intel: extract nested structure from Python class with methods"""
-    intel = process("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Class" for s in intel.get("structure", [])), "Structure should contain a 'Class' kind node"
+    assert any(s.get("kind") == "Class" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Class' kind node"
+    )
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 6, "Should have at least 6 total line(s)"
     assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
@@ -190,10 +382,24 @@ def test_python_class_with_methods_process():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_class_with_methods_process_detail():
     """Intel: extract nested structure from Python class with methods"""
-    intel = process("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Class" for s in intel.get("structure", [])), "Structure should contain a 'Class' kind node"
+    assert any(s.get("kind") == "Class" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Class' kind node"
+    )
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 6, "Should have at least 6 total line(s)"
     assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
@@ -202,7 +408,19 @@ def test_python_class_with_methods_process_detail():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_error_diagnostics():
     """Intel: Python code with syntax errors should report diagnostics"""
-    intel = process("def broken(\n    pass\n", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "def broken(\n    pass\n",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     metrics = intel.get("metrics", {})
     assert metrics.get("error_count", 0) == 1, f"Expected error_count 1, got {metrics.get('error_count', 0)}"
@@ -212,10 +430,24 @@ def test_python_error_diagnostics():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_function_process():
     """Intel: extract structure from Python function definition"""
-    intel = process("def greet(name):\n    return f'Hello, {name}!'\n", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "def greet(name):\n    return f'Hello, {name}!'\n",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), "Structure should contain a 'Function' kind node"
+    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Function' kind node"
+    )
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 2, "Should have at least 2 total line(s)"
     assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
@@ -224,10 +456,24 @@ def test_python_function_process():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_function_process_detail():
     """Intel: extract structure from Python function definition"""
-    intel = process("def greet(name):\n    return f'Hello, {name}!'\n", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "def greet(name):\n    return f'Hello, {name}!'\n",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), "Structure should contain a 'Function' kind node"
+    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Function' kind node"
+    )
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 2, "Should have at least 2 total line(s)"
     assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
@@ -236,7 +482,19 @@ def test_python_function_process_detail():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_malformed_code_process():
     """Intel: detect diagnostics in malformed Python code"""
-    intel = process("def broken(\n    return\nclass", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "def broken(\n    return\nclass",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     assert len(intel.get("diagnostics", [])) > 0, "Diagnostics should not be empty"
 
@@ -244,7 +502,19 @@ def test_python_malformed_code_process():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_malformed_code_process_detail():
     """Intel: detect diagnostics in malformed Python code"""
-    intel = process("def broken(\n    return\nclass", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "def broken(\n    return\nclass",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     assert len(intel.get("diagnostics", [])) > 0, "Diagnostics should not be empty"
 
@@ -252,7 +522,19 @@ def test_python_malformed_code_process_detail():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_multi_import_process():
     """Intel: detect multiple Python imports"""
-    intel = process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
     assert len(intel.get("imports", [])) >= 3, "Should have at least 3 import(s)"
@@ -264,7 +546,19 @@ def test_python_multi_import_process():
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
 def test_python_multi_import_process_detail():
     """Intel: detect multiple Python imports"""
-    intel = process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", ProcessConfig(language="python", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+        ProcessConfig(
+            language="python",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
     assert len(intel.get("imports", [])) >= 3, "Should have at least 3 import(s)"
@@ -276,10 +570,24 @@ def test_python_multi_import_process_detail():
 @pytest.mark.skipif(not has_language("ruby"), reason="Language 'ruby' not available")
 def test_ruby_class_process():
     """Intel: Ruby class with method"""
-    intel = process("require 'json'\n\nclass Greeter\n  def greet(name)\n    \"Hello #{name}\"\n  end\nend\n", ProcessConfig(language="ruby", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "require 'json'\n\nclass Greeter\n  def greet(name)\n    \"Hello #{name}\"\n  end\nend\n",
+        ProcessConfig(
+            language="ruby",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "ruby", f"Expected language 'ruby', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Class" for s in intel.get("structure", [])), "Structure should contain a 'Class' kind node"
+    assert any(s.get("kind") == "Class" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Class' kind node"
+    )
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 7, "Should have at least 7 total line(s)"
     assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
@@ -288,7 +596,10 @@ def test_ruby_class_process():
 @pytest.mark.skipif(not has_language("rust"), reason="Language 'rust' not available")
 def test_rust_chunking_process():
     """Intel: chunk multi-function Rust source into pieces"""
-    intel = process("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", ProcessConfig(language="rust", chunk_max_size=30))
+    intel = process(
+        "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n",
+        ProcessConfig(language="rust", chunk_max_size=30),
+    )
     chunks = intel.get("chunks", [])
     assert len(chunks) >= 2, f"Should have at least 2 chunk(s), got {len(chunks)}"
     assert intel.get("language") == "rust", f"Expected language 'rust', got {intel.get('language')}"
@@ -299,7 +610,10 @@ def test_rust_chunking_process():
 @pytest.mark.skipif(not has_language("rust"), reason="Language 'rust' not available")
 def test_rust_chunking_process_detail():
     """Intel: chunk multi-function Rust source into pieces"""
-    intel = process("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", ProcessConfig(language="rust", chunk_max_size=30))
+    intel = process(
+        "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n",
+        ProcessConfig(language="rust", chunk_max_size=30),
+    )
     chunks = intel.get("chunks", [])
     assert len(chunks) >= 2, f"Should have at least 2 chunk(s), got {len(chunks)}"
     assert intel.get("language") == "rust", f"Expected language 'rust', got {intel.get('language')}"
@@ -310,10 +624,24 @@ def test_rust_chunking_process_detail():
 @pytest.mark.skipif(not has_language("rust"), reason="Language 'rust' not available")
 def test_rust_function_process():
     """Intel: extract structure from Rust function definition"""
-    intel = process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", ProcessConfig(language="rust", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n",
+        ProcessConfig(
+            language="rust",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "rust", f"Expected language 'rust', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), "Structure should contain a 'Function' kind node"
+    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Function' kind node"
+    )
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 3, "Should have at least 3 total line(s)"
     assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
@@ -322,10 +650,24 @@ def test_rust_function_process():
 @pytest.mark.skipif(not has_language("rust"), reason="Language 'rust' not available")
 def test_rust_function_process_detail():
     """Intel: extract structure from Rust function definition"""
-    intel = process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", ProcessConfig(language="rust", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n",
+        ProcessConfig(
+            language="rust",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "rust", f"Expected language 'rust', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), "Structure should contain a 'Function' kind node"
+    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Function' kind node"
+    )
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 3, "Should have at least 3 total line(s)"
     assert metrics.get("error_count", 0) == 0, f"Expected error_count 0, got {metrics.get('error_count', 0)}"
@@ -334,10 +676,24 @@ def test_rust_function_process_detail():
 @pytest.mark.skipif(not has_language("typescript"), reason="Language 'typescript' not available")
 def test_typescript_function_process():
     """Intel: extract structure from TypeScript function"""
-    intel = process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", ProcessConfig(language="typescript", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n",
+        ProcessConfig(
+            language="typescript",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "typescript", f"Expected language 'typescript', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), "Structure should contain a 'Function' kind node"
+    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Function' kind node"
+    )
     assert len(intel.get("imports", [])) >= 1, "Should have at least 1 import(s)"
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 5, "Should have at least 5 total line(s)"
@@ -347,10 +703,24 @@ def test_typescript_function_process():
 @pytest.mark.skipif(not has_language("typescript"), reason="Language 'typescript' not available")
 def test_typescript_function_process_detail():
     """Intel: extract structure from TypeScript function"""
-    intel = process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", ProcessConfig(language="typescript", structure=True, imports=True, exports=True, comments=True, docstrings=True, symbols=True, diagnostics=True))
+    intel = process(
+        "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n",
+        ProcessConfig(
+            language="typescript",
+            structure=True,
+            imports=True,
+            exports=True,
+            comments=True,
+            docstrings=True,
+            symbols=True,
+            diagnostics=True,
+        ),
+    )
     assert intel.get("language") == "typescript", f"Expected language 'typescript', got {intel.get('language')}"
     assert len(intel.get("structure", [])) >= 1, "Should have at least 1 structure(s)"
-    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), "Structure should contain a 'Function' kind node"
+    assert any(s.get("kind") == "Function" for s in intel.get("structure", [])), (
+        "Structure should contain a 'Function' kind node"
+    )
     assert len(intel.get("imports", [])) >= 1, "Should have at least 1 import(s)"
     metrics = intel.get("metrics", {})
     assert metrics.get("total_lines", 0) >= 5, "Should have at least 5 total line(s)"

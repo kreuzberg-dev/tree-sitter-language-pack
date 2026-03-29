@@ -265,6 +265,46 @@ lang = TreeSitterLanguagePack.detect_language_from_content("#!/usr/bin/env pytho
 puts lang # "python"
 ```
 
+### `TreeSitterLanguagePack.detect_language_from_extension(ext)`
+
+Detect language name from a bare file extension (without the leading dot).
+
+**Parameters:**
+
+- `ext` (String): File extension without dot (e.g., `"py"`, `"js"`)
+
+**Returns:** String or nil
+
+**Example:**
+
+```ruby
+lang = TreeSitterLanguagePack.detect_language_from_extension("py")
+puts lang # "python"
+
+lang = TreeSitterLanguagePack.detect_language_from_extension("xyz")
+puts lang # nil
+```
+
+### `TreeSitterLanguagePack.detect_language_from_path(path)`
+
+Detect language name from a file path based on its extension.
+
+**Parameters:**
+
+- `path` (String): File path
+
+**Returns:** String or nil
+
+**Example:**
+
+```ruby
+lang = TreeSitterLanguagePack.detect_language_from_path("/home/user/project/main.py")
+puts lang # "python"
+
+lang = TreeSitterLanguagePack.detect_language_from_path("src/app.tsx")
+puts lang # "tsx"
+```
+
 ### `TreeSitterLanguagePack.extension_ambiguity(ext)`
 
 Returns extension ambiguity information as a JSON string, or nil if the extension is unambiguous.

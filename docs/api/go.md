@@ -202,6 +202,40 @@ Detect a language name from a file path or extension. Returns an empty string if
 
 **Returns:** string
 
+### `DetectLanguageFromExtension(ext string) string`
+
+Detect a language name from a bare file extension (without the leading dot). Returns an empty string if not recognized.
+
+**Parameters:**
+
+- `ext` (string): File extension (e.g., `"rs"`, `"py"`)
+
+**Returns:** string
+
+**Example:**
+
+```go
+lang := tspack.DetectLanguageFromExtension("rs")
+// lang == "rust"
+```
+
+### `DetectLanguageFromPath(path string) string`
+
+Detect a language name from a file path. Returns an empty string if not recognized.
+
+**Parameters:**
+
+- `path` (string): File path
+
+**Returns:** string
+
+**Example:**
+
+```go
+lang := tspack.DetectLanguageFromPath("/home/user/project/main.py")
+// lang == "python"
+```
+
 ### `DetectLanguageFromContent(content string) string`
 
 Detect a language name from file content using shebang-based detection. Returns an empty string if no shebang is recognized.

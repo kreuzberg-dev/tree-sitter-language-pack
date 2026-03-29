@@ -82,6 +82,17 @@ func TestDetectExtJavascript(t *testing.T) {
 	}
 }
 
+func TestDetectExtPhp(t *testing.T) {
+	// detect_language_from_extension recognizes .php as php
+	result := tspack.DetectLanguage("file.php")
+	if result == "" {
+		t.Fatalf("Expected %q, got empty string", "php")
+	}
+	if result != "php" {
+		t.Fatalf("Expected %q, got %q", "php", result)
+	}
+}
+
 func TestDetectExtPython(t *testing.T) {
 	// detect_language_from_extension recognizes .py as python
 	result := tspack.DetectLanguage("file.py")
@@ -134,6 +145,47 @@ func TestDetectExtUnknown(t *testing.T) {
 	}
 }
 
+func TestDetectPathDotfile(t *testing.T) {
+	// detect_language_from_path returns None for dotfile .gitignore (no standard extension)
+	result := tspack.DetectLanguage(".gitignore")
+	if result != "" {
+		t.Fatalf("Expected empty result, got %q", result)
+	}
+}
+
+func TestDetectPathGoNested(t *testing.T) {
+	// detect_language_from_path extracts extension from nested path lib/server.go
+	result := tspack.DetectLanguage("lib/server.go")
+	if result == "" {
+		t.Fatalf("Expected %q, got empty string", "go")
+	}
+	if result != "go" {
+		t.Fatalf("Expected %q, got %q", "go", result)
+	}
+}
+
+func TestDetectPathJavaRoot(t *testing.T) {
+	// detect_language_from_path recognizes Main.java in root directory
+	result := tspack.DetectLanguage("Main.java")
+	if result == "" {
+		t.Fatalf("Expected %q, got empty string", "java")
+	}
+	if result != "java" {
+		t.Fatalf("Expected %q, got %q", "java", result)
+	}
+}
+
+func TestDetectPathJsRoot(t *testing.T) {
+	// detect_language_from_path recognizes app.js in root directory
+	result := tspack.DetectLanguage("app.js")
+	if result == "" {
+		t.Fatalf("Expected %q, got empty string", "javascript")
+	}
+	if result != "javascript" {
+		t.Fatalf("Expected %q, got %q", "javascript", result)
+	}
+}
+
 func TestDetectPathNested(t *testing.T) {
 	// detect_language_from_path extracts extension from nested path src/main.py
 	result := tspack.DetectLanguage("src/main.py")
@@ -150,5 +202,16 @@ func TestDetectPathNoExtension(t *testing.T) {
 	result := tspack.DetectLanguage("Makefile")
 	if result != "" {
 		t.Fatalf("Expected empty result, got %q", result)
+	}
+}
+
+func TestDetectPathRustSrc(t *testing.T) {
+	// detect_language_from_path extracts extension from nested path src/main.rs
+	result := tspack.DetectLanguage("src/main.rs")
+	if result == "" {
+		t.Fatalf("Expected %q, got empty string", "rust")
+	}
+	if result != "rust" {
+		t.Fatalf("Expected %q, got %q", "rust", result)
 	}
 }

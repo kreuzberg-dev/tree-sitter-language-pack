@@ -4,709 +4,950 @@ package io.github.treesitter.languagepack.e2e;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.treesitter.languagepack.TsPackRegistry;
-import org.junit.jupiter.api.Test;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import org.junit.jupiter.api.Test;
 
 class ProcessTest {
 
-    private static final Gson GSON = new Gson();
+  private static final Gson GSON = new Gson();
 
-    @Test
-    void c_function_process() {
-        // Intel: C function with include
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("c"), "Language 'c' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"c\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("#include <stdio.h>\n\nint main() {\n    printf(\"hello\");\n    return 0;\n}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("c", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+  @Test
+  void c_function_process() {
+    // Intel: C function with include
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("c"), "Language 'c' not available");
     }
-
-    @Test
-    void config_all_python() {
-        // Intel: process with all features enabled
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"c\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "#include <stdio.h>\n\nint main() {\n    printf(\"hello\");\n    return 0;\n}\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("c", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
+          foundKind = true;
+          break;
         }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-            assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
     }
+  }
 
-    @Test
-    void config_minimal_python() {
-        // Intel: process with minimal config - only metrics
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("def hello():\n    pass\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 2, "Should have at least 2 total line(s)");
-        }
+  @Test
+  void config_all_python() {
+    // Intel: process with all features enabled
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
     }
-
-    @Test
-    void go_function_process() {
-        // Intel: extract structure from Go function definition
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("go"), "Language 'go' not available");
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "# A comment\n"
+                  + "def greet(name):\n"
+                  + "    \"\"\"Say hello.\"\"\"\n"
+                  + "    return f'Hi {name}'\n\n"
+                  + "import os\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
+          foundKind = true;
+          break;
         }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"go\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("go", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-            assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
+      assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
     }
+  }
 
-    @Test
-    void go_function_process_detail() {
-        // Intel: extract structure from Go function definition
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("go"), "Language 'go' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"go\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("go", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-            assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+  @Test
+  void config_minimal_python() {
+    // Intel: process with minimal config - only metrics
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
     }
-
-    @Test
-    void java_class_process() {
-        // Intel: Java class with methods and imports
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("java"), "Language 'java' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"java\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("import java.util.List;\n\npublic class Greeter {\n    public String greet(String name) {\n        return \"Hello \" + name;\n    }\n}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("java", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Class")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Class' kind node");
-            assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson = registry.process("def hello():\n    pass\n", configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 2, "Should have at least 2 total line(s)");
     }
+  }
 
-    @Test
-    void javascript_multi_import_process() {
-        // Intel: detect multiple imports and function in JavaScript
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("javascript"), "Language 'javascript' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"javascript\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("javascript", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-            assertTrue(intel.getAsJsonArray("imports").size() >= 2, "Should have at least 2 import(s)");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+  @Test
+  void go_function_process() {
+    // Intel: extract structure from Go function definition
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("go"), "Language 'go' not available");
     }
-
-    @Test
-    void javascript_multi_import_process_detail() {
-        // Intel: detect multiple imports and function in JavaScript
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("javascript"), "Language 'javascript' not available");
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"go\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("go", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
+          foundKind = true;
+          break;
         }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"javascript\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("javascript", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-            assertTrue(intel.getAsJsonArray("imports").size() >= 2, "Should have at least 2 import(s)");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
+      assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
     }
+  }
 
-    @Test
-    void process_javascript_exports_detail() {
-        // JavaScript with exports, verify export count
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("javascript"), "Language 'javascript' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"javascript\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("javascript", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("exports").size() >= 1, "Should have at least 1 export(s)");
-        }
+  @Test
+  void go_function_process_detail() {
+    // Intel: extract structure from Go function definition
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("go"), "Language 'go' not available");
     }
-
-    @Test
-    void process_python_comments() {
-        // Python with comments, verify comment count
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"go\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("go", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
+          foundKind = true;
+          break;
         }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("comments").size() >= 1, "Should have at least 1 comment(s)");
-        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
+      assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
     }
+  }
 
-    @Test
-    void process_python_imports_detail() {
-        // Python with multiple imports, verify imports contain specific source
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("imports").size() >= 2, "Should have at least 2 import(s)");
-            boolean foundImport = false;
-            for (var elem : intel.getAsJsonArray("imports")) {
-                var srcElem = elem.getAsJsonObject().get("source");
-                if (srcElem != null && srcElem.getAsString().contains("os")) {
-                    foundImport = true;
-                    break;
-                }
-            }
-            assertTrue(foundImport, "Imports should contain source 'os'");
-        }
+  @Test
+  void java_class_process() {
+    // Intel: Java class with methods and imports
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("java"), "Language 'java' not available");
     }
-
-    @Test
-    void process_python_metrics_detail() {
-        // Python code with metrics assertions
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"java\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "import java.util.List;\n\n"
+                  + "public class Greeter {\n"
+                  + "    public String greet(String name) {\n"
+                  + "        return \"Hello \" + name;\n"
+                  + "    }\n"
+                  + "}\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("java", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Class")) {
+          foundKind = true;
+          break;
         }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("code_lines").getAsInt() >= 4, "Should have at least 4 code line(s)");
-            assertTrue(metrics.get("comment_lines").getAsInt() >= 1, "Should have at least 1 comment line(s)");
-            assertTrue(metrics.get("max_depth").getAsInt() >= 1, "Should have max_depth >= 1");
-        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Class' kind node");
+      assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
     }
+  }
 
-    @Test
-    void process_rust_structure_name() {
-        // Rust struct with name, verify structure name contains value
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("rust"), "Language 'rust' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"rust\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("rust", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundName = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                var nameElem = elem.getAsJsonObject().get("name");
-                if (nameElem != null && nameElem.getAsString().contains("MyConfig")) {
-                    foundName = true;
-                    break;
-                }
-            }
-            assertTrue(foundName, "Structure should contain an item with name containing 'MyConfig'");
-        }
+  @Test
+  void javascript_multi_import_process() {
+    // Intel: detect multiple imports and function in JavaScript
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("javascript"), "Language 'javascript' not available");
     }
-
-    @Test
-    void python_chunking_medium() {
-        // Intel: Python code with medium chunk size
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"javascript\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "import fs from 'fs';\n"
+                  + "import path from 'path';\n\n"
+                  + "function process(input) {\n"
+                  + "    return input.trim();\n"
+                  + "}\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("javascript", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
+          foundKind = true;
+          break;
         }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"chunk_max_size\":50}";
-            String resultJson = registry.process("def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            JsonArray chunks = intel.getAsJsonArray("chunks");
-            assertTrue(chunks.size() >= 2, "Should have at least 2 chunk(s), got " + chunks.size());
-            assertEquals("python", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 3, "Should have at least 3 structure(s)");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
+      assertTrue(intel.getAsJsonArray("imports").size() >= 2, "Should have at least 2 import(s)");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
     }
+  }
 
-    @Test
-    void python_chunking_process_detail() {
-        // Intel: chunk multi-function Python source into multiple pieces
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"chunk_max_size\":30}";
-            String resultJson = registry.process("def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            JsonArray chunks = intel.getAsJsonArray("chunks");
-            assertTrue(chunks.size() >= 2, "Should have at least 2 chunk(s), got " + chunks.size());
-            assertEquals("python", intel.get("language").getAsString());
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 8, "Should have at least 8 total line(s)");
-        }
+  @Test
+  void javascript_multi_import_process_detail() {
+    // Intel: detect multiple imports and function in JavaScript
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("javascript"), "Language 'javascript' not available");
     }
-
-    @Test
-    void python_class_with_methods_process() {
-        // Intel: extract nested structure from Python class with methods
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"javascript\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "import fs from 'fs';\n"
+                  + "import path from 'path';\n\n"
+                  + "function process(input) {\n"
+                  + "    return input.trim();\n"
+                  + "}\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("javascript", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
+          foundKind = true;
+          break;
         }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Class")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Class' kind node");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
+      assertTrue(intel.getAsJsonArray("imports").size() >= 2, "Should have at least 2 import(s)");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
     }
+  }
 
-    @Test
-    void python_class_with_methods_process_detail() {
-        // Intel: extract nested structure from Python class with methods
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Class")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Class' kind node");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+  @Test
+  void process_javascript_exports_detail() {
+    // JavaScript with exports, verify export count
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("javascript"), "Language 'javascript' not available");
     }
-
-    @Test
-    void python_error_diagnostics() {
-        // Intel: Python code with syntax errors should report diagnostics
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("def broken(\n    pass\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertEquals(1, metrics.get("error_count").getAsInt(), "Expected error_count 1");
-            assertFalse(intel.getAsJsonArray("diagnostics").isEmpty(), "Diagnostics should not be empty");
-        }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"javascript\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "export function greet(name) {\n"
+                  + "  return `Hello ${name}`;\n"
+                  + "}\n\n"
+                  + "export const VERSION = '1.0';\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("javascript", intel.get("language").getAsString());
+      assertTrue(intel.getAsJsonArray("exports").size() >= 1, "Should have at least 1 export(s)");
     }
+  }
 
-    @Test
-    void python_function_process() {
-        // Intel: extract structure from Python function definition
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("def greet(name):\n    return f'Hello, {name}!'\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 2, "Should have at least 2 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+  @Test
+  void process_python_comments() {
+    // Python with comments, verify comment count
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
     }
-
-    @Test
-    void python_function_process_detail() {
-        // Intel: extract structure from Python function definition
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("def greet(name):\n    return f'Hello, {name}!'\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 2, "Should have at least 2 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "# This is a comment\n"
+                  + "# Another comment\n"
+                  + "def hello():\n"
+                  + "    # inline comment\n"
+                  + "    pass\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      assertTrue(intel.getAsJsonArray("comments").size() >= 1, "Should have at least 1 comment(s)");
     }
+  }
 
-    @Test
-    void python_malformed_code_process() {
-        // Intel: detect diagnostics in malformed Python code
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("def broken(\n    return\nclass", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            assertFalse(intel.getAsJsonArray("diagnostics").isEmpty(), "Diagnostics should not be empty");
-        }
+  @Test
+  void process_python_imports_detail() {
+    // Python with multiple imports, verify imports contain specific source
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
     }
-
-    @Test
-    void python_malformed_code_process_detail() {
-        // Intel: detect diagnostics in malformed Python code
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      assertTrue(intel.getAsJsonArray("imports").size() >= 2, "Should have at least 2 import(s)");
+      boolean foundImport = false;
+      for (var elem : intel.getAsJsonArray("imports")) {
+        var srcElem = elem.getAsJsonObject().get("source");
+        if (srcElem != null && srcElem.getAsString().contains("os")) {
+          foundImport = true;
+          break;
         }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("def broken(\n    return\nclass", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            assertFalse(intel.getAsJsonArray("diagnostics").isEmpty(), "Diagnostics should not be empty");
-        }
+      }
+      assertTrue(foundImport, "Imports should contain source 'os'");
     }
+  }
 
-    @Test
-    void python_multi_import_process() {
-        // Intel: detect multiple Python imports
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            assertTrue(intel.getAsJsonArray("imports").size() >= 3, "Should have at least 3 import(s)");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 5, "Should have at least 5 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+  @Test
+  void process_python_metrics_detail() {
+    // Python code with metrics assertions
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
     }
-
-    @Test
-    void python_multi_import_process_detail() {
-        // Intel: detect multiple Python imports
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("python", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            assertTrue(intel.getAsJsonArray("imports").size() >= 3, "Should have at least 3 import(s)");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 5, "Should have at least 5 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "# module docstring\n"
+                  + "import os\n\n"
+                  + "def hello():\n"
+                  + "    # greeting\n"
+                  + "    print('hello')\n\n"
+                  + "def world():\n"
+                  + "    print('world')\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(metrics.get("code_lines").getAsInt() >= 4, "Should have at least 4 code line(s)");
+      assertTrue(
+          metrics.get("comment_lines").getAsInt() >= 1, "Should have at least 1 comment line(s)");
+      assertTrue(metrics.get("max_depth").getAsInt() >= 1, "Should have max_depth >= 1");
     }
+  }
 
-    @Test
-    void ruby_class_process() {
-        // Intel: Ruby class with method
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("ruby"), "Language 'ruby' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"ruby\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("require 'json'\n\nclass Greeter\n  def greet(name)\n    \"Hello #{name}\"\n  end\nend\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("ruby", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Class")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Class' kind node");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+  @Test
+  void process_rust_structure_name() {
+    // Rust struct with name, verify structure name contains value
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("rust"), "Language 'rust' not available");
     }
-
-    @Test
-    void rust_chunking_process() {
-        // Intel: chunk multi-function Rust source into pieces
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("rust"), "Language 'rust' not available");
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"rust\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "pub struct MyConfig {\n"
+                  + "    pub name: String,\n"
+                  + "    pub value: i32,\n"
+                  + "}\n\n"
+                  + "impl MyConfig {\n"
+                  + "    pub fn new() -> Self {\n"
+                  + "        Self { name: String::new(), value: 0 }\n"
+                  + "    }\n"
+                  + "}\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("rust", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundName = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        var nameElem = elem.getAsJsonObject().get("name");
+        if (nameElem != null && nameElem.getAsString().contains("MyConfig")) {
+          foundName = true;
+          break;
         }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"rust\",\"chunk_max_size\":30}";
-            String resultJson = registry.process("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            JsonArray chunks = intel.getAsJsonArray("chunks");
-            assertTrue(chunks.size() >= 2, "Should have at least 2 chunk(s), got " + chunks.size());
-            assertEquals("rust", intel.get("language").getAsString());
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
-        }
+      }
+      assertTrue(foundName, "Structure should contain an item with name containing 'MyConfig'");
     }
+  }
 
-    @Test
-    void rust_chunking_process_detail() {
-        // Intel: chunk multi-function Rust source into pieces
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("rust"), "Language 'rust' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"rust\",\"chunk_max_size\":30}";
-            String resultJson = registry.process("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            JsonArray chunks = intel.getAsJsonArray("chunks");
-            assertTrue(chunks.size() >= 2, "Should have at least 2 chunk(s), got " + chunks.size());
-            assertEquals("rust", intel.get("language").getAsString());
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
-        }
+  @Test
+  void python_chunking_medium() {
+    // Intel: Python code with medium chunk size
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
     }
-
-    @Test
-    void rust_function_process() {
-        // Intel: extract structure from Rust function definition
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("rust"), "Language 'rust' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"rust\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("rust", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 3, "Should have at least 3 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson = "{\"language\":\"python\",\"chunk_max_size\":50}";
+      String resultJson =
+          registry.process(
+              "def first():\n"
+                  + "    x = 1\n"
+                  + "    return x\n\n"
+                  + "def second():\n"
+                  + "    y = 2\n"
+                  + "    return y\n\n"
+                  + "def third():\n"
+                  + "    z = 3\n"
+                  + "    return z\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      JsonArray chunks = intel.getAsJsonArray("chunks");
+      assertTrue(chunks.size() >= 2, "Should have at least 2 chunk(s), got " + chunks.size());
+      assertEquals("python", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 3, "Should have at least 3 structure(s)");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
     }
+  }
 
-    @Test
-    void rust_function_process_detail() {
-        // Intel: extract structure from Rust function definition
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("rust"), "Language 'rust' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"rust\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("rust", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 3, "Should have at least 3 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+  @Test
+  void python_chunking_process_detail() {
+    // Intel: chunk multi-function Python source into multiple pieces
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
     }
-
-    @Test
-    void typescript_function_process() {
-        // Intel: extract structure from TypeScript function
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("typescript"), "Language 'typescript' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"typescript\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("typescript", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-            assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 5, "Should have at least 5 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson = "{\"language\":\"python\",\"chunk_max_size\":30}";
+      String resultJson =
+          registry.process(
+              "def alpha():\n"
+                  + "    pass\n\n"
+                  + "def beta():\n"
+                  + "    pass\n\n"
+                  + "def gamma():\n"
+                  + "    pass\n\n"
+                  + "def delta():\n"
+                  + "    pass\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      JsonArray chunks = intel.getAsJsonArray("chunks");
+      assertTrue(chunks.size() >= 2, "Should have at least 2 chunk(s), got " + chunks.size());
+      assertEquals("python", intel.get("language").getAsString());
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 8, "Should have at least 8 total line(s)");
     }
+  }
 
-    @Test
-    void typescript_function_process_detail() {
-        // Intel: extract structure from TypeScript function
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("typescript"), "Language 'typescript' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            String configJson = "{\"language\":\"typescript\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
-            String resultJson = registry.process("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", configJson);
-            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
-            assertEquals("typescript", intel.get("language").getAsString());
-            assertTrue(intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
-            boolean foundKind = false;
-            for (var elem : intel.getAsJsonArray("structure")) {
-                if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
-                    foundKind = true;
-                    break;
-                }
-            }
-            assertTrue(foundKind, "Structure should contain a 'Function' kind node");
-            assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
-            JsonObject metrics = intel.getAsJsonObject("metrics");
-            assertTrue(metrics.get("total_lines").getAsInt() >= 5, "Should have at least 5 total line(s)");
-            assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
-        }
+  @Test
+  void python_class_with_methods_process() {
+    // Intel: extract nested structure from Python class with methods
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
     }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "class Calculator:\n"
+                  + "    def add(self, a, b):\n"
+                  + "        return a + b\n\n"
+                  + "    def subtract(self, a, b):\n"
+                  + "        return a - b\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Class")) {
+          foundKind = true;
+          break;
+        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Class' kind node");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+    }
+  }
 
+  @Test
+  void python_class_with_methods_process_detail() {
+    // Intel: extract nested structure from Python class with methods
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "class Calculator:\n"
+                  + "    def add(self, a, b):\n"
+                  + "        return a + b\n\n"
+                  + "    def subtract(self, a, b):\n"
+                  + "        return a - b\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Class")) {
+          foundKind = true;
+          break;
+        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Class' kind node");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 6, "Should have at least 6 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+    }
+  }
+
+  @Test
+  void python_error_diagnostics() {
+    // Intel: Python code with syntax errors should report diagnostics
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson = registry.process("def broken(\n    pass\n", configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertEquals(1, metrics.get("error_count").getAsInt(), "Expected error_count 1");
+      assertFalse(intel.getAsJsonArray("diagnostics").isEmpty(), "Diagnostics should not be empty");
+    }
+  }
+
+  @Test
+  void python_function_process() {
+    // Intel: extract structure from Python function definition
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process("def greet(name):\n    return f'Hello, {name}!'\n", configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
+          foundKind = true;
+          break;
+        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 2, "Should have at least 2 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+    }
+  }
+
+  @Test
+  void python_function_process_detail() {
+    // Intel: extract structure from Python function definition
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process("def greet(name):\n    return f'Hello, {name}!'\n", configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
+          foundKind = true;
+          break;
+        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 2, "Should have at least 2 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+    }
+  }
+
+  @Test
+  void python_malformed_code_process() {
+    // Intel: detect diagnostics in malformed Python code
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson = registry.process("def broken(\n    return\nclass", configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      assertFalse(intel.getAsJsonArray("diagnostics").isEmpty(), "Diagnostics should not be empty");
+    }
+  }
+
+  @Test
+  void python_malformed_code_process_detail() {
+    // Intel: detect diagnostics in malformed Python code
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson = registry.process("def broken(\n    return\nclass", configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      assertFalse(intel.getAsJsonArray("diagnostics").isEmpty(), "Diagnostics should not be empty");
+    }
+  }
+
+  @Test
+  void python_multi_import_process() {
+    // Intel: detect multiple Python imports
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      assertTrue(intel.getAsJsonArray("imports").size() >= 3, "Should have at least 3 import(s)");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 5, "Should have at least 5 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+    }
+  }
+
+  @Test
+  void python_multi_import_process_detail() {
+    // Intel: detect multiple Python imports
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"python\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("python", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      assertTrue(intel.getAsJsonArray("imports").size() >= 3, "Should have at least 3 import(s)");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 5, "Should have at least 5 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+    }
+  }
+
+  @Test
+  void ruby_class_process() {
+    // Intel: Ruby class with method
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("ruby"), "Language 'ruby' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"ruby\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "require 'json'\n\n"
+                  + "class Greeter\n"
+                  + "  def greet(name)\n"
+                  + "    \"Hello #{name}\"\n"
+                  + "  end\n"
+                  + "end\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("ruby", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Class")) {
+          foundKind = true;
+          break;
+        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Class' kind node");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+    }
+  }
+
+  @Test
+  void rust_chunking_process() {
+    // Intel: chunk multi-function Rust source into pieces
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("rust"), "Language 'rust' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson = "{\"language\":\"rust\",\"chunk_max_size\":30}";
+      String resultJson =
+          registry.process(
+              "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      JsonArray chunks = intel.getAsJsonArray("chunks");
+      assertTrue(chunks.size() >= 2, "Should have at least 2 chunk(s), got " + chunks.size());
+      assertEquals("rust", intel.get("language").getAsString());
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
+    }
+  }
+
+  @Test
+  void rust_chunking_process_detail() {
+    // Intel: chunk multi-function Rust source into pieces
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("rust"), "Language 'rust' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson = "{\"language\":\"rust\",\"chunk_max_size\":30}";
+      String resultJson =
+          registry.process(
+              "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      JsonArray chunks = intel.getAsJsonArray("chunks");
+      assertTrue(chunks.size() >= 2, "Should have at least 2 chunk(s), got " + chunks.size());
+      assertEquals("rust", intel.get("language").getAsString());
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 7, "Should have at least 7 total line(s)");
+    }
+  }
+
+  @Test
+  void rust_function_process() {
+    // Intel: extract structure from Rust function definition
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("rust"), "Language 'rust' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"rust\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("rust", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
+          foundKind = true;
+          break;
+        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 3, "Should have at least 3 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+    }
+  }
+
+  @Test
+  void rust_function_process_detail() {
+    // Intel: extract structure from Rust function definition
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("rust"), "Language 'rust' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"rust\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("rust", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
+          foundKind = true;
+          break;
+        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 3, "Should have at least 3 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+    }
+  }
+
+  @Test
+  void typescript_function_process() {
+    // Intel: extract structure from TypeScript function
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("typescript"), "Language 'typescript' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"typescript\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "import { readFile } from 'fs';\n\n"
+                  + "function greet(name: string): string {\n"
+                  + "    return `Hello, ${name}!`;\n"
+                  + "}\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("typescript", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
+          foundKind = true;
+          break;
+        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
+      assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 5, "Should have at least 5 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+    }
+  }
+
+  @Test
+  void typescript_function_process_detail() {
+    // Intel: extract structure from TypeScript function
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("typescript"), "Language 'typescript' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      String configJson =
+          "{\"language\":\"typescript\",\"structure\":true,\"imports\":true,\"exports\":true,\"comments\":true,\"docstrings\":true,\"symbols\":true,\"diagnostics\":true}";
+      String resultJson =
+          registry.process(
+              "import { readFile } from 'fs';\n\n"
+                  + "function greet(name: string): string {\n"
+                  + "    return `Hello, ${name}!`;\n"
+                  + "}\n",
+              configJson);
+      JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);
+      assertEquals("typescript", intel.get("language").getAsString());
+      assertTrue(
+          intel.getAsJsonArray("structure").size() >= 1, "Should have at least 1 structure(s)");
+      boolean foundKind = false;
+      for (var elem : intel.getAsJsonArray("structure")) {
+        if (elem.getAsJsonObject().get("kind").getAsString().equals("Function")) {
+          foundKind = true;
+          break;
+        }
+      }
+      assertTrue(foundKind, "Structure should contain a 'Function' kind node");
+      assertTrue(intel.getAsJsonArray("imports").size() >= 1, "Should have at least 1 import(s)");
+      JsonObject metrics = intel.getAsJsonObject("metrics");
+      assertTrue(
+          metrics.get("total_lines").getAsInt() >= 5, "Should have at least 5 total line(s)");
+      assertEquals(0, metrics.get("error_count").getAsInt(), "Expected error_count 0");
+    }
+  }
 }

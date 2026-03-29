@@ -36,6 +36,16 @@ fn detect_language_from_content(content: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_content(&content).map(String::from)
 }
 
+#[rustler::nif]
+fn detect_language_from_extension(ext: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_extension(&ext).map(String::from)
+}
+
+#[rustler::nif]
+fn detect_language_from_path(path: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
+}
+
 /// Returns extension ambiguity as a JSON string, or nil.
 #[rustler::nif]
 fn extension_ambiguity(ext: String) -> Option<String> {

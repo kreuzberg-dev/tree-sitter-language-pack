@@ -93,6 +93,36 @@ pub fn ts_pack_detect_language_from_content(content: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_content(&content).map(String::from)
 }
 
+/// Detect language name from a bare file extension (without leading dot).
+///
+/// Returns null if the extension is not recognized.
+///
+/// # Example
+///
+/// ```php
+/// $lang = ts_pack_detect_language_from_extension("py");
+/// echo "Detected: $lang\n"; // "python"
+/// ```
+#[php_function]
+pub fn ts_pack_detect_language_from_extension(ext: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_extension(&ext).map(String::from)
+}
+
+/// Detect language name from a file path based on its extension.
+///
+/// Returns null if the extension is not recognized.
+///
+/// # Example
+///
+/// ```php
+/// $lang = ts_pack_detect_language_from_path("/home/user/script.py");
+/// echo "Detected: $lang\n"; // "python"
+/// ```
+#[php_function]
+pub fn ts_pack_detect_language_from_path(path: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
+}
+
 /// Returns extension ambiguity information for the given file extension as a JSON string.
 ///
 /// Returns null if the extension is not ambiguous. When non-null, the JSON decodes to
@@ -558,6 +588,8 @@ pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
         .function(wrap_function!(ts_pack_has_language))
         .function(wrap_function!(ts_pack_detect_language))
         .function(wrap_function!(ts_pack_detect_language_from_content))
+        .function(wrap_function!(ts_pack_detect_language_from_extension))
+        .function(wrap_function!(ts_pack_detect_language_from_path))
         .function(wrap_function!(ts_pack_extension_ambiguity))
         .function(wrap_function!(ts_pack_get_highlights_query))
         .function(wrap_function!(ts_pack_get_injections_query))

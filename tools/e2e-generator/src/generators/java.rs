@@ -25,9 +25,7 @@ impl Generator for JavaGenerator {
         write_pom_xml(&java_dir)?;
         write_helpers_java(&test_pkg)?;
 
-        // Java binding doesn't expose detect_language yet — skip detection fixtures
-        let filtered: Vec<_> = fixtures.iter().filter(|f| !has_detect_assertions(f)).cloned().collect();
-        let groups = group_by_category(&filtered);
+        let groups = group_by_category(fixtures);
         for (category, cat_fixtures) in &groups {
             write_test_file(&test_pkg, category, cat_fixtures)?;
         }

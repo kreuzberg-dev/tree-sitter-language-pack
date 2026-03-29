@@ -4,35 +4,38 @@ package io.github.treesitter.languagepack.e2e;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.treesitter.languagepack.TsPackRegistry;
 import org.junit.jupiter.api.Test;
 
 class RegistryTest {
 
-    @Test
-    void registry_has_language_false() {
-        // has_language('nonexistent') should return false
-        try (var registry = Helpers.createRegistry()) {
-            assertEquals(false, registry.hasLanguage("nonexistent"));
-        }
+  @Test
+  void registry_has_language_false() {
+    // has_language('nonexistent') should return false
+    try (var registry = Helpers.createRegistry()) {
+      assertEquals(false, registry.hasLanguage("nonexistent"));
     }
+  }
 
-    @Test
-    void registry_has_language_true() {
-        // has_language('python') should return true
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.languageCount() > 0, "No languages loaded (native library may not be available)");
-            assertEquals(true, registry.hasLanguage("python"));
-        }
+  @Test
+  void registry_has_language_true() {
+    // has_language('python') should return true
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.languageCount() > 0,
+          "No languages loaded (native library may not be available)");
+      assertEquals(true, registry.hasLanguage("python"));
     }
+  }
 
-    @Test
-    void registry_list_languages() {
-        // available_languages should return a non-empty list
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.languageCount() > 0, "No languages loaded (native library may not be available)");
-            assertFalse(registry.availableLanguages().isEmpty(), "availableLanguages() should not be empty");
-        }
+  @Test
+  void registry_list_languages() {
+    // available_languages should return a non-empty list
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.languageCount() > 0,
+          "No languages loaded (native library may not be available)");
+      assertFalse(
+          registry.availableLanguages().isEmpty(), "availableLanguages() should not be empty");
     }
-
+  }
 }

@@ -1,0 +1,10 @@
+{
+	"id": "detect_path_java_root",
+	"category": "language-detection",
+	"description": "detect_language_from_path recognizes Main.java in root directory",
+	"assertions": {
+		"detect_from_path": "Main.java",
+		"detect_result": "java"
+	},
+	"tags": ["language-detection", "path"]
+}

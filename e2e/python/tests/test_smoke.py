@@ -134,7 +134,7 @@ def test_smoke_bicep():
 def test_smoke_bitbake():
     """Smoke test: load bitbake and parse a simple snippet"""
     parser = get_parser("bitbake")
-    tree = parser.parse(b"DESCRIPTION = \"hello\"")
+    tree = parser.parse(b'DESCRIPTION = "hello"')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -254,7 +254,7 @@ def test_smoke_comment():
 def test_smoke_commonlisp():
     """Smoke test: load commonlisp and parse a simple snippet"""
     parser = get_parser("commonlisp")
-    tree = parser.parse(b"(defun hello () (print \"hello\"))")
+    tree = parser.parse(b'(defun hello () (print "hello"))')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -265,7 +265,7 @@ def test_smoke_commonlisp():
 def test_smoke_cpon():
     """Smoke test: load cpon and parse a simple snippet"""
     parser = get_parser("cpon")
-    tree = parser.parse(b"{\"key\": 1}")
+    tree = parser.parse(b'{"key": 1}')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -384,7 +384,7 @@ def test_smoke_dtd():
 def test_smoke_elisp():
     """Smoke test: load elisp and parse a simple snippet"""
     parser = get_parser("elisp")
-    tree = parser.parse(b"(defun hello () (message \"hello\"))")
+    tree = parser.parse(b'(defun hello () (message "hello"))')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -395,7 +395,7 @@ def test_smoke_elisp():
 def test_smoke_elixir():
     """Smoke test: load elixir and parse a simple snippet"""
     parser = get_parser("elixir")
-    tree = parser.parse(b"IO.puts(\"hello\")")
+    tree = parser.parse(b'IO.puts("hello")')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -486,7 +486,9 @@ def test_smoke_fsharp():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "declaration_expression"), "Tree should contain a 'declaration_expression' node"
+    assert tree_contains_node_type(root, "declaration_expression"), (
+        "Tree should contain a 'declaration_expression' node"
+    )
 
 
 @pytest.mark.skipif(not has_language("fsharp_signature"), reason="Language 'fsharp_signature' not available")
@@ -581,7 +583,7 @@ def test_smoke_glsl():
 def test_smoke_gn():
     """Smoke test: load gn and parse a simple snippet"""
     parser = get_parser("gn")
-    tree = parser.parse(b"group(\"hello\") {}")
+    tree = parser.parse(b'group("hello") {}')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -679,7 +681,7 @@ def test_smoke_hare():
 def test_smoke_haskell():
     """Smoke test: load haskell and parse a simple snippet"""
     parser = get_parser("haskell")
-    tree = parser.parse(b"main = putStrLn \"hello\"")
+    tree = parser.parse(b'main = putStrLn "hello"')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -701,7 +703,7 @@ def test_smoke_haxe():
 def test_smoke_hcl():
     """Smoke test: load hcl and parse a simple snippet"""
     parser = get_parser("hcl")
-    tree = parser.parse(b"variable \"name\" { type = string }")
+    tree = parser.parse(b'variable "name" { type = string }')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -777,7 +779,7 @@ def test_smoke_ispc():
 def test_smoke_janet():
     """Smoke test: load janet and parse a simple snippet"""
     parser = get_parser("janet")
-    tree = parser.parse(b"(print \"hello\")")
+    tree = parser.parse(b'(print "hello")')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -819,7 +821,7 @@ def test_smoke_jsdoc():
 def test_smoke_json():
     """Smoke test: load json and parse a simple snippet"""
     parser = get_parser("json")
-    tree = parser.parse(b"{\"key\": \"value\"}")
+    tree = parser.parse(b'{"key": "value"}')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -852,7 +854,7 @@ def test_smoke_julia():
 def test_smoke_kconfig():
     """Smoke test: load kconfig and parse a simple snippet"""
     parser = get_parser("kconfig")
-    tree = parser.parse(b"config FOO\n\tbool \"Enable foo\"")
+    tree = parser.parse(b'config FOO\n\tbool "Enable foo"')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -863,7 +865,7 @@ def test_smoke_kconfig():
 def test_smoke_kdl():
     """Smoke test: load kdl and parse a simple snippet"""
     parser = get_parser("kdl")
-    tree = parser.parse(b"node \"value\"")
+    tree = parser.parse(b'node "value"')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1050,7 +1052,7 @@ def test_smoke_netlinx():
 def test_smoke_nim():
     """Smoke test: load nim and parse a simple snippet"""
     parser = get_parser("nim")
-    tree = parser.parse(b"echo \"hello\"")
+    tree = parser.parse(b'echo "hello"')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1114,7 +1116,7 @@ def test_smoke_objc():
 def test_smoke_ocaml():
     """Smoke test: load ocaml and parse a simple snippet"""
     parser = get_parser("ocaml")
-    tree = parser.parse(b"let () = print_endline \"hello\"")
+    tree = parser.parse(b'let () = print_endline "hello"')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1213,7 +1215,7 @@ def test_smoke_php():
 def test_smoke_po():
     """Smoke test: load po and parse a simple snippet"""
     parser = get_parser("po")
-    tree = parser.parse(b"msgid \"hello\"\nmsgstr \"world\"")
+    tree = parser.parse(b'msgid "hello"\nmsgstr "world"')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1279,7 +1281,7 @@ def test_smoke_properties():
 def test_smoke_proto():
     """Smoke test: load proto and parse a simple snippet"""
     parser = get_parser("proto")
-    tree = parser.parse(b"syntax = \"proto3\";")
+    tree = parser.parse(b'syntax = "proto3";')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1443,7 +1445,7 @@ def test_smoke_requirements():
 def test_smoke_ron():
     """Smoke test: load ron and parse a simple snippet"""
     parser = get_parser("ron")
-    tree = parser.parse(b"(key: \"value\")")
+    tree = parser.parse(b'(key: "value")')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1605,7 +1607,7 @@ def test_smoke_svelte():
 def test_smoke_swift():
     """Smoke test: load swift and parse a simple snippet"""
     parser = get_parser("swift")
-    tree = parser.parse(b"print(\"hello\")")
+    tree = parser.parse(b'print("hello")')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1638,7 +1640,7 @@ def test_smoke_tcl():
 def test_smoke_terraform():
     """Smoke test: load terraform and parse a simple snippet"""
     parser = get_parser("terraform")
-    tree = parser.parse(b"resource \"null_resource\" \"main\" {}")
+    tree = parser.parse(b'resource "null_resource" "main" {}')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1671,7 +1673,7 @@ def test_smoke_thrift():
 def test_smoke_toml():
     """Smoke test: load toml and parse a simple snippet"""
     parser = get_parser("toml")
-    tree = parser.parse(b"key = \"value\"")
+    tree = parser.parse(b'key = "value"')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1736,7 +1738,7 @@ def test_smoke_typst():
 def test_smoke_udev():
     """Smoke test: load udev and parse a simple snippet"""
     parser = get_parser("udev")
-    tree = parser.parse(b"ACTION==\"add\", KERNEL==\"sd*\"")
+    tree = parser.parse(b'ACTION=="add", KERNEL=="sd*"')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1867,7 +1869,7 @@ def test_smoke_wgsl():
 def test_smoke_xcompose():
     """Smoke test: load xcompose and parse a simple snippet"""
     parser = get_parser("xcompose")
-    tree = parser.parse(b"<Multi_key> <a> : \"a\"")
+    tree = parser.parse(b'<Multi_key> <a> : "a"')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1878,7 +1880,7 @@ def test_smoke_xcompose():
 def test_smoke_xml():
     """Smoke test: load xml and parse a simple snippet"""
     parser = get_parser("xml")
-    tree = parser.parse(b"<?xml version=\"1.0\"?>\n<root>hello</root>")
+    tree = parser.parse(b'<?xml version="1.0"?>\n<root>hello</root>')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1889,7 +1891,7 @@ def test_smoke_xml():
 def test_smoke_yuck():
     """Smoke test: load yuck and parse a simple snippet"""
     parser = get_parser("yuck")
-    tree = parser.parse(b"(defwidget main [] (label :text \"hi\"))")
+    tree = parser.parse(b'(defwidget main [] (label :text "hi"))')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"

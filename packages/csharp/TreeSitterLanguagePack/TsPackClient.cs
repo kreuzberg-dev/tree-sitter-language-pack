@@ -107,6 +107,7 @@ public static class TsPackClient
             var resultPtr = NativeMethods.DetectLanguageFromContent(contentPtr);
             if (resultPtr == IntPtr.Zero)
             {
+                InteropUtilities.ThrowIfError();
                 return null;
             }
             try
@@ -121,6 +122,66 @@ public static class TsPackClient
         finally
         {
             Marshal.FreeHGlobal(contentPtr);
+        }
+    }
+
+    /// <summary>
+    /// Detect language name from a bare file extension (without leading dot).
+    /// Returns null if the extension is not recognized.
+    /// </summary>
+    public static string? DetectLanguageFromExtension(string ext)
+    {
+        var extPtr = InteropUtilities.StringToUtf8Ptr(ext);
+        try
+        {
+            var resultPtr = NativeMethods.DetectLanguageFromExtension(extPtr);
+            if (resultPtr == IntPtr.Zero)
+            {
+                InteropUtilities.ThrowIfError();
+                return null;
+            }
+            try
+            {
+                return InteropUtilities.Utf8PtrToString(resultPtr);
+            }
+            finally
+            {
+                NativeMethods.FreeString(resultPtr);
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(extPtr);
+        }
+    }
+
+    /// <summary>
+    /// Detect language name from a file path based on its extension.
+    /// Returns null if the extension is not recognized.
+    /// </summary>
+    public static string? DetectLanguageFromPath(string path)
+    {
+        var pathPtr = InteropUtilities.StringToUtf8Ptr(path);
+        try
+        {
+            var resultPtr = NativeMethods.DetectLanguageFromPath(pathPtr);
+            if (resultPtr == IntPtr.Zero)
+            {
+                InteropUtilities.ThrowIfError();
+                return null;
+            }
+            try
+            {
+                return InteropUtilities.Utf8PtrToString(resultPtr);
+            }
+            finally
+            {
+                NativeMethods.FreeString(resultPtr);
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(pathPtr);
         }
     }
 

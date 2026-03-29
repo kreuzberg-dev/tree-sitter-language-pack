@@ -310,6 +310,176 @@ Get the effective cache directory path.
 
 - `RuntimeException`: If the operation fails
 
+### Static Methods -- Language Detection
+
+#### `detectLanguage(String path): String`
+
+Detect language name from a file path or extension. Returns null if not recognized.
+
+**Parameters:**
+
+- `path` (String): File path or extension
+
+**Returns:** String (or null)
+
+**Example:**
+
+```java
+String lang = TsPackRegistry.detectLanguage("src/main.rs");
+// lang == "rust"
+```
+
+#### `detectLanguageFromContent(String content): String`
+
+Detect language name from file content using shebang-based detection. Returns null if no shebang is recognized.
+
+**Parameters:**
+
+- `content` (String): File content
+
+**Returns:** String (or null)
+
+**Example:**
+
+```java
+String lang = TsPackRegistry.detectLanguageFromContent("#!/usr/bin/env python3\nprint('hi')");
+// lang == "python"
+```
+
+#### `detectLanguageFromExtension(String ext): String`
+
+Detect language name from a bare file extension (without the leading dot). Returns null if not recognized.
+
+**Parameters:**
+
+- `ext` (String): File extension (e.g., `"rs"`, `"py"`)
+
+**Returns:** String (or null)
+
+**Example:**
+
+```java
+String lang = TsPackRegistry.detectLanguageFromExtension("rs");
+// lang == "rust"
+```
+
+#### `detectLanguageFromPath(String path): String`
+
+Detect language name from a file path. Returns null if not recognized.
+
+**Parameters:**
+
+- `path` (String): File path
+
+**Returns:** String (or null)
+
+**Example:**
+
+```java
+String lang = TsPackRegistry.detectLanguageFromPath("/home/user/project/main.py");
+// lang == "python"
+```
+
+#### `extensionAmbiguity(String ext): String`
+
+Get extension ambiguity information as a JSON string. Returns null if the extension is not ambiguous.
+
+**Parameters:**
+
+- `ext` (String): File extension (without dot)
+
+**Returns:** String (JSON with `"assigned"` and `"alternatives"` fields, or null)
+
+**Example:**
+
+```java
+String json = TsPackRegistry.extensionAmbiguity("h");
+// json contains {"assigned":"c","alternatives":["cpp","objective-c"]}
+```
+
+### Static Methods -- Queries
+
+#### `getHighlightsQuery(String language): String`
+
+Get the bundled highlights query for the given language. Returns null if not available.
+
+**Parameters:**
+
+- `language` (String): Language name
+
+**Returns:** String (or null)
+
+#### `getInjectionsQuery(String language): String`
+
+Get the bundled injections query for the given language. Returns null if not available.
+
+**Parameters:**
+
+- `language` (String): Language name
+
+**Returns:** String (or null)
+
+#### `getLocalsQuery(String language): String`
+
+Get the bundled locals query for the given language. Returns null if not available.
+
+**Parameters:**
+
+- `language` (String): Language name
+
+**Returns:** String (or null)
+
+### Static Methods -- Extraction
+
+#### `extract(String source, String configJson): String`
+
+Run extraction queries against source code using tree-sitter query patterns. Returns results as a JSON string.
+
+**Parameters:**
+
+- `source` (String): Source code to query
+- `configJson` (String): JSON configuration with `"language"` and `"patterns"` fields
+
+**Returns:** String (JSON result)
+
+**Throws:**
+
+- `RuntimeException`: If extraction fails
+
+**Example:**
+
+```java
+String config = """
+    {"language":"python","patterns":{"fns":{"query":"(function_definition name: (identifier) @fn_name)","capture_output":{},"child_fields":[],"max_results":null,"byte_range":null}}}
+    """;
+String result = TsPackRegistry.extract("def hello(): pass", config);
+System.out.println(result);
+```
+
+#### `validateExtraction(String configJson): String`
+
+Validate extraction patterns without running them against source code. Useful for checking query syntax.
+
+**Parameters:**
+
+- `configJson` (String): JSON configuration with the same shape as for `extract`
+
+**Returns:** String (JSON validation result)
+
+**Throws:**
+
+- `RuntimeException`: If validation fails
+
+**Example:**
+
+```java
+String config = """
+    {"language":"python","patterns":{"fns":{"query":"(function_definition name: (identifier) @fn_name)","capture_output":{},"child_fields":[],"max_results":null,"byte_range":null}}}
+    """;
+String result = TsPackRegistry.validateExtraction(config);
+System.out.println(result);
+```
+
 ## TsPackTree
 
 Implements `AutoCloseable`. Not thread-safe.
@@ -363,6 +533,43 @@ Check whether the tree contains any ERROR or MISSING nodes.
 **Throws:**
 
 - `IllegalStateException`: If the tree has been closed
+
+#### `toSexp(): String`
+
+Return the S-expression representation of the tree.
+
+**Returns:** String
+
+**Throws:**
+
+- `IllegalStateException`: If the tree has been closed
+
+**Example:**
+
+```java
+try (var tree = registry.parseString("python", "x = 1")) {
+    String sexp = tree.toSexp();
+    System.out.println(sexp); // (module (expression_statement (assignment ...)))
+}
+```
+
+#### `errorCount(): int`
+
+Return the count of ERROR and MISSING nodes in the tree.
+
+**Returns:** int (non-negative)
+
+**Throws:**
+
+- `IllegalStateException`: If the tree has been closed
+
+**Example:**
+
+```java
+try (var tree = registry.parseString("python", "def (broken")) {
+    System.out.println(tree.errorCount()); // >= 1
+}
+```
 
 ## Exceptions
 

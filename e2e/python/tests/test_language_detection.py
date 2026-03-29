@@ -48,6 +48,12 @@ def test_detect_ext_javascript():
     assert result == "javascript", f"Expected 'javascript', got {result!r}"
 
 
+def test_detect_ext_php():
+    """detect_language_from_extension recognizes .php as php"""
+    result = detect_language("file.php")
+    assert result == "php", f"Expected 'php', got {result!r}"
+
+
 def test_detect_ext_python():
     """detect_language_from_extension recognizes .py as python"""
     result = detect_language("file.py")
@@ -78,6 +84,30 @@ def test_detect_ext_unknown():
     assert result is None, f"Expected None, got {result!r}"
 
 
+def test_detect_path_dotfile():
+    """detect_language_from_path returns None for dotfile .gitignore (no standard extension)"""
+    result = detect_language(".gitignore")
+    assert result is None, f"Expected None, got {result!r}"
+
+
+def test_detect_path_go_nested():
+    """detect_language_from_path extracts extension from nested path lib/server.go"""
+    result = detect_language("lib/server.go")
+    assert result == "go", f"Expected 'go', got {result!r}"
+
+
+def test_detect_path_java_root():
+    """detect_language_from_path recognizes Main.java in root directory"""
+    result = detect_language("Main.java")
+    assert result == "java", f"Expected 'java', got {result!r}"
+
+
+def test_detect_path_js_root():
+    """detect_language_from_path recognizes app.js in root directory"""
+    result = detect_language("app.js")
+    assert result == "javascript", f"Expected 'javascript', got {result!r}"
+
+
 def test_detect_path_nested():
     """detect_language_from_path extracts extension from nested path src/main.py"""
     result = detect_language("src/main.py")
@@ -88,3 +118,9 @@ def test_detect_path_no_extension():
     """detect_language_from_path returns None for extensionless file Makefile"""
     result = detect_language("Makefile")
     assert result is None, f"Expected None, got {result!r}"
+
+
+def test_detect_path_rust_src():
+    """detect_language_from_path extracts extension from nested path src/main.rs"""
+    result = detect_language("src/main.rs")
+    assert result == "rust", f"Expected 'rust', got {result!r}"

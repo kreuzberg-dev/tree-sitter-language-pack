@@ -4,2097 +4,2269 @@ package io.github.treesitter.languagepack.e2e;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.treesitter.languagepack.TsPackRegistry;
 import org.junit.jupiter.api.Test;
 
 class SmokeTest {
 
-    @Test
-    void smoke_actionscript() {
-        // Smoke test: load actionscript and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("actionscript"), "Language 'actionscript' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("actionscript");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_ada() {
-        // Smoke test: load ada and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("ada"), "Language 'ada' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("ada");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_agda() {
-        // Smoke test: load agda and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("agda"), "Language 'agda' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("agda");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_apex() {
-        // Smoke test: load apex and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("apex"), "Language 'apex' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("apex");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_arduino() {
-        // Smoke test: load arduino and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("arduino"), "Language 'arduino' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("arduino");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_asm() {
-        // Smoke test: load asm and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("asm"), "Language 'asm' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("asm");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_astro() {
-        // Smoke test: load astro and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("astro"), "Language 'astro' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("astro");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_bash() {
-        // Smoke test: load bash and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("bash"), "Language 'bash' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("bash");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_beancount() {
-        // Smoke test: load beancount and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("beancount"), "Language 'beancount' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("beancount");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_bibtex() {
-        // Smoke test: load bibtex and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("bibtex"), "Language 'bibtex' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("bibtex");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_bicep() {
-        // Smoke test: load bicep and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("bicep"), "Language 'bicep' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("bicep");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_bitbake() {
-        // Smoke test: load bitbake and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("bitbake"), "Language 'bitbake' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("bitbake");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_bsl() {
-        // Smoke test: load bsl and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("bsl"), "Language 'bsl' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("bsl");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_c() {
-        // Smoke test: load c and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("c"), "Language 'c' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("c");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_cairo() {
-        // Smoke test: load cairo and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("cairo"), "Language 'cairo' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("cairo");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_capnp() {
-        // Smoke test: load capnp and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("capnp"), "Language 'capnp' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("capnp");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_chatito() {
-        // Smoke test: load chatito and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("chatito"), "Language 'chatito' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("chatito");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_clarity() {
-        // Smoke test: load clarity and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("clarity"), "Language 'clarity' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("clarity");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_clojure() {
-        // Smoke test: load clojure and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("clojure"), "Language 'clojure' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("clojure");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_cmake() {
-        // Smoke test: load cmake and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("cmake"), "Language 'cmake' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("cmake");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_cobol() {
-        // Smoke test: load cobol and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("cobol"), "Language 'cobol' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("cobol");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_comment() {
-        // Smoke test: load comment and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("comment"), "Language 'comment' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("comment");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_commonlisp() {
-        // Smoke test: load commonlisp and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("commonlisp"), "Language 'commonlisp' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("commonlisp");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_cpon() {
-        // Smoke test: load cpon and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("cpon"), "Language 'cpon' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("cpon");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_cpp() {
-        // Smoke test: load cpp and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("cpp"), "Language 'cpp' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("cpp");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_csharp() {
-        // Smoke test: load csharp and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("csharp"), "Language 'csharp' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("csharp");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_css() {
-        // Smoke test: load css and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("css"), "Language 'css' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("css");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_csv() {
-        // Smoke test: load csv and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("csv"), "Language 'csv' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("csv");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_cuda() {
-        // Smoke test: load cuda and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("cuda"), "Language 'cuda' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("cuda");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_d() {
-        // Smoke test: load d and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("d"), "Language 'd' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("d");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_dart() {
-        // Smoke test: load dart and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("dart"), "Language 'dart' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("dart");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_dockerfile() {
-        // Smoke test: load dockerfile and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("dockerfile"), "Language 'dockerfile' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("dockerfile");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_doxygen() {
-        // Smoke test: load doxygen and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("doxygen"), "Language 'doxygen' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("doxygen");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_dtd() {
-        // Smoke test: load dtd and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("dtd"), "Language 'dtd' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("dtd");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_elisp() {
-        // Smoke test: load elisp and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("elisp"), "Language 'elisp' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("elisp");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_elixir() {
-        // Smoke test: load elixir and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("elixir"), "Language 'elixir' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("elixir");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_elm() {
-        // Smoke test: load elm and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("elm"), "Language 'elm' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("elm");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_embeddedtemplate() {
-        // Smoke test: load embeddedtemplate and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("embeddedtemplate"), "Language 'embeddedtemplate' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("embeddedtemplate");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_erlang() {
-        // Smoke test: load erlang and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("erlang"), "Language 'erlang' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("erlang");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_fennel() {
-        // Smoke test: load fennel and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("fennel"), "Language 'fennel' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("fennel");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_firrtl() {
-        // Smoke test: load firrtl and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("firrtl"), "Language 'firrtl' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("firrtl");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_fish() {
-        // Smoke test: load fish and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("fish"), "Language 'fish' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("fish");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_fortran() {
-        // Smoke test: load fortran and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("fortran"), "Language 'fortran' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("fortran");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_fsharp() {
-        // Smoke test: load fsharp and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("fsharp"), "Language 'fsharp' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("fsharp");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_fsharp_signature() {
-        // Smoke test: load fsharp_signature and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("fsharp_signature"), "Language 'fsharp_signature' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("fsharp_signature");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_func() {
-        // Smoke test: load func and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("func"), "Language 'func' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("func");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_gdscript() {
-        // Smoke test: load gdscript and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("gdscript"), "Language 'gdscript' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("gdscript");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_gitattributes() {
-        // Smoke test: load gitattributes and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("gitattributes"), "Language 'gitattributes' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("gitattributes");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_gitcommit() {
-        // Smoke test: load gitcommit and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("gitcommit"), "Language 'gitcommit' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("gitcommit");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_gitignore() {
-        // Smoke test: load gitignore and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("gitignore"), "Language 'gitignore' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("gitignore");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_gleam() {
-        // Smoke test: load gleam and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("gleam"), "Language 'gleam' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("gleam");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_glsl() {
-        // Smoke test: load glsl and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("glsl"), "Language 'glsl' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("glsl");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_gn() {
-        // Smoke test: load gn and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("gn"), "Language 'gn' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("gn");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_go() {
-        // Smoke test: load go and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("go"), "Language 'go' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("go");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_gomod() {
-        // Smoke test: load gomod and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("gomod"), "Language 'gomod' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("gomod");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_gosum() {
-        // Smoke test: load gosum and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("gosum"), "Language 'gosum' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("gosum");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_graphql() {
-        // Smoke test: load graphql and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("graphql"), "Language 'graphql' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("graphql");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_groovy() {
-        // Smoke test: load groovy and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("groovy"), "Language 'groovy' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("groovy");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_gstlaunch() {
-        // Smoke test: load gstlaunch and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("gstlaunch"), "Language 'gstlaunch' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("gstlaunch");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_hack() {
-        // Smoke test: load hack and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("hack"), "Language 'hack' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("hack");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_hare() {
-        // Smoke test: load hare and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("hare"), "Language 'hare' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("hare");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_haskell() {
-        // Smoke test: load haskell and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("haskell"), "Language 'haskell' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("haskell");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_haxe() {
-        // Smoke test: load haxe and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("haxe"), "Language 'haxe' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("haxe");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_hcl() {
-        // Smoke test: load hcl and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("hcl"), "Language 'hcl' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("hcl");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_heex() {
-        // Smoke test: load heex and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("heex"), "Language 'heex' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("heex");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_hlsl() {
-        // Smoke test: load hlsl and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("hlsl"), "Language 'hlsl' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("hlsl");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_html() {
-        // Smoke test: load html and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("html"), "Language 'html' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("html");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_hyprlang() {
-        // Smoke test: load hyprlang and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("hyprlang"), "Language 'hyprlang' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("hyprlang");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_ini() {
-        // Smoke test: load ini and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("ini"), "Language 'ini' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("ini");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_ispc() {
-        // Smoke test: load ispc and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("ispc"), "Language 'ispc' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("ispc");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_janet() {
-        // Smoke test: load janet and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("janet"), "Language 'janet' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("janet");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_java() {
-        // Smoke test: load java and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("java"), "Language 'java' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("java");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_javascript() {
-        // Smoke test: load javascript and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("javascript"), "Language 'javascript' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("javascript");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_jsdoc() {
-        // Smoke test: load jsdoc and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("jsdoc"), "Language 'jsdoc' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("jsdoc");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_json() {
-        // Smoke test: load json and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("json"), "Language 'json' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("json");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_jsonnet() {
-        // Smoke test: load jsonnet and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("jsonnet"), "Language 'jsonnet' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("jsonnet");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_julia() {
-        // Smoke test: load julia and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("julia"), "Language 'julia' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("julia");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_kconfig() {
-        // Smoke test: load kconfig and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("kconfig"), "Language 'kconfig' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("kconfig");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_kdl() {
-        // Smoke test: load kdl and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("kdl"), "Language 'kdl' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("kdl");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_kotlin() {
-        // Smoke test: load kotlin and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("kotlin"), "Language 'kotlin' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("kotlin");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_latex() {
-        // Smoke test: load latex and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("latex"), "Language 'latex' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("latex");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_linkerscript() {
-        // Smoke test: load linkerscript and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("linkerscript"), "Language 'linkerscript' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("linkerscript");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_llvm() {
-        // Smoke test: load llvm and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("llvm"), "Language 'llvm' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("llvm");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_lua() {
-        // Smoke test: load lua and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("lua"), "Language 'lua' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("lua");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_luadoc() {
-        // Smoke test: load luadoc and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("luadoc"), "Language 'luadoc' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("luadoc");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_luap() {
-        // Smoke test: load luap and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("luap"), "Language 'luap' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("luap");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_luau() {
-        // Smoke test: load luau and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("luau"), "Language 'luau' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("luau");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_magik() {
-        // Smoke test: load magik and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("magik"), "Language 'magik' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("magik");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_make() {
-        // Smoke test: load make and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("make"), "Language 'make' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("make");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_markdown() {
-        // Smoke test: load markdown and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("markdown"), "Language 'markdown' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("markdown");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_markdown_inline() {
-        // Smoke test: load markdown_inline and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("markdown_inline"), "Language 'markdown_inline' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("markdown_inline");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_matlab() {
-        // Smoke test: load matlab and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("matlab"), "Language 'matlab' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("matlab");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_mermaid() {
-        // Smoke test: load mermaid and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("mermaid"), "Language 'mermaid' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("mermaid");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_meson() {
-        // Smoke test: load meson and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("meson"), "Language 'meson' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("meson");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_netlinx() {
-        // Smoke test: load netlinx and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("netlinx"), "Language 'netlinx' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("netlinx");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_nim() {
-        // Smoke test: load nim and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("nim"), "Language 'nim' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("nim");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_ninja() {
-        // Smoke test: load ninja and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("ninja"), "Language 'ninja' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("ninja");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_nix() {
-        // Smoke test: load nix and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("nix"), "Language 'nix' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("nix");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_nqc() {
-        // Smoke test: load nqc and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("nqc"), "Language 'nqc' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("nqc");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_nushell() {
-        // Smoke test: load nushell and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("nushell"), "Language 'nushell' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("nushell");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_objc() {
-        // Smoke test: load objc and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("objc"), "Language 'objc' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("objc");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_ocaml() {
-        // Smoke test: load ocaml and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("ocaml"), "Language 'ocaml' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("ocaml");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_ocaml_interface() {
-        // Smoke test: load ocaml_interface and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("ocaml_interface"), "Language 'ocaml_interface' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("ocaml_interface");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_odin() {
-        // Smoke test: load odin and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("odin"), "Language 'odin' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("odin");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_org() {
-        // Smoke test: load org and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("org"), "Language 'org' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("org");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_pascal() {
-        // Smoke test: load pascal and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("pascal"), "Language 'pascal' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("pascal");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_pem() {
-        // Smoke test: load pem and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("pem"), "Language 'pem' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("pem");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_perl() {
-        // Smoke test: load perl and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("perl"), "Language 'perl' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("perl");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_pgn() {
-        // Smoke test: load pgn and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("pgn"), "Language 'pgn' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("pgn");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_php() {
-        // Smoke test: load php and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("php"), "Language 'php' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("php");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_po() {
-        // Smoke test: load po and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("po"), "Language 'po' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("po");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_pony() {
-        // Smoke test: load pony and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("pony"), "Language 'pony' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("pony");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_powershell() {
-        // Smoke test: load powershell and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("powershell"), "Language 'powershell' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("powershell");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_printf() {
-        // Smoke test: load printf and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("printf"), "Language 'printf' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("printf");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_prisma() {
-        // Smoke test: load prisma and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("prisma"), "Language 'prisma' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("prisma");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_properties() {
-        // Smoke test: load properties and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("properties"), "Language 'properties' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("properties");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_proto() {
-        // Smoke test: load proto and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("proto"), "Language 'proto' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("proto");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_psv() {
-        // Smoke test: load psv and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("psv"), "Language 'psv' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("psv");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_puppet() {
-        // Smoke test: load puppet and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("puppet"), "Language 'puppet' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("puppet");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_purescript() {
-        // Smoke test: load purescript and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("purescript"), "Language 'purescript' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("purescript");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_pymanifest() {
-        // Smoke test: load pymanifest and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("pymanifest"), "Language 'pymanifest' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("pymanifest");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_python() {
-        // Smoke test: load python and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("python");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_qmldir() {
-        // Smoke test: load qmldir and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("qmldir"), "Language 'qmldir' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("qmldir");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_qmljs() {
-        // Smoke test: load qmljs and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("qmljs"), "Language 'qmljs' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("qmljs");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_query() {
-        // Smoke test: load query and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("query"), "Language 'query' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("query");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_r() {
-        // Smoke test: load r and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("r"), "Language 'r' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("r");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_racket() {
-        // Smoke test: load racket and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("racket"), "Language 'racket' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("racket");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_re2c() {
-        // Smoke test: load re2c and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("re2c"), "Language 're2c' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("re2c");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_readline() {
-        // Smoke test: load readline and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("readline"), "Language 'readline' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("readline");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_rego() {
-        // Smoke test: load rego and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("rego"), "Language 'rego' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("rego");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_requirements() {
-        // Smoke test: load requirements and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("requirements"), "Language 'requirements' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("requirements");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_ron() {
-        // Smoke test: load ron and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("ron"), "Language 'ron' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("ron");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_rst() {
-        // Smoke test: load rst and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("rst"), "Language 'rst' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("rst");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_ruby() {
-        // Smoke test: load ruby and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("ruby"), "Language 'ruby' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("ruby");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_rust() {
-        // Smoke test: load rust and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("rust"), "Language 'rust' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("rust");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_scala() {
-        // Smoke test: load scala and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("scala"), "Language 'scala' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("scala");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_scheme() {
-        // Smoke test: load scheme and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("scheme"), "Language 'scheme' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("scheme");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_scss() {
-        // Smoke test: load scss and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("scss"), "Language 'scss' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("scss");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_smali() {
-        // Smoke test: load smali and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("smali"), "Language 'smali' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("smali");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_smithy() {
-        // Smoke test: load smithy and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("smithy"), "Language 'smithy' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("smithy");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_solidity() {
-        // Smoke test: load solidity and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("solidity"), "Language 'solidity' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("solidity");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_sparql() {
-        // Smoke test: load sparql and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("sparql"), "Language 'sparql' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("sparql");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_sql() {
-        // Smoke test: load sql and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("sql"), "Language 'sql' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("sql");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_squirrel() {
-        // Smoke test: load squirrel and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("squirrel"), "Language 'squirrel' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("squirrel");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_starlark() {
-        // Smoke test: load starlark and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("starlark"), "Language 'starlark' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("starlark");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_svelte() {
-        // Smoke test: load svelte and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("svelte"), "Language 'svelte' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("svelte");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_swift() {
-        // Smoke test: load swift and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("swift"), "Language 'swift' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("swift");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_tablegen() {
-        // Smoke test: load tablegen and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("tablegen"), "Language 'tablegen' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("tablegen");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_tcl() {
-        // Smoke test: load tcl and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("tcl"), "Language 'tcl' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("tcl");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_terraform() {
-        // Smoke test: load terraform and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("terraform"), "Language 'terraform' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("terraform");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_test() {
-        // Smoke test: load test and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("test"), "Language 'test' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("test");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_thrift() {
-        // Smoke test: load thrift and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("thrift"), "Language 'thrift' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("thrift");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_toml() {
-        // Smoke test: load toml and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("toml"), "Language 'toml' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("toml");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_tsv() {
-        // Smoke test: load tsv and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("tsv"), "Language 'tsv' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("tsv");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_tsx() {
-        // Smoke test: load tsx and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("tsx"), "Language 'tsx' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("tsx");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_twig() {
-        // Smoke test: load twig and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("twig"), "Language 'twig' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("twig");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_typescript() {
-        // Smoke test: load typescript and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("typescript"), "Language 'typescript' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("typescript");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_typst() {
-        // Smoke test: load typst and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("typst"), "Language 'typst' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("typst");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_udev() {
-        // Smoke test: load udev and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("udev"), "Language 'udev' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("udev");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_ungrammar() {
-        // Smoke test: load ungrammar and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("ungrammar"), "Language 'ungrammar' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("ungrammar");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_uxntal() {
-        // Smoke test: load uxntal and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("uxntal"), "Language 'uxntal' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("uxntal");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_v() {
-        // Smoke test: load v and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("v"), "Language 'v' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("v");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_vb() {
-        // Smoke test: load vb and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("vb"), "Language 'vb' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("vb");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_verilog() {
-        // Smoke test: load verilog and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("verilog"), "Language 'verilog' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("verilog");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_vhdl() {
-        // Smoke test: load vhdl and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("vhdl"), "Language 'vhdl' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("vhdl");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_vim() {
-        // Smoke test: load vim and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("vim"), "Language 'vim' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("vim");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_vue() {
-        // Smoke test: load vue and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("vue"), "Language 'vue' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("vue");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_wast() {
-        // Smoke test: load wast and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("wast"), "Language 'wast' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("wast");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_wat() {
-        // Smoke test: load wat and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("wat"), "Language 'wat' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("wat");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_wgsl() {
-        // Smoke test: load wgsl and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("wgsl"), "Language 'wgsl' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("wgsl");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_xcompose() {
-        // Smoke test: load xcompose and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("xcompose"), "Language 'xcompose' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("xcompose");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_xml() {
-        // Smoke test: load xml and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("xml"), "Language 'xml' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("xml");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_yuck() {
-        // Smoke test: load yuck and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("yuck"), "Language 'yuck' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("yuck");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
-    @Test
-    void smoke_zig() {
-        // Smoke test: load zig and parse a simple snippet
-        try (var registry = Helpers.createRegistry()) {
-            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("zig"), "Language 'zig' not available");
-        }
-        try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("zig");
-            assertNotNull(langPtr, "Language pointer should not be null");
-        }
-    }
-
+  @Test
+  void smoke_actionscript() {
+    // Smoke test: load actionscript and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("actionscript"), "Language 'actionscript' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("actionscript");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_ada() {
+    // Smoke test: load ada and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("ada"), "Language 'ada' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("ada");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_agda() {
+    // Smoke test: load agda and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("agda"), "Language 'agda' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("agda");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_apex() {
+    // Smoke test: load apex and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("apex"), "Language 'apex' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("apex");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_arduino() {
+    // Smoke test: load arduino and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("arduino"), "Language 'arduino' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("arduino");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_asm() {
+    // Smoke test: load asm and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("asm"), "Language 'asm' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("asm");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_astro() {
+    // Smoke test: load astro and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("astro"), "Language 'astro' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("astro");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_bash() {
+    // Smoke test: load bash and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("bash"), "Language 'bash' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("bash");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_beancount() {
+    // Smoke test: load beancount and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("beancount"), "Language 'beancount' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("beancount");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_bibtex() {
+    // Smoke test: load bibtex and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("bibtex"), "Language 'bibtex' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("bibtex");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_bicep() {
+    // Smoke test: load bicep and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("bicep"), "Language 'bicep' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("bicep");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_bitbake() {
+    // Smoke test: load bitbake and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("bitbake"), "Language 'bitbake' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("bitbake");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_bsl() {
+    // Smoke test: load bsl and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("bsl"), "Language 'bsl' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("bsl");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_c() {
+    // Smoke test: load c and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("c"), "Language 'c' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("c");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_cairo() {
+    // Smoke test: load cairo and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("cairo"), "Language 'cairo' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("cairo");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_capnp() {
+    // Smoke test: load capnp and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("capnp"), "Language 'capnp' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("capnp");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_chatito() {
+    // Smoke test: load chatito and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("chatito"), "Language 'chatito' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("chatito");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_clarity() {
+    // Smoke test: load clarity and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("clarity"), "Language 'clarity' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("clarity");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_clojure() {
+    // Smoke test: load clojure and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("clojure"), "Language 'clojure' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("clojure");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_cmake() {
+    // Smoke test: load cmake and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("cmake"), "Language 'cmake' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("cmake");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_cobol() {
+    // Smoke test: load cobol and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("cobol"), "Language 'cobol' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("cobol");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_comment() {
+    // Smoke test: load comment and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("comment"), "Language 'comment' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("comment");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_commonlisp() {
+    // Smoke test: load commonlisp and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("commonlisp"), "Language 'commonlisp' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("commonlisp");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_cpon() {
+    // Smoke test: load cpon and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("cpon"), "Language 'cpon' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("cpon");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_cpp() {
+    // Smoke test: load cpp and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("cpp"), "Language 'cpp' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("cpp");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_csharp() {
+    // Smoke test: load csharp and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("csharp"), "Language 'csharp' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("csharp");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_css() {
+    // Smoke test: load css and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("css"), "Language 'css' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("css");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_csv() {
+    // Smoke test: load csv and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("csv"), "Language 'csv' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("csv");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_cuda() {
+    // Smoke test: load cuda and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("cuda"), "Language 'cuda' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("cuda");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_d() {
+    // Smoke test: load d and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("d"), "Language 'd' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("d");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_dart() {
+    // Smoke test: load dart and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("dart"), "Language 'dart' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("dart");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_dockerfile() {
+    // Smoke test: load dockerfile and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("dockerfile"), "Language 'dockerfile' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("dockerfile");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_doxygen() {
+    // Smoke test: load doxygen and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("doxygen"), "Language 'doxygen' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("doxygen");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_dtd() {
+    // Smoke test: load dtd and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("dtd"), "Language 'dtd' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("dtd");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_elisp() {
+    // Smoke test: load elisp and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("elisp"), "Language 'elisp' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("elisp");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_elixir() {
+    // Smoke test: load elixir and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("elixir"), "Language 'elixir' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("elixir");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_elm() {
+    // Smoke test: load elm and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("elm"), "Language 'elm' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("elm");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_embeddedtemplate() {
+    // Smoke test: load embeddedtemplate and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("embeddedtemplate"), "Language 'embeddedtemplate' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("embeddedtemplate");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_erlang() {
+    // Smoke test: load erlang and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("erlang"), "Language 'erlang' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("erlang");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_fennel() {
+    // Smoke test: load fennel and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("fennel"), "Language 'fennel' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("fennel");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_firrtl() {
+    // Smoke test: load firrtl and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("firrtl"), "Language 'firrtl' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("firrtl");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_fish() {
+    // Smoke test: load fish and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("fish"), "Language 'fish' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("fish");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_fortran() {
+    // Smoke test: load fortran and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("fortran"), "Language 'fortran' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("fortran");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_fsharp() {
+    // Smoke test: load fsharp and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("fsharp"), "Language 'fsharp' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("fsharp");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_fsharp_signature() {
+    // Smoke test: load fsharp_signature and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("fsharp_signature"), "Language 'fsharp_signature' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("fsharp_signature");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_func() {
+    // Smoke test: load func and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("func"), "Language 'func' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("func");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_gdscript() {
+    // Smoke test: load gdscript and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("gdscript"), "Language 'gdscript' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("gdscript");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_gitattributes() {
+    // Smoke test: load gitattributes and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("gitattributes"), "Language 'gitattributes' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("gitattributes");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_gitcommit() {
+    // Smoke test: load gitcommit and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("gitcommit"), "Language 'gitcommit' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("gitcommit");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_gitignore() {
+    // Smoke test: load gitignore and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("gitignore"), "Language 'gitignore' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("gitignore");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_gleam() {
+    // Smoke test: load gleam and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("gleam"), "Language 'gleam' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("gleam");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_glsl() {
+    // Smoke test: load glsl and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("glsl"), "Language 'glsl' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("glsl");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_gn() {
+    // Smoke test: load gn and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("gn"), "Language 'gn' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("gn");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_go() {
+    // Smoke test: load go and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("go"), "Language 'go' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("go");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_gomod() {
+    // Smoke test: load gomod and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("gomod"), "Language 'gomod' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("gomod");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_gosum() {
+    // Smoke test: load gosum and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("gosum"), "Language 'gosum' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("gosum");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_graphql() {
+    // Smoke test: load graphql and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("graphql"), "Language 'graphql' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("graphql");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_groovy() {
+    // Smoke test: load groovy and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("groovy"), "Language 'groovy' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("groovy");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_gstlaunch() {
+    // Smoke test: load gstlaunch and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("gstlaunch"), "Language 'gstlaunch' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("gstlaunch");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_hack() {
+    // Smoke test: load hack and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("hack"), "Language 'hack' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("hack");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_hare() {
+    // Smoke test: load hare and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("hare"), "Language 'hare' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("hare");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_haskell() {
+    // Smoke test: load haskell and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("haskell"), "Language 'haskell' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("haskell");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_haxe() {
+    // Smoke test: load haxe and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("haxe"), "Language 'haxe' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("haxe");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_hcl() {
+    // Smoke test: load hcl and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("hcl"), "Language 'hcl' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("hcl");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_heex() {
+    // Smoke test: load heex and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("heex"), "Language 'heex' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("heex");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_hlsl() {
+    // Smoke test: load hlsl and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("hlsl"), "Language 'hlsl' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("hlsl");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_html() {
+    // Smoke test: load html and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("html"), "Language 'html' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("html");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_hyprlang() {
+    // Smoke test: load hyprlang and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("hyprlang"), "Language 'hyprlang' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("hyprlang");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_ini() {
+    // Smoke test: load ini and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("ini"), "Language 'ini' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("ini");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_ispc() {
+    // Smoke test: load ispc and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("ispc"), "Language 'ispc' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("ispc");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_janet() {
+    // Smoke test: load janet and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("janet"), "Language 'janet' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("janet");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_java() {
+    // Smoke test: load java and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("java"), "Language 'java' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("java");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_javascript() {
+    // Smoke test: load javascript and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("javascript"), "Language 'javascript' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("javascript");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_jsdoc() {
+    // Smoke test: load jsdoc and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("jsdoc"), "Language 'jsdoc' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("jsdoc");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_json() {
+    // Smoke test: load json and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("json"), "Language 'json' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("json");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_jsonnet() {
+    // Smoke test: load jsonnet and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("jsonnet"), "Language 'jsonnet' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("jsonnet");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_julia() {
+    // Smoke test: load julia and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("julia"), "Language 'julia' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("julia");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_kconfig() {
+    // Smoke test: load kconfig and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("kconfig"), "Language 'kconfig' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("kconfig");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_kdl() {
+    // Smoke test: load kdl and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("kdl"), "Language 'kdl' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("kdl");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_kotlin() {
+    // Smoke test: load kotlin and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("kotlin"), "Language 'kotlin' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("kotlin");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_latex() {
+    // Smoke test: load latex and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("latex"), "Language 'latex' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("latex");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_linkerscript() {
+    // Smoke test: load linkerscript and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("linkerscript"), "Language 'linkerscript' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("linkerscript");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_llvm() {
+    // Smoke test: load llvm and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("llvm"), "Language 'llvm' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("llvm");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_lua() {
+    // Smoke test: load lua and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("lua"), "Language 'lua' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("lua");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_luadoc() {
+    // Smoke test: load luadoc and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("luadoc"), "Language 'luadoc' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("luadoc");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_luap() {
+    // Smoke test: load luap and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("luap"), "Language 'luap' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("luap");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_luau() {
+    // Smoke test: load luau and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("luau"), "Language 'luau' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("luau");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_magik() {
+    // Smoke test: load magik and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("magik"), "Language 'magik' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("magik");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_make() {
+    // Smoke test: load make and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("make"), "Language 'make' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("make");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_markdown() {
+    // Smoke test: load markdown and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("markdown"), "Language 'markdown' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("markdown");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_markdown_inline() {
+    // Smoke test: load markdown_inline and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("markdown_inline"), "Language 'markdown_inline' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("markdown_inline");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_matlab() {
+    // Smoke test: load matlab and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("matlab"), "Language 'matlab' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("matlab");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_mermaid() {
+    // Smoke test: load mermaid and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("mermaid"), "Language 'mermaid' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("mermaid");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_meson() {
+    // Smoke test: load meson and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("meson"), "Language 'meson' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("meson");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_netlinx() {
+    // Smoke test: load netlinx and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("netlinx"), "Language 'netlinx' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("netlinx");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_nim() {
+    // Smoke test: load nim and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("nim"), "Language 'nim' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("nim");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_ninja() {
+    // Smoke test: load ninja and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("ninja"), "Language 'ninja' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("ninja");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_nix() {
+    // Smoke test: load nix and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("nix"), "Language 'nix' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("nix");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_nqc() {
+    // Smoke test: load nqc and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("nqc"), "Language 'nqc' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("nqc");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_nushell() {
+    // Smoke test: load nushell and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("nushell"), "Language 'nushell' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("nushell");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_objc() {
+    // Smoke test: load objc and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("objc"), "Language 'objc' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("objc");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_ocaml() {
+    // Smoke test: load ocaml and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("ocaml"), "Language 'ocaml' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("ocaml");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_ocaml_interface() {
+    // Smoke test: load ocaml_interface and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("ocaml_interface"), "Language 'ocaml_interface' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("ocaml_interface");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_odin() {
+    // Smoke test: load odin and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("odin"), "Language 'odin' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("odin");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_org() {
+    // Smoke test: load org and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("org"), "Language 'org' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("org");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_pascal() {
+    // Smoke test: load pascal and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("pascal"), "Language 'pascal' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("pascal");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_pem() {
+    // Smoke test: load pem and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("pem"), "Language 'pem' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("pem");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_perl() {
+    // Smoke test: load perl and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("perl"), "Language 'perl' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("perl");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_pgn() {
+    // Smoke test: load pgn and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("pgn"), "Language 'pgn' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("pgn");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_php() {
+    // Smoke test: load php and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("php"), "Language 'php' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("php");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_po() {
+    // Smoke test: load po and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("po"), "Language 'po' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("po");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_pony() {
+    // Smoke test: load pony and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("pony"), "Language 'pony' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("pony");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_powershell() {
+    // Smoke test: load powershell and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("powershell"), "Language 'powershell' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("powershell");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_printf() {
+    // Smoke test: load printf and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("printf"), "Language 'printf' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("printf");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_prisma() {
+    // Smoke test: load prisma and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("prisma"), "Language 'prisma' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("prisma");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_properties() {
+    // Smoke test: load properties and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("properties"), "Language 'properties' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("properties");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_proto() {
+    // Smoke test: load proto and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("proto"), "Language 'proto' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("proto");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_psv() {
+    // Smoke test: load psv and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("psv"), "Language 'psv' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("psv");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_puppet() {
+    // Smoke test: load puppet and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("puppet"), "Language 'puppet' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("puppet");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_purescript() {
+    // Smoke test: load purescript and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("purescript"), "Language 'purescript' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("purescript");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_pymanifest() {
+    // Smoke test: load pymanifest and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("pymanifest"), "Language 'pymanifest' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("pymanifest");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_python() {
+    // Smoke test: load python and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("python"), "Language 'python' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("python");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_qmldir() {
+    // Smoke test: load qmldir and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("qmldir"), "Language 'qmldir' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("qmldir");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_qmljs() {
+    // Smoke test: load qmljs and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("qmljs"), "Language 'qmljs' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("qmljs");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_query() {
+    // Smoke test: load query and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("query"), "Language 'query' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("query");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_r() {
+    // Smoke test: load r and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("r"), "Language 'r' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("r");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_racket() {
+    // Smoke test: load racket and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("racket"), "Language 'racket' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("racket");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_re2c() {
+    // Smoke test: load re2c and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("re2c"), "Language 're2c' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("re2c");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_readline() {
+    // Smoke test: load readline and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("readline"), "Language 'readline' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("readline");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_rego() {
+    // Smoke test: load rego and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("rego"), "Language 'rego' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("rego");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_requirements() {
+    // Smoke test: load requirements and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("requirements"), "Language 'requirements' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("requirements");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_ron() {
+    // Smoke test: load ron and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("ron"), "Language 'ron' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("ron");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_rst() {
+    // Smoke test: load rst and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("rst"), "Language 'rst' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("rst");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_ruby() {
+    // Smoke test: load ruby and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("ruby"), "Language 'ruby' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("ruby");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_rust() {
+    // Smoke test: load rust and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("rust"), "Language 'rust' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("rust");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_scala() {
+    // Smoke test: load scala and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("scala"), "Language 'scala' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("scala");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_scheme() {
+    // Smoke test: load scheme and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("scheme"), "Language 'scheme' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("scheme");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_scss() {
+    // Smoke test: load scss and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("scss"), "Language 'scss' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("scss");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_smali() {
+    // Smoke test: load smali and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("smali"), "Language 'smali' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("smali");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_smithy() {
+    // Smoke test: load smithy and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("smithy"), "Language 'smithy' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("smithy");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_solidity() {
+    // Smoke test: load solidity and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("solidity"), "Language 'solidity' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("solidity");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_sparql() {
+    // Smoke test: load sparql and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("sparql"), "Language 'sparql' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("sparql");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_sql() {
+    // Smoke test: load sql and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("sql"), "Language 'sql' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("sql");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_squirrel() {
+    // Smoke test: load squirrel and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("squirrel"), "Language 'squirrel' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("squirrel");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_starlark() {
+    // Smoke test: load starlark and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("starlark"), "Language 'starlark' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("starlark");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_svelte() {
+    // Smoke test: load svelte and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("svelte"), "Language 'svelte' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("svelte");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_swift() {
+    // Smoke test: load swift and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("swift"), "Language 'swift' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("swift");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_tablegen() {
+    // Smoke test: load tablegen and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("tablegen"), "Language 'tablegen' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("tablegen");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_tcl() {
+    // Smoke test: load tcl and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("tcl"), "Language 'tcl' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("tcl");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_terraform() {
+    // Smoke test: load terraform and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("terraform"), "Language 'terraform' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("terraform");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_test() {
+    // Smoke test: load test and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("test"), "Language 'test' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("test");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_thrift() {
+    // Smoke test: load thrift and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("thrift"), "Language 'thrift' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("thrift");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_toml() {
+    // Smoke test: load toml and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("toml"), "Language 'toml' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("toml");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_tsv() {
+    // Smoke test: load tsv and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("tsv"), "Language 'tsv' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("tsv");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_tsx() {
+    // Smoke test: load tsx and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("tsx"), "Language 'tsx' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("tsx");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_twig() {
+    // Smoke test: load twig and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("twig"), "Language 'twig' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("twig");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_typescript() {
+    // Smoke test: load typescript and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("typescript"), "Language 'typescript' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("typescript");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_typst() {
+    // Smoke test: load typst and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("typst"), "Language 'typst' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("typst");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_udev() {
+    // Smoke test: load udev and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("udev"), "Language 'udev' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("udev");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_ungrammar() {
+    // Smoke test: load ungrammar and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("ungrammar"), "Language 'ungrammar' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("ungrammar");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_uxntal() {
+    // Smoke test: load uxntal and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("uxntal"), "Language 'uxntal' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("uxntal");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_v() {
+    // Smoke test: load v and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("v"), "Language 'v' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("v");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_vb() {
+    // Smoke test: load vb and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("vb"), "Language 'vb' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("vb");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_verilog() {
+    // Smoke test: load verilog and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("verilog"), "Language 'verilog' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("verilog");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_vhdl() {
+    // Smoke test: load vhdl and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("vhdl"), "Language 'vhdl' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("vhdl");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_vim() {
+    // Smoke test: load vim and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("vim"), "Language 'vim' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("vim");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_vue() {
+    // Smoke test: load vue and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("vue"), "Language 'vue' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("vue");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_wast() {
+    // Smoke test: load wast and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("wast"), "Language 'wast' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("wast");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_wat() {
+    // Smoke test: load wat and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("wat"), "Language 'wat' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("wat");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_wgsl() {
+    // Smoke test: load wgsl and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("wgsl"), "Language 'wgsl' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("wgsl");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_xcompose() {
+    // Smoke test: load xcompose and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("xcompose"), "Language 'xcompose' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("xcompose");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_xml() {
+    // Smoke test: load xml and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("xml"), "Language 'xml' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("xml");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_yuck() {
+    // Smoke test: load yuck and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("yuck"), "Language 'yuck' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("yuck");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_zig() {
+    // Smoke test: load zig and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("zig"), "Language 'zig' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("zig");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
 }

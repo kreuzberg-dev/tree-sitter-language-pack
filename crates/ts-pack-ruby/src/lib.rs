@@ -50,6 +50,14 @@ fn detect_language_from_content(content: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_content(&content).map(String::from)
 }
 
+fn detect_language_from_extension(ext: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_extension(&ext).map(String::from)
+}
+
+fn detect_language_from_path(path: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
+}
+
 /// Returns extension ambiguity information as a JSON string, or nil.
 fn extension_ambiguity(ext: String) -> Option<String> {
     tree_sitter_language_pack::extension_ambiguity_json(&ext)
@@ -252,6 +260,11 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
         "detect_language_from_content",
         function!(detect_language_from_content, 1),
     )?;
+    module.define_module_function(
+        "detect_language_from_extension",
+        function!(detect_language_from_extension, 1),
+    )?;
+    module.define_module_function("detect_language_from_path", function!(detect_language_from_path, 1))?;
     module.define_module_function("extension_ambiguity", function!(extension_ambiguity, 1))?;
     module.define_module_function("get_highlights_query", function!(get_highlights_query, 1))?;
     module.define_module_function("get_injections_query", function!(get_injections_query, 1))?;

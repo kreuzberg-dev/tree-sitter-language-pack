@@ -65,6 +65,15 @@ fn detect_ext_javascript() {
 }
 
 #[test]
+fn detect_ext_php() {
+    // detect_language_from_extension recognizes .php as php
+    assert_eq!(
+        tree_sitter_language_pack::detect_language_from_extension("php"),
+        Some("php")
+    );
+}
+
+#[test]
 fn detect_ext_python() {
     // detect_language_from_extension recognizes .py as python
     assert_eq!(
@@ -107,6 +116,39 @@ fn detect_ext_unknown() {
 }
 
 #[test]
+fn detect_path_dotfile() {
+    // detect_language_from_path returns None for dotfile .gitignore (no standard extension)
+    assert_eq!(tree_sitter_language_pack::detect_language_from_path(".gitignore"), None);
+}
+
+#[test]
+fn detect_path_go_nested() {
+    // detect_language_from_path extracts extension from nested path lib/server.go
+    assert_eq!(
+        tree_sitter_language_pack::detect_language_from_path("lib/server.go"),
+        Some("go")
+    );
+}
+
+#[test]
+fn detect_path_java_root() {
+    // detect_language_from_path recognizes Main.java in root directory
+    assert_eq!(
+        tree_sitter_language_pack::detect_language_from_path("Main.java"),
+        Some("java")
+    );
+}
+
+#[test]
+fn detect_path_js_root() {
+    // detect_language_from_path recognizes app.js in root directory
+    assert_eq!(
+        tree_sitter_language_pack::detect_language_from_path("app.js"),
+        Some("javascript")
+    );
+}
+
+#[test]
 fn detect_path_nested() {
     // detect_language_from_path extracts extension from nested path src/main.py
     assert_eq!(
@@ -119,4 +161,13 @@ fn detect_path_nested() {
 fn detect_path_no_extension() {
     // detect_language_from_path returns None for extensionless file Makefile
     assert_eq!(tree_sitter_language_pack::detect_language_from_path("Makefile"), None);
+}
+
+#[test]
+fn detect_path_rust_src() {
+    // detect_language_from_path extracts extension from nested path src/main.rs
+    assert_eq!(
+        tree_sitter_language_pack::detect_language_from_path("src/main.rs"),
+        Some("rust")
+    );
 }

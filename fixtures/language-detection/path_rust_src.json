@@ -1,0 +1,10 @@
+{
+	"id": "detect_path_rust_src",
+	"category": "language-detection",
+	"description": "detect_language_from_path extracts extension from nested path src/main.rs",
+	"assertions": {
+		"detect_from_path": "src/main.rs",
+		"detect_result": "rust"
+	},
+	"tags": ["language-detection", "path"]
+}

@@ -1,0 +1,10 @@
+{
+	"id": "detect_path_dotfile",
+	"category": "language-detection",
+	"description": "detect_language_from_path returns None for dotfile .gitignore (no standard extension)",
+	"assertions": {
+		"detect_from_path": ".gitignore",
+		"detect_result_none": true
+	},
+	"tags": ["language-detection", "path"]
+}

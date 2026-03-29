@@ -281,6 +281,27 @@ export declare function treeRootNodeType(tree: ExternalObject<Tree>): string;
 export declare function detectLanguageFromContent(content: string): string | null;
 
 /**
+ * Detect language from a file path or extension.
+ *
+ * Returns the detected language name, or null if detection fails.
+ */
+export declare function detectLanguage(path: string): string | null;
+
+/**
+ * Detect language from a bare file extension (without leading dot).
+ *
+ * Returns the detected language name, or null if detection fails.
+ */
+export declare function detectLanguageFromExtension(ext: string): string | null;
+
+/**
+ * Detect language from a file path based on its extension.
+ *
+ * Returns the detected language name, or null if detection fails.
+ */
+export declare function detectLanguageFromPath(path: string): string | null;
+
+/**
  * Resolve ambiguity for a file extension that maps to multiple languages.
  *
  * Returns the assigned language and alternatives, or null if no ambiguity exists.

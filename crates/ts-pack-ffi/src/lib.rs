@@ -329,6 +329,72 @@ pub unsafe extern "C" fn ts_pack_detect_language_from_content(content: *const c_
     })
 }
 
+/// Detect language name from a bare file extension (without leading dot).
+///
+/// Returns a newly allocated null-terminated UTF-8 string with the language name,
+/// or null if the extension is not recognized. The caller must free the returned
+/// pointer with `ts_pack_free_string`.
+///
+/// # Safety
+///
+/// `ext` must be a valid null-terminated UTF-8 C string, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_detect_language_from_extension(ext: *const c_char) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if ext.is_null() {
+            set_last_error("ext pointer is null");
+            return ptr::null_mut();
+        }
+        // SAFETY: caller guarantees valid null-terminated string; null check above
+        let ext_str = unsafe { CStr::from_ptr(ext) };
+        match ext_str.to_str() {
+            Ok(s) => match tree_sitter_language_pack::detect_language_from_extension(s) {
+                Some(lang) => CString::new(lang).map(CString::into_raw).unwrap_or(ptr::null_mut()),
+                None => ptr::null_mut(),
+            },
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in ext: {e}"));
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
+/// Detect language name from a file path based on its extension.
+///
+/// This is an explicit alias of `ts_pack_detect_language` for API consistency.
+///
+/// Returns a newly allocated null-terminated UTF-8 string with the language name,
+/// or null if the extension is not recognized. The caller must free the returned
+/// pointer with `ts_pack_free_string`.
+///
+/// # Safety
+///
+/// `path` must be a valid null-terminated UTF-8 C string, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_detect_language_from_path(path: *const c_char) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if path.is_null() {
+            set_last_error("path pointer is null");
+            return ptr::null_mut();
+        }
+        // SAFETY: caller guarantees valid null-terminated string; null check above
+        let path_str = unsafe { CStr::from_ptr(path) };
+        match path_str.to_str() {
+            Ok(s) => match tree_sitter_language_pack::detect_language_from_path(s) {
+                Some(lang) => CString::new(lang).map(CString::into_raw).unwrap_or(ptr::null_mut()),
+                None => ptr::null_mut(),
+            },
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in path: {e}"));
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
 /// Returns extension ambiguity information for the given file extension as a JSON C string.
 ///
 /// Returns null if the extension is not ambiguous.

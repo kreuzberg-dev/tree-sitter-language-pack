@@ -56,6 +56,16 @@ public class TsPackRegistry implements AutoCloseable {
   private static final MethodHandle CLEAN_CACHE;
   private static final MethodHandle CACHE_DIR;
   private static final MethodHandle FREE_STRING_ARRAY;
+  private static final MethodHandle DETECT_LANGUAGE;
+  private static final MethodHandle DETECT_LANGUAGE_FROM_CONTENT;
+  private static final MethodHandle DETECT_LANGUAGE_FROM_EXTENSION;
+  private static final MethodHandle DETECT_LANGUAGE_FROM_PATH;
+  private static final MethodHandle EXTENSION_AMBIGUITY;
+  private static final MethodHandle GET_HIGHLIGHTS_QUERY;
+  private static final MethodHandle GET_INJECTIONS_QUERY;
+  private static final MethodHandle GET_LOCALS_QUERY;
+  private static final MethodHandle EXTRACT;
+  private static final MethodHandle VALIDATE_EXTRACTION;
 
   static {
     // Load the native library: check TSPACK_LIB_PATH env var first, then system path
@@ -196,6 +206,70 @@ public class TsPackRegistry implements AutoCloseable {
         LINKER.downcallHandle(
             LOOKUP.find("ts_pack_free_string_array").orElseThrow(),
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
+
+    // ts_pack_detect_language(pointer) -> pointer
+    DETECT_LANGUAGE =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_detect_language").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    // ts_pack_detect_language_from_content(pointer) -> pointer
+    DETECT_LANGUAGE_FROM_CONTENT =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_detect_language_from_content").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    // ts_pack_detect_language_from_extension(pointer) -> pointer
+    DETECT_LANGUAGE_FROM_EXTENSION =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_detect_language_from_extension").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    // ts_pack_detect_language_from_path(pointer) -> pointer
+    DETECT_LANGUAGE_FROM_PATH =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_detect_language_from_path").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    // ts_pack_extension_ambiguity(pointer) -> pointer
+    EXTENSION_AMBIGUITY =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_extension_ambiguity").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    // ts_pack_get_highlights_query(pointer) -> pointer
+    GET_HIGHLIGHTS_QUERY =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_get_highlights_query").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    // ts_pack_get_injections_query(pointer) -> pointer
+    GET_INJECTIONS_QUERY =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_get_injections_query").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    // ts_pack_get_locals_query(pointer) -> pointer
+    GET_LOCALS_QUERY =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_get_locals_query").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    // ts_pack_extract(pointer, long, pointer) -> pointer
+    EXTRACT =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_extract").orElseThrow(),
+            FunctionDescriptor.of(
+                ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS,
+                ValueLayout.JAVA_LONG,
+                ValueLayout.ADDRESS));
+
+    // ts_pack_validate_extraction(pointer) -> pointer
+    VALIDATE_EXTRACTION =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_validate_extraction").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
   }
 
   private static final System.Logger LOGGER = System.getLogger(TsPackRegistry.class.getName());
@@ -448,6 +522,311 @@ public class TsPackRegistry implements AutoCloseable {
       throw e;
     } catch (Throwable t) {
       throw new RuntimeException("Failed to invoke ts_pack_process", t);
+    }
+  }
+
+  /**
+   * Detects the language name for the given file path based on its extension.
+   *
+   * @param path the file path (e.g. {@code "main.py"}, {@code "/src/App.java"})
+   * @return the detected language name, or {@code null} if not recognized
+   * @throws RuntimeException if the native call fails
+   */
+  public static String detectLanguage(String path) {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment cPath = arena.allocateFrom(path);
+      MemorySegment result = (MemorySegment) DETECT_LANGUAGE.invokeExact(cPath);
+
+      if (result.equals(MemorySegment.NULL)) {
+        return null;
+      }
+
+      try {
+        return result.reinterpret(Long.MAX_VALUE).getString(0);
+      } finally {
+        FREE_STRING.invokeExact(result);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_detect_language", t);
+    }
+  }
+
+  /**
+   * Detects the language name from file content using shebang-based detection.
+   *
+   * @param content the file content to analyze (e.g. {@code "#!/usr/bin/env python3\nprint('hi')"})
+   * @return the detected language name, or {@code null} if not recognized
+   * @throws RuntimeException if the native call fails
+   */
+  public static String detectLanguageFromContent(String content) {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment cContent = arena.allocateFrom(content);
+      MemorySegment result = (MemorySegment) DETECT_LANGUAGE_FROM_CONTENT.invokeExact(cContent);
+
+      if (result.equals(MemorySegment.NULL)) {
+        return null;
+      }
+
+      try {
+        return result.reinterpret(Long.MAX_VALUE).getString(0);
+      } finally {
+        FREE_STRING.invokeExact(result);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_detect_language_from_content", t);
+    }
+  }
+
+  /**
+   * Detects the language name from a bare file extension (without leading dot).
+   *
+   * @param ext the file extension (e.g. {@code "py"}, {@code "java"}, {@code "rs"})
+   * @return the detected language name, or {@code null} if not recognized
+   * @throws RuntimeException if the native call fails
+   */
+  public static String detectLanguageFromExtension(String ext) {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment cExt = arena.allocateFrom(ext);
+      MemorySegment result = (MemorySegment) DETECT_LANGUAGE_FROM_EXTENSION.invokeExact(cExt);
+
+      if (result.equals(MemorySegment.NULL)) {
+        return null;
+      }
+
+      try {
+        return result.reinterpret(Long.MAX_VALUE).getString(0);
+      } finally {
+        FREE_STRING.invokeExact(result);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_detect_language_from_extension", t);
+    }
+  }
+
+  /**
+   * Detects the language name from a file path based on its extension.
+   *
+   * <p>This is an explicit alias of {@link #detectLanguage(String)} for API consistency.
+   *
+   * @param path the file path (e.g. {@code "main.py"}, {@code "/src/App.java"})
+   * @return the detected language name, or {@code null} if not recognized
+   * @throws RuntimeException if the native call fails
+   */
+  public static String detectLanguageFromPath(String path) {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment cPath = arena.allocateFrom(path);
+      MemorySegment result = (MemorySegment) DETECT_LANGUAGE_FROM_PATH.invokeExact(cPath);
+
+      if (result.equals(MemorySegment.NULL)) {
+        return null;
+      }
+
+      try {
+        return result.reinterpret(Long.MAX_VALUE).getString(0);
+      } finally {
+        FREE_STRING.invokeExact(result);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_detect_language_from_path", t);
+    }
+  }
+
+  /**
+   * Returns ambiguity information for a file extension as a JSON string.
+   *
+   * <p>If the extension maps to multiple languages, the returned JSON describes the ambiguity.
+   * Returns {@code null} if the extension is unambiguous or not recognized.
+   *
+   * @param ext the file extension (e.g. {@code "h"}, {@code "m"})
+   * @return a JSON string describing the ambiguity, or {@code null}
+   * @throws RuntimeException if the native call fails
+   */
+  public static String extensionAmbiguity(String ext) {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment cExt = arena.allocateFrom(ext);
+      MemorySegment result = (MemorySegment) EXTENSION_AMBIGUITY.invokeExact(cExt);
+
+      if (result.equals(MemorySegment.NULL)) {
+        return null;
+      }
+
+      try {
+        return result.reinterpret(Long.MAX_VALUE).getString(0);
+      } finally {
+        FREE_STRING.invokeExact(result);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_extension_ambiguity", t);
+    }
+  }
+
+  /**
+   * Returns the highlights query for the given language.
+   *
+   * @param language the language name (e.g. {@code "python"}, {@code "java"})
+   * @return the highlights query string, or {@code null} if not available
+   * @throws RuntimeException if the native call fails
+   */
+  public static String getHighlightsQuery(String language) {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment cLang = arena.allocateFrom(language);
+      MemorySegment result = (MemorySegment) GET_HIGHLIGHTS_QUERY.invokeExact(cLang);
+
+      if (result.equals(MemorySegment.NULL)) {
+        return null;
+      }
+
+      try {
+        return result.reinterpret(Long.MAX_VALUE).getString(0);
+      } finally {
+        FREE_STRING.invokeExact(result);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_get_highlights_query", t);
+    }
+  }
+
+  /**
+   * Returns the injections query for the given language.
+   *
+   * @param language the language name (e.g. {@code "markdown"}, {@code "html"})
+   * @return the injections query string, or {@code null} if not available
+   * @throws RuntimeException if the native call fails
+   */
+  public static String getInjectionsQuery(String language) {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment cLang = arena.allocateFrom(language);
+      MemorySegment result = (MemorySegment) GET_INJECTIONS_QUERY.invokeExact(cLang);
+
+      if (result.equals(MemorySegment.NULL)) {
+        return null;
+      }
+
+      try {
+        return result.reinterpret(Long.MAX_VALUE).getString(0);
+      } finally {
+        FREE_STRING.invokeExact(result);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_get_injections_query", t);
+    }
+  }
+
+  /**
+   * Returns the locals query for the given language.
+   *
+   * @param language the language name (e.g. {@code "python"}, {@code "java"})
+   * @return the locals query string, or {@code null} if not available
+   * @throws RuntimeException if the native call fails
+   */
+  public static String getLocalsQuery(String language) {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment cLang = arena.allocateFrom(language);
+      MemorySegment result = (MemorySegment) GET_LOCALS_QUERY.invokeExact(cLang);
+
+      if (result.equals(MemorySegment.NULL)) {
+        return null;
+      }
+
+      try {
+        return result.reinterpret(Long.MAX_VALUE).getString(0);
+      } finally {
+        FREE_STRING.invokeExact(result);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_get_locals_query", t);
+    }
+  }
+
+  /**
+   * Extracts patterns from source code using a JSON extraction configuration.
+   *
+   * <p>The {@code configJson} parameter is a JSON string with fields:
+   *
+   * <ul>
+   *   <li>{@code "language"} (string, required): the language name
+   *   <li>{@code "patterns"} (object, required): named patterns to extract
+   * </ul>
+   *
+   * @param source the source code to extract from
+   * @param configJson a JSON string specifying the extraction configuration
+   * @return a JSON string containing the extraction results
+   * @throws RuntimeException if extraction fails
+   */
+  public static String extract(String source, String configJson) {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment cSource = arena.allocateFrom(source);
+      MemorySegment cConfig = arena.allocateFrom(configJson);
+      MemorySegment result =
+          (MemorySegment)
+              EXTRACT.invokeExact(
+                  cSource,
+                  (long) source.getBytes(java.nio.charset.StandardCharsets.UTF_8).length,
+                  cConfig);
+
+      if (result.equals(MemorySegment.NULL)) {
+        String error = lastError();
+        throw new RuntimeException(
+            "ts_pack_extract returned null" + (error != null ? ": " + error : ""));
+      }
+
+      try {
+        return result.reinterpret(Long.MAX_VALUE).getString(0);
+      } finally {
+        FREE_STRING.invokeExact(result);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_extract", t);
+    }
+  }
+
+  /**
+   * Validates extraction patterns without running them.
+   *
+   * <p>The {@code configJson} parameter has the same shape as for {@link #extract(String, String)}.
+   *
+   * @param configJson a JSON string specifying the extraction configuration to validate
+   * @return a JSON string containing the validation results
+   * @throws RuntimeException if validation fails
+   */
+  public static String validateExtraction(String configJson) {
+    try (Arena arena = Arena.ofConfined()) {
+      MemorySegment cConfig = arena.allocateFrom(configJson);
+      MemorySegment result = (MemorySegment) VALIDATE_EXTRACTION.invokeExact(cConfig);
+
+      if (result.equals(MemorySegment.NULL)) {
+        String error = lastError();
+        throw new RuntimeException(
+            "ts_pack_validate_extraction returned null" + (error != null ? ": " + error : ""));
+      }
+
+      try {
+        return result.reinterpret(Long.MAX_VALUE).getString(0);
+      } finally {
+        FREE_STRING.invokeExact(result);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_validate_extraction", t);
     }
   }
 

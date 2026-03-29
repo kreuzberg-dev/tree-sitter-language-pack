@@ -30,6 +30,8 @@ public class TsPackTree implements AutoCloseable {
   private static final MethodHandle TREE_ROOT_CHILD_COUNT;
   private static final MethodHandle TREE_CONTAINS_NODE_TYPE;
   private static final MethodHandle TREE_HAS_ERROR_NODES;
+  private static final MethodHandle TREE_TO_SEXP;
+  private static final MethodHandle TREE_ERROR_COUNT;
   private static final MethodHandle FREE_STRING;
 
   static {
@@ -65,6 +67,18 @@ public class TsPackTree implements AutoCloseable {
         LINKER.downcallHandle(
             LOOKUP.find("ts_pack_tree_has_error_nodes").orElseThrow(),
             FunctionDescriptor.of(ValueLayout.JAVA_BOOLEAN, ValueLayout.ADDRESS));
+
+    // ts_pack_tree_to_sexp(pointer) -> pointer
+    TREE_TO_SEXP =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_tree_to_sexp").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    // ts_pack_tree_error_count(pointer) -> long (usize)
+    TREE_ERROR_COUNT =
+        LINKER.downcallHandle(
+            LOOKUP.find("ts_pack_tree_error_count").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS));
 
     FREE_STRING =
         LINKER.downcallHandle(
@@ -167,6 +181,48 @@ public class TsPackTree implements AutoCloseable {
       return (boolean) TREE_HAS_ERROR_NODES.invokeExact(treePtr);
     } catch (Throwable t) {
       throw new RuntimeException("Failed to invoke ts_pack_tree_has_error_nodes", t);
+    }
+  }
+
+  /**
+   * Returns the S-expression representation of the syntax tree.
+   *
+   * @return the S-expression string
+   * @throws IllegalStateException if the tree has been closed
+   * @throws RuntimeException if the native call fails
+   */
+  public String toSexp() {
+    ensureOpen();
+    try {
+      MemorySegment cStr = (MemorySegment) TREE_TO_SEXP.invokeExact(treePtr);
+      if (cStr.equals(MemorySegment.NULL)) {
+        throw new RuntimeException("ts_pack_tree_to_sexp returned null");
+      }
+      try {
+        return cStr.reinterpret(Long.MAX_VALUE).getString(0);
+      } finally {
+        FREE_STRING.invokeExact(cStr);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_tree_to_sexp", t);
+    }
+  }
+
+  /**
+   * Returns the count of ERROR and MISSING nodes in the tree.
+   *
+   * @return the error node count (non-negative)
+   * @throws IllegalStateException if the tree has been closed
+   * @throws RuntimeException if the native call fails
+   */
+  public long errorCount() {
+    ensureOpen();
+    try {
+      return (long) TREE_ERROR_COUNT.invokeExact(treePtr);
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to invoke ts_pack_tree_error_count", t);
     }
   }
 

@@ -46,6 +46,12 @@ describe("language_detection", () => {
     expect(result).toBe("javascript");
   });
 
+  it("detect_ext_php", () => {
+    // detect_language_from_extension recognizes .php as php
+    const result = detectLanguageFromExtension("php");
+    expect(result).toBe("php");
+  });
+
   it("detect_ext_python", () => {
     // detect_language_from_extension recognizes .py as python
     const result = detectLanguageFromExtension("py");
@@ -76,6 +82,30 @@ describe("language_detection", () => {
     expect(result).toBeNull();
   });
 
+  it("detect_path_dotfile", () => {
+    // detect_language_from_path returns None for dotfile .gitignore (no standard extension)
+    const result = detectLanguageFromPath(".gitignore");
+    expect(result).toBeNull();
+  });
+
+  it("detect_path_go_nested", () => {
+    // detect_language_from_path extracts extension from nested path lib/server.go
+    const result = detectLanguageFromPath("lib/server.go");
+    expect(result).toBe("go");
+  });
+
+  it("detect_path_java_root", () => {
+    // detect_language_from_path recognizes Main.java in root directory
+    const result = detectLanguageFromPath("Main.java");
+    expect(result).toBe("java");
+  });
+
+  it("detect_path_js_root", () => {
+    // detect_language_from_path recognizes app.js in root directory
+    const result = detectLanguageFromPath("app.js");
+    expect(result).toBe("javascript");
+  });
+
   it("detect_path_nested", () => {
     // detect_language_from_path extracts extension from nested path src/main.py
     const result = detectLanguageFromPath("src/main.py");
@@ -86,6 +116,12 @@ describe("language_detection", () => {
     // detect_language_from_path returns None for extensionless file Makefile
     const result = detectLanguageFromPath("Makefile");
     expect(result).toBeNull();
+  });
+
+  it("detect_path_rust_src", () => {
+    // detect_language_from_path extracts extension from nested path src/main.rs
+    const result = detectLanguageFromPath("src/main.rs");
+    expect(result).toBe("rust");
   });
 
 });

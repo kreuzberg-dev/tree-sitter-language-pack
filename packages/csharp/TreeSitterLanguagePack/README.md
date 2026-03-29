@@ -95,6 +95,8 @@ TsPackClient.Download(["python", "javascript"]);
 ### Language Detection
 
 - `TsPackClient.DetectLanguage(path)` -- detect language from file path
+- `TsPackClient.DetectLanguageFromExtension(ext)` -- detect language from bare extension
+- `TsPackClient.DetectLanguageFromPath(path)` -- detect language from file path
 - `TsPackClient.DetectLanguageFromContent(content)` -- detect language from shebang line
 - `TsPackClient.ExtensionAmbiguity(ext)` -- check if an extension is ambiguous
 

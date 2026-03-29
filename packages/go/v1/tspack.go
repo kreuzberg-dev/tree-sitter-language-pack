@@ -242,6 +242,40 @@ func DetectLanguageFromContent(content string) string {
 	return C.GoString(result)
 }
 
+// DetectLanguageFromExtension detects a language name from a bare file extension
+// (without leading dot). Returns an empty string if the extension is not recognized.
+func DetectLanguageFromExtension(ext string) string {
+	cext := C.CString(ext)
+	defer C.free(unsafe.Pointer(cext))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	result := C.ts_pack_detect_language_from_extension(cext)
+	if result == nil {
+		return ""
+	}
+	defer C.ts_pack_free_string(result)
+	return C.GoString(result)
+}
+
+// DetectLanguageFromPath detects a language name from a file path based on its
+// extension. Returns an empty string if the extension is not recognized.
+func DetectLanguageFromPath(path string) string {
+	cpath := C.CString(path)
+	defer C.free(unsafe.Pointer(cpath))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	result := C.ts_pack_detect_language_from_path(cpath)
+	if result == nil {
+		return ""
+	}
+	defer C.ts_pack_free_string(result)
+	return C.GoString(result)
+}
+
 // ExtensionAmbiguityResult holds the result of an extension ambiguity lookup.
 type ExtensionAmbiguityResult struct {
 	Assigned     string   `json:"assigned"`

@@ -118,6 +118,22 @@ defmodule TreeSitterLanguagePack do
   def detect_language_from_content(_content), do: :erlang.nif_error(:nif_not_loaded)
 
   @doc """
+  Detect language from a bare file extension (without leading dot).
+
+  Returns `nil` if the extension is not recognized.
+  """
+  @spec detect_language_from_extension(String.t()) :: String.t() | nil
+  def detect_language_from_extension(_ext), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
+  Detect language from a file path based on its extension.
+
+  Returns `nil` if the extension is not recognized.
+  """
+  @spec detect_language_from_path(String.t()) :: String.t() | nil
+  def detect_language_from_path(_path), do: :erlang.nif_error(:nif_not_loaded)
+
+  @doc """
   Returns extension ambiguity info as a JSON string, or `nil`.
   """
   @spec extension_ambiguity(String.t()) :: String.t() | nil

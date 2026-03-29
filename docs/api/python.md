@@ -121,6 +121,46 @@ lang = detect_language_from_content("no shebang here")
 print(lang)  # None
 ```
 
+### `detect_language_from_extension(ext: str) -> str | None`
+
+Detect a language name from a bare file extension (without the leading dot). Returns `None` if the extension is not recognized.
+
+!!! note
+    This function is available from the native module: `from tree_sitter_language_pack._native import detect_language_from_extension`
+
+```python
+from tree_sitter_language_pack._native import detect_language_from_extension
+
+lang = detect_language_from_extension("py")
+print(lang)  # "python"
+
+lang = detect_language_from_extension("tsx")
+print(lang)  # "tsx"
+
+lang = detect_language_from_extension("xyz")
+print(lang)  # None
+```
+
+### `detect_language_from_path(path: str) -> str | None`
+
+Detect a language name from a file path based on its extension. Returns `None` if the extension is not recognized.
+
+!!! note
+    This function is available from the native module: `from tree_sitter_language_pack._native import detect_language_from_path`
+
+```python
+from tree_sitter_language_pack._native import detect_language_from_path
+
+lang = detect_language_from_path("/home/user/project/main.py")
+print(lang)  # "python"
+
+lang = detect_language_from_path("src/app.tsx")
+print(lang)  # "tsx"
+
+lang = detect_language_from_path("unknown.xyz")
+print(lang)  # None
+```
+
 ### `extension_ambiguity(ext: str) -> tuple[str, list[str]] | None`
 
 Returns extension ambiguity information for a given file extension. If the extension maps to multiple possible languages, returns a tuple of `(assigned_language, alternative_languages)`. Returns `None` if the extension is not ambiguous.

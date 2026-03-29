@@ -65,6 +65,14 @@ public class LanguageDetectionTests
     }
 
     [Fact]
+    public void DetectExtPhp()
+    {
+        // detect_language_from_extension recognizes .php as php
+        var detectResult = TsPackClient.DetectLanguage("file.php");
+        Assert.Equal("php", detectResult);
+    }
+
+    [Fact]
     public void DetectExtPython()
     {
         // detect_language_from_extension recognizes .py as python
@@ -105,6 +113,38 @@ public class LanguageDetectionTests
     }
 
     [Fact]
+    public void DetectPathDotfile()
+    {
+        // detect_language_from_path returns None for dotfile .gitignore (no standard extension)
+        var detectResult = TsPackClient.DetectLanguage(".gitignore");
+        Assert.Null(detectResult);
+    }
+
+    [Fact]
+    public void DetectPathGoNested()
+    {
+        // detect_language_from_path extracts extension from nested path lib/server.go
+        var detectResult = TsPackClient.DetectLanguage("lib/server.go");
+        Assert.Equal("go", detectResult);
+    }
+
+    [Fact]
+    public void DetectPathJavaRoot()
+    {
+        // detect_language_from_path recognizes Main.java in root directory
+        var detectResult = TsPackClient.DetectLanguage("Main.java");
+        Assert.Equal("java", detectResult);
+    }
+
+    [Fact]
+    public void DetectPathJsRoot()
+    {
+        // detect_language_from_path recognizes app.js in root directory
+        var detectResult = TsPackClient.DetectLanguage("app.js");
+        Assert.Equal("javascript", detectResult);
+    }
+
+    [Fact]
     public void DetectPathNested()
     {
         // detect_language_from_path extracts extension from nested path src/main.py
@@ -118,5 +158,13 @@ public class LanguageDetectionTests
         // detect_language_from_path returns None for extensionless file Makefile
         var detectResult = TsPackClient.DetectLanguage("Makefile");
         Assert.Null(detectResult);
+    }
+
+    [Fact]
+    public void DetectPathRustSrc()
+    {
+        // detect_language_from_path extracts extension from nested path src/main.rs
+        var detectResult = TsPackClient.DetectLanguage("src/main.rs");
+        Assert.Equal("rust", detectResult);
     }
 }

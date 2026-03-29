@@ -62,6 +62,12 @@ describe("language_detection", () => {
     expect(detectResult).toBe("javascript");
   });
 
+  it("detect_ext_php", () => {
+    // detect_language_from_extension recognizes .php as php
+    const detectResult = detectLanguageFromExtension("php");
+    expect(detectResult).toBe("php");
+  });
+
   it("detect_ext_python", () => {
     // detect_language_from_extension recognizes .py as python
     const detectResult = detectLanguageFromExtension("py");
@@ -92,6 +98,30 @@ describe("language_detection", () => {
     expect(detectResult).toBeUndefined();
   });
 
+  it("detect_path_dotfile", () => {
+    // detect_language_from_path returns None for dotfile .gitignore (no standard extension)
+    const detectResult = detectLanguageFromPath(".gitignore");
+    expect(detectResult).toBeUndefined();
+  });
+
+  it("detect_path_go_nested", () => {
+    // detect_language_from_path extracts extension from nested path lib/server.go
+    const detectResult = detectLanguageFromPath("lib/server.go");
+    expect(detectResult).toBe("go");
+  });
+
+  it("detect_path_java_root", () => {
+    // detect_language_from_path recognizes Main.java in root directory
+    const detectResult = detectLanguageFromPath("Main.java");
+    expect(detectResult).toBe("java");
+  });
+
+  it("detect_path_js_root", () => {
+    // detect_language_from_path recognizes app.js in root directory
+    const detectResult = detectLanguageFromPath("app.js");
+    expect(detectResult).toBe("javascript");
+  });
+
   it("detect_path_nested", () => {
     // detect_language_from_path extracts extension from nested path src/main.py
     const detectResult = detectLanguageFromPath("src/main.py");
@@ -102,6 +132,12 @@ describe("language_detection", () => {
     // detect_language_from_path returns None for extensionless file Makefile
     const detectResult = detectLanguageFromPath("Makefile");
     expect(detectResult).toBeUndefined();
+  });
+
+  it("detect_path_rust_src", () => {
+    // detect_language_from_path extracts extension from nested path src/main.rs
+    const detectResult = detectLanguageFromPath("src/main.rs");
+    expect(detectResult).toBe("rust");
   });
 
 });

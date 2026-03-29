@@ -335,6 +335,8 @@ These are the raw functions exposed by the native extension. The wrapper class c
 | `ts_pack_language_count()` | none | int |
 | `ts_pack_detect_language(string $path)` | file path | string or null |
 | `ts_pack_detect_language_from_content(string $content)` | file content | string or null |
+| `ts_pack_detect_language_from_extension(string $ext)` | bare extension (no dot) | string or null |
+| `ts_pack_detect_language_from_path(string $path)` | file path | string or null |
 | `ts_pack_extension_ambiguity(string $ext)` | extension | string (JSON) or null |
 | `ts_pack_get_highlights_query(string $language)` | language name | string or null |
 | `ts_pack_get_injections_query(string $language)` | language name | string or null |
@@ -381,6 +383,8 @@ ts_pack_clean_cache();
 ```php
 $lang = ts_pack_detect_language('script.py');     // "python"
 $lang = ts_pack_detect_language_from_content("#!/usr/bin/env python3\n");  // "python"
+$lang = ts_pack_detect_language_from_extension('py');  // "python"
+$lang = ts_pack_detect_language_from_path('/home/user/project/main.py');  // "python"
 
 $info = ts_pack_extension_ambiguity('h');
 if ($info !== null) {

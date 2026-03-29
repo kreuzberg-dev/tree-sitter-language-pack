@@ -120,6 +120,34 @@ char *ts_pack_detect_language(const char *path);
 char *ts_pack_detect_language_from_content(const char *content);
 
 /**
+ * Detect language name from a bare file extension (without leading dot).
+ *
+ * Returns a newly allocated null-terminated UTF-8 string with the language name,
+ * or null if the extension is not recognized. The caller must free the returned
+ * pointer with `ts_pack_free_string`.
+ *
+ * # Safety
+ *
+ * `ext` must be a valid null-terminated UTF-8 C string, or null.
+ */
+char *ts_pack_detect_language_from_extension(const char *ext);
+
+/**
+ * Detect language name from a file path based on its extension.
+ *
+ * This is an explicit alias of `ts_pack_detect_language` for API consistency.
+ *
+ * Returns a newly allocated null-terminated UTF-8 string with the language name,
+ * or null if the extension is not recognized. The caller must free the returned
+ * pointer with `ts_pack_free_string`.
+ *
+ * # Safety
+ *
+ * `path` must be a valid null-terminated UTF-8 C string, or null.
+ */
+char *ts_pack_detect_language_from_path(const char *path);
+
+/**
  * Returns extension ambiguity information for the given file extension as a JSON C string.
  *
  * Returns null if the extension is not ambiguous.

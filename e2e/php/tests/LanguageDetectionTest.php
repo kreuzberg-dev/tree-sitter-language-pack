@@ -59,6 +59,13 @@ class LanguageDetectionTest extends TestCase
         $this->assertSame('javascript', $detectResult, 'Expected language \'javascript\' detected from extension');
     }
 
+    public function test_detect_ext_php(): void
+    {
+        // detect_language_from_extension recognizes .php as php
+        $detectResult = \ts_pack_detect_language('file.php');
+        $this->assertSame('php', $detectResult, 'Expected language \'php\' detected from extension');
+    }
+
     public function test_detect_ext_python(): void
     {
         // detect_language_from_extension recognizes .py as python
@@ -94,6 +101,34 @@ class LanguageDetectionTest extends TestCase
         $this->assertNull($detectResult, 'Expected no language detected for extension');
     }
 
+    public function test_detect_path_dotfile(): void
+    {
+        // detect_language_from_path returns None for dotfile .gitignore (no standard extension)
+        $detectResult = \ts_pack_detect_language('.gitignore');
+        $this->assertNull($detectResult, 'Expected no language detected for path');
+    }
+
+    public function test_detect_path_go_nested(): void
+    {
+        // detect_language_from_path extracts extension from nested path lib/server.go
+        $detectResult = \ts_pack_detect_language('lib/server.go');
+        $this->assertSame('go', $detectResult, 'Expected language \'go\' detected from path');
+    }
+
+    public function test_detect_path_java_root(): void
+    {
+        // detect_language_from_path recognizes Main.java in root directory
+        $detectResult = \ts_pack_detect_language('Main.java');
+        $this->assertSame('java', $detectResult, 'Expected language \'java\' detected from path');
+    }
+
+    public function test_detect_path_js_root(): void
+    {
+        // detect_language_from_path recognizes app.js in root directory
+        $detectResult = \ts_pack_detect_language('app.js');
+        $this->assertSame('javascript', $detectResult, 'Expected language \'javascript\' detected from path');
+    }
+
     public function test_detect_path_nested(): void
     {
         // detect_language_from_path extracts extension from nested path src/main.py
@@ -106,5 +141,12 @@ class LanguageDetectionTest extends TestCase
         // detect_language_from_path returns None for extensionless file Makefile
         $detectResult = \ts_pack_detect_language('Makefile');
         $this->assertNull($detectResult, 'Expected no language detected for path');
+    }
+
+    public function test_detect_path_rust_src(): void
+    {
+        // detect_language_from_path extracts extension from nested path src/main.rs
+        $detectResult = \ts_pack_detect_language('src/main.rs');
+        $this->assertSame('rust', $detectResult, 'Expected language \'rust\' detected from path');
     }
 }
