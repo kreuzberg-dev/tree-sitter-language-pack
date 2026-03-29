@@ -44,6 +44,6 @@
 	],
 	"license": "MIT",
 	"devDependencies": {
-		"@napi-rs/cli": "^3.5.1"
+		"@napi-rs/cli": "^3.6.0"
 	}
 }

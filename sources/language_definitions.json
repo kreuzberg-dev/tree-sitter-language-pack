@@ -432,14 +432,14 @@
 		"directory": "fsharp",
 		"extensions": ["fs", "fsx"],
 		"repo": "https://github.com/ionide/tree-sitter-fsharp",
-		"rev": "1c2d9351d1f731c08cfdc4ed41e63126ae56e462"
+		"rev": "594c500ecace8618db32dd1144307897277db067"
 	},
 	"fsharp_signature": {
 		"branch": "main",
 		"directory": "fsharp_signature",
 		"extensions": ["fsi"],
 		"repo": "https://github.com/ionide/tree-sitter-fsharp",
-		"rev": "1c2d9351d1f731c08cfdc4ed41e63126ae56e462"
+		"rev": "594c500ecace8618db32dd1144307897277db067"
 	},
 	"func": {
 		"extensions": ["fc"],
@@ -851,14 +851,14 @@
 		"directory": "grammars/ocaml",
 		"extensions": ["ml"],
 		"repo": "https://github.com/tree-sitter/tree-sitter-ocaml",
-		"rev": "28a93319a67a93780bbd484e6ed5b12dcbe7eddb"
+		"rev": "5a979b3ec7f1fe990b8e8c4412294a0cf7228e45"
 	},
 	"ocaml_interface": {
 		"branch": "master",
 		"directory": "grammars/interface",
 		"extensions": ["mli"],
 		"repo": "https://github.com/tree-sitter/tree-sitter-ocaml",
-		"rev": "28a93319a67a93780bbd484e6ed5b12dcbe7eddb"
+		"rev": "5a979b3ec7f1fe990b8e8c4412294a0cf7228e45"
 	},
 	"odin": {
 		"extensions": ["odin"],
@@ -906,7 +906,7 @@
 		"extensions": ["pkl"],
 		"generate": true,
 		"repo": "https://github.com/apple/tree-sitter-pkl",
-		"rev": "7c8a0d15d83c1a436e91277d5023340f1ae5726b"
+		"rev": "f5beed1da8e5fc856a1a11e29a929d0b7cdcfe3c"
 	},
 	"po": {
 		"extensions": ["po", "pot"],
@@ -1080,7 +1080,7 @@
 	"rust": {
 		"extensions": ["rs"],
 		"repo": "https://github.com/tree-sitter/tree-sitter-rust",
-		"rev": "8a1ccae7aaccdc11b04dbd803453e3e9cfd9159b"
+		"rev": "77a3747266f4d621d0757825e6b11edcbf991ca5"
 	},
 	"scala": {
 		"branch": "master",
@@ -1150,7 +1150,7 @@
 		"extensions": ["swift"],
 		"generate": true,
 		"repo": "https://github.com/alex-pinkus/tree-sitter-swift",
-		"rev": "8abb3e8b33256d89127a35e87480736f74755ff9"
+		"rev": "59b5dc98f8c324d992f0acaeab5ff8f9228adb80"
 	},
 	"tablegen": {
 		"branch": "master",
