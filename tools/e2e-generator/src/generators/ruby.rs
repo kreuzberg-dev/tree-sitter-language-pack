@@ -258,7 +258,7 @@ fn write_spec_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(ext) = &assertions.detect_from_extension {
                 writeln!(
                     out,
-                    "    detect_result = TreeSitterLanguagePack.detect_language_from_extension(\"{}\")",
+                    "    detect_result = TreeSitterLanguagePack.detect_language(\"file.{}\")",
                     escape_ruby_string(ext)
                 )
                 .unwrap();
@@ -279,7 +279,7 @@ fn write_spec_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(path) = &assertions.detect_from_path {
                 writeln!(
                     out,
-                    "    detect_result = TreeSitterLanguagePack.detect_language_from_path(\"{}\")",
+                    "    detect_result = TreeSitterLanguagePack.detect_language(\"{}\")",
                     escape_ruby_string(path)
                 )
                 .unwrap();

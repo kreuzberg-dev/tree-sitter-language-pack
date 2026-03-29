@@ -405,7 +405,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 )
                 .unwrap();
                 if assertions.detect_result_none == Some(true) {
-                    writeln!(out, "    expect(detectResult).toBeNull();").unwrap();
+                    writeln!(out, "    expect(detectResult).toBeUndefined();").unwrap();
                 } else if let Some(expected) = &assertions.detect_result {
                     writeln!(
                         out,
@@ -426,7 +426,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 )
                 .unwrap();
                 if assertions.detect_result_none == Some(true) {
-                    writeln!(out, "    expect(detectResult).toBeNull();").unwrap();
+                    writeln!(out, "    expect(detectResult).toBeUndefined();").unwrap();
                 } else if let Some(expected) = &assertions.detect_result {
                     writeln!(
                         out,
@@ -447,7 +447,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 )
                 .unwrap();
                 if assertions.detect_result_none == Some(true) {
-                    writeln!(out, "    expect(detectResult).toBeNull();").unwrap();
+                    writeln!(out, "    expect(detectResult).toBeUndefined();").unwrap();
                 } else if let Some(expected) = &assertions.detect_result {
                     writeln!(
                         out,

@@ -1,0 +1,10 @@
+{
+	"id": "detect_content_bash_shebang",
+	"category": "language-detection",
+	"description": "detect_language_from_content recognizes #!/bin/bash shebang",
+	"assertions": {
+		"detect_from_content": "#!/bin/bash\necho hi",
+		"detect_result": "bash"
+	},
+	"tags": ["language-detection", "content", "shebang"]
+}

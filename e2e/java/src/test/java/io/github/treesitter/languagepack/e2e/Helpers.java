@@ -4,13 +4,17 @@ package io.github.treesitter.languagepack.e2e;
 
 import io.github.treesitter.languagepack.TsPackRegistry;
 
-/** Shared helpers for E2E tests. */
+/**
+ * Shared helpers for E2E tests.
+ */
 final class Helpers {
 
-  private Helpers() {}
+    private Helpers() {}
 
-  /** Create a new registry, failing the test if creation fails. */
-  static TsPackRegistry createRegistry() {
-    return new TsPackRegistry();
-  }
+    /**
+     * Create a new registry, failing the test if creation fails.
+     */
+    static TsPackRegistry createRegistry() {
+        return new TsPackRegistry();
+    }
 }

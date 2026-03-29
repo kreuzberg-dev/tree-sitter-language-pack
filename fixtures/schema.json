@@ -57,6 +57,26 @@
 				"languages_not_empty": {
 					"type": "boolean",
 					"description": "Assert that available_languages() returns a non-empty list."
+				},
+				"detect_from_extension": {
+					"type": "string",
+					"description": "File extension to pass to detect_language_from_extension()."
+				},
+				"detect_from_path": {
+					"type": "string",
+					"description": "File path to pass to detect_language_from_path()."
+				},
+				"detect_from_content": {
+					"type": "string",
+					"description": "File content to pass to detect_language_from_content()."
+				},
+				"detect_result": {
+					"type": "string",
+					"description": "Expected language name returned by detect function."
+				},
+				"detect_result_none": {
+					"type": "boolean",
+					"description": "Assert that the detect function returns None/null."
 				}
 			},
 			"additionalProperties": false

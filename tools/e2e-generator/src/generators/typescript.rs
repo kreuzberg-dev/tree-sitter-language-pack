@@ -53,8 +53,8 @@ fn write_package_json(dir: &Path) -> Result<(), String> {
     "@kreuzberg/tree-sitter-language-pack": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.0"
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2"
   }
 }
 "#;

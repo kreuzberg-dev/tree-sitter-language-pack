@@ -1,0 +1,10 @@
+{
+	"id": "detect_ext_rust",
+	"category": "language-detection",
+	"description": "detect_language_from_extension recognizes .rs as rust",
+	"assertions": {
+		"detect_from_extension": "rs",
+		"detect_result": "rust"
+	},
+	"tags": ["language-detection", "extension"]
+}

@@ -4,72 +4,69 @@ package io.github.treesitter.languagepack.e2e;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import io.github.treesitter.languagepack.TsPackRegistry;
 import org.junit.jupiter.api.Test;
 
 class TreeInspectionTest {
 
-  @Test
-  void tree_error_count_broken() {
-    // Parse broken Python code and verify error count >= 1
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void tree_error_count_broken() {
+        // Parse broken Python code and verify error count >= 1
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void tree_error_count_valid() {
-    // Parse valid Python code and verify zero error count
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void tree_error_count_valid() {
+        // Parse valid Python code and verify zero error count
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void tree_find_nodes_two_functions() {
-    // Parse Python with 2 functions and verify find_nodes_by_type count
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void tree_find_nodes_two_functions() {
+        // Parse Python with 2 functions and verify find_nodes_by_type count
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void tree_named_children_class_and_function() {
-    // Parse Python with class and function, verify named children count
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void tree_named_children_class_and_function() {
+        // Parse Python with class and function, verify named children count
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
 
-  @Test
-  void tree_root_node_info_python() {
-    // Parse Python source and verify root node info
-    try (var registry = Helpers.createRegistry()) {
-      org.junit.jupiter.api.Assumptions.assumeTrue(
-          registry.hasLanguage("python"), "Language 'python' not available");
+    @Test
+    void tree_root_node_info_python() {
+        // Parse Python source and verify root node info
+        try (var registry = Helpers.createRegistry()) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(registry.hasLanguage("python"), "Language 'python' not available");
+        }
+        try (var registry = Helpers.createRegistry()) {
+            var langPtr = registry.getLanguage("python");
+            assertNotNull(langPtr, "Language pointer should not be null");
+        }
     }
-    try (var registry = Helpers.createRegistry()) {
-      var langPtr = registry.getLanguage("python");
-      assertNotNull(langPtr, "Language pointer should not be null");
-    }
-  }
+
 }
