@@ -1,5 +1,5 @@
 ```typescript title="Node.js"
-const { init, download, downloadedLanguages, manifestLanguages } = require("@kreuzberg/tree-sitter-language-pack");
+import { init, download, downloadedLanguages, manifestLanguages } from "@kreuzberg/tree-sitter-language-pack";
 
 // Pre-download specific languages
 download(["python", "javascript", "rust"]);

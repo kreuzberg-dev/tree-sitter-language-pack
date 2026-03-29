@@ -1,5 +1,5 @@
 ```typescript title="Node.js"
-const { process } = require("@kreuzberg/tree-sitter-language-pack");
+import { process } from "@kreuzberg/tree-sitter-language-pack";
 
 const result = process(`
 import { readFile } from 'fs/promises';
