@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-03-29
+
+### Fixed
+
+- Expose `detect_language` in Python public API (#85)
+- PHP extension name corrected to `ts-pack-php` (hyphens)
+
+### Changed
+
+- All language snippet READMEs and documentation corrected
+- Removed automated grammar updates workflow
+
 ## [1.3.3] - 2026-03-27
 
 ### Fixed
