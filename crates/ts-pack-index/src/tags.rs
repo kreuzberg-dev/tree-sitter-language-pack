@@ -188,7 +188,7 @@ pub fn run_tags(lang_name: &str, tree: &ts_pack::Tree, source: &[u8]) -> Option<
                     Err(_) => continue,
                 };
 
-                match cap_name.as_str() {
+                match cap_name.as_ref() {
                     "vis" => {
                         has_vis = true;
                     }

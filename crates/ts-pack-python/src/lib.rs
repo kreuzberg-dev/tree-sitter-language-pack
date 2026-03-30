@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
+use std::path::Path;
 use std::sync::Mutex;
 
 /// Execute a closure with the Python GIL released.
@@ -144,6 +145,34 @@ fn detect_language_from_extension(ext: &str) -> Option<String> {
 #[pyfunction]
 fn detect_language_from_path(path: &str) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_path(path).map(String::from)
+}
+
+/// Index a workspace (Rust-native indexer). Returns list of indexed file paths.
+#[pyfunction]
+fn index_workspace(
+    path: &str,
+    project_id: &str,
+    neo4j_uri: &str,
+    neo4j_user: &str,
+    neo4j_pass: &str,
+    manifest_file: &str,
+) -> PyResult<Vec<String>> {
+    let config = ts_pack_index::IndexerConfig {
+        neo4j_uri: neo4j_uri.to_string(),
+        neo4j_user: neo4j_user.to_string(),
+        neo4j_pass: neo4j_pass.to_string(),
+        project_id: project_id.to_string(),
+        manifest_file: Some(manifest_file.to_string()),
+    };
+
+    let result = without_gil(|| {
+        let rt =
+            tokio::runtime::Runtime::new().map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+        rt.block_on(ts_pack_index::index_workspace(Path::new(path), config))
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+    })?;
+
+    Ok(result.into_iter().map(|p| p.to_string_lossy().into_owned()).collect())
 }
 
 /// Returns extension ambiguity information for the given file extension.
@@ -714,6 +743,7 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(detect_language_from_extension, m)?)?;
     m.add_function(wrap_pyfunction!(detect_language_from_path, m)?)?;
     m.add_function(wrap_pyfunction!(extension_ambiguity, m)?)?;
+    m.add_function(wrap_pyfunction!(index_workspace, m)?)?;
     m.add_function(wrap_pyfunction!(get_highlights_query, m)?)?;
     m.add_function(wrap_pyfunction!(get_injections_query, m)?)?;
     m.add_function(wrap_pyfunction!(get_locals_query, m)?)?;
