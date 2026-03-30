@@ -87,11 +87,19 @@ pub enum StructureKind {
     Class,
     Struct,
     Interface,
+    Protocol,
     Enum,
+    EnumCase,
+    Extension,
+    TypeAlias,
+    AssociatedType,
     Module,
     Trait,
     Impl,
     Namespace,
+    /// A section heading in a documentation format (Markdown, RST, LaTeX, HTML).
+    /// The name field holds the heading text; children hold nested subsections.
+    Section,
     Other(String),
 }
 
@@ -102,6 +110,8 @@ pub struct StructureItem {
     pub kind: StructureKind,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub name: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
+    pub qualified_name: Option<String>,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     pub visibility: Option<String>,
     pub span: Span,
@@ -223,7 +233,12 @@ pub enum SymbolKind {
     Class,
     Type,
     Interface,
+    Protocol,
     Enum,
+    EnumCase,
+    Extension,
+    TypeAlias,
+    AssociatedType,
     Module,
     Other(String),
 }

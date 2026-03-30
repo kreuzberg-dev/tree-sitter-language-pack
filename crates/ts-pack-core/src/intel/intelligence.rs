@@ -6,7 +6,7 @@ pub fn extract_intelligence(source: &str, language: &str, tree: &tree_sitter::Tr
     ProcessResult {
         language: language.to_string(),
         metrics: compute_metrics(source, &root),
-        structure: extract_structure(&root, source),
+        structure: extract_structure(&root, source, language),
         imports: extract_imports(&root, source, language),
         exports: extract_exports(&root, source, language),
         comments: extract_comments(&root, source, language),
@@ -202,6 +202,10 @@ fn collect_imports(node: &tree_sitter::Node, source: &str, language: &str, impor
 pub(crate) fn extract_exports(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<ExportInfo> {
     let mut exports = Vec::with_capacity(16);
     collect_exports(root, source, language, &mut exports);
+    if language == "python" {
+        let mut seen = std::collections::HashSet::new();
+        exports.retain(|item| seen.insert(item.name.clone()));
+    }
     exports
 }
 
@@ -209,22 +213,50 @@ fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, expor
     let kind = node.kind();
     let is_export = match language {
         "javascript" | "typescript" | "tsx" => kind == "export_statement",
+        "python" => kind == "assignment" || kind == "expression_statement",
         _ => false,
     };
     if is_export {
-        let export_kind = if node.child_by_field_name("default").is_some() {
-            ExportKind::Default
-        } else if node.child_by_field_name("source").is_some() {
-            ExportKind::ReExport
-        } else {
-            ExportKind::Named
-        };
         let text = node_text(node, source);
-        exports.push(ExportInfo {
-            name: text.lines().next().unwrap_or("").to_string(),
-            kind: export_kind,
-            span: span_from_node(node),
-        });
+        if language == "python" {
+            // Only treat explicit __all__ assignments as exports.
+            if text.contains("__all__") {
+                exports.push(ExportInfo {
+                    name: text.lines().next().unwrap_or("").to_string(),
+                    kind: ExportKind::Named,
+                    span: span_from_node(node),
+                });
+            }
+        } else {
+            let export_kind = if node.child_by_field_name("default").is_some() {
+                ExportKind::Default
+            } else if node.child_by_field_name("source").is_some() {
+                ExportKind::ReExport
+            } else {
+                ExportKind::Named
+            };
+            exports.push(ExportInfo {
+                name: text.lines().next().unwrap_or("").to_string(),
+                kind: export_kind,
+                span: span_from_node(node),
+            });
+        }
+    }
+    if language == "python" && (kind == "function_definition" || kind == "class_definition") {
+        if let Some(parent) = node.parent() {
+            if parent.kind() == "module" {
+                if let Some(name_node) = node.child_by_field_name("name") {
+                    let name = node_text(&name_node, source).to_string();
+                    if !name.starts_with('_') {
+                        exports.push(ExportInfo {
+                            name,
+                            kind: ExportKind::Named,
+                            span: span_from_node(node),
+                        });
+                    }
+                }
+            }
+        }
     }
     let mut cursor = node.walk();
     for child in node.children(&mut cursor) {
@@ -232,23 +264,214 @@ fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, expor
     }
 }
 
-pub(crate) fn extract_structure(root: &tree_sitter::Node, source: &str) -> Vec<StructureItem> {
+pub(crate) fn extract_structure(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<StructureItem> {
     let mut items = Vec::with_capacity(32);
-    collect_structure(root, source, &mut items);
+    collect_structure(root, source, language, &mut items);
     items
 }
 
-fn collect_structure(node: &tree_sitter::Node, source: &str, items: &mut Vec<StructureItem>) {
+fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, items: &mut Vec<StructureItem>) {
     let kind = node.kind();
+
+    fn is_swift_method(node: &tree_sitter::Node) -> bool {
+        let mut current = node.parent();
+        for _ in 0..32 {
+            let Some(parent) = current else {
+                break;
+            };
+            match parent.kind() {
+                "class_declaration"
+                | "struct_declaration"
+                | "enum_declaration"
+                | "extension_declaration"
+                | "protocol_declaration" => return true,
+                _ => current = parent.parent(),
+            }
+        }
+        false
+    }
+
+    fn swift_signature(node: &tree_sitter::Node, source: &str) -> Option<String> {
+        let bytes = source.as_bytes();
+        let start = node.start_byte();
+        let mut end = node.end_byte();
+        if start >= bytes.len() {
+            return None;
+        }
+        if end > bytes.len() {
+            end = bytes.len();
+        }
+        let raw = String::from_utf8_lossy(&bytes[start..end]);
+        let mut sig = raw.as_ref();
+        if let Some(idx) = sig.find('{') {
+            sig = &sig[..idx];
+        }
+        let compact = sig.split_whitespace().collect::<Vec<_>>().join(" ");
+        if compact.is_empty() { None } else { Some(compact) }
+    }
+
+    fn swift_qualified_name(node: &tree_sitter::Node, source: &str) -> Option<String> {
+        let name = node
+            .child_by_field_name("name")
+            .map(|n| node_text(&n, source).to_string())?;
+        swift_qualified_name_for(node, source, &name)
+    }
+
+    fn swift_qualified_name_for(node: &tree_sitter::Node, source: &str, name: &str) -> Option<String> {
+        let mut parts: Vec<String> = Vec::new();
+        let mut current = node.parent();
+        for _ in 0..32 {
+            let Some(parent) = current else {
+                break;
+            };
+            match parent.kind() {
+                "class_declaration"
+                | "struct_declaration"
+                | "enum_declaration"
+                | "extension_declaration"
+                | "protocol_declaration" => {
+                    if let Some(pname) = parent
+                        .child_by_field_name("name")
+                        .map(|n| node_text(&n, source).to_string())
+                    {
+                        parts.push(pname);
+                    }
+                }
+                _ => {}
+            }
+            current = parent.parent();
+        }
+
+        if parts.is_empty() {
+            Some(name.to_string())
+        } else {
+            parts.reverse();
+            parts.push(name.to_string());
+            Some(parts.join("."))
+        }
+    }
+
+    fn swift_enum_case_name(node: &tree_sitter::Node, source: &str) -> Option<String> {
+        if let Some(name_node) = node.child_by_field_name("name") {
+            return Some(node_text(&name_node, source).to_string());
+        }
+        fn find_identifier(node: &tree_sitter::Node, source: &str) -> Option<String> {
+            let mut cursor = node.walk();
+            for child in node.children(&mut cursor) {
+                if !child.is_named() {
+                    continue;
+                }
+                let kind = child.kind();
+                if kind.contains("identifier") {
+                    return Some(node_text(&child, source).to_string());
+                }
+                if let Some(found) = find_identifier(&child, source) {
+                    return Some(found);
+                }
+            }
+            None
+        }
+
+        find_identifier(node, source)
+    }
+
+    fn swift_enum_case_nodes<'a>(node: &'a tree_sitter::Node<'a>) -> Vec<tree_sitter::Node<'a>> {
+        let kind = node.kind();
+        if kind == "enum_entry" {
+            return vec![*node];
+        }
+        if !kind.contains("enum_case") {
+            return Vec::new();
+        }
+        let mut nodes = Vec::new();
+        let mut cursor = node.walk();
+        for child in node.children(&mut cursor) {
+            if !child.is_named() {
+                continue;
+            }
+            if child.kind().contains("enum_case_element") {
+                nodes.push(child);
+            }
+        }
+        if nodes.is_empty() {
+            nodes.push(*node);
+        }
+        nodes
+    }
+
+    // ── Documentation format heading extraction ──────────────────────────────
+    // Each doc language uses different grammar node kinds and different child
+    // nodes to hold the heading text — handle them before the generic match.
+    if let Some(heading_name) = extract_doc_heading(node, source, language) {
+        let mut children = Vec::new();
+        // For RST/markdown `section` nodes, children are nested sections
+        let mut cursor = node.walk();
+        for child in node.children(&mut cursor) {
+            collect_structure(&child, source, language, &mut children);
+        }
+        items.push(StructureItem {
+            kind: StructureKind::Section,
+            name: Some(heading_name),
+            qualified_name: None,
+            visibility: None,
+            span: span_from_node(node),
+            children,
+            decorators: Vec::new(),
+            doc_comment: None,
+            signature: None,
+            body_span: None,
+        });
+        return; // don't recurse further — already walked children above
+    }
+
+    if language == "swift" && (kind.contains("enum_case") || kind == "enum_entry") {
+        let mut added = false;
+        for case_node in swift_enum_case_nodes(node) {
+            let Some(case_name) = swift_enum_case_name(&case_node, source) else {
+                continue;
+            };
+            let qualified_name = swift_qualified_name_for(&case_node, source, &case_name);
+            items.push(StructureItem {
+                kind: StructureKind::EnumCase,
+                name: Some(case_name),
+                qualified_name,
+                visibility: None,
+                span: span_from_node(&case_node),
+                children: Vec::new(),
+                decorators: Vec::new(),
+                doc_comment: None,
+                signature: None,
+                body_span: None,
+            });
+            added = true;
+        }
+        if added {
+            return;
+        }
+    }
+
     let structure_kind = match kind {
         "function_definition" | "function_declaration" | "function_item" | "arrow_function" => {
-            Some(StructureKind::Function)
+            if language == "swift" && kind == "function_declaration" && is_swift_method(node) {
+                Some(StructureKind::Method)
+            } else {
+                Some(StructureKind::Function)
+            }
         }
         "method_definition" | "method_declaration" => Some(StructureKind::Method),
-        "class_definition" | "class_declaration" | "class" => Some(StructureKind::Class),
+        "class_definition" | "class_declaration" | "class" => {
+            if language == "swift" && kind == "class_declaration" {
+                swift_classlike_kind(node, source).or(Some(StructureKind::Class))
+            } else {
+                Some(StructureKind::Class)
+            }
+        }
         "struct_item" | "struct_definition" | "struct_declaration" => Some(StructureKind::Struct),
         "interface_declaration" | "interface_definition" => Some(StructureKind::Interface),
+        "protocol_declaration" => Some(StructureKind::Protocol),
         "enum_item" | "enum_definition" | "enum_declaration" => Some(StructureKind::Enum),
+        "typealias_declaration" => Some(StructureKind::TypeAlias),
+        "associatedtype_declaration" => Some(StructureKind::AssociatedType),
         "module_definition" | "mod_item" => Some(StructureKind::Module),
         "trait_item" => Some(StructureKind::Trait),
         "impl_item" => Some(StructureKind::Impl),
@@ -259,44 +482,270 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, items: &mut Vec<Str
         let name = node
             .child_by_field_name("name")
             .map(|n| node_text(&n, source).to_string());
+        let qualified_name = if language == "swift" {
+            swift_qualified_name(node, source)
+        } else {
+            None
+        };
         let body_span = node.child_by_field_name("body").map(|n| span_from_node(&n));
         let mut children = Vec::new();
         if let Some(body) = node.child_by_field_name("body") {
-            collect_structure(&body, source, &mut children);
+            collect_structure(&body, source, language, &mut children);
+        } else if language == "swift"
+            && matches!(
+                sk,
+                StructureKind::Class
+                    | StructureKind::Struct
+                    | StructureKind::Enum
+                    | StructureKind::Extension
+                    | StructureKind::Protocol
+            )
+        {
+            let mut cursor = node.walk();
+            for child in node.children(&mut cursor) {
+                collect_structure(&child, source, language, &mut children);
+            }
         }
+        let signature = if language == "swift" && (sk == StructureKind::Function || sk == StructureKind::Method) {
+            swift_signature(node, source)
+        } else {
+            None
+        };
+
         items.push(StructureItem {
             kind: sk,
             name,
+            qualified_name,
             visibility: None,
             span: span_from_node(node),
             children,
             decorators: Vec::new(),
             doc_comment: None,
-            signature: None,
+            signature,
             body_span,
         });
     } else {
         let mut cursor = node.walk();
         for child in node.children(&mut cursor) {
-            collect_structure(&child, source, items);
+            collect_structure(&child, source, language, items);
         }
     }
 }
 
-pub(crate) fn extract_symbols(root: &tree_sitter::Node, source: &str, _language: &str) -> Vec<SymbolInfo> {
-    let mut symbols = Vec::with_capacity(32);
-    collect_symbols(root, source, &mut symbols);
+fn swift_classlike_kind(node: &tree_sitter::Node, source: &str) -> Option<StructureKind> {
+    let text = node_text(node, source);
+    if text.contains("extension ") || text.starts_with("extension ") || text.starts_with("public extension") {
+        return Some(StructureKind::Extension);
+    }
+    if text.contains(" enum ") || text.starts_with("enum ") || text.starts_with("public enum") {
+        return Some(StructureKind::Enum);
+    }
+    if text.contains(" struct ") || text.starts_with("struct ") || text.starts_with("public struct") {
+        return Some(StructureKind::Struct);
+    }
+    if text.contains(" class ") || text.starts_with("class ") || text.starts_with("public class") {
+        return Some(StructureKind::Class);
+    }
+    None
+}
+
+/// Extract a heading name from a doc-format node, returning `Some(text)` if
+/// this node represents a heading in the given doc language, `None` otherwise.
+fn extract_doc_heading(node: &tree_sitter::Node, source: &str, language: &str) -> Option<String> {
+    let kind = node.kind();
+    match language {
+        // ── Markdown ──────────────────────────────────────────────────────────
+        // `atx_heading` node: children are marker(s) + inline text
+        // e.g.  (atx_heading (atx_h2_marker) (inline "Section title"))
+        "markdown" | "markdown_inline" => {
+            if kind == "atx_heading" {
+                let mut cursor = node.walk();
+                let text = node
+                    .children(&mut cursor)
+                    .filter(|c| c.kind() == "inline" || c.kind() == "heading_content")
+                    .map(|c| node_text(&c, source).trim().to_string())
+                    .next()
+                    .unwrap_or_default();
+                if !text.is_empty() {
+                    return Some(text);
+                }
+            }
+            None
+        }
+
+        // ── reStructuredText ─────────────────────────────────────────────────
+        // `section` node contains a `title` child whose text is the heading.
+        "rst" => {
+            if kind == "section" {
+                let mut cursor = node.walk();
+                let text = node
+                    .children(&mut cursor)
+                    .find(|c| c.kind() == "title")
+                    .map(|t| node_text(&t, source).trim().to_string())
+                    .unwrap_or_default();
+                if !text.is_empty() {
+                    return Some(text);
+                }
+            }
+            None
+        }
+
+        // ── LaTeX ─────────────────────────────────────────────────────────────
+        // `section` / `subsection` nodes: the curly_group child holds the title.
+        // e.g.  (section (curly_group "Introduction"))
+        "latex" => {
+            if kind == "section"
+                || kind == "subsection"
+                || kind == "subsubsection"
+                || kind == "chapter"
+                || kind == "part"
+            {
+                let mut cursor = node.walk();
+                let text = node
+                    .children(&mut cursor)
+                    .find(|c| c.kind() == "curly_group")
+                    .map(|g| {
+                        node_text(&g, source)
+                            .trim_matches(|ch| ch == '{' || ch == '}')
+                            .trim()
+                            .to_string()
+                    })
+                    .unwrap_or_default();
+                if !text.is_empty() {
+                    return Some(text);
+                }
+            }
+            None
+        }
+
+        // ── HTML ──────────────────────────────────────────────────────────────
+        // `element` nodes: check if first child start_tag contains h1..h6 tag_name.
+        "html" => {
+            if kind == "element" {
+                let mut cursor = node.walk();
+                if let Some(start_tag) = node.children(&mut cursor).find(|c| c.kind() == "start_tag") {
+                    let mut sc = start_tag.walk();
+                    if let Some(tag_name_node) = start_tag.children(&mut sc).find(|c| c.kind() == "tag_name") {
+                        let tag = node_text(&tag_name_node, source);
+                        if matches!(tag, "h1" | "h2" | "h3" | "h4" | "h5" | "h6") {
+                            // Collect all text children of the element (not the tags themselves)
+                            let mut ec = node.walk();
+                            let text: String = node
+                                .children(&mut ec)
+                                .filter(|c| c.kind() == "text")
+                                .map(|c| node_text(&c, source).trim().to_string())
+                                .collect::<Vec<_>>()
+                                .join(" ");
+                            if !text.is_empty() {
+                                return Some(text);
+                            }
+                        }
+                    }
+                }
+            }
+            None
+        }
+
+        _ => None,
+    }
+}
+
+pub(crate) fn extract_symbols(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<SymbolInfo> {
+    let mut symbols = Vec::new();
+    collect_symbols(root, source, language, &mut symbols);
     symbols
 }
 
-fn collect_symbols(node: &tree_sitter::Node, source: &str, symbols: &mut Vec<SymbolInfo>) {
+fn collect_symbols(node: &tree_sitter::Node, source: &str, language: &str, symbols: &mut Vec<SymbolInfo>) {
     let kind = node.kind();
+
+    fn swift_enum_case_name(node: &tree_sitter::Node, source: &str) -> Option<String> {
+        if let Some(name_node) = node.child_by_field_name("name") {
+            return Some(node_text(&name_node, source).to_string());
+        }
+        fn find_identifier(node: &tree_sitter::Node, source: &str) -> Option<String> {
+            let mut cursor = node.walk();
+            for child in node.children(&mut cursor) {
+                if !child.is_named() {
+                    continue;
+                }
+                let kind = child.kind();
+                if kind.contains("identifier") {
+                    return Some(node_text(&child, source).to_string());
+                }
+                if let Some(found) = find_identifier(&child, source) {
+                    return Some(found);
+                }
+            }
+            None
+        }
+
+        find_identifier(node, source)
+    }
+
+    fn swift_enum_case_nodes<'a>(node: &'a tree_sitter::Node<'a>) -> Vec<tree_sitter::Node<'a>> {
+        let kind = node.kind();
+        if kind == "enum_entry" {
+            return vec![*node];
+        }
+        if !kind.contains("enum_case") {
+            return Vec::new();
+        }
+        let mut nodes = Vec::new();
+        let mut cursor = node.walk();
+        for child in node.children(&mut cursor) {
+            if !child.is_named() {
+                continue;
+            }
+            if child.kind().contains("enum_case_element") {
+                nodes.push(child);
+            }
+        }
+        if nodes.is_empty() {
+            nodes.push(*node);
+        }
+        nodes
+    }
+
+    if language == "swift" && (kind.contains("enum_case") || kind == "enum_entry") {
+        let mut added = false;
+        for case_node in swift_enum_case_nodes(node) {
+            let Some(case_name) = swift_enum_case_name(&case_node, source) else {
+                continue;
+            };
+            symbols.push(SymbolInfo {
+                name: case_name,
+                kind: SymbolKind::EnumCase,
+                span: span_from_node(&case_node),
+                type_annotation: None,
+                doc: None,
+            });
+            added = true;
+        }
+        if added {
+            return;
+        }
+    }
     let symbol_kind = match kind {
         "function_definition" | "function_declaration" | "function_item" => Some(SymbolKind::Function),
-        "class_definition" | "class_declaration" => Some(SymbolKind::Class),
+        "class_definition" | "class_declaration" => {
+            if language == "swift" && kind == "class_declaration" {
+                match swift_classlike_kind(node, source) {
+                    Some(StructureKind::Enum) => Some(SymbolKind::Enum),
+                    Some(StructureKind::Struct) => Some(SymbolKind::Type),
+                    Some(StructureKind::Extension) => Some(SymbolKind::Extension),
+                    _ => Some(SymbolKind::Class),
+                }
+            } else {
+                Some(SymbolKind::Class)
+            }
+        }
         "type_alias_declaration" | "type_item" => Some(SymbolKind::Type),
         "interface_declaration" => Some(SymbolKind::Interface),
+        "protocol_declaration" => Some(SymbolKind::Protocol),
         "enum_item" | "enum_declaration" => Some(SymbolKind::Enum),
+        "typealias_declaration" => Some(SymbolKind::TypeAlias),
+        "associatedtype_declaration" => Some(SymbolKind::AssociatedType),
         "const_item" | "const_declaration" => Some(SymbolKind::Constant),
         "let_declaration" | "variable_declaration" | "lexical_declaration" => Some(SymbolKind::Variable),
         _ => None,
@@ -316,7 +765,7 @@ fn collect_symbols(node: &tree_sitter::Node, source: &str, symbols: &mut Vec<Sym
     }
     let mut cursor = node.walk();
     for child in node.children(&mut cursor) {
-        collect_symbols(&child, source, symbols);
+        collect_symbols(&child, source, language, symbols);
     }
 }
 
