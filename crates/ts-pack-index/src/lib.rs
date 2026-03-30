@@ -539,6 +539,12 @@ pub async fn index_workspace(
         let parse_entry = |entry: &ManifestEntry| {
             // Language detection
             let lang_name = ts_pack::detect_language_from_extension(&entry.ext)?;
+            if !ts_pack::has_language(lang_name) {
+                if let Err(err) = ts_pack::download(&[lang_name]) {
+                    eprintln!("[ts-pack-index] download failed: {lang} ({err})", lang = lang_name);
+                    return None;
+                }
+            }
 
             // Read source — skip oversized files
             let source = std::fs::read_to_string(&entry.abs_path).ok()?;
