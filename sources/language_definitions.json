@@ -252,7 +252,7 @@
 	"cue": {
 		"extensions": ["cue"],
 		"repo": "https://github.com/eonpatapon/tree-sitter-cue",
-		"rev": "20bb9195dac00b64c00ee494812abf3bf76f4181"
+		"rev": "a9e713c2fa2da69de03ceb799807043420ca7c4b"
 	},
 	"cylc": {
 		"extensions": ["cylc"],
@@ -680,7 +680,7 @@
 	"kotlin": {
 		"extensions": ["kt", "kts"],
 		"repo": "https://github.com/fwcd/tree-sitter-kotlin",
-		"rev": "93bfeee1555d2b1442d68c44b0afde2a3b069e46"
+		"rev": "6032dfd418aefbc0d5085051c3c58aa07791e813"
 	},
 	"latex": {
 		"branch": "master",
@@ -743,7 +743,7 @@
 		"extensions": ["magik"],
 		"generate": true,
 		"repo": "https://github.com/krn-robin/tree-sitter-magik",
-		"rev": "06fe02c76aef09faead56cdf9495bb9d5fc477b0"
+		"rev": "f288161c5f64f0582386e54d90cf1a720520b55d"
 	},
 	"make": {
 		"extensions": ["mk", "makefile"],
@@ -888,7 +888,7 @@
 		"branch": "release",
 		"extensions": ["pl", "pm"],
 		"repo": "https://github.com/tree-sitter-perl/tree-sitter-perl",
-		"rev": "1d5d6972b6c0958fc26ead7287aafada5facf75b"
+		"rev": "4a0f3435a1a01aa5854e01592ae7734eeb7c35c2"
 	},
 	"pgn": {
 		"branch": "master",
@@ -1150,7 +1150,7 @@
 		"extensions": ["swift"],
 		"generate": true,
 		"repo": "https://github.com/alex-pinkus/tree-sitter-swift",
-		"rev": "59b5dc98f8c324d992f0acaeab5ff8f9228adb80"
+		"rev": "50f2735c48adbbf06c01c37d151f73c9d9dadc6a"
 	},
 	"tablegen": {
 		"branch": "master",

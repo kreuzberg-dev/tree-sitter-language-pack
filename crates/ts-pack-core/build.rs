@@ -61,8 +61,8 @@ fn selected_languages(definitions: &BTreeMap<String, LanguageDefinition>) -> Vec
                 );
             }
             if !definitions.contains_key(name) {
-                println!(
-                    "cargo:warning=Language '{}' from TSLP_LANGUAGES not found in language_definitions.json",
+                eprintln!(
+                    "Language '{}' from TSLP_LANGUAGES not found in language_definitions.json",
                     name
                 );
             }
@@ -117,8 +117,8 @@ fn compile_parser_dynamic(name: &str, c_symbol: Option<&str>, parser_dir: &Path,
     let parser_c = src_dir.join("parser.c");
 
     if !parser_c.exists() {
-        println!(
-            "cargo:warning=Skipping language '{}': parser.c not found at {}",
+        eprintln!(
+            "Skipping language '{}': parser.c not found at {}",
             name,
             parser_c.display()
         );
@@ -204,15 +204,11 @@ fn compile_parser_dynamic(name: &str, c_symbol: Option<&str>, parser_dir: &Path,
                     cmd.arg(&scanner_obj);
                 }
                 Ok(s) => {
-                    println!(
-                        "cargo:warning=Failed to compile C++ scanner for '{}': exit code {:?}",
-                        name,
-                        s.code()
-                    );
+                    eprintln!("Failed to compile C++ scanner for '{}': exit code {:?}", name, s.code());
                     return false;
                 }
                 Err(e) => {
-                    println!("cargo:warning=Failed to run C++ compiler for '{}': {}", name, e);
+                    eprintln!("Failed to run C++ compiler for '{}': {}", name, e);
                     return false;
                 }
             }
@@ -231,15 +227,15 @@ fn compile_parser_dynamic(name: &str, c_symbol: Option<&str>, parser_dir: &Path,
     match status {
         Ok(s) if s.success() => true,
         Ok(s) => {
-            println!(
-                "cargo:warning=Failed to compile shared library for '{}': exit code {:?}",
+            eprintln!(
+                "Failed to compile shared library for '{}': exit code {:?}",
                 name,
                 s.code()
             );
             false
         }
         Err(e) => {
-            println!("cargo:warning=Failed to run compiler for '{}': {}", name, e);
+            eprintln!("Failed to run compiler for '{}': {}", name, e);
             false
         }
     }
@@ -311,8 +307,8 @@ fn apply_wasm32_sysroot(build: &mut cc::Build) {
             build.flag(format!("-isystem{}", wasi_include.display()));
         }
     } else {
-        println!(
-            "cargo:warning=wasm32 target detected but no wasi-sysroot found. \
+        eprintln!(
+            "wasm32 target detected but no wasi-sysroot found. \
                   Install wasi-libc (brew install wasi-libc) or set WASI_SYSROOT env var."
         );
     }
@@ -345,7 +341,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
     }
 
     if let Err(e) = build.try_compile(&format!("tree_sitter_{name}_parser")) {
-        println!("cargo:warning=Failed to compile parser for '{}': {}", name, e);
+        eprintln!("Failed to compile parser for '{}': {}", name, e);
         return false;
     }
 
@@ -372,7 +368,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
             scanner_build.include(&common_dir);
         }
         if let Err(e) = scanner_build.try_compile(&format!("tree_sitter_{name}_scanner")) {
-            println!("cargo:warning=Failed to compile C scanner for '{}': {}", name, e);
+            eprintln!("Failed to compile C scanner for '{}': {}", name, e);
             return false;
         }
     }
@@ -397,7 +393,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
             cpp_build.include(&common_dir);
         }
         if let Err(e) = cpp_build.try_compile(&format!("tree_sitter_{name}_scanner_cpp")) {
-            println!("cargo:warning=Failed to compile C++ scanner for '{}': {}", name, e);
+            eprintln!("Failed to compile C++ scanner for '{}': {}", name, e);
             return false;
         }
     }
@@ -748,11 +744,7 @@ fn main() {
     for name in &selected {
         let parser_dir = parsers_dir.join(name);
         if !parser_dir.join("src/parser.c").exists() {
-            println!(
-                "cargo:warning=Parser sources not found for '{}' at {}",
-                name,
-                parser_dir.display()
-            );
+            eprintln!("Parser sources not found for '{}' at {}", name, parser_dir.display());
             continue;
         }
 
@@ -780,10 +772,7 @@ fn main() {
                 }
             }
             _ => {
-                println!(
-                    "cargo:warning=Unknown TSLP_LINK_MODE '{}', defaulting to dynamic",
-                    link_mode
-                );
+                eprintln!("Unknown TSLP_LINK_MODE '{}', defaulting to dynamic", link_mode);
                 let c_sym = definitions.get(name.as_str()).and_then(|d| d.c_symbol.as_deref());
                 if compile_parser_dynamic(name, c_sym, &parser_dir, &libs_dir) {
                     dynamic_compiled.push(name.clone());

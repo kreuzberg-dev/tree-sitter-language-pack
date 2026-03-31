@@ -1,5 +1,7 @@
 use ahash::AHashMap;
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use std::hint::black_box;
+
+use criterion::{Criterion, criterion_group, criterion_main};
 use tree_sitter_language_pack::{
     CaptureOutput, CompiledExtraction, ExtractionConfig, ExtractionPattern, ProcessConfig,
     detect_language_from_content, detect_language_from_extension, detect_language_from_path, extract_patterns,

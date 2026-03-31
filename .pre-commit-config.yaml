@@ -111,7 +111,7 @@ repos:
 
   # GitHub Actions: linting
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.11
+    rev: v1.7.12
     hooks:
       - id: actionlint
 
@@ -124,13 +124,13 @@ repos:
 
   # AI Rules
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v3.11.2
+    rev: v3.11.3
     hooks:
       - id: ai-rulez-generate
 
   # JavaScript/TypeScript/JSON: biome (formatting + linting)
   - repo: https://github.com/biomejs/pre-commit
-    rev: v2.4.9
+    rev: v2.4.10
     hooks:
       - id: biome-format
       - id: biome-lint
