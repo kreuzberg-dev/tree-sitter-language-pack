@@ -35,6 +35,13 @@ fn find_project_root() -> PathBuf {
     }
 
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
+
+    // Check for language_definitions.json in the crate directory itself
+    // (present when published to crates.io or copied during development).
+    if manifest_dir.join("language_definitions.json").exists() {
+        return manifest_dir.clone();
+    }
+
     let mut dir = manifest_dir.as_path();
     loop {
         if dir.join("sources/language_definitions.json").exists() {
@@ -708,17 +715,25 @@ fn main() {
 
     let project_root = find_project_root();
 
-    // When installed from crates.io without lang-* features, the project root
-    // (and language_definitions.json) won't exist. Generate an empty registry
-    // so the crate builds — dynamic loading + download handles parsers at runtime.
-    let definitions_path = project_root.join("sources/language_definitions.json");
+    // Look for language_definitions.json in two locations:
+    // 1. Crate-local (published to crates.io): {manifest_dir}/language_definitions.json
+    // 2. Workspace (development): {project_root}/sources/language_definitions.json
+    let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
+    let crate_local = manifest_dir.join("language_definitions.json");
+    let workspace_path = project_root.join("sources/language_definitions.json");
+    let definitions_path = if crate_local.exists() {
+        crate_local
+    } else {
+        workspace_path
+    };
+
     let definitions: BTreeMap<String, LanguageDefinition> = if definitions_path.exists() {
         println!("cargo:rerun-if-changed={}", definitions_path.display());
         let definitions_json = fs::read_to_string(&definitions_path)
             .unwrap_or_else(|e| panic!("Failed to read {}: {e}", definitions_path.display()));
         serde_json::from_str(&definitions_json).expect("Failed to parse language_definitions.json")
     } else {
-        // No definitions available (e.g. crates.io install) — empty set
+        // No definitions available — empty set
         BTreeMap::new()
     };
     let parsers_dir = project_root.join("parsers");

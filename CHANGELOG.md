@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-03-31
+
+### Fixed
+
+- Include `language_definitions.json` in the published crate so `build.rs` can find extension mappings, ambiguity data, and C symbol overrides when installed from crates.io
+
+### Changed
+
+- Updated dependencies across all language ecosystems
+
 ## [1.4.0] - 2026-03-29
 
 ### Fixed

@@ -144,26 +144,6 @@ checksum = "2af50177e190e07a26ab74f8b1efbfe2ef87da2116221318cb1c2e82baf7de06"
 
 [[package]]
 name = "bindgen"
-version = "0.69.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "271383c67ccabffb7381723dea0672a673f292304fcb45c01cc648c7a8d58088"
-dependencies = [
- "bitflags",
- "cexpr",
- "clang-sys",
- "itertools 0.12.1",
- "lazy_static",
- "lazycell",
- "proc-macro2",
- "quote",
- "regex",
- "rustc-hash 1.1.0",
- "shlex",
- "syn",
-]
-
-[[package]]
-name = "bindgen"
 version = "0.72.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "993776b509cfb49c750f11b8f07a46fa23e0a1386ffc01fb1e7d343efc387895"
@@ -177,7 +157,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "regex",
- "rustc-hash 2.1.2",
+ "rustc-hash",
  "shlex",
  "syn",
 ]
@@ -792,7 +772,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c719e3bb9dbffdac2b5db25bc5f5a9cbb237033dc5b2861f84b3e11e0cf297e3"
 dependencies = [
  "anyhow",
- "bindgen 0.72.1",
+ "bindgen",
  "bitflags",
  "cc",
  "cfg-if",
@@ -1133,15 +1113,6 @@ checksum = "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695"
 
 [[package]]
 name = "itertools"
-version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
-dependencies = [
- "either",
-]
-
-[[package]]
-name = "itertools"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
@@ -1191,12 +1162,6 @@ name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
-
-[[package]]
-name = "lazycell"
-version = "1.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "leb128fmt"
@@ -1352,7 +1317,7 @@ dependencies = [
  "napi-build",
  "napi-sys",
  "nohash-hasher",
- "rustc-hash 2.1.2",
+ "rustc-hash",
  "serde",
  "serde_json",
 ]
@@ -1778,20 +1743,20 @@ dependencies = [
 
 [[package]]
 name = "rb-sys"
-version = "0.9.124"
+version = "0.9.125"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c85c4188462601e2aa1469def389c17228566f82ea72f137ed096f21591bc489"
+checksum = "85b37650fabd8ba515910a0dc089dcb6348eb3c35fbf91698cb226435be2babc"
 dependencies = [
  "rb-sys-build",
 ]
 
 [[package]]
 name = "rb-sys-build"
-version = "0.9.124"
+version = "0.9.125"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "568068db4102230882e6d4ae8de6632e224ca75fe5970f6e026a04e91ed635d3"
+checksum = "c73b806faa66006e491458b48a78725621c1ac5a2a6efe2614c90711a7780b80"
 dependencies = [
- "bindgen 0.69.5",
+ "bindgen",
  "lazy_static",
  "proc-macro2",
  "quote",
@@ -1877,12 +1842,6 @@ dependencies = [
  "untrusted",
  "windows-sys 0.52.0",
 ]
-
-[[package]]
-name = "rustc-hash"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
 
 [[package]]
 name = "rustc-hash"
@@ -2140,7 +2099,7 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
 name = "snippet-runner"
-version = "1.4.0"
+version = "1.4.1"
 dependencies = [
  "clap",
  "rayon",
@@ -2356,7 +2315,7 @@ checksum = "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
 
 [[package]]
 name = "tree-sitter-language-pack"
-version = "1.4.0"
+version = "1.4.1"
 dependencies = [
  "ahash",
  "cc",
@@ -2377,7 +2336,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-cli"
-version = "1.4.0"
+version = "1.4.1"
 dependencies = [
  "clap",
  "clap_complete",
@@ -2387,7 +2346,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-ffi"
-version = "1.4.0"
+version = "1.4.1"
 dependencies = [
  "cbindgen",
  "serde_json",
@@ -2397,7 +2356,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-node"
-version = "1.4.0"
+version = "1.4.1"
 dependencies = [
  "napi",
  "napi-build",
@@ -2409,7 +2368,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-php"
-version = "1.4.0"
+version = "1.4.1"
 dependencies = [
  "ext-php-rs",
  "serde_json",
@@ -2418,7 +2377,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-python"
-version = "1.4.0"
+version = "1.4.1"
 dependencies = [
  "pyo3",
  "serde_json",
@@ -2428,7 +2387,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-ruby"
-version = "1.4.0"
+version = "1.4.1"
 dependencies = [
  "magnus",
  "rb-sys",
@@ -2439,7 +2398,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-wasm"
-version = "1.4.0"
+version = "1.4.1"
 dependencies = [
  "js-sys",
  "serde_json",
