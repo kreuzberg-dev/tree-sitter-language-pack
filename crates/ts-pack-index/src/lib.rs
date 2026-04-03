@@ -102,6 +102,115 @@ fn clean_import_name(name: &str) -> String {
     out
 }
 
+fn project_root_from_manifest(manifest: &[ManifestEntry]) -> Option<String> {
+    let first = manifest.first()?;
+    if let Some(root) = first.abs_path.strip_suffix(&first.rel_path) {
+        return Some(root.trim_end_matches('/').to_string());
+    }
+    let path = PathBuf::from(&first.abs_path);
+    path.parent().and_then(|p| p.to_str()).map(|p| p.to_string())
+}
+
+fn extract_string_value(block: &str, key: &str) -> Option<String> {
+    let idx = block.find(key)?;
+    let rest = &block[idx + key.len()..];
+    let quote_start = rest.find('"')?;
+    let rest = &rest[quote_start + 1..];
+    let quote_end = rest.find('"')?;
+    Some(rest[..quote_end].to_string())
+}
+
+fn extract_string_array(block: &str, key: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let idx = match block.find(key) {
+        Some(idx) => idx,
+        None => return out,
+    };
+    let rest = &block[idx + key.len()..];
+    let start = match rest.find('[') {
+        Some(pos) => pos,
+        None => return out,
+    };
+    let rest = &rest[start + 1..];
+    let end = match rest.find(']') {
+        Some(pos) => pos,
+        None => return out,
+    };
+    let inner = &rest[..end];
+    for part in inner.split(',') {
+        let trimmed = part.trim();
+        if trimmed.starts_with('"') && trimmed.ends_with('"') && trimmed.len() >= 2 {
+            out.push(trimmed[1..trimmed.len() - 1].to_string());
+        }
+    }
+    out
+}
+
+fn build_swift_module_map(project_root: &str, files_set: &HashSet<String>) -> HashMap<String, Vec<String>> {
+    let mut map = HashMap::new();
+    let pkg_path = Path::new(project_root).join("Package.swift");
+    let Ok(contents) = std::fs::read_to_string(&pkg_path) else {
+        return map;
+    };
+
+    let mut current = String::new();
+    let mut depth = 0i32;
+    let mut in_target = false;
+    for line in contents.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with(".target(")
+            || trimmed.starts_with(".executableTarget(")
+            || trimmed.starts_with(".testTarget(")
+        {
+            in_target = true;
+            depth = 0;
+            current.clear();
+        }
+        if in_target {
+            for ch in trimmed.chars() {
+                if ch == '(' {
+                    depth += 1;
+                } else if ch == ')' {
+                    depth -= 1;
+                }
+            }
+            current.push_str(trimmed);
+            current.push('\n');
+            if depth <= 0 {
+                in_target = false;
+                let name = extract_string_value(&current, "name:");
+                let path = extract_string_value(&current, "path:");
+                let sources = extract_string_array(&current, "sources:");
+                let Some(name) = name else {
+                    continue;
+                };
+                let base_path = path.unwrap_or_else(|| format!("Sources/{name}"));
+                let mut files: Vec<String> = Vec::new();
+                if !sources.is_empty() {
+                    for src in sources {
+                        let joined = format!("{}/{}", base_path.trim_end_matches('/'), src);
+                        if files_set.contains(&joined) {
+                            files.push(joined);
+                        }
+                    }
+                } else {
+                    let prefix = base_path.trim_end_matches('/').to_string() + "/";
+                    for fp in files_set.iter() {
+                        if fp.starts_with(&prefix) {
+                            files.push(fp.clone());
+                        }
+                    }
+                }
+                if !files.is_empty() {
+                    map.insert(name, files);
+                }
+            }
+        }
+    }
+
+    map
+}
+
 fn resolve_module_path(src_fp: &str, module: &str, files_set: &HashSet<String>) -> Option<String> {
     let module = module.trim();
     if module.is_empty() {
@@ -129,6 +238,83 @@ fn resolve_module_path(src_fp: &str, module: &str, files_set: &HashSet<String>) 
         module[2..].to_string()
     } else if module.starts_with("src/") {
         module.to_string()
+    } else if src_fp.ends_with(".rs") {
+        let mut mod_str = module.to_string();
+        if let Some(idx) = mod_str.rfind("use ") {
+            mod_str = mod_str[idx + 4..].to_string();
+        }
+        mod_str = mod_str.trim().trim_end_matches(';').to_string();
+        if let Some((before, _)) = mod_str.split_once(" as ") {
+            mod_str = before.trim().to_string();
+        }
+        if let Some((before, _)) = mod_str.split_once('{') {
+            mod_str = before.trim().trim_end_matches("::").to_string();
+        }
+        mod_str = mod_str.trim_end_matches("::").to_string();
+        if mod_str.is_empty() {
+            return None;
+        }
+
+        let mut module_dir = if src_fp.ends_with("/mod.rs") {
+            src_fp.trim_end_matches("/mod.rs").to_string()
+        } else {
+            src_fp.trim_end_matches(".rs").to_string()
+        };
+
+        let mut crate_root: Option<String> = None;
+        if let Some(idx) = src_fp.rfind("/src/") {
+            crate_root = Some(src_fp[..idx + 4].to_string());
+        } else if src_fp.starts_with("src/") {
+            crate_root = Some("src".to_string());
+        }
+
+        let mut tail = mod_str.as_str();
+        let mut super_count = 0usize;
+        while tail.starts_with("super::") {
+            super_count += 1;
+            tail = &tail[7..];
+        }
+
+        let base_dir = if mod_str.starts_with("crate::") {
+            tail = &mod_str[7..];
+            crate_root?
+        } else if tail.starts_with("self::") {
+            tail = &tail[6..];
+            module_dir.clone()
+        } else if super_count > 0 {
+            for _ in 0..super_count {
+                if let Some(idx) = module_dir.rfind('/') {
+                    module_dir.truncate(idx);
+                } else {
+                    return None;
+                }
+            }
+            module_dir.clone()
+        } else {
+            return None;
+        };
+
+        let tail = tail.trim_matches(':').trim();
+        let mut base_path = base_dir.trim_end_matches('/').to_string();
+        if !tail.is_empty() {
+            base_path.push('/');
+            base_path.push_str(&tail.replace("::", "/"));
+        }
+
+        let mut candidates: Vec<String> = Vec::new();
+        if tail.is_empty() {
+            candidates.push(format!("{base_path}/lib.rs"));
+            candidates.push(format!("{base_path}/main.rs"));
+        }
+        candidates.push(format!("{base_path}.rs"));
+        candidates.push(format!("{base_path}/mod.rs"));
+
+        for candidate in candidates {
+            if files_set.contains(&candidate) {
+                return Some(candidate);
+            }
+        }
+        return None;
     } else if src_fp.ends_with(".py") {
         let mut mod_str = module.to_string();
         let mut dot_count = 0usize;
@@ -1128,6 +1314,8 @@ pub async fn index_workspace(
         None => return Err("Manifest file required for indexing".into()),
     };
 
+    let project_root = project_root_from_manifest(&manifest);
+
     let total_files = manifest.len();
     let project_id: Arc<str> = Arc::from(config.project_id.as_str());
 
@@ -1382,7 +1570,7 @@ pub async fn index_workspace(
                     child: import_id,
                 });
 
-                if !imp.items.is_empty() && !imp.is_wildcard {
+                if !imp.source.is_empty() {
                     import_symbol_requests.push(ImportSymbolRequest {
                         src_id: file_id.clone(),
                         src_filepath: rel_path.clone(),
@@ -1485,34 +1673,95 @@ pub async fn index_workspace(
     );
 
     let mut symbols_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
+    let mut exported_symbols_by_file: HashMap<String, Vec<String>> = HashMap::new();
+    let mut exported_symbols_by_prefix: HashMap<String, Vec<String>> = HashMap::new();
     for syms in all_symbols.values() {
         for sym in syms {
             symbols_by_file
                 .entry(sym.filepath.clone())
                 .or_default()
                 .insert(sym.name.clone(), sym.id.clone());
+            if sym.is_exported {
+                exported_symbols_by_file
+                    .entry(sym.filepath.clone())
+                    .or_default()
+                    .push(sym.id.clone());
+                if let Some((prefix, _)) = sym.filepath.split_once('/') {
+                    exported_symbols_by_prefix
+                        .entry(prefix.to_string())
+                        .or_default()
+                        .push(sym.id.clone());
+                }
+            }
         }
     }
     let files_set: HashSet<String> = all_files.iter().map(|f| f.filepath.clone()).collect();
+    let swift_module_map = project_root
+        .as_deref()
+        .map(|root| build_swift_module_map(root, &files_set))
+        .unwrap_or_default();
     for req in &import_symbol_requests {
-        let target_fp = match resolve_module_path(&req.src_filepath, &req.module, &files_set) {
-            Some(fp) => fp,
-            None => continue,
-        };
-        let Some(sym_map) = symbols_by_file.get(&target_fp) else {
+        let target_fp = resolve_module_path(&req.src_filepath, &req.module, &files_set);
+        let sym_map = target_fp.as_ref().and_then(|fp| symbols_by_file.get(fp));
+        if req.items.is_empty() {
+            if let Some(fp) = target_fp.as_ref() {
+                if let Some(exported) = exported_symbols_by_file.get(fp) {
+                    for sym_id in exported {
+                        if seen_import_symbol.insert((req.src_id.clone(), sym_id.clone())) {
+                            import_symbol_edges.push(ImportSymbolEdgeRow {
+                                src: req.src_id.clone(),
+                                tgt: sym_id.clone(),
+                            });
+                        }
+                    }
+                    continue;
+                }
+            }
+            if req.src_filepath.ends_with(".swift") {
+                if let Some(module_files) = swift_module_map.get(&req.module) {
+                    for fp in module_files {
+                        if let Some(exported) = exported_symbols_by_file.get(fp) {
+                            for sym_id in exported {
+                                if seen_import_symbol.insert((req.src_id.clone(), sym_id.clone())) {
+                                    import_symbol_edges.push(ImportSymbolEdgeRow {
+                                        src: req.src_id.clone(),
+                                        tgt: sym_id.clone(),
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    continue;
+                }
+            }
+            if let Some(prefix) = req.module.split('.').next().filter(|p| !p.is_empty()) {
+                if let Some(exported) = exported_symbols_by_prefix.get(prefix) {
+                    for sym_id in exported {
+                        if seen_import_symbol.insert((req.src_id.clone(), sym_id.clone())) {
+                            import_symbol_edges.push(ImportSymbolEdgeRow {
+                                src: req.src_id.clone(),
+                                tgt: sym_id.clone(),
+                            });
+                        }
+                    }
+                }
+            }
             continue;
-        };
+        }
+
         for item in &req.items {
             let name = clean_import_name(item);
             if name.is_empty() {
                 continue;
             }
-            if let Some(sym_id) = sym_map.get(&name) {
-                if seen_import_symbol.insert((req.src_id.clone(), sym_id.clone())) {
-                    import_symbol_edges.push(ImportSymbolEdgeRow {
-                        src: req.src_id.clone(),
-                        tgt: sym_id.clone(),
-                    });
+            if let Some(sym_map) = sym_map {
+                if let Some(sym_id) = sym_map.get(&name) {
+                    if seen_import_symbol.insert((req.src_id.clone(), sym_id.clone())) {
+                        import_symbol_edges.push(ImportSymbolEdgeRow {
+                            src: req.src_id.clone(),
+                            tgt: sym_id.clone(),
+                        });
+                    }
                 }
             }
         }

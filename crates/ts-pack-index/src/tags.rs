@@ -329,8 +329,36 @@ const GO_TAGS: &str = r#"
     field: (field_identifier) @callee))
 "#;
 
-/// Swift: function declarations and call expressions.
+/// Swift: exported declarations and call expressions.
 const SWIFT_TAGS: &str = r#"
+(function_declaration
+  (modifiers) @vis
+  name: (simple_identifier) @name) @exported
+
+(function_declaration
+  (modifiers) @vis
+  name: (identifier) @name) @exported
+
+(class_declaration
+  (modifiers) @vis
+  name: (type_identifier) @name) @exported
+
+(struct_declaration
+  (modifiers) @vis
+  name: (type_identifier) @name) @exported
+
+(enum_declaration
+  (modifiers) @vis
+  name: (type_identifier) @name) @exported
+
+(protocol_declaration
+  (modifiers) @vis
+  name: (type_identifier) @name) @exported
+
+(typealias_declaration
+  (modifiers) @vis
+  name: (type_identifier) @name) @exported
+
 (function_declaration
   name: (simple_identifier) @name)
 
@@ -754,7 +782,14 @@ pub fn run_tags(lang_name: &str, tree: &ts_pack::Tree, source: &[u8]) -> Option<
 
                 match cap_name.as_ref() {
                     "vis" => {
-                        has_vis = true;
+                        if lang_name == "swift" {
+                            let lowered = text.to_lowercase();
+                            if lowered.contains("public") || lowered.contains("open") {
+                                has_vis = true;
+                            }
+                        } else {
+                            has_vis = true;
+                        }
                     }
                     "name" => {
                         def_name = Some(text);

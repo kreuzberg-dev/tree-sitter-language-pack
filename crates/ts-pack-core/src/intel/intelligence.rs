@@ -274,6 +274,119 @@ fn collect_imports(node: &tree_sitter::Node, source: &str, language: &str, impor
         }
     }
 
+    if language == "swift" && is_import && !handled {
+        let text = node_text(node, source);
+        let cleaned = text.trim().trim_start_matches("import").trim().to_string();
+        if cleaned.is_empty() {
+            return;
+        }
+        let mut parts = cleaned.split_whitespace();
+        let first = parts.next().unwrap_or("");
+        let module_token = match first {
+            "class" | "struct" | "enum" | "protocol" | "typealias" | "func" | "var" | "let" => {
+                parts.next().unwrap_or("")
+            }
+            _ => first,
+        };
+        if !module_token.is_empty() {
+            let module = module_token.split('.').next().unwrap_or("").trim();
+            if !module.is_empty() {
+                imports.push(ImportInfo {
+                    source: module.to_string(),
+                    items: Vec::new(),
+                    alias: None,
+                    is_wildcard: false,
+                    span: span_from_node(node),
+                });
+                handled = true;
+            }
+        }
+    }
+
+    if language == "rust" && is_import && !handled {
+        let text = node_text(node, source);
+        let mut cleaned = text
+            .trim()
+            .trim_start_matches("use ")
+            .trim_end_matches(';')
+            .trim()
+            .to_string();
+
+        if let Some((before, _)) = cleaned.split_once(" as ") {
+            cleaned = before.trim().to_string();
+        }
+
+        if let Some((head, rest)) = cleaned.split_once('{') {
+            let module_base = head.trim().trim_end_matches("::").to_string();
+            let items_part = rest.split_once('}').map(|(a, _)| a).unwrap_or("");
+            for raw in items_part.split(',') {
+                let item_raw = raw.trim();
+                if item_raw.is_empty() || item_raw == "self" {
+                    continue;
+                }
+                if item_raw == "*" {
+                    imports.push(ImportInfo {
+                        source: module_base.clone(),
+                        items: Vec::new(),
+                        alias: None,
+                        is_wildcard: true,
+                        span: span_from_node(node),
+                    });
+                    continue;
+                }
+                let item_clean = item_raw.split_once(" as ").map(|(a, _)| a).unwrap_or(item_raw);
+                let item_clean = item_clean.trim();
+                let (module, item) = if let Some((prefix, name)) = item_clean.rsplit_once("::") {
+                    (format!("{}::{}", module_base, prefix.trim_matches(':')), name.trim())
+                } else {
+                    (module_base.clone(), item_clean)
+                };
+                if !item.is_empty() {
+                    imports.push(ImportInfo {
+                        source: module,
+                        items: vec![item.to_string()],
+                        alias: None,
+                        is_wildcard: false,
+                        span: span_from_node(node),
+                    });
+                }
+            }
+            handled = true;
+        } else {
+            let mut is_wildcard = false;
+            let item_part = if cleaned.ends_with("::*") {
+                is_wildcard = true;
+                cleaned.trim_end_matches("::*").trim().to_string()
+            } else {
+                cleaned.clone()
+            };
+            let parts: Vec<&str> = item_part.split("::").filter(|p| !p.is_empty()).collect();
+            let (module, item) = if parts.len() >= 2 {
+                let last = parts[parts.len() - 1];
+                let module_path = parts[..parts.len() - 1].join("::");
+                if last.chars().next().map(|c| c.is_uppercase()).unwrap_or(false) {
+                    (module_path, last.to_string())
+                } else {
+                    (parts.join("::"), String::new())
+                }
+            } else {
+                (item_part.trim().to_string(), String::new())
+            };
+            imports.push(ImportInfo {
+                source: module,
+                items: if item.is_empty() || is_wildcard {
+                    Vec::new()
+                } else {
+                    vec![item]
+                },
+                alias: None,
+                is_wildcard,
+                span: span_from_node(node),
+            });
+            handled = true;
+        }
+    }
+
     if is_import && !handled {
         let text = node_text(node, source);
         let mut source_name = text.to_string();
