@@ -326,56 +326,38 @@ public static class TreeSitterLanguagePackLib
         return str ?? string.Empty;
     }
 
-    public static string FromTomlFile(string path)
-    {
-        var result = NativeMethods.FromTomlFile(
-            path
-        );
-        var str = Marshal.PtrToStringUTF8(result);
-        NativeMethods.FreeString(result);
-        return str ?? string.Empty;
-    }
-
-    public static string? Discover()
-    {
-        var result = NativeMethods.Discover();
-        var json = Marshal.PtrToStringUTF8(result);
-        NativeMethods.FreeString(result);
-        return JsonSerializer.Deserialize<string?>(json ?? "null")!;
-    }
-
-    public static string Default()
+    public static ProcessConfig Default()
     {
         var result = NativeMethods.Default();
-        var str = Marshal.PtrToStringUTF8(result);
+        var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
-        return str ?? string.Empty;
+        return JsonSerializer.Deserialize<ProcessConfig>(json ?? "null")!;
     }
 
-    public static string WithChunking(nuint maxSize)
+    public static ProcessConfig WithChunking(nuint maxSize)
     {
         var result = NativeMethods.WithChunking(
             maxSize
         );
-        var str = Marshal.PtrToStringUTF8(result);
+        var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
-        return str ?? string.Empty;
+        return JsonSerializer.Deserialize<ProcessConfig>(json ?? "null")!;
     }
 
-    public static string All()
+    public static ProcessConfig All()
     {
         var result = NativeMethods.All();
-        var str = Marshal.PtrToStringUTF8(result);
+        var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
-        return str ?? string.Empty;
+        return JsonSerializer.Deserialize<ProcessConfig>(json ?? "null")!;
     }
 
-    public static string Minimal()
+    public static ProcessConfig Minimal()
     {
         var result = NativeMethods.Minimal();
-        var str = Marshal.PtrToStringUTF8(result);
+        var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
-        return str ?? string.Empty;
+        return JsonSerializer.Deserialize<ProcessConfig>(json ?? "null")!;
     }
 
     private static TreeSitterLanguagePackException GetLastError()

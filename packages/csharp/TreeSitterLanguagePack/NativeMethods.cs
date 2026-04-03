@@ -174,14 +174,6 @@ internal static partial class NativeMethods
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_cache_dir")]
     internal static extern IntPtr CacheDir();
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_from_toml_file")]
-    internal static extern IntPtr FromTomlFile(
-        string path
-    );
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_discover")]
-    internal static extern IntPtr Discover();
-
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_default")]
     internal static extern IntPtr Default();
 
@@ -195,16 +187,6 @@ internal static partial class NativeMethods
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_minimal")]
     internal static extern IntPtr Minimal();
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_with_libs_dir")]
-    internal static extern IntPtr WithLibsDir(
-        string libsDir
-    );
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_add_extra_libs_dir")]
-    internal static extern void AddExtraLibsDir(
-        string dir
-    );
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_last_error_code")]
     internal static extern int LastErrorCode();

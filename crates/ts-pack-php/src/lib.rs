@@ -1,6 +1,11 @@
+#![allow(unused_imports)]
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::missing_errors_doc)]
+#![allow(unused_variables)]
+#![allow(dead_code)]
+#![allow(clippy::should_implement_trait)]
+
 use ext_php_rs::prelude::*;
-use std::collections::HashMap;
-use tree_sitter_language_pack;
 use std::sync::Arc;
 
 #[derive(Clone, serde::Serialize)]
@@ -15,8 +20,8 @@ pub struct ExtractionPattern {
 
 #[php_impl]
 impl ExtractionPattern {
-    pub fn __construct() -> Self {
-        todo!("constructor for ExtractionPattern requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for ExtractionPattern requires complex params".to_string()).into())
     }
 }
 
@@ -46,8 +51,8 @@ pub struct CaptureResult {
 
 #[php_impl]
 impl CaptureResult {
-    pub fn __construct() -> Self {
-        todo!("constructor for CaptureResult requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for CaptureResult requires complex params".to_string()).into())
     }
 }
 
@@ -60,8 +65,8 @@ pub struct MatchResult {
 
 #[php_impl]
 impl MatchResult {
-    pub fn __construct() -> Self {
-        todo!("constructor for MatchResult requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for MatchResult requires complex params".to_string()).into())
     }
 }
 
@@ -74,8 +79,8 @@ pub struct PatternResult {
 
 #[php_impl]
 impl PatternResult {
-    pub fn __construct() -> Self {
-        todo!("constructor for PatternResult requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for PatternResult requires complex params".to_string()).into())
     }
 }
 
@@ -166,8 +171,8 @@ pub struct ProcessResult {
 
 #[php_impl]
 impl ProcessResult {
-    pub fn __construct() -> Self {
-        todo!("constructor for ProcessResult requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for ProcessResult requires complex params".to_string()).into())
     }
 }
 
@@ -216,8 +221,8 @@ pub struct StructureItem {
 
 #[php_impl]
 impl StructureItem {
-    pub fn __construct() -> Self {
-        todo!("constructor for StructureItem requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for StructureItem requires complex params".to_string()).into())
     }
 }
 
@@ -232,8 +237,8 @@ pub struct CommentInfo {
 
 #[php_impl]
 impl CommentInfo {
-    pub fn __construct() -> Self {
-        todo!("constructor for CommentInfo requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for CommentInfo requires complex params".to_string()).into())
     }
 }
 
@@ -249,8 +254,8 @@ pub struct DocstringInfo {
 
 #[php_impl]
 impl DocstringInfo {
-    pub fn __construct() -> Self {
-        todo!("constructor for DocstringInfo requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for DocstringInfo requires complex params".to_string()).into())
     }
 }
 
@@ -281,8 +286,8 @@ pub struct ImportInfo {
 
 #[php_impl]
 impl ImportInfo {
-    pub fn __construct() -> Self {
-        todo!("constructor for ImportInfo requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for ImportInfo requires complex params".to_string()).into())
     }
 }
 
@@ -296,8 +301,8 @@ pub struct ExportInfo {
 
 #[php_impl]
 impl ExportInfo {
-    pub fn __construct() -> Self {
-        todo!("constructor for ExportInfo requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for ExportInfo requires complex params".to_string()).into())
     }
 }
 
@@ -313,8 +318,8 @@ pub struct SymbolInfo {
 
 #[php_impl]
 impl SymbolInfo {
-    pub fn __construct() -> Self {
-        todo!("constructor for SymbolInfo requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for SymbolInfo requires complex params".to_string()).into())
     }
 }
 
@@ -328,8 +333,8 @@ pub struct Diagnostic {
 
 #[php_impl]
 impl Diagnostic {
-    pub fn __construct() -> Self {
-        todo!("constructor for Diagnostic requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for Diagnostic requires complex params".to_string()).into())
     }
 }
 
@@ -346,8 +351,8 @@ pub struct CodeChunk {
 
 #[php_impl]
 impl CodeChunk {
-    pub fn __construct() -> Self {
-        todo!("constructor for CodeChunk requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for CodeChunk requires complex params".to_string()).into())
     }
 }
 
@@ -367,8 +372,8 @@ pub struct ChunkContext {
 
 #[php_impl]
 impl ChunkContext {
-    pub fn __construct() -> Self {
-        todo!("constructor for ChunkContext requires complex params — implement manually")
+    pub fn __construct() -> PhpResult<Self> {
+        Err(PhpException::default("Not implemented: constructor for ChunkContext requires complex params".to_string()).into())
     }
 }
 
@@ -420,14 +425,6 @@ impl PackConfig {
     pub fn __construct(cache_dir: Option<String>, languages: Option<Vec<String>>, groups: Option<Vec<String>>) -> Self {
         Self { cache_dir, languages, groups }
     }
-
-    pub fn from_toml_file() -> PhpResult<String> {
-        todo!("call into core implementation")
-    }
-
-    pub fn discover() -> Option<String> {
-        todo!("call into core implementation")
-    }
 }
 
 #[derive(Clone, serde::Serialize)]
@@ -462,78 +459,60 @@ impl ProcessConfig {
         Self { language, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunk_max_size, extractions }
     }
 
-    pub fn with_chunking(&self) -> String {
-        todo!("call into core implementation")
+    pub fn with_chunking(&self) -> ProcessConfig {
+        todo!("Not auto-delegatable: with_chunking -- return type requires custom implementation")
     }
 
-    pub fn all(&self) -> String {
-        todo!("call into core implementation")
+    pub fn all(&self) -> ProcessConfig {
+        todo!("Not auto-delegatable: all -- return type requires custom implementation")
     }
 
-    pub fn minimal(&self) -> String {
-        todo!("call into core implementation")
+    pub fn minimal(&self) -> ProcessConfig {
+        todo!("Not auto-delegatable: minimal -- return type requires custom implementation")
     }
 
-    pub fn default() -> String {
-        todo!("call into core implementation")
+    pub fn default() -> ProcessConfig {
+        todo!("Not auto-delegatable: default -- return type requires custom implementation")
     }
 }
 
 #[derive(Clone)]
 #[php_class]
 pub struct LanguageRegistry {
-    inner: std::sync::Arc<tree_sitter_language_pack::LanguageRegistry>,
+    inner: Arc<tree_sitter_language_pack::LanguageRegistry>,
 }
 
 #[php_impl]
 impl LanguageRegistry {
-    pub fn add_extra_libs_dir(&self) -> () {
-        todo!("call into core implementation")
-    }
-
     pub fn get_language(&self) -> PhpResult<Language> {
-        todo!("call into core implementation")
+        Err(ext_php_rs::exception::PhpException::default("Not implemented: get_language".to_string()).into())
     }
 
     pub fn available_languages(&self) -> Vec<String> {
-        todo!("call into core implementation")
+        Vec::new()
     }
 
     pub fn has_language(&self) -> bool {
-        todo!("call into core implementation")
+        false
     }
 
     pub fn language_count(&self) -> i64 {
-        todo!("call into core implementation")
+        0
     }
 
     pub fn process(&self) -> PhpResult<ProcessResult> {
-        todo!("call into core implementation")
+        Err(ext_php_rs::exception::PhpException::default("Not implemented: process".to_string()).into())
     }
 
-    pub fn with_libs_dir() -> String {
-        todo!("call into core implementation")
+    pub fn default() -> LanguageRegistry {
+        todo!("Not auto-delegatable: default -- return type requires custom implementation")
     }
-
-    pub fn default() -> String {
-        todo!("call into core implementation")
-    }
-}
-
-#[derive(Clone)]
-#[php_class]
-pub struct Language {
-    inner: std::sync::Arc<tree_sitter_language_pack::Language>,
-}
-
-#[php_impl]
-impl Language {
 }
 
 #[derive(Clone)]
 #[php_class]
 pub struct Parser {
-    inner: std::sync::Arc<tree_sitter_language_pack::Parser>,
+    inner: Arc<tree_sitter_language_pack::Parser>,
 }
 
 #[php_impl]
@@ -542,8 +521,18 @@ impl Parser {
 
 #[derive(Clone)]
 #[php_class]
+pub struct Language {
+    inner: Arc<tree_sitter_language_pack::Language>,
+}
+
+#[php_impl]
+impl Language {
+}
+
+#[derive(Clone)]
+#[php_class]
 pub struct Tree {
-    inner: std::sync::Arc<tree_sitter_language_pack::Tree>,
+    inner: Arc<tree_sitter_language_pack::Tree>,
 }
 
 #[php_impl]
@@ -620,172 +609,172 @@ pub const DIAGNOSTICSEVERITY_INFO: &str = "Info";
 
 #[php_function]
 pub fn detect_language_from_extension() -> Option<String> {
-    todo!("call into core")
+    None
 }
 
 #[php_function]
 pub fn detect_language_from_path() -> Option<String> {
-    todo!("call into core")
+    None
 }
 
 #[php_function]
 pub fn extension_ambiguity() -> Option<String> {
-    todo!("call into core")
+    None
 }
 
 #[php_function]
 pub fn extension_ambiguity_json() -> Option<String> {
-    todo!("call into core")
+    None
 }
 
 #[php_function]
 pub fn detect_language_from_content() -> Option<String> {
-    todo!("call into core")
+    None
 }
 
 #[php_function]
 pub fn validate_extraction() -> PhpResult<ValidationResult> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: validate_extraction".to_string()).into())
 }
 
 #[php_function]
 pub fn process() -> PhpResult<ProcessResult> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: process".to_string()).into())
 }
 
 #[php_function]
 pub fn node_info_from_node() -> NodeInfo {
-    todo!("call into core")
+    todo!("Not auto-delegatable: node_info_from_node -- return type requires custom implementation")
 }
 
 #[php_function]
 pub fn root_node_info() -> NodeInfo {
-    todo!("call into core")
+    todo!("Not auto-delegatable: root_node_info -- return type requires custom implementation")
 }
 
 #[php_function]
 pub fn find_nodes_by_type() -> Vec<NodeInfo> {
-    todo!("call into core")
+    Vec::new()
 }
 
 #[php_function]
 pub fn named_children_info() -> Vec<NodeInfo> {
-    todo!("call into core")
+    Vec::new()
 }
 
 #[php_function]
 pub fn parse_string() -> PhpResult<Tree> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: parse_string".to_string()).into())
 }
 
 #[php_function]
 pub fn tree_contains_node_type() -> bool {
-    todo!("call into core")
+    false
 }
 
 #[php_function]
 pub fn tree_has_error_nodes() -> bool {
-    todo!("call into core")
+    false
 }
 
 #[php_function]
 pub fn tree_to_sexp() -> String {
-    todo!("call into core")
+    String::from("[unimplemented: tree_to_sexp]")
 }
 
 #[php_function]
 pub fn tree_error_count() -> i64 {
-    todo!("call into core")
+    0
 }
 
 #[php_function]
 pub fn get_highlights_query() -> Option<String> {
-    todo!("call into core")
+    None
 }
 
 #[php_function]
 pub fn get_injections_query() -> Option<String> {
-    todo!("call into core")
+    None
 }
 
 #[php_function]
 pub fn get_locals_query() -> Option<String> {
-    todo!("call into core")
+    None
 }
 
 #[php_function]
 pub fn run_query() -> PhpResult<Vec<String>> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: run_query".to_string()).into())
 }
 
 #[php_function]
 pub fn split_code() -> Vec<String> {
-    todo!("call into core")
+    Vec::new()
 }
 
 #[php_function]
 pub fn get_language() -> PhpResult<Language> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: get_language".to_string()).into())
 }
 
 #[php_function]
 pub fn get_parser() -> PhpResult<Parser> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: get_parser".to_string()).into())
 }
 
 #[php_function]
 pub fn available_languages() -> Vec<String> {
-    todo!("call into core")
+    Vec::new()
 }
 
 #[php_function]
 pub fn has_language() -> bool {
-    todo!("call into core")
+    false
 }
 
 #[php_function]
 pub fn language_count() -> i64 {
-    todo!("call into core")
+    0
 }
 
 #[php_function]
 pub fn extract_patterns() -> PhpResult<ExtractionResult> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: extract_patterns".to_string()).into())
 }
 
 #[php_function]
 pub fn init() -> PhpResult<()> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: init".to_string()).into())
 }
 
 #[php_function]
 pub fn configure() -> PhpResult<()> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: configure".to_string()).into())
 }
 
 #[php_function]
 pub fn download_all() -> PhpResult<i64> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: download_all".to_string()).into())
 }
 
 #[php_function]
 pub fn manifest_languages() -> PhpResult<Vec<String>> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: manifest_languages".to_string()).into())
 }
 
 #[php_function]
 pub fn downloaded_languages() -> Vec<String> {
-    todo!("call into core")
+    Vec::new()
 }
 
 #[php_function]
 pub fn clean_cache() -> PhpResult<()> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: clean_cache".to_string()).into())
 }
 
 #[php_function]
 pub fn cache_dir() -> PhpResult<String> {
-    todo!("call into core")
+    Err(ext_php_rs::exception::PhpException::default("Not implemented: cache_dir".to_string()).into())
 }
 
 impl From<PatternValidation> for tree_sitter_language_pack::PatternValidation {

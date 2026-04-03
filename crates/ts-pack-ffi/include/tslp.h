@@ -1150,51 +1150,6 @@ char *tslp_pack_config_languages(const TSLPPackConfig *ptr);
 char *tslp_pack_config_groups(const TSLPPackConfig *ptr);
 
 /**
- * Load configuration from a TOML file.
- *
- * # Errors
- *
- * Returns an error if the file cannot be read or the TOML is invalid.
- *
- * # Example
- *
- * ```no_run
- * use std::path::Path;
- * use tree_sitter_language_pack::PackConfig;
- *
- * let config = PackConfig::from_toml_file(Path::new("language-pack.toml")).unwrap();
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-char *tslp_pack_config_from_toml_file(const char *path);
-
-/**
- * Discover configuration by searching for `language-pack.toml` in:
- *
- * 1. Current directory and up to 10 parent directories
- * 2. `$XDG_CONFIG_HOME/tree-sitter-language-pack/config.toml`
- * 3. `~/.config/tree-sitter-language-pack/config.toml`
- *
- * Returns `None` if no configuration file is found.
- *
- * # Example
- *
- * ```no_run
- * use tree_sitter_language_pack::PackConfig;
- *
- * if let Some(config) = PackConfig::discover() {
- *     println!("Found config with {:?} languages", config.languages);
- * }
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-char *tslp_pack_config_discover(void);
-
-/**
  * Create a `ProcessConfig` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
@@ -1270,7 +1225,7 @@ uintptr_t tslp_process_config_chunk_max_size(const TSLPProcessConfig *ptr);
  * Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_process_config_default(void);
+TSLPProcessConfig *tslp_process_config_default(void);
 
 /**
  * Enable chunking with the given maximum chunk size in bytes.
@@ -1278,8 +1233,8 @@ char *tslp_process_config_default(void);
  * Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_process_config_with_chunking(TSLPProcessConfig *this_,
-                                        uintptr_t max_size);
+TSLPProcessConfig *tslp_process_config_with_chunking(TSLPProcessConfig *this_,
+                                                     uintptr_t max_size);
 
 /**
  * Enable all analysis features.
@@ -1287,7 +1242,7 @@ char *tslp_process_config_with_chunking(TSLPProcessConfig *this_,
  * Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_process_config_all(TSLPProcessConfig *this_);
+TSLPProcessConfig *tslp_process_config_all(TSLPProcessConfig *this_);
 
 /**
  * Disable all analysis features (only metrics computed).
@@ -1295,7 +1250,7 @@ char *tslp_process_config_all(TSLPProcessConfig *this_);
  * Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_process_config_minimal(TSLPProcessConfig *this_);
+TSLPProcessConfig *tslp_process_config_minimal(TSLPProcessConfig *this_);
 
 /**
  * Free a `LanguageRegistry` handle.
@@ -1303,34 +1258,6 @@ char *tslp_process_config_minimal(TSLPProcessConfig *this_);
  * Pointer must have been returned by this library, or be null.
  */
 void tslp_language_registry_free(TSLPLanguageRegistry *ptr);
-
-/**
- * Create a registry with a custom directory for dynamic libraries.
- *
- * Overrides the default build-time library directory. Useful when
- * dynamic grammar shared libraries are stored in a non-standard location.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-char *tslp_language_registry_with_libs_dir(const char *libs_dir);
-
-/**
- * Add an additional directory to search for dynamic libraries.
- *
- * When [`get_language`](Self::get_language) cannot find a grammar in the
- * primary library directory, it searches these extra directories in order.
- * Typically used by the download system to register its cache directory.
- *
- * Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
- * mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
- * immutable while the directory list is updated.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-void tslp_language_registry_add_extra_libs_dir(const TSLPLanguageRegistry *this_,
-                                               const char *dir);
 
 /**
  * Get a tree-sitter [`Language`] by name.
@@ -1396,14 +1323,7 @@ TSLPProcessResult *tslp_language_registry_process(const TSLPLanguageRegistry *th
  * Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_language_registry_default(void);
-
-/**
- * Free a `Language` handle.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void tslp_language_free(TSLPLanguage *ptr);
+TSLPLanguageRegistry *tslp_language_registry_default(void);
 
 /**
  * Free a `Parser` handle.
@@ -1411,6 +1331,13 @@ void tslp_language_free(TSLPLanguage *ptr);
  * Pointer must have been returned by this library, or be null.
  */
 void tslp_parser_free(TSLPParser *ptr);
+
+/**
+ * Free a `Language` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void tslp_language_free(TSLPLanguage *ptr);
 
 /**
  * Free a `Tree` handle.

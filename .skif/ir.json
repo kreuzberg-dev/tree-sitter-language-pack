@@ -1391,40 +1391,7 @@
           "sanitized": false
         }
       ],
-      "methods": [
-        {
-          "name": "from_toml_file",
-          "params": [
-            {
-              "name": "path",
-              "ty": "Path",
-              "optional": false,
-              "default": null,
-              "sanitized": false
-            }
-          ],
-          "return_type": "String",
-          "is_async": false,
-          "is_static": true,
-          "error_type": "crate::error::Error",
-          "doc": "Load configuration from a TOML file.\n\n# Errors\n\nReturns an error if the file cannot be read or the TOML is invalid.\n\n# Example\n\n```no_run\nuse std::path::Path;\nuse tree_sitter_language_pack::PackConfig;\n\nlet config = PackConfig::from_toml_file(Path::new(\"language-pack.toml\")).unwrap();\n```",
-          "receiver": null,
-          "sanitized": true
-        },
-        {
-          "name": "discover",
-          "params": [],
-          "return_type": {
-            "Optional": "String"
-          },
-          "is_async": false,
-          "is_static": true,
-          "error_type": null,
-          "doc": "Discover configuration by searching for `language-pack.toml` in:\n\n1. Current directory and up to 10 parent directories\n2. `$XDG_CONFIG_HOME/tree-sitter-language-pack/config.toml`\n3. `~/.config/tree-sitter-language-pack/config.toml`\n\nReturns `None` if no configuration file is found.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::PackConfig;\n\nif let Some(config) = PackConfig::discover() {\n    println!(\"Found config with {:?} languages\", config.languages);\n}\n```",
-          "receiver": null,
-          "sanitized": true
-        }
-      ],
+      "methods": [],
       "is_opaque": false,
       "is_clone": true,
       "doc": "Configuration for the tree-sitter language pack.\n\nControls cache directory and which languages to pre-download.\nCan be loaded from a TOML file, constructed programmatically,\nor passed as a dict/object from language bindings.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::PackConfig;\n\nlet config = PackConfig {\n    cache_dir: None,\n    languages: Some(vec![\"python\".to_string(), \"rust\".to_string()]),\n    groups: None,\n};\n```",
@@ -1536,13 +1503,15 @@
         {
           "name": "default",
           "params": [],
-          "return_type": "String",
+          "return_type": {
+            "Named": "ProcessConfig"
+          },
           "is_async": false,
           "is_static": true,
           "error_type": null,
           "doc": "",
           "receiver": null,
-          "sanitized": true
+          "sanitized": false
         },
         {
           "name": "with_chunking",
@@ -1557,35 +1526,41 @@
               "sanitized": false
             }
           ],
-          "return_type": "String",
+          "return_type": {
+            "Named": "ProcessConfig"
+          },
           "is_async": false,
           "is_static": false,
           "error_type": null,
           "doc": "Enable chunking with the given maximum chunk size in bytes.",
           "receiver": "Owned",
-          "sanitized": true
+          "sanitized": false
         },
         {
           "name": "all",
           "params": [],
-          "return_type": "String",
+          "return_type": {
+            "Named": "ProcessConfig"
+          },
           "is_async": false,
           "is_static": false,
           "error_type": null,
           "doc": "Enable all analysis features.",
           "receiver": "Owned",
-          "sanitized": true
+          "sanitized": false
         },
         {
           "name": "minimal",
           "params": [],
-          "return_type": "String",
+          "return_type": {
+            "Named": "ProcessConfig"
+          },
           "is_async": false,
           "is_static": false,
           "error_type": null,
           "doc": "Disable all analysis features (only metrics computed).",
           "receiver": "Owned",
-          "sanitized": true
+          "sanitized": false
         }
       ],
       "is_opaque": false,
@@ -1599,44 +1574,6 @@
       "rust_path": "tree-sitter-language-pack::LanguageRegistry",
       "fields": [],
       "methods": [
-        {
-          "name": "with_libs_dir",
-          "params": [
-            {
-              "name": "libs_dir",
-              "ty": "Path",
-              "optional": false,
-              "default": null,
-              "sanitized": false
-            }
-          ],
-          "return_type": "String",
-          "is_async": false,
-          "is_static": true,
-          "error_type": null,
-          "doc": "Create a registry with a custom directory for dynamic libraries.\n\nOverrides the default build-time library directory. Useful when\ndynamic grammar shared libraries are stored in a non-standard location.",
-          "receiver": null,
-          "sanitized": true
-        },
-        {
-          "name": "add_extra_libs_dir",
-          "params": [
-            {
-              "name": "dir",
-              "ty": "Path",
-              "optional": false,
-              "default": null,
-              "sanitized": false
-            }
-          ],
-          "return_type": "Unit",
-          "is_async": false,
-          "is_static": false,
-          "error_type": null,
-          "doc": "Add an additional directory to search for dynamic libraries.\n\nWhen [`get_language`](Self::get_language) cannot find a grammar in the\nprimary library directory, it searches these extra directories in order.\nTypically used by the download system to register its cache directory.\n\nTakes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior\nmutability via an `Arc<RwLock<...>>`, so the outer registry can remain\nimmutable while the directory list is updated.",
-          "receiver": "Ref",
-          "sanitized": false
-        },
         {
           "name": "get_language",
           "params": [
@@ -1738,13 +1675,15 @@
         {
           "name": "default",
           "params": [],
-          "return_type": "String",
+          "return_type": {
+            "Named": "LanguageRegistry"
+          },
           "is_async": false,
           "is_static": true,
           "error_type": null,
           "doc": "",
           "receiver": null,
-          "sanitized": true
+          "sanitized": false
         }
       ],
       "is_opaque": true,
@@ -1754,8 +1693,8 @@
       "is_trait": false
     },
     {
-      "name": "Language",
-      "rust_path": "tree_sitter_language_pack::Language",
+      "name": "Parser",
+      "rust_path": "tree_sitter_language_pack::Parser",
       "fields": [],
       "methods": [],
       "is_opaque": true,
@@ -1765,8 +1704,8 @@
       "is_trait": false
     },
     {
-      "name": "Parser",
-      "rust_path": "tree_sitter_language_pack::Parser",
+      "name": "Language",
+      "rust_path": "tree_sitter_language_pack::Language",
       "fields": [],
       "methods": [],
       "is_opaque": true,
