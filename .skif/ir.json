@@ -1,0 +1,3046 @@
+{
+  "crate_name": "tree-sitter-language-pack",
+  "version": "1.4.1",
+  "types": [
+    {
+      "name": "ExtractionPattern",
+      "rust_path": "tree-sitter-language-pack::ExtractionPattern",
+      "fields": [
+        {
+          "name": "query",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "The tree-sitter query string (S-expression).",
+          "sanitized": false
+        },
+        {
+          "name": "capture_output",
+          "ty": {
+            "Named": "CaptureOutput"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "What to include in each capture result.",
+          "sanitized": false
+        },
+        {
+          "name": "child_fields",
+          "ty": {
+            "Vec": "String"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Field names to extract from child nodes of each capture.\nMaps a label to a tree-sitter field name used with `child_by_field_name`.",
+          "sanitized": false
+        },
+        {
+          "name": "max_results",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": true,
+          "default": null,
+          "doc": "Maximum number of matches to return. `None` means unlimited.",
+          "sanitized": false
+        },
+        {
+          "name": "byte_range",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "Restrict matches to a byte range `(start, end)`.",
+          "sanitized": true
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Defines a single extraction pattern and its configuration.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "ExtractionConfig",
+      "rust_path": "tree-sitter-language-pack::ExtractionConfig",
+      "fields": [
+        {
+          "name": "language",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "The language name (e.g., `\"python\"`).",
+          "sanitized": false
+        },
+        {
+          "name": "patterns",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "Named patterns to run. Keys become the keys in `ExtractionResult::results`.",
+          "sanitized": true
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Configuration for an extraction run against a single language.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "CaptureResult",
+      "rust_path": "tree-sitter-language-pack::CaptureResult",
+      "fields": [
+        {
+          "name": "name",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "The capture name from the query (e.g., `\"fn_name\"`).",
+          "sanitized": false
+        },
+        {
+          "name": "node",
+          "ty": {
+            "Named": "NodeInfo"
+          },
+          "optional": true,
+          "default": null,
+          "doc": "The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`.",
+          "sanitized": false
+        },
+        {
+          "name": "text",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "The matched source text, present when `CaptureOutput` is `Text` or `Full`.",
+          "sanitized": false
+        },
+        {
+          "name": "child_fields",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "Values of requested child fields, keyed by field name.",
+          "sanitized": true
+        },
+        {
+          "name": "start_byte",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Byte offset where this capture starts in the source.",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "A single captured node within a match.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "MatchResult",
+      "rust_path": "tree-sitter-language-pack::MatchResult",
+      "fields": [
+        {
+          "name": "pattern_index",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "The pattern index within the query that produced this match.",
+          "sanitized": false
+        },
+        {
+          "name": "captures",
+          "ty": {
+            "Vec": {
+              "Named": "CaptureResult"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "The captures for this match.",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "A single query match containing one or more captures.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "PatternResult",
+      "rust_path": "tree-sitter-language-pack::PatternResult",
+      "fields": [
+        {
+          "name": "matches",
+          "ty": {
+            "Vec": {
+              "Named": "MatchResult"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "The individual matches.",
+          "sanitized": false
+        },
+        {
+          "name": "total_count",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Total number of matches before `max_results` truncation.",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Results for a single named pattern.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "ExtractionResult",
+      "rust_path": "tree-sitter-language-pack::ExtractionResult",
+      "fields": [
+        {
+          "name": "language",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "The language that was used.",
+          "sanitized": false
+        },
+        {
+          "name": "results",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "Results keyed by pattern name.",
+          "sanitized": true
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Complete extraction results for all patterns.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "PatternValidation",
+      "rust_path": "tree-sitter-language-pack::PatternValidation",
+      "fields": [
+        {
+          "name": "valid",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Whether the pattern compiled successfully.",
+          "sanitized": false
+        },
+        {
+          "name": "capture_names",
+          "ty": {
+            "Vec": "String"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Names of captures defined in the query.",
+          "sanitized": false
+        },
+        {
+          "name": "pattern_count",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Number of patterns in the query.",
+          "sanitized": false
+        },
+        {
+          "name": "warnings",
+          "ty": {
+            "Vec": "String"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Non-fatal warnings (e.g., unused captures).",
+          "sanitized": false
+        },
+        {
+          "name": "errors",
+          "ty": {
+            "Vec": "String"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Fatal errors (e.g., query syntax errors).",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Validation information for a single pattern.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "ValidationResult",
+      "rust_path": "tree-sitter-language-pack::ValidationResult",
+      "fields": [
+        {
+          "name": "valid",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Whether all patterns are valid.",
+          "sanitized": false
+        },
+        {
+          "name": "patterns",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "Per-pattern validation details.",
+          "sanitized": true
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Validation results for an entire extraction config.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "Span",
+      "rust_path": "tree-sitter-language-pack::Span",
+      "fields": [
+        {
+          "name": "start_byte",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "end_byte",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "start_line",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "start_column",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "end_line",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "end_column",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Byte and line/column range in source code.\n\nRepresents both byte offsets (for slicing) and human-readable line/column\npositions (for display and diagnostics).",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "ProcessResult",
+      "rust_path": "tree-sitter-language-pack::ProcessResult",
+      "fields": [
+        {
+          "name": "language",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "metrics",
+          "ty": {
+            "Named": "FileMetrics"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "structure",
+          "ty": {
+            "Vec": {
+              "Named": "StructureItem"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "imports",
+          "ty": {
+            "Vec": {
+              "Named": "ImportInfo"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "exports",
+          "ty": {
+            "Vec": {
+              "Named": "ExportInfo"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "comments",
+          "ty": {
+            "Vec": {
+              "Named": "CommentInfo"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "docstrings",
+          "ty": {
+            "Vec": {
+              "Named": "DocstringInfo"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "symbols",
+          "ty": {
+            "Vec": {
+              "Named": "SymbolInfo"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "diagnostics",
+          "ty": {
+            "Vec": {
+              "Named": "Diagnostic"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "chunks",
+          "ty": {
+            "Vec": {
+              "Named": "CodeChunk"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "extractions",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "Results of custom extraction patterns (when `config.extractions` is set).",
+          "sanitized": true
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Complete analysis result from processing a source file.\n\nContains metrics, structural analysis, imports/exports, comments,\ndocstrings, symbols, diagnostics, and optionally chunked code segments.\nFields are populated based on the [`crate::ProcessConfig`] flags.\n\n# Fields\n\n- `language` - The language used for parsing\n- `metrics` - Always computed: line counts, byte sizes, error counts\n- `structure` - Functions, classes, structs (when `config.structure = true`)\n- `imports` - Import statements (when `config.imports = true`)\n- `exports` - Export statements (when `config.exports = true`)\n- `comments` - Comments (when `config.comments = true`)\n- `docstrings` - Docstrings (when `config.docstrings = true`)\n- `symbols` - Symbol definitions (when `config.symbols = true`)\n- `diagnostics` - Parse errors (when `config.diagnostics = true`)\n- `chunks` - Chunked code segments (when `config.chunk_max_size` is set)",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "FileMetrics",
+      "rust_path": "tree-sitter-language-pack::FileMetrics",
+      "fields": [
+        {
+          "name": "total_lines",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "code_lines",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "comment_lines",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "blank_lines",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "total_bytes",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "node_count",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "error_count",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "max_depth",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Aggregate metrics for a source file.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "StructureItem",
+      "rust_path": "tree-sitter-language-pack::StructureItem",
+      "fields": [
+        {
+          "name": "kind",
+          "ty": {
+            "Named": "StructureKind"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "name",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "visibility",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "span",
+          "ty": {
+            "Named": "Span"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "children",
+          "ty": {
+            "Vec": {
+              "Named": "StructureItem"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "decorators",
+          "ty": {
+            "Vec": "String"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "doc_comment",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "signature",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "body_span",
+          "ty": {
+            "Named": "Span"
+          },
+          "optional": true,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "A structural item (function, class, struct, etc.) in source code.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "CommentInfo",
+      "rust_path": "tree-sitter-language-pack::CommentInfo",
+      "fields": [
+        {
+          "name": "text",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "kind",
+          "ty": {
+            "Named": "CommentKind"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "span",
+          "ty": {
+            "Named": "Span"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "associated_node",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "A comment extracted from source code.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "DocstringInfo",
+      "rust_path": "tree-sitter-language-pack::DocstringInfo",
+      "fields": [
+        {
+          "name": "text",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "format",
+          "ty": {
+            "Named": "DocstringFormat"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "span",
+          "ty": {
+            "Named": "Span"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "associated_item",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "parsed_sections",
+          "ty": {
+            "Vec": {
+              "Named": "DocSection"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "A docstring extracted from source code.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "DocSection",
+      "rust_path": "tree-sitter-language-pack::DocSection",
+      "fields": [
+        {
+          "name": "kind",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "name",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "description",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "A section within a docstring (e.g., Args, Returns, Raises).",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "ImportInfo",
+      "rust_path": "tree-sitter-language-pack::ImportInfo",
+      "fields": [
+        {
+          "name": "source",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "items",
+          "ty": {
+            "Vec": "String"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "alias",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "is_wildcard",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "span",
+          "ty": {
+            "Named": "Span"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "An import statement extracted from source code.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "ExportInfo",
+      "rust_path": "tree-sitter-language-pack::ExportInfo",
+      "fields": [
+        {
+          "name": "name",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "kind",
+          "ty": {
+            "Named": "ExportKind"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "span",
+          "ty": {
+            "Named": "Span"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "An export statement extracted from source code.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "SymbolInfo",
+      "rust_path": "tree-sitter-language-pack::SymbolInfo",
+      "fields": [
+        {
+          "name": "name",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "kind",
+          "ty": {
+            "Named": "SymbolKind"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "span",
+          "ty": {
+            "Named": "Span"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "type_annotation",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "doc",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "A symbol (variable, function, type, etc.) extracted from source code.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "Diagnostic",
+      "rust_path": "tree-sitter-language-pack::Diagnostic",
+      "fields": [
+        {
+          "name": "message",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "severity",
+          "ty": {
+            "Named": "DiagnosticSeverity"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "span",
+          "ty": {
+            "Named": "Span"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "A diagnostic (syntax error, missing node, etc.) from parsing.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "CodeChunk",
+      "rust_path": "tree-sitter-language-pack::CodeChunk",
+      "fields": [
+        {
+          "name": "content",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "start_byte",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "end_byte",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "start_line",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "end_line",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "metadata",
+          "ty": {
+            "Named": "ChunkContext"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "A chunk of source code with rich metadata.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "ChunkContext",
+      "rust_path": "tree-sitter-language-pack::ChunkContext",
+      "fields": [
+        {
+          "name": "language",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "chunk_index",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "total_chunks",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "node_types",
+          "ty": {
+            "Vec": "String"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "context_path",
+          "ty": {
+            "Vec": "String"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "symbols_defined",
+          "ty": {
+            "Vec": "String"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "comments",
+          "ty": {
+            "Vec": {
+              "Named": "CommentInfo"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "docstrings",
+          "ty": {
+            "Vec": {
+              "Named": "DocstringInfo"
+            }
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        },
+        {
+          "name": "has_error_nodes",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Metadata for a single chunk of source code.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "NodeInfo",
+      "rust_path": "tree-sitter-language-pack::NodeInfo",
+      "fields": [
+        {
+          "name": "kind",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "The grammar type name (e.g., \"function_definition\", \"identifier\").",
+          "sanitized": true
+        },
+        {
+          "name": "is_named",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Whether this is a named node (vs anonymous like punctuation).",
+          "sanitized": false
+        },
+        {
+          "name": "start_byte",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Start byte offset in source.",
+          "sanitized": false
+        },
+        {
+          "name": "end_byte",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "End byte offset in source.",
+          "sanitized": false
+        },
+        {
+          "name": "start_row",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Start row (zero-indexed).",
+          "sanitized": false
+        },
+        {
+          "name": "start_col",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Start column (zero-indexed).",
+          "sanitized": false
+        },
+        {
+          "name": "end_row",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "End row (zero-indexed).",
+          "sanitized": false
+        },
+        {
+          "name": "end_col",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "End column (zero-indexed).",
+          "sanitized": false
+        },
+        {
+          "name": "named_child_count",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Number of named children.",
+          "sanitized": false
+        },
+        {
+          "name": "is_error",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Whether this node is an ERROR node.",
+          "sanitized": false
+        },
+        {
+          "name": "is_missing",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Whether this node is a MISSING node.",
+          "sanitized": false
+        }
+      ],
+      "methods": [],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Lightweight snapshot of a tree-sitter node's properties.\n\nContains only primitive types for easy cross-language serialization.\nThis is an owned type that can be passed across FFI boundaries, unlike\n`tree_sitter::Node` which borrows from the tree.",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "PackConfig",
+      "rust_path": "tree-sitter-language-pack::PackConfig",
+      "fields": [
+        {
+          "name": "cache_dir",
+          "ty": "Path",
+          "optional": true,
+          "default": null,
+          "doc": "Override default cache directory.\n\nDefault: `~/.cache/tree-sitter-language-pack/v{version}/libs/`",
+          "sanitized": false
+        },
+        {
+          "name": "languages",
+          "ty": {
+            "Vec": "String"
+          },
+          "optional": true,
+          "default": null,
+          "doc": "Languages to pre-download on init.\n\nEach entry is a language name (e.g. `\"python\"`, `\"rust\"`).",
+          "sanitized": false
+        },
+        {
+          "name": "groups",
+          "ty": {
+            "Vec": "String"
+          },
+          "optional": true,
+          "default": null,
+          "doc": "Language groups to pre-download (e.g. `\"web\"`, `\"systems\"`, `\"scripting\"`).",
+          "sanitized": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "from_toml_file",
+          "params": [
+            {
+              "name": "path",
+              "ty": "Path",
+              "optional": false,
+              "default": null,
+              "sanitized": false
+            }
+          ],
+          "return_type": "String",
+          "is_async": false,
+          "is_static": true,
+          "error_type": "crate::error::Error",
+          "doc": "Load configuration from a TOML file.\n\n# Errors\n\nReturns an error if the file cannot be read or the TOML is invalid.\n\n# Example\n\n```no_run\nuse std::path::Path;\nuse tree_sitter_language_pack::PackConfig;\n\nlet config = PackConfig::from_toml_file(Path::new(\"language-pack.toml\")).unwrap();\n```",
+          "receiver": null,
+          "sanitized": true
+        },
+        {
+          "name": "discover",
+          "params": [],
+          "return_type": {
+            "Optional": "String"
+          },
+          "is_async": false,
+          "is_static": true,
+          "error_type": null,
+          "doc": "Discover configuration by searching for `language-pack.toml` in:\n\n1. Current directory and up to 10 parent directories\n2. `$XDG_CONFIG_HOME/tree-sitter-language-pack/config.toml`\n3. `~/.config/tree-sitter-language-pack/config.toml`\n\nReturns `None` if no configuration file is found.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::PackConfig;\n\nif let Some(config) = PackConfig::discover() {\n    println!(\"Found config with {:?} languages\", config.languages);\n}\n```",
+          "receiver": null,
+          "sanitized": true
+        }
+      ],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Configuration for the tree-sitter language pack.\n\nControls cache directory and which languages to pre-download.\nCan be loaded from a TOML file, constructed programmatically,\nor passed as a dict/object from language bindings.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::PackConfig;\n\nlet config = PackConfig {\n    cache_dir: None,\n    languages: Some(vec![\"python\".to_string(), \"rust\".to_string()]),\n    groups: None,\n};\n```",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "ProcessConfig",
+      "rust_path": "tree-sitter-language-pack::ProcessConfig",
+      "fields": [
+        {
+          "name": "language",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "doc": "Language name (required).",
+          "sanitized": true
+        },
+        {
+          "name": "structure",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Extract structural items (functions, classes, etc.). Default: true.",
+          "sanitized": false
+        },
+        {
+          "name": "imports",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Extract import statements. Default: true.",
+          "sanitized": false
+        },
+        {
+          "name": "exports",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Extract export statements. Default: true.",
+          "sanitized": false
+        },
+        {
+          "name": "comments",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Extract comments. Default: false.",
+          "sanitized": false
+        },
+        {
+          "name": "docstrings",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Extract docstrings. Default: false.",
+          "sanitized": false
+        },
+        {
+          "name": "symbols",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Extract symbol definitions. Default: false.",
+          "sanitized": false
+        },
+        {
+          "name": "diagnostics",
+          "ty": {
+            "Primitive": "Bool"
+          },
+          "optional": false,
+          "default": null,
+          "doc": "Include parse diagnostics. Default: false.",
+          "sanitized": false
+        },
+        {
+          "name": "chunk_max_size",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": true,
+          "default": null,
+          "doc": "Maximum chunk size in bytes. `None` disables chunking.",
+          "sanitized": false
+        },
+        {
+          "name": "extractions",
+          "ty": "String",
+          "optional": true,
+          "default": null,
+          "doc": "Custom extraction patterns to run against the parsed tree.\nKeys become the keys in `ProcessResult::extractions`.",
+          "sanitized": true
+        }
+      ],
+      "methods": [
+        {
+          "name": "default",
+          "params": [],
+          "return_type": "String",
+          "is_async": false,
+          "is_static": true,
+          "error_type": null,
+          "doc": "",
+          "receiver": null,
+          "sanitized": true
+        },
+        {
+          "name": "with_chunking",
+          "params": [
+            {
+              "name": "max_size",
+              "ty": {
+                "Primitive": "Usize"
+              },
+              "optional": false,
+              "default": null,
+              "sanitized": false
+            }
+          ],
+          "return_type": "String",
+          "is_async": false,
+          "is_static": false,
+          "error_type": null,
+          "doc": "Enable chunking with the given maximum chunk size in bytes.",
+          "receiver": "Owned",
+          "sanitized": true
+        },
+        {
+          "name": "all",
+          "params": [],
+          "return_type": "String",
+          "is_async": false,
+          "is_static": false,
+          "error_type": null,
+          "doc": "Enable all analysis features.",
+          "receiver": "Owned",
+          "sanitized": true
+        },
+        {
+          "name": "minimal",
+          "params": [],
+          "return_type": "String",
+          "is_async": false,
+          "is_static": false,
+          "error_type": null,
+          "doc": "Disable all analysis features (only metrics computed).",
+          "receiver": "Owned",
+          "sanitized": true
+        }
+      ],
+      "is_opaque": false,
+      "is_clone": true,
+      "doc": "Configuration for the `process()` function.\n\nControls which analysis features are enabled and whether chunking is performed.\n\n# Examples\n\n```\nuse tree_sitter_language_pack::ProcessConfig;\n\n// Defaults: structure + imports + exports enabled\nlet config = ProcessConfig::new(\"python\");\n\n// With chunking\nlet config = ProcessConfig::new(\"python\").with_chunking(1000);\n\n// Everything enabled\nlet config = ProcessConfig::new(\"python\").all();\n```",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "LanguageRegistry",
+      "rust_path": "tree-sitter-language-pack::LanguageRegistry",
+      "fields": [],
+      "methods": [
+        {
+          "name": "with_libs_dir",
+          "params": [
+            {
+              "name": "libs_dir",
+              "ty": "Path",
+              "optional": false,
+              "default": null,
+              "sanitized": false
+            }
+          ],
+          "return_type": "String",
+          "is_async": false,
+          "is_static": true,
+          "error_type": null,
+          "doc": "Create a registry with a custom directory for dynamic libraries.\n\nOverrides the default build-time library directory. Useful when\ndynamic grammar shared libraries are stored in a non-standard location.",
+          "receiver": null,
+          "sanitized": true
+        },
+        {
+          "name": "add_extra_libs_dir",
+          "params": [
+            {
+              "name": "dir",
+              "ty": "Path",
+              "optional": false,
+              "default": null,
+              "sanitized": false
+            }
+          ],
+          "return_type": "Unit",
+          "is_async": false,
+          "is_static": false,
+          "error_type": null,
+          "doc": "Add an additional directory to search for dynamic libraries.\n\nWhen [`get_language`](Self::get_language) cannot find a grammar in the\nprimary library directory, it searches these extra directories in order.\nTypically used by the download system to register its cache directory.\n\nTakes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior\nmutability via an `Arc<RwLock<...>>`, so the outer registry can remain\nimmutable while the directory list is updated.",
+          "receiver": "Ref",
+          "sanitized": false
+        },
+        {
+          "name": "get_language",
+          "params": [
+            {
+              "name": "name",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "sanitized": false
+            }
+          ],
+          "return_type": {
+            "Named": "Language"
+          },
+          "is_async": false,
+          "is_static": false,
+          "error_type": "Error",
+          "doc": "Get a tree-sitter [`Language`] by name.\n\nResolves aliases (e.g., `\"shell\"` -> `\"bash\"`, `\"makefile\"` -> `\"make\"`),\nthen looks up the language in the static table. When the `dynamic-loading`\nfeature is enabled, falls back to loading a shared library on demand.\n\n# Errors\n\nReturns [`Error::LanguageNotFound`] if the name (after alias resolution)\ndoes not match any known grammar.",
+          "receiver": "Ref",
+          "sanitized": false
+        },
+        {
+          "name": "available_languages",
+          "params": [],
+          "return_type": {
+            "Vec": "String"
+          },
+          "is_async": false,
+          "is_static": false,
+          "error_type": null,
+          "doc": "List all available language names, sorted and deduplicated.\n\nIncludes statically compiled languages, dynamically loadable languages\n(if the `dynamic-loading` feature is enabled), and all configured aliases.",
+          "receiver": "Ref",
+          "sanitized": false
+        },
+        {
+          "name": "has_language",
+          "params": [
+            {
+              "name": "name",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "sanitized": false
+            }
+          ],
+          "return_type": {
+            "Primitive": "Bool"
+          },
+          "is_async": false,
+          "is_static": false,
+          "error_type": null,
+          "doc": "Check whether a language is available by name or alias.\n\nReturns `true` if the language can be loaded, either from the static\ntable or from a dynamic library on disk.",
+          "receiver": "Ref",
+          "sanitized": false
+        },
+        {
+          "name": "language_count",
+          "params": [],
+          "return_type": {
+            "Primitive": "Usize"
+          },
+          "is_async": false,
+          "is_static": false,
+          "error_type": null,
+          "doc": "Return the total number of available languages (including aliases).",
+          "receiver": "Ref",
+          "sanitized": false
+        },
+        {
+          "name": "process",
+          "params": [
+            {
+              "name": "source",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "sanitized": false
+            },
+            {
+              "name": "config",
+              "ty": {
+                "Named": "ProcessConfig"
+              },
+              "optional": false,
+              "default": null,
+              "sanitized": false
+            }
+          ],
+          "return_type": {
+            "Named": "ProcessResult"
+          },
+          "is_async": false,
+          "is_static": false,
+          "error_type": "Error",
+          "doc": "Parse source code and extract file intelligence based on config in a single pass.",
+          "receiver": "Ref",
+          "sanitized": false
+        },
+        {
+          "name": "default",
+          "params": [],
+          "return_type": "String",
+          "is_async": false,
+          "is_static": true,
+          "error_type": null,
+          "doc": "",
+          "receiver": null,
+          "sanitized": true
+        }
+      ],
+      "is_opaque": true,
+      "is_clone": false,
+      "doc": "Thread-safe registry of tree-sitter language parsers.\n\nManages both statically compiled and dynamically loaded language grammars.\nUse [`LanguageRegistry::new()`] for the default registry, or access the\nglobal instance via the module-level convenience functions\n([`crate::get_language`], [`crate::available_languages`], etc.).\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::{LanguageRegistry, ProcessConfig};\n\nlet registry = LanguageRegistry::new();\nlet langs = registry.available_languages();\nprintln!(\"Available: {:?}\", langs);\n\nlet config = ProcessConfig::new(\"python\").all();\nlet result = registry.process(\"def hello(): pass\", &config).unwrap();\nprintln!(\"Structure: {:?}\", result.structure);\n```",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "Tree",
+      "rust_path": "tree_sitter_language_pack::Tree",
+      "fields": [],
+      "methods": [],
+      "is_opaque": true,
+      "is_clone": false,
+      "doc": "",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "Language",
+      "rust_path": "tree_sitter_language_pack::Language",
+      "fields": [],
+      "methods": [],
+      "is_opaque": true,
+      "is_clone": false,
+      "doc": "",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "Parser",
+      "rust_path": "tree_sitter_language_pack::Parser",
+      "fields": [],
+      "methods": [],
+      "is_opaque": true,
+      "is_clone": false,
+      "doc": "",
+      "cfg": null,
+      "is_trait": false
+    }
+  ],
+  "functions": [
+    {
+      "name": "detect_language_from_extension",
+      "rust_path": "tree-sitter-language-pack::detect_language_from_extension",
+      "params": [
+        {
+          "name": "ext",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Optional": "String"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Detect language name from a file extension (without leading dot).\n\nReturns `None` for unrecognized extensions. The match is case-insensitive.\n\n```\nuse tree_sitter_language_pack::detect_language_from_extension;\nassert_eq!(detect_language_from_extension(\"py\"), Some(\"python\"));\nassert_eq!(detect_language_from_extension(\"RS\"), Some(\"rust\"));\nassert_eq!(detect_language_from_extension(\"xyz\"), None);\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "detect_language_from_path",
+      "rust_path": "tree-sitter-language-pack::detect_language_from_path",
+      "params": [
+        {
+          "name": "path",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Optional": "String"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Detect language name from a file path.\n\nExtracts the file extension and looks it up. Returns `None` if the\npath has no extension or the extension is not recognized.\n\n```\nuse tree_sitter_language_pack::detect_language_from_path;\nassert_eq!(detect_language_from_path(\"src/main.rs\"), Some(\"rust\"));\nassert_eq!(detect_language_from_path(\"README.md\"), Some(\"markdown\"));\nassert_eq!(detect_language_from_path(\"Makefile\"), None);\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "extension_ambiguity",
+      "rust_path": "tree-sitter-language-pack::extension_ambiguity",
+      "params": [
+        {
+          "name": "ext",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Optional": "String"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Check if a file extension is ambiguous — i.e. it could reasonably belong to\nmultiple languages.\n\nReturns `Some((assigned_language, alternatives))` if the extension is known\nto be ambiguous, where `assigned_language` is what [`detect_language_from_extension`]\nreturns and `alternatives` lists other languages it could also belong to.\n\nReturns `None` if the extension is unambiguous or unrecognized.\n\n```\nuse tree_sitter_language_pack::extension_ambiguity;\n// .m is assigned to objc but could also be matlab\nif let Some((assigned, alternatives)) = extension_ambiguity(\"m\") {\n    assert_eq!(assigned, \"objc\");\n    assert!(alternatives.contains(&\"matlab\"));\n}\n// .py is unambiguous\nassert!(extension_ambiguity(\"py\").is_none());\n```",
+      "cfg": null,
+      "sanitized": true
+    },
+    {
+      "name": "extension_ambiguity_json",
+      "rust_path": "tree-sitter-language-pack::extension_ambiguity_json",
+      "params": [
+        {
+          "name": "ext",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Optional": "String"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "",
+      "cfg": "feature = \"serde\"",
+      "sanitized": false
+    },
+    {
+      "name": "detect_language_from_content",
+      "rust_path": "tree-sitter-language-pack::detect_language_from_content",
+      "params": [
+        {
+          "name": "content",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Optional": "String"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Detect language name from file content using the shebang line (`#!`).\n\nInspects only the first line of `content`. If it begins with `#!`, the\ninterpreter name is extracted and mapped to a language name.\n\nHandles common patterns:\n- `#!/usr/bin/env python3` → `\"python\"`\n- `#!/bin/bash` → `\"bash\"`\n- `#!/usr/bin/env node` → `\"javascript\"`\n\nThe `-S` flag accepted by some `env` implementations is skipped automatically.\nVersion suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.\n\nReturns `None` when content does not start with `#!`, the shebang is\nmalformed, or the interpreter is not recognised.\n\n```\nuse tree_sitter_language_pack::detect_language_from_content;\nassert_eq!(detect_language_from_content(\"#!/usr/bin/env python3\\npass\"), Some(\"python\"));\nassert_eq!(detect_language_from_content(\"#!/bin/bash\\necho hi\"), Some(\"bash\"));\nassert_eq!(detect_language_from_content(\"no shebang here\"), None);\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "validate_extraction",
+      "rust_path": "tree-sitter-language-pack::extract::validate_extraction",
+      "params": [
+        {
+          "name": "config",
+          "ty": {
+            "Named": "ExtractionConfig"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Named": "ValidationResult"
+      },
+      "is_async": false,
+      "error_type": "Error",
+      "doc": "Validate an extraction config without running it.\n\nChecks that the language exists and all query patterns compile. Returns\ndetailed diagnostics per pattern.\n\n# Errors\n\nReturns an error if the language cannot be loaded.",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "process",
+      "rust_path": "tree-sitter-language-pack::intel::process",
+      "params": [
+        {
+          "name": "source",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        },
+        {
+          "name": "config",
+          "ty": {
+            "Named": "ProcessConfig"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        },
+        {
+          "name": "registry",
+          "ty": {
+            "Named": "LanguageRegistry"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Named": "ProcessResult"
+      },
+      "is_async": false,
+      "error_type": "crate::Error",
+      "doc": "Process source code: parse once, extract intelligence based on config, and return it.",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "node_info_from_node",
+      "rust_path": "tree-sitter-language-pack::node_info_from_node",
+      "params": [
+        {
+          "name": "node",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": true
+        }
+      ],
+      "return_type": {
+        "Named": "NodeInfo"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Extract a `NodeInfo` from a tree-sitter `Node`.",
+      "cfg": null,
+      "sanitized": true
+    },
+    {
+      "name": "root_node_info",
+      "rust_path": "tree-sitter-language-pack::root_node_info",
+      "params": [
+        {
+          "name": "tree",
+          "ty": {
+            "Named": "Tree"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Named": "NodeInfo"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Get a `NodeInfo` snapshot of the root node.",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "find_nodes_by_type",
+      "rust_path": "tree-sitter-language-pack::find_nodes_by_type",
+      "params": [
+        {
+          "name": "tree",
+          "ty": {
+            "Named": "Tree"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        },
+        {
+          "name": "node_type",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Vec": {
+          "Named": "NodeInfo"
+        }
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Find all nodes matching the given type name, returning their `NodeInfo`.\n\nPerforms a depth-first traversal. Returns an empty vec if no matches.",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "named_children_info",
+      "rust_path": "tree-sitter-language-pack::named_children_info",
+      "params": [
+        {
+          "name": "tree",
+          "ty": {
+            "Named": "Tree"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Vec": {
+          "Named": "NodeInfo"
+        }
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Get `NodeInfo` for all named children of the root node.\n\nUseful for understanding the top-level structure of a file\n(e.g., list of function definitions, class declarations, imports).",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "parse_string",
+      "rust_path": "tree-sitter-language-pack::parse_string",
+      "params": [
+        {
+          "name": "language",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        },
+        {
+          "name": "source",
+          "ty": "Bytes",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Named": "Tree"
+      },
+      "is_async": false,
+      "error_type": "Error",
+      "doc": "Parse source code with the named language, returning the syntax tree.\n\nUses the global registry to look up the language by name.\n\n# Examples\n\n```no_run\nlet tree = tree_sitter_language_pack::parse::parse_string(\"python\", b\"def hello(): pass\").unwrap();\nassert_eq!(tree.root_node().kind(), \"module\");\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "tree_contains_node_type",
+      "rust_path": "tree-sitter-language-pack::tree_contains_node_type",
+      "params": [
+        {
+          "name": "tree",
+          "ty": {
+            "Named": "Tree"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        },
+        {
+          "name": "node_type",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Primitive": "Bool"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Check whether any node in the tree matches the given type name.\n\nPerforms a depth-first traversal using `TreeCursor`.",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "tree_has_error_nodes",
+      "rust_path": "tree-sitter-language-pack::tree_has_error_nodes",
+      "params": [
+        {
+          "name": "tree",
+          "ty": {
+            "Named": "Tree"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Primitive": "Bool"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Check whether the tree contains any ERROR or MISSING nodes.\n\nUseful for determining if the parse was clean or had syntax errors.",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "tree_to_sexp",
+      "rust_path": "tree-sitter-language-pack::tree_to_sexp",
+      "params": [
+        {
+          "name": "tree",
+          "ty": {
+            "Named": "Tree"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": "String",
+      "is_async": false,
+      "error_type": null,
+      "doc": "Return the S-expression representation of the entire tree.\n\nThis is the standard tree-sitter debug format, useful for logging,\nsnapshot testing, and debugging grammars.",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "tree_error_count",
+      "rust_path": "tree-sitter-language-pack::tree_error_count",
+      "params": [
+        {
+          "name": "tree",
+          "ty": {
+            "Named": "Tree"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Primitive": "Usize"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Count the number of ERROR and MISSING nodes in the tree.\n\nReturns 0 for a clean parse.",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "get_highlights_query",
+      "rust_path": "tree-sitter-language-pack::get_highlights_query",
+      "params": [
+        {
+          "name": "language",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Optional": "String"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Get the highlights query for a language, if bundled.\n\nReturns the contents of `highlights.scm` as a static string, or `None`\nif no highlights query is bundled for this language.\n\n# Example\n\n```\nuse tree_sitter_language_pack::get_highlights_query;\n\n// Returns Some(...) for languages with bundled queries\nlet query = get_highlights_query(\"python\");\n// Returns None for languages without bundled highlights queries\nlet missing = get_highlights_query(\"nonexistent_lang\");\nassert!(missing.is_none());\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "get_injections_query",
+      "rust_path": "tree-sitter-language-pack::get_injections_query",
+      "params": [
+        {
+          "name": "language",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Optional": "String"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Get the injections query for a language, if bundled.\n\nReturns the contents of `injections.scm` as a static string, or `None`\nif no injections query is bundled for this language.\n\n# Example\n\n```\nuse tree_sitter_language_pack::get_injections_query;\n\nlet query = get_injections_query(\"markdown\");\n// Returns None for languages without bundled injections queries\nlet missing = get_injections_query(\"nonexistent_lang\");\nassert!(missing.is_none());\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "get_locals_query",
+      "rust_path": "tree-sitter-language-pack::get_locals_query",
+      "params": [
+        {
+          "name": "language",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Optional": "String"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Get the locals query for a language, if bundled.\n\nReturns the contents of `locals.scm` as a static string, or `None`\nif no locals query is bundled for this language.\n\n# Example\n\n```\nuse tree_sitter_language_pack::get_locals_query;\n\nlet query = get_locals_query(\"python\");\n// Returns None for languages without bundled locals queries\nlet missing = get_locals_query(\"nonexistent_lang\");\nassert!(missing.is_none());\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "run_query",
+      "rust_path": "tree-sitter-language-pack::run_query",
+      "params": [
+        {
+          "name": "tree",
+          "ty": {
+            "Named": "Tree"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        },
+        {
+          "name": "language",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        },
+        {
+          "name": "query_source",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        },
+        {
+          "name": "source",
+          "ty": "Bytes",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Vec": "String"
+      },
+      "is_async": false,
+      "error_type": "Error",
+      "doc": "Execute a tree-sitter query pattern against a parsed tree.\n\nThe `query_source` is an S-expression pattern like:\n```text\n(function_definition name: (identifier) @name)\n```\n\nReturns all matches with their captured nodes.\n\n# Arguments\n\n* `tree` - The parsed syntax tree to query.\n* `language` - Language name (used to compile the query pattern).\n* `query_source` - The tree-sitter query pattern string.\n* `source` - The original source code bytes (needed for capture resolution).\n\n# Examples\n\n```no_run\nlet tree = tree_sitter_language_pack::parse::parse_string(\"python\", b\"def hello(): pass\").unwrap();\nlet matches = tree_sitter_language_pack::query::run_query(\n    &tree,\n    \"python\",\n    \"(function_definition name: (identifier) @fn_name)\",\n    b\"def hello(): pass\",\n).unwrap();\nassert!(!matches.is_empty());\n```",
+      "cfg": null,
+      "sanitized": true
+    },
+    {
+      "name": "split_code",
+      "rust_path": "tree-sitter-language-pack::split_code",
+      "params": [
+        {
+          "name": "source",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        },
+        {
+          "name": "tree",
+          "ty": {
+            "Named": "Tree"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        },
+        {
+          "name": "max_chunk_size",
+          "ty": {
+            "Primitive": "Usize"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Vec": "String"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Split source code into chunks using tree-sitter AST structure for intelligent boundaries.\nReturns a list of `(start_byte, end_byte)` ranges.\n\nThe algorithm works by:\n1. Walking the tree-sitter AST to collect all nodes with their depth.\n2. Using depth as a semantic level: shallower nodes (functions, classes) are\n   preferred split boundaries over deeper nodes (statements, expressions).\n3. Greedily merging adjacent sections at the best semantic level that keeps\n   each chunk under `max_chunk_size` bytes.\n4. When no AST node boundary fits, falling back to line boundaries and\n   ultimately to raw byte splits.\n\nThe function never splits in the middle of a token/leaf node when an AST\nboundary is available.\n\n# Arguments\n\n* `source` - The full source code string.\n* `tree`   - A tree-sitter `Tree` previously parsed from `source`.\n* `max_chunk_size` - Maximum size in bytes for each chunk.\n\n# Returns\n\nA `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the\nentire source. Ranges are non-overlapping, contiguous, and each range is\nat most `max_chunk_size` bytes (except when a single indivisible token\nexceeds that limit).",
+      "cfg": null,
+      "sanitized": true
+    },
+    {
+      "name": "get_language",
+      "rust_path": "tree-sitter-language-pack::get_language",
+      "params": [
+        {
+          "name": "name",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Named": "Language"
+      },
+      "is_async": false,
+      "error_type": "Error",
+      "doc": "Get a tree-sitter [`Language`] by name using the global registry.\n\nResolves language aliases (e.g., `\"shell\"` maps to `\"bash\"`).\nWhen the `download` feature is enabled (default), automatically downloads\nthe parser from GitHub releases if not found locally.\n\n# Errors\n\nReturns [`Error::LanguageNotFound`] if the language is not recognized,\nor [`Error::Download`] if auto-download fails.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::get_language;\n\nlet lang = get_language(\"python\").unwrap();\n// Use the Language with a tree-sitter Parser\nlet mut parser = tree_sitter::Parser::new();\nparser.set_language(&lang).unwrap();\nlet tree = parser.parse(\"x = 1\", None).unwrap();\nassert_eq!(tree.root_node().kind(), \"module\");\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "get_parser",
+      "rust_path": "tree-sitter-language-pack::get_parser",
+      "params": [
+        {
+          "name": "name",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Named": "Parser"
+      },
+      "is_async": false,
+      "error_type": "Error",
+      "doc": "Get a tree-sitter [`Parser`] pre-configured for the given language.\n\nThis is a convenience function that calls [`get_language`] and configures\na new parser in one step.\n\n# Errors\n\nReturns [`Error::LanguageNotFound`] if the language is not recognized, or\n[`Error::ParserSetup`] if the language cannot be applied to the parser.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::get_parser;\n\nlet mut parser = get_parser(\"rust\").unwrap();\nlet tree = parser.parse(\"fn main() {}\", None).unwrap();\nassert!(!tree.root_node().has_error());\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "available_languages",
+      "rust_path": "tree-sitter-language-pack::available_languages",
+      "params": [],
+      "return_type": {
+        "Vec": "String"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "List all available language names (sorted, deduplicated, includes aliases).\n\nReturns names of both statically compiled and dynamically loadable languages,\nplus any configured aliases.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::available_languages;\n\nlet langs = available_languages();\nfor name in &langs {\n    println!(\"{}\", name);\n}\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "has_language",
+      "rust_path": "tree-sitter-language-pack::has_language",
+      "params": [
+        {
+          "name": "name",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Primitive": "Bool"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Check if a language is available by name or alias.\n\nReturns `true` if the language can be loaded (statically compiled,\ndynamically available, or a known alias for one of these).\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::has_language;\n\nassert!(has_language(\"python\"));\nassert!(has_language(\"shell\")); // alias for \"bash\"\nassert!(!has_language(\"nonexistent_language\"));\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "language_count",
+      "rust_path": "tree-sitter-language-pack::language_count",
+      "params": [],
+      "return_type": {
+        "Primitive": "Usize"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Return the number of available languages.\n\nIncludes statically compiled languages, dynamically loadable languages,\nand aliases.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::language_count;\n\nlet count = language_count();\nprintln!(\"{} languages available\", count);\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "extract_patterns",
+      "rust_path": "tree-sitter-language-pack::extract_patterns",
+      "params": [
+        {
+          "name": "source",
+          "ty": "String",
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        },
+        {
+          "name": "config",
+          "ty": {
+            "Named": "ExtractionConfig"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": {
+        "Named": "ExtractionResult"
+      },
+      "is_async": false,
+      "error_type": "Error",
+      "doc": "Run extraction patterns against source code.\n\nConvenience wrapper around [`extract::extract`].\n\n# Errors\n\nReturns an error if the language is not found, parsing fails, or a query\npattern is invalid.\n\n# Example\n\n```no_run\nuse ahash::AHashMap;\nuse tree_sitter_language_pack::{ExtractionConfig, ExtractionPattern, CaptureOutput, extract_patterns};\n\nlet mut patterns = AHashMap::new();\npatterns.insert(\"fns\".to_string(), ExtractionPattern {\n    query: \"(function_definition name: (identifier) @fn_name)\".to_string(),\n    capture_output: CaptureOutput::default(),\n    child_fields: Vec::new(),\n    max_results: None,\n    byte_range: None,\n});\nlet config = ExtractionConfig { language: \"python\".to_string(), patterns };\nlet result = extract_patterns(\"def hello(): pass\", &config).unwrap();\n```",
+      "cfg": null,
+      "sanitized": false
+    },
+    {
+      "name": "init",
+      "rust_path": "tree-sitter-language-pack::init",
+      "params": [
+        {
+          "name": "config",
+          "ty": {
+            "Named": "PackConfig"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": "Unit",
+      "is_async": false,
+      "error_type": "Error",
+      "doc": "Initialize the language pack with the given configuration.\n\nApplies any custom cache directory, then downloads all languages and groups\nspecified in the config. This is the recommended entry point when you want\nto pre-warm the cache before use.\n\n# Errors\n\nReturns an error if configuration cannot be applied or if downloads fail.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::{PackConfig, init};\n\nlet config = PackConfig {\n    cache_dir: None,\n    languages: Some(vec![\"python\".to_string(), \"rust\".to_string()]),\n    groups: None,\n};\ninit(&config).unwrap();\n```",
+      "cfg": "feature = \"download\"",
+      "sanitized": false
+    },
+    {
+      "name": "configure",
+      "rust_path": "tree-sitter-language-pack::configure",
+      "params": [
+        {
+          "name": "config",
+          "ty": {
+            "Named": "PackConfig"
+          },
+          "optional": false,
+          "default": null,
+          "sanitized": false
+        }
+      ],
+      "return_type": "Unit",
+      "is_async": false,
+      "error_type": "Error",
+      "doc": "Apply download configuration without downloading anything.\n\nUse this to set a custom cache directory before the first call to\n[`get_language`] or any download function. Changing the cache dir\nafter languages have been registered has no effect on already-loaded\nlanguages.\n\n# Errors\n\nReturns an error if the lock cannot be acquired.\n\n# Example\n\n```no_run\nuse std::path::PathBuf;\nuse tree_sitter_language_pack::{PackConfig, configure};\n\nlet config = PackConfig {\n    cache_dir: Some(PathBuf::from(\"/tmp/my-parsers\")),\n    languages: None,\n    groups: None,\n};\nconfigure(&config).unwrap();\n```",
+      "cfg": "feature = \"download\"",
+      "sanitized": false
+    },
+    {
+      "name": "download_all",
+      "rust_path": "tree-sitter-language-pack::download_all",
+      "params": [],
+      "return_type": {
+        "Primitive": "Usize"
+      },
+      "is_async": false,
+      "error_type": "Error",
+      "doc": "Download all available languages from the remote manifest.\n\nReturns the number of newly downloaded languages.\n\n# Errors\n\nReturns an error if the manifest cannot be fetched or a download fails.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::download_all;\n\nlet count = download_all().unwrap();\nprintln!(\"Downloaded {} languages\", count);\n```",
+      "cfg": "feature = \"download\"",
+      "sanitized": false
+    },
+    {
+      "name": "manifest_languages",
+      "rust_path": "tree-sitter-language-pack::manifest_languages",
+      "params": [],
+      "return_type": {
+        "Vec": "String"
+      },
+      "is_async": false,
+      "error_type": "Error",
+      "doc": "Return all language names available in the remote manifest (248).\n\nFetches (and caches) the remote manifest to discover the full list of\ndownloadable languages. Use [`downloaded_languages`] to list what is\nalready cached locally.\n\n# Errors\n\nReturns an error if the manifest cannot be fetched.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::manifest_languages;\n\nlet langs = manifest_languages().unwrap();\nprintln!(\"{} languages available for download\", langs.len());\n```",
+      "cfg": "feature = \"download\"",
+      "sanitized": false
+    },
+    {
+      "name": "downloaded_languages",
+      "rust_path": "tree-sitter-language-pack::downloaded_languages",
+      "params": [],
+      "return_type": {
+        "Vec": "String"
+      },
+      "is_async": false,
+      "error_type": null,
+      "doc": "Return languages that are already downloaded and cached locally.\n\nDoes not perform any network requests. Returns an empty list if the\ncache directory does not exist or cannot be read.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::downloaded_languages;\n\nlet langs = downloaded_languages();\nprintln!(\"{} languages already cached\", langs.len());\n```",
+      "cfg": "feature = \"download\"",
+      "sanitized": false
+    },
+    {
+      "name": "clean_cache",
+      "rust_path": "tree-sitter-language-pack::clean_cache",
+      "params": [],
+      "return_type": "Unit",
+      "is_async": false,
+      "error_type": "Error",
+      "doc": "Delete all cached parser shared libraries.\n\nResets the cache registration so the next call to [`get_language`] or\na download function will re-register the (now empty) cache directory.\n\n# Errors\n\nReturns an error if the cache directory cannot be removed.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::clean_cache;\n\nclean_cache().unwrap();\nprintln!(\"Cache cleared\");\n```",
+      "cfg": "feature = \"download\"",
+      "sanitized": false
+    },
+    {
+      "name": "cache_dir",
+      "rust_path": "tree-sitter-language-pack::cache_dir",
+      "params": [],
+      "return_type": "Path",
+      "is_async": false,
+      "error_type": "Error",
+      "doc": "Return the effective cache directory path.\n\nThis is either the custom path set via [`configure`] / [`init`] or the\ndefault: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.\n\n# Errors\n\nReturns an error if the system cache directory cannot be determined.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::cache_dir;\n\nlet dir = cache_dir().unwrap();\nprintln!(\"Cache directory: {}\", dir.display());\n```",
+      "cfg": "feature = \"download\"",
+      "sanitized": false
+    }
+  ],
+  "enums": [
+    {
+      "name": "Error",
+      "rust_path": "tree-sitter-language-pack::Error",
+      "variants": [
+        {
+          "name": "LanguageNotFound",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        },
+        {
+          "name": "DynamicLoad",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        },
+        {
+          "name": "NullLanguagePointer",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        },
+        {
+          "name": "ParserSetup",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        },
+        {
+          "name": "LockPoisoned",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        },
+        {
+          "name": "Config",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        },
+        {
+          "name": "ParseFailed",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "QueryError",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        },
+        {
+          "name": "InvalidRange",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        },
+        {
+          "name": "Io",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": {
+                "Named": "Error"
+              },
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        },
+        {
+          "name": "Json",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": {
+                "Named": "Error"
+              },
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        },
+        {
+          "name": "Toml",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": {
+                "Named": "Error"
+              },
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        },
+        {
+          "name": "Download",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        },
+        {
+          "name": "ChecksumMismatch",
+          "fields": [
+            {
+              "name": "file",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            },
+            {
+              "name": "expected",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            },
+            {
+              "name": "actual",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        }
+      ],
+      "doc": "Errors that can occur when using the tree-sitter language pack.\n\nCovers language lookup failures, parse errors, query errors, and I/O issues.\nFeature-gated variants are included when `config`, `download`, or related\nfeatures are enabled.",
+      "cfg": null
+    },
+    {
+      "name": "CaptureOutput",
+      "rust_path": "tree-sitter-language-pack::CaptureOutput",
+      "variants": [
+        {
+          "name": "Text",
+          "fields": [],
+          "doc": "Capture only the matched text."
+        },
+        {
+          "name": "Node",
+          "fields": [],
+          "doc": "Capture only the `NodeInfo`."
+        },
+        {
+          "name": "Full",
+          "fields": [],
+          "doc": "Capture both text and `NodeInfo` (default)."
+        }
+      ],
+      "doc": "Controls what data is captured for each query match.",
+      "cfg": null
+    },
+    {
+      "name": "StructureKind",
+      "rust_path": "tree-sitter-language-pack::StructureKind",
+      "variants": [
+        {
+          "name": "Function",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Method",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Class",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Struct",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Interface",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Enum",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Module",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Trait",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Impl",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Namespace",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Other",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        }
+      ],
+      "doc": "The kind of structural item found in source code.\n\nCategorizes top-level and nested declarations such as functions, classes,\nstructs, enums, traits, and more. Use [`Other`](StructureKind::Other) for\nlanguage-specific constructs that do not fit a standard category.",
+      "cfg": null
+    },
+    {
+      "name": "CommentKind",
+      "rust_path": "tree-sitter-language-pack::CommentKind",
+      "variants": [
+        {
+          "name": "Line",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Block",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Doc",
+          "fields": [],
+          "doc": ""
+        }
+      ],
+      "doc": "The kind of a comment found in source code.\n\nDistinguishes between single-line comments, block (multi-line) comments,\nand documentation comments.",
+      "cfg": null
+    },
+    {
+      "name": "DocstringFormat",
+      "rust_path": "tree-sitter-language-pack::DocstringFormat",
+      "variants": [
+        {
+          "name": "PythonTripleQuote",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "JSDoc",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Rustdoc",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "GoDoc",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "JavaDoc",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Other",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        }
+      ],
+      "doc": "The format of a docstring extracted from source code.\n\nIdentifies the docstring convention used, which varies by language\n(e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).",
+      "cfg": null
+    },
+    {
+      "name": "ExportKind",
+      "rust_path": "tree-sitter-language-pack::ExportKind",
+      "variants": [
+        {
+          "name": "Named",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Default",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "ReExport",
+          "fields": [],
+          "doc": ""
+        }
+      ],
+      "doc": "The kind of an export statement found in source code.\n\nCovers named exports, default exports, and re-exports from other modules.",
+      "cfg": null
+    },
+    {
+      "name": "SymbolKind",
+      "rust_path": "tree-sitter-language-pack::SymbolKind",
+      "variants": [
+        {
+          "name": "Variable",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Constant",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Function",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Class",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Type",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Interface",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Enum",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Module",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Other",
+          "fields": [
+            {
+              "name": "_0",
+              "ty": "String",
+              "optional": false,
+              "default": null,
+              "doc": "",
+              "sanitized": false
+            }
+          ],
+          "doc": ""
+        }
+      ],
+      "doc": "The kind of a symbol definition found in source code.\n\nCategorizes symbol definitions such as variables, constants, functions,\nclasses, types, interfaces, enums, and modules.",
+      "cfg": null
+    },
+    {
+      "name": "DiagnosticSeverity",
+      "rust_path": "tree-sitter-language-pack::DiagnosticSeverity",
+      "variants": [
+        {
+          "name": "Error",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Warning",
+          "fields": [],
+          "doc": ""
+        },
+        {
+          "name": "Info",
+          "fields": [],
+          "doc": ""
+        }
+      ],
+      "doc": "Severity level of a diagnostic produced during parsing.\n\nUsed to classify parse errors, warnings, and informational messages\nfound in the syntax tree.",
+      "cfg": null
+    }
+  ],
+  "errors": []
+}

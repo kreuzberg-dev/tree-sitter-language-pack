@@ -1,0 +1,31 @@
+[build-system]
+build-backend = "maturin"
+requires = [ "maturin>=1,<2" ]
+
+[project]
+name = "tree-sitter-language-pack"
+version = "1.4.1"
+description = "Pre-compiled tree-sitter grammars for 200+ languages"
+keywords = [ "parser", "syntax", "tree-sitter" ]
+license = "MIT"
+authors = [ { name = "Kreuzberg Team" } ]
+requires-python = ">=3.9"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+urls.repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+
+[tool.maturin]
+module-name = "_tree_sitter_language_pack"
+features = [ "pyo3/extension-module" ]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+lint.select = [ "E", "F", "W" ]

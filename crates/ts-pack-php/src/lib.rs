@@ -1,611 +1,991 @@
-//! PHP bindings for tree-sitter-language-pack.
-//!
-//! This module exposes the Rust core parsing API to PHP using ext-php-rs.
-//!
-//! # Architecture
-//!
-//! - All parsing logic is in the Rust core (ts-pack-core)
-//! - PHP is a thin wrapper that adds language-specific features
-//! - Zero duplication of core functionality
-
-#![cfg_attr(windows, feature(abi_vectorcall))]
-
 use ext_php_rs::prelude::*;
+use std::collections::HashMap;
+use tree_sitter_language_pack;
+use std::sync::Arc;
 
-/// Get the library version.
-///
-/// # Returns
-///
-/// Version string in semver format (e.g., "1.0.0-rc.1")
-///
-/// # Example
-///
-/// ```php
-/// $version = ts_pack_version();
-/// echo "Version: $version\n";
-/// ```
-#[php_function]
-pub fn ts_pack_version() -> String {
-    env!("CARGO_PKG_VERSION").to_string()
+#[derive(Clone)]
+#[php_class]
+pub struct ExtractionPattern {
+    pub query: String,
+    pub capture_output: String,
+    pub child_fields: Vec<String>,
+    pub max_results: Option<i64>,
+    pub byte_range: Option<String>,
 }
 
-/// Get a list of all available language names.
-///
-/// # Returns
-///
-/// Array of language name strings sorted alphabetically.
-///
-/// # Example
-///
-/// ```php
-/// $languages = ts_pack_available_languages();
-/// foreach ($languages as $lang) {
-///     echo "$lang\n";
-/// }
-/// ```
-#[php_function]
-pub fn ts_pack_available_languages() -> Vec<String> {
-    tree_sitter_language_pack::available_languages()
+#[php_impl]
+impl ExtractionPattern {
+    pub fn __construct() -> Self {
+        todo!("constructor for ExtractionPattern requires complex params — implement manually")
+    }
 }
 
-/// Check whether a language is available.
-///
-/// # Arguments
-///
-/// * `name` - The language name to check.
-///
-/// # Returns
-///
-/// `true` if the language is available, `false` otherwise.
-///
-/// # Example
-///
-/// ```php
-/// if (ts_pack_has_language("python")) {
-///     echo "Python is available!\n";
-/// }
-/// ```
-#[php_function]
-pub fn ts_pack_has_language(name: String) -> bool {
-    tree_sitter_language_pack::has_language(&name)
+#[derive(Clone)]
+#[php_class]
+pub struct ExtractionConfig {
+    pub language: String,
+    pub patterns: String,
 }
 
-/// Detect language name from a file path or extension.
-///
-/// Returns null if the extension is not recognized.
-#[php_function]
-pub fn ts_pack_detect_language(path: String) -> Option<String> {
-    tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
+#[php_impl]
+impl ExtractionConfig {
+    pub fn __construct(language: String, patterns: String) -> Self {
+        Self { language, patterns }
+    }
 }
 
-/// Detect language name from file content using shebang-based detection.
-///
-/// Returns null if the content does not contain a recognized shebang.
-///
-/// # Example
-///
-/// ```php
-/// $lang = ts_pack_detect_language_from_content("#!/usr/bin/env python3\nprint('hello')\n");
-/// echo "Detected: $lang\n"; // "python"
-/// ```
-#[php_function]
-pub fn ts_pack_detect_language_from_content(content: String) -> Option<String> {
-    tree_sitter_language_pack::detect_language_from_content(&content).map(String::from)
+#[derive(Clone)]
+#[php_class]
+pub struct CaptureResult {
+    pub name: String,
+    pub node: Option<NodeInfo>,
+    pub text: Option<String>,
+    pub child_fields: String,
+    pub start_byte: i64,
 }
 
-/// Detect language name from a bare file extension (without leading dot).
-///
-/// Returns null if the extension is not recognized.
-///
-/// # Example
-///
-/// ```php
-/// $lang = ts_pack_detect_language_from_extension("py");
-/// echo "Detected: $lang\n"; // "python"
-/// ```
-#[php_function]
-pub fn ts_pack_detect_language_from_extension(ext: String) -> Option<String> {
-    tree_sitter_language_pack::detect_language_from_extension(&ext).map(String::from)
+#[php_impl]
+impl CaptureResult {
+    pub fn __construct() -> Self {
+        todo!("constructor for CaptureResult requires complex params — implement manually")
+    }
 }
 
-/// Detect language name from a file path based on its extension.
-///
-/// Returns null if the extension is not recognized.
-///
-/// # Example
-///
-/// ```php
-/// $lang = ts_pack_detect_language_from_path("/home/user/script.py");
-/// echo "Detected: $lang\n"; // "python"
-/// ```
-#[php_function]
-pub fn ts_pack_detect_language_from_path(path: String) -> Option<String> {
-    tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
+#[derive(Clone)]
+#[php_class]
+pub struct MatchResult {
+    pub pattern_index: i64,
+    pub captures: Vec<CaptureResult>,
 }
 
-/// Returns extension ambiguity information for the given file extension as a JSON string.
-///
-/// Returns null if the extension is not ambiguous. When non-null, the JSON decodes to
-/// an object with "assigned" (string) and "alternatives" (string[]) fields.
-///
-/// # Example
-///
-/// ```php
-/// $info = ts_pack_extension_ambiguity("h");
-/// $data = json_decode($info, true);
-/// echo "Assigned: " . $data["assigned"] . "\n";
-/// ```
-#[php_function]
-pub fn ts_pack_extension_ambiguity(ext: String) -> Option<String> {
-    tree_sitter_language_pack::extension_ambiguity_json(&ext)
+#[php_impl]
+impl MatchResult {
+    pub fn __construct() -> Self {
+        todo!("constructor for MatchResult requires complex params — implement manually")
+    }
 }
 
-/// Returns the bundled highlights query for the given language, or null.
-///
-/// # Example
-///
-/// ```php
-/// $query = ts_pack_get_highlights_query("python");
-/// if ($query !== null) {
-///     echo "Got highlights query (" . strlen($query) . " bytes)\n";
-/// }
-/// ```
-#[php_function]
-pub fn ts_pack_get_highlights_query(language: String) -> Option<String> {
-    tree_sitter_language_pack::get_highlights_query(&language).map(String::from)
+#[derive(Clone)]
+#[php_class]
+pub struct PatternResult {
+    pub matches: Vec<MatchResult>,
+    pub total_count: i64,
 }
 
-/// Returns the bundled injections query for the given language, or null.
-///
-/// # Example
-///
-/// ```php
-/// $query = ts_pack_get_injections_query("markdown");
-/// if ($query !== null) {
-///     echo "Got injections query\n";
-/// }
-/// ```
-#[php_function]
-pub fn ts_pack_get_injections_query(language: String) -> Option<String> {
-    tree_sitter_language_pack::get_injections_query(&language).map(String::from)
+#[php_impl]
+impl PatternResult {
+    pub fn __construct() -> Self {
+        todo!("constructor for PatternResult requires complex params — implement manually")
+    }
 }
 
-/// Returns the bundled locals query for the given language, or null.
-///
-/// # Example
-///
-/// ```php
-/// $query = ts_pack_get_locals_query("python");
-/// if ($query !== null) {
-///     echo "Got locals query\n";
-/// }
-/// ```
-#[php_function]
-pub fn ts_pack_get_locals_query(language: String) -> Option<String> {
-    tree_sitter_language_pack::get_locals_query(&language).map(String::from)
+#[derive(Clone)]
+#[php_class]
+pub struct ExtractionResult {
+    pub language: String,
+    pub results: String,
 }
 
-/// Get the number of available languages.
-///
-/// # Returns
-///
-/// The count of available languages as an integer.
-///
-/// # Example
-///
-/// ```php
-/// $count = ts_pack_language_count();
-/// echo "Available languages: $count\n";
-/// ```
-#[php_function]
-pub fn ts_pack_language_count() -> i64 {
-    tree_sitter_language_pack::language_count() as i64
+#[php_impl]
+impl ExtractionResult {
+    pub fn __construct(language: String, results: String) -> Self {
+        Self { language, results }
+    }
 }
 
-/// Get a raw language pointer as an integer handle.
-///
-/// Returns the raw `TSLanguage` pointer cast to `i64`, which can be used by PHP
-/// code to verify that a language is available and obtain its opaque handle.
-///
-/// # Arguments
-///
-/// * `name` - The language name to look up.
-///
-/// # Returns
-///
-/// The raw language pointer as an `i64` value.
-///
-/// # Throws
-///
-/// Throws an exception if the language is not available.
-///
-/// # Example
-///
-/// ```php
-/// $langPtr = ts_pack_get_language("python");
-/// echo "Got language pointer: $langPtr\n";
-/// ```
-#[php_function]
-pub fn ts_pack_get_language(name: String) -> PhpResult<i64> {
-    let lang = tree_sitter_language_pack::get_language(&name).map_err(|e| PhpException::default(format!("{e}")))?;
-    Ok(lang.into_raw() as i64)
+#[derive(Clone)]
+#[php_class]
+pub struct PatternValidation {
+    pub valid: bool,
+    pub capture_names: Vec<String>,
+    pub pattern_count: i64,
+    pub warnings: Vec<String>,
+    pub errors: Vec<String>,
 }
 
-/// Parse source code and return an S-expression representation of the syntax tree.
-///
-/// # Arguments
-///
-/// * `language` - The language name to use for parsing.
-/// * `source` - The source code to parse.
-///
-/// # Returns
-///
-/// The S-expression string representation of the parsed tree.
-///
-/// # Throws
-///
-/// Throws an exception if the language is not available or parsing fails.
-///
-/// # Example
-///
-/// ```php
-/// $sexp = ts_pack_parse_string("python", "def hello(): pass");
-/// echo "Tree: $sexp\n";
-/// ```
-#[php_function]
-pub fn ts_pack_parse_string(language: String, source: String) -> PhpResult<String> {
-    let tree = tree_sitter_language_pack::parse_string(&language, source.as_bytes())
-        .map_err(|e| PhpException::default(format!("{e}")))?;
-    Ok(tree_sitter_language_pack::tree_to_sexp(&tree))
+#[php_impl]
+impl PatternValidation {
+    pub fn __construct(
+            valid: bool,
+            capture_names: Vec<String>,
+            pattern_count: i64,
+            warnings: Vec<String>,
+            errors: Vec<String>,
+        ) -> Self {
+        Self { valid, capture_names, pattern_count, warnings, errors }
+    }
 }
 
-/// Process source code and extract metadata + chunks as a JSON string.
-///
-/// The config JSON must contain at least `"language"`. Optional fields:
-/// - `structure` (bool, default true): Extract structural items (functions, classes, etc.)
-/// - `imports` (bool, default true): Extract import statements
-/// - `exports` (bool, default true): Extract export statements
-/// - `comments` (bool, default false): Extract comments
-/// - `docstrings` (bool, default false): Extract docstrings
-/// - `symbols` (bool, default false): Extract symbol definitions
-/// - `diagnostics` (bool, default false): Include parse diagnostics
-/// - `chunk_max_size` (int or null, default null): Maximum chunk size in bytes
-///
-/// # Arguments
-///
-/// * `source` - The source code to process.
-/// * `config_json` - JSON string with processing configuration.
-///
-/// # Returns
-///
-/// JSON string with extraction results.
-///
-/// # Throws
-///
-/// Throws an exception if the config JSON is invalid, the language is unknown,
-/// or processing fails.
-///
-/// # Example
-///
-/// ```php
-/// $result = ts_pack_process("def hello(): pass", '{"language":"python"}');
-/// $data = json_decode($result, true);
-/// echo "Functions: " . count($data['structure']) . "\n";
-/// ```
-#[php_function]
-pub fn ts_pack_process(source: String, config_json: String) -> PhpResult<String> {
-    let core_config: tree_sitter_language_pack::ProcessConfig =
-        serde_json::from_str(&config_json).map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
-
-    let result =
-        tree_sitter_language_pack::process(&source, &core_config).map_err(|e| PhpException::default(format!("{e}")))?;
-
-    serde_json::to_string(&result).map_err(|e| PhpException::default(format!("serialization failed: {e}")))
+#[derive(Clone)]
+#[php_class]
+pub struct ValidationResult {
+    pub valid: bool,
+    pub patterns: String,
 }
 
-/// Extract patterns from source code using a JSON configuration.
-///
-/// The config JSON must contain:
-/// - `language` (string): the language name
-/// - `patterns` (object): named patterns to run, each with a `query` field
-///
-/// # Arguments
-///
-/// * `source` - The source code to extract from.
-/// * `config_json` - JSON string with extraction configuration.
-///
-/// # Returns
-///
-/// JSON string with extraction results.
-///
-/// # Throws
-///
-/// Throws an exception if the config JSON is invalid, the language is unknown,
-/// or extraction fails.
-///
-/// # Example
-///
-/// ```php
-/// $config = '{"language":"python","patterns":{"fns":{"query":"(function_definition name: (identifier) @fn_name)"}}}';
-/// $result = ts_pack_extract("def hello(): pass", $config);
-/// $data = json_decode($result, true);
-/// ```
-#[php_function]
-pub fn ts_pack_extract(source: String, config_json: String) -> PhpResult<String> {
-    let config: tree_sitter_language_pack::ExtractionConfig =
-        serde_json::from_str(&config_json).map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
-
-    let result = tree_sitter_language_pack::extract_patterns(&source, &config)
-        .map_err(|e| PhpException::default(format!("{e}")))?;
-
-    serde_json::to_string(&result).map_err(|e| PhpException::default(format!("serialization failed: {e}")))
+#[php_impl]
+impl ValidationResult {
+    pub fn __construct(valid: bool, patterns: String) -> Self {
+        Self { valid, patterns }
+    }
 }
 
-/// Validate extraction patterns without running them.
-///
-/// The config JSON must contain:
-/// - `language` (string): the language name
-/// - `patterns` (object): named patterns to validate
-///
-/// # Arguments
-///
-/// * `config_json` - JSON string with extraction configuration.
-///
-/// # Returns
-///
-/// JSON string with validation results.
-///
-/// # Throws
-///
-/// Throws an exception if the config JSON is invalid or the language is unknown.
-///
-/// # Example
-///
-/// ```php
-/// $config = '{"language":"python","patterns":{"fns":{"query":"(function_definition name: (identifier) @fn_name)"}}}';
-/// $result = ts_pack_validate_extraction($config);
-/// $data = json_decode($result, true);
-/// echo $data['valid'] ? "Valid\n" : "Invalid\n";
-/// ```
-#[php_function]
-pub fn ts_pack_validate_extraction(config_json: String) -> PhpResult<String> {
-    let config: tree_sitter_language_pack::ExtractionConfig =
-        serde_json::from_str(&config_json).map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
-
-    let result =
-        tree_sitter_language_pack::validate_extraction(&config).map_err(|e| PhpException::default(format!("{e}")))?;
-
-    serde_json::to_string(&result).map_err(|e| PhpException::default(format!("serialization failed: {e}")))
+#[derive(Clone)]
+#[php_class]
+pub struct Span {
+    pub start_byte: i64,
+    pub end_byte: i64,
+    pub start_line: i64,
+    pub start_column: i64,
+    pub end_line: i64,
+    pub end_column: i64,
 }
 
-/// Initialize the language pack with the given configuration (JSON string).
-///
-/// Applies cache directory settings and downloads specified languages/groups.
-/// `config_json` should contain optional fields:
-/// - `cache_dir` (string, optional): custom cache directory path
-/// - `languages` (list, optional): language names to download
-/// - `groups` (list, optional): language groups to download
-///
-/// # Arguments
-///
-/// * `config_json` - JSON string with configuration.
-///
-/// # Throws
-///
-/// Throws an exception if the config JSON is invalid or downloads fail.
-///
-/// # Example
-///
-/// ```php
-/// ts_pack_init('{"languages":["python","rust"]}');
-/// ```
-#[php_function]
-pub fn ts_pack_init(config_json: String) -> PhpResult<()> {
-    let config: tree_sitter_language_pack::PackConfig =
-        serde_json::from_str(&config_json).map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
-    tree_sitter_language_pack::init(&config).map_err(|e| PhpException::default(format!("{e}")))
+#[php_impl]
+impl Span {
+    pub fn __construct(start_byte: i64, end_byte: i64, start_line: i64, start_column: i64, end_line: i64, end_column: i64) -> Self {
+        Self { start_byte, end_byte, start_line, start_column, end_line, end_column }
+    }
 }
 
-/// Apply download configuration without downloading anything.
-///
-/// Use this to set a custom cache directory before the first call to
-/// [`ts_pack_get_language`] or any download function.
-/// `config_json` should contain optional fields:
-/// - `cache_dir` (string, optional): custom cache directory path
-///
-/// # Arguments
-///
-/// * `config_json` - JSON string with configuration.
-///
-/// # Throws
-///
-/// Throws an exception if the config JSON is invalid.
-///
-/// # Example
-///
-/// ```php
-/// ts_pack_configure('{"cache_dir":"/tmp/parsers"}');
-/// ```
-#[php_function]
-pub fn ts_pack_configure(config_json: String) -> PhpResult<()> {
-    let config: tree_sitter_language_pack::PackConfig =
-        serde_json::from_str(&config_json).map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
-    tree_sitter_language_pack::configure(&config).map_err(|e| PhpException::default(format!("{e}")))
+#[derive(Clone)]
+#[php_class]
+pub struct ProcessResult {
+    pub language: String,
+    pub metrics: FileMetrics,
+    pub structure: Vec<StructureItem>,
+    pub imports: Vec<ImportInfo>,
+    pub exports: Vec<ExportInfo>,
+    pub comments: Vec<CommentInfo>,
+    pub docstrings: Vec<DocstringInfo>,
+    pub symbols: Vec<SymbolInfo>,
+    pub diagnostics: Vec<Diagnostic>,
+    pub chunks: Vec<CodeChunk>,
+    pub extractions: String,
 }
 
-/// Download specific languages to the local cache.
-///
-/// Returns the number of newly downloaded languages (already cached languages
-/// are not counted).
-///
-/// # Arguments
-///
-/// * `names` - Array of language names to download.
-///
-/// # Returns
-///
-/// Integer count of newly downloaded languages.
-///
-/// # Throws
-///
-/// Throws an exception if any language is not available or download fails.
-///
-/// # Example
-///
-/// ```php
-/// $count = ts_pack_download(["python", "rust", "typescript"]);
-/// echo "Downloaded $count new languages\n";
-/// ```
-#[php_function]
-pub fn ts_pack_download(names: Vec<String>) -> PhpResult<i64> {
-    let refs: Vec<&str> = names.iter().map(String::as_str).collect();
-    tree_sitter_language_pack::download(&refs)
-        .map(|count| count as i64)
-        .map_err(|e| PhpException::default(format!("{e}")))
+#[php_impl]
+impl ProcessResult {
+    pub fn __construct() -> Self {
+        todo!("constructor for ProcessResult requires complex params — implement manually")
+    }
 }
 
-/// Download all available languages from the remote manifest.
-///
-/// Returns the number of newly downloaded languages.
-///
-/// # Returns
-///
-/// Integer count of newly downloaded languages.
-///
-/// # Throws
-///
-/// Throws an exception if the manifest cannot be fetched or a download fails.
-///
-/// # Example
-///
-/// ```php
-/// $count = ts_pack_download_all();
-/// echo "Downloaded $count languages\n";
-/// ```
-#[php_function]
-pub fn ts_pack_download_all() -> PhpResult<i64> {
-    tree_sitter_language_pack::download_all()
-        .map(|count| count as i64)
-        .map_err(|e| PhpException::default(format!("{e}")))
+#[derive(Clone)]
+#[php_class]
+pub struct FileMetrics {
+    pub total_lines: i64,
+    pub code_lines: i64,
+    pub comment_lines: i64,
+    pub blank_lines: i64,
+    pub total_bytes: i64,
+    pub node_count: i64,
+    pub error_count: i64,
+    pub max_depth: i64,
 }
 
-/// Return all language names available in the remote manifest (248).
-///
-/// Fetches (and caches) the remote manifest to discover the full list of
-/// downloadable languages.
-///
-/// # Returns
-///
-/// Array of language names sorted alphabetically.
-///
-/// # Throws
-///
-/// Throws an exception if the manifest cannot be fetched.
-///
-/// # Example
-///
-/// ```php
-/// $langs = ts_pack_manifest_languages();
-/// echo count($langs) . " languages available for download\n";
-/// ```
-#[php_function]
-pub fn ts_pack_manifest_languages() -> PhpResult<Vec<String>> {
-    tree_sitter_language_pack::manifest_languages().map_err(|e| PhpException::default(format!("{e}")))
+#[php_impl]
+impl FileMetrics {
+    pub fn __construct(
+            total_lines: i64,
+            code_lines: i64,
+            comment_lines: i64,
+            blank_lines: i64,
+            total_bytes: i64,
+            node_count: i64,
+            error_count: i64,
+            max_depth: i64,
+        ) -> Self {
+        Self { total_lines, code_lines, comment_lines, blank_lines, total_bytes, node_count, error_count, max_depth }
+    }
 }
 
-/// Return languages that are already downloaded and cached locally.
-///
-/// Does not perform any network requests. Returns an empty array if the
-/// cache directory does not exist or cannot be read.
-///
-/// # Returns
-///
-/// Array of cached language names sorted alphabetically.
-///
-/// # Example
-///
-/// ```php
-/// $cached = ts_pack_downloaded_languages();
-/// echo count($cached) . " languages already cached\n";
-/// ```
-#[php_function]
-pub fn ts_pack_downloaded_languages() -> Vec<String> {
-    tree_sitter_language_pack::downloaded_languages()
+#[derive(Clone)]
+#[php_class]
+pub struct StructureItem {
+    pub kind: String,
+    pub name: Option<String>,
+    pub visibility: Option<String>,
+    pub span: Span,
+    pub children: Vec<StructureItem>,
+    pub decorators: Vec<String>,
+    pub doc_comment: Option<String>,
+    pub signature: Option<String>,
+    pub body_span: Option<Span>,
 }
 
-/// Delete all cached parser shared libraries.
-///
-/// Resets the cache registration so the next call to ts_pack_get_language or
-/// a download function will re-register the (now empty) cache directory.
-///
-/// # Throws
-///
-/// Throws an exception if the cache directory cannot be removed.
-///
-/// # Example
-///
-/// ```php
-/// ts_pack_clean_cache();
-/// echo "Cache cleared\n";
-/// ```
-#[php_function]
-pub fn ts_pack_clean_cache() -> PhpResult<()> {
-    tree_sitter_language_pack::clean_cache().map_err(|e| PhpException::default(format!("{e}")))
+#[php_impl]
+impl StructureItem {
+    pub fn __construct() -> Self {
+        todo!("constructor for StructureItem requires complex params — implement manually")
+    }
 }
 
-/// Return the effective cache directory path.
-///
-/// This is either the custom path set via ts_pack_configure/ts_pack_init or the
-/// default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
-///
-/// # Returns
-///
-/// String path to the cache directory.
-///
-/// # Throws
-///
-/// Throws an exception if the system cache directory cannot be determined.
-///
-/// # Example
-///
-/// ```php
-/// $dir = ts_pack_cache_dir();
-/// echo "Cache directory: $dir\n";
-/// ```
-#[php_function]
-pub fn ts_pack_cache_dir() -> PhpResult<String> {
-    tree_sitter_language_pack::cache_dir()
-        .map(|p| p.to_string_lossy().to_string())
-        .map_err(|e| PhpException::default(format!("{e}")))
+#[derive(Clone)]
+#[php_class]
+pub struct CommentInfo {
+    pub text: String,
+    pub kind: String,
+    pub span: Span,
+    pub associated_node: Option<String>,
 }
 
-/// tree-sitter-language-pack PHP extension module.
-#[php_module]
-pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
-    module
-        .function(wrap_function!(ts_pack_version))
-        .function(wrap_function!(ts_pack_available_languages))
-        .function(wrap_function!(ts_pack_has_language))
-        .function(wrap_function!(ts_pack_detect_language))
-        .function(wrap_function!(ts_pack_detect_language_from_content))
-        .function(wrap_function!(ts_pack_detect_language_from_extension))
-        .function(wrap_function!(ts_pack_detect_language_from_path))
-        .function(wrap_function!(ts_pack_extension_ambiguity))
-        .function(wrap_function!(ts_pack_get_highlights_query))
-        .function(wrap_function!(ts_pack_get_injections_query))
-        .function(wrap_function!(ts_pack_get_locals_query))
-        .function(wrap_function!(ts_pack_language_count))
-        .function(wrap_function!(ts_pack_get_language))
-        .function(wrap_function!(ts_pack_parse_string))
-        .function(wrap_function!(ts_pack_process))
-        .function(wrap_function!(ts_pack_extract))
-        .function(wrap_function!(ts_pack_validate_extraction))
-        .function(wrap_function!(ts_pack_init))
-        .function(wrap_function!(ts_pack_configure))
-        .function(wrap_function!(ts_pack_download))
-        .function(wrap_function!(ts_pack_download_all))
-        .function(wrap_function!(ts_pack_manifest_languages))
-        .function(wrap_function!(ts_pack_downloaded_languages))
-        .function(wrap_function!(ts_pack_clean_cache))
-        .function(wrap_function!(ts_pack_cache_dir))
+#[php_impl]
+impl CommentInfo {
+    pub fn __construct() -> Self {
+        todo!("constructor for CommentInfo requires complex params — implement manually")
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct DocstringInfo {
+    pub text: String,
+    pub format: String,
+    pub span: Span,
+    pub associated_item: Option<String>,
+    pub parsed_sections: Vec<DocSection>,
+}
+
+#[php_impl]
+impl DocstringInfo {
+    pub fn __construct() -> Self {
+        todo!("constructor for DocstringInfo requires complex params — implement manually")
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct DocSection {
+    pub kind: String,
+    pub name: Option<String>,
+    pub description: String,
+}
+
+#[php_impl]
+impl DocSection {
+    pub fn __construct(kind: String, description: String, name: Option<String>) -> Self {
+        Self { kind, name, description }
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct ImportInfo {
+    pub source: String,
+    pub items: Vec<String>,
+    pub alias: Option<String>,
+    pub is_wildcard: bool,
+    pub span: Span,
+}
+
+#[php_impl]
+impl ImportInfo {
+    pub fn __construct() -> Self {
+        todo!("constructor for ImportInfo requires complex params — implement manually")
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct ExportInfo {
+    pub name: String,
+    pub kind: String,
+    pub span: Span,
+}
+
+#[php_impl]
+impl ExportInfo {
+    pub fn __construct() -> Self {
+        todo!("constructor for ExportInfo requires complex params — implement manually")
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct SymbolInfo {
+    pub name: String,
+    pub kind: String,
+    pub span: Span,
+    pub type_annotation: Option<String>,
+    pub doc: Option<String>,
+}
+
+#[php_impl]
+impl SymbolInfo {
+    pub fn __construct() -> Self {
+        todo!("constructor for SymbolInfo requires complex params — implement manually")
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct Diagnostic {
+    pub message: String,
+    pub severity: String,
+    pub span: Span,
+}
+
+#[php_impl]
+impl Diagnostic {
+    pub fn __construct() -> Self {
+        todo!("constructor for Diagnostic requires complex params — implement manually")
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct CodeChunk {
+    pub content: String,
+    pub start_byte: i64,
+    pub end_byte: i64,
+    pub start_line: i64,
+    pub end_line: i64,
+    pub metadata: ChunkContext,
+}
+
+#[php_impl]
+impl CodeChunk {
+    pub fn __construct() -> Self {
+        todo!("constructor for CodeChunk requires complex params — implement manually")
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct ChunkContext {
+    pub language: String,
+    pub chunk_index: i64,
+    pub total_chunks: i64,
+    pub node_types: Vec<String>,
+    pub context_path: Vec<String>,
+    pub symbols_defined: Vec<String>,
+    pub comments: Vec<CommentInfo>,
+    pub docstrings: Vec<DocstringInfo>,
+    pub has_error_nodes: bool,
+}
+
+#[php_impl]
+impl ChunkContext {
+    pub fn __construct() -> Self {
+        todo!("constructor for ChunkContext requires complex params — implement manually")
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct NodeInfo {
+    pub kind: String,
+    pub is_named: bool,
+    pub start_byte: i64,
+    pub end_byte: i64,
+    pub start_row: i64,
+    pub start_col: i64,
+    pub end_row: i64,
+    pub end_col: i64,
+    pub named_child_count: i64,
+    pub is_error: bool,
+    pub is_missing: bool,
+}
+
+#[php_impl]
+impl NodeInfo {
+    pub fn __construct(
+            kind: String,
+            is_named: bool,
+            start_byte: i64,
+            end_byte: i64,
+            start_row: i64,
+            start_col: i64,
+            end_row: i64,
+            end_col: i64,
+            named_child_count: i64,
+            is_error: bool,
+            is_missing: bool,
+        ) -> Self {
+        Self { kind, is_named, start_byte, end_byte, start_row, start_col, end_row, end_col, named_child_count, is_error, is_missing }
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct PackConfig {
+    pub cache_dir: Option<String>,
+    pub languages: Option<Vec<String>>,
+    pub groups: Option<Vec<String>>,
+}
+
+#[php_impl]
+impl PackConfig {
+    pub fn __construct(cache_dir: Option<String>, languages: Option<Vec<String>>, groups: Option<Vec<String>>) -> Self {
+        Self { cache_dir, languages, groups }
+    }
+
+    pub fn from_toml_file() -> PhpResult<String> {
+        todo!("call into core implementation")
+    }
+
+    pub fn discover() -> Option<String> {
+        todo!("call into core implementation")
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct ProcessConfig {
+    pub language: String,
+    pub structure: bool,
+    pub imports: bool,
+    pub exports: bool,
+    pub comments: bool,
+    pub docstrings: bool,
+    pub symbols: bool,
+    pub diagnostics: bool,
+    pub chunk_max_size: Option<i64>,
+    pub extractions: Option<String>,
+}
+
+#[php_impl]
+impl ProcessConfig {
+    pub fn __construct(
+            language: String,
+            structure: bool,
+            imports: bool,
+            exports: bool,
+            comments: bool,
+            docstrings: bool,
+            symbols: bool,
+            diagnostics: bool,
+            chunk_max_size: Option<i64>,
+            extractions: Option<String>,
+        ) -> Self {
+        Self { language, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunk_max_size, extractions }
+    }
+
+    pub fn with_chunking(&self) -> String {
+        todo!("call into core implementation")
+    }
+
+    pub fn all(&self) -> String {
+        todo!("call into core implementation")
+    }
+
+    pub fn minimal(&self) -> String {
+        todo!("call into core implementation")
+    }
+
+    pub fn default() -> String {
+        todo!("call into core implementation")
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct LanguageRegistry {
+    inner: std::sync::Arc<tree_sitter_language_pack::LanguageRegistry>,
+}
+
+#[php_impl]
+impl LanguageRegistry {
+    pub fn add_extra_libs_dir(&self) -> () {
+        todo!("call into core implementation")
+    }
+
+    pub fn get_language(&self) -> PhpResult<Language> {
+        todo!("call into core implementation")
+    }
+
+    pub fn available_languages(&self) -> Vec<String> {
+        todo!("call into core implementation")
+    }
+
+    pub fn has_language(&self) -> bool {
+        todo!("call into core implementation")
+    }
+
+    pub fn language_count(&self) -> i64 {
+        todo!("call into core implementation")
+    }
+
+    pub fn process(&self) -> PhpResult<ProcessResult> {
+        todo!("call into core implementation")
+    }
+
+    pub fn with_libs_dir() -> String {
+        todo!("call into core implementation")
+    }
+
+    pub fn default() -> String {
+        todo!("call into core implementation")
+    }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct Tree {
+    inner: std::sync::Arc<tree_sitter_language_pack::Tree>,
+}
+
+#[php_impl]
+impl Tree {
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct Language {
+    inner: std::sync::Arc<tree_sitter_language_pack::Language>,
+}
+
+#[php_impl]
+impl Language {
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct Parser {
+    inner: std::sync::Arc<tree_sitter_language_pack::Parser>,
+}
+
+#[php_impl]
+impl Parser {
+}
+
+// Error enum values
+pub const ERROR_LANGUAGENOTFOUND: &str = "LanguageNotFound";
+pub const ERROR_DYNAMICLOAD: &str = "DynamicLoad";
+pub const ERROR_NULLLANGUAGEPOINTER: &str = "NullLanguagePointer";
+pub const ERROR_PARSERSETUP: &str = "ParserSetup";
+pub const ERROR_LOCKPOISONED: &str = "LockPoisoned";
+pub const ERROR_CONFIG: &str = "Config";
+pub const ERROR_PARSEFAILED: &str = "ParseFailed";
+pub const ERROR_QUERYERROR: &str = "QueryError";
+pub const ERROR_INVALIDRANGE: &str = "InvalidRange";
+pub const ERROR_IO: &str = "Io";
+pub const ERROR_JSON: &str = "Json";
+pub const ERROR_TOML: &str = "Toml";
+pub const ERROR_DOWNLOAD: &str = "Download";
+pub const ERROR_CHECKSUMMISMATCH: &str = "ChecksumMismatch";
+
+// CaptureOutput enum values
+pub const CAPTUREOUTPUT_TEXT: &str = "Text";
+pub const CAPTUREOUTPUT_NODE: &str = "Node";
+pub const CAPTUREOUTPUT_FULL: &str = "Full";
+
+// StructureKind enum values
+pub const STRUCTUREKIND_FUNCTION: &str = "Function";
+pub const STRUCTUREKIND_METHOD: &str = "Method";
+pub const STRUCTUREKIND_CLASS: &str = "Class";
+pub const STRUCTUREKIND_STRUCT: &str = "Struct";
+pub const STRUCTUREKIND_INTERFACE: &str = "Interface";
+pub const STRUCTUREKIND_ENUM: &str = "Enum";
+pub const STRUCTUREKIND_MODULE: &str = "Module";
+pub const STRUCTUREKIND_TRAIT: &str = "Trait";
+pub const STRUCTUREKIND_IMPL: &str = "Impl";
+pub const STRUCTUREKIND_NAMESPACE: &str = "Namespace";
+pub const STRUCTUREKIND_OTHER: &str = "Other";
+
+// CommentKind enum values
+pub const COMMENTKIND_LINE: &str = "Line";
+pub const COMMENTKIND_BLOCK: &str = "Block";
+pub const COMMENTKIND_DOC: &str = "Doc";
+
+// DocstringFormat enum values
+pub const DOCSTRINGFORMAT_PYTHONTRIPLEQUOTE: &str = "PythonTripleQuote";
+pub const DOCSTRINGFORMAT_JSDOC: &str = "JSDoc";
+pub const DOCSTRINGFORMAT_RUSTDOC: &str = "Rustdoc";
+pub const DOCSTRINGFORMAT_GODOC: &str = "GoDoc";
+pub const DOCSTRINGFORMAT_JAVADOC: &str = "JavaDoc";
+pub const DOCSTRINGFORMAT_OTHER: &str = "Other";
+
+// ExportKind enum values
+pub const EXPORTKIND_NAMED: &str = "Named";
+pub const EXPORTKIND_DEFAULT: &str = "Default";
+pub const EXPORTKIND_REEXPORT: &str = "ReExport";
+
+// SymbolKind enum values
+pub const SYMBOLKIND_VARIABLE: &str = "Variable";
+pub const SYMBOLKIND_CONSTANT: &str = "Constant";
+pub const SYMBOLKIND_FUNCTION: &str = "Function";
+pub const SYMBOLKIND_CLASS: &str = "Class";
+pub const SYMBOLKIND_TYPE: &str = "Type";
+pub const SYMBOLKIND_INTERFACE: &str = "Interface";
+pub const SYMBOLKIND_ENUM: &str = "Enum";
+pub const SYMBOLKIND_MODULE: &str = "Module";
+pub const SYMBOLKIND_OTHER: &str = "Other";
+
+// DiagnosticSeverity enum values
+pub const DIAGNOSTICSEVERITY_ERROR: &str = "Error";
+pub const DIAGNOSTICSEVERITY_WARNING: &str = "Warning";
+pub const DIAGNOSTICSEVERITY_INFO: &str = "Info";
+
+#[php_function]
+pub fn detect_language_from_extension() -> Option<String> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn detect_language_from_path() -> Option<String> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn extension_ambiguity() -> Option<String> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn extension_ambiguity_json() -> Option<String> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn detect_language_from_content() -> Option<String> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn validate_extraction() -> PhpResult<ValidationResult> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn process() -> PhpResult<ProcessResult> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn node_info_from_node() -> NodeInfo {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn root_node_info() -> NodeInfo {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn find_nodes_by_type() -> Vec<NodeInfo> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn named_children_info() -> Vec<NodeInfo> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn parse_string() -> PhpResult<Tree> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn tree_contains_node_type() -> bool {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn tree_has_error_nodes() -> bool {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn tree_to_sexp() -> String {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn tree_error_count() -> i64 {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn get_highlights_query() -> Option<String> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn get_injections_query() -> Option<String> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn get_locals_query() -> Option<String> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn run_query() -> PhpResult<Vec<String>> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn split_code() -> Vec<String> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn get_language() -> PhpResult<Language> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn get_parser() -> PhpResult<Parser> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn available_languages() -> Vec<String> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn has_language() -> bool {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn language_count() -> i64 {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn extract_patterns() -> PhpResult<ExtractionResult> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn init() -> PhpResult<()> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn configure() -> PhpResult<()> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn download_all() -> PhpResult<i64> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn manifest_languages() -> PhpResult<Vec<String>> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn downloaded_languages() -> Vec<String> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn clean_cache() -> PhpResult<()> {
+    todo!("call into core")
+}
+
+#[php_function]
+pub fn cache_dir() -> PhpResult<String> {
+    todo!("call into core")
+}
+
+impl From<PatternValidation> for tree_sitter_language_pack::PatternValidation {
+    fn from(val: PatternValidation) -> Self {
+        Self {
+            valid: val.valid,
+            capture_names: val.capture_names,
+            pattern_count: val.pattern_count as usize,
+            warnings: val.warnings,
+            errors: val.errors,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternValidation> for PatternValidation {
+    fn from(val: tree_sitter_language_pack::PatternValidation) -> Self {
+        Self {
+            valid: val.valid,
+            capture_names: val.capture_names,
+            pattern_count: val.pattern_count as i64,
+            warnings: val.warnings,
+            errors: val.errors,
+        }
+    }
+}
+
+impl From<Span> for tree_sitter_language_pack::Span {
+    fn from(val: Span) -> Self {
+        Self {
+            start_byte: val.start_byte as usize,
+            end_byte: val.end_byte as usize,
+            start_line: val.start_line as usize,
+            start_column: val.start_column as usize,
+            end_line: val.end_line as usize,
+            end_column: val.end_column as usize,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::Span> for Span {
+    fn from(val: tree_sitter_language_pack::Span) -> Self {
+        Self {
+            start_byte: val.start_byte as i64,
+            end_byte: val.end_byte as i64,
+            start_line: val.start_line as i64,
+            start_column: val.start_column as i64,
+            end_line: val.end_line as i64,
+            end_column: val.end_column as i64,
+        }
+    }
+}
+
+impl From<FileMetrics> for tree_sitter_language_pack::FileMetrics {
+    fn from(val: FileMetrics) -> Self {
+        Self {
+            total_lines: val.total_lines as usize,
+            code_lines: val.code_lines as usize,
+            comment_lines: val.comment_lines as usize,
+            blank_lines: val.blank_lines as usize,
+            total_bytes: val.total_bytes as usize,
+            node_count: val.node_count as usize,
+            error_count: val.error_count as usize,
+            max_depth: val.max_depth as usize,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::FileMetrics> for FileMetrics {
+    fn from(val: tree_sitter_language_pack::FileMetrics) -> Self {
+        Self {
+            total_lines: val.total_lines as i64,
+            code_lines: val.code_lines as i64,
+            comment_lines: val.comment_lines as i64,
+            blank_lines: val.blank_lines as i64,
+            total_bytes: val.total_bytes as i64,
+            node_count: val.node_count as i64,
+            error_count: val.error_count as i64,
+            max_depth: val.max_depth as i64,
+        }
+    }
+}
+
+impl From<DocSection> for tree_sitter_language_pack::DocSection {
+    fn from(val: DocSection) -> Self {
+        Self {
+            kind: val.kind,
+            name: val.name,
+            description: val.description,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::DocSection> for DocSection {
+    fn from(val: tree_sitter_language_pack::DocSection) -> Self {
+        Self {
+            kind: val.kind,
+            name: val.name,
+            description: val.description,
+        }
+    }
+}
+
+impl From<ImportInfo> for tree_sitter_language_pack::ImportInfo {
+    fn from(val: ImportInfo) -> Self {
+        Self {
+            source: val.source,
+            items: val.items,
+            alias: val.alias,
+            is_wildcard: val.is_wildcard,
+            span: val.span.into(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ImportInfo> for ImportInfo {
+    fn from(val: tree_sitter_language_pack::ImportInfo) -> Self {
+        Self {
+            source: val.source,
+            items: val.items,
+            alias: val.alias,
+            is_wildcard: val.is_wildcard,
+            span: val.span.into(),
+        }
+    }
+}
+
+impl From<CodeChunk> for tree_sitter_language_pack::CodeChunk {
+    fn from(val: CodeChunk) -> Self {
+        Self {
+            content: val.content,
+            start_byte: val.start_byte as usize,
+            end_byte: val.end_byte as usize,
+            start_line: val.start_line as usize,
+            end_line: val.end_line as usize,
+            metadata: val.metadata.into(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::CodeChunk> for CodeChunk {
+    fn from(val: tree_sitter_language_pack::CodeChunk) -> Self {
+        Self {
+            content: val.content,
+            start_byte: val.start_byte as i64,
+            end_byte: val.end_byte as i64,
+            start_line: val.start_line as i64,
+            end_line: val.end_line as i64,
+            metadata: val.metadata.into(),
+        }
+    }
+}
+
+impl From<ChunkContext> for tree_sitter_language_pack::ChunkContext {
+    fn from(val: ChunkContext) -> Self {
+        Self {
+            language: val.language,
+            chunk_index: val.chunk_index as usize,
+            total_chunks: val.total_chunks as usize,
+            node_types: val.node_types,
+            context_path: val.context_path,
+            symbols_defined: val.symbols_defined,
+            comments: val.comments,
+            docstrings: val.docstrings,
+            has_error_nodes: val.has_error_nodes,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ChunkContext> for ChunkContext {
+    fn from(val: tree_sitter_language_pack::ChunkContext) -> Self {
+        Self {
+            language: val.language,
+            chunk_index: val.chunk_index as i64,
+            total_chunks: val.total_chunks as i64,
+            node_types: val.node_types,
+            context_path: val.context_path,
+            symbols_defined: val.symbols_defined,
+            comments: val.comments,
+            docstrings: val.docstrings,
+            has_error_nodes: val.has_error_nodes,
+        }
+    }
+}
+
+impl From<PackConfig> for tree_sitter_language_pack::PackConfig {
+    fn from(val: PackConfig) -> Self {
+        Self {
+            cache_dir: val.cache_dir.map(Into::into),
+            languages: val.languages,
+            groups: val.groups,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PackConfig> for PackConfig {
+    fn from(val: tree_sitter_language_pack::PackConfig) -> Self {
+        Self {
+            cache_dir: val.cache_dir.map(|p| p.to_string_lossy().to_string()),
+            languages: val.languages,
+            groups: val.groups,
+        }
+    }
 }

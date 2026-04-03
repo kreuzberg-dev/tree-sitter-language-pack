@@ -1,0 +1,81 @@
+languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
+
+[crate]
+name = "tree-sitter-language-pack"
+core_import = "tree_sitter_language_pack"
+sources = ["crates/ts-pack-core/src/lib.rs"]
+version_from = "Cargo.toml"
+workspace_root = "."
+
+# Declare opaque types from external crates (tree-sitter)
+# skif can't extract these but generates wrappers for them
+[opaque_types]
+Language = "tree_sitter_language_pack::Language"
+Parser = "tree_sitter_language_pack::Parser"
+Tree = "tree_sitter_language_pack::Tree"
+
+# Exclude types behind feature gates or internal-only
+[exclude]
+types = [
+    "Config",
+    "LanguagePackConfig",
+    "LanguagesConfig",     # config feature
+    "LanguageDefinition",
+    "LanguageDefinitions", # definitions feature (not re-exported)
+    "PlatformBundle",
+    "LanguageInfo",        # download feature
+    "CompiledExtraction",  # opaque internal
+    "ParserManifest",      # download feature
+    "DownloadManager",     # download feature, opaque, no serde
+    "QueryMatch",          # opaque, no serde
+]
+functions = [
+    "snake_to_camel",
+    "camel_to_snake",       # utility, not core API
+    "load_definitions",     # config feature
+    "extract_intelligence", # internal
+    "chunk_source",         # takes non-FFI types (Tree, Language)
+    "download",             # takes &[&str] which needs special FFI handling
+    "extract",              # collides with module name
+]
+
+[output]
+python = "crates/ts-pack-python/src/"
+node = "crates/ts-pack-node/src/"
+ruby = "crates/ts-pack-ruby/src/"
+php = "crates/ts-pack-php/src/"
+ffi = "crates/ts-pack-ffi/src/"
+elixir = "crates/ts-pack-elixir/src/"
+wasm = "crates/ts-pack-wasm/src/"
+
+[python]
+module_name = "_tree_sitter_language_pack"
+
+[python.stubs]
+output = "packages/python/tree_sitter_language_pack/"
+
+[ffi]
+prefix = "tslp"
+header_name = "tslp.h"
+
+[go]
+module = "github.com/kreuzberg-dev/tree-sitter-language-pack-go"
+
+[java]
+package = "dev.kreuzberg.tslp"
+
+[csharp]
+namespace = "TreeSitterLanguagePack"
+
+[node]
+package_name = "@kreuzberg/tree-sitter-language-pack"
+
+[elixir]
+app_name = "tree_sitter_language_pack"
+
+[scaffold]
+description = "Pre-compiled tree-sitter grammars for 200+ languages"
+license = "MIT"
+repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+authors = ["Kreuzberg Team"]
+keywords = ["tree-sitter", "parser", "syntax"]

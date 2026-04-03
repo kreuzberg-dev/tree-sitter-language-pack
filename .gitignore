@@ -94,3 +94,14 @@ GEMINI.md
 
 .cache/
 site/
+.skif/
+*.pyd
+.venv/
+.gems/
+vendor/bundle/
+*.h.bak
+*.test
+bin/
+obj/
+*.nupkg
+pkg/

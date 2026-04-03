@@ -1,10 +1,16 @@
 version: "3"
 
+vars:
+  # Default dev languages for local builds. Override with TSLP_LANGUAGES env var or pass via CI.
+  DEV_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+
 tasks:
   build:ffi:
-    desc: Build FFI static library for Go
+    desc: Build FFI static library for Go (compiles parser libraries)
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LINK_MODE: "{{.TSLP_LINK_MODE | default \"dynamic\"}}"
+      TSLP_LANGUAGES: "{{.TSLP_LANGUAGES | default .DEV_LANGUAGES}}"
     cmds:
       - cargo build -p ts-pack-ffi --release
 

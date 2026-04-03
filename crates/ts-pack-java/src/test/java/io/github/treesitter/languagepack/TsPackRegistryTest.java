@@ -2,12 +2,12 @@ package io.github.treesitter.languagepack;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.lang.foreign.MemorySegment;
+import dev.kreuzberg.tslp.TreeSitterLanguagePack;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link TsPackRegistry}.
+ * Tests for {@link TreeSitterLanguagePack}.
  *
  * <p>These tests require the {@code ts_pack_ffi} native library to be available. Set the {@code
  * TSPACK_LIB_PATH} environment variable to the full path of the shared library if it is not on the
@@ -16,127 +16,59 @@ import org.junit.jupiter.api.Test;
 class TsPackRegistryTest {
 
   @Test
-  void testCreateAndClose() {
-    TsPackRegistry registry = new TsPackRegistry();
-    assertNotNull(registry);
-    // Should not throw
-    registry.close();
-    // Double close should be safe
-    registry.close();
-  }
-
-  @Test
-  void testCreateWithTryWithResources() {
-    assertDoesNotThrow(
-        () -> {
-          try (var registry = new TsPackRegistry()) {
-            assertNotNull(registry);
-          }
-        });
-  }
-
-  @Test
   void testLanguageCount() {
-    try (var registry = new TsPackRegistry()) {
-      int count = registry.languageCount();
-      assertTrue(count > 0, "Expected at least one language, got " + count);
-    }
+    long count = TreeSitterLanguagePack.languageCount();
+    assertTrue(count > 0, "Expected at least one language, got " + count);
   }
 
   @Test
   void testAvailableLanguages() {
-    try (var registry = new TsPackRegistry()) {
-      List<String> languages = registry.availableLanguages();
-      assertNotNull(languages);
-      assertFalse(languages.isEmpty(), "Available languages list should not be empty");
-      // The list should contain well-known languages
-      assertTrue(
-          languages.size() == registry.languageCount(),
-          "availableLanguages size should match languageCount");
-    }
+    List<String> languages = TreeSitterLanguagePack.availableLanguages();
+    assertNotNull(languages);
+    assertFalse(languages.isEmpty(), "Available languages list should not be empty");
+    assertEquals(
+        TreeSitterLanguagePack.languageCount(),
+        languages.size(),
+        "availableLanguages size should match languageCount");
   }
 
   @Test
-  void testHasLanguage() {
-    try (var registry = new TsPackRegistry()) {
-      // Pick the first available language — it must exist
-      String firstName = registry.languageNameAt(0);
-      assertTrue(registry.hasLanguage(firstName), "Registry should contain language: " + firstName);
-
-      assertFalse(
-          registry.hasLanguage("__nonexistent_language_42__"),
-          "Registry should not contain a made-up language name");
-    }
+  void testHasLanguageKnown() {
+    List<String> languages = TreeSitterLanguagePack.availableLanguages();
+    assertFalse(languages.isEmpty(), "Expected at least one language to be available");
+    String firstName = languages.get(0);
+    assertTrue(
+        TreeSitterLanguagePack.hasLanguage(firstName),
+        "hasLanguage should return true for: " + firstName);
   }
 
   @Test
-  void testGetLanguage() {
-    try (var registry = new TsPackRegistry()) {
-      // Use the first available language for a reliable test
-      String firstName = registry.languageNameAt(0);
-      MemorySegment lang = registry.getLanguage(firstName);
-      assertNotNull(lang);
-      assertNotEquals(
-          MemorySegment.NULL,
-          lang,
-          "getLanguage should return a non-null pointer for: " + firstName);
-    }
-  }
-
-  @Test
-  void testGetLanguageNotFound() {
-    try (var registry = new TsPackRegistry()) {
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> registry.getLanguage("__nonexistent_language_42__"));
-    }
-  }
-
-  @Test
-  void testLanguageNameAtOutOfBounds() {
-    try (var registry = new TsPackRegistry()) {
-      int count = registry.languageCount();
-      assertThrows(IndexOutOfBoundsException.class, () -> registry.languageNameAt(count));
-      assertThrows(IndexOutOfBoundsException.class, () -> registry.languageNameAt(-1));
-    }
-  }
-
-  @Test
-  void testUseAfterClose() {
-    TsPackRegistry registry = new TsPackRegistry();
-    registry.close();
-
-    assertThrows(IllegalStateException.class, registry::languageCount);
-    assertThrows(IllegalStateException.class, () -> registry.hasLanguage("java"));
-    assertThrows(IllegalStateException.class, () -> registry.getLanguage("java"));
-    assertThrows(IllegalStateException.class, registry::availableLanguages);
-    assertThrows(IllegalStateException.class, () -> registry.languageNameAt(0));
-  }
-
-  @Test
-  void testClearError() {
-    try (var registry = new TsPackRegistry()) {
-      // Trigger an error by requesting a nonexistent language
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> registry.getLanguage("__nonexistent_language_42__"));
-
-      // Clear should not throw
-      assertDoesNotThrow(TsPackRegistry::clearError);
-    }
+  void testHasLanguageUnknown() {
+    assertFalse(
+        TreeSitterLanguagePack.hasLanguage("__nonexistent_language_42__"),
+        "hasLanguage should return false for a made-up language name");
   }
 
   @Test
   void testAvailableLanguagesContents() {
-    try (var registry = new TsPackRegistry()) {
-      List<String> languages = registry.availableLanguages();
-      // Each entry should be a non-empty string
-      for (String lang : languages) {
-        assertNotNull(lang);
-        assertFalse(lang.isEmpty(), "Language name should not be empty");
-      }
-      // The returned list should be unmodifiable
-      assertThrows(UnsupportedOperationException.class, () -> languages.add("bogus"));
+    List<String> languages = TreeSitterLanguagePack.availableLanguages();
+    for (String lang : languages) {
+      assertNotNull(lang, "Language name should not be null");
+      assertFalse(lang.isEmpty(), "Language name should not be empty");
     }
+  }
+
+  @Test
+  void testDetectLanguageFromExtension() {
+    String language = TreeSitterLanguagePack.detectLanguageFromExtension("py");
+    assertNotNull(language, "Expected a language for extension 'py'");
+    assertFalse(language.isEmpty(), "Detected language should not be empty");
+  }
+
+  @Test
+  void testDetectLanguageFromPath() {
+    String language = TreeSitterLanguagePack.detectLanguageFromPath("main.rs");
+    assertNotNull(language, "Expected a language for path 'main.rs'");
+    assertFalse(language.isEmpty(), "Detected language should not be empty");
   }
 }

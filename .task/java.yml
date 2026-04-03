@@ -2,6 +2,8 @@ version: "3"
 
 vars:
   FFI_LIB_PATH: '{{.PROJECT_ROOT}}/target/release/libts_pack_ffi.{{if eq OS "darwin"}}dylib{{else if eq OS "windows"}}dll{{else}}so{{end}}'
+  # Default dev languages for local builds. Override with TSLP_LANGUAGES env var or pass via CI.
+  DEV_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
 tasks:
   deps:
@@ -11,9 +13,11 @@ tasks:
       - mvn dependency:resolve -q
 
   build:ffi:
-    desc: Build FFI shared library for Java
+    desc: Build FFI shared library for Java (compiles parser libraries)
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LINK_MODE: "{{.TSLP_LINK_MODE | default \"dynamic\"}}"
+      TSLP_LANGUAGES: "{{.TSLP_LANGUAGES | default .DEV_LANGUAGES}}"
     cmds:
       - cargo build -p ts-pack-ffi --release
 

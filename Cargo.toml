@@ -3,6 +3,7 @@ members = ["crates/*", "tools/e2e-generator", "tools/snippet-runner"]
 exclude = [
     "crates/ts-pack-elixir",
     "crates/ts-pack-java",
+    "crates/ts-pack-php",
     "packages/go/v1",
     "tests/test_apps/rust",
 ]

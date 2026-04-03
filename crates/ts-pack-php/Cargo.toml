@@ -18,4 +18,4 @@ test = false
 [dependencies]
 ext-php-rs = "0.15"
 serde_json = { workspace = true }
-tree-sitter-language-pack = { workspace = true, features = ["serde", "download"] }
+tree-sitter-language-pack = { path = "vendor/ts-pack-core", features = ["serde", "download"] }

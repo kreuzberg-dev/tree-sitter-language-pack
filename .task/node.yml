@@ -1,5 +1,9 @@
 version: "3"
 
+vars:
+  # Default dev languages for local builds. Override with TSLP_LANGUAGES env var or pass via CI.
+  DEV_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+
 tasks:
   deps:
     desc: Install Node.js dependencies
@@ -16,20 +20,24 @@ tasks:
       - pnpm up --latest -w
 
   build:
-    desc: Build NAPI-RS native module (release)
+    desc: Build NAPI-RS native module (release, compiles parser libraries)
     dir: crates/ts-pack-node
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LINK_MODE: "{{.TSLP_LINK_MODE | default \"dynamic\"}}"
+      TSLP_LANGUAGES: "{{.TSLP_LANGUAGES | default .DEV_LANGUAGES}}"
     cmds:
-      - napi build --release
+      - napi build --platform --release
 
   build:dev:
-    desc: Build NAPI-RS native module (debug)
+    desc: Build NAPI-RS native module (debug, compiles parser libraries)
     dir: crates/ts-pack-node
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LINK_MODE: "{{.TSLP_LINK_MODE | default \"dynamic\"}}"
+      TSLP_LANGUAGES: "{{.TSLP_LANGUAGES | default .DEV_LANGUAGES}}"
     cmds:
-      - napi build
+      - napi build --platform
 
   test:
     desc: Smoke test Node.js native module
