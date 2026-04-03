@@ -957,14 +957,14 @@ impl LanguageRegistry {
 
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
-pub struct Parser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
+pub struct Language {
+    inner: Arc<tree_sitter_language_pack::Language>,
 }
 
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
-pub struct Language {
-    inner: Arc<tree_sitter_language_pack::Language>,
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
 }
 
 #[derive(Clone)]
@@ -1120,12 +1120,6 @@ pub fn process(source: String, config: ProcessConfig, registry: LanguageRegistry
 }
 
 #[pyfunction]
-#[pyo3(signature = (node))]
-pub fn node_info_from_node(node: String) -> NodeInfo {
-    todo!("Not auto-delegatable: node_info_from_node — return type requires custom implementation")
-}
-
-#[pyfunction]
 #[pyo3(signature = (tree))]
 pub fn root_node_info(tree: Tree) -> NodeInfo {
     tree_sitter_language_pack::root_node_info(&tree.inner).into()
@@ -1197,14 +1191,6 @@ pub fn get_injections_query(language: String) -> Option<String> {
 #[pyo3(signature = (language))]
 pub fn get_locals_query(language: String) -> Option<String> {
     tree_sitter_language_pack::get_locals_query(&language).map(Into::into)
-}
-
-#[pyfunction]
-#[pyo3(signature = (tree, language, query_source, source))]
-pub fn run_query(tree: Tree, language: String, query_source: String, source: Vec<u8>) -> PyResult<Vec<String>> {
-    Err(pyo3::exceptions::PyNotImplementedError::new_err(
-        "Not implemented: run_query",
-    ))
 }
 
 #[pyfunction]
@@ -1990,8 +1976,8 @@ pub fn _tree_sitter_language_pack(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PackConfig>()?;
     m.add_class::<ProcessConfig>()?;
     m.add_class::<LanguageRegistry>()?;
-    m.add_class::<Parser>()?;
     m.add_class::<Language>()?;
+    m.add_class::<Parser>()?;
     m.add_class::<Tree>()?;
     m.add_class::<Error>()?;
     m.add_class::<CaptureOutput>()?;
@@ -2008,7 +1994,6 @@ pub fn _tree_sitter_language_pack(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(detect_language_from_content, m)?)?;
     m.add_function(wrap_pyfunction!(validate_extraction, m)?)?;
     m.add_function(wrap_pyfunction!(process, m)?)?;
-    m.add_function(wrap_pyfunction!(node_info_from_node, m)?)?;
     m.add_function(wrap_pyfunction!(root_node_info, m)?)?;
     m.add_function(wrap_pyfunction!(find_nodes_by_type, m)?)?;
     m.add_function(wrap_pyfunction!(named_children_info, m)?)?;
@@ -2020,7 +2005,6 @@ pub fn _tree_sitter_language_pack(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_highlights_query, m)?)?;
     m.add_function(wrap_pyfunction!(get_injections_query, m)?)?;
     m.add_function(wrap_pyfunction!(get_locals_query, m)?)?;
-    m.add_function(wrap_pyfunction!(run_query, m)?)?;
     m.add_function(wrap_pyfunction!(split_code, m)?)?;
     m.add_function(wrap_pyfunction!(get_language, m)?)?;
     m.add_function(wrap_pyfunction!(get_parser, m)?)?;

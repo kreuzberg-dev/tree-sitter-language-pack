@@ -1326,18 +1326,18 @@ TSLPProcessResult *tslp_language_registry_process(const TSLPLanguageRegistry *th
 TSLPLanguageRegistry *tslp_language_registry_default(void);
 
 /**
- * Free a `Parser` handle.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void tslp_parser_free(TSLPParser *ptr);
-
-/**
  * Free a `Language` handle.
  * # Safety
  * Pointer must have been returned by this library, or be null.
  */
 void tslp_language_free(TSLPLanguage *ptr);
+
+/**
+ * Free a `Parser` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void tslp_parser_free(TSLPParser *ptr);
 
 /**
  * Free a `Tree` handle.
@@ -1574,14 +1574,6 @@ TSLPProcessResult *tslp_process(const char *source,
                                 const TSLPLanguageRegistry *registry);
 
 /**
- * Extract a `NodeInfo` from a tree-sitter `Node`.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TSLPNodeInfo *tslp_node_info_from_node(const char *node);
-
-/**
  * Get a `NodeInfo` snapshot of the root node.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -1738,45 +1730,6 @@ char *tslp_get_injections_query(const char *language);
  * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_get_locals_query(const char *language);
-
-/**
- * Execute a tree-sitter query pattern against a parsed tree.
- *
- * The `query_source` is an S-expression pattern like:
- * ```text
- * (function_definition name: (identifier) @name)
- * ```
- *
- * Returns all matches with their captured nodes.
- *
- * # Arguments
- *
- * * `tree` - The parsed syntax tree to query.
- * * `language` - Language name (used to compile the query pattern).
- * * `query_source` - The tree-sitter query pattern string.
- * * `source` - The original source code bytes (needed for capture resolution).
- *
- * # Examples
- *
- * ```no_run
- * let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
- * let matches = tree_sitter_language_pack::query::run_query(
- *     &tree,
- *     "python",
- *     "(function_definition name: (identifier) @fn_name)",
- *     b"def hello(): pass",
- * ).unwrap();
- * assert!(!matches.is_empty());
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-char *tslp_run_query(const TSLPTree *tree,
-                     const char *language,
-                     const char *query_source,
-                     const uint8_t *source,
-                     uintptr_t source_len);
 
 /**
  * Split source code into chunks using tree-sitter AST structure for intelligent boundaries.

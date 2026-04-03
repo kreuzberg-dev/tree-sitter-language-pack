@@ -1693,8 +1693,8 @@
       "is_trait": false
     },
     {
-      "name": "Parser",
-      "rust_path": "tree_sitter_language_pack::Parser",
+      "name": "Language",
+      "rust_path": "tree_sitter_language_pack::Language",
       "fields": [],
       "methods": [],
       "is_opaque": true,
@@ -1704,8 +1704,8 @@
       "is_trait": false
     },
     {
-      "name": "Language",
-      "rust_path": "tree_sitter_language_pack::Language",
+      "name": "Parser",
+      "rust_path": "tree_sitter_language_pack::Parser",
       "fields": [],
       "methods": [],
       "is_opaque": true,
@@ -1893,27 +1893,6 @@
       "doc": "Process source code: parse once, extract intelligence based on config, and return it.",
       "cfg": null,
       "sanitized": false
-    },
-    {
-      "name": "node_info_from_node",
-      "rust_path": "tree-sitter-language-pack::node_info_from_node",
-      "params": [
-        {
-          "name": "node",
-          "ty": "String",
-          "optional": false,
-          "default": null,
-          "sanitized": true
-        }
-      ],
-      "return_type": {
-        "Named": "NodeInfo"
-      },
-      "is_async": false,
-      "error_type": null,
-      "doc": "Extract a `NodeInfo` from a tree-sitter `Node`.",
-      "cfg": null,
-      "sanitized": true
     },
     {
       "name": "root_node_info",
@@ -2182,50 +2161,6 @@
       "doc": "Get the locals query for a language, if bundled.\n\nReturns the contents of `locals.scm` as a static string, or `None`\nif no locals query is bundled for this language.\n\n# Example\n\n```\nuse tree_sitter_language_pack::get_locals_query;\n\nlet query = get_locals_query(\"python\");\n// Returns None for languages without bundled locals queries\nlet missing = get_locals_query(\"nonexistent_lang\");\nassert!(missing.is_none());\n```",
       "cfg": null,
       "sanitized": false
-    },
-    {
-      "name": "run_query",
-      "rust_path": "tree-sitter-language-pack::run_query",
-      "params": [
-        {
-          "name": "tree",
-          "ty": {
-            "Named": "Tree"
-          },
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        },
-        {
-          "name": "language",
-          "ty": "String",
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        },
-        {
-          "name": "query_source",
-          "ty": "String",
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        },
-        {
-          "name": "source",
-          "ty": "Bytes",
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        }
-      ],
-      "return_type": {
-        "Vec": "String"
-      },
-      "is_async": false,
-      "error_type": "Error",
-      "doc": "Execute a tree-sitter query pattern against a parsed tree.\n\nThe `query_source` is an S-expression pattern like:\n```text\n(function_definition name: (identifier) @name)\n```\n\nReturns all matches with their captured nodes.\n\n# Arguments\n\n* `tree` - The parsed syntax tree to query.\n* `language` - Language name (used to compile the query pattern).\n* `query_source` - The tree-sitter query pattern string.\n* `source` - The original source code bytes (needed for capture resolution).\n\n# Examples\n\n```no_run\nlet tree = tree_sitter_language_pack::parse::parse_string(\"python\", b\"def hello(): pass\").unwrap();\nlet matches = tree_sitter_language_pack::query::run_query(\n    &tree,\n    \"python\",\n    \"(function_definition name: (identifier) @fn_name)\",\n    b\"def hello(): pass\",\n).unwrap();\nassert!(!matches.is_empty());\n```",
-      "cfg": null,
-      "sanitized": true
     },
     {
       "name": "split_code",

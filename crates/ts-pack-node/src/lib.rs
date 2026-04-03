@@ -357,21 +357,21 @@ impl JsLanguageRegistry {
 
 #[derive(Clone)]
 #[napi]
-pub struct JsParser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
-}
-
-#[napi]
-impl JsParser {}
-
-#[derive(Clone)]
-#[napi]
 pub struct JsLanguage {
     inner: Arc<tree_sitter_language_pack::Language>,
 }
 
 #[napi]
 impl JsLanguage {}
+
+#[derive(Clone)]
+#[napi]
+pub struct JsParser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
+}
+
+#[napi]
+impl JsParser {}
 
 #[derive(Clone)]
 #[napi]
@@ -505,11 +505,6 @@ pub fn validate_extraction(config: JsExtractionConfig) -> Result<JsValidationRes
         napi::Status::GenericFailure,
         "Not implemented: validate_extraction",
     ))
-}
-
-#[napi(js_name = "nodeInfoFromNode")]
-pub fn node_info_from_node(node: String) -> JsNodeInfo {
-    todo!("Not auto-delegatable: node_info_from_node -- return type requires custom implementation")
 }
 
 #[napi(js_name = "parseString")]

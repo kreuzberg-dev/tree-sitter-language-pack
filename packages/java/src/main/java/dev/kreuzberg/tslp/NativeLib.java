@@ -41,10 +41,6 @@ final class NativeLib {
         LIB.find("tslp_process").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
     );
-    static final MethodHandle TSLP_NODE_INFO_FROM_NODE = LINKER.downcallHandle(
-        LIB.find("tslp_node_info_from_node").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
     static final MethodHandle TSLP_ROOT_NODE_INFO = LINKER.downcallHandle(
         LIB.find("tslp_root_node_info").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
@@ -88,10 +84,6 @@ final class NativeLib {
     static final MethodHandle TSLP_GET_LOCALS_QUERY = LINKER.downcallHandle(
         LIB.find("tslp_get_locals_query").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-    static final MethodHandle TSLP_RUN_QUERY = LINKER.downcallHandle(
-        LIB.find("tslp_run_query").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
     );
     static final MethodHandle TSLP_SPLIT_CODE = LINKER.downcallHandle(
         LIB.find("tslp_split_code").orElseThrow(),

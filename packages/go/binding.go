@@ -540,13 +540,13 @@ type LanguageRegistry struct {
 }
 
 
-// Parser is a type.
-type Parser struct {
+// Language is a type.
+type Language struct {
 }
 
 
-// Language is a type.
-type Language struct {
+// Parser is a type.
+type Parser struct {
 }
 
 
@@ -711,16 +711,6 @@ func Process(source string, config ProcessConfig, registry LanguageRegistry) *Pr
         return nil, err
     }
     return unmarshalProcessResult(ptr), nil
-}
-
-
-// Extract a `NodeInfo` from a tree-sitter `Node`.
-func NodeInfoFromNode(node string) *NodeInfo {
-    cNode := C.CString(node)
-    defer C.free(unsafe.Pointer(cNode))
-
-    ptr := C.tslp_node_info_from_node(cNode)
-    return unmarshalNodeInfo(ptr)
 }
 
 
@@ -937,58 +927,6 @@ func GetLocalsQuery(language string) **string {
 
     ptr := C.tslp_get_locals_query(cLanguage)
     return unmarshalString(ptr)
-}
-
-
-// Execute a tree-sitter query pattern against a parsed tree.
-//
-// The `query_source` is an S-expression pattern like:
-// ```text
-// (function_definition name: (identifier) @name)
-// ```
-//
-// Returns all matches with their captured nodes.
-//
-// # Arguments
-//
-// * `tree` - The parsed syntax tree to query.
-// * `language` - Language name (used to compile the query pattern).
-// * `query_source` - The tree-sitter query pattern string.
-// * `source` - The original source code bytes (needed for capture resolution).
-//
-// # Examples
-//
-// ```no_run
-// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
-// let matches = tree_sitter_language_pack::query::run_query(
-// &tree,
-// "python",
-// "(function_definition name: (identifier) @fn_name)",
-// b"def hello(): pass",
-// ).unwrap();
-// assert!(!matches.is_empty());
-// ```
-func RunQuery(tree Tree, language string, query_source string, source []byte) *[]string, error {
-    jsonBytes, err := json.Marshal(tree)
-    if err != nil {
-        return fmt.Errorf("failed to marshal: %w", err)
-    }
-    cTree := C.CString(string(jsonBytes))
-    defer C.free(unsafe.Pointer(cTree))
-
-    cLanguage := C.CString(language)
-    defer C.free(unsafe.Pointer(cLanguage))
-
-    cQuerySource := C.CString(query_source)
-    defer C.free(unsafe.Pointer(cQuerySource))
-
-    cSource := (*C.uchar)(unsafe.Pointer(&source[0]))
-
-    ptr := C.tslp_run_query(cTree, cLanguage, cQuerySource, cSource)
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return unmarshalListString(ptr), nil
 }
 
 

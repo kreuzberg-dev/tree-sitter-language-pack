@@ -2017,21 +2017,21 @@ impl JsLanguageRegistry {
 
 #[derive(Clone)]
 #[wasm_bindgen]
-pub struct JsParser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
-}
-
-#[wasm_bindgen]
-impl JsParser {}
-
-#[derive(Clone)]
-#[wasm_bindgen]
 pub struct JsLanguage {
     inner: Arc<tree_sitter_language_pack::Language>,
 }
 
 #[wasm_bindgen]
 impl JsLanguage {}
+
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct JsParser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
+}
+
+#[wasm_bindgen]
+impl JsParser {}
 
 #[derive(Clone)]
 #[wasm_bindgen]
@@ -2173,11 +2173,6 @@ pub fn process(
     Err(JsValue::from_str("Not implemented: process"))
 }
 
-#[wasm_bindgen(js_name = "nodeInfoFromNode")]
-pub fn node_info_from_node(node: String) -> JsNodeInfo {
-    todo!("Not auto-delegatable: node_info_from_node -- return type requires custom implementation")
-}
-
 #[wasm_bindgen(js_name = "rootNodeInfo")]
 pub fn root_node_info(tree: JsTree) -> JsNodeInfo {
     todo!("Not auto-delegatable: root_node_info -- return type requires custom implementation")
@@ -2231,16 +2226,6 @@ pub fn get_injections_query(language: String) -> Option<String> {
 #[wasm_bindgen(js_name = "getLocalsQuery")]
 pub fn get_locals_query(language: String) -> Option<String> {
     None
-}
-
-#[wasm_bindgen(js_name = "runQuery")]
-pub fn run_query(
-    tree: JsTree,
-    language: String,
-    query_source: String,
-    source: Vec<u8>,
-) -> Result<Vec<String>, JsValue> {
-    Err(JsValue::from_str("Not implemented: run_query"))
 }
 
 #[wasm_bindgen(js_name = "splitCode")]

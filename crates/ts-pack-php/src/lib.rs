@@ -511,22 +511,22 @@ impl LanguageRegistry {
 
 #[derive(Clone)]
 #[php_class]
-pub struct Parser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
-}
-
-#[php_impl]
-impl Parser {
-}
-
-#[derive(Clone)]
-#[php_class]
 pub struct Language {
     inner: Arc<tree_sitter_language_pack::Language>,
 }
 
 #[php_impl]
 impl Language {
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
+}
+
+#[php_impl]
+impl Parser {
 }
 
 #[derive(Clone)]
@@ -643,11 +643,6 @@ pub fn process() -> PhpResult<ProcessResult> {
 }
 
 #[php_function]
-pub fn node_info_from_node() -> NodeInfo {
-    todo!("Not auto-delegatable: node_info_from_node -- return type requires custom implementation")
-}
-
-#[php_function]
 pub fn root_node_info() -> NodeInfo {
     todo!("Not auto-delegatable: root_node_info -- return type requires custom implementation")
 }
@@ -700,11 +695,6 @@ pub fn get_injections_query() -> Option<String> {
 #[php_function]
 pub fn get_locals_query() -> Option<String> {
     None
-}
-
-#[php_function]
-pub fn run_query() -> PhpResult<Vec<String>> {
-    Err(ext_php_rs::exception::PhpException::default("Not implemented: run_query".to_string()).into())
 }
 
 #[php_function]

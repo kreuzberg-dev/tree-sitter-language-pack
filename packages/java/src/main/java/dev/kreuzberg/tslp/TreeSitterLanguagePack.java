@@ -93,16 +93,6 @@ public final class TreeSitterLanguagePack {
         }
     }
 
-    public static NodeInfo nodeInfoFromNode(String node) throws TreeSitterLanguagePackException {
-        try (var arena = Arena.ofConfined()) {
-            var cnode = arena.allocateFrom(node);
-            var result = (MemorySegment) NativeLib.TSLP_NODE_INFO_FROM_NODE.invoke(cnode);
-            return result;
-        } catch (Throwable t) {
-            throw new TreeSitterLanguagePackException("FFI call failed", t);
-        }
-    }
-
     public static NodeInfo rootNodeInfo(Tree tree) throws TreeSitterLanguagePackException {
         try (var arena = Arena.ofConfined()) {
             var result = (MemorySegment) NativeLib.TSLP_ROOT_NODE_INFO.invoke(tree);
@@ -214,17 +204,6 @@ public final class TreeSitterLanguagePack {
             if (resultPtr.equals(MemorySegment.NULL)) return null;
             String result = resultPtr.reinterpret(Long.MAX_VALUE).getString(0);
             NativeLib.TSLP_FREE_STRING.invoke(resultPtr);
-            return result;
-        } catch (Throwable t) {
-            throw new TreeSitterLanguagePackException("FFI call failed", t);
-        }
-    }
-
-    public static java.util.List<String> runQuery(Tree tree, String language, String query_source, byte[] source) throws TreeSitterLanguagePackException {
-        try (var arena = Arena.ofConfined()) {
-            var clanguage = arena.allocateFrom(language);
-            var cquery_source = arena.allocateFrom(query_source);
-            var result = (MemorySegment) NativeLib.TSLP_RUN_QUERY.invoke(tree, clanguage, cquery_source, source);
             return result;
         } catch (Throwable t) {
             throw new TreeSitterLanguagePackException("FFI call failed", t);

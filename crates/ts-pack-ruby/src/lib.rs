@@ -1437,24 +1437,6 @@ impl LanguageRegistry {
 }
 
 #[derive(Clone)]
-#[magnus::wrap(class = "Kreuzberg::Parser")]
-pub struct Parser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
-}
-
-unsafe impl IntoValueFromNative for Parser {}
-
-impl magnus::TryConvert for Parser {
-    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Parser = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
-    }
-}
-unsafe impl TryConvertOwned for Parser {}
-
-impl Parser {}
-
-#[derive(Clone)]
 #[magnus::wrap(class = "Kreuzberg::Language")]
 pub struct Language {
     inner: Arc<tree_sitter_language_pack::Language>,
@@ -1471,6 +1453,24 @@ impl magnus::TryConvert for Language {
 unsafe impl TryConvertOwned for Language {}
 
 impl Language {}
+
+#[derive(Clone)]
+#[magnus::wrap(class = "Kreuzberg::Parser")]
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
+}
+
+unsafe impl IntoValueFromNative for Parser {}
+
+impl magnus::TryConvert for Parser {
+    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
+        let r: &Parser = magnus::TryConvert::try_convert(val)?;
+        Ok(r.clone())
+    }
+}
+unsafe impl TryConvertOwned for Parser {}
+
+impl Parser {}
 
 #[derive(Clone)]
 #[magnus::wrap(class = "Kreuzberg::Tree")]
@@ -1827,10 +1827,6 @@ fn process(source: String, config: ProcessConfig, registry: LanguageRegistry) ->
     ))
 }
 
-fn node_info_from_node(node: String) -> NodeInfo {
-    todo!("Not auto-delegatable: node_info_from_node -- return type requires custom implementation")
-}
-
 fn root_node_info(tree: Tree) -> NodeInfo {
     todo!("Not auto-delegatable: root_node_info -- return type requires custom implementation")
 }
@@ -1876,13 +1872,6 @@ fn get_injections_query(language: String) -> Option<String> {
 
 fn get_locals_query(language: String) -> Option<String> {
     None
-}
-
-fn run_query(tree: Tree, language: String, query_source: String, source: Vec<u8>) -> Result<Vec<String>, Error> {
-    Err(magnus::Error::new(
-        magnus::exception::runtime_error(),
-        "Not implemented: run_query",
-    ))
 }
 
 fn split_code(source: String, tree: Tree, max_chunk_size: usize) -> Vec<String> {
@@ -2173,9 +2162,9 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_method("language_count", method!(LanguageRegistry::language_count, 0))?;
     class.define_method("process", method!(LanguageRegistry::process, 2))?;
 
-    let class = module.define_class("Parser", ruby.class_object())?;
-
     let class = module.define_class("Language", ruby.class_object())?;
+
+    let class = module.define_class("Parser", ruby.class_object())?;
 
     let class = module.define_class("Tree", ruby.class_object())?;
 
@@ -2192,7 +2181,6 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     )?;
     module.define_module_function("validate_extraction", function!(validate_extraction, 1))?;
     module.define_module_function("process", function!(process, 3))?;
-    module.define_module_function("node_info_from_node", function!(node_info_from_node, 1))?;
     module.define_module_function("root_node_info", function!(root_node_info, 1))?;
     module.define_module_function("find_nodes_by_type", function!(find_nodes_by_type, 2))?;
     module.define_module_function("named_children_info", function!(named_children_info, 1))?;
@@ -2204,7 +2192,6 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_module_function("get_highlights_query", function!(get_highlights_query, 1))?;
     module.define_module_function("get_injections_query", function!(get_injections_query, 1))?;
     module.define_module_function("get_locals_query", function!(get_locals_query, 1))?;
-    module.define_module_function("run_query", function!(run_query, 4))?;
     module.define_module_function("split_code", function!(split_code, 3))?;
     module.define_module_function("get_language", function!(get_language, 1))?;
     module.define_module_function("get_parser", function!(get_parser, 1))?;

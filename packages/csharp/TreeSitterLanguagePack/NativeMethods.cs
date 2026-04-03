@@ -44,11 +44,6 @@ internal static partial class NativeMethods
         LanguageRegistry registry
     );
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_node_info_from_node")]
-    internal static extern IntPtr NodeInfoFromNode(
-        [MarshalAs(UnmanagedType.LPStr)] string node
-    );
-
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_root_node_info")]
     internal static extern IntPtr RootNodeInfo(
         Tree tree
@@ -105,14 +100,6 @@ internal static partial class NativeMethods
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_get_locals_query")]
     internal static extern IntPtr GetLocalsQuery(
         [MarshalAs(UnmanagedType.LPStr)] string language
-    );
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_run_query")]
-    internal static extern IntPtr RunQuery(
-        Tree tree,
-        [MarshalAs(UnmanagedType.LPStr)] string language,
-        [MarshalAs(UnmanagedType.LPStr)] string querySource,
-        byte[] source
     );
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_split_code")]

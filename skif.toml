@@ -37,6 +37,8 @@ functions = [
     "chunk_source",         # takes non-FFI types (Tree, Language)
     "download",             # takes &[&str] which needs special FFI handling
     "extract",              # collides with module name
+    "node_info_from_node",  # takes tree_sitter::Node, can't cross FFI
+    "run_query",            # returns QueryMatch with Cow tuples, can't cross FFI cleanly
 ]
 
 [output]

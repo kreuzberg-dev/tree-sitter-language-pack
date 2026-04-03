@@ -3103,11 +3103,11 @@ pub unsafe extern "C" fn tslp_language_registry_default() -> *mut tree_sitter_la
     std::ptr::null_mut()
 }
 
-/// Free a `Parser` handle.
+/// Free a `Language` handle.
 /// # Safety
 /// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_parser_free(ptr: *mut tree_sitter_language_pack::Parser) {
+pub unsafe extern "C" fn tslp_language_free(ptr: *mut tree_sitter_language_pack::Language) {
     if !ptr.is_null() {
         unsafe {
             drop(Box::from_raw(ptr));
@@ -3115,11 +3115,11 @@ pub unsafe extern "C" fn tslp_parser_free(ptr: *mut tree_sitter_language_pack::P
     }
 }
 
-/// Free a `Language` handle.
+/// Free a `Parser` handle.
 /// # Safety
 /// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_language_free(ptr: *mut tree_sitter_language_pack::Language) {
+pub unsafe extern "C" fn tslp_parser_free(ptr: *mut tree_sitter_language_pack::Parser) {
     if !ptr.is_null() {
         unsafe {
             drop(Box::from_raw(ptr));
@@ -3707,19 +3707,6 @@ pub unsafe extern "C" fn tslp_process(
     std::ptr::null_mut()
 }
 
-/// Extract a `NodeInfo` from a tree-sitter `Node`.
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_node_info_from_node(
-    node: *const std::ffi::c_char,
-) -> *mut tree_sitter_language_pack::NodeInfo {
-    clear_last_error();
-    set_last_error(99, "Not implemented: node_info_from_node");
-    std::ptr::null_mut()
-}
-
 /// Get a `NodeInfo` snapshot of the root node.
 /// # Safety
 /// Caller must ensure all pointer arguments are valid or null.
@@ -3970,50 +3957,6 @@ pub unsafe extern "C" fn tslp_get_locals_query(language: *const std::ffi::c_char
         },
         None => std::ptr::null_mut(),
     }
-}
-
-/// Execute a tree-sitter query pattern against a parsed tree.
-///
-/// The `query_source` is an S-expression pattern like:
-/// ```text
-/// (function_definition name: (identifier) @name)
-/// ```
-///
-/// Returns all matches with their captured nodes.
-///
-/// # Arguments
-///
-/// * `tree` - The parsed syntax tree to query.
-/// * `language` - Language name (used to compile the query pattern).
-/// * `query_source` - The tree-sitter query pattern string.
-/// * `source` - The original source code bytes (needed for capture resolution).
-///
-/// # Examples
-///
-/// ```no_run
-/// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
-/// let matches = tree_sitter_language_pack::query::run_query(
-///     &tree,
-///     "python",
-///     "(function_definition name: (identifier) @fn_name)",
-///     b"def hello(): pass",
-/// ).unwrap();
-/// assert!(!matches.is_empty());
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_run_query(
-    tree: *const tree_sitter_language_pack::Tree,
-    language: *const std::ffi::c_char,
-    query_source: *const std::ffi::c_char,
-    source: *const u8,
-    source_len: usize,
-) -> *mut std::ffi::c_char {
-    clear_last_error();
-    set_last_error(99, "Not implemented: run_query");
-    std::ptr::null_mut()
 }
 
 /// Split source code into chunks using tree-sitter AST structure for intelligent boundaries.

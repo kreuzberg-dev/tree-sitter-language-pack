@@ -82,16 +82,6 @@ public static class TreeSitterLanguagePackLib
         return JsonSerializer.Deserialize<ProcessResult>(json ?? "null")!;
     }
 
-    public static NodeInfo NodeInfoFromNode(string node)
-    {
-        var result = NativeMethods.NodeInfoFromNode(
-            node
-        );
-        var json = Marshal.PtrToStringUTF8(result);
-        NativeMethods.FreeString(result);
-        return JsonSerializer.Deserialize<NodeInfo>(json ?? "null")!;
-    }
-
     public static NodeInfo RootNodeInfo(Tree tree)
     {
         var result = NativeMethods.RootNodeInfo(
@@ -197,19 +187,6 @@ public static class TreeSitterLanguagePackLib
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         return JsonSerializer.Deserialize<string?>(json ?? "null")!;
-    }
-
-    public static List<string> RunQuery(Tree tree, string language, string querySource, byte[] source)
-    {
-        var result = NativeMethods.RunQuery(
-            tree,
-            language,
-            querySource,
-            source
-        );
-        var json = Marshal.PtrToStringUTF8(result);
-        NativeMethods.FreeString(result);
-        return JsonSerializer.Deserialize<List<string>>(json ?? "null")!;
     }
 
     public static List<string> SplitCode(string source, Tree tree, nuint maxChunkSize)

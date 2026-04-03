@@ -264,18 +264,18 @@ pub struct LanguageRegistry {
 impl rustler::Resource for LanguageRegistry {}
 
 #[derive(Clone)]
-pub struct Parser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
-}
-
-impl rustler::Resource for Parser {}
-
-#[derive(Clone)]
 pub struct Language {
     inner: Arc<tree_sitter_language_pack::Language>,
 }
 
 impl rustler::Resource for Language {}
+
+#[derive(Clone)]
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
+}
+
+impl rustler::Resource for Parser {}
 
 #[derive(Clone)]
 pub struct Tree {
@@ -404,11 +404,6 @@ pub fn process(source: String, config: ProcessConfig, registry: ResourceArc<Lang
 }
 
 #[rustler::nif]
-pub fn node_info_from_node(node: String) -> NodeInfo {
-    todo!("Not auto-delegatable: node_info_from_node -- return type requires custom implementation")
-}
-
-#[rustler::nif]
 pub fn root_node_info(tree: ResourceArc<Tree>) -> NodeInfo {
     todo!("Not auto-delegatable: root_node_info -- return type requires custom implementation")
 }
@@ -461,11 +456,6 @@ pub fn get_injections_query(language: String) -> Option<String> {
 #[rustler::nif]
 pub fn get_locals_query(language: String) -> Option<String> {
     None
-}
-
-#[rustler::nif]
-pub fn run_query(tree: ResourceArc<Tree>, language: String, query_source: String, source: Vec<u8>) -> Result<Vec<String>, String> {
-    Err(String::from("Not implemented: run_query"))
 }
 
 #[rustler::nif]
@@ -1106,4 +1096,4 @@ impl From<tree_sitter_language_pack::DiagnosticSeverity> for DiagnosticSeverity 
     }
 }
 
-rustler::init!("elixir_module", [detect_language_from_extension, detect_language_from_path, extension_ambiguity, extension_ambiguity_json, detect_language_from_content, validate_extraction, process, node_info_from_node, root_node_info, find_nodes_by_type, named_children_info, parse_string, tree_contains_node_type, tree_has_error_nodes, tree_to_sexp, tree_error_count, get_highlights_query, get_injections_query, get_locals_query, run_query, split_code, get_language, get_parser, available_languages, has_language, language_count, extract_patterns, init, configure, download_all, manifest_languages, downloaded_languages, clean_cache, cache_dir, processconfig_default, processconfig_with_chunking, processconfig_all, processconfig_minimal, languageregistry_get_language, languageregistry_available_languages, languageregistry_has_language, languageregistry_language_count, languageregistry_process, languageregistry_default]);
+rustler::init!("elixir_module", [detect_language_from_extension, detect_language_from_path, extension_ambiguity, extension_ambiguity_json, detect_language_from_content, validate_extraction, process, root_node_info, find_nodes_by_type, named_children_info, parse_string, tree_contains_node_type, tree_has_error_nodes, tree_to_sexp, tree_error_count, get_highlights_query, get_injections_query, get_locals_query, split_code, get_language, get_parser, available_languages, has_language, language_count, extract_patterns, init, configure, download_all, manifest_languages, downloaded_languages, clean_cache, cache_dir, processconfig_default, processconfig_with_chunking, processconfig_all, processconfig_minimal, languageregistry_get_language, languageregistry_available_languages, languageregistry_has_language, languageregistry_language_count, languageregistry_process, languageregistry_default]);
