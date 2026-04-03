@@ -6,6 +6,8 @@ use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
+use std::collections::HashSet;
+use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Instant;
@@ -61,6 +63,380 @@ const MANIFEST_BATCH_SIZE: usize = 1000;
 /// Max source file size: skip files larger than 1 MB
 const MAX_FILE_BYTES: usize = 1_000_000;
 
+fn external_api_id(project_id: &str, url: &str) -> String {
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    url.hash(&mut hasher);
+    format!("{}:external:{}", project_id, format!("{:x}", hasher.finish()))
+}
+
+fn join_url(base: &str, path: &str) -> Option<String> {
+    if base.is_empty() || path.is_empty() {
+        return None;
+    }
+    if path.starts_with("http://") || path.starts_with("https://") {
+        return Some(path.to_string());
+    }
+    if !(base.starts_with("http://") || base.starts_with("https://") || base.starts_with("env://")) {
+        return None;
+    }
+    let mut base = base.to_string();
+    let mut path = path.to_string();
+    if base.ends_with('/') && path.starts_with('/') {
+        path.remove(0);
+    } else if !base.ends_with('/') && !path.starts_with('/') {
+        base.push('/');
+    }
+    Some(format!("{base}{path}"))
+}
+
+fn clean_import_name(name: &str) -> String {
+    let mut out = name.trim().to_string();
+    for prefix in ["type ", "typeof "] {
+        if out.starts_with(prefix) {
+            out = out[prefix.len()..].trim().to_string();
+        }
+    }
+    if let Some((before, _)) = out.split_once(" as ") {
+        out = before.trim().to_string();
+    }
+    out
+}
+
+fn resolve_module_path(src_fp: &str, module: &str, files_set: &HashSet<String>) -> Option<String> {
+    let module = module.trim();
+    if module.is_empty() {
+        return None;
+    }
+
+    let base = if module.starts_with("./") || module.starts_with("../") {
+        let mut base = std::path::PathBuf::from(src_fp);
+        base.pop();
+        base.push(module);
+        let mut parts: Vec<String> = Vec::new();
+        for comp in base.components() {
+            use std::path::Component;
+            match comp {
+                Component::ParentDir => {
+                    parts.pop();
+                }
+                Component::CurDir => {}
+                Component::Normal(val) => parts.push(val.to_string_lossy().to_string()),
+                _ => {}
+            }
+        }
+        parts.join("/")
+    } else if module.starts_with("@/") || module.starts_with("~/") {
+        module[2..].to_string()
+    } else if module.starts_with("src/") {
+        module.to_string()
+    } else if src_fp.ends_with(".py") {
+        let mut mod_str = module.to_string();
+        let mut dot_count = 0usize;
+        while mod_str.starts_with('.') {
+            dot_count += 1;
+            mod_str.remove(0);
+        }
+
+        let base = if dot_count > 0 {
+            let mut base = std::path::PathBuf::from(src_fp);
+            base.pop();
+            for _ in 1..dot_count {
+                base.pop();
+            }
+            if !mod_str.is_empty() {
+                base.push(mod_str.replace('.', "/"));
+            }
+            base
+        } else {
+            std::path::PathBuf::from(mod_str.replace('.', "/"))
+        };
+
+        let base_str = base
+            .to_string_lossy()
+            .replace('\\', "/")
+            .trim_end_matches('/')
+            .to_string();
+        if base_str.is_empty() {
+            return None;
+        }
+        for suf in [".py", "/__init__.py"] {
+            let candidate = format!("{base_str}{suf}");
+            if files_set.contains(&candidate) {
+                return Some(candidate);
+            }
+        }
+        return None;
+    } else {
+        return None;
+    };
+
+    for suf in [
+        "",
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        "/index.ts",
+        "/index.tsx",
+        "/index.js",
+        "/index.jsx",
+    ] {
+        let candidate = format!("{base}{suf}");
+        if files_set.contains(&candidate) {
+            return Some(candidate);
+        }
+    }
+
+    None
+}
+
+fn extract_prisma_models(schema_text: &str) -> Vec<String> {
+    let mut models: HashSet<String> = HashSet::new();
+    let tree = match ts_pack::parse_string("prisma", schema_text.as_bytes()) {
+        Ok(tree) => tree,
+        Err(_) => return Vec::new(),
+    };
+    let matches = match ts_pack::run_query(
+        &tree,
+        "prisma",
+        "(model_block (identifier) @model)",
+        schema_text.as_bytes(),
+    ) {
+        Ok(m) => m,
+        Err(_) => return Vec::new(),
+    };
+    for m in matches {
+        for (cap, node_info) in m.captures {
+            if cap != "model" {
+                continue;
+            }
+            if let Ok(text) = ts_pack::extract_text(schema_text.as_bytes(), &node_info) {
+                let name = text.trim();
+                if !name.is_empty() {
+                    models.insert(name.to_string());
+                }
+            }
+        }
+    }
+    models.into_iter().collect()
+}
+
+// ---------------------------------------------------------------------------
+// Swift inference helpers
+// ---------------------------------------------------------------------------
+
+fn normalize_swift_type(raw: &str) -> Option<String> {
+    let mut s = raw.trim().trim_end_matches('?').trim_end_matches('!').to_string();
+    if let Some(idx) = s.find('<') {
+        s.truncate(idx);
+    }
+    if s.is_empty() { None } else { Some(s) }
+}
+
+fn parse_swift_var_types(source: &str) -> std::collections::HashMap<String, String> {
+    let mut map = std::collections::HashMap::new();
+    let extract_type_from_rhs = |rhs: &str| -> Option<String> {
+        let mut rhs = rhs.trim();
+        if rhs.is_empty() {
+            return None;
+        }
+        if let Some(idx) = rhs.find(" as? ") {
+            rhs = rhs[idx + 5..].trim();
+        } else if let Some(idx) = rhs.find(" as ") {
+            rhs = rhs[idx + 4..].trim();
+        }
+        let mut ty = String::new();
+        for ch in rhs.chars() {
+            if ch.is_alphanumeric() || ch == '_' || ch == '.' || ch == '<' || ch == '>' || ch == '?' || ch == '!' {
+                ty.push(ch);
+            } else {
+                break;
+            }
+        }
+        if let Some(tn) = normalize_swift_type(&ty) {
+            if let Some((head, _)) = tn.split_once('.') {
+                return normalize_swift_type(head);
+            }
+            return Some(tn);
+        }
+        None
+    };
+
+    let extract_receiver_from_chain = |rhs: &str| -> Option<String> {
+        let mut rhs = rhs.trim();
+        if rhs.is_empty() {
+            return None;
+        }
+        if let Some(idx) = rhs.find(" as? ") {
+            rhs = rhs[..idx].trim();
+        } else if let Some(idx) = rhs.find(" as ") {
+            rhs = rhs[..idx].trim();
+        }
+        let mut name = String::new();
+        for ch in rhs.chars() {
+            if ch.is_alphanumeric() || ch == '_' {
+                name.push(ch);
+            } else {
+                break;
+            }
+        }
+        if name.is_empty() { None } else { Some(name) }
+    };
+
+    for line in source.lines() {
+        let trimmed = line.trim();
+        let (kw, rest) = if let Some(r) = trimmed.strip_prefix("let ") {
+            ("let", r)
+        } else if let Some(r) = trimmed.strip_prefix("var ") {
+            ("var", r)
+        } else if let Some(r) = trimmed.strip_prefix("if let ") {
+            ("if let", r)
+        } else if let Some(r) = trimmed.strip_prefix("guard let ") {
+            ("guard let", r)
+        } else {
+            // Try reassignment: name = Type(...)
+            if trimmed.contains('=')
+                && !trimmed.contains("==")
+                && !trimmed.contains("!=")
+                && !trimmed.contains(">=")
+                && !trimmed.contains("<=")
+            {
+                if let Some(eq_idx) = trimmed.find('=') {
+                    let lhs = trimmed[..eq_idx].trim();
+                    let rhs = trimmed[eq_idx + 1..].trim();
+                    let mut name = String::new();
+                    for ch in lhs.chars().rev() {
+                        if ch.is_alphanumeric() || ch == '_' {
+                            name.push(ch);
+                        } else if !name.is_empty() {
+                            break;
+                        }
+                    }
+                    let name = name.chars().rev().collect::<String>();
+                    if !name.is_empty() {
+                        if let Some(tn) = extract_type_from_rhs(rhs) {
+                            map.insert(name, tn);
+                        } else if rhs.contains('.') {
+                            if let Some(recv) = extract_receiver_from_chain(rhs) {
+                                if let Some(tn) = map.get(&recv).cloned() {
+                                    map.insert(name, tn);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            continue;
+        };
+        let rest = rest.trim();
+        if rest.is_empty() {
+            continue;
+        }
+
+        let mut name = String::new();
+        for ch in rest.chars() {
+            if ch.is_alphanumeric() || ch == '_' {
+                name.push(ch);
+            } else {
+                break;
+            }
+        }
+        if name.is_empty() {
+            continue;
+        }
+
+        if let Some(idx) = rest.find(':') {
+            let type_part = rest[idx + 1..].trim();
+            let mut ty = String::new();
+            for ch in type_part.chars() {
+                if ch.is_alphanumeric() || ch == '_' || ch == '.' || ch == '<' || ch == '>' || ch == '?' || ch == '!' {
+                    ty.push(ch);
+                } else {
+                    break;
+                }
+            }
+            if let Some(tn) = normalize_swift_type(&ty) {
+                map.insert(name, tn);
+            }
+            continue;
+        }
+
+        if let Some(eq_idx) = rest.find('=') {
+            let rhs = rest[eq_idx + 1..].trim();
+            if let Some(tn) = extract_type_from_rhs(rhs) {
+                map.insert(name, tn);
+            } else if rhs.contains('.') {
+                if let Some(recv) = extract_receiver_from_chain(rhs) {
+                    if let Some(tn) = map.get(&recv).cloned() {
+                        map.insert(name, tn);
+                    }
+                }
+            }
+        }
+
+        let _ = kw; // silence unused warning if config changes
+    }
+    map
+}
+
+fn collect_swift_extensions(
+    items: &[ts_pack::StructureItem],
+    map: &mut std::collections::HashMap<String, std::collections::HashSet<String>>,
+) {
+    for item in items {
+        if item.kind == ts_pack::StructureKind::Extension {
+            if let Some(type_name) = item.name.as_ref().and_then(|n| normalize_swift_type(n)) {
+                let entry = map.entry(type_name).or_default();
+                for child in &item.children {
+                    if matches!(
+                        child.kind,
+                        ts_pack::StructureKind::Method | ts_pack::StructureKind::Function
+                    ) {
+                        if let Some(name) = child.name.as_ref() {
+                            entry.insert(name.clone());
+                        }
+                    }
+                }
+            }
+        }
+        if !item.children.is_empty() {
+            collect_swift_extensions(&item.children, map);
+        }
+    }
+}
+
+fn collect_swift_extension_spans(items: &[ts_pack::StructureItem], spans: &mut Vec<(usize, usize, String)>) {
+    for item in items {
+        if item.kind == ts_pack::StructureKind::Extension {
+            if let Some(type_name) = item.name.as_ref().and_then(|n| normalize_swift_type(n)) {
+                spans.push((item.span.start_byte, item.span.end_byte, type_name));
+            }
+        }
+        if !item.children.is_empty() {
+            collect_swift_extension_spans(&item.children, spans);
+        }
+    }
+}
+
+fn collect_swift_type_spans(items: &[ts_pack::StructureItem], spans: &mut Vec<(usize, usize, String)>) {
+    for item in items {
+        if matches!(
+            item.kind,
+            ts_pack::StructureKind::Class
+                | ts_pack::StructureKind::Struct
+                | ts_pack::StructureKind::Enum
+                | ts_pack::StructureKind::Protocol
+        ) {
+            if let Some(name) = item.name.as_ref().and_then(|n| normalize_swift_type(n)) {
+                spans.push((item.span.start_byte, item.span.end_byte, name));
+            }
+        }
+        if !item.children.is_empty() {
+            collect_swift_type_spans(&item.children, spans);
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Typed payload structs (avoids serde_json::json! round-trips in hot loops)
 // ---------------------------------------------------------------------------
@@ -103,6 +479,65 @@ struct SymbolCallRow {
     allow_same_file: bool,
 }
 
+/// One inferred call edge (Swift extension resolution).
+struct InferredCallRow {
+    caller_id: String,
+    callee: String,
+    receiver_type: String,
+    project_id: Arc<str>,
+    caller_filepath: String,
+    allow_same_file: bool,
+}
+
+struct DbEdgeRow {
+    src: String,
+    tgt: String,
+}
+
+struct DbModelEdgeRow {
+    src: String,
+    model: String,
+    project_id: Arc<str>,
+}
+
+struct ExternalApiNode {
+    id: String,
+    url: String,
+    project_id: Arc<str>,
+}
+
+struct ExternalApiEdgeRow {
+    src: String,
+    tgt: String,
+}
+
+struct ImportSymbolRequest {
+    src_id: String,
+    src_filepath: String,
+    module: String,
+    items: Vec<String>,
+}
+
+struct ImportSymbolEdgeRow {
+    src: String,
+    tgt: String,
+}
+
+struct ExportSymbolEdgeRow {
+    src: String,
+    tgt: String,
+}
+
+struct SwiftFileContext {
+    file_id: String,
+    filepath: String,
+    symbol_spans: Vec<(usize, usize, String)>,
+    extension_spans: Vec<(usize, usize, String)>,
+    type_spans: Vec<(usize, usize, String)>,
+    call_sites: Vec<tags::CallSite>,
+    var_types: std::collections::HashMap<String, String>,
+}
+
 impl SymbolCallRow {
     fn to_value(&self) -> Value {
         Value::Object({
@@ -112,6 +547,89 @@ impl SymbolCallRow {
             m.insert("pid".into(), Value::String(self.project_id.to_string()));
             m.insert("caller_fp".into(), Value::String(self.caller_filepath.clone()));
             m.insert("allow_same_file".into(), Value::Bool(self.allow_same_file));
+            m
+        })
+    }
+}
+
+impl InferredCallRow {
+    fn to_value(&self) -> Value {
+        Value::Object({
+            let mut m = serde_json::Map::new();
+            m.insert("caller_id".into(), Value::String(self.caller_id.clone()));
+            m.insert("callee".into(), Value::String(self.callee.clone()));
+            m.insert("recv".into(), Value::String(self.receiver_type.clone()));
+            m.insert("pid".into(), Value::String(self.project_id.to_string()));
+            m.insert("caller_fp".into(), Value::String(self.caller_filepath.clone()));
+            m.insert("allow_same_file".into(), Value::Bool(self.allow_same_file));
+            m
+        })
+    }
+}
+
+impl DbEdgeRow {
+    fn to_value(&self) -> Value {
+        Value::Object({
+            let mut m = serde_json::Map::new();
+            m.insert("src".into(), Value::String(self.src.clone()));
+            m.insert("tgt".into(), Value::String(self.tgt.clone()));
+            m
+        })
+    }
+}
+
+impl DbModelEdgeRow {
+    fn to_value(&self) -> Value {
+        Value::Object({
+            let mut m = serde_json::Map::new();
+            m.insert("src".into(), Value::String(self.src.clone()));
+            m.insert("model".into(), Value::String(self.model.clone()));
+            m.insert("pid".into(), Value::String(self.project_id.to_string()));
+            m
+        })
+    }
+}
+
+impl ExternalApiNode {
+    fn to_value(&self) -> Value {
+        Value::Object({
+            let mut m = serde_json::Map::new();
+            m.insert("id".into(), Value::String(self.id.clone()));
+            m.insert("url".into(), Value::String(self.url.clone()));
+            m.insert("pid".into(), Value::String(self.project_id.to_string()));
+            m
+        })
+    }
+}
+
+impl ExternalApiEdgeRow {
+    fn to_value(&self) -> Value {
+        Value::Object({
+            let mut m = serde_json::Map::new();
+            m.insert("src".into(), Value::String(self.src.clone()));
+            m.insert("tgt".into(), Value::String(self.tgt.clone()));
+            m
+        })
+    }
+}
+
+impl ImportSymbolEdgeRow {
+    fn to_value(&self) -> Value {
+        Value::Object({
+            let mut m = serde_json::Map::new();
+            m.insert("src".into(), Value::String(self.src.clone()));
+            m.insert("tgt".into(), Value::String(self.tgt.clone()));
+            m
+        })
+    }
+}
+
+impl ExportSymbolEdgeRow {
+    fn to_value(&self) -> Value {
+        Value::Object({
+            let mut m = serde_json::Map::new();
+            m.insert("src".into(), Value::String(self.src.clone()));
+            m.insert("tgt".into(), Value::String(self.tgt.clone()));
             m
         })
     }
@@ -376,6 +894,103 @@ async fn write_calls(graph: &Arc<Graph>, batch: &[SymbolCallRow]) {
     let _ = graph.run(q).await;
 }
 
+async fn write_inferred_calls(graph: &Arc<Graph>, batch: &[InferredCallRow]) {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MATCH (caller:Node {id: item.caller_id}) \
+         MATCH (callee:Node {project_id: item.pid, name: item.callee}) \
+         WHERE (callee:Function OR callee:Class OR callee:Struct OR callee:Method) \
+           AND callee.qualified_name IS NOT NULL \
+           AND callee.qualified_name STARTS WITH item.recv + '.' \
+           AND (item.allow_same_file = true OR callee.filepath <> item.caller_fp) \
+         MERGE (caller)-[:CALLS_INFERRED]->(callee)"
+            .to_string(),
+    )
+    .param("batch", bolt);
+    let _ = graph.run(q).await;
+}
+
+async fn write_db_edges(graph: &Arc<Graph>, batch: &[DbEdgeRow]) {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MATCH (a:File {id: item.src}) \
+         MATCH (b:File {id: item.tgt}) \
+         MERGE (a)-[:CALLS_DB]->(b)"
+            .to_string(),
+    )
+    .param("batch", bolt);
+    let _ = graph.run(q).await;
+}
+
+async fn write_db_model_edges(graph: &Arc<Graph>, batch: &[DbModelEdgeRow]) {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MERGE (m:Model {id: item.pid + ':model:' + item.model}) \
+         SET m.project_id = item.pid, m.name = item.model \
+         WITH item, m \
+         MATCH (a:File {id: item.src}) \
+         MERGE (a)-[:CALLS_DB_MODEL]->(m)"
+            .to_string(),
+    )
+    .param("batch", bolt);
+    let _ = graph.run(q).await;
+}
+
+async fn write_external_api_nodes(graph: &Arc<Graph>, batch: &[ExternalApiNode]) {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MERGE (e:ExternalAPI {id: item.id}) \
+         SET e.project_id = item.pid, \
+             e.url = item.url"
+            .to_string(),
+    )
+    .param("batch", bolt);
+    let _ = graph.run(q).await;
+}
+
+async fn write_external_api_edges(graph: &Arc<Graph>, batch: &[ExternalApiEdgeRow]) {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MATCH (a:File {id: item.src}) \
+         MATCH (b:ExternalAPI {id: item.tgt}) \
+         MERGE (a)-[:CALLS_API_EXTERNAL]->(b)"
+            .to_string(),
+    )
+    .param("batch", bolt);
+    let _ = graph.run(q).await;
+}
+
+async fn write_import_symbol_edges(graph: &Arc<Graph>, batch: &[ImportSymbolEdgeRow]) {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MATCH (a:File {id: item.src}) \
+         MATCH (b:Node {id: item.tgt}) \
+         MERGE (a)-[:IMPORTS_SYMBOL]->(b)"
+            .to_string(),
+    )
+    .param("batch", bolt);
+    let _ = graph.run(q).await;
+}
+
+async fn write_export_symbol_edges(graph: &Arc<Graph>, batch: &[ExportSymbolEdgeRow]) {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MATCH (a:File {id: item.src}) \
+         MATCH (b:Node {id: item.tgt}) \
+         MERGE (a)-[:EXPORTS_SYMBOL]->(b)"
+            .to_string(),
+    )
+    .param("batch", bolt);
+    let _ = graph.run(q).await;
+}
+
 // ---------------------------------------------------------------------------
 // Per-file parse output
 // ---------------------------------------------------------------------------
@@ -387,6 +1002,11 @@ struct FileResult {
     imports: Vec<ImportNode>,
     import_rels: Vec<RelRow>,
     symbol_calls: Vec<SymbolCallRow>, // attributed call edges (Symbol→Symbol or File→Symbol)
+    swift_extensions: Option<std::collections::HashMap<String, std::collections::HashSet<String>>>,
+    swift_context: Option<SwiftFileContext>,
+    db_delegates: Vec<String>,
+    external_urls: Vec<String>,
+    import_symbol_requests: Vec<ImportSymbolRequest>,
 }
 
 // ---------------------------------------------------------------------------
@@ -520,6 +1140,20 @@ pub async fn index_workspace(
     let mut all_imports: Vec<ImportNode> = Vec::new();
     let mut all_import_rels: Vec<RelRow> = Vec::new();
     let mut all_symbol_call_rows: Vec<SymbolCallRow> = Vec::new();
+    let mut inferred_call_rows: Vec<InferredCallRow> = Vec::new();
+    let mut swift_extension_map: std::collections::HashMap<String, std::collections::HashSet<String>> =
+        std::collections::HashMap::new();
+    let mut swift_contexts: Vec<SwiftFileContext> = Vec::new();
+    let mut db_sources: Vec<String> = Vec::new();
+    let mut db_delegates_by_file: Vec<(String, String)> = Vec::new();
+    let mut external_api_edges: Vec<ExternalApiEdgeRow> = Vec::new();
+    let mut external_api_urls: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut seen_external_edges: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
+    let mut import_symbol_edges: Vec<ImportSymbolEdgeRow> = Vec::new();
+    let mut export_symbol_edges: Vec<ExportSymbolEdgeRow> = Vec::new();
+    let mut seen_import_symbol: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
+    let mut seen_export_symbol: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
+    let mut import_symbol_requests: Vec<ImportSymbolRequest> = Vec::new();
 
     // --- Phase 1: Parse files in parallel batches ------------------------
     let t_parse = Instant::now();
@@ -573,6 +1207,9 @@ pub async fn index_workspace(
             let mut relations: Vec<RelRow> = Vec::new();
             let mut imports: Vec<ImportNode> = Vec::new();
             let mut import_rels: Vec<RelRow> = Vec::new();
+            let mut swift_extensions: Option<std::collections::HashMap<String, std::collections::HashSet<String>>> =
+                None;
+            let mut swift_context: Option<SwiftFileContext> = None;
 
             // Build exported-name set from structural result + tags visibility
             let mut exported_names: std::collections::HashSet<String> =
@@ -582,11 +1219,56 @@ pub async fn index_workspace(
                 .and_then(|tree| tags::run_tags(lang_name, &tree, source.as_bytes()));
 
             // --- Consume tags result: split into exported names + call sites ---
-            let (tag_exported, raw_call_sites) = match tags_result {
-                Some(tr) => (tr.exported_names, tr.call_sites),
-                None => (std::collections::HashSet::new(), Vec::new()),
+            let (tag_exported, raw_call_sites, db_delegates, external_calls, const_strings) = match tags_result {
+                Some(tr) => (
+                    tr.exported_names,
+                    tr.call_sites,
+                    tr.db_delegates,
+                    tr.external_calls,
+                    tr.const_strings,
+                ),
+                None => (
+                    std::collections::HashSet::new(),
+                    Vec::new(),
+                    std::collections::HashSet::new(),
+                    Vec::new(),
+                    std::collections::HashMap::new(),
+                ),
             };
             exported_names.extend(tag_exported);
+            let call_sites = raw_call_sites;
+            let db_delegates = db_delegates.into_iter().collect::<Vec<_>>();
+            let mut external_urls: Vec<String> = Vec::new();
+            for call in external_calls {
+                let url = match call.arg {
+                    tags::ExternalCallArg::Literal(value) => Some(value),
+                    tags::ExternalCallArg::Identifier(name) => const_strings.get(&name).cloned(),
+                    tags::ExternalCallArg::ConcatIdentLiteral { ident, literal } => {
+                        const_strings.get(&ident).map(|base| format!("{base}{literal}"))
+                    }
+                    tags::ExternalCallArg::ConcatLiteralIdent { literal, ident } => {
+                        const_strings.get(&ident).map(|base| format!("{literal}{base}"))
+                    }
+                    tags::ExternalCallArg::UrlLiteral { path, base } => join_url(&base, &path),
+                    tags::ExternalCallArg::UrlWithBaseIdent { path, base_ident } => {
+                        const_strings.get(&base_ident).and_then(|base| join_url(base, &path))
+                    }
+                };
+                if let Some(url) = url {
+                    if url.starts_with("http://") || url.starts_with("https://") || url.starts_with("env://") {
+                        external_urls.push(url);
+                    }
+                }
+            }
+            let is_backend = rel_path.starts_with("src/api/")
+                || rel_path.starts_with("src/services/")
+                || rel_path.starts_with("src/webhooks/")
+                || rel_path.starts_with("src/jobs/")
+                || rel_path.starts_with("src/db/")
+                || rel_path.starts_with("src/seed/")
+                || rel_path == "src/server.ts";
+            let is_public = rel_path.starts_with("src/public/");
+            let is_backend = is_backend && !is_public;
 
             // Walk structural tree (populates `symbols` with start/end bytes)
             for item in &result.structure {
@@ -617,7 +1299,8 @@ pub async fn index_workspace(
                 .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
                 .unwrap_or(false);
 
-            let symbol_calls: Vec<SymbolCallRow> = raw_call_sites
+            let symbol_calls: Vec<SymbolCallRow> = call_sites
+                .clone()
                 .into_iter()
                 .filter_map(|cs| {
                     // Find the innermost enclosing symbol (smallest span containing cs.start_byte)
@@ -643,6 +1326,45 @@ pub async fn index_workspace(
                 })
                 .collect();
 
+            if lang_name == "swift" {
+                let mut ext_map: std::collections::HashMap<String, std::collections::HashSet<String>> =
+                    std::collections::HashMap::new();
+                collect_swift_extensions(&result.structure, &mut ext_map);
+                if !ext_map.is_empty() {
+                    swift_extensions = Some(ext_map);
+                }
+
+                let mut ext_spans: Vec<(usize, usize, String)> = Vec::new();
+                collect_swift_extension_spans(&result.structure, &mut ext_spans);
+
+                let mut type_spans: Vec<(usize, usize, String)> = Vec::new();
+                collect_swift_type_spans(&result.structure, &mut type_spans);
+
+                let var_types = parse_swift_var_types(&source);
+                if !var_types.is_empty() {
+                    swift_context = Some(SwiftFileContext {
+                        file_id: file_id.clone(),
+                        filepath: rel_path.clone(),
+                        symbol_spans: symbol_spans.clone(),
+                        extension_spans: ext_spans.clone(),
+                        type_spans: type_spans.clone(),
+                        call_sites: call_sites.clone(),
+                        var_types,
+                    });
+                } else if !call_sites.is_empty() {
+                    swift_context = Some(SwiftFileContext {
+                        file_id: file_id.clone(),
+                        filepath: rel_path.clone(),
+                        symbol_spans: symbol_spans.clone(),
+                        extension_spans: ext_spans.clone(),
+                        type_spans: type_spans.clone(),
+                        call_sites: call_sites.clone(),
+                        var_types: std::collections::HashMap::new(),
+                    });
+                }
+            }
+
+            let mut import_symbol_requests: Vec<ImportSymbolRequest> = Vec::new();
             // Collect imports
             for imp in &result.imports {
                 let import_id = format!("{}:import:{}:{}", pid, rel_path, imp.source);
@@ -659,6 +1381,15 @@ pub async fn index_workspace(
                     parent: file_id.clone(),
                     child: import_id,
                 });
+
+                if !imp.items.is_empty() && !imp.is_wildcard {
+                    import_symbol_requests.push(ImportSymbolRequest {
+                        src_id: file_id.clone(),
+                        src_filepath: rel_path.clone(),
+                        module: imp.source.clone(),
+                        items: imp.items.clone(),
+                    });
+                }
             }
 
             Some(FileResult {
@@ -668,6 +1399,11 @@ pub async fn index_workspace(
                 imports,
                 import_rels,
                 symbol_calls,
+                swift_extensions,
+                swift_context,
+                db_delegates: if is_backend { db_delegates } else { Vec::new() },
+                external_urls,
+                import_symbol_requests,
             })
         };
 
@@ -679,14 +1415,59 @@ pub async fn index_workspace(
 
         // Merge batch results into global reservoirs
         for res in batch_results {
+            let file_id = res.file_node.id.clone();
             all_symbol_call_rows.extend(res.symbol_calls);
             all_files.push(res.file_node);
-            for (label, syms) in res.symbols {
+            let local_symbols = res.symbols;
+            if !local_symbols.is_empty() {
+                for syms in local_symbols.values() {
+                    for sym in syms {
+                        if sym.is_exported {
+                            if seen_export_symbol.insert((file_id.clone(), sym.id.clone())) {
+                                export_symbol_edges.push(ExportSymbolEdgeRow {
+                                    src: file_id.clone(),
+                                    tgt: sym.id.clone(),
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            for (label, syms) in local_symbols {
                 all_symbols.entry(label).or_default().extend(syms);
             }
             all_rels.extend(res.relations);
             all_imports.extend(res.imports);
             all_import_rels.extend(res.import_rels);
+            if !res.db_delegates.is_empty() {
+                db_sources.push(file_id.clone());
+                for name in res.db_delegates {
+                    db_delegates_by_file.push((file_id.clone(), name));
+                }
+            }
+            if !res.external_urls.is_empty() {
+                for url in res.external_urls {
+                    let external_id = external_api_id(&project_id, &url);
+                    external_api_urls.insert(url.clone());
+                    if seen_external_edges.insert((file_id.clone(), external_id.clone())) {
+                        external_api_edges.push(ExternalApiEdgeRow {
+                            src: file_id.clone(),
+                            tgt: external_id,
+                        });
+                    }
+                }
+            }
+            if !res.import_symbol_requests.is_empty() {
+                import_symbol_requests.extend(res.import_symbol_requests);
+            }
+            if let Some(exts) = res.swift_extensions {
+                for (ty, methods) in exts {
+                    swift_extension_map.entry(ty).or_default().extend(methods);
+                }
+            }
+            if let Some(ctx) = res.swift_context {
+                swift_contexts.push(ctx);
+            }
         }
 
         files_parsed += batch.len();
@@ -702,6 +1483,274 @@ pub async fn index_workspace(
         all_rels.len(),
         all_imports.len(),
     );
+
+    let mut symbols_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
+    for syms in all_symbols.values() {
+        for sym in syms {
+            symbols_by_file
+                .entry(sym.filepath.clone())
+                .or_default()
+                .insert(sym.name.clone(), sym.id.clone());
+        }
+    }
+    let files_set: HashSet<String> = all_files.iter().map(|f| f.filepath.clone()).collect();
+    for req in &import_symbol_requests {
+        let target_fp = match resolve_module_path(&req.src_filepath, &req.module, &files_set) {
+            Some(fp) => fp,
+            None => continue,
+        };
+        let Some(sym_map) = symbols_by_file.get(&target_fp) else {
+            continue;
+        };
+        for item in &req.items {
+            let name = clean_import_name(item);
+            if name.is_empty() {
+                continue;
+            }
+            if let Some(sym_id) = sym_map.get(&name) {
+                if seen_import_symbol.insert((req.src_id.clone(), sym_id.clone())) {
+                    import_symbol_edges.push(ImportSymbolEdgeRow {
+                        src: req.src_id.clone(),
+                        tgt: sym_id.clone(),
+                    });
+                }
+            }
+        }
+    }
+
+    if !swift_extension_map.is_empty() && !swift_contexts.is_empty() {
+        let allow_same_file = std::env::var("TS_PACK_INCLUDE_INTRA_FILE_CALLS")
+            .ok()
+            .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+            .unwrap_or(false);
+        let mut seen: std::collections::HashSet<(String, String, String)> = std::collections::HashSet::new();
+        for ctx in &swift_contexts {
+            for call in &ctx.call_sites {
+                let Some(recv_raw) = &call.receiver else {
+                    continue;
+                };
+
+                let recv = recv_raw.trim_end_matches(|c| c == '?' || c == '!');
+                if recv.is_empty() {
+                    continue;
+                }
+
+                let mut norm_ty = ctx.var_types.get(recv).and_then(|t| normalize_swift_type(t));
+
+                if norm_ty.is_none() {
+                    if recv == "self" || recv == "Self" {
+                        norm_ty = ctx
+                            .extension_spans
+                            .iter()
+                            .filter(|(sb, eb, _)| *sb <= call.start_byte && call.start_byte < *eb)
+                            .min_by_key(|(sb, eb, _)| eb - sb)
+                            .map(|(_, _, ty)| ty.clone())
+                            .or_else(|| {
+                                ctx.type_spans
+                                    .iter()
+                                    .filter(|(sb, eb, _)| *sb <= call.start_byte && call.start_byte < *eb)
+                                    .min_by_key(|(sb, eb, _)| eb - sb)
+                                    .map(|(_, _, ty)| ty.clone())
+                            });
+                    } else if swift_extension_map.contains_key(recv) {
+                        norm_ty = normalize_swift_type(recv);
+                    }
+                }
+
+                let Some(norm_ty) = norm_ty else {
+                    continue;
+                };
+
+                let mut candidates = Vec::new();
+                if let Some(methods) = swift_extension_map.get(&norm_ty) {
+                    if methods.contains(&call.callee) {
+                        candidates.push(norm_ty.clone());
+                    }
+                }
+                if candidates.is_empty() {
+                    if let Some((_, short)) = norm_ty.rsplit_once('.') {
+                        if let Some(methods) = swift_extension_map.get(short) {
+                            if methods.contains(&call.callee) {
+                                candidates.push(short.to_string());
+                            }
+                        }
+                    }
+                }
+                if candidates.is_empty() {
+                    continue;
+                }
+
+                let caller_id = ctx
+                    .symbol_spans
+                    .iter()
+                    .filter(|(sb, eb, _)| *sb <= call.start_byte && call.start_byte < *eb)
+                    .min_by_key(|(sb, eb, _)| eb - sb)
+                    .map(|(_, _, id)| id.clone())
+                    .unwrap_or_else(|| ctx.file_id.clone());
+
+                for ty in candidates {
+                    if seen.insert((caller_id.clone(), call.callee.clone(), ty.clone())) {
+                        inferred_call_rows.push(InferredCallRow {
+                            caller_id: caller_id.clone(),
+                            callee: call.callee.clone(),
+                            receiver_type: ty,
+                            project_id: Arc::clone(&project_id),
+                            caller_filepath: ctx.filepath.clone(),
+                            allow_same_file,
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    let mut manifest_abs: HashMap<String, String> = HashMap::new();
+    for entry in &manifest {
+        manifest_abs.insert(entry.rel_path.clone(), entry.abs_path.clone());
+    }
+
+    let schema_id = all_files
+        .iter()
+        .find(|f| f.filepath == "prisma/schema.prisma")
+        .map(|f| f.id.clone());
+    if let Some(schema_id) = schema_id {
+        let _ = graph
+            .run(
+                Query::new("MATCH (:File {project_id: $pid})-[r:CALLS_DB]->() DELETE r".to_string())
+                    .param("pid", project_id.to_string()),
+            )
+            .await;
+        let mut seen: std::collections::HashSet<String> = std::collections::HashSet::new();
+        let mut db_edges: Vec<DbEdgeRow> = Vec::new();
+        for src in &db_sources {
+            if seen.insert(src.clone()) {
+                db_edges.push(DbEdgeRow {
+                    src: src.clone(),
+                    tgt: schema_id.clone(),
+                });
+            }
+        }
+        if !db_edges.is_empty() {
+            let t_db = Instant::now();
+            let db_count = db_edges.len();
+            stream::iter(db_edges.chunks(CALLS_BATCH_SIZE))
+                .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+                    let g = Arc::clone(&graph);
+                    async move { write_db_edges(&g, chunk).await }
+                })
+                .await;
+            eprintln!(
+                "[ts-pack-index] CALLS_DB writes done in {:.2}s (rows={})",
+                t_db.elapsed().as_secs_f64(),
+                db_count,
+            );
+        }
+
+        if let Some(schema_abs) = manifest_abs.get("prisma/schema.prisma") {
+            if let Ok(schema_text) = std::fs::read_to_string(schema_abs) {
+                let mut model_map: HashMap<String, String> = HashMap::new();
+                let models = extract_prisma_models(&schema_text);
+                for model in models {
+                    if model.is_empty() {
+                        continue;
+                    }
+                    model_map.insert(model.to_lowercase(), model.clone());
+                    if let Some(first) = model.chars().next() {
+                        let delegate = first.to_lowercase().collect::<String>() + &model[1..];
+                        model_map.insert(delegate.to_lowercase(), model.clone());
+                    }
+                }
+
+                let mut db_model_edges: Vec<DbModelEdgeRow> = Vec::new();
+                for (file_id, delegate) in &db_delegates_by_file {
+                    if let Some(model) = model_map.get(&delegate.to_lowercase()) {
+                        db_model_edges.push(DbModelEdgeRow {
+                            src: file_id.clone(),
+                            model: model.clone(),
+                            project_id: Arc::clone(&project_id),
+                        });
+                    }
+                }
+
+                let _ = graph
+                    .run(
+                        Query::new("MATCH (m:Model {project_id: $pid}) DETACH DELETE m".to_string())
+                            .param("pid", project_id.to_string()),
+                    )
+                    .await;
+                if !db_model_edges.is_empty() {
+                    let t_dbm = Instant::now();
+                    let dbm_count = db_model_edges.len();
+                    stream::iter(db_model_edges.chunks(CALLS_BATCH_SIZE))
+                        .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+                            let g = Arc::clone(&graph);
+                            async move { write_db_model_edges(&g, chunk).await }
+                        })
+                        .await;
+                    eprintln!(
+                        "[ts-pack-index] CALLS_DB_MODEL writes done in {:.2}s (rows={})",
+                        t_dbm.elapsed().as_secs_f64(),
+                        dbm_count,
+                    );
+                }
+            }
+        }
+    }
+
+    let _ = graph
+        .run(
+            Query::new("MATCH (:File {project_id: $pid})-[r:CALLS_API_EXTERNAL]->() DELETE r".to_string())
+                .param("pid", project_id.to_string()),
+        )
+        .await;
+    let _ = graph
+        .run(
+            Query::new("MATCH (e:ExternalAPI {project_id: $pid}) DETACH DELETE e".to_string())
+                .param("pid", project_id.to_string()),
+        )
+        .await;
+    if !external_api_urls.is_empty() && !external_api_edges.is_empty() {
+        let t_ext = Instant::now();
+        let mut external_nodes: Vec<ExternalApiNode> = Vec::new();
+        for url in &external_api_urls {
+            external_nodes.push(ExternalApiNode {
+                id: external_api_id(&project_id, url),
+                url: url.clone(),
+                project_id: Arc::clone(&project_id),
+            });
+        }
+        stream::iter(external_nodes.chunks(NODE_BATCH_SIZE))
+            .for_each_concurrent(NODE_CONCURRENCY, |chunk| {
+                let g = Arc::clone(&graph);
+                async move { write_external_api_nodes(&g, chunk).await }
+            })
+            .await;
+        let ext_count = external_api_edges.len();
+        stream::iter(external_api_edges.chunks(CALLS_BATCH_SIZE))
+            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+                let g = Arc::clone(&graph);
+                async move { write_external_api_edges(&g, chunk).await }
+            })
+            .await;
+        eprintln!(
+            "[ts-pack-index] CALLS_API_EXTERNAL writes done in {:.2}s (rows={})",
+            t_ext.elapsed().as_secs_f64(),
+            ext_count,
+        );
+    }
+
+    let _ = graph
+        .run(
+            Query::new("MATCH (:File {project_id: $pid})-[r:IMPORTS_SYMBOL]->() DELETE r".to_string())
+                .param("pid", project_id.to_string()),
+        )
+        .await;
+    let _ = graph
+        .run(
+            Query::new("MATCH (:File {project_id: $pid})-[r:EXPORTS_SYMBOL]->() DELETE r".to_string())
+                .param("pid", project_id.to_string()),
+        )
+        .await;
 
     // --- Phase 2: Write file nodes ----------------------------------------
     let t_nodes = Instant::now();
@@ -732,6 +1781,38 @@ pub async fn index_workspace(
         all_files.len(),
         total_symbols,
     );
+
+    if !import_symbol_edges.is_empty() {
+        let t_imp = Instant::now();
+        let imp_count = import_symbol_edges.len();
+        stream::iter(import_symbol_edges.chunks(CALLS_BATCH_SIZE))
+            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+                let g = Arc::clone(&graph);
+                async move { write_import_symbol_edges(&g, chunk).await }
+            })
+            .await;
+        eprintln!(
+            "[ts-pack-index] IMPORTS_SYMBOL writes done in {:.2}s (rows={})",
+            t_imp.elapsed().as_secs_f64(),
+            imp_count,
+        );
+    }
+
+    if !export_symbol_edges.is_empty() {
+        let t_exp = Instant::now();
+        let exp_count = export_symbol_edges.len();
+        stream::iter(export_symbol_edges.chunks(CALLS_BATCH_SIZE))
+            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+                let g = Arc::clone(&graph);
+                async move { write_export_symbol_edges(&g, chunk).await }
+            })
+            .await;
+        eprintln!(
+            "[ts-pack-index] EXPORTS_SYMBOL writes done in {:.2}s (rows={})",
+            t_exp.elapsed().as_secs_f64(),
+            exp_count,
+        );
+    }
 
     // --- Phase 3: Write import nodes -------------------------------------
     let t_imports = Instant::now();
@@ -788,6 +1869,22 @@ pub async fn index_workspace(
         t_calls.elapsed().as_secs_f64(),
         calls_row_count,
     );
+
+    if !inferred_call_rows.is_empty() {
+        let t_inf = Instant::now();
+        let inf_count = inferred_call_rows.len();
+        stream::iter(inferred_call_rows.chunks(CALLS_BATCH_SIZE))
+            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+                let g = Arc::clone(&graph);
+                async move { write_inferred_calls(&g, chunk).await }
+            })
+            .await;
+        eprintln!(
+            "[ts-pack-index] CALLS_INFERRED writes done in {:.2}s (rows={})",
+            t_inf.elapsed().as_secs_f64(),
+            inf_count,
+        );
+    }
 
     // --- Summary ----------------------------------------------------------
     let total_elapsed = t0.elapsed();
