@@ -7,16 +7,16 @@ namespace TreeSitterLanguagePack;
 
 /// <summary>
 /// Configuration for the tree-sitter language pack.
-///
+/// 
 /// Controls cache directory and which languages to pre-download.
 /// Can be loaded from a TOML file, constructed programmatically,
 /// or passed as a dict/object from language bindings.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::PackConfig;
-///
+/// 
 /// let config = PackConfig {
 ///     cache_dir: None,
 ///     languages: Some(vec!["python".to_string(), "rust".to_string()]),
@@ -28,7 +28,7 @@ public sealed class PackConfig
 {
     /// <summary>
     /// Override default cache directory.
-    ///
+    /// 
     /// Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
     /// </summary>
     [JsonPropertyName("cacheDir")]
@@ -36,7 +36,7 @@ public sealed class PackConfig
 
     /// <summary>
     /// Languages to pre-download on init.
-    ///
+    /// 
     /// Each entry is a language name (e.g. `"python"`, `"rust"`).
     /// </summary>
     [JsonPropertyName("languages")]

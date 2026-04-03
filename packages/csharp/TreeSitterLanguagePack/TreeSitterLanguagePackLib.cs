@@ -12,99 +12,377 @@ public static class TreeSitterLanguagePackLib
 {
     public static string? DetectLanguageFromExtension(string ext)
     {
-        var result = NativeMethods.DetectLanguageFromExtension(ext);
-        if (result == IntPtr.Zero) return null;
-        try { return Marshal.PtrToStringUTF8(result); }
-        finally { NativeMethods.FreeString(result); }
+        var result = NativeMethods.DetectLanguageFromExtension(
+            ext
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<string?>(json ?? "null")!;
     }
 
     public static string? DetectLanguageFromPath(string path)
     {
-        var result = NativeMethods.DetectLanguageFromPath(path);
-        if (result == IntPtr.Zero) return null;
-        try { return Marshal.PtrToStringUTF8(result); }
-        finally { NativeMethods.FreeString(result); }
+        var result = NativeMethods.DetectLanguageFromPath(
+            path
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<string?>(json ?? "null")!;
     }
 
     public static string? ExtensionAmbiguity(string ext)
     {
-        var result = NativeMethods.ExtensionAmbiguity(ext);
-        if (result == IntPtr.Zero) return null;
-        try { return Marshal.PtrToStringUTF8(result); }
-        finally { NativeMethods.FreeString(result); }
+        var result = NativeMethods.ExtensionAmbiguity(
+            ext
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<string?>(json ?? "null")!;
     }
 
     public static string? ExtensionAmbiguityJson(string ext)
     {
-        var result = NativeMethods.ExtensionAmbiguityJson(ext);
-        if (result == IntPtr.Zero) return null;
-        try { return Marshal.PtrToStringUTF8(result); }
-        finally { NativeMethods.FreeString(result); }
+        var result = NativeMethods.ExtensionAmbiguityJson(
+            ext
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<string?>(json ?? "null")!;
     }
 
     public static string? DetectLanguageFromContent(string content)
     {
-        var result = NativeMethods.DetectLanguageFromContent(content);
-        if (result == IntPtr.Zero) return null;
-        try { return Marshal.PtrToStringUTF8(result); }
-        finally { NativeMethods.FreeString(result); }
+        var result = NativeMethods.DetectLanguageFromContent(
+            content
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<string?>(json ?? "null")!;
+    }
+
+    public static ValidationResult ValidateExtraction(ExtractionConfig config)
+    {
+        var result = NativeMethods.ValidateExtraction(
+            config
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<ValidationResult>(json ?? "null")!;
+    }
+
+    public static ProcessResult Process(string source, ProcessConfig config, LanguageRegistry registry)
+    {
+        var result = NativeMethods.Process(
+            source,
+            config,
+            registry
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<ProcessResult>(json ?? "null")!;
+    }
+
+    public static NodeInfo NodeInfoFromNode(string node)
+    {
+        var result = NativeMethods.NodeInfoFromNode(
+            node
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<NodeInfo>(json ?? "null")!;
+    }
+
+    public static NodeInfo RootNodeInfo(Tree tree)
+    {
+        var result = NativeMethods.RootNodeInfo(
+            tree
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<NodeInfo>(json ?? "null")!;
+    }
+
+    public static List<NodeInfo> FindNodesByType(Tree tree, string nodeType)
+    {
+        var result = NativeMethods.FindNodesByType(
+            tree,
+            nodeType
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<List<NodeInfo>>(json ?? "null")!;
+    }
+
+    public static List<NodeInfo> NamedChildrenInfo(Tree tree)
+    {
+        var result = NativeMethods.NamedChildrenInfo(
+            tree
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<List<NodeInfo>>(json ?? "null")!;
+    }
+
+    public static Tree ParseString(string language, byte[] source)
+    {
+        var result = NativeMethods.ParseString(
+            language,
+            source
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<Tree>(json ?? "null")!;
+    }
+
+    public static bool TreeContainsNodeType(Tree tree, string nodeType)
+    {
+        var result = NativeMethods.TreeContainsNodeType(
+            tree,
+            nodeType
+        );
+        return result != 0;
+    }
+
+    public static bool TreeHasErrorNodes(Tree tree)
+    {
+        var result = NativeMethods.TreeHasErrorNodes(
+            tree
+        );
+        return result != 0;
+    }
+
+    public static string TreeToSexp(Tree tree)
+    {
+        var result = NativeMethods.TreeToSexp(
+            tree
+        );
+        var str = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return str ?? string.Empty;
+    }
+
+    public static nuint TreeErrorCount(Tree tree)
+    {
+        var result = NativeMethods.TreeErrorCount(
+            tree
+        );
+        return result;
     }
 
     public static string? GetHighlightsQuery(string language)
     {
-        var result = NativeMethods.GetHighlightsQuery(language);
-        if (result == IntPtr.Zero) return null;
-        try { return Marshal.PtrToStringUTF8(result); }
-        finally { NativeMethods.FreeString(result); }
+        var result = NativeMethods.GetHighlightsQuery(
+            language
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<string?>(json ?? "null")!;
     }
 
     public static string? GetInjectionsQuery(string language)
     {
-        var result = NativeMethods.GetInjectionsQuery(language);
-        if (result == IntPtr.Zero) return null;
-        try { return Marshal.PtrToStringUTF8(result); }
-        finally { NativeMethods.FreeString(result); }
+        var result = NativeMethods.GetInjectionsQuery(
+            language
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<string?>(json ?? "null")!;
     }
 
     public static string? GetLocalsQuery(string language)
     {
-        var result = NativeMethods.GetLocalsQuery(language);
-        if (result == IntPtr.Zero) return null;
-        try { return Marshal.PtrToStringUTF8(result); }
-        finally { NativeMethods.FreeString(result); }
+        var result = NativeMethods.GetLocalsQuery(
+            language
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<string?>(json ?? "null")!;
+    }
+
+    public static List<string> RunQuery(Tree tree, string language, string querySource, byte[] source)
+    {
+        var result = NativeMethods.RunQuery(
+            tree,
+            language,
+            querySource,
+            source
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<List<string>>(json ?? "null")!;
+    }
+
+    public static List<string> SplitCode(string source, Tree tree, nuint maxChunkSize)
+    {
+        var result = NativeMethods.SplitCode(
+            source,
+            tree,
+            maxChunkSize
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<List<string>>(json ?? "null")!;
+    }
+
+    public static Language GetLanguage(string name)
+    {
+        var result = NativeMethods.GetLanguage(
+            name
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<Language>(json ?? "null")!;
+    }
+
+    public static Parser GetParser(string name)
+    {
+        var result = NativeMethods.GetParser(
+            name
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<Parser>(json ?? "null")!;
     }
 
     public static List<string> AvailableLanguages()
     {
-        var ptr = NativeMethods.AvailableLanguages();
-        if (ptr == IntPtr.Zero) return [];
-        try
-        {
-            var json = Marshal.PtrToStringUTF8(ptr);
-            if (json is null) return [];
-            return JsonSerializer.Deserialize<List<string>>(json) ?? [];
-        }
-        finally
-        {
-            NativeMethods.FreeString(ptr);
-        }
+        var result = NativeMethods.AvailableLanguages();
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<List<string>>(json ?? "null")!;
     }
 
     public static bool HasLanguage(string name)
     {
-        return NativeMethods.HasLanguage(name) != 0;
+        var result = NativeMethods.HasLanguage(
+            name
+        );
+        return result != 0;
     }
 
     public static nuint LanguageCount()
     {
-        return NativeMethods.LanguageCount();
+        var result = NativeMethods.LanguageCount();
+        return result;
     }
 
-    public static string? CacheDir()
+    public static ExtractionResult ExtractPatterns(string source, ExtractionConfig config)
+    {
+        var result = NativeMethods.ExtractPatterns(
+            source,
+            config
+        );
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<ExtractionResult>(json ?? "null")!;
+    }
+
+    public static void Init(PackConfig config)
+    {
+        NativeMethods.Init(
+            config
+        );
+    }
+
+    public static void Configure(PackConfig config)
+    {
+        NativeMethods.Configure(
+            config
+        );
+    }
+
+    public static nuint DownloadAll()
+    {
+        var result = NativeMethods.DownloadAll();
+        return result;
+    }
+
+    public static List<string> ManifestLanguages()
+    {
+        var result = NativeMethods.ManifestLanguages();
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<List<string>>(json ?? "null")!;
+    }
+
+    public static List<string> DownloadedLanguages()
+    {
+        var result = NativeMethods.DownloadedLanguages();
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<List<string>>(json ?? "null")!;
+    }
+
+    public static void CleanCache()
+    {
+        NativeMethods.CleanCache();
+    }
+
+    public static string CacheDir()
     {
         var result = NativeMethods.CacheDir();
-        if (result == IntPtr.Zero) return null;
-        try { return Marshal.PtrToStringUTF8(result); }
-        finally { NativeMethods.FreeString(result); }
+        var str = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return str ?? string.Empty;
+    }
+
+    public static string FromTomlFile(string path)
+    {
+        var result = NativeMethods.FromTomlFile(
+            path
+        );
+        var str = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return str ?? string.Empty;
+    }
+
+    public static string? Discover()
+    {
+        var result = NativeMethods.Discover();
+        var json = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return JsonSerializer.Deserialize<string?>(json ?? "null")!;
+    }
+
+    public static string Default()
+    {
+        var result = NativeMethods.Default();
+        var str = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return str ?? string.Empty;
+    }
+
+    public static string WithChunking(nuint maxSize)
+    {
+        var result = NativeMethods.WithChunking(
+            maxSize
+        );
+        var str = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return str ?? string.Empty;
+    }
+
+    public static string All()
+    {
+        var result = NativeMethods.All();
+        var str = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return str ?? string.Empty;
+    }
+
+    public static string Minimal()
+    {
+        var result = NativeMethods.Minimal();
+        var str = Marshal.PtrToStringUTF8(result);
+        NativeMethods.FreeString(result);
+        return str ?? string.Empty;
+    }
+
+    private static TreeSitterLanguagePackException GetLastError()
+    {
+        var code = NativeMethods.LastErrorCode();
+        var ctxPtr = NativeMethods.LastErrorContext();
+        var message = Marshal.PtrToStringAnsi(ctxPtr) ?? "Unknown error";
+        return new TreeSitterLanguagePackException(code, message);
     }
 }

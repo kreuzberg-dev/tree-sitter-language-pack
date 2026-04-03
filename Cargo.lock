@@ -1767,6 +1767,7 @@ name = "ts-pack-python"
 version = "1.4.1"
 dependencies = [
  "pyo3",
+ "serde",
  "serde_json",
  "tree-sitter",
  "tree-sitter-language-pack",

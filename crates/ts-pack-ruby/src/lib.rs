@@ -3,10 +3,10 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::missing_errors_doc)]
 
-use magnus::{Error, IntoValueFromNative, Ruby, function, method, prelude::*, try_convert::TryConvertOwned};
+use magnus::{function, method, prelude::*, Error, Ruby, IntoValueFromNative, try_convert::TryConvertOwned};
 use std::collections::HashMap;
-use std::sync::Arc;
 use tree_sitter_language_pack;
+use std::sync::Arc;
 
 #[derive(Clone)]
 #[magnus::wrap(class = "Kreuzberg::ExtractionPattern")]
@@ -30,40 +30,34 @@ unsafe impl TryConvertOwned for ExtractionPattern {}
 
 impl ExtractionPattern {
     fn new(
-        query: String,
-        capture_output: CaptureOutput,
-        child_fields: Vec<String>,
-        max_results: Option<usize>,
-        byte_range: Option<String>,
-    ) -> Self {
-        Self {
-            query,
-            capture_output,
-            child_fields,
-            max_results,
-            byte_range,
+            query: String,
+            capture_output: CaptureOutput,
+            child_fields: Vec<String>,
+            max_results: Option<usize>,
+            byte_range: Option<String>,
+        ) -> Self {
+            Self { query, capture_output, child_fields, max_results, byte_range }
         }
-    }
 
     fn query(&self) -> String {
-        self.query.clone()
-    }
+            self.query.clone()
+        }
 
     fn capture_output(&self) -> CaptureOutput {
-        self.capture_output.clone()
-    }
+            self.capture_output.clone()
+        }
 
     fn child_fields(&self) -> Vec<String> {
-        self.child_fields.clone()
-    }
+            self.child_fields.clone()
+        }
 
     fn max_results(&self) -> Option<usize> {
-        self.max_results
-    }
+            self.max_results
+        }
 
     fn byte_range(&self) -> Option<String> {
-        self.byte_range.clone()
-    }
+            self.byte_range.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -85,16 +79,16 @@ unsafe impl TryConvertOwned for ExtractionConfig {}
 
 impl ExtractionConfig {
     fn new(language: String, patterns: String) -> Self {
-        Self { language, patterns }
-    }
+            Self { language, patterns }
+        }
 
     fn language(&self) -> String {
-        self.language.clone()
-    }
+            self.language.clone()
+        }
 
     fn patterns(&self) -> String {
-        self.patterns.clone()
-    }
+            self.patterns.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -118,41 +112,29 @@ impl magnus::TryConvert for CaptureResult {
 unsafe impl TryConvertOwned for CaptureResult {}
 
 impl CaptureResult {
-    fn new(
-        name: String,
-        child_fields: String,
-        start_byte: usize,
-        node: Option<NodeInfo>,
-        text: Option<String>,
-    ) -> Self {
-        Self {
-            name,
-            node,
-            text,
-            child_fields,
-            start_byte,
+    fn new(name: String, child_fields: String, start_byte: usize, node: Option<NodeInfo>, text: Option<String>) -> Self {
+            Self { name, node, text, child_fields, start_byte }
         }
-    }
 
     fn name(&self) -> String {
-        self.name.clone()
-    }
+            self.name.clone()
+        }
 
     fn node(&self) -> Option<NodeInfo> {
-        self.node.clone()
-    }
+            self.node.clone()
+        }
 
     fn text(&self) -> Option<String> {
-        self.text.clone()
-    }
+            self.text.clone()
+        }
 
     fn child_fields(&self) -> String {
-        self.child_fields.clone()
-    }
+            self.child_fields.clone()
+        }
 
     fn start_byte(&self) -> usize {
-        self.start_byte
-    }
+            self.start_byte
+        }
 }
 
 #[derive(Clone)]
@@ -174,19 +156,16 @@ unsafe impl TryConvertOwned for MatchResult {}
 
 impl MatchResult {
     fn new(pattern_index: usize, captures: Vec<CaptureResult>) -> Self {
-        Self {
-            pattern_index,
-            captures,
+            Self { pattern_index, captures }
         }
-    }
 
     fn pattern_index(&self) -> usize {
-        self.pattern_index
-    }
+            self.pattern_index
+        }
 
     fn captures(&self) -> Vec<CaptureResult> {
-        self.captures.clone()
-    }
+            self.captures.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -208,16 +187,16 @@ unsafe impl TryConvertOwned for PatternResult {}
 
 impl PatternResult {
     fn new(matches: Vec<MatchResult>, total_count: usize) -> Self {
-        Self { matches, total_count }
-    }
+            Self { matches, total_count }
+        }
 
     fn matches(&self) -> Vec<MatchResult> {
-        self.matches.clone()
-    }
+            self.matches.clone()
+        }
 
     fn total_count(&self) -> usize {
-        self.total_count
-    }
+            self.total_count
+        }
 }
 
 #[derive(Clone)]
@@ -239,16 +218,16 @@ unsafe impl TryConvertOwned for ExtractionResult {}
 
 impl ExtractionResult {
     fn new(language: String, results: String) -> Self {
-        Self { language, results }
-    }
+            Self { language, results }
+        }
 
     fn language(&self) -> String {
-        self.language.clone()
-    }
+            self.language.clone()
+        }
 
     fn results(&self) -> String {
-        self.results.clone()
-    }
+            self.results.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -273,40 +252,34 @@ unsafe impl TryConvertOwned for PatternValidation {}
 
 impl PatternValidation {
     fn new(
-        valid: bool,
-        capture_names: Vec<String>,
-        pattern_count: usize,
-        warnings: Vec<String>,
-        errors: Vec<String>,
-    ) -> Self {
-        Self {
-            valid,
-            capture_names,
-            pattern_count,
-            warnings,
-            errors,
+            valid: bool,
+            capture_names: Vec<String>,
+            pattern_count: usize,
+            warnings: Vec<String>,
+            errors: Vec<String>,
+        ) -> Self {
+            Self { valid, capture_names, pattern_count, warnings, errors }
         }
-    }
 
     fn valid(&self) -> bool {
-        self.valid
-    }
+            self.valid
+        }
 
     fn capture_names(&self) -> Vec<String> {
-        self.capture_names.clone()
-    }
+            self.capture_names.clone()
+        }
 
     fn pattern_count(&self) -> usize {
-        self.pattern_count
-    }
+            self.pattern_count
+        }
 
     fn warnings(&self) -> Vec<String> {
-        self.warnings.clone()
-    }
+            self.warnings.clone()
+        }
 
     fn errors(&self) -> Vec<String> {
-        self.errors.clone()
-    }
+            self.errors.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -328,16 +301,16 @@ unsafe impl TryConvertOwned for ValidationResult {}
 
 impl ValidationResult {
     fn new(valid: bool, patterns: String) -> Self {
-        Self { valid, patterns }
-    }
+            Self { valid, patterns }
+        }
 
     fn valid(&self) -> bool {
-        self.valid
-    }
+            self.valid
+        }
 
     fn patterns(&self) -> String {
-        self.patterns.clone()
-    }
+            self.patterns.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -363,46 +336,39 @@ unsafe impl TryConvertOwned for Span {}
 
 impl Span {
     fn new(
-        start_byte: usize,
-        end_byte: usize,
-        start_line: usize,
-        start_column: usize,
-        end_line: usize,
-        end_column: usize,
-    ) -> Self {
-        Self {
-            start_byte,
-            end_byte,
-            start_line,
-            start_column,
-            end_line,
-            end_column,
+            start_byte: usize,
+            end_byte: usize,
+            start_line: usize,
+            start_column: usize,
+            end_line: usize,
+            end_column: usize,
+        ) -> Self {
+            Self { start_byte, end_byte, start_line, start_column, end_line, end_column }
         }
-    }
 
     fn start_byte(&self) -> usize {
-        self.start_byte
-    }
+            self.start_byte
+        }
 
     fn end_byte(&self) -> usize {
-        self.end_byte
-    }
+            self.end_byte
+        }
 
     fn start_line(&self) -> usize {
-        self.start_line
-    }
+            self.start_line
+        }
 
     fn start_column(&self) -> usize {
-        self.start_column
-    }
+            self.start_column
+        }
 
     fn end_line(&self) -> usize {
-        self.end_line
-    }
+            self.end_line
+        }
 
     fn end_column(&self) -> usize {
-        self.end_column
-    }
+            self.end_column
+        }
 }
 
 #[derive(Clone)]
@@ -433,76 +399,64 @@ unsafe impl TryConvertOwned for ProcessResult {}
 
 impl ProcessResult {
     fn new(
-        language: String,
-        metrics: FileMetrics,
-        structure: Vec<StructureItem>,
-        imports: Vec<ImportInfo>,
-        exports: Vec<ExportInfo>,
-        comments: Vec<CommentInfo>,
-        docstrings: Vec<DocstringInfo>,
-        symbols: Vec<SymbolInfo>,
-        diagnostics: Vec<Diagnostic>,
-        chunks: Vec<CodeChunk>,
-        extractions: String,
-    ) -> Self {
-        Self {
-            language,
-            metrics,
-            structure,
-            imports,
-            exports,
-            comments,
-            docstrings,
-            symbols,
-            diagnostics,
-            chunks,
-            extractions,
+            language: String,
+            metrics: FileMetrics,
+            structure: Vec<StructureItem>,
+            imports: Vec<ImportInfo>,
+            exports: Vec<ExportInfo>,
+            comments: Vec<CommentInfo>,
+            docstrings: Vec<DocstringInfo>,
+            symbols: Vec<SymbolInfo>,
+            diagnostics: Vec<Diagnostic>,
+            chunks: Vec<CodeChunk>,
+            extractions: String,
+        ) -> Self {
+            Self { language, metrics, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunks, extractions }
         }
-    }
 
     fn language(&self) -> String {
-        self.language.clone()
-    }
+            self.language.clone()
+        }
 
     fn metrics(&self) -> FileMetrics {
-        self.metrics.clone()
-    }
+            self.metrics.clone()
+        }
 
     fn structure(&self) -> Vec<StructureItem> {
-        self.structure.clone()
-    }
+            self.structure.clone()
+        }
 
     fn imports(&self) -> Vec<ImportInfo> {
-        self.imports.clone()
-    }
+            self.imports.clone()
+        }
 
     fn exports(&self) -> Vec<ExportInfo> {
-        self.exports.clone()
-    }
+            self.exports.clone()
+        }
 
     fn comments(&self) -> Vec<CommentInfo> {
-        self.comments.clone()
-    }
+            self.comments.clone()
+        }
 
     fn docstrings(&self) -> Vec<DocstringInfo> {
-        self.docstrings.clone()
-    }
+            self.docstrings.clone()
+        }
 
     fn symbols(&self) -> Vec<SymbolInfo> {
-        self.symbols.clone()
-    }
+            self.symbols.clone()
+        }
 
     fn diagnostics(&self) -> Vec<Diagnostic> {
-        self.diagnostics.clone()
-    }
+            self.diagnostics.clone()
+        }
 
     fn chunks(&self) -> Vec<CodeChunk> {
-        self.chunks.clone()
-    }
+            self.chunks.clone()
+        }
 
     fn extractions(&self) -> String {
-        self.extractions.clone()
-    }
+            self.extractions.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -530,58 +484,49 @@ unsafe impl TryConvertOwned for FileMetrics {}
 
 impl FileMetrics {
     fn new(
-        total_lines: usize,
-        code_lines: usize,
-        comment_lines: usize,
-        blank_lines: usize,
-        total_bytes: usize,
-        node_count: usize,
-        error_count: usize,
-        max_depth: usize,
-    ) -> Self {
-        Self {
-            total_lines,
-            code_lines,
-            comment_lines,
-            blank_lines,
-            total_bytes,
-            node_count,
-            error_count,
-            max_depth,
+            total_lines: usize,
+            code_lines: usize,
+            comment_lines: usize,
+            blank_lines: usize,
+            total_bytes: usize,
+            node_count: usize,
+            error_count: usize,
+            max_depth: usize,
+        ) -> Self {
+            Self { total_lines, code_lines, comment_lines, blank_lines, total_bytes, node_count, error_count, max_depth }
         }
-    }
 
     fn total_lines(&self) -> usize {
-        self.total_lines
-    }
+            self.total_lines
+        }
 
     fn code_lines(&self) -> usize {
-        self.code_lines
-    }
+            self.code_lines
+        }
 
     fn comment_lines(&self) -> usize {
-        self.comment_lines
-    }
+            self.comment_lines
+        }
 
     fn blank_lines(&self) -> usize {
-        self.blank_lines
-    }
+            self.blank_lines
+        }
 
     fn total_bytes(&self) -> usize {
-        self.total_bytes
-    }
+            self.total_bytes
+        }
 
     fn node_count(&self) -> usize {
-        self.node_count
-    }
+            self.node_count
+        }
 
     fn error_count(&self) -> usize {
-        self.error_count
-    }
+            self.error_count
+        }
 
     fn max_depth(&self) -> usize {
-        self.max_depth
-    }
+            self.max_depth
+        }
 }
 
 #[derive(Clone)]
@@ -610,64 +555,54 @@ unsafe impl TryConvertOwned for StructureItem {}
 
 impl StructureItem {
     fn new(
-        kind: StructureKind,
-        span: Span,
-        children: Vec<StructureItem>,
-        decorators: Vec<String>,
-        name: Option<String>,
-        visibility: Option<String>,
-        doc_comment: Option<String>,
-        signature: Option<String>,
-        body_span: Option<Span>,
-    ) -> Self {
-        Self {
-            kind,
-            name,
-            visibility,
-            span,
-            children,
-            decorators,
-            doc_comment,
-            signature,
-            body_span,
+            kind: StructureKind,
+            span: Span,
+            children: Vec<StructureItem>,
+            decorators: Vec<String>,
+            name: Option<String>,
+            visibility: Option<String>,
+            doc_comment: Option<String>,
+            signature: Option<String>,
+            body_span: Option<Span>,
+        ) -> Self {
+            Self { kind, name, visibility, span, children, decorators, doc_comment, signature, body_span }
         }
-    }
 
     fn kind(&self) -> StructureKind {
-        self.kind.clone()
-    }
+            self.kind.clone()
+        }
 
     fn name(&self) -> Option<String> {
-        self.name.clone()
-    }
+            self.name.clone()
+        }
 
     fn visibility(&self) -> Option<String> {
-        self.visibility.clone()
-    }
+            self.visibility.clone()
+        }
 
     fn span(&self) -> Span {
-        self.span.clone()
-    }
+            self.span.clone()
+        }
 
     fn children(&self) -> Vec<StructureItem> {
-        self.children.clone()
-    }
+            self.children.clone()
+        }
 
     fn decorators(&self) -> Vec<String> {
-        self.decorators.clone()
-    }
+            self.decorators.clone()
+        }
 
     fn doc_comment(&self) -> Option<String> {
-        self.doc_comment.clone()
-    }
+            self.doc_comment.clone()
+        }
 
     fn signature(&self) -> Option<String> {
-        self.signature.clone()
-    }
+            self.signature.clone()
+        }
 
     fn body_span(&self) -> Option<Span> {
-        self.body_span.clone()
-    }
+            self.body_span.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -691,29 +626,24 @@ unsafe impl TryConvertOwned for CommentInfo {}
 
 impl CommentInfo {
     fn new(text: String, kind: CommentKind, span: Span, associated_node: Option<String>) -> Self {
-        Self {
-            text,
-            kind,
-            span,
-            associated_node,
+            Self { text, kind, span, associated_node }
         }
-    }
 
     fn text(&self) -> String {
-        self.text.clone()
-    }
+            self.text.clone()
+        }
 
     fn kind(&self) -> CommentKind {
-        self.kind.clone()
-    }
+            self.kind.clone()
+        }
 
     fn span(&self) -> Span {
-        self.span.clone()
-    }
+            self.span.clone()
+        }
 
     fn associated_node(&self) -> Option<String> {
-        self.associated_node.clone()
-    }
+            self.associated_node.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -738,40 +668,34 @@ unsafe impl TryConvertOwned for DocstringInfo {}
 
 impl DocstringInfo {
     fn new(
-        text: String,
-        format: DocstringFormat,
-        span: Span,
-        parsed_sections: Vec<DocSection>,
-        associated_item: Option<String>,
-    ) -> Self {
-        Self {
-            text,
-            format,
-            span,
-            associated_item,
-            parsed_sections,
+            text: String,
+            format: DocstringFormat,
+            span: Span,
+            parsed_sections: Vec<DocSection>,
+            associated_item: Option<String>,
+        ) -> Self {
+            Self { text, format, span, associated_item, parsed_sections }
         }
-    }
 
     fn text(&self) -> String {
-        self.text.clone()
-    }
+            self.text.clone()
+        }
 
     fn format(&self) -> DocstringFormat {
-        self.format.clone()
-    }
+            self.format.clone()
+        }
 
     fn span(&self) -> Span {
-        self.span.clone()
-    }
+            self.span.clone()
+        }
 
     fn associated_item(&self) -> Option<String> {
-        self.associated_item.clone()
-    }
+            self.associated_item.clone()
+        }
 
     fn parsed_sections(&self) -> Vec<DocSection> {
-        self.parsed_sections.clone()
-    }
+            self.parsed_sections.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -794,24 +718,20 @@ unsafe impl TryConvertOwned for DocSection {}
 
 impl DocSection {
     fn new(kind: String, description: String, name: Option<String>) -> Self {
-        Self {
-            kind,
-            name,
-            description,
+            Self { kind, name, description }
         }
-    }
 
     fn kind(&self) -> String {
-        self.kind.clone()
-    }
+            self.kind.clone()
+        }
 
     fn name(&self) -> Option<String> {
-        self.name.clone()
-    }
+            self.name.clone()
+        }
 
     fn description(&self) -> String {
-        self.description.clone()
-    }
+            self.description.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -836,34 +756,28 @@ unsafe impl TryConvertOwned for ImportInfo {}
 
 impl ImportInfo {
     fn new(source: String, items: Vec<String>, is_wildcard: bool, span: Span, alias: Option<String>) -> Self {
-        Self {
-            source,
-            items,
-            alias,
-            is_wildcard,
-            span,
+            Self { source, items, alias, is_wildcard, span }
         }
-    }
 
     fn source(&self) -> String {
-        self.source.clone()
-    }
+            self.source.clone()
+        }
 
     fn items(&self) -> Vec<String> {
-        self.items.clone()
-    }
+            self.items.clone()
+        }
 
     fn alias(&self) -> Option<String> {
-        self.alias.clone()
-    }
+            self.alias.clone()
+        }
 
     fn is_wildcard(&self) -> bool {
-        self.is_wildcard
-    }
+            self.is_wildcard
+        }
 
     fn span(&self) -> Span {
-        self.span.clone()
-    }
+            self.span.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -886,20 +800,20 @@ unsafe impl TryConvertOwned for ExportInfo {}
 
 impl ExportInfo {
     fn new(name: String, kind: ExportKind, span: Span) -> Self {
-        Self { name, kind, span }
-    }
+            Self { name, kind, span }
+        }
 
     fn name(&self) -> String {
-        self.name.clone()
-    }
+            self.name.clone()
+        }
 
     fn kind(&self) -> ExportKind {
-        self.kind.clone()
-    }
+            self.kind.clone()
+        }
 
     fn span(&self) -> Span {
-        self.span.clone()
-    }
+            self.span.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -924,34 +838,28 @@ unsafe impl TryConvertOwned for SymbolInfo {}
 
 impl SymbolInfo {
     fn new(name: String, kind: SymbolKind, span: Span, type_annotation: Option<String>, doc: Option<String>) -> Self {
-        Self {
-            name,
-            kind,
-            span,
-            type_annotation,
-            doc,
+            Self { name, kind, span, type_annotation, doc }
         }
-    }
 
     fn name(&self) -> String {
-        self.name.clone()
-    }
+            self.name.clone()
+        }
 
     fn kind(&self) -> SymbolKind {
-        self.kind.clone()
-    }
+            self.kind.clone()
+        }
 
     fn span(&self) -> Span {
-        self.span.clone()
-    }
+            self.span.clone()
+        }
 
     fn type_annotation(&self) -> Option<String> {
-        self.type_annotation.clone()
-    }
+            self.type_annotation.clone()
+        }
 
     fn doc(&self) -> Option<String> {
-        self.doc.clone()
-    }
+            self.doc.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -974,24 +882,20 @@ unsafe impl TryConvertOwned for Diagnostic {}
 
 impl Diagnostic {
     fn new(message: String, severity: DiagnosticSeverity, span: Span) -> Self {
-        Self {
-            message,
-            severity,
-            span,
+            Self { message, severity, span }
         }
-    }
 
     fn message(&self) -> String {
-        self.message.clone()
-    }
+            self.message.clone()
+        }
 
     fn severity(&self) -> DiagnosticSeverity {
-        self.severity.clone()
-    }
+            self.severity.clone()
+        }
 
     fn span(&self) -> Span {
-        self.span.clone()
-    }
+            self.span.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -1017,46 +921,39 @@ unsafe impl TryConvertOwned for CodeChunk {}
 
 impl CodeChunk {
     fn new(
-        content: String,
-        start_byte: usize,
-        end_byte: usize,
-        start_line: usize,
-        end_line: usize,
-        metadata: ChunkContext,
-    ) -> Self {
-        Self {
-            content,
-            start_byte,
-            end_byte,
-            start_line,
-            end_line,
-            metadata,
+            content: String,
+            start_byte: usize,
+            end_byte: usize,
+            start_line: usize,
+            end_line: usize,
+            metadata: ChunkContext,
+        ) -> Self {
+            Self { content, start_byte, end_byte, start_line, end_line, metadata }
         }
-    }
 
     fn content(&self) -> String {
-        self.content.clone()
-    }
+            self.content.clone()
+        }
 
     fn start_byte(&self) -> usize {
-        self.start_byte
-    }
+            self.start_byte
+        }
 
     fn end_byte(&self) -> usize {
-        self.end_byte
-    }
+            self.end_byte
+        }
 
     fn start_line(&self) -> usize {
-        self.start_line
-    }
+            self.start_line
+        }
 
     fn end_line(&self) -> usize {
-        self.end_line
-    }
+            self.end_line
+        }
 
     fn metadata(&self) -> ChunkContext {
-        self.metadata.clone()
-    }
+            self.metadata.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -1085,64 +982,54 @@ unsafe impl TryConvertOwned for ChunkContext {}
 
 impl ChunkContext {
     fn new(
-        language: String,
-        chunk_index: usize,
-        total_chunks: usize,
-        node_types: Vec<String>,
-        context_path: Vec<String>,
-        symbols_defined: Vec<String>,
-        comments: Vec<CommentInfo>,
-        docstrings: Vec<DocstringInfo>,
-        has_error_nodes: bool,
-    ) -> Self {
-        Self {
-            language,
-            chunk_index,
-            total_chunks,
-            node_types,
-            context_path,
-            symbols_defined,
-            comments,
-            docstrings,
-            has_error_nodes,
+            language: String,
+            chunk_index: usize,
+            total_chunks: usize,
+            node_types: Vec<String>,
+            context_path: Vec<String>,
+            symbols_defined: Vec<String>,
+            comments: Vec<CommentInfo>,
+            docstrings: Vec<DocstringInfo>,
+            has_error_nodes: bool,
+        ) -> Self {
+            Self { language, chunk_index, total_chunks, node_types, context_path, symbols_defined, comments, docstrings, has_error_nodes }
         }
-    }
 
     fn language(&self) -> String {
-        self.language.clone()
-    }
+            self.language.clone()
+        }
 
     fn chunk_index(&self) -> usize {
-        self.chunk_index
-    }
+            self.chunk_index
+        }
 
     fn total_chunks(&self) -> usize {
-        self.total_chunks
-    }
+            self.total_chunks
+        }
 
     fn node_types(&self) -> Vec<String> {
-        self.node_types.clone()
-    }
+            self.node_types.clone()
+        }
 
     fn context_path(&self) -> Vec<String> {
-        self.context_path.clone()
-    }
+            self.context_path.clone()
+        }
 
     fn symbols_defined(&self) -> Vec<String> {
-        self.symbols_defined.clone()
-    }
+            self.symbols_defined.clone()
+        }
 
     fn comments(&self) -> Vec<CommentInfo> {
-        self.comments.clone()
-    }
+            self.comments.clone()
+        }
 
     fn docstrings(&self) -> Vec<DocstringInfo> {
-        self.docstrings.clone()
-    }
+            self.docstrings.clone()
+        }
 
     fn has_error_nodes(&self) -> bool {
-        self.has_error_nodes
-    }
+            self.has_error_nodes
+        }
 }
 
 #[derive(Clone)]
@@ -1173,76 +1060,64 @@ unsafe impl TryConvertOwned for NodeInfo {}
 
 impl NodeInfo {
     fn new(
-        kind: String,
-        is_named: bool,
-        start_byte: usize,
-        end_byte: usize,
-        start_row: usize,
-        start_col: usize,
-        end_row: usize,
-        end_col: usize,
-        named_child_count: usize,
-        is_error: bool,
-        is_missing: bool,
-    ) -> Self {
-        Self {
-            kind,
-            is_named,
-            start_byte,
-            end_byte,
-            start_row,
-            start_col,
-            end_row,
-            end_col,
-            named_child_count,
-            is_error,
-            is_missing,
+            kind: String,
+            is_named: bool,
+            start_byte: usize,
+            end_byte: usize,
+            start_row: usize,
+            start_col: usize,
+            end_row: usize,
+            end_col: usize,
+            named_child_count: usize,
+            is_error: bool,
+            is_missing: bool,
+        ) -> Self {
+            Self { kind, is_named, start_byte, end_byte, start_row, start_col, end_row, end_col, named_child_count, is_error, is_missing }
         }
-    }
 
     fn kind(&self) -> String {
-        self.kind.clone()
-    }
+            self.kind.clone()
+        }
 
     fn is_named(&self) -> bool {
-        self.is_named
-    }
+            self.is_named
+        }
 
     fn start_byte(&self) -> usize {
-        self.start_byte
-    }
+            self.start_byte
+        }
 
     fn end_byte(&self) -> usize {
-        self.end_byte
-    }
+            self.end_byte
+        }
 
     fn start_row(&self) -> usize {
-        self.start_row
-    }
+            self.start_row
+        }
 
     fn start_col(&self) -> usize {
-        self.start_col
-    }
+            self.start_col
+        }
 
     fn end_row(&self) -> usize {
-        self.end_row
-    }
+            self.end_row
+        }
 
     fn end_col(&self) -> usize {
-        self.end_col
-    }
+            self.end_col
+        }
 
     fn named_child_count(&self) -> usize {
-        self.named_child_count
-    }
+            self.named_child_count
+        }
 
     fn is_error(&self) -> bool {
-        self.is_error
-    }
+            self.is_error
+        }
 
     fn is_missing(&self) -> bool {
-        self.is_missing
-    }
+            self.is_missing
+        }
 }
 
 #[derive(Clone)]
@@ -1265,24 +1140,20 @@ unsafe impl TryConvertOwned for PackConfig {}
 
 impl PackConfig {
     fn new(cache_dir: Option<String>, languages: Option<Vec<String>>, groups: Option<Vec<String>>) -> Self {
-        Self {
-            cache_dir,
-            languages,
-            groups,
+            Self { cache_dir, languages, groups }
         }
-    }
 
     fn cache_dir(&self) -> Option<String> {
-        self.cache_dir.clone()
-    }
+            self.cache_dir.clone()
+        }
 
     fn languages(&self) -> Option<Vec<String>> {
-        self.languages.clone()
-    }
+            self.languages.clone()
+        }
 
     fn groups(&self) -> Option<Vec<String>> {
-        self.groups.clone()
-    }
+            self.groups.clone()
+        }
 }
 
 #[derive(Clone)]
@@ -1312,82 +1183,71 @@ unsafe impl TryConvertOwned for ProcessConfig {}
 
 impl ProcessConfig {
     fn new(
-        language: String,
-        structure: bool,
-        imports: bool,
-        exports: bool,
-        comments: bool,
-        docstrings: bool,
-        symbols: bool,
-        diagnostics: bool,
-        chunk_max_size: Option<usize>,
-        extractions: Option<String>,
-    ) -> Self {
-        Self {
-            language,
-            structure,
-            imports,
-            exports,
-            comments,
-            docstrings,
-            symbols,
-            diagnostics,
-            chunk_max_size,
-            extractions,
+            language: String,
+            structure: bool,
+            imports: bool,
+            exports: bool,
+            comments: bool,
+            docstrings: bool,
+            symbols: bool,
+            diagnostics: bool,
+            chunk_max_size: Option<usize>,
+            extractions: Option<String>,
+        ) -> Self {
+            Self { language, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunk_max_size, extractions }
         }
-    }
 
     fn language(&self) -> String {
-        self.language.clone()
-    }
+            self.language.clone()
+        }
 
     fn structure(&self) -> bool {
-        self.structure
-    }
+            self.structure
+        }
 
     fn imports(&self) -> bool {
-        self.imports
-    }
+            self.imports
+        }
 
     fn exports(&self) -> bool {
-        self.exports
-    }
+            self.exports
+        }
 
     fn comments(&self) -> bool {
-        self.comments
-    }
+            self.comments
+        }
 
     fn docstrings(&self) -> bool {
-        self.docstrings
-    }
+            self.docstrings
+        }
 
     fn symbols(&self) -> bool {
-        self.symbols
-    }
+            self.symbols
+        }
 
     fn diagnostics(&self) -> bool {
-        self.diagnostics
-    }
+            self.diagnostics
+        }
 
     fn chunk_max_size(&self) -> Option<usize> {
-        self.chunk_max_size
-    }
+            self.chunk_max_size
+        }
 
     fn extractions(&self) -> Option<String> {
-        self.extractions.clone()
-    }
+            self.extractions.clone()
+        }
 
     fn with_chunking(&self, max_size: usize) -> String {
-        todo!("call into core")
-    }
+            todo!("call into core")
+        }
 
-    fn all(&self) -> String {
-        todo!("call into core")
-    }
+    fn all(&self, ) -> String {
+            todo!("call into core")
+        }
 
-    fn minimal(&self) -> String {
-        todo!("call into core")
-    }
+    fn minimal(&self, ) -> String {
+            todo!("call into core")
+        }
 }
 
 #[derive(Clone)]
@@ -1408,28 +1268,66 @@ unsafe impl TryConvertOwned for LanguageRegistry {}
 
 impl LanguageRegistry {
     fn add_extra_libs_dir(&self, dir: String) -> () {
-        todo!("delegate to self.inner")
-    }
+            todo!("delegate to self.inner")
+        }
 
     fn get_language(&self, name: String) -> Result<Language, Error> {
-        todo!("delegate to self.inner")
-    }
+            todo!("delegate to self.inner")
+        }
 
-    fn available_languages(&self) -> Vec<String> {
-        todo!("delegate to self.inner")
-    }
+    fn available_languages(&self, ) -> Vec<String> {
+            todo!("delegate to self.inner")
+        }
 
     fn has_language(&self, name: String) -> bool {
-        todo!("delegate to self.inner")
-    }
+            todo!("delegate to self.inner")
+        }
 
-    fn language_count(&self) -> usize {
-        todo!("delegate to self.inner")
-    }
+    fn language_count(&self, ) -> usize {
+            todo!("delegate to self.inner")
+        }
 
     fn process(&self, source: String, config: ProcessConfig) -> Result<ProcessResult, Error> {
-        todo!("delegate to self.inner")
+            todo!("delegate to self.inner")
+        }
+}
+
+#[derive(Clone)]
+#[magnus::wrap(class = "Kreuzberg::Language")]
+pub struct Language {
+    inner: std::sync::Arc<tree_sitter_language_pack::Language>,
+}
+
+unsafe impl IntoValueFromNative for Language {}
+
+impl magnus::TryConvert for Language {
+    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
+        let r: &Language = magnus::TryConvert::try_convert(val)?;
+        Ok(r.clone())
     }
+}
+unsafe impl TryConvertOwned for Language {}
+
+impl Language {
+}
+
+#[derive(Clone)]
+#[magnus::wrap(class = "Kreuzberg::Parser")]
+pub struct Parser {
+    inner: std::sync::Arc<tree_sitter_language_pack::Parser>,
+}
+
+unsafe impl IntoValueFromNative for Parser {}
+
+impl magnus::TryConvert for Parser {
+    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
+        let r: &Parser = magnus::TryConvert::try_convert(val)?;
+        Ok(r.clone())
+    }
+}
+unsafe impl TryConvertOwned for Parser {}
+
+impl Parser {
 }
 
 #[derive(Clone)]
@@ -1448,43 +1346,8 @@ impl magnus::TryConvert for Tree {
 }
 unsafe impl TryConvertOwned for Tree {}
 
-impl Tree {}
-
-#[derive(Clone)]
-#[magnus::wrap(class = "Kreuzberg::Language")]
-pub struct Language {
-    inner: std::sync::Arc<tree_sitter_language_pack::Language>,
+impl Tree {
 }
-
-unsafe impl IntoValueFromNative for Language {}
-
-impl magnus::TryConvert for Language {
-    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Language = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
-    }
-}
-unsafe impl TryConvertOwned for Language {}
-
-impl Language {}
-
-#[derive(Clone)]
-#[magnus::wrap(class = "Kreuzberg::Parser")]
-pub struct Parser {
-    inner: std::sync::Arc<tree_sitter_language_pack::Parser>,
-}
-
-unsafe impl IntoValueFromNative for Parser {}
-
-impl magnus::TryConvert for Parser {
-    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Parser = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
-    }
-}
-unsafe impl TryConvertOwned for Parser {}
-
-impl Parser {}
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum CaptureOutput {
@@ -2134,23 +1997,17 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_method("language_count", method!(LanguageRegistry::language_count, 0))?;
     class.define_method("process", method!(LanguageRegistry::process, 2))?;
 
-    let class = module.define_class("Tree", ruby.class_object())?;
-
     let class = module.define_class("Language", ruby.class_object())?;
 
     let class = module.define_class("Parser", ruby.class_object())?;
 
-    module.define_module_function(
-        "detect_language_from_extension",
-        function!(detect_language_from_extension, 1),
-    )?;
+    let class = module.define_class("Tree", ruby.class_object())?;
+
+    module.define_module_function("detect_language_from_extension", function!(detect_language_from_extension, 1))?;
     module.define_module_function("detect_language_from_path", function!(detect_language_from_path, 1))?;
     module.define_module_function("extension_ambiguity", function!(extension_ambiguity, 1))?;
     module.define_module_function("extension_ambiguity_json", function!(extension_ambiguity_json, 1))?;
-    module.define_module_function(
-        "detect_language_from_content",
-        function!(detect_language_from_content, 1),
-    )?;
+    module.define_module_function("detect_language_from_content", function!(detect_language_from_content, 1))?;
     module.define_module_function("validate_extraction", function!(validate_extraction, 1))?;
     module.define_module_function("process", function!(process, 3))?;
     module.define_module_function("node_info_from_node", function!(node_info_from_node, 1))?;

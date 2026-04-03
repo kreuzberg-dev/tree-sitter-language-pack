@@ -1754,17 +1754,6 @@
       "is_trait": false
     },
     {
-      "name": "Tree",
-      "rust_path": "tree_sitter_language_pack::Tree",
-      "fields": [],
-      "methods": [],
-      "is_opaque": true,
-      "is_clone": false,
-      "doc": "",
-      "cfg": null,
-      "is_trait": false
-    },
-    {
       "name": "Language",
       "rust_path": "tree_sitter_language_pack::Language",
       "fields": [],
@@ -1778,6 +1767,17 @@
     {
       "name": "Parser",
       "rust_path": "tree_sitter_language_pack::Parser",
+      "fields": [],
+      "methods": [],
+      "is_opaque": true,
+      "is_clone": false,
+      "doc": "",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
+      "name": "Tree",
+      "rust_path": "tree_sitter_language_pack::Tree",
       "fields": [],
       "methods": [],
       "is_opaque": true,

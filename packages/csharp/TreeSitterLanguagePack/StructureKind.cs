@@ -4,7 +4,7 @@ namespace TreeSitterLanguagePack;
 
 /// <summary>
 /// The kind of structural item found in source code.
-///
+/// 
 /// Categorizes top-level and nested declarations such as functions, classes,
 /// structs, enums, traits, and more. Use [`Other`](StructureKind::Other) for
 /// language-specific constructs that do not fit a standard category.

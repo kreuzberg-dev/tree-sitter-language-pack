@@ -5,6 +5,10 @@
 
 use napi::*;
 use napi_derive::napi;
+use std::collections::HashMap;
+use serde_json;
+use tree_sitter_language_pack;
+use std::sync::Arc;
 
 #[derive(Clone)]
 #[napi(object)]
@@ -314,37 +318,37 @@ pub struct JsLanguageRegistry {
 #[napi]
 impl JsLanguageRegistry {
     #[napi(js_name = "addExtraLibsDir")]
-    pub fn add_extra_libs_dir(&self, _dir: String) -> () {
+    pub fn add_extra_libs_dir(&self, dir: String) -> () {
         todo!("wire up add_extra_libs_dir")
     }
 
     #[napi(js_name = "getLanguage")]
-    pub fn get_language(&self, _name: String) -> Result<JsLanguage> {
+    pub fn get_language(&self, name: String) -> Result<JsLanguage> {
         todo!("wire up get_language")
     }
 
     #[napi(js_name = "availableLanguages")]
-    pub fn available_languages(&self) -> Vec<String> {
+    pub fn available_languages(&self, ) -> Vec<String> {
         todo!("wire up available_languages")
     }
 
     #[napi(js_name = "hasLanguage")]
-    pub fn has_language(&self, _name: String) -> bool {
+    pub fn has_language(&self, name: String) -> bool {
         todo!("wire up has_language")
     }
 
     #[napi(js_name = "languageCount")]
-    pub fn language_count(&self) -> i64 {
+    pub fn language_count(&self, ) -> i64 {
         self.inner.language_count() as i64
     }
 
     #[napi]
-    pub fn process(&self, _source: String, _config: JsProcessConfig) -> Result<JsProcessResult> {
+    pub fn process(&self, source: String, config: JsProcessConfig) -> Result<JsProcessResult> {
         todo!("wire up process")
     }
 
     #[napi(js_name = "withLibsDir")]
-    pub fn with_libs_dir(_libs_dir: String) -> String {
+    pub fn with_libs_dir(libs_dir: String) -> String {
         todo!("call into core")
     }
 
@@ -356,21 +360,13 @@ impl JsLanguageRegistry {
 
 #[derive(Clone)]
 #[napi]
-pub struct JsTree {
-    inner: std::sync::Arc<tree_sitter_language_pack::Tree>,
-}
-
-#[napi]
-impl JsTree {}
-
-#[derive(Clone)]
-#[napi]
 pub struct JsLanguage {
     inner: std::sync::Arc<tree_sitter_language_pack::Language>,
 }
 
 #[napi]
-impl JsLanguage {}
+impl JsLanguage {
+}
 
 #[derive(Clone)]
 #[napi]
@@ -379,7 +375,18 @@ pub struct JsParser {
 }
 
 #[napi]
-impl JsParser {}
+impl JsParser {
+}
+
+#[derive(Clone)]
+#[napi]
+pub struct JsTree {
+    inner: std::sync::Arc<tree_sitter_language_pack::Tree>,
+}
+
+#[napi]
+impl JsTree {
+}
 
 #[napi(string_enum)]
 #[derive(Clone)]
@@ -474,67 +481,67 @@ pub enum JsDiagnosticSeverity {
 }
 
 #[napi(js_name = "detectLanguageFromExtension")]
-pub fn detect_language_from_extension(_ext: String) -> Option<String> {
+pub fn detect_language_from_extension(ext: String) -> Option<String> {
     todo!("call into core")
 }
 
 #[napi(js_name = "detectLanguageFromPath")]
-pub fn detect_language_from_path(_path: String) -> Option<String> {
+pub fn detect_language_from_path(path: String) -> Option<String> {
     todo!("call into core")
 }
 
 #[napi(js_name = "extensionAmbiguity")]
-pub fn extension_ambiguity(_ext: String) -> Option<String> {
+pub fn extension_ambiguity(ext: String) -> Option<String> {
     todo!("call into core")
 }
 
 #[napi(js_name = "extensionAmbiguityJson")]
-pub fn extension_ambiguity_json(_ext: String) -> Option<String> {
+pub fn extension_ambiguity_json(ext: String) -> Option<String> {
     todo!("call into core")
 }
 
 #[napi(js_name = "detectLanguageFromContent")]
-pub fn detect_language_from_content(_content: String) -> Option<String> {
+pub fn detect_language_from_content(content: String) -> Option<String> {
     todo!("call into core")
 }
 
 #[napi(js_name = "validateExtraction")]
-pub fn validate_extraction(_config: JsExtractionConfig) -> Result<JsValidationResult> {
+pub fn validate_extraction(config: JsExtractionConfig) -> Result<JsValidationResult> {
     todo!("call into core")
 }
 
 #[napi(js_name = "nodeInfoFromNode")]
-pub fn node_info_from_node(_node: String) -> JsNodeInfo {
+pub fn node_info_from_node(node: String) -> JsNodeInfo {
     todo!("call into core")
 }
 
 #[napi(js_name = "parseString")]
-pub fn parse_string(_language: String, _source: Vec<u8>) -> Result<JsTree> {
+pub fn parse_string(language: String, source: Vec<u8>) -> Result<JsTree> {
     todo!("call into core")
 }
 
 #[napi(js_name = "getHighlightsQuery")]
-pub fn get_highlights_query(_language: String) -> Option<String> {
+pub fn get_highlights_query(language: String) -> Option<String> {
     todo!("call into core")
 }
 
 #[napi(js_name = "getInjectionsQuery")]
-pub fn get_injections_query(_language: String) -> Option<String> {
+pub fn get_injections_query(language: String) -> Option<String> {
     todo!("call into core")
 }
 
 #[napi(js_name = "getLocalsQuery")]
-pub fn get_locals_query(_language: String) -> Option<String> {
+pub fn get_locals_query(language: String) -> Option<String> {
     todo!("call into core")
 }
 
 #[napi(js_name = "getLanguage")]
-pub fn get_language(_name: String) -> Result<JsLanguage> {
+pub fn get_language(name: String) -> Result<JsLanguage> {
     todo!("call into core")
 }
 
 #[napi(js_name = "getParser")]
-pub fn get_parser(_name: String) -> Result<JsParser> {
+pub fn get_parser(name: String) -> Result<JsParser> {
     todo!("call into core")
 }
 
@@ -544,7 +551,7 @@ pub fn available_languages() -> Vec<String> {
 }
 
 #[napi(js_name = "hasLanguage")]
-pub fn has_language(_name: String) -> bool {
+pub fn has_language(name: String) -> bool {
     todo!("call into core")
 }
 
@@ -554,17 +561,17 @@ pub fn language_count() -> i64 {
 }
 
 #[napi(js_name = "extractPatterns")]
-pub fn extract_patterns(_source: String, _config: JsExtractionConfig) -> Result<JsExtractionResult> {
+pub fn extract_patterns(source: String, config: JsExtractionConfig) -> Result<JsExtractionResult> {
     todo!("call into core")
 }
 
 #[napi]
-pub fn init(_config: JsPackConfig) -> Result<()> {
+pub fn init(config: JsPackConfig) -> Result<()> {
     todo!("call into core")
 }
 
 #[napi]
-pub fn configure(_config: JsPackConfig) -> Result<()> {
+pub fn configure(config: JsPackConfig) -> Result<()> {
     todo!("call into core")
 }
 

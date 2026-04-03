@@ -4,7 +4,7 @@ namespace TreeSitterLanguagePack;
 
 /// <summary>
 /// The format of a docstring extracted from source code.
-///
+/// 
 /// Identifies the docstring convention used, which varies by language
 /// (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 /// </summary>

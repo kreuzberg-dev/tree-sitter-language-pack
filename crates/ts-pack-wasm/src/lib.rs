@@ -3,10 +3,10 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::missing_errors_doc)]
 
-use std::collections::HashMap;
-use std::sync::Arc;
-use tree_sitter_language_pack;
 use wasm_bindgen::prelude::*;
+use std::collections::HashMap;
+use tree_sitter_language_pack;
+use std::sync::Arc;
 
 #[derive(Clone)]
 #[wasm_bindgen]
@@ -18,23 +18,18 @@ pub struct JsExtractionPattern {
     byte_range: Option<String>,
 }
 
+
 #[wasm_bindgen]
 impl JsExtractionPattern {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        query: String,
-        capture_output: JsCaptureOutput,
-        child_fields: Vec<String>,
-        max_results: Option<usize>,
-        byte_range: Option<String>,
-    ) -> JsExtractionPattern {
-        JsExtractionPattern {
-            query,
-            capture_output,
-            child_fields,
-            max_results,
-            byte_range,
-        }
+            query: String,
+            capture_output: JsCaptureOutput,
+            child_fields: Vec<String>,
+            max_results: Option<usize>,
+            byte_range: Option<String>,
+        ) -> JsExtractionPattern {
+        JsExtractionPattern { query, capture_output, child_fields, max_results, byte_range }
     }
 
     #[wasm_bindgen(getter)]
@@ -95,6 +90,7 @@ pub struct JsExtractionConfig {
     patterns: String,
 }
 
+
 #[wasm_bindgen]
 impl JsExtractionConfig {
     #[wasm_bindgen(constructor)]
@@ -133,23 +129,18 @@ pub struct JsCaptureResult {
     start_byte: usize,
 }
 
+
 #[wasm_bindgen]
 impl JsCaptureResult {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        name: String,
-        child_fields: String,
-        start_byte: usize,
-        node: Option<JsNodeInfo>,
-        text: Option<String>,
-    ) -> JsCaptureResult {
-        JsCaptureResult {
-            name,
-            node,
-            text,
-            child_fields,
-            start_byte,
-        }
+            name: String,
+            child_fields: String,
+            start_byte: usize,
+            node: Option<JsNodeInfo>,
+            text: Option<String>,
+        ) -> JsCaptureResult {
+        JsCaptureResult { name, node, text, child_fields, start_byte }
     }
 
     #[wasm_bindgen(getter)]
@@ -210,14 +201,12 @@ pub struct JsMatchResult {
     captures: Vec<JsCaptureResult>,
 }
 
+
 #[wasm_bindgen]
 impl JsMatchResult {
     #[wasm_bindgen(constructor)]
     pub fn new(pattern_index: usize, captures: Vec<JsCaptureResult>) -> JsMatchResult {
-        JsMatchResult {
-            pattern_index,
-            captures,
-        }
+        JsMatchResult { pattern_index, captures }
     }
 
     #[wasm_bindgen(getter, js_name = "patternIndex")]
@@ -247,6 +236,7 @@ pub struct JsPatternResult {
     matches: Vec<JsMatchResult>,
     total_count: usize,
 }
+
 
 #[wasm_bindgen]
 impl JsPatternResult {
@@ -282,6 +272,7 @@ pub struct JsExtractionResult {
     language: String,
     results: String,
 }
+
 
 #[wasm_bindgen]
 impl JsExtractionResult {
@@ -321,23 +312,18 @@ pub struct JsPatternValidation {
     errors: Vec<String>,
 }
 
+
 #[wasm_bindgen]
 impl JsPatternValidation {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        valid: bool,
-        capture_names: Vec<String>,
-        pattern_count: usize,
-        warnings: Vec<String>,
-        errors: Vec<String>,
-    ) -> JsPatternValidation {
-        JsPatternValidation {
-            valid,
-            capture_names,
-            pattern_count,
-            warnings,
-            errors,
-        }
+            valid: bool,
+            capture_names: Vec<String>,
+            pattern_count: usize,
+            warnings: Vec<String>,
+            errors: Vec<String>,
+        ) -> JsPatternValidation {
+        JsPatternValidation { valid, capture_names, pattern_count, warnings, errors }
     }
 
     #[wasm_bindgen(getter)]
@@ -398,6 +384,7 @@ pub struct JsValidationResult {
     patterns: String,
 }
 
+
 #[wasm_bindgen]
 impl JsValidationResult {
     #[wasm_bindgen(constructor)]
@@ -437,25 +424,19 @@ pub struct JsSpan {
     end_column: usize,
 }
 
+
 #[wasm_bindgen]
 impl JsSpan {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        start_byte: usize,
-        end_byte: usize,
-        start_line: usize,
-        start_column: usize,
-        end_line: usize,
-        end_column: usize,
-    ) -> JsSpan {
-        JsSpan {
-            start_byte,
-            end_byte,
-            start_line,
-            start_column,
-            end_line,
-            end_column,
-        }
+            start_byte: usize,
+            end_byte: usize,
+            start_line: usize,
+            start_column: usize,
+            end_line: usize,
+            end_column: usize,
+        ) -> JsSpan {
+        JsSpan { start_byte, end_byte, start_line, start_column, end_line, end_column }
     }
 
     #[wasm_bindgen(getter, js_name = "startByte")]
@@ -535,35 +516,24 @@ pub struct JsProcessResult {
     extractions: String,
 }
 
+
 #[wasm_bindgen]
 impl JsProcessResult {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        language: String,
-        metrics: JsFileMetrics,
-        structure: Vec<JsStructureItem>,
-        imports: Vec<JsImportInfo>,
-        exports: Vec<JsExportInfo>,
-        comments: Vec<JsCommentInfo>,
-        docstrings: Vec<JsDocstringInfo>,
-        symbols: Vec<JsSymbolInfo>,
-        diagnostics: Vec<JsDiagnostic>,
-        chunks: Vec<JsCodeChunk>,
-        extractions: String,
-    ) -> JsProcessResult {
-        JsProcessResult {
-            language,
-            metrics,
-            structure,
-            imports,
-            exports,
-            comments,
-            docstrings,
-            symbols,
-            diagnostics,
-            chunks,
-            extractions,
-        }
+            language: String,
+            metrics: JsFileMetrics,
+            structure: Vec<JsStructureItem>,
+            imports: Vec<JsImportInfo>,
+            exports: Vec<JsExportInfo>,
+            comments: Vec<JsCommentInfo>,
+            docstrings: Vec<JsDocstringInfo>,
+            symbols: Vec<JsSymbolInfo>,
+            diagnostics: Vec<JsDiagnostic>,
+            chunks: Vec<JsCodeChunk>,
+            extractions: String,
+        ) -> JsProcessResult {
+        JsProcessResult { language, metrics, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunks, extractions }
     }
 
     #[wasm_bindgen(getter)]
@@ -690,29 +660,21 @@ pub struct JsFileMetrics {
     max_depth: usize,
 }
 
+
 #[wasm_bindgen]
 impl JsFileMetrics {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        total_lines: usize,
-        code_lines: usize,
-        comment_lines: usize,
-        blank_lines: usize,
-        total_bytes: usize,
-        node_count: usize,
-        error_count: usize,
-        max_depth: usize,
-    ) -> JsFileMetrics {
-        JsFileMetrics {
-            total_lines,
-            code_lines,
-            comment_lines,
-            blank_lines,
-            total_bytes,
-            node_count,
-            error_count,
-            max_depth,
-        }
+            total_lines: usize,
+            code_lines: usize,
+            comment_lines: usize,
+            blank_lines: usize,
+            total_bytes: usize,
+            node_count: usize,
+            error_count: usize,
+            max_depth: usize,
+        ) -> JsFileMetrics {
+        JsFileMetrics { total_lines, code_lines, comment_lines, blank_lines, total_bytes, node_count, error_count, max_depth }
     }
 
     #[wasm_bindgen(getter, js_name = "totalLines")]
@@ -810,31 +772,22 @@ pub struct JsStructureItem {
     body_span: Option<JsSpan>,
 }
 
+
 #[wasm_bindgen]
 impl JsStructureItem {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        kind: JsStructureKind,
-        span: JsSpan,
-        children: Vec<JsStructureItem>,
-        decorators: Vec<String>,
-        name: Option<String>,
-        visibility: Option<String>,
-        doc_comment: Option<String>,
-        signature: Option<String>,
-        body_span: Option<JsSpan>,
-    ) -> JsStructureItem {
-        JsStructureItem {
-            kind,
-            name,
-            visibility,
-            span,
-            children,
-            decorators,
-            doc_comment,
-            signature,
-            body_span,
-        }
+            kind: JsStructureKind,
+            span: JsSpan,
+            children: Vec<JsStructureItem>,
+            decorators: Vec<String>,
+            name: Option<String>,
+            visibility: Option<String>,
+            doc_comment: Option<String>,
+            signature: Option<String>,
+            body_span: Option<JsSpan>,
+        ) -> JsStructureItem {
+        JsStructureItem { kind, name, visibility, span, children, decorators, doc_comment, signature, body_span }
     }
 
     #[wasm_bindgen(getter)]
@@ -937,16 +890,12 @@ pub struct JsCommentInfo {
     associated_node: Option<String>,
 }
 
+
 #[wasm_bindgen]
 impl JsCommentInfo {
     #[wasm_bindgen(constructor)]
     pub fn new(text: String, kind: JsCommentKind, span: JsSpan, associated_node: Option<String>) -> JsCommentInfo {
-        JsCommentInfo {
-            text,
-            kind,
-            span,
-            associated_node,
-        }
+        JsCommentInfo { text, kind, span, associated_node }
     }
 
     #[wasm_bindgen(getter)]
@@ -1000,23 +949,18 @@ pub struct JsDocstringInfo {
     parsed_sections: Vec<JsDocSection>,
 }
 
+
 #[wasm_bindgen]
 impl JsDocstringInfo {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        text: String,
-        format: JsDocstringFormat,
-        span: JsSpan,
-        parsed_sections: Vec<JsDocSection>,
-        associated_item: Option<String>,
-    ) -> JsDocstringInfo {
-        JsDocstringInfo {
-            text,
-            format,
-            span,
-            associated_item,
-            parsed_sections,
-        }
+            text: String,
+            format: JsDocstringFormat,
+            span: JsSpan,
+            parsed_sections: Vec<JsDocSection>,
+            associated_item: Option<String>,
+        ) -> JsDocstringInfo {
+        JsDocstringInfo { text, format, span, associated_item, parsed_sections }
     }
 
     #[wasm_bindgen(getter)]
@@ -1078,15 +1022,12 @@ pub struct JsDocSection {
     description: String,
 }
 
+
 #[wasm_bindgen]
 impl JsDocSection {
     #[wasm_bindgen(constructor)]
     pub fn new(kind: String, description: String, name: Option<String>) -> JsDocSection {
-        JsDocSection {
-            kind,
-            name,
-            description,
-        }
+        JsDocSection { kind, name, description }
     }
 
     #[wasm_bindgen(getter)]
@@ -1130,23 +1071,12 @@ pub struct JsImportInfo {
     span: JsSpan,
 }
 
+
 #[wasm_bindgen]
 impl JsImportInfo {
     #[wasm_bindgen(constructor)]
-    pub fn new(
-        source: String,
-        items: Vec<String>,
-        is_wildcard: bool,
-        span: JsSpan,
-        alias: Option<String>,
-    ) -> JsImportInfo {
-        JsImportInfo {
-            source,
-            items,
-            alias,
-            is_wildcard,
-            span,
-        }
+    pub fn new(source: String, items: Vec<String>, is_wildcard: bool, span: JsSpan, alias: Option<String>) -> JsImportInfo {
+        JsImportInfo { source, items, alias, is_wildcard, span }
     }
 
     #[wasm_bindgen(getter)]
@@ -1208,6 +1138,7 @@ pub struct JsExportInfo {
     span: JsSpan,
 }
 
+
 #[wasm_bindgen]
 impl JsExportInfo {
     #[wasm_bindgen(constructor)]
@@ -1256,23 +1187,12 @@ pub struct JsSymbolInfo {
     doc: Option<String>,
 }
 
+
 #[wasm_bindgen]
 impl JsSymbolInfo {
     #[wasm_bindgen(constructor)]
-    pub fn new(
-        name: String,
-        kind: JsSymbolKind,
-        span: JsSpan,
-        type_annotation: Option<String>,
-        doc: Option<String>,
-    ) -> JsSymbolInfo {
-        JsSymbolInfo {
-            name,
-            kind,
-            span,
-            type_annotation,
-            doc,
-        }
+    pub fn new(name: String, kind: JsSymbolKind, span: JsSpan, type_annotation: Option<String>, doc: Option<String>) -> JsSymbolInfo {
+        JsSymbolInfo { name, kind, span, type_annotation, doc }
     }
 
     #[wasm_bindgen(getter)]
@@ -1334,15 +1254,12 @@ pub struct JsDiagnostic {
     span: JsSpan,
 }
 
+
 #[wasm_bindgen]
 impl JsDiagnostic {
     #[wasm_bindgen(constructor)]
     pub fn new(message: String, severity: JsDiagnosticSeverity, span: JsSpan) -> JsDiagnostic {
-        JsDiagnostic {
-            message,
-            severity,
-            span,
-        }
+        JsDiagnostic { message, severity, span }
     }
 
     #[wasm_bindgen(getter)]
@@ -1387,25 +1304,19 @@ pub struct JsCodeChunk {
     metadata: JsChunkContext,
 }
 
+
 #[wasm_bindgen]
 impl JsCodeChunk {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        content: String,
-        start_byte: usize,
-        end_byte: usize,
-        start_line: usize,
-        end_line: usize,
-        metadata: JsChunkContext,
-    ) -> JsCodeChunk {
-        JsCodeChunk {
-            content,
-            start_byte,
-            end_byte,
-            start_line,
-            end_line,
-            metadata,
-        }
+            content: String,
+            start_byte: usize,
+            end_byte: usize,
+            start_line: usize,
+            end_line: usize,
+            metadata: JsChunkContext,
+        ) -> JsCodeChunk {
+        JsCodeChunk { content, start_byte, end_byte, start_line, end_line, metadata }
     }
 
     #[wasm_bindgen(getter)]
@@ -1483,31 +1394,22 @@ pub struct JsChunkContext {
     has_error_nodes: bool,
 }
 
+
 #[wasm_bindgen]
 impl JsChunkContext {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        language: String,
-        chunk_index: usize,
-        total_chunks: usize,
-        node_types: Vec<String>,
-        context_path: Vec<String>,
-        symbols_defined: Vec<String>,
-        comments: Vec<JsCommentInfo>,
-        docstrings: Vec<JsDocstringInfo>,
-        has_error_nodes: bool,
-    ) -> JsChunkContext {
-        JsChunkContext {
-            language,
-            chunk_index,
-            total_chunks,
-            node_types,
-            context_path,
-            symbols_defined,
-            comments,
-            docstrings,
-            has_error_nodes,
-        }
+            language: String,
+            chunk_index: usize,
+            total_chunks: usize,
+            node_types: Vec<String>,
+            context_path: Vec<String>,
+            symbols_defined: Vec<String>,
+            comments: Vec<JsCommentInfo>,
+            docstrings: Vec<JsDocstringInfo>,
+            has_error_nodes: bool,
+        ) -> JsChunkContext {
+        JsChunkContext { language, chunk_index, total_chunks, node_types, context_path, symbols_defined, comments, docstrings, has_error_nodes }
     }
 
     #[wasm_bindgen(getter)]
@@ -1617,35 +1519,24 @@ pub struct JsNodeInfo {
     is_missing: bool,
 }
 
+
 #[wasm_bindgen]
 impl JsNodeInfo {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        kind: String,
-        is_named: bool,
-        start_byte: usize,
-        end_byte: usize,
-        start_row: usize,
-        start_col: usize,
-        end_row: usize,
-        end_col: usize,
-        named_child_count: usize,
-        is_error: bool,
-        is_missing: bool,
-    ) -> JsNodeInfo {
-        JsNodeInfo {
-            kind,
-            is_named,
-            start_byte,
-            end_byte,
-            start_row,
-            start_col,
-            end_row,
-            end_col,
-            named_child_count,
-            is_error,
-            is_missing,
-        }
+            kind: String,
+            is_named: bool,
+            start_byte: usize,
+            end_byte: usize,
+            start_row: usize,
+            start_col: usize,
+            end_row: usize,
+            end_col: usize,
+            named_child_count: usize,
+            is_error: bool,
+            is_missing: bool,
+        ) -> JsNodeInfo {
+        JsNodeInfo { kind, is_named, start_byte, end_byte, start_row, start_col, end_row, end_col, named_child_count, is_error, is_missing }
     }
 
     #[wasm_bindgen(getter)]
@@ -1767,15 +1658,12 @@ pub struct JsPackConfig {
     groups: Option<Vec<String>>,
 }
 
+
 #[wasm_bindgen]
 impl JsPackConfig {
     #[wasm_bindgen(constructor)]
     pub fn new(cache_dir: Option<String>, languages: Option<Vec<String>>, groups: Option<Vec<String>>) -> JsPackConfig {
-        JsPackConfig {
-            cache_dir,
-            languages,
-            groups,
-        }
+        JsPackConfig { cache_dir, languages, groups }
     }
 
     #[wasm_bindgen(getter, js_name = "cacheDir")]
@@ -1834,33 +1722,23 @@ pub struct JsProcessConfig {
     extractions: Option<String>,
 }
 
+
 #[wasm_bindgen]
 impl JsProcessConfig {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        language: String,
-        structure: bool,
-        imports: bool,
-        exports: bool,
-        comments: bool,
-        docstrings: bool,
-        symbols: bool,
-        diagnostics: bool,
-        chunk_max_size: Option<usize>,
-        extractions: Option<String>,
-    ) -> JsProcessConfig {
-        JsProcessConfig {
-            language,
-            structure,
-            imports,
-            exports,
-            comments,
-            docstrings,
-            symbols,
-            diagnostics,
-            chunk_max_size,
-            extractions,
-        }
+            language: String,
+            structure: bool,
+            imports: bool,
+            exports: bool,
+            comments: bool,
+            docstrings: bool,
+            symbols: bool,
+            diagnostics: bool,
+            chunk_max_size: Option<usize>,
+            extractions: Option<String>,
+        ) -> JsProcessConfig {
+        JsProcessConfig { language, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunk_max_size, extractions }
     }
 
     #[wasm_bindgen(getter)]
@@ -1974,12 +1852,12 @@ impl JsProcessConfig {
     }
 
     #[wasm_bindgen]
-    pub fn all(&self) -> String {
+    pub fn all(&self, ) -> String {
         todo!("call into core implementation")
     }
 
     #[wasm_bindgen]
-    pub fn minimal(&self) -> String {
+    pub fn minimal(&self, ) -> String {
         todo!("call into core implementation")
     }
 }
@@ -2008,7 +1886,7 @@ impl JsLanguageRegistry {
     }
 
     #[wasm_bindgen(js_name = "availableLanguages")]
-    pub fn available_languages(&self) -> Vec<String> {
+    pub fn available_languages(&self, ) -> Vec<String> {
         todo!("wire up available_languages")
     }
 
@@ -2018,7 +1896,7 @@ impl JsLanguageRegistry {
     }
 
     #[wasm_bindgen(js_name = "languageCount")]
-    pub fn language_count(&self) -> usize {
+    pub fn language_count(&self, ) -> usize {
         self.inner.language_count()
     }
 
@@ -2028,9 +1906,29 @@ impl JsLanguageRegistry {
     }
 
     #[wasm_bindgen]
-    pub fn default(&self) -> String {
+    pub fn default(&self, ) -> String {
         todo!("wire up default")
     }
+}
+
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct JsLanguage {
+    inner: std::sync::Arc<tree_sitter_language_pack::Language>,
+}
+
+#[wasm_bindgen]
+impl JsLanguage {
+}
+
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct JsParser {
+    inner: std::sync::Arc<tree_sitter_language_pack::Parser>,
+}
+
+#[wasm_bindgen]
+impl JsParser {
 }
 
 #[derive(Clone)]
@@ -2040,25 +1938,8 @@ pub struct JsTree {
 }
 
 #[wasm_bindgen]
-impl JsTree {}
-
-#[derive(Clone)]
-#[wasm_bindgen]
-pub struct JsLanguage {
-    inner: std::sync::Arc<tree_sitter_language_pack::Language>,
+impl JsTree {
 }
-
-#[wasm_bindgen]
-impl JsLanguage {}
-
-#[derive(Clone)]
-#[wasm_bindgen]
-pub struct JsParser {
-    inner: std::sync::Arc<tree_sitter_language_pack::Parser>,
-}
-
-#[wasm_bindgen]
-impl JsParser {}
 
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -2183,11 +2064,7 @@ pub fn validate_extraction(config: JsExtractionConfig) -> Result<JsValidationRes
 }
 
 #[wasm_bindgen]
-pub fn process(
-    source: String,
-    config: JsProcessConfig,
-    registry: JsLanguageRegistry,
-) -> Result<JsProcessResult, JsValue> {
+pub fn process(source: String, config: JsProcessConfig, registry: JsLanguageRegistry) -> Result<JsProcessResult, JsValue> {
     todo!("call into core implementation")
 }
 
@@ -2252,12 +2129,7 @@ pub fn get_locals_query(language: String) -> Option<String> {
 }
 
 #[wasm_bindgen(js_name = "runQuery")]
-pub fn run_query(
-    tree: JsTree,
-    language: String,
-    query_source: String,
-    source: Vec<u8>,
-) -> Result<Vec<String>, JsValue> {
+pub fn run_query(tree: JsTree, language: String, query_source: String, source: Vec<u8>) -> Result<Vec<String>, JsValue> {
     todo!("call into core implementation")
 }
 

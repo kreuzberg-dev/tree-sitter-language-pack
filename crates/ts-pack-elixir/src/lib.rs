@@ -262,13 +262,6 @@ pub struct LanguageRegistry {
 impl rustler::Resource for LanguageRegistry {}
 
 #[derive(Clone)]
-pub struct Tree {
-    inner: std::sync::Arc<tree_sitter_language_pack::Tree>,
-}
-
-impl rustler::Resource for Tree {}
-
-#[derive(Clone)]
 pub struct Language {
     inner: std::sync::Arc<tree_sitter_language_pack::Language>,
 }
@@ -281,6 +274,13 @@ pub struct Parser {
 }
 
 impl rustler::Resource for Parser {}
+
+#[derive(Clone)]
+pub struct Tree {
+    inner: std::sync::Arc<tree_sitter_language_pack::Tree>,
+}
+
+impl rustler::Resource for Tree {}
 
 #[derive(Debug, Clone, Copy, rustler::NifUnitEnum)]
 pub enum Error {

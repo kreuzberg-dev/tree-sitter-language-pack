@@ -149,4 +149,9 @@ final class NativeLib {
         LIB.find("tslp_cache_dir").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS)
     );
+
+    static final MethodHandle TSLP_FREE_STRING = LINKER.downcallHandle(
+        LIB.find("tslp_free_string").orElseThrow(),
+        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
+    );
 }

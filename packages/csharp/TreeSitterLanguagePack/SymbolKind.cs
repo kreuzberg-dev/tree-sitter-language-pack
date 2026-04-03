@@ -4,7 +4,7 @@ namespace TreeSitterLanguagePack;
 
 /// <summary>
 /// The kind of a symbol definition found in source code.
-///
+/// 
 /// Categorizes symbol definitions such as variables, constants, functions,
 /// classes, types, interfaces, enums, and modules.
 /// </summary>

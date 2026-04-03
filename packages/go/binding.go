@@ -1,7 +1,7 @@
 package treesitterlanguagepackgo
 
 /*
-#cgo LDFLAGS: -ltslp_ffi
+#cgo LDFLAGS: -lts_pack_ffi
 #include "tslp.h"
 import "C"
 */
@@ -20,11 +20,12 @@ func lastError() error {
     }
     ctx := C.tslp_last_error_context()
     message := C.GoString(ctx)
+    C.tslp_free_string(ctx)
     return fmt.Errorf("[%d] %s", code, message)
 }
 
 // Errors that can occur when using the tree-sitter language pack.
-//
+// 
 // Covers language lookup failures, parse errors, query errors, and I/O issues.
 // Feature-gated variants are included when `config`, `download`, or related
 // features are enabled.
@@ -62,7 +63,7 @@ const (
 
 
 // The kind of structural item found in source code.
-//
+// 
 // Categorizes top-level and nested declarations such as functions, classes,
 // structs, enums, traits, and more. Use [`Other`](StructureKind::Other) for
 // language-specific constructs that do not fit a standard category.
@@ -84,7 +85,7 @@ const (
 
 
 // The kind of a comment found in source code.
-//
+// 
 // Distinguishes between single-line comments, block (multi-line) comments,
 // and documentation comments.
 type CommentKind string
@@ -97,7 +98,7 @@ const (
 
 
 // The format of a docstring extracted from source code.
-//
+// 
 // Identifies the docstring convention used, which varies by language
 // (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 type DocstringFormat string
@@ -113,7 +114,7 @@ const (
 
 
 // The kind of an export statement found in source code.
-//
+// 
 // Covers named exports, default exports, and re-exports from other modules.
 type ExportKind string
 
@@ -125,7 +126,7 @@ const (
 
 
 // The kind of a symbol definition found in source code.
-//
+// 
 // Categorizes symbol definitions such as variables, constants, functions,
 // classes, types, interfaces, enums, and modules.
 type SymbolKind string
@@ -144,7 +145,7 @@ const (
 
 
 // Severity level of a diagnostic produced during parsing.
-//
+// 
 // Used to classify parse errors, warnings, and informational messages
 // found in the syntax tree.
 type DiagnosticSeverity string
@@ -248,7 +249,7 @@ type ValidationResult struct {
 
 
 // Byte and line/column range in source code.
-//
+// 
 // Represents both byte offsets (for slicing) and human-readable line/column
 // positions (for display and diagnostics).
 type Span struct {
@@ -262,13 +263,13 @@ type Span struct {
 
 
 // Complete analysis result from processing a source file.
-//
+// 
 // Contains metrics, structural analysis, imports/exports, comments,
 // docstrings, symbols, diagnostics, and optionally chunked code segments.
 // Fields are populated based on the [`crate::ProcessConfig`] flags.
-//
+// 
 // # Fields
-//
+// 
 // - `language` - The language used for parsing
 // - `metrics` - Always computed: line counts, byte sizes, error counts
 // - `structure` - Functions, classes, structs (when `config.structure = true`)
@@ -411,7 +412,7 @@ type ChunkContext struct {
 
 
 // Lightweight snapshot of a tree-sitter node's properties.
-//
+// 
 // Contains only primitive types for easy cross-language serialization.
 // This is an owned type that can be passed across FFI boundaries, unlike
 // `tree_sitter::Node` which borrows from the tree.
@@ -442,16 +443,16 @@ type NodeInfo struct {
 
 
 // Configuration for the tree-sitter language pack.
-//
+// 
 // Controls cache directory and which languages to pre-download.
 // Can be loaded from a TOML file, constructed programmatically,
 // or passed as a dict/object from language bindings.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::PackConfig;
-//
+// 
 // let config = PackConfig {
 // cache_dir: None,
 // languages: Some(vec!["python".to_string(), "rust".to_string()]),
@@ -460,11 +461,11 @@ type NodeInfo struct {
 // ```
 type PackConfig struct {
     // Override default cache directory.
-    //
+    // 
     // Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
     CacheDir *string `json:"cache_dir,omitempty"`
     // Languages to pre-download on init.
-    //
+    // 
     // Each entry is a language name (e.g. `"python"`, `"rust"`).
     Languages *[]string `json:"languages,omitempty"`
     // Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).
@@ -473,20 +474,20 @@ type PackConfig struct {
 
 
 // Configuration for the `process()` function.
-//
+// 
 // Controls which analysis features are enabled and whether chunking is performed.
-//
+// 
 // # Examples
-//
+// 
 // ```
 // use tree_sitter_language_pack::ProcessConfig;
-//
+// 
 // // Defaults: structure + imports + exports enabled
 // let config = ProcessConfig::new("python");
-//
+// 
 // // With chunking
 // let config = ProcessConfig::new("python").with_chunking(1000);
-//
+// 
 // // Everything enabled
 // let config = ProcessConfig::new("python").all();
 // ```
@@ -516,31 +517,26 @@ type ProcessConfig struct {
 
 
 // Thread-safe registry of tree-sitter language parsers.
-//
+// 
 // Manages both statically compiled and dynamically loaded language grammars.
 // Use [`LanguageRegistry::new()`] for the default registry, or access the
 // global instance via the module-level convenience functions
 // ([`crate::get_language`], [`crate::available_languages`], etc.).
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::{LanguageRegistry, ProcessConfig};
-//
+// 
 // let registry = LanguageRegistry::new();
 // let langs = registry.available_languages();
 // println!("Available: {:?}", langs);
-//
+// 
 // let config = ProcessConfig::new("python").all();
 // let result = registry.process("def hello(): pass", &config).unwrap();
 // println!("Structure: {:?}", result.structure);
 // ```
 type LanguageRegistry struct {
-}
-
-
-// Tree is a type.
-type Tree struct {
 }
 
 
@@ -554,10 +550,15 @@ type Parser struct {
 }
 
 
+// Tree is a type.
+type Tree struct {
+}
+
+
 // Detect language name from a file extension (without leading dot).
-//
+// 
 // Returns `None` for unrecognized extensions. The match is case-insensitive.
-//
+// 
 // ```
 // use tree_sitter_language_pack::detect_language_from_extension;
 // assert_eq!(detect_language_from_extension("py"), Some("python"));
@@ -574,10 +575,10 @@ func DetectLanguageFromExtension(ext string) **string {
 
 
 // Detect language name from a file path.
-//
+// 
 // Extracts the file extension and looks it up. Returns `None` if the
 // path has no extension or the extension is not recognized.
-//
+// 
 // ```
 // use tree_sitter_language_pack::detect_language_from_path;
 // assert_eq!(detect_language_from_path("src/main.rs"), Some("rust"));
@@ -595,13 +596,13 @@ func DetectLanguageFromPath(path string) **string {
 
 // Check if a file extension is ambiguous — i.e. it could reasonably belong to
 // multiple languages.
-//
+// 
 // Returns `Some((assigned_language, alternatives))` if the extension is known
 // to be ambiguous, where `assigned_language` is what [`detect_language_from_extension`]
 // returns and `alternatives` lists other languages it could also belong to.
-//
+// 
 // Returns `None` if the extension is unambiguous or unrecognized.
-//
+// 
 // ```
 // use tree_sitter_language_pack::extension_ambiguity;
 // // .m is assigned to objc but could also be matlab
@@ -632,21 +633,21 @@ func ExtensionAmbiguityJson(ext string) **string {
 
 
 // Detect language name from file content using the shebang line (`#!`).
-//
+// 
 // Inspects only the first line of `content`. If it begins with `#!`, the
 // interpreter name is extracted and mapped to a language name.
-//
+// 
 // Handles common patterns:
 // - `#!/usr/bin/env python3` → `"python"`
 // - `#!/bin/bash` → `"bash"`
 // - `#!/usr/bin/env node` → `"javascript"`
-//
+// 
 // The `-S` flag accepted by some `env` implementations is skipped automatically.
 // Version suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.
-//
+// 
 // Returns `None` when content does not start with `#!`, the shebang is
 // malformed, or the interpreter is not recognised.
-//
+// 
 // ```
 // use tree_sitter_language_pack::detect_language_from_content;
 // assert_eq!(detect_language_from_content("#!/usr/bin/env python3\npass"), Some("python"));
@@ -663,12 +664,12 @@ func DetectLanguageFromContent(content string) **string {
 
 
 // Validate an extraction config without running it.
-//
+// 
 // Checks that the language exists and all query patterns compile. Returns
 // detailed diagnostics per pattern.
-//
+// 
 // # Errors
-//
+// 
 // Returns an error if the language cannot be loaded.
 func ValidateExtraction(config ExtractionConfig) *ValidationResult, error {
     jsonBytes, err := json.Marshal(config)
@@ -738,7 +739,7 @@ func RootNodeInfo(tree Tree) *NodeInfo {
 
 
 // Find all nodes matching the given type name, returning their `NodeInfo`.
-//
+// 
 // Performs a depth-first traversal. Returns an empty vec if no matches.
 func FindNodesByType(tree Tree, node_type string) *[]NodeInfo {
     jsonBytes, err := json.Marshal(tree)
@@ -757,7 +758,7 @@ func FindNodesByType(tree Tree, node_type string) *[]NodeInfo {
 
 
 // Get `NodeInfo` for all named children of the root node.
-//
+// 
 // Useful for understanding the top-level structure of a file
 // (e.g., list of function definitions, class declarations, imports).
 func NamedChildrenInfo(tree Tree) *[]NodeInfo {
@@ -774,11 +775,11 @@ func NamedChildrenInfo(tree Tree) *[]NodeInfo {
 
 
 // Parse source code with the named language, returning the syntax tree.
-//
+// 
 // Uses the global registry to look up the language by name.
-//
+// 
 // # Examples
-//
+// 
 // ```no_run
 // let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
 // assert_eq!(tree.root_node().kind(), "module");
@@ -798,7 +799,7 @@ func ParseString(language string, source []byte) *Tree, error {
 
 
 // Check whether any node in the tree matches the given type name.
-//
+// 
 // Performs a depth-first traversal using `TreeCursor`.
 func TreeContainsNodeType(tree Tree, node_type string) *bool {
     jsonBytes, err := json.Marshal(tree)
@@ -817,7 +818,7 @@ func TreeContainsNodeType(tree Tree, node_type string) *bool {
 
 
 // Check whether the tree contains any ERROR or MISSING nodes.
-//
+// 
 // Useful for determining if the parse was clean or had syntax errors.
 func TreeHasErrorNodes(tree Tree) *bool {
     jsonBytes, err := json.Marshal(tree)
@@ -833,7 +834,7 @@ func TreeHasErrorNodes(tree Tree) *bool {
 
 
 // Return the S-expression representation of the entire tree.
-//
+// 
 // This is the standard tree-sitter debug format, useful for logging,
 // snapshot testing, and debugging grammars.
 func TreeToSexp(tree Tree) *string {
@@ -851,7 +852,7 @@ func TreeToSexp(tree Tree) *string {
 
 
 // Count the number of ERROR and MISSING nodes in the tree.
-//
+// 
 // Returns 0 for a clean parse.
 func TreeErrorCount(tree Tree) *uint {
     jsonBytes, err := json.Marshal(tree)
@@ -867,15 +868,15 @@ func TreeErrorCount(tree Tree) *uint {
 
 
 // Get the highlights query for a language, if bundled.
-//
+// 
 // Returns the contents of `highlights.scm` as a static string, or `None`
 // if no highlights query is bundled for this language.
-//
+// 
 // # Example
-//
+// 
 // ```
 // use tree_sitter_language_pack::get_highlights_query;
-//
+// 
 // // Returns Some(...) for languages with bundled queries
 // let query = get_highlights_query("python");
 // // Returns None for languages without bundled highlights queries
@@ -892,15 +893,15 @@ func GetHighlightsQuery(language string) **string {
 
 
 // Get the injections query for a language, if bundled.
-//
+// 
 // Returns the contents of `injections.scm` as a static string, or `None`
 // if no injections query is bundled for this language.
-//
+// 
 // # Example
-//
+// 
 // ```
 // use tree_sitter_language_pack::get_injections_query;
-//
+// 
 // let query = get_injections_query("markdown");
 // // Returns None for languages without bundled injections queries
 // let missing = get_injections_query("nonexistent_lang");
@@ -916,15 +917,15 @@ func GetInjectionsQuery(language string) **string {
 
 
 // Get the locals query for a language, if bundled.
-//
+// 
 // Returns the contents of `locals.scm` as a static string, or `None`
 // if no locals query is bundled for this language.
-//
+// 
 // # Example
-//
+// 
 // ```
 // use tree_sitter_language_pack::get_locals_query;
-//
+// 
 // let query = get_locals_query("python");
 // // Returns None for languages without bundled locals queries
 // let missing = get_locals_query("nonexistent_lang");
@@ -940,23 +941,23 @@ func GetLocalsQuery(language string) **string {
 
 
 // Execute a tree-sitter query pattern against a parsed tree.
-//
+// 
 // The `query_source` is an S-expression pattern like:
 // ```text
 // (function_definition name: (identifier) @name)
 // ```
-//
+// 
 // Returns all matches with their captured nodes.
-//
+// 
 // # Arguments
-//
+// 
 // * `tree` - The parsed syntax tree to query.
 // * `language` - Language name (used to compile the query pattern).
 // * `query_source` - The tree-sitter query pattern string.
 // * `source` - The original source code bytes (needed for capture resolution).
-//
+// 
 // # Examples
-//
+// 
 // ```no_run
 // let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
 // let matches = tree_sitter_language_pack::query::run_query(
@@ -993,7 +994,7 @@ func RunQuery(tree Tree, language string, query_source string, source []byte) *[
 
 // Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
 // Returns a list of `(start_byte, end_byte)` ranges.
-//
+// 
 // The algorithm works by:
 // 1. Walking the tree-sitter AST to collect all nodes with their depth.
 // 2. Using depth as a semantic level: shallower nodes (functions, classes) are
@@ -1002,18 +1003,18 @@ func RunQuery(tree Tree, language string, query_source string, source []byte) *[
 // each chunk under `max_chunk_size` bytes.
 // 4. When no AST node boundary fits, falling back to line boundaries and
 // ultimately to raw byte splits.
-//
+// 
 // The function never splits in the middle of a token/leaf node when an AST
 // boundary is available.
-//
+// 
 // # Arguments
-//
+// 
 // * `source` - The full source code string.
 // * `tree`   - A tree-sitter `Tree` previously parsed from `source`.
 // * `max_chunk_size` - Maximum size in bytes for each chunk.
-//
+// 
 // # Returns
-//
+// 
 // A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
 // entire source. Ranges are non-overlapping, contiguous, and each range is
 // at most `max_chunk_size` bytes (except when a single indivisible token
@@ -1035,21 +1036,21 @@ func SplitCode(source string, tree Tree, max_chunk_size uint) *[]string {
 
 
 // Get a tree-sitter [`Language`] by name using the global registry.
-//
+// 
 // Resolves language aliases (e.g., `"shell"` maps to `"bash"`).
 // When the `download` feature is enabled (default), automatically downloads
 // the parser from GitHub releases if not found locally.
-//
+// 
 // # Errors
-//
+// 
 // Returns [`Error::LanguageNotFound`] if the language is not recognized,
 // or [`Error::Download`] if auto-download fails.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::get_language;
-//
+// 
 // let lang = get_language("python").unwrap();
 // // Use the Language with a tree-sitter Parser
 // let mut parser = tree_sitter::Parser::new();
@@ -1070,20 +1071,20 @@ func GetLanguage(name string) *Language, error {
 
 
 // Get a tree-sitter [`Parser`] pre-configured for the given language.
-//
+// 
 // This is a convenience function that calls [`get_language`] and configures
 // a new parser in one step.
-//
+// 
 // # Errors
-//
+// 
 // Returns [`Error::LanguageNotFound`] if the language is not recognized, or
 // [`Error::ParserSetup`] if the language cannot be applied to the parser.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::get_parser;
-//
+// 
 // let mut parser = get_parser("rust").unwrap();
 // let tree = parser.parse("fn main() {}", None).unwrap();
 // assert!(!tree.root_node().has_error());
@@ -1101,15 +1102,15 @@ func GetParser(name string) *Parser, error {
 
 
 // List all available language names (sorted, deduplicated, includes aliases).
-//
+// 
 // Returns names of both statically compiled and dynamically loadable languages,
 // plus any configured aliases.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::available_languages;
-//
+// 
 // let langs = available_languages();
 // for name in &langs {
 // println!("{}", name);
@@ -1122,15 +1123,15 @@ func AvailableLanguages() *[]string {
 
 
 // Check if a language is available by name or alias.
-//
+// 
 // Returns `true` if the language can be loaded (statically compiled,
 // dynamically available, or a known alias for one of these).
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::has_language;
-//
+// 
 // assert!(has_language("python"));
 // assert!(has_language("shell")); // alias for "bash"
 // assert!(!has_language("nonexistent_language"));
@@ -1145,15 +1146,15 @@ func HasLanguage(name string) *bool {
 
 
 // Return the number of available languages.
-//
+// 
 // Includes statically compiled languages, dynamically loadable languages,
 // and aliases.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::language_count;
-//
+// 
 // let count = language_count();
 // println!("{} languages available", count);
 // ```
@@ -1164,20 +1165,20 @@ func LanguageCount() *uint {
 
 
 // Run extraction patterns against source code.
-//
+// 
 // Convenience wrapper around [`extract::extract`].
-//
+// 
 // # Errors
-//
+// 
 // Returns an error if the language is not found, parsing fails, or a query
 // pattern is invalid.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use ahash::AHashMap;
 // use tree_sitter_language_pack::{ExtractionConfig, ExtractionPattern, CaptureOutput, extract_patterns};
-//
+// 
 // let mut patterns = AHashMap::new();
 // patterns.insert("fns".to_string(), ExtractionPattern {
 // query: "(function_definition name: (identifier) @fn_name)".to_string(),
@@ -1209,20 +1210,20 @@ func ExtractPatterns(source string, config ExtractionConfig) *ExtractionResult, 
 
 
 // Initialize the language pack with the given configuration.
-//
+// 
 // Applies any custom cache directory, then downloads all languages and groups
 // specified in the config. This is the recommended entry point when you want
 // to pre-warm the cache before use.
-//
+// 
 // # Errors
-//
+// 
 // Returns an error if configuration cannot be applied or if downloads fail.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::{PackConfig, init};
-//
+// 
 // let config = PackConfig {
 // cache_dir: None,
 // languages: Some(vec!["python".to_string(), "rust".to_string()]),
@@ -1244,22 +1245,22 @@ func Init(config PackConfig) error {
 
 
 // Apply download configuration without downloading anything.
-//
+// 
 // Use this to set a custom cache directory before the first call to
 // [`get_language`] or any download function. Changing the cache dir
 // after languages have been registered has no effect on already-loaded
 // languages.
-//
+// 
 // # Errors
-//
+// 
 // Returns an error if the lock cannot be acquired.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use std::path::PathBuf;
 // use tree_sitter_language_pack::{PackConfig, configure};
-//
+// 
 // let config = PackConfig {
 // cache_dir: Some(PathBuf::from("/tmp/my-parsers")),
 // languages: None,
@@ -1281,18 +1282,18 @@ func Configure(config PackConfig) error {
 
 
 // Download all available languages from the remote manifest.
-//
+// 
 // Returns the number of newly downloaded languages.
-//
+// 
 // # Errors
-//
+// 
 // Returns an error if the manifest cannot be fetched or a download fails.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::download_all;
-//
+// 
 // let count = download_all().unwrap();
 // println!("Downloaded {} languages", count);
 // ```
@@ -1306,20 +1307,20 @@ func DownloadAll() *uint, error {
 
 
 // Return all language names available in the remote manifest (248).
-//
+// 
 // Fetches (and caches) the remote manifest to discover the full list of
 // downloadable languages. Use [`downloaded_languages`] to list what is
 // already cached locally.
-//
+// 
 // # Errors
-//
+// 
 // Returns an error if the manifest cannot be fetched.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::manifest_languages;
-//
+// 
 // let langs = manifest_languages().unwrap();
 // println!("{} languages available for download", langs.len());
 // ```
@@ -1333,15 +1334,15 @@ func ManifestLanguages() *[]string, error {
 
 
 // Return languages that are already downloaded and cached locally.
-//
+// 
 // Does not perform any network requests. Returns an empty list if the
 // cache directory does not exist or cannot be read.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::downloaded_languages;
-//
+// 
 // let langs = downloaded_languages();
 // println!("{} languages already cached", langs.len());
 // ```
@@ -1352,19 +1353,19 @@ func DownloadedLanguages() *[]string {
 
 
 // Delete all cached parser shared libraries.
-//
+// 
 // Resets the cache registration so the next call to [`get_language`] or
 // a download function will re-register the (now empty) cache directory.
-//
+// 
 // # Errors
-//
+// 
 // Returns an error if the cache directory cannot be removed.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::clean_cache;
-//
+// 
 // clean_cache().unwrap();
 // println!("Cache cleared");
 // ```
@@ -1375,69 +1376,78 @@ func CleanCache() error {
 
 
 // Return the effective cache directory path.
-//
+// 
 // This is either the custom path set via [`configure`] / [`init`] or the
 // default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
-//
+// 
 // # Errors
-//
+// 
 // Returns an error if the system cache directory cannot be determined.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::cache_dir;
-//
+// 
 // let dir = cache_dir().unwrap();
 // println!("Cache directory: {}", dir.display());
 // ```
 func CacheDir() *string, error {
     ptr := C.tslp_cache_dir()
-    defer C.tslp_free_string(ptr)
     if err := lastError(); err != nil {
+        if ptr != nil {
+            C.tslp_free_string(ptr)
+        }
         return nil, err
     }
+    defer C.tslp_free_string(ptr)
     return unmarshalPath(ptr), nil
 }
 
 
 // Load configuration from a TOML file.
-//
+// 
 // # Errors
-//
+// 
 // Returns an error if the file cannot be read or the TOML is invalid.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use std::path::Path;
 // use tree_sitter_language_pack::PackConfig;
-//
+// 
 // let config = PackConfig::from_toml_file(Path::new("language-pack.toml")).unwrap();
 // ```
 func (r *PackConfig) FromTomlFile(path string) *string, error {
+    cPath := C.CString(path)
+    defer C.free(unsafe.Pointer(cPath))
+
     ptr := C.tslp_pack_config_from_toml_file (unsafe.Pointer(r), cPath)
-    defer C.tslp_free_string(ptr)
     if err := lastError(); err != nil {
+        if ptr != nil {
+            C.tslp_free_string(ptr)
+        }
         return nil, err
     }
+    defer C.tslp_free_string(ptr)
     return unmarshalString(ptr), nil
 }
 
 
 // Discover configuration by searching for `language-pack.toml` in:
-//
+// 
 // 1. Current directory and up to 10 parent directories
 // 2. `$XDG_CONFIG_HOME/tree-sitter-language-pack/config.toml`
 // 3. `~/.config/tree-sitter-language-pack/config.toml`
-//
+// 
 // Returns `None` if no configuration file is found.
-//
+// 
 // # Example
-//
+// 
 // ```no_run
 // use tree_sitter_language_pack::PackConfig;
-//
+// 
 // if let Some(config) = PackConfig::discover() {
 // println!("Found config with {:?} languages", config.languages);
 // }
@@ -1481,10 +1491,13 @@ func (r *ProcessConfig) Minimal() *string {
 
 
 // Create a registry with a custom directory for dynamic libraries.
-//
+// 
 // Overrides the default build-time library directory. Useful when
 // dynamic grammar shared libraries are stored in a non-standard location.
 func (r *LanguageRegistry) WithLibsDir(libs_dir string) *string {
+    cLibsDir := C.CString(libs_dir)
+    defer C.free(unsafe.Pointer(cLibsDir))
+
     ptr := C.tslp_language_registry_with_libs_dir (unsafe.Pointer(r), cLibsDir)
     defer C.tslp_free_string(ptr)
     return unmarshalString(ptr)
@@ -1492,27 +1505,30 @@ func (r *LanguageRegistry) WithLibsDir(libs_dir string) *string {
 
 
 // Add an additional directory to search for dynamic libraries.
-//
+// 
 // When [`get_language`](Self::get_language) cannot find a grammar in the
 // primary library directory, it searches these extra directories in order.
 // Typically used by the download system to register its cache directory.
-//
+// 
 // Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
 // mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
 // immutable while the directory list is updated.
 func (r *LanguageRegistry) AddExtraLibsDir(dir string) {
+    cDir := C.CString(dir)
+    defer C.free(unsafe.Pointer(cDir))
+
     C.tslp_language_registry_add_extra_libs_dir (unsafe.Pointer(r), cDir)
 }
 
 
 // Get a tree-sitter [`Language`] by name.
-//
+// 
 // Resolves aliases (e.g., `"shell"` -> `"bash"`, `"makefile"` -> `"make"`),
 // then looks up the language in the static table. When the `dynamic-loading`
 // feature is enabled, falls back to loading a shared library on demand.
-//
+// 
 // # Errors
-//
+// 
 // Returns [`Error::LanguageNotFound`] if the name (after alias resolution)
 // does not match any known grammar.
 func (r *LanguageRegistry) GetLanguage(name string) *Language, error {
@@ -1528,7 +1544,7 @@ func (r *LanguageRegistry) GetLanguage(name string) *Language, error {
 
 
 // List all available language names, sorted and deduplicated.
-//
+// 
 // Includes statically compiled languages, dynamically loadable languages
 // (if the `dynamic-loading` feature is enabled), and all configured aliases.
 func (r *LanguageRegistry) AvailableLanguages() *[]string {
@@ -1538,7 +1554,7 @@ func (r *LanguageRegistry) AvailableLanguages() *[]string {
 
 
 // Check whether a language is available by name or alias.
-//
+// 
 // Returns `true` if the language can be loaded, either from the static
 // table or from a dynamic library on disk.
 func (r *LanguageRegistry) HasLanguage(name string) *bool {
@@ -1583,3 +1599,5 @@ func (r *LanguageRegistry) Default() *string {
     defer C.tslp_free_string(ptr)
     return unmarshalString(ptr)
 }
+
+

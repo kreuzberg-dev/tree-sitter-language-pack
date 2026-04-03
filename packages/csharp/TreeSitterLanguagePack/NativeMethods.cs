@@ -72,13 +72,13 @@ internal static partial class NativeMethods
     );
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_tree_contains_node_type")]
-    internal static extern IntPtr TreeContainsNodeType(
+    internal static extern int TreeContainsNodeType(
         Tree tree,
         [MarshalAs(UnmanagedType.LPStr)] string nodeType
     );
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_tree_has_error_nodes")]
-    internal static extern IntPtr TreeHasErrorNodes(
+    internal static extern int TreeHasErrorNodes(
         Tree tree
     );
 
@@ -88,7 +88,7 @@ internal static partial class NativeMethods
     );
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_tree_error_count")]
-    internal static extern IntPtr TreeErrorCount(
+    internal static extern nuint TreeErrorCount(
         Tree tree
     );
 
@@ -160,7 +160,7 @@ internal static partial class NativeMethods
     );
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_download_all")]
-    internal static extern IntPtr DownloadAll();
+    internal static extern nuint DownloadAll();
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_manifest_languages")]
     internal static extern IntPtr ManifestLanguages();

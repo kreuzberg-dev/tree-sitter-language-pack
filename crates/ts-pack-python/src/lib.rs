@@ -2,16 +2,16 @@
 // Re-generate with: skif generate
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::missing_errors_doc)]
+#![allow(clippy::useless_conversion)]
+#![allow(clippy::let_unit_value)]
 
-use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
-use pyo3::types::PyDict;
-use std::collections::HashMap;
-use std::sync::Arc;
 use tree_sitter_language_pack;
+use serde_json;
+use std::sync::Arc;
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct ExtractionPattern {
     #[pyo3(get)]
     pub query: String,
@@ -27,7 +27,7 @@ pub struct ExtractionPattern {
 
 #[pymethods]
 impl ExtractionPattern {
-    #[pyo3(signature = (query, capture_output, child_fields, max_results=None, byte_range=None))]
+        #[pyo3(signature = (query, capture_output, child_fields, max_results=None, byte_range=None))]
     #[new]
     pub fn new(
         query: String,
@@ -36,18 +36,12 @@ impl ExtractionPattern {
         max_results: Option<usize>,
         byte_range: Option<String>,
     ) -> Self {
-        Self {
-            query,
-            capture_output,
-            child_fields,
-            max_results,
-            byte_range,
-        }
+        Self { query, capture_output, child_fields, max_results, byte_range }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct ExtractionConfig {
     #[pyo3(get)]
     pub language: String,
@@ -57,15 +51,15 @@ pub struct ExtractionConfig {
 
 #[pymethods]
 impl ExtractionConfig {
-    #[pyo3(signature = (language, patterns))]
+        #[pyo3(signature = (language, patterns))]
     #[new]
     pub fn new(language: String, patterns: String) -> Self {
         Self { language, patterns }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct CaptureResult {
     #[pyo3(get)]
     pub name: String,
@@ -81,27 +75,15 @@ pub struct CaptureResult {
 
 #[pymethods]
 impl CaptureResult {
-    #[pyo3(signature = (name, child_fields, start_byte, node=None, text=None))]
+        #[pyo3(signature = (name, child_fields, start_byte, node=None, text=None))]
     #[new]
-    pub fn new(
-        name: String,
-        child_fields: String,
-        start_byte: usize,
-        node: Option<NodeInfo>,
-        text: Option<String>,
-    ) -> Self {
-        Self {
-            name,
-            node,
-            text,
-            child_fields,
-            start_byte,
-        }
+    pub fn new(name: String, child_fields: String, start_byte: usize, node: Option<NodeInfo>, text: Option<String>) -> Self {
+        Self { name, node, text, child_fields, start_byte }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct MatchResult {
     #[pyo3(get)]
     pub pattern_index: usize,
@@ -111,18 +93,15 @@ pub struct MatchResult {
 
 #[pymethods]
 impl MatchResult {
-    #[pyo3(signature = (pattern_index, captures))]
+        #[pyo3(signature = (pattern_index, captures))]
     #[new]
     pub fn new(pattern_index: usize, captures: Vec<CaptureResult>) -> Self {
-        Self {
-            pattern_index,
-            captures,
-        }
+        Self { pattern_index, captures }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct PatternResult {
     #[pyo3(get)]
     pub matches: Vec<MatchResult>,
@@ -132,15 +111,15 @@ pub struct PatternResult {
 
 #[pymethods]
 impl PatternResult {
-    #[pyo3(signature = (matches, total_count))]
+        #[pyo3(signature = (matches, total_count))]
     #[new]
     pub fn new(matches: Vec<MatchResult>, total_count: usize) -> Self {
         Self { matches, total_count }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct ExtractionResult {
     #[pyo3(get)]
     pub language: String,
@@ -150,15 +129,15 @@ pub struct ExtractionResult {
 
 #[pymethods]
 impl ExtractionResult {
-    #[pyo3(signature = (language, results))]
+        #[pyo3(signature = (language, results))]
     #[new]
     pub fn new(language: String, results: String) -> Self {
         Self { language, results }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct PatternValidation {
     #[pyo3(get)]
     pub valid: bool,
@@ -174,7 +153,7 @@ pub struct PatternValidation {
 
 #[pymethods]
 impl PatternValidation {
-    #[pyo3(signature = (valid, capture_names, pattern_count, warnings, errors))]
+        #[pyo3(signature = (valid, capture_names, pattern_count, warnings, errors))]
     #[new]
     pub fn new(
         valid: bool,
@@ -183,18 +162,12 @@ impl PatternValidation {
         warnings: Vec<String>,
         errors: Vec<String>,
     ) -> Self {
-        Self {
-            valid,
-            capture_names,
-            pattern_count,
-            warnings,
-            errors,
-        }
+        Self { valid, capture_names, pattern_count, warnings, errors }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct ValidationResult {
     #[pyo3(get)]
     pub valid: bool,
@@ -204,15 +177,15 @@ pub struct ValidationResult {
 
 #[pymethods]
 impl ValidationResult {
-    #[pyo3(signature = (valid, patterns))]
+        #[pyo3(signature = (valid, patterns))]
     #[new]
     pub fn new(valid: bool, patterns: String) -> Self {
         Self { valid, patterns }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct Span {
     #[pyo3(get)]
     pub start_byte: usize,
@@ -230,7 +203,7 @@ pub struct Span {
 
 #[pymethods]
 impl Span {
-    #[pyo3(signature = (start_byte, end_byte, start_line, start_column, end_line, end_column))]
+        #[pyo3(signature = (start_byte, end_byte, start_line, start_column, end_line, end_column))]
     #[new]
     pub fn new(
         start_byte: usize,
@@ -240,19 +213,12 @@ impl Span {
         end_line: usize,
         end_column: usize,
     ) -> Self {
-        Self {
-            start_byte,
-            end_byte,
-            start_line,
-            start_column,
-            end_line,
-            end_column,
-        }
+        Self { start_byte, end_byte, start_line, start_column, end_line, end_column }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct ProcessResult {
     #[pyo3(get)]
     pub language: String,
@@ -280,7 +246,7 @@ pub struct ProcessResult {
 
 #[pymethods]
 impl ProcessResult {
-    #[pyo3(signature = (language, metrics, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunks, extractions))]
+        #[pyo3(signature = (language, metrics, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunks, extractions))]
     #[new]
     pub fn new(
         language: String,
@@ -295,24 +261,12 @@ impl ProcessResult {
         chunks: Vec<CodeChunk>,
         extractions: String,
     ) -> Self {
-        Self {
-            language,
-            metrics,
-            structure,
-            imports,
-            exports,
-            comments,
-            docstrings,
-            symbols,
-            diagnostics,
-            chunks,
-            extractions,
-        }
+        Self { language, metrics, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunks, extractions }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct FileMetrics {
     #[pyo3(get)]
     pub total_lines: usize,
@@ -334,7 +288,7 @@ pub struct FileMetrics {
 
 #[pymethods]
 impl FileMetrics {
-    #[pyo3(signature = (total_lines, code_lines, comment_lines, blank_lines, total_bytes, node_count, error_count, max_depth))]
+        #[pyo3(signature = (total_lines, code_lines, comment_lines, blank_lines, total_bytes, node_count, error_count, max_depth))]
     #[new]
     pub fn new(
         total_lines: usize,
@@ -346,21 +300,12 @@ impl FileMetrics {
         error_count: usize,
         max_depth: usize,
     ) -> Self {
-        Self {
-            total_lines,
-            code_lines,
-            comment_lines,
-            blank_lines,
-            total_bytes,
-            node_count,
-            error_count,
-            max_depth,
-        }
+        Self { total_lines, code_lines, comment_lines, blank_lines, total_bytes, node_count, error_count, max_depth }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct StructureItem {
     #[pyo3(get)]
     pub kind: StructureKind,
@@ -384,7 +329,7 @@ pub struct StructureItem {
 
 #[pymethods]
 impl StructureItem {
-    #[pyo3(signature = (kind, span, children, decorators, name=None, visibility=None, doc_comment=None, signature=None, body_span=None))]
+        #[pyo3(signature = (kind, span, children, decorators, name=None, visibility=None, doc_comment=None, signature=None, body_span=None))]
     #[new]
     pub fn new(
         kind: StructureKind,
@@ -397,22 +342,12 @@ impl StructureItem {
         signature: Option<String>,
         body_span: Option<Span>,
     ) -> Self {
-        Self {
-            kind,
-            name,
-            visibility,
-            span,
-            children,
-            decorators,
-            doc_comment,
-            signature,
-            body_span,
-        }
+        Self { kind, name, visibility, span, children, decorators, doc_comment, signature, body_span }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct CommentInfo {
     #[pyo3(get)]
     pub text: String,
@@ -426,20 +361,15 @@ pub struct CommentInfo {
 
 #[pymethods]
 impl CommentInfo {
-    #[pyo3(signature = (text, kind, span, associated_node=None))]
+        #[pyo3(signature = (text, kind, span, associated_node=None))]
     #[new]
     pub fn new(text: String, kind: CommentKind, span: Span, associated_node: Option<String>) -> Self {
-        Self {
-            text,
-            kind,
-            span,
-            associated_node,
-        }
+        Self { text, kind, span, associated_node }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct DocstringInfo {
     #[pyo3(get)]
     pub text: String,
@@ -455,7 +385,7 @@ pub struct DocstringInfo {
 
 #[pymethods]
 impl DocstringInfo {
-    #[pyo3(signature = (text, format, span, parsed_sections, associated_item=None))]
+        #[pyo3(signature = (text, format, span, parsed_sections, associated_item=None))]
     #[new]
     pub fn new(
         text: String,
@@ -464,18 +394,12 @@ impl DocstringInfo {
         parsed_sections: Vec<DocSection>,
         associated_item: Option<String>,
     ) -> Self {
-        Self {
-            text,
-            format,
-            span,
-            associated_item,
-            parsed_sections,
-        }
+        Self { text, format, span, associated_item, parsed_sections }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct DocSection {
     #[pyo3(get)]
     pub kind: String,
@@ -487,19 +411,15 @@ pub struct DocSection {
 
 #[pymethods]
 impl DocSection {
-    #[pyo3(signature = (kind, description, name=None))]
+        #[pyo3(signature = (kind, description, name=None))]
     #[new]
     pub fn new(kind: String, description: String, name: Option<String>) -> Self {
-        Self {
-            kind,
-            name,
-            description,
-        }
+        Self { kind, name, description }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct ImportInfo {
     #[pyo3(get)]
     pub source: String,
@@ -515,21 +435,15 @@ pub struct ImportInfo {
 
 #[pymethods]
 impl ImportInfo {
-    #[pyo3(signature = (source, items, is_wildcard, span, alias=None))]
+        #[pyo3(signature = (source, items, is_wildcard, span, alias=None))]
     #[new]
     pub fn new(source: String, items: Vec<String>, is_wildcard: bool, span: Span, alias: Option<String>) -> Self {
-        Self {
-            source,
-            items,
-            alias,
-            is_wildcard,
-            span,
-        }
+        Self { source, items, alias, is_wildcard, span }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct ExportInfo {
     #[pyo3(get)]
     pub name: String,
@@ -541,15 +455,15 @@ pub struct ExportInfo {
 
 #[pymethods]
 impl ExportInfo {
-    #[pyo3(signature = (name, kind, span))]
+        #[pyo3(signature = (name, kind, span))]
     #[new]
     pub fn new(name: String, kind: ExportKind, span: Span) -> Self {
         Self { name, kind, span }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct SymbolInfo {
     #[pyo3(get)]
     pub name: String,
@@ -565,27 +479,15 @@ pub struct SymbolInfo {
 
 #[pymethods]
 impl SymbolInfo {
-    #[pyo3(signature = (name, kind, span, type_annotation=None, doc=None))]
+        #[pyo3(signature = (name, kind, span, type_annotation=None, doc=None))]
     #[new]
-    pub fn new(
-        name: String,
-        kind: SymbolKind,
-        span: Span,
-        type_annotation: Option<String>,
-        doc: Option<String>,
-    ) -> Self {
-        Self {
-            name,
-            kind,
-            span,
-            type_annotation,
-            doc,
-        }
+    pub fn new(name: String, kind: SymbolKind, span: Span, type_annotation: Option<String>, doc: Option<String>) -> Self {
+        Self { name, kind, span, type_annotation, doc }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct Diagnostic {
     #[pyo3(get)]
     pub message: String,
@@ -597,19 +499,15 @@ pub struct Diagnostic {
 
 #[pymethods]
 impl Diagnostic {
-    #[pyo3(signature = (message, severity, span))]
+        #[pyo3(signature = (message, severity, span))]
     #[new]
     pub fn new(message: String, severity: DiagnosticSeverity, span: Span) -> Self {
-        Self {
-            message,
-            severity,
-            span,
-        }
+        Self { message, severity, span }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct CodeChunk {
     #[pyo3(get)]
     pub content: String,
@@ -627,7 +525,7 @@ pub struct CodeChunk {
 
 #[pymethods]
 impl CodeChunk {
-    #[pyo3(signature = (content, start_byte, end_byte, start_line, end_line, metadata))]
+        #[pyo3(signature = (content, start_byte, end_byte, start_line, end_line, metadata))]
     #[new]
     pub fn new(
         content: String,
@@ -637,19 +535,12 @@ impl CodeChunk {
         end_line: usize,
         metadata: ChunkContext,
     ) -> Self {
-        Self {
-            content,
-            start_byte,
-            end_byte,
-            start_line,
-            end_line,
-            metadata,
-        }
+        Self { content, start_byte, end_byte, start_line, end_line, metadata }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct ChunkContext {
     #[pyo3(get)]
     pub language: String,
@@ -673,7 +564,7 @@ pub struct ChunkContext {
 
 #[pymethods]
 impl ChunkContext {
-    #[pyo3(signature = (language, chunk_index, total_chunks, node_types, context_path, symbols_defined, comments, docstrings, has_error_nodes))]
+        #[pyo3(signature = (language, chunk_index, total_chunks, node_types, context_path, symbols_defined, comments, docstrings, has_error_nodes))]
     #[new]
     pub fn new(
         language: String,
@@ -686,22 +577,12 @@ impl ChunkContext {
         docstrings: Vec<DocstringInfo>,
         has_error_nodes: bool,
     ) -> Self {
-        Self {
-            language,
-            chunk_index,
-            total_chunks,
-            node_types,
-            context_path,
-            symbols_defined,
-            comments,
-            docstrings,
-            has_error_nodes,
-        }
+        Self { language, chunk_index, total_chunks, node_types, context_path, symbols_defined, comments, docstrings, has_error_nodes }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct NodeInfo {
     #[pyo3(get)]
     pub kind: String,
@@ -729,7 +610,7 @@ pub struct NodeInfo {
 
 #[pymethods]
 impl NodeInfo {
-    #[pyo3(signature = (kind, is_named, start_byte, end_byte, start_row, start_col, end_row, end_col, named_child_count, is_error, is_missing))]
+        #[pyo3(signature = (kind, is_named, start_byte, end_byte, start_row, start_col, end_row, end_col, named_child_count, is_error, is_missing))]
     #[new]
     pub fn new(
         kind: String,
@@ -744,24 +625,12 @@ impl NodeInfo {
         is_error: bool,
         is_missing: bool,
     ) -> Self {
-        Self {
-            kind,
-            is_named,
-            start_byte,
-            end_byte,
-            start_row,
-            start_col,
-            end_row,
-            end_col,
-            named_child_count,
-            is_error,
-            is_missing,
-        }
+        Self { kind, is_named, start_byte, end_byte, start_row, start_col, end_row, end_col, named_child_count, is_error, is_missing }
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct PackConfig {
     #[pyo3(get)]
     pub cache_dir: Option<String>,
@@ -773,31 +642,27 @@ pub struct PackConfig {
 
 #[pymethods]
 impl PackConfig {
-    #[pyo3(signature = (cache_dir=None, languages=None, groups=None))]
+        #[pyo3(signature = (cache_dir=None, languages=None, groups=None))]
     #[new]
     pub fn new(cache_dir: Option<String>, languages: Option<Vec<String>>, groups: Option<Vec<String>>) -> Self {
-        Self {
-            cache_dir,
-            languages,
-            groups,
-        }
+        Self { cache_dir, languages, groups }
     }
 
     #[staticmethod]
-    #[pyo3(signature = (path))]
+        #[pyo3(signature = (path))]
     pub fn from_toml_file(path: String) -> PyResult<String> {
-        todo!("wire up PackConfig::from_toml_file")
+        Err(pyo3::exceptions::PyNotImplementedError::new_err("Not implemented: PackConfig::from_toml_file"))
     }
 
     #[staticmethod]
-    #[pyo3(signature = ())]
+        #[pyo3(signature = ())]
     pub fn discover() -> Option<String> {
-        todo!("wire up PackConfig::discover")
+        None
     }
 }
 
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[derive(Clone, serde::Serialize)]
+#[pyclass(frozen, from_py_object)]
 pub struct ProcessConfig {
     #[pyo3(get)]
     pub language: String,
@@ -823,7 +688,7 @@ pub struct ProcessConfig {
 
 #[pymethods]
 impl ProcessConfig {
-    #[pyo3(signature = (language, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunk_max_size=None, extractions=None))]
+        #[pyo3(signature = (language, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunk_max_size=None, extractions=None))]
     #[new]
     pub fn new(
         language: String,
@@ -837,113 +702,106 @@ impl ProcessConfig {
         chunk_max_size: Option<usize>,
         extractions: Option<String>,
     ) -> Self {
-        Self {
-            language,
-            structure,
-            imports,
-            exports,
-            comments,
-            docstrings,
-            symbols,
-            diagnostics,
-            chunk_max_size,
-            extractions,
-        }
+        Self { language, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunk_max_size, extractions }
     }
 
-    #[pyo3(signature = (max_size))]
+        #[pyo3(signature = (max_size))]
     pub fn with_chunking(&self, max_size: usize) -> String {
-        todo!("wire up ProcessConfig.with_chunking")
+        String::from("[unimplemented: ProcessConfig.with_chunking]")
     }
 
-    #[pyo3(signature = ())]
+        #[pyo3(signature = ())]
     pub fn all(&self) -> String {
-        todo!("wire up ProcessConfig.all")
+        String::from("[unimplemented: ProcessConfig.all]")
     }
 
-    #[pyo3(signature = ())]
+        #[pyo3(signature = ())]
     pub fn minimal(&self) -> String {
-        todo!("wire up ProcessConfig.minimal")
+        String::from("[unimplemented: ProcessConfig.minimal]")
     }
 
     #[staticmethod]
-    #[pyo3(signature = ())]
+        #[pyo3(signature = ())]
     pub fn default() -> String {
-        todo!("wire up ProcessConfig::default")
+        String::from("[unimplemented: ProcessConfig::default]")
     }
 }
 
 #[derive(Clone)]
-#[pyclass(frozen)]
+#[pyclass(frozen, from_py_object)]
 pub struct LanguageRegistry {
     inner: std::sync::Arc<tree_sitter_language_pack::LanguageRegistry>,
 }
 
 #[pymethods]
 impl LanguageRegistry {
-    #[pyo3(signature = (dir))]
+        #[pyo3(signature = (dir))]
     pub fn add_extra_libs_dir(&self, dir: String) -> () {
         self.inner.add_extra_libs_dir(std::path::PathBuf::from(dir))
     }
 
-    #[pyo3(signature = (name))]
+        #[pyo3(signature = (name))]
     pub fn get_language(&self, name: String) -> PyResult<Language> {
-        todo!("wire up LanguageRegistry.get_language")
+        let result = self.inner.get_language(&name).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+        Ok(Language { inner: std::sync::Arc::new(result) })
     }
 
-    #[pyo3(signature = ())]
+        #[pyo3(signature = ())]
     pub fn available_languages(&self) -> Vec<String> {
         self.inner.available_languages()
     }
 
-    #[pyo3(signature = (name))]
+        #[pyo3(signature = (name))]
     pub fn has_language(&self, name: String) -> bool {
         self.inner.has_language(&name)
     }
 
-    #[pyo3(signature = ())]
+        #[pyo3(signature = ())]
     pub fn language_count(&self) -> usize {
         self.inner.language_count()
     }
 
-    #[pyo3(signature = (source, config))]
+        #[pyo3(signature = (source, config))]
     pub fn process(&self, source: String, config: ProcessConfig) -> PyResult<ProcessResult> {
-        todo!("wire up LanguageRegistry.process")
+        let config_json = serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+        let config_core: tree_sitter_language_pack::ProcessConfig = serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+        let result = self.inner.process(&source, &config_core).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+        Ok(result.into())
     }
 
     #[staticmethod]
-    #[pyo3(signature = (libs_dir))]
+        #[pyo3(signature = (libs_dir))]
     pub fn with_libs_dir(libs_dir: String) -> String {
-        todo!("wire up LanguageRegistry::with_libs_dir")
+        String::from("[unimplemented: LanguageRegistry::with_libs_dir]")
     }
 
     #[staticmethod]
-    #[pyo3(signature = ())]
+        #[pyo3(signature = ())]
     pub fn default() -> String {
-        todo!("wire up LanguageRegistry::default")
+        String::from("[unimplemented: LanguageRegistry::default]")
     }
 }
 
 #[derive(Clone)]
-#[pyclass(frozen)]
-pub struct Tree {
-    inner: std::sync::Arc<tree_sitter_language_pack::Tree>,
-}
-
-#[derive(Clone)]
-#[pyclass(frozen)]
+#[pyclass(frozen, from_py_object)]
 pub struct Language {
     inner: std::sync::Arc<tree_sitter_language_pack::Language>,
 }
 
 #[derive(Clone)]
-#[pyclass(frozen)]
+#[pyclass(frozen, from_py_object)]
 pub struct Parser {
     inner: std::sync::Arc<tree_sitter_language_pack::Parser>,
 }
 
-#[derive(Clone, PartialEq)]
-#[pyclass(eq, eq_int)]
+#[derive(Clone)]
+#[pyclass(frozen, from_py_object)]
+pub struct Tree {
+    inner: std::sync::Arc<tree_sitter_language_pack::Tree>,
+}
+
+#[derive(Clone, PartialEq, serde::Serialize)]
+#[pyclass(eq, eq_int, from_py_object)]
 pub enum Error {
     LanguageNotFound = 0,
     DynamicLoad = 1,
@@ -961,16 +819,16 @@ pub enum Error {
     ChecksumMismatch = 13,
 }
 
-#[derive(Clone, PartialEq)]
-#[pyclass(eq, eq_int)]
+#[derive(Clone, PartialEq, serde::Serialize)]
+#[pyclass(eq, eq_int, from_py_object)]
 pub enum CaptureOutput {
     Text = 0,
     Node = 1,
     Full = 2,
 }
 
-#[derive(Clone, PartialEq)]
-#[pyclass(eq, eq_int)]
+#[derive(Clone, PartialEq, serde::Serialize)]
+#[pyclass(eq, eq_int, from_py_object)]
 pub enum StructureKind {
     Function = 0,
     Method = 1,
@@ -985,16 +843,16 @@ pub enum StructureKind {
     Other = 10,
 }
 
-#[derive(Clone, PartialEq)]
-#[pyclass(eq, eq_int)]
+#[derive(Clone, PartialEq, serde::Serialize)]
+#[pyclass(eq, eq_int, from_py_object)]
 pub enum CommentKind {
     Line = 0,
     Block = 1,
     Doc = 2,
 }
 
-#[derive(Clone, PartialEq)]
-#[pyclass(eq, eq_int)]
+#[derive(Clone, PartialEq, serde::Serialize)]
+#[pyclass(eq, eq_int, from_py_object)]
 pub enum DocstringFormat {
     PythonTripleQuote = 0,
     JSDoc = 1,
@@ -1004,16 +862,16 @@ pub enum DocstringFormat {
     Other = 5,
 }
 
-#[derive(Clone, PartialEq)]
-#[pyclass(eq, eq_int)]
+#[derive(Clone, PartialEq, serde::Serialize)]
+#[pyclass(eq, eq_int, from_py_object)]
 pub enum ExportKind {
     Named = 0,
     Default = 1,
     ReExport = 2,
 }
 
-#[derive(Clone, PartialEq)]
-#[pyclass(eq, eq_int)]
+#[derive(Clone, PartialEq, serde::Serialize)]
+#[pyclass(eq, eq_int, from_py_object)]
 pub enum SymbolKind {
     Variable = 0,
     Constant = 1,
@@ -1026,8 +884,8 @@ pub enum SymbolKind {
     Other = 8,
 }
 
-#[derive(Clone, PartialEq)]
-#[pyclass(eq, eq_int)]
+#[derive(Clone, PartialEq, serde::Serialize)]
+#[pyclass(eq, eq_int, from_py_object)]
 pub enum DiagnosticSeverity {
     Error = 0,
     Warning = 1,
@@ -1035,237 +893,279 @@ pub enum DiagnosticSeverity {
 }
 
 #[pyfunction]
-#[pyo3(signature = (ext))]
+    #[pyo3(signature = (ext))]
 pub fn detect_language_from_extension(ext: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_extension(&ext).map(Into::into)
 }
 
 #[pyfunction]
-#[pyo3(signature = (path))]
+    #[pyo3(signature = (path))]
 pub fn detect_language_from_path(path: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_path(&path).map(Into::into)
 }
 
 #[pyfunction]
-#[pyo3(signature = (ext))]
+    #[pyo3(signature = (ext))]
 pub fn extension_ambiguity(ext: String) -> Option<String> {
-    todo!("wire up extension_ambiguity")
+    None
 }
 
-#[cfg(feature = "serde")]
 #[pyfunction]
-#[pyo3(signature = (ext))]
+    #[pyo3(signature = (ext))]
 pub fn extension_ambiguity_json(ext: String) -> Option<String> {
     tree_sitter_language_pack::extension_ambiguity_json(&ext).map(Into::into)
 }
 
 #[pyfunction]
-#[pyo3(signature = (content))]
+    #[pyo3(signature = (content))]
 pub fn detect_language_from_content(content: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_content(&content).map(Into::into)
 }
 
 #[pyfunction]
-#[pyo3(signature = (config))]
+    #[pyo3(signature = (config))]
 pub fn validate_extraction(config: ExtractionConfig) -> PyResult<ValidationResult> {
-    todo!("wire up validate_extraction")
+    let config_json = serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    tree_sitter_language_pack::extract::validate_extraction(&config_core).map(|val| val.into()).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
 #[pyfunction]
-#[pyo3(signature = (source, config, registry))]
+    #[pyo3(signature = (source, config, registry))]
 pub fn process(source: String, config: ProcessConfig, registry: LanguageRegistry) -> PyResult<ProcessResult> {
-    todo!("wire up process")
+    let config_json = serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ProcessConfig = serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    tree_sitter_language_pack::intel::process(&source, &config_core, &registry.inner).map(|val| val.into()).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
 #[pyfunction]
-#[pyo3(signature = (node))]
+    #[pyo3(signature = (node))]
 pub fn node_info_from_node(node: String) -> NodeInfo {
-    todo!("wire up node_info_from_node")
+    todo!("Not auto-delegatable: node_info_from_node — return type requires custom implementation")
 }
 
 #[pyfunction]
-#[pyo3(signature = (tree))]
+    #[pyo3(signature = (tree))]
 pub fn root_node_info(tree: Tree) -> NodeInfo {
-    todo!("wire up root_node_info")
+    tree_sitter_language_pack::root_node_info(&tree.inner).into()
 }
 
 #[pyfunction]
-#[pyo3(signature = (tree, node_type))]
+    #[pyo3(signature = (tree, node_type))]
 pub fn find_nodes_by_type(tree: Tree, node_type: String) -> Vec<NodeInfo> {
-    todo!("wire up find_nodes_by_type")
+    tree_sitter_language_pack::find_nodes_by_type(&tree.inner, &node_type).into_iter().map(Into::into).collect()
 }
 
 #[pyfunction]
-#[pyo3(signature = (tree))]
+    #[pyo3(signature = (tree))]
 pub fn named_children_info(tree: Tree) -> Vec<NodeInfo> {
-    todo!("wire up named_children_info")
+    tree_sitter_language_pack::named_children_info(&tree.inner).into_iter().map(Into::into).collect()
 }
 
 #[pyfunction]
-#[pyo3(signature = (language, source))]
+    #[pyo3(signature = (language, source))]
 pub fn parse_string(language: String, source: Vec<u8>) -> PyResult<Tree> {
-    tree_sitter_language_pack::parse_string(&language, &source)
-        .map(|val| Tree {
-            inner: std::sync::Arc::new(val),
-        })
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+    tree_sitter_language_pack::parse_string(&language, &source).map(|val| Tree { inner: std::sync::Arc::new(val) }).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
 #[pyfunction]
-#[pyo3(signature = (tree, node_type))]
+    #[pyo3(signature = (tree, node_type))]
 pub fn tree_contains_node_type(tree: Tree, node_type: String) -> bool {
-    todo!("wire up tree_contains_node_type")
+    tree_sitter_language_pack::tree_contains_node_type(&tree.inner, &node_type)
 }
 
 #[pyfunction]
-#[pyo3(signature = (tree))]
+    #[pyo3(signature = (tree))]
 pub fn tree_has_error_nodes(tree: Tree) -> bool {
-    todo!("wire up tree_has_error_nodes")
+    tree_sitter_language_pack::tree_has_error_nodes(&tree.inner)
 }
 
 #[pyfunction]
-#[pyo3(signature = (tree))]
+    #[pyo3(signature = (tree))]
 pub fn tree_to_sexp(tree: Tree) -> String {
-    todo!("wire up tree_to_sexp")
+    tree_sitter_language_pack::tree_to_sexp(&tree.inner).into()
 }
 
 #[pyfunction]
-#[pyo3(signature = (tree))]
+    #[pyo3(signature = (tree))]
 pub fn tree_error_count(tree: Tree) -> usize {
-    todo!("wire up tree_error_count")
+    tree_sitter_language_pack::tree_error_count(&tree.inner)
 }
 
 #[pyfunction]
-#[pyo3(signature = (language))]
+    #[pyo3(signature = (language))]
 pub fn get_highlights_query(language: String) -> Option<String> {
     tree_sitter_language_pack::get_highlights_query(&language).map(Into::into)
 }
 
 #[pyfunction]
-#[pyo3(signature = (language))]
+    #[pyo3(signature = (language))]
 pub fn get_injections_query(language: String) -> Option<String> {
     tree_sitter_language_pack::get_injections_query(&language).map(Into::into)
 }
 
 #[pyfunction]
-#[pyo3(signature = (language))]
+    #[pyo3(signature = (language))]
 pub fn get_locals_query(language: String) -> Option<String> {
     tree_sitter_language_pack::get_locals_query(&language).map(Into::into)
 }
 
 #[pyfunction]
-#[pyo3(signature = (tree, language, query_source, source))]
+    #[pyo3(signature = (tree, language, query_source, source))]
 pub fn run_query(tree: Tree, language: String, query_source: String, source: Vec<u8>) -> PyResult<Vec<String>> {
-    todo!("wire up run_query")
+    Err(pyo3::exceptions::PyNotImplementedError::new_err("Not implemented: run_query"))
 }
 
 #[pyfunction]
-#[pyo3(signature = (source, tree, max_chunk_size))]
+    #[pyo3(signature = (source, tree, max_chunk_size))]
 pub fn split_code(source: String, tree: Tree, max_chunk_size: usize) -> Vec<String> {
-    todo!("wire up split_code")
+    Vec::new()
 }
 
 #[pyfunction]
-#[pyo3(signature = (name))]
+    #[pyo3(signature = (name))]
 pub fn get_language(name: String) -> PyResult<Language> {
-    tree_sitter_language_pack::get_language(&name)
-        .map(|val| Language {
-            inner: std::sync::Arc::new(val),
-        })
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+    tree_sitter_language_pack::get_language(&name).map(|val| Language { inner: std::sync::Arc::new(val) }).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
 #[pyfunction]
-#[pyo3(signature = (name))]
+    #[pyo3(signature = (name))]
 pub fn get_parser(name: String) -> PyResult<Parser> {
-    tree_sitter_language_pack::get_parser(&name)
-        .map(|val| Parser {
-            inner: std::sync::Arc::new(val),
-        })
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+    tree_sitter_language_pack::get_parser(&name).map(|val| Parser { inner: std::sync::Arc::new(val) }).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
 #[pyfunction]
-#[pyo3(signature = ())]
+    #[pyo3(signature = ())]
 pub fn available_languages() -> Vec<String> {
-    tree_sitter_language_pack::available_languages()
-        .into_iter()
-        .map(Into::into)
-        .collect()
+    tree_sitter_language_pack::available_languages().into_iter().map(Into::into).collect()
 }
 
 #[pyfunction]
-#[pyo3(signature = (name))]
+    #[pyo3(signature = (name))]
 pub fn has_language(name: String) -> bool {
     tree_sitter_language_pack::has_language(&name)
 }
 
 #[pyfunction]
-#[pyo3(signature = ())]
+    #[pyo3(signature = ())]
 pub fn language_count() -> usize {
     tree_sitter_language_pack::language_count()
 }
 
 #[pyfunction]
-#[pyo3(signature = (source, config))]
+    #[pyo3(signature = (source, config))]
 pub fn extract_patterns(source: String, config: ExtractionConfig) -> PyResult<ExtractionResult> {
-    todo!("wire up extract_patterns")
+    let config_json = serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    tree_sitter_language_pack::extract_patterns(&source, &config_core).map(|val| val.into()).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
-#[cfg(feature = "download")]
 #[pyfunction]
-#[pyo3(signature = (config))]
+    #[pyo3(signature = (config))]
 pub fn init(config: PackConfig) -> PyResult<()> {
-    todo!("wire up init")
+    let config_json = serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    let config_core: tree_sitter_language_pack::PackConfig = serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    tree_sitter_language_pack::init(&config_core).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    Ok(())
 }
 
-#[cfg(feature = "download")]
 #[pyfunction]
-#[pyo3(signature = (config))]
+    #[pyo3(signature = (config))]
 pub fn configure(config: PackConfig) -> PyResult<()> {
-    todo!("wire up configure")
+    let config_json = serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    let config_core: tree_sitter_language_pack::PackConfig = serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    tree_sitter_language_pack::configure(&config_core).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    Ok(())
 }
 
-#[cfg(feature = "download")]
 #[pyfunction]
-#[pyo3(signature = ())]
+    #[pyo3(signature = ())]
 pub fn download_all() -> PyResult<usize> {
     tree_sitter_language_pack::download_all().map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
-#[cfg(feature = "download")]
 #[pyfunction]
-#[pyo3(signature = ())]
+    #[pyo3(signature = ())]
 pub fn manifest_languages() -> PyResult<Vec<String>> {
-    tree_sitter_language_pack::manifest_languages()
-        .map(|val| val.into_iter().map(Into::into).collect())
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+    tree_sitter_language_pack::manifest_languages().map(|val| val.into_iter().map(Into::into).collect()).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
-#[cfg(feature = "download")]
 #[pyfunction]
-#[pyo3(signature = ())]
+    #[pyo3(signature = ())]
 pub fn downloaded_languages() -> Vec<String> {
-    tree_sitter_language_pack::downloaded_languages()
-        .into_iter()
-        .map(Into::into)
-        .collect()
+    tree_sitter_language_pack::downloaded_languages().into_iter().map(Into::into).collect()
 }
 
-#[cfg(feature = "download")]
 #[pyfunction]
-#[pyo3(signature = ())]
+    #[pyo3(signature = ())]
 pub fn clean_cache() -> PyResult<()> {
     tree_sitter_language_pack::clean_cache().map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
-#[cfg(feature = "download")]
 #[pyfunction]
-#[pyo3(signature = ())]
+    #[pyo3(signature = ())]
 pub fn cache_dir() -> PyResult<String> {
-    tree_sitter_language_pack::cache_dir()
-        .map(|val| val.to_string_lossy().to_string())
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+    tree_sitter_language_pack::cache_dir().map(|val| val.to_string_lossy().to_string()).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+}
+
+impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {
+    fn from(val: tree_sitter_language_pack::ExtractionPattern) -> Self {
+        Self {
+            query: val.query,
+            capture_output: val.capture_output.into(),
+            child_fields: val.child_fields,
+            max_results: val.max_results,
+            byte_range: val.byte_range.as_ref().map(|v| format!("{:?}", v)),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ExtractionConfig> for ExtractionConfig {
+    fn from(val: tree_sitter_language_pack::ExtractionConfig) -> Self {
+        Self {
+            language: val.language,
+            patterns: format!("{:?}", val.patterns),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::CaptureResult> for CaptureResult {
+    fn from(val: tree_sitter_language_pack::CaptureResult) -> Self {
+        Self {
+            name: val.name,
+            node: val.node.map(Into::into),
+            text: val.text,
+            child_fields: format!("{:?}", val.child_fields),
+            start_byte: val.start_byte,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::MatchResult> for MatchResult {
+    fn from(val: tree_sitter_language_pack::MatchResult) -> Self {
+        Self {
+            pattern_index: val.pattern_index,
+            captures: val.captures.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternResult> for PatternResult {
+    fn from(val: tree_sitter_language_pack::PatternResult) -> Self {
+        Self {
+            matches: val.matches.into_iter().map(Into::into).collect(),
+            total_count: val.total_count,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ExtractionResult> for ExtractionResult {
+    fn from(val: tree_sitter_language_pack::ExtractionResult) -> Self {
+        Self {
+            language: val.language,
+            results: format!("{:?}", val.results),
+        }
+    }
 }
 
 impl From<PatternValidation> for tree_sitter_language_pack::PatternValidation {
@@ -1292,6 +1192,15 @@ impl From<tree_sitter_language_pack::PatternValidation> for PatternValidation {
     }
 }
 
+impl From<tree_sitter_language_pack::ValidationResult> for ValidationResult {
+    fn from(val: tree_sitter_language_pack::ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: format!("{:?}", val.patterns),
+        }
+    }
+}
+
 impl From<Span> for tree_sitter_language_pack::Span {
     fn from(val: Span) -> Self {
         Self {
@@ -1314,6 +1223,24 @@ impl From<tree_sitter_language_pack::Span> for Span {
             start_column: val.start_column,
             end_line: val.end_line,
             end_column: val.end_column,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ProcessResult> for ProcessResult {
+    fn from(val: tree_sitter_language_pack::ProcessResult) -> Self {
+        Self {
+            language: val.language,
+            metrics: val.metrics.into(),
+            structure: val.structure.into_iter().map(Into::into).collect(),
+            imports: val.imports.into_iter().map(Into::into).collect(),
+            exports: val.exports.into_iter().map(Into::into).collect(),
+            comments: val.comments.into_iter().map(Into::into).collect(),
+            docstrings: val.docstrings.into_iter().map(Into::into).collect(),
+            symbols: val.symbols.into_iter().map(Into::into).collect(),
+            diagnostics: val.diagnostics.into_iter().map(Into::into).collect(),
+            chunks: val.chunks.into_iter().map(Into::into).collect(),
+            extractions: format!("{:?}", val.extractions),
         }
     }
 }
@@ -1592,6 +1519,24 @@ impl From<tree_sitter_language_pack::ChunkContext> for ChunkContext {
     }
 }
 
+impl From<tree_sitter_language_pack::NodeInfo> for NodeInfo {
+    fn from(val: tree_sitter_language_pack::NodeInfo) -> Self {
+        Self {
+            kind: format!("{:?}", val.kind),
+            is_named: val.is_named,
+            start_byte: val.start_byte,
+            end_byte: val.end_byte,
+            start_row: val.start_row,
+            start_col: val.start_col,
+            end_row: val.end_row,
+            end_col: val.end_col,
+            named_child_count: val.named_child_count,
+            is_error: val.is_error,
+            is_missing: val.is_missing,
+        }
+    }
+}
+
 impl From<PackConfig> for tree_sitter_language_pack::PackConfig {
     fn from(val: PackConfig) -> Self {
         Self {
@@ -1608,6 +1553,23 @@ impl From<tree_sitter_language_pack::PackConfig> for PackConfig {
             cache_dir: val.cache_dir.map(|p| p.to_string_lossy().to_string()),
             languages: val.languages,
             groups: val.groups,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ProcessConfig> for ProcessConfig {
+    fn from(val: tree_sitter_language_pack::ProcessConfig) -> Self {
+        Self {
+            language: format!("{:?}", val.language),
+            structure: val.structure,
+            imports: val.imports,
+            exports: val.exports,
+            comments: val.comments,
+            docstrings: val.docstrings,
+            symbols: val.symbols,
+            diagnostics: val.diagnostics,
+            chunk_max_size: val.chunk_max_size,
+            extractions: val.extractions.as_ref().map(|v| format!("{:?}", v)),
         }
     }
 }
@@ -1813,9 +1775,9 @@ pub fn _tree_sitter_language_pack(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PackConfig>()?;
     m.add_class::<ProcessConfig>()?;
     m.add_class::<LanguageRegistry>()?;
-    m.add_class::<Tree>()?;
     m.add_class::<Language>()?;
     m.add_class::<Parser>()?;
+    m.add_class::<Tree>()?;
     m.add_class::<Error>()?;
     m.add_class::<CaptureOutput>()?;
     m.add_class::<StructureKind>()?;
@@ -1827,7 +1789,6 @@ pub fn _tree_sitter_language_pack(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(detect_language_from_extension, m)?)?;
     m.add_function(wrap_pyfunction!(detect_language_from_path, m)?)?;
     m.add_function(wrap_pyfunction!(extension_ambiguity, m)?)?;
-    #[cfg(feature = "serde")]
     m.add_function(wrap_pyfunction!(extension_ambiguity_json, m)?)?;
     m.add_function(wrap_pyfunction!(detect_language_from_content, m)?)?;
     m.add_function(wrap_pyfunction!(validate_extraction, m)?)?;
@@ -1852,19 +1813,12 @@ pub fn _tree_sitter_language_pack(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(has_language, m)?)?;
     m.add_function(wrap_pyfunction!(language_count, m)?)?;
     m.add_function(wrap_pyfunction!(extract_patterns, m)?)?;
-    #[cfg(feature = "download")]
     m.add_function(wrap_pyfunction!(init, m)?)?;
-    #[cfg(feature = "download")]
     m.add_function(wrap_pyfunction!(configure, m)?)?;
-    #[cfg(feature = "download")]
     m.add_function(wrap_pyfunction!(download_all, m)?)?;
-    #[cfg(feature = "download")]
     m.add_function(wrap_pyfunction!(manifest_languages, m)?)?;
-    #[cfg(feature = "download")]
     m.add_function(wrap_pyfunction!(downloaded_languages, m)?)?;
-    #[cfg(feature = "download")]
     m.add_function(wrap_pyfunction!(clean_cache, m)?)?;
-    #[cfg(feature = "download")]
     m.add_function(wrap_pyfunction!(cache_dir, m)?)?;
     Ok(())
 }

@@ -4,7 +4,7 @@ namespace TreeSitterLanguagePack;
 
 /// <summary>
 /// The kind of a comment found in source code.
-///
+/// 
 /// Distinguishes between single-line comments, block (multi-line) comments,
 /// and documentation comments.
 /// </summary>

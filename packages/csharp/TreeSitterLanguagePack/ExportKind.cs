@@ -4,7 +4,7 @@ namespace TreeSitterLanguagePack;
 
 /// <summary>
 /// The kind of an export statement found in source code.
-///
+/// 
 /// Covers named exports, default exports, and re-exports from other modules.
 /// </summary>
 public enum ExportKind

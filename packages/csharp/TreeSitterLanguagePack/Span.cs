@@ -7,7 +7,7 @@ namespace TreeSitterLanguagePack;
 
 /// <summary>
 /// Byte and line/column range in source code.
-///
+/// 
 /// Represents both byte offsets (for slicing) and human-readable line/column
 /// positions (for display and diagnostics).
 /// </summary>

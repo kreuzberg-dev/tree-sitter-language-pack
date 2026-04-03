@@ -522,16 +522,6 @@ impl LanguageRegistry {
 
 #[derive(Clone)]
 #[php_class]
-pub struct Tree {
-    inner: std::sync::Arc<tree_sitter_language_pack::Tree>,
-}
-
-#[php_impl]
-impl Tree {
-}
-
-#[derive(Clone)]
-#[php_class]
 pub struct Language {
     inner: std::sync::Arc<tree_sitter_language_pack::Language>,
 }
@@ -548,6 +538,16 @@ pub struct Parser {
 
 #[php_impl]
 impl Parser {
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct Tree {
+    inner: std::sync::Arc<tree_sitter_language_pack::Tree>,
+}
+
+#[php_impl]
+impl Tree {
 }
 
 // Error enum values

@@ -57,6 +57,7 @@ output = "packages/python/tree_sitter_language_pack/"
 [ffi]
 prefix = "tslp"
 header_name = "tslp.h"
+lib_name = "ts_pack_ffi"
 
 [go]
 module = "github.com/kreuzberg-dev/tree-sitter-language-pack-go"

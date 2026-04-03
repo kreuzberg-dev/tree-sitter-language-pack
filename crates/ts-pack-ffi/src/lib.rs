@@ -3,8 +3,10 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::missing_errors_doc)]
 
+use std::ffi::{c_char, CStr, CString};
 use std::cell::RefCell;
-use std::ffi::{CStr, CString, c_char};
+use serde_json;
+use tree_sitter_language_pack;
 
 thread_local! {
     static LAST_ERROR_CODE: RefCell<i32> = const { RefCell::new(0) };
@@ -22,28 +24,39 @@ fn clear_last_error() {
 }
 
 /// Return the last error code (0 means no error).
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_last_error_code() -> i32 {
     LAST_ERROR_CODE.with_borrow(|c| *c)
 }
 
 /// Return the last error message. The pointer is valid until the next FFI call on this thread.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_last_error_context() -> *const c_char {
-    LAST_ERROR_CONTEXT.with_borrow(|ctx| ctx.as_ref().map_or(std::ptr::null(), |c| c.as_ptr()))
+    LAST_ERROR_CONTEXT.with_borrow(|ctx| {
+        ctx.as_ref().map_or(std::ptr::null(), |c| c.as_ptr())
+    })
 }
 
 /// Free a string previously returned by this library.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_free_string(ptr: *mut c_char) {
     if !ptr.is_null() {
-        unsafe {
-            drop(CString::from_raw(ptr));
-        }
+        unsafe { drop(CString::from_raw(ptr)); }
     }
 }
 
 /// Return the library version string. The pointer is static and must NOT be freed.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_version() -> *const c_char {
     static VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "\0");
@@ -51,10 +64,11 @@ pub unsafe extern "C" fn tslp_version() -> *const c_char {
 }
 
 /// Create a `ExtractionPattern` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_extraction_pattern_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_extraction_pattern_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::ExtractionPattern {
+pub unsafe extern "C" fn tslp_extraction_pattern_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::ExtractionPattern {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -77,20 +91,20 @@ pub unsafe extern "C" fn tslp_extraction_pattern_from_json(
 }
 
 /// Free a `ExtractionPattern` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_extraction_pattern_free(ptr: *mut tree_sitter_language_pack::ExtractionPattern) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `query` field from a `ExtractionPattern`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_extraction_pattern_query(
-    ptr: *const tree_sitter_language_pack::ExtractionPattern,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_extraction_pattern_query(ptr: *const tree_sitter_language_pack::ExtractionPattern) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -102,10 +116,10 @@ pub unsafe extern "C" fn tslp_extraction_pattern_query(
 }
 
 /// Get the `capture_output` field from a `ExtractionPattern`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_extraction_pattern_capture_output(
-    ptr: *const tree_sitter_language_pack::ExtractionPattern,
-) -> *mut tree_sitter_language_pack::CaptureOutput {
+pub unsafe extern "C" fn tslp_extraction_pattern_capture_output(ptr: *const tree_sitter_language_pack::ExtractionPattern) -> *mut tree_sitter_language_pack::CaptureOutput {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -114,10 +128,10 @@ pub unsafe extern "C" fn tslp_extraction_pattern_capture_output(
 }
 
 /// Get the `child_fields` field from a `ExtractionPattern`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_extraction_pattern_child_fields(
-    ptr: *const tree_sitter_language_pack::ExtractionPattern,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_extraction_pattern_child_fields(ptr: *const tree_sitter_language_pack::ExtractionPattern) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -132,25 +146,28 @@ pub unsafe extern "C" fn tslp_extraction_pattern_child_fields(
 }
 
 /// Get the `max_results` field from a `ExtractionPattern`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_extraction_pattern_max_results(
-    ptr: *const tree_sitter_language_pack::ExtractionPattern,
-) -> usize {
+pub unsafe extern "C" fn tslp_extraction_pattern_max_results(ptr: *const tree_sitter_language_pack::ExtractionPattern) -> usize {
     if ptr.is_null() {
         return 0;
     }
     let obj = unsafe { &*ptr };
     match &obj.max_results {
-        Some(val) => *val,
+        Some(val) => {
+            *val
+        }
         None => 0,
     }
 }
 
 /// Create a `ExtractionConfig` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_extraction_config_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_extraction_config_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::ExtractionConfig {
+pub unsafe extern "C" fn tslp_extraction_config_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::ExtractionConfig {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -173,20 +190,20 @@ pub unsafe extern "C" fn tslp_extraction_config_from_json(
 }
 
 /// Free a `ExtractionConfig` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_extraction_config_free(ptr: *mut tree_sitter_language_pack::ExtractionConfig) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `language` field from a `ExtractionConfig`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_extraction_config_language(
-    ptr: *const tree_sitter_language_pack::ExtractionConfig,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_extraction_config_language(ptr: *const tree_sitter_language_pack::ExtractionConfig) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -198,10 +215,11 @@ pub unsafe extern "C" fn tslp_extraction_config_language(
 }
 
 /// Create a `CaptureResult` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_capture_result_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_capture_result_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::CaptureResult {
+pub unsafe extern "C" fn tslp_capture_result_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::CaptureResult {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -224,20 +242,20 @@ pub unsafe extern "C" fn tslp_capture_result_from_json(
 }
 
 /// Free a `CaptureResult` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_capture_result_free(ptr: *mut tree_sitter_language_pack::CaptureResult) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `name` field from a `CaptureResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_capture_result_name(
-    ptr: *const tree_sitter_language_pack::CaptureResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_capture_result_name(ptr: *const tree_sitter_language_pack::CaptureResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -249,39 +267,45 @@ pub unsafe extern "C" fn tslp_capture_result_name(
 }
 
 /// Get the `node` field from a `CaptureResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_capture_result_node(
-    ptr: *const tree_sitter_language_pack::CaptureResult,
-) -> *mut tree_sitter_language_pack::NodeInfo {
+pub unsafe extern "C" fn tslp_capture_result_node(ptr: *const tree_sitter_language_pack::CaptureResult) -> *mut tree_sitter_language_pack::NodeInfo {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.node {
-        Some(val) => Box::into_raw(Box::new(val.clone())),
+        Some(val) => {
+            Box::into_raw(Box::new(val.clone()))
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the `text` field from a `CaptureResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_capture_result_text(
-    ptr: *const tree_sitter_language_pack::CaptureResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_capture_result_text(ptr: *const tree_sitter_language_pack::CaptureResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.text {
-        Some(val) => match CString::new(val.clone()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val.clone()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the `start_byte` field from a `CaptureResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_capture_result_start_byte(ptr: *const tree_sitter_language_pack::CaptureResult) -> usize {
     if ptr.is_null() {
@@ -292,10 +316,11 @@ pub unsafe extern "C" fn tslp_capture_result_start_byte(ptr: *const tree_sitter_
 }
 
 /// Create a `MatchResult` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_match_result_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_match_result_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::MatchResult {
+pub unsafe extern "C" fn tslp_match_result_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::MatchResult {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -318,16 +343,18 @@ pub unsafe extern "C" fn tslp_match_result_from_json(
 }
 
 /// Free a `MatchResult` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_match_result_free(ptr: *mut tree_sitter_language_pack::MatchResult) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `pattern_index` field from a `MatchResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_match_result_pattern_index(ptr: *const tree_sitter_language_pack::MatchResult) -> usize {
     if ptr.is_null() {
@@ -338,10 +365,10 @@ pub unsafe extern "C" fn tslp_match_result_pattern_index(ptr: *const tree_sitter
 }
 
 /// Get the `captures` field from a `MatchResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_match_result_captures(
-    ptr: *const tree_sitter_language_pack::MatchResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_match_result_captures(ptr: *const tree_sitter_language_pack::MatchResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -356,10 +383,11 @@ pub unsafe extern "C" fn tslp_match_result_captures(
 }
 
 /// Create a `PatternResult` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_pattern_result_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pattern_result_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::PatternResult {
+pub unsafe extern "C" fn tslp_pattern_result_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::PatternResult {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -382,20 +410,20 @@ pub unsafe extern "C" fn tslp_pattern_result_from_json(
 }
 
 /// Free a `PatternResult` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_pattern_result_free(ptr: *mut tree_sitter_language_pack::PatternResult) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `matches` field from a `PatternResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pattern_result_matches(
-    ptr: *const tree_sitter_language_pack::PatternResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_pattern_result_matches(ptr: *const tree_sitter_language_pack::PatternResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -410,10 +438,10 @@ pub unsafe extern "C" fn tslp_pattern_result_matches(
 }
 
 /// Get the `total_count` field from a `PatternResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pattern_result_total_count(
-    ptr: *const tree_sitter_language_pack::PatternResult,
-) -> usize {
+pub unsafe extern "C" fn tslp_pattern_result_total_count(ptr: *const tree_sitter_language_pack::PatternResult) -> usize {
     if ptr.is_null() {
         return 0;
     }
@@ -422,10 +450,11 @@ pub unsafe extern "C" fn tslp_pattern_result_total_count(
 }
 
 /// Create a `ExtractionResult` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_extraction_result_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_extraction_result_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::ExtractionResult {
+pub unsafe extern "C" fn tslp_extraction_result_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::ExtractionResult {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -448,20 +477,20 @@ pub unsafe extern "C" fn tslp_extraction_result_from_json(
 }
 
 /// Free a `ExtractionResult` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_extraction_result_free(ptr: *mut tree_sitter_language_pack::ExtractionResult) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `language` field from a `ExtractionResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_extraction_result_language(
-    ptr: *const tree_sitter_language_pack::ExtractionResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_extraction_result_language(ptr: *const tree_sitter_language_pack::ExtractionResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -473,10 +502,11 @@ pub unsafe extern "C" fn tslp_extraction_result_language(
 }
 
 /// Create a `PatternValidation` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_pattern_validation_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pattern_validation_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::PatternValidation {
+pub unsafe extern "C" fn tslp_pattern_validation_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::PatternValidation {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -499,20 +529,20 @@ pub unsafe extern "C" fn tslp_pattern_validation_from_json(
 }
 
 /// Free a `PatternValidation` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_pattern_validation_free(ptr: *mut tree_sitter_language_pack::PatternValidation) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `valid` field from a `PatternValidation`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pattern_validation_valid(
-    ptr: *const tree_sitter_language_pack::PatternValidation,
-) -> i32 {
+pub unsafe extern "C" fn tslp_pattern_validation_valid(ptr: *const tree_sitter_language_pack::PatternValidation) -> i32 {
     if ptr.is_null() {
         return 0;
     }
@@ -521,10 +551,10 @@ pub unsafe extern "C" fn tslp_pattern_validation_valid(
 }
 
 /// Get the `capture_names` field from a `PatternValidation`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pattern_validation_capture_names(
-    ptr: *const tree_sitter_language_pack::PatternValidation,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_pattern_validation_capture_names(ptr: *const tree_sitter_language_pack::PatternValidation) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -539,10 +569,10 @@ pub unsafe extern "C" fn tslp_pattern_validation_capture_names(
 }
 
 /// Get the `pattern_count` field from a `PatternValidation`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pattern_validation_pattern_count(
-    ptr: *const tree_sitter_language_pack::PatternValidation,
-) -> usize {
+pub unsafe extern "C" fn tslp_pattern_validation_pattern_count(ptr: *const tree_sitter_language_pack::PatternValidation) -> usize {
     if ptr.is_null() {
         return 0;
     }
@@ -551,10 +581,10 @@ pub unsafe extern "C" fn tslp_pattern_validation_pattern_count(
 }
 
 /// Get the `warnings` field from a `PatternValidation`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pattern_validation_warnings(
-    ptr: *const tree_sitter_language_pack::PatternValidation,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_pattern_validation_warnings(ptr: *const tree_sitter_language_pack::PatternValidation) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -569,10 +599,10 @@ pub unsafe extern "C" fn tslp_pattern_validation_warnings(
 }
 
 /// Get the `errors` field from a `PatternValidation`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pattern_validation_errors(
-    ptr: *const tree_sitter_language_pack::PatternValidation,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_pattern_validation_errors(ptr: *const tree_sitter_language_pack::PatternValidation) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -587,10 +617,11 @@ pub unsafe extern "C" fn tslp_pattern_validation_errors(
 }
 
 /// Create a `ValidationResult` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_validation_result_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_validation_result_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::ValidationResult {
+pub unsafe extern "C" fn tslp_validation_result_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::ValidationResult {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -613,16 +644,18 @@ pub unsafe extern "C" fn tslp_validation_result_from_json(
 }
 
 /// Free a `ValidationResult` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_validation_result_free(ptr: *mut tree_sitter_language_pack::ValidationResult) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `valid` field from a `ValidationResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_validation_result_valid(ptr: *const tree_sitter_language_pack::ValidationResult) -> i32 {
     if ptr.is_null() {
@@ -633,6 +666,9 @@ pub unsafe extern "C" fn tslp_validation_result_valid(ptr: *const tree_sitter_la
 }
 
 /// Create a `Span` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_span_free`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_span_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::Span {
     clear_last_error();
@@ -657,16 +693,18 @@ pub unsafe extern "C" fn tslp_span_from_json(json: *const c_char) -> *mut tree_s
 }
 
 /// Free a `Span` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_span_free(ptr: *mut tree_sitter_language_pack::Span) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `start_byte` field from a `Span`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_span_start_byte(ptr: *const tree_sitter_language_pack::Span) -> usize {
     if ptr.is_null() {
@@ -677,6 +715,8 @@ pub unsafe extern "C" fn tslp_span_start_byte(ptr: *const tree_sitter_language_p
 }
 
 /// Get the `end_byte` field from a `Span`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_span_end_byte(ptr: *const tree_sitter_language_pack::Span) -> usize {
     if ptr.is_null() {
@@ -687,6 +727,8 @@ pub unsafe extern "C" fn tslp_span_end_byte(ptr: *const tree_sitter_language_pac
 }
 
 /// Get the `start_line` field from a `Span`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_span_start_line(ptr: *const tree_sitter_language_pack::Span) -> usize {
     if ptr.is_null() {
@@ -697,6 +739,8 @@ pub unsafe extern "C" fn tslp_span_start_line(ptr: *const tree_sitter_language_p
 }
 
 /// Get the `start_column` field from a `Span`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_span_start_column(ptr: *const tree_sitter_language_pack::Span) -> usize {
     if ptr.is_null() {
@@ -707,6 +751,8 @@ pub unsafe extern "C" fn tslp_span_start_column(ptr: *const tree_sitter_language
 }
 
 /// Get the `end_line` field from a `Span`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_span_end_line(ptr: *const tree_sitter_language_pack::Span) -> usize {
     if ptr.is_null() {
@@ -717,6 +763,8 @@ pub unsafe extern "C" fn tslp_span_end_line(ptr: *const tree_sitter_language_pac
 }
 
 /// Get the `end_column` field from a `Span`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_span_end_column(ptr: *const tree_sitter_language_pack::Span) -> usize {
     if ptr.is_null() {
@@ -727,10 +775,11 @@ pub unsafe extern "C" fn tslp_span_end_column(ptr: *const tree_sitter_language_p
 }
 
 /// Create a `ProcessResult` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_process_result_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_result_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::ProcessResult {
+pub unsafe extern "C" fn tslp_process_result_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::ProcessResult {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -753,20 +802,20 @@ pub unsafe extern "C" fn tslp_process_result_from_json(
 }
 
 /// Free a `ProcessResult` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process_result_free(ptr: *mut tree_sitter_language_pack::ProcessResult) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `language` field from a `ProcessResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_result_language(
-    ptr: *const tree_sitter_language_pack::ProcessResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_process_result_language(ptr: *const tree_sitter_language_pack::ProcessResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -778,10 +827,10 @@ pub unsafe extern "C" fn tslp_process_result_language(
 }
 
 /// Get the `metrics` field from a `ProcessResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_result_metrics(
-    ptr: *const tree_sitter_language_pack::ProcessResult,
-) -> *mut tree_sitter_language_pack::FileMetrics {
+pub unsafe extern "C" fn tslp_process_result_metrics(ptr: *const tree_sitter_language_pack::ProcessResult) -> *mut tree_sitter_language_pack::FileMetrics {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -790,10 +839,10 @@ pub unsafe extern "C" fn tslp_process_result_metrics(
 }
 
 /// Get the `structure` field from a `ProcessResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_result_structure(
-    ptr: *const tree_sitter_language_pack::ProcessResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_process_result_structure(ptr: *const tree_sitter_language_pack::ProcessResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -808,10 +857,10 @@ pub unsafe extern "C" fn tslp_process_result_structure(
 }
 
 /// Get the `imports` field from a `ProcessResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_result_imports(
-    ptr: *const tree_sitter_language_pack::ProcessResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_process_result_imports(ptr: *const tree_sitter_language_pack::ProcessResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -826,10 +875,10 @@ pub unsafe extern "C" fn tslp_process_result_imports(
 }
 
 /// Get the `exports` field from a `ProcessResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_result_exports(
-    ptr: *const tree_sitter_language_pack::ProcessResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_process_result_exports(ptr: *const tree_sitter_language_pack::ProcessResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -844,10 +893,10 @@ pub unsafe extern "C" fn tslp_process_result_exports(
 }
 
 /// Get the `comments` field from a `ProcessResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_result_comments(
-    ptr: *const tree_sitter_language_pack::ProcessResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_process_result_comments(ptr: *const tree_sitter_language_pack::ProcessResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -862,10 +911,10 @@ pub unsafe extern "C" fn tslp_process_result_comments(
 }
 
 /// Get the `docstrings` field from a `ProcessResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_result_docstrings(
-    ptr: *const tree_sitter_language_pack::ProcessResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_process_result_docstrings(ptr: *const tree_sitter_language_pack::ProcessResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -880,10 +929,10 @@ pub unsafe extern "C" fn tslp_process_result_docstrings(
 }
 
 /// Get the `symbols` field from a `ProcessResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_result_symbols(
-    ptr: *const tree_sitter_language_pack::ProcessResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_process_result_symbols(ptr: *const tree_sitter_language_pack::ProcessResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -898,10 +947,10 @@ pub unsafe extern "C" fn tslp_process_result_symbols(
 }
 
 /// Get the `diagnostics` field from a `ProcessResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_result_diagnostics(
-    ptr: *const tree_sitter_language_pack::ProcessResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_process_result_diagnostics(ptr: *const tree_sitter_language_pack::ProcessResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -916,10 +965,10 @@ pub unsafe extern "C" fn tslp_process_result_diagnostics(
 }
 
 /// Get the `chunks` field from a `ProcessResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_result_chunks(
-    ptr: *const tree_sitter_language_pack::ProcessResult,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_process_result_chunks(ptr: *const tree_sitter_language_pack::ProcessResult) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -934,10 +983,11 @@ pub unsafe extern "C" fn tslp_process_result_chunks(
 }
 
 /// Create a `FileMetrics` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_file_metrics_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_file_metrics_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::FileMetrics {
+pub unsafe extern "C" fn tslp_file_metrics_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::FileMetrics {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -960,16 +1010,18 @@ pub unsafe extern "C" fn tslp_file_metrics_from_json(
 }
 
 /// Free a `FileMetrics` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_file_metrics_free(ptr: *mut tree_sitter_language_pack::FileMetrics) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `total_lines` field from a `FileMetrics`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_file_metrics_total_lines(ptr: *const tree_sitter_language_pack::FileMetrics) -> usize {
     if ptr.is_null() {
@@ -980,6 +1032,8 @@ pub unsafe extern "C" fn tslp_file_metrics_total_lines(ptr: *const tree_sitter_l
 }
 
 /// Get the `code_lines` field from a `FileMetrics`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_file_metrics_code_lines(ptr: *const tree_sitter_language_pack::FileMetrics) -> usize {
     if ptr.is_null() {
@@ -990,6 +1044,8 @@ pub unsafe extern "C" fn tslp_file_metrics_code_lines(ptr: *const tree_sitter_la
 }
 
 /// Get the `comment_lines` field from a `FileMetrics`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_file_metrics_comment_lines(ptr: *const tree_sitter_language_pack::FileMetrics) -> usize {
     if ptr.is_null() {
@@ -1000,6 +1056,8 @@ pub unsafe extern "C" fn tslp_file_metrics_comment_lines(ptr: *const tree_sitter
 }
 
 /// Get the `blank_lines` field from a `FileMetrics`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_file_metrics_blank_lines(ptr: *const tree_sitter_language_pack::FileMetrics) -> usize {
     if ptr.is_null() {
@@ -1010,6 +1068,8 @@ pub unsafe extern "C" fn tslp_file_metrics_blank_lines(ptr: *const tree_sitter_l
 }
 
 /// Get the `total_bytes` field from a `FileMetrics`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_file_metrics_total_bytes(ptr: *const tree_sitter_language_pack::FileMetrics) -> usize {
     if ptr.is_null() {
@@ -1020,6 +1080,8 @@ pub unsafe extern "C" fn tslp_file_metrics_total_bytes(ptr: *const tree_sitter_l
 }
 
 /// Get the `node_count` field from a `FileMetrics`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_file_metrics_node_count(ptr: *const tree_sitter_language_pack::FileMetrics) -> usize {
     if ptr.is_null() {
@@ -1030,6 +1092,8 @@ pub unsafe extern "C" fn tslp_file_metrics_node_count(ptr: *const tree_sitter_la
 }
 
 /// Get the `error_count` field from a `FileMetrics`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_file_metrics_error_count(ptr: *const tree_sitter_language_pack::FileMetrics) -> usize {
     if ptr.is_null() {
@@ -1040,6 +1104,8 @@ pub unsafe extern "C" fn tslp_file_metrics_error_count(ptr: *const tree_sitter_l
 }
 
 /// Get the `max_depth` field from a `FileMetrics`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_file_metrics_max_depth(ptr: *const tree_sitter_language_pack::FileMetrics) -> usize {
     if ptr.is_null() {
@@ -1050,10 +1116,11 @@ pub unsafe extern "C" fn tslp_file_metrics_max_depth(ptr: *const tree_sitter_lan
 }
 
 /// Create a `StructureItem` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_structure_item_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_structure_item_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::StructureItem {
+pub unsafe extern "C" fn tslp_structure_item_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::StructureItem {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -1076,20 +1143,20 @@ pub unsafe extern "C" fn tslp_structure_item_from_json(
 }
 
 /// Free a `StructureItem` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_structure_item_free(ptr: *mut tree_sitter_language_pack::StructureItem) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `kind` field from a `StructureItem`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_structure_item_kind(
-    ptr: *const tree_sitter_language_pack::StructureItem,
-) -> *mut tree_sitter_language_pack::StructureKind {
+pub unsafe extern "C" fn tslp_structure_item_kind(ptr: *const tree_sitter_language_pack::StructureItem) -> *mut tree_sitter_language_pack::StructureKind {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1098,46 +1165,50 @@ pub unsafe extern "C" fn tslp_structure_item_kind(
 }
 
 /// Get the `name` field from a `StructureItem`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_structure_item_name(
-    ptr: *const tree_sitter_language_pack::StructureItem,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_structure_item_name(ptr: *const tree_sitter_language_pack::StructureItem) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.name {
-        Some(val) => match CString::new(val.clone()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val.clone()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the `visibility` field from a `StructureItem`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_structure_item_visibility(
-    ptr: *const tree_sitter_language_pack::StructureItem,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_structure_item_visibility(ptr: *const tree_sitter_language_pack::StructureItem) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.visibility {
-        Some(val) => match CString::new(val.clone()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val.clone()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the `span` field from a `StructureItem`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_structure_item_span(
-    ptr: *const tree_sitter_language_pack::StructureItem,
-) -> *mut tree_sitter_language_pack::Span {
+pub unsafe extern "C" fn tslp_structure_item_span(ptr: *const tree_sitter_language_pack::StructureItem) -> *mut tree_sitter_language_pack::Span {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1146,10 +1217,10 @@ pub unsafe extern "C" fn tslp_structure_item_span(
 }
 
 /// Get the `children` field from a `StructureItem`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_structure_item_children(
-    ptr: *const tree_sitter_language_pack::StructureItem,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_structure_item_children(ptr: *const tree_sitter_language_pack::StructureItem) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1164,10 +1235,10 @@ pub unsafe extern "C" fn tslp_structure_item_children(
 }
 
 /// Get the `decorators` field from a `StructureItem`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_structure_item_decorators(
-    ptr: *const tree_sitter_language_pack::StructureItem,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_structure_item_decorators(ptr: *const tree_sitter_language_pack::StructureItem) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1182,61 +1253,68 @@ pub unsafe extern "C" fn tslp_structure_item_decorators(
 }
 
 /// Get the `doc_comment` field from a `StructureItem`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_structure_item_doc_comment(
-    ptr: *const tree_sitter_language_pack::StructureItem,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_structure_item_doc_comment(ptr: *const tree_sitter_language_pack::StructureItem) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.doc_comment {
-        Some(val) => match CString::new(val.clone()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val.clone()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the `signature` field from a `StructureItem`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_structure_item_signature(
-    ptr: *const tree_sitter_language_pack::StructureItem,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_structure_item_signature(ptr: *const tree_sitter_language_pack::StructureItem) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.signature {
-        Some(val) => match CString::new(val.clone()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val.clone()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the `body_span` field from a `StructureItem`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_structure_item_body_span(
-    ptr: *const tree_sitter_language_pack::StructureItem,
-) -> *mut tree_sitter_language_pack::Span {
+pub unsafe extern "C" fn tslp_structure_item_body_span(ptr: *const tree_sitter_language_pack::StructureItem) -> *mut tree_sitter_language_pack::Span {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.body_span {
-        Some(val) => Box::into_raw(Box::new(val.clone())),
+        Some(val) => {
+            Box::into_raw(Box::new(val.clone()))
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Create a `CommentInfo` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_comment_info_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_comment_info_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::CommentInfo {
+pub unsafe extern "C" fn tslp_comment_info_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::CommentInfo {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -1259,20 +1337,20 @@ pub unsafe extern "C" fn tslp_comment_info_from_json(
 }
 
 /// Free a `CommentInfo` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_comment_info_free(ptr: *mut tree_sitter_language_pack::CommentInfo) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `text` field from a `CommentInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_comment_info_text(
-    ptr: *const tree_sitter_language_pack::CommentInfo,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_comment_info_text(ptr: *const tree_sitter_language_pack::CommentInfo) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1284,10 +1362,10 @@ pub unsafe extern "C" fn tslp_comment_info_text(
 }
 
 /// Get the `kind` field from a `CommentInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_comment_info_kind(
-    ptr: *const tree_sitter_language_pack::CommentInfo,
-) -> *mut tree_sitter_language_pack::CommentKind {
+pub unsafe extern "C" fn tslp_comment_info_kind(ptr: *const tree_sitter_language_pack::CommentInfo) -> *mut tree_sitter_language_pack::CommentKind {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1296,10 +1374,10 @@ pub unsafe extern "C" fn tslp_comment_info_kind(
 }
 
 /// Get the `span` field from a `CommentInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_comment_info_span(
-    ptr: *const tree_sitter_language_pack::CommentInfo,
-) -> *mut tree_sitter_language_pack::Span {
+pub unsafe extern "C" fn tslp_comment_info_span(ptr: *const tree_sitter_language_pack::CommentInfo) -> *mut tree_sitter_language_pack::Span {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1308,28 +1386,31 @@ pub unsafe extern "C" fn tslp_comment_info_span(
 }
 
 /// Get the `associated_node` field from a `CommentInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_comment_info_associated_node(
-    ptr: *const tree_sitter_language_pack::CommentInfo,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_comment_info_associated_node(ptr: *const tree_sitter_language_pack::CommentInfo) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.associated_node {
-        Some(val) => match CString::new(val.clone()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val.clone()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Create a `DocstringInfo` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_docstring_info_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_docstring_info_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::DocstringInfo {
+pub unsafe extern "C" fn tslp_docstring_info_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::DocstringInfo {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -1352,20 +1433,20 @@ pub unsafe extern "C" fn tslp_docstring_info_from_json(
 }
 
 /// Free a `DocstringInfo` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_docstring_info_free(ptr: *mut tree_sitter_language_pack::DocstringInfo) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `text` field from a `DocstringInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_docstring_info_text(
-    ptr: *const tree_sitter_language_pack::DocstringInfo,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_docstring_info_text(ptr: *const tree_sitter_language_pack::DocstringInfo) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1377,10 +1458,10 @@ pub unsafe extern "C" fn tslp_docstring_info_text(
 }
 
 /// Get the `format` field from a `DocstringInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_docstring_info_format(
-    ptr: *const tree_sitter_language_pack::DocstringInfo,
-) -> *mut tree_sitter_language_pack::DocstringFormat {
+pub unsafe extern "C" fn tslp_docstring_info_format(ptr: *const tree_sitter_language_pack::DocstringInfo) -> *mut tree_sitter_language_pack::DocstringFormat {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1389,10 +1470,10 @@ pub unsafe extern "C" fn tslp_docstring_info_format(
 }
 
 /// Get the `span` field from a `DocstringInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_docstring_info_span(
-    ptr: *const tree_sitter_language_pack::DocstringInfo,
-) -> *mut tree_sitter_language_pack::Span {
+pub unsafe extern "C" fn tslp_docstring_info_span(ptr: *const tree_sitter_language_pack::DocstringInfo) -> *mut tree_sitter_language_pack::Span {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1401,28 +1482,30 @@ pub unsafe extern "C" fn tslp_docstring_info_span(
 }
 
 /// Get the `associated_item` field from a `DocstringInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_docstring_info_associated_item(
-    ptr: *const tree_sitter_language_pack::DocstringInfo,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_docstring_info_associated_item(ptr: *const tree_sitter_language_pack::DocstringInfo) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.associated_item {
-        Some(val) => match CString::new(val.clone()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val.clone()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the `parsed_sections` field from a `DocstringInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_docstring_info_parsed_sections(
-    ptr: *const tree_sitter_language_pack::DocstringInfo,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_docstring_info_parsed_sections(ptr: *const tree_sitter_language_pack::DocstringInfo) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1437,6 +1520,9 @@ pub unsafe extern "C" fn tslp_docstring_info_parsed_sections(
 }
 
 /// Create a `DocSection` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_doc_section_free`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_doc_section_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::DocSection {
     clear_last_error();
@@ -1461,20 +1547,20 @@ pub unsafe extern "C" fn tslp_doc_section_from_json(json: *const c_char) -> *mut
 }
 
 /// Free a `DocSection` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_doc_section_free(ptr: *mut tree_sitter_language_pack::DocSection) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `kind` field from a `DocSection`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_doc_section_kind(
-    ptr: *const tree_sitter_language_pack::DocSection,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_doc_section_kind(ptr: *const tree_sitter_language_pack::DocSection) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1486,28 +1572,30 @@ pub unsafe extern "C" fn tslp_doc_section_kind(
 }
 
 /// Get the `name` field from a `DocSection`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_doc_section_name(
-    ptr: *const tree_sitter_language_pack::DocSection,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_doc_section_name(ptr: *const tree_sitter_language_pack::DocSection) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.name {
-        Some(val) => match CString::new(val.clone()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val.clone()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the `description` field from a `DocSection`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_doc_section_description(
-    ptr: *const tree_sitter_language_pack::DocSection,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_doc_section_description(ptr: *const tree_sitter_language_pack::DocSection) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1519,6 +1607,9 @@ pub unsafe extern "C" fn tslp_doc_section_description(
 }
 
 /// Create a `ImportInfo` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_import_info_free`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_import_info_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::ImportInfo {
     clear_last_error();
@@ -1543,20 +1634,20 @@ pub unsafe extern "C" fn tslp_import_info_from_json(json: *const c_char) -> *mut
 }
 
 /// Free a `ImportInfo` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_import_info_free(ptr: *mut tree_sitter_language_pack::ImportInfo) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `source` field from a `ImportInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_import_info_source(
-    ptr: *const tree_sitter_language_pack::ImportInfo,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_import_info_source(ptr: *const tree_sitter_language_pack::ImportInfo) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1568,10 +1659,10 @@ pub unsafe extern "C" fn tslp_import_info_source(
 }
 
 /// Get the `items` field from a `ImportInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_import_info_items(
-    ptr: *const tree_sitter_language_pack::ImportInfo,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_import_info_items(ptr: *const tree_sitter_language_pack::ImportInfo) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1586,24 +1677,28 @@ pub unsafe extern "C" fn tslp_import_info_items(
 }
 
 /// Get the `alias` field from a `ImportInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_import_info_alias(
-    ptr: *const tree_sitter_language_pack::ImportInfo,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_import_info_alias(ptr: *const tree_sitter_language_pack::ImportInfo) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.alias {
-        Some(val) => match CString::new(val.clone()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val.clone()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the `is_wildcard` field from a `ImportInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_import_info_is_wildcard(ptr: *const tree_sitter_language_pack::ImportInfo) -> i32 {
     if ptr.is_null() {
@@ -1614,10 +1709,10 @@ pub unsafe extern "C" fn tslp_import_info_is_wildcard(ptr: *const tree_sitter_la
 }
 
 /// Get the `span` field from a `ImportInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_import_info_span(
-    ptr: *const tree_sitter_language_pack::ImportInfo,
-) -> *mut tree_sitter_language_pack::Span {
+pub unsafe extern "C" fn tslp_import_info_span(ptr: *const tree_sitter_language_pack::ImportInfo) -> *mut tree_sitter_language_pack::Span {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1626,6 +1721,9 @@ pub unsafe extern "C" fn tslp_import_info_span(
 }
 
 /// Create a `ExportInfo` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_export_info_free`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_export_info_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::ExportInfo {
     clear_last_error();
@@ -1650,20 +1748,20 @@ pub unsafe extern "C" fn tslp_export_info_from_json(json: *const c_char) -> *mut
 }
 
 /// Free a `ExportInfo` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_export_info_free(ptr: *mut tree_sitter_language_pack::ExportInfo) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `name` field from a `ExportInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_export_info_name(
-    ptr: *const tree_sitter_language_pack::ExportInfo,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_export_info_name(ptr: *const tree_sitter_language_pack::ExportInfo) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1675,10 +1773,10 @@ pub unsafe extern "C" fn tslp_export_info_name(
 }
 
 /// Get the `kind` field from a `ExportInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_export_info_kind(
-    ptr: *const tree_sitter_language_pack::ExportInfo,
-) -> *mut tree_sitter_language_pack::ExportKind {
+pub unsafe extern "C" fn tslp_export_info_kind(ptr: *const tree_sitter_language_pack::ExportInfo) -> *mut tree_sitter_language_pack::ExportKind {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1687,10 +1785,10 @@ pub unsafe extern "C" fn tslp_export_info_kind(
 }
 
 /// Get the `span` field from a `ExportInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_export_info_span(
-    ptr: *const tree_sitter_language_pack::ExportInfo,
-) -> *mut tree_sitter_language_pack::Span {
+pub unsafe extern "C" fn tslp_export_info_span(ptr: *const tree_sitter_language_pack::ExportInfo) -> *mut tree_sitter_language_pack::Span {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1699,6 +1797,9 @@ pub unsafe extern "C" fn tslp_export_info_span(
 }
 
 /// Create a `SymbolInfo` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_symbol_info_free`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_symbol_info_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::SymbolInfo {
     clear_last_error();
@@ -1723,20 +1824,20 @@ pub unsafe extern "C" fn tslp_symbol_info_from_json(json: *const c_char) -> *mut
 }
 
 /// Free a `SymbolInfo` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_symbol_info_free(ptr: *mut tree_sitter_language_pack::SymbolInfo) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `name` field from a `SymbolInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_symbol_info_name(
-    ptr: *const tree_sitter_language_pack::SymbolInfo,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_symbol_info_name(ptr: *const tree_sitter_language_pack::SymbolInfo) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1748,10 +1849,10 @@ pub unsafe extern "C" fn tslp_symbol_info_name(
 }
 
 /// Get the `kind` field from a `SymbolInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_symbol_info_kind(
-    ptr: *const tree_sitter_language_pack::SymbolInfo,
-) -> *mut tree_sitter_language_pack::SymbolKind {
+pub unsafe extern "C" fn tslp_symbol_info_kind(ptr: *const tree_sitter_language_pack::SymbolInfo) -> *mut tree_sitter_language_pack::SymbolKind {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1760,10 +1861,10 @@ pub unsafe extern "C" fn tslp_symbol_info_kind(
 }
 
 /// Get the `span` field from a `SymbolInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_symbol_info_span(
-    ptr: *const tree_sitter_language_pack::SymbolInfo,
-) -> *mut tree_sitter_language_pack::Span {
+pub unsafe extern "C" fn tslp_symbol_info_span(ptr: *const tree_sitter_language_pack::SymbolInfo) -> *mut tree_sitter_language_pack::Span {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1772,42 +1873,49 @@ pub unsafe extern "C" fn tslp_symbol_info_span(
 }
 
 /// Get the `type_annotation` field from a `SymbolInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_symbol_info_type_annotation(
-    ptr: *const tree_sitter_language_pack::SymbolInfo,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_symbol_info_type_annotation(ptr: *const tree_sitter_language_pack::SymbolInfo) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.type_annotation {
-        Some(val) => match CString::new(val.clone()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val.clone()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the `doc` field from a `SymbolInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_symbol_info_doc(
-    ptr: *const tree_sitter_language_pack::SymbolInfo,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_symbol_info_doc(ptr: *const tree_sitter_language_pack::SymbolInfo) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.doc {
-        Some(val) => match CString::new(val.clone()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val.clone()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Create a `Diagnostic` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_diagnostic_free`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_diagnostic_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::Diagnostic {
     clear_last_error();
@@ -1832,20 +1940,20 @@ pub unsafe extern "C" fn tslp_diagnostic_from_json(json: *const c_char) -> *mut 
 }
 
 /// Free a `Diagnostic` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_diagnostic_free(ptr: *mut tree_sitter_language_pack::Diagnostic) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `message` field from a `Diagnostic`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_diagnostic_message(
-    ptr: *const tree_sitter_language_pack::Diagnostic,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_diagnostic_message(ptr: *const tree_sitter_language_pack::Diagnostic) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1857,10 +1965,10 @@ pub unsafe extern "C" fn tslp_diagnostic_message(
 }
 
 /// Get the `severity` field from a `Diagnostic`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_diagnostic_severity(
-    ptr: *const tree_sitter_language_pack::Diagnostic,
-) -> *mut tree_sitter_language_pack::DiagnosticSeverity {
+pub unsafe extern "C" fn tslp_diagnostic_severity(ptr: *const tree_sitter_language_pack::Diagnostic) -> *mut tree_sitter_language_pack::DiagnosticSeverity {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1869,10 +1977,10 @@ pub unsafe extern "C" fn tslp_diagnostic_severity(
 }
 
 /// Get the `span` field from a `Diagnostic`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_diagnostic_span(
-    ptr: *const tree_sitter_language_pack::Diagnostic,
-) -> *mut tree_sitter_language_pack::Span {
+pub unsafe extern "C" fn tslp_diagnostic_span(ptr: *const tree_sitter_language_pack::Diagnostic) -> *mut tree_sitter_language_pack::Span {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1881,6 +1989,9 @@ pub unsafe extern "C" fn tslp_diagnostic_span(
 }
 
 /// Create a `CodeChunk` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_code_chunk_free`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_code_chunk_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::CodeChunk {
     clear_last_error();
@@ -1905,20 +2016,20 @@ pub unsafe extern "C" fn tslp_code_chunk_from_json(json: *const c_char) -> *mut 
 }
 
 /// Free a `CodeChunk` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_code_chunk_free(ptr: *mut tree_sitter_language_pack::CodeChunk) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `content` field from a `CodeChunk`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_code_chunk_content(
-    ptr: *const tree_sitter_language_pack::CodeChunk,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_code_chunk_content(ptr: *const tree_sitter_language_pack::CodeChunk) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1930,6 +2041,8 @@ pub unsafe extern "C" fn tslp_code_chunk_content(
 }
 
 /// Get the `start_byte` field from a `CodeChunk`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_code_chunk_start_byte(ptr: *const tree_sitter_language_pack::CodeChunk) -> usize {
     if ptr.is_null() {
@@ -1940,6 +2053,8 @@ pub unsafe extern "C" fn tslp_code_chunk_start_byte(ptr: *const tree_sitter_lang
 }
 
 /// Get the `end_byte` field from a `CodeChunk`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_code_chunk_end_byte(ptr: *const tree_sitter_language_pack::CodeChunk) -> usize {
     if ptr.is_null() {
@@ -1950,6 +2065,8 @@ pub unsafe extern "C" fn tslp_code_chunk_end_byte(ptr: *const tree_sitter_langua
 }
 
 /// Get the `start_line` field from a `CodeChunk`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_code_chunk_start_line(ptr: *const tree_sitter_language_pack::CodeChunk) -> usize {
     if ptr.is_null() {
@@ -1960,6 +2077,8 @@ pub unsafe extern "C" fn tslp_code_chunk_start_line(ptr: *const tree_sitter_lang
 }
 
 /// Get the `end_line` field from a `CodeChunk`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_code_chunk_end_line(ptr: *const tree_sitter_language_pack::CodeChunk) -> usize {
     if ptr.is_null() {
@@ -1970,10 +2089,10 @@ pub unsafe extern "C" fn tslp_code_chunk_end_line(ptr: *const tree_sitter_langua
 }
 
 /// Get the `metadata` field from a `CodeChunk`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_code_chunk_metadata(
-    ptr: *const tree_sitter_language_pack::CodeChunk,
-) -> *mut tree_sitter_language_pack::ChunkContext {
+pub unsafe extern "C" fn tslp_code_chunk_metadata(ptr: *const tree_sitter_language_pack::CodeChunk) -> *mut tree_sitter_language_pack::ChunkContext {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -1982,10 +2101,11 @@ pub unsafe extern "C" fn tslp_code_chunk_metadata(
 }
 
 /// Create a `ChunkContext` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_chunk_context_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_chunk_context_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::ChunkContext {
+pub unsafe extern "C" fn tslp_chunk_context_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::ChunkContext {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -2008,20 +2128,20 @@ pub unsafe extern "C" fn tslp_chunk_context_from_json(
 }
 
 /// Free a `ChunkContext` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_chunk_context_free(ptr: *mut tree_sitter_language_pack::ChunkContext) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `language` field from a `ChunkContext`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_chunk_context_language(
-    ptr: *const tree_sitter_language_pack::ChunkContext,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_chunk_context_language(ptr: *const tree_sitter_language_pack::ChunkContext) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -2033,6 +2153,8 @@ pub unsafe extern "C" fn tslp_chunk_context_language(
 }
 
 /// Get the `chunk_index` field from a `ChunkContext`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_chunk_context_chunk_index(ptr: *const tree_sitter_language_pack::ChunkContext) -> usize {
     if ptr.is_null() {
@@ -2043,6 +2165,8 @@ pub unsafe extern "C" fn tslp_chunk_context_chunk_index(ptr: *const tree_sitter_
 }
 
 /// Get the `total_chunks` field from a `ChunkContext`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_chunk_context_total_chunks(ptr: *const tree_sitter_language_pack::ChunkContext) -> usize {
     if ptr.is_null() {
@@ -2053,10 +2177,10 @@ pub unsafe extern "C" fn tslp_chunk_context_total_chunks(ptr: *const tree_sitter
 }
 
 /// Get the `node_types` field from a `ChunkContext`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_chunk_context_node_types(
-    ptr: *const tree_sitter_language_pack::ChunkContext,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_chunk_context_node_types(ptr: *const tree_sitter_language_pack::ChunkContext) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -2071,10 +2195,10 @@ pub unsafe extern "C" fn tslp_chunk_context_node_types(
 }
 
 /// Get the `context_path` field from a `ChunkContext`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_chunk_context_context_path(
-    ptr: *const tree_sitter_language_pack::ChunkContext,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_chunk_context_context_path(ptr: *const tree_sitter_language_pack::ChunkContext) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -2089,10 +2213,10 @@ pub unsafe extern "C" fn tslp_chunk_context_context_path(
 }
 
 /// Get the `symbols_defined` field from a `ChunkContext`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_chunk_context_symbols_defined(
-    ptr: *const tree_sitter_language_pack::ChunkContext,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_chunk_context_symbols_defined(ptr: *const tree_sitter_language_pack::ChunkContext) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -2107,10 +2231,10 @@ pub unsafe extern "C" fn tslp_chunk_context_symbols_defined(
 }
 
 /// Get the `comments` field from a `ChunkContext`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_chunk_context_comments(
-    ptr: *const tree_sitter_language_pack::ChunkContext,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_chunk_context_comments(ptr: *const tree_sitter_language_pack::ChunkContext) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -2125,10 +2249,10 @@ pub unsafe extern "C" fn tslp_chunk_context_comments(
 }
 
 /// Get the `docstrings` field from a `ChunkContext`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_chunk_context_docstrings(
-    ptr: *const tree_sitter_language_pack::ChunkContext,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_chunk_context_docstrings(ptr: *const tree_sitter_language_pack::ChunkContext) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
@@ -2143,10 +2267,10 @@ pub unsafe extern "C" fn tslp_chunk_context_docstrings(
 }
 
 /// Get the `has_error_nodes` field from a `ChunkContext`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_chunk_context_has_error_nodes(
-    ptr: *const tree_sitter_language_pack::ChunkContext,
-) -> i32 {
+pub unsafe extern "C" fn tslp_chunk_context_has_error_nodes(ptr: *const tree_sitter_language_pack::ChunkContext) -> i32 {
     if ptr.is_null() {
         return 0;
     }
@@ -2155,6 +2279,9 @@ pub unsafe extern "C" fn tslp_chunk_context_has_error_nodes(
 }
 
 /// Create a `NodeInfo` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_node_info_free`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::NodeInfo {
     clear_last_error();
@@ -2179,16 +2306,18 @@ pub unsafe extern "C" fn tslp_node_info_from_json(json: *const c_char) -> *mut t
 }
 
 /// Free a `NodeInfo` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_free(ptr: *mut tree_sitter_language_pack::NodeInfo) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `is_named` field from a `NodeInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_is_named(ptr: *const tree_sitter_language_pack::NodeInfo) -> i32 {
     if ptr.is_null() {
@@ -2199,6 +2328,8 @@ pub unsafe extern "C" fn tslp_node_info_is_named(ptr: *const tree_sitter_languag
 }
 
 /// Get the `start_byte` field from a `NodeInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_start_byte(ptr: *const tree_sitter_language_pack::NodeInfo) -> usize {
     if ptr.is_null() {
@@ -2209,6 +2340,8 @@ pub unsafe extern "C" fn tslp_node_info_start_byte(ptr: *const tree_sitter_langu
 }
 
 /// Get the `end_byte` field from a `NodeInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_end_byte(ptr: *const tree_sitter_language_pack::NodeInfo) -> usize {
     if ptr.is_null() {
@@ -2219,6 +2352,8 @@ pub unsafe extern "C" fn tslp_node_info_end_byte(ptr: *const tree_sitter_languag
 }
 
 /// Get the `start_row` field from a `NodeInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_start_row(ptr: *const tree_sitter_language_pack::NodeInfo) -> usize {
     if ptr.is_null() {
@@ -2229,6 +2364,8 @@ pub unsafe extern "C" fn tslp_node_info_start_row(ptr: *const tree_sitter_langua
 }
 
 /// Get the `start_col` field from a `NodeInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_start_col(ptr: *const tree_sitter_language_pack::NodeInfo) -> usize {
     if ptr.is_null() {
@@ -2239,6 +2376,8 @@ pub unsafe extern "C" fn tslp_node_info_start_col(ptr: *const tree_sitter_langua
 }
 
 /// Get the `end_row` field from a `NodeInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_end_row(ptr: *const tree_sitter_language_pack::NodeInfo) -> usize {
     if ptr.is_null() {
@@ -2249,6 +2388,8 @@ pub unsafe extern "C" fn tslp_node_info_end_row(ptr: *const tree_sitter_language
 }
 
 /// Get the `end_col` field from a `NodeInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_end_col(ptr: *const tree_sitter_language_pack::NodeInfo) -> usize {
     if ptr.is_null() {
@@ -2259,6 +2400,8 @@ pub unsafe extern "C" fn tslp_node_info_end_col(ptr: *const tree_sitter_language
 }
 
 /// Get the `named_child_count` field from a `NodeInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_named_child_count(ptr: *const tree_sitter_language_pack::NodeInfo) -> usize {
     if ptr.is_null() {
@@ -2269,6 +2412,8 @@ pub unsafe extern "C" fn tslp_node_info_named_child_count(ptr: *const tree_sitte
 }
 
 /// Get the `is_error` field from a `NodeInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_is_error(ptr: *const tree_sitter_language_pack::NodeInfo) -> i32 {
     if ptr.is_null() {
@@ -2279,6 +2424,8 @@ pub unsafe extern "C" fn tslp_node_info_is_error(ptr: *const tree_sitter_languag
 }
 
 /// Get the `is_missing` field from a `NodeInfo`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_is_missing(ptr: *const tree_sitter_language_pack::NodeInfo) -> i32 {
     if ptr.is_null() {
@@ -2289,6 +2436,9 @@ pub unsafe extern "C" fn tslp_node_info_is_missing(ptr: *const tree_sitter_langu
 }
 
 /// Create a `PackConfig` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_pack_config_free`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_pack_config_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::PackConfig {
     clear_last_error();
@@ -2313,123 +2463,140 @@ pub unsafe extern "C" fn tslp_pack_config_from_json(json: *const c_char) -> *mut
 }
 
 /// Free a `PackConfig` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_pack_config_free(ptr: *mut tree_sitter_language_pack::PackConfig) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `cache_dir` field from a `PackConfig`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pack_config_cache_dir(
-    ptr: *const tree_sitter_language_pack::PackConfig,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_pack_config_cache_dir(ptr: *const tree_sitter_language_pack::PackConfig) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.cache_dir {
-        Some(val) => match CString::new(val.to_string_lossy().to_string()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val.to_string_lossy().to_string()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the `languages` field from a `PackConfig`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pack_config_languages(
-    ptr: *const tree_sitter_language_pack::PackConfig,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_pack_config_languages(ptr: *const tree_sitter_language_pack::PackConfig) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.languages {
-        Some(val) => match serde_json::to_string(&val) {
-            Ok(s) => match CString::new(s) {
-                Ok(cs) => cs.into_raw(),
+        Some(val) => {
+            match serde_json::to_string(&val) {
+                Ok(s) => match CString::new(s) {
+                    Ok(cs) => cs.into_raw(),
+                    Err(_) => std::ptr::null_mut(),
+                },
                 Err(_) => std::ptr::null_mut(),
-            },
-            Err(_) => std::ptr::null_mut(),
-        },
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the `groups` field from a `PackConfig`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pack_config_groups(
-    ptr: *const tree_sitter_language_pack::PackConfig,
-) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_pack_config_groups(ptr: *const tree_sitter_language_pack::PackConfig) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
     let obj = unsafe { &*ptr };
     match &obj.groups {
-        Some(val) => match serde_json::to_string(&val) {
-            Ok(s) => match CString::new(s) {
-                Ok(cs) => cs.into_raw(),
+        Some(val) => {
+            match serde_json::to_string(&val) {
+                Ok(s) => match CString::new(s) {
+                    Ok(cs) => cs.into_raw(),
+                    Err(_) => std::ptr::null_mut(),
+                },
                 Err(_) => std::ptr::null_mut(),
-            },
-            Err(_) => std::ptr::null_mut(),
-        },
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Load configuration from a TOML file.
-///
+/// 
 /// # Errors
-///
+/// 
 /// Returns an error if the file cannot be read or the TOML is invalid.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use std::path::Path;
 /// use tree_sitter_language_pack::PackConfig;
-///
+/// 
 /// let config = PackConfig::from_toml_file(Path::new("language-pack.toml")).unwrap();
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pack_config_from_toml_file(_path: *const std::ffi::c_char) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_pack_config_from_toml_file(
+    path: *const std::ffi::c_char
+) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up PackConfig::from_toml_file — requires manual FFI bridge")
 }
 
 /// Discover configuration by searching for `language-pack.toml` in:
-///
+/// 
 /// 1. Current directory and up to 10 parent directories
 /// 2. `$XDG_CONFIG_HOME/tree-sitter-language-pack/config.toml`
 /// 3. `~/.config/tree-sitter-language-pack/config.toml`
-///
+/// 
 /// Returns `None` if no configuration file is found.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::PackConfig;
-///
+/// 
 /// if let Some(config) = PackConfig::discover() {
 ///     println!("Found config with {:?} languages", config.languages);
 /// }
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_pack_config_discover() -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_pack_config_discover(
+
+) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up PackConfig::discover — requires manual FFI bridge")
 }
 
 /// Create a `ProcessConfig` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `tslp_process_config_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_config_from_json(
-    json: *const c_char,
-) -> *mut tree_sitter_language_pack::ProcessConfig {
+pub unsafe extern "C" fn tslp_process_config_from_json(json: *const c_char) -> *mut tree_sitter_language_pack::ProcessConfig {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -2452,16 +2619,18 @@ pub unsafe extern "C" fn tslp_process_config_from_json(
 }
 
 /// Free a `ProcessConfig` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process_config_free(ptr: *mut tree_sitter_language_pack::ProcessConfig) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Get the `structure` field from a `ProcessConfig`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process_config_structure(ptr: *const tree_sitter_language_pack::ProcessConfig) -> i32 {
     if ptr.is_null() {
@@ -2472,6 +2641,8 @@ pub unsafe extern "C" fn tslp_process_config_structure(ptr: *const tree_sitter_l
 }
 
 /// Get the `imports` field from a `ProcessConfig`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process_config_imports(ptr: *const tree_sitter_language_pack::ProcessConfig) -> i32 {
     if ptr.is_null() {
@@ -2482,6 +2653,8 @@ pub unsafe extern "C" fn tslp_process_config_imports(ptr: *const tree_sitter_lan
 }
 
 /// Get the `exports` field from a `ProcessConfig`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process_config_exports(ptr: *const tree_sitter_language_pack::ProcessConfig) -> i32 {
     if ptr.is_null() {
@@ -2492,6 +2665,8 @@ pub unsafe extern "C" fn tslp_process_config_exports(ptr: *const tree_sitter_lan
 }
 
 /// Get the `comments` field from a `ProcessConfig`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process_config_comments(ptr: *const tree_sitter_language_pack::ProcessConfig) -> i32 {
     if ptr.is_null() {
@@ -2502,6 +2677,8 @@ pub unsafe extern "C" fn tslp_process_config_comments(ptr: *const tree_sitter_la
 }
 
 /// Get the `docstrings` field from a `ProcessConfig`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process_config_docstrings(ptr: *const tree_sitter_language_pack::ProcessConfig) -> i32 {
     if ptr.is_null() {
@@ -2512,6 +2689,8 @@ pub unsafe extern "C" fn tslp_process_config_docstrings(ptr: *const tree_sitter_
 }
 
 /// Get the `symbols` field from a `ProcessConfig`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process_config_symbols(ptr: *const tree_sitter_language_pack::ProcessConfig) -> i32 {
     if ptr.is_null() {
@@ -2522,6 +2701,8 @@ pub unsafe extern "C" fn tslp_process_config_symbols(ptr: *const tree_sitter_lan
 }
 
 /// Get the `diagnostics` field from a `ProcessConfig`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process_config_diagnostics(ptr: *const tree_sitter_language_pack::ProcessConfig) -> i32 {
     if ptr.is_null() {
@@ -2532,89 +2713,111 @@ pub unsafe extern "C" fn tslp_process_config_diagnostics(ptr: *const tree_sitter
 }
 
 /// Get the `chunk_max_size` field from a `ProcessConfig`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_config_chunk_max_size(
-    ptr: *const tree_sitter_language_pack::ProcessConfig,
-) -> usize {
+pub unsafe extern "C" fn tslp_process_config_chunk_max_size(ptr: *const tree_sitter_language_pack::ProcessConfig) -> usize {
     if ptr.is_null() {
         return 0;
     }
     let obj = unsafe { &*ptr };
     match &obj.chunk_max_size {
-        Some(val) => *val,
+        Some(val) => {
+            *val
+        }
         None => 0,
     }
 }
 
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_config_default() -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_process_config_default(
+
+) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up ProcessConfig::default — requires manual FFI bridge")
 }
 
 /// Enable chunking with the given maximum chunk size in bytes.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process_config_with_chunking(
-    _this: *mut tree_sitter_language_pack::ProcessConfig,
-    _max_size: usize,
+    this: *mut tree_sitter_language_pack::ProcessConfig,
+    max_size: usize
 ) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up ProcessConfig::with_chunking — requires manual FFI bridge")
 }
 
 /// Enable all analysis features.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process_config_all(
-    _this: *mut tree_sitter_language_pack::ProcessConfig,
+    this: *mut tree_sitter_language_pack::ProcessConfig
 ) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up ProcessConfig::all — requires manual FFI bridge")
 }
 
 /// Disable all analysis features (only metrics computed).
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process_config_minimal(
-    _this: *mut tree_sitter_language_pack::ProcessConfig,
+    this: *mut tree_sitter_language_pack::ProcessConfig
 ) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up ProcessConfig::minimal — requires manual FFI bridge")
 }
 
 /// Free a `LanguageRegistry` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_language_registry_free(ptr: *mut tree_sitter_language_pack::LanguageRegistry) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Create a registry with a custom directory for dynamic libraries.
-///
+/// 
 /// Overrides the default build-time library directory. Useful when
 /// dynamic grammar shared libraries are stored in a non-standard location.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_language_registry_with_libs_dir(
-    _libs_dir: *const std::ffi::c_char,
+    libs_dir: *const std::ffi::c_char
 ) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up LanguageRegistry::with_libs_dir — requires manual FFI bridge")
 }
 
 /// Add an additional directory to search for dynamic libraries.
-///
+/// 
 /// When [`get_language`](Self::get_language) cannot find a grammar in the
 /// primary library directory, it searches these extra directories in order.
 /// Typically used by the download system to register its cache directory.
-///
+/// 
 /// Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
 /// mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
 /// immutable while the directory list is updated.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_language_registry_add_extra_libs_dir(
     this: *const tree_sitter_language_pack::LanguageRegistry,
-    dir: *const std::ffi::c_char,
+    dir: *const std::ffi::c_char
 ) {
     clear_last_error();
     if this.is_null() {
@@ -2633,35 +2836,41 @@ pub unsafe extern "C" fn tslp_language_registry_add_extra_libs_dir(
             return;
         }
     };
-    obj.add_extra_libs_dir(dir_rs);
+    let result = obj.add_extra_libs_dir(dir_rs);
 }
 
 /// Get a tree-sitter [`Language`] by name.
-///
+/// 
 /// Resolves aliases (e.g., `"shell"` -> `"bash"`, `"makefile"` -> `"make"`),
 /// then looks up the language in the static table. When the `dynamic-loading`
 /// feature is enabled, falls back to loading a shared library on demand.
-///
+/// 
 /// # Errors
-///
+/// 
 /// Returns [`Error::LanguageNotFound`] if the name (after alias resolution)
 /// does not match any known grammar.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_language_registry_get_language(
-    _this: *const tree_sitter_language_pack::LanguageRegistry,
-    _name: *const std::ffi::c_char,
+    this: *const tree_sitter_language_pack::LanguageRegistry,
+    name: *const std::ffi::c_char
 ) -> *mut tree_sitter_language_pack::Language {
     clear_last_error();
     todo!("wire up LanguageRegistry::get_language — requires manual FFI bridge")
 }
 
 /// List all available language names, sorted and deduplicated.
-///
+/// 
 /// Includes statically compiled languages, dynamically loadable languages
 /// (if the `dynamic-loading` feature is enabled), and all configured aliases.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_language_registry_available_languages(
-    this: *const tree_sitter_language_pack::LanguageRegistry,
+    this: *const tree_sitter_language_pack::LanguageRegistry
 ) -> *mut std::ffi::c_char {
     clear_last_error();
     if this.is_null() {
@@ -2680,13 +2889,16 @@ pub unsafe extern "C" fn tslp_language_registry_available_languages(
 }
 
 /// Check whether a language is available by name or alias.
-///
+/// 
 /// Returns `true` if the language can be loaded, either from the static
 /// table or from a dynamic library on disk.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_language_registry_has_language(
     this: *const tree_sitter_language_pack::LanguageRegistry,
-    name: *const std::ffi::c_char,
+    name: *const std::ffi::c_char
 ) -> i32 {
     clear_last_error();
     if this.is_null() {
@@ -2710,9 +2922,12 @@ pub unsafe extern "C" fn tslp_language_registry_has_language(
 }
 
 /// Return the total number of available languages (including aliases).
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_language_registry_language_count(
-    this: *const tree_sitter_language_pack::LanguageRegistry,
+    this: *const tree_sitter_language_pack::LanguageRegistry
 ) -> usize {
     clear_last_error();
     if this.is_null() {
@@ -2720,16 +2935,19 @@ pub unsafe extern "C" fn tslp_language_registry_language_count(
         return 0;
     }
     let obj = unsafe { &*this };
-    
-    obj.language_count()
+    let result = obj.language_count();
+    result
 }
 
 /// Parse source code and extract file intelligence based on config in a single pass.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_language_registry_process(
     this: *const tree_sitter_language_pack::LanguageRegistry,
     source: *const std::ffi::c_char,
-    config: *const tree_sitter_language_pack::ProcessConfig,
+    config: *const tree_sitter_language_pack::ProcessConfig
 ) -> *mut tree_sitter_language_pack::ProcessResult {
     clear_last_error();
     if this.is_null() {
@@ -2755,7 +2973,9 @@ pub unsafe extern "C" fn tslp_language_registry_process(
     let config_rs = unsafe { &*config }.clone();
     let result = obj.process(&source_rs, &config_rs);
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => {
+            Box::into_raw(Box::new(val.clone()))
+        }
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -2763,43 +2983,51 @@ pub unsafe extern "C" fn tslp_language_registry_process(
     }
 }
 
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_language_registry_default() -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_language_registry_default(
+
+) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up LanguageRegistry::default — requires manual FFI bridge")
 }
 
-/// Free a `Tree` handle.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_tree_free(ptr: *mut tree_sitter_language_pack::Tree) {
-    if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
-    }
-}
-
 /// Free a `Language` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_language_free(ptr: *mut tree_sitter_language_pack::Language) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Free a `Parser` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_parser_free(ptr: *mut tree_sitter_language_pack::Parser) {
     if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
+        unsafe { drop(Box::from_raw(ptr)); }
+    }
+}
+
+/// Free a `Tree` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn tslp_tree_free(ptr: *mut tree_sitter_language_pack::Tree) {
+    if !ptr.is_null() {
+        unsafe { drop(Box::from_raw(ptr)); }
     }
 }
 
 /// Convert an integer to a `CaptureOutput` variant. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_capture_output_from_i32(value: i32) -> i32 {
     match value {
@@ -2814,6 +3042,8 @@ pub unsafe extern "C" fn tslp_capture_output_from_i32(value: i32) -> i32 {
 }
 
 /// Convert a `CaptureOutput` variant name (C string) to its integer value. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_capture_output_from_str(name: *const c_char) -> i32 {
     if name.is_null() {
@@ -2839,19 +3069,22 @@ pub unsafe extern "C" fn tslp_capture_output_from_str(name: *const c_char) -> i3
 }
 
 /// Convert an integer to a `StructureKind` variant. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_structure_kind_from_i32(value: i32) -> i32 {
     match value {
-        0 => 0,   // Function
-        1 => 1,   // Method
-        2 => 2,   // Class
-        3 => 3,   // Struct
-        4 => 4,   // Interface
-        5 => 5,   // Enum
-        6 => 6,   // Module
-        7 => 7,   // Trait
-        8 => 8,   // Impl
-        9 => 9,   // Namespace
+        0 => 0, // Function
+        1 => 1, // Method
+        2 => 2, // Class
+        3 => 3, // Struct
+        4 => 4, // Interface
+        5 => 5, // Enum
+        6 => 6, // Module
+        7 => 7, // Trait
+        8 => 8, // Impl
+        9 => 9, // Namespace
         10 => 10, // Other
         _ => {
             set_last_error(1, "Invalid StructureKind variant");
@@ -2861,6 +3094,8 @@ pub unsafe extern "C" fn tslp_structure_kind_from_i32(value: i32) -> i32 {
 }
 
 /// Convert a `StructureKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_structure_kind_from_str(name: *const c_char) -> i32 {
     if name.is_null() {
@@ -2894,6 +3129,9 @@ pub unsafe extern "C" fn tslp_structure_kind_from_str(name: *const c_char) -> i3
 }
 
 /// Convert an integer to a `CommentKind` variant. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_comment_kind_from_i32(value: i32) -> i32 {
     match value {
@@ -2908,6 +3146,8 @@ pub unsafe extern "C" fn tslp_comment_kind_from_i32(value: i32) -> i32 {
 }
 
 /// Convert a `CommentKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_comment_kind_from_str(name: *const c_char) -> i32 {
     if name.is_null() {
@@ -2933,6 +3173,9 @@ pub unsafe extern "C" fn tslp_comment_kind_from_str(name: *const c_char) -> i32 
 }
 
 /// Convert an integer to a `DocstringFormat` variant. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_docstring_format_from_i32(value: i32) -> i32 {
     match value {
@@ -2950,6 +3193,8 @@ pub unsafe extern "C" fn tslp_docstring_format_from_i32(value: i32) -> i32 {
 }
 
 /// Convert a `DocstringFormat` variant name (C string) to its integer value. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_docstring_format_from_str(name: *const c_char) -> i32 {
     if name.is_null() {
@@ -2978,6 +3223,9 @@ pub unsafe extern "C" fn tslp_docstring_format_from_str(name: *const c_char) -> 
 }
 
 /// Convert an integer to a `ExportKind` variant. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_export_kind_from_i32(value: i32) -> i32 {
     match value {
@@ -2992,6 +3240,8 @@ pub unsafe extern "C" fn tslp_export_kind_from_i32(value: i32) -> i32 {
 }
 
 /// Convert a `ExportKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_export_kind_from_str(name: *const c_char) -> i32 {
     if name.is_null() {
@@ -3017,6 +3267,9 @@ pub unsafe extern "C" fn tslp_export_kind_from_str(name: *const c_char) -> i32 {
 }
 
 /// Convert an integer to a `SymbolKind` variant. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_symbol_kind_from_i32(value: i32) -> i32 {
     match value {
@@ -3037,6 +3290,8 @@ pub unsafe extern "C" fn tslp_symbol_kind_from_i32(value: i32) -> i32 {
 }
 
 /// Convert a `SymbolKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_symbol_kind_from_str(name: *const c_char) -> i32 {
     if name.is_null() {
@@ -3068,6 +3323,9 @@ pub unsafe extern "C" fn tslp_symbol_kind_from_str(name: *const c_char) -> i32 {
 }
 
 /// Convert an integer to a `DiagnosticSeverity` variant. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_diagnostic_severity_from_i32(value: i32) -> i32 {
     match value {
@@ -3082,6 +3340,8 @@ pub unsafe extern "C" fn tslp_diagnostic_severity_from_i32(value: i32) -> i32 {
 }
 
 /// Convert a `DiagnosticSeverity` variant name (C string) to its integer value. Returns -1 on invalid input.
+/// # Safety
+/// Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_diagnostic_severity_from_str(name: *const c_char) -> i32 {
     if name.is_null() {
@@ -3107,17 +3367,22 @@ pub unsafe extern "C" fn tslp_diagnostic_severity_from_str(name: *const c_char) 
 }
 
 /// Detect language name from a file extension (without leading dot).
-///
+/// 
 /// Returns `None` for unrecognized extensions. The match is case-insensitive.
-///
+/// 
 /// ```
 /// use tree_sitter_language_pack::detect_language_from_extension;
 /// assert_eq!(detect_language_from_extension("py"), Some("python"));
 /// assert_eq!(detect_language_from_extension("RS"), Some("rust"));
 /// assert_eq!(detect_language_from_extension("xyz"), None);
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_detect_language_from_extension(ext: *const std::ffi::c_char) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_detect_language_from_extension(
+    ext: *const std::ffi::c_char
+) -> *mut std::ffi::c_char {
     clear_last_error();
     if ext.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'ext'");
@@ -3132,27 +3397,34 @@ pub unsafe extern "C" fn tslp_detect_language_from_extension(ext: *const std::ff
     };
     let result = tree_sitter_language_pack::detect_language_from_extension(&ext_rs);
     match result {
-        Some(val) => match CString::new(val) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Detect language name from a file path.
-///
+/// 
 /// Extracts the file extension and looks it up. Returns `None` if the
 /// path has no extension or the extension is not recognized.
-///
+/// 
 /// ```
 /// use tree_sitter_language_pack::detect_language_from_path;
 /// assert_eq!(detect_language_from_path("src/main.rs"), Some("rust"));
 /// assert_eq!(detect_language_from_path("README.md"), Some("markdown"));
 /// assert_eq!(detect_language_from_path("Makefile"), None);
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_detect_language_from_path(path: *const std::ffi::c_char) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_detect_language_from_path(
+    path: *const std::ffi::c_char
+) -> *mut std::ffi::c_char {
     clear_last_error();
     if path.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'path'");
@@ -3167,23 +3439,25 @@ pub unsafe extern "C" fn tslp_detect_language_from_path(path: *const std::ffi::c
     };
     let result = tree_sitter_language_pack::detect_language_from_path(&path_rs);
     match result {
-        Some(val) => match CString::new(val) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Check if a file extension is ambiguous — i.e. it could reasonably belong to
 /// multiple languages.
-///
+/// 
 /// Returns `Some((assigned_language, alternatives))` if the extension is known
 /// to be ambiguous, where `assigned_language` is what [`detect_language_from_extension`]
 /// returns and `alternatives` lists other languages it could also belong to.
-///
+/// 
 /// Returns `None` if the extension is unambiguous or unrecognized.
-///
+/// 
 /// ```
 /// use tree_sitter_language_pack::extension_ambiguity;
 /// // .m is assigned to objc but could also be matlab
@@ -3194,14 +3468,24 @@ pub unsafe extern "C" fn tslp_detect_language_from_path(path: *const std::ffi::c
 /// // .py is unambiguous
 /// assert!(extension_ambiguity("py").is_none());
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_extension_ambiguity(_ext: *const std::ffi::c_char) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_extension_ambiguity(
+    ext: *const std::ffi::c_char
+) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up extension_ambiguity — requires manual FFI bridge")
 }
 
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_extension_ambiguity_json(ext: *const std::ffi::c_char) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_extension_ambiguity_json(
+    ext: *const std::ffi::c_char
+) -> *mut std::ffi::c_char {
     clear_last_error();
     if ext.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'ext'");
@@ -3216,38 +3500,45 @@ pub unsafe extern "C" fn tslp_extension_ambiguity_json(ext: *const std::ffi::c_c
     };
     let result = tree_sitter_language_pack::extension_ambiguity_json(&ext_rs);
     match result {
-        Some(val) => match CString::new(val) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Detect language name from file content using the shebang line (`#!`).
-///
+/// 
 /// Inspects only the first line of `content`. If it begins with `#!`, the
 /// interpreter name is extracted and mapped to a language name.
-///
+/// 
 /// Handles common patterns:
 /// - `#!/usr/bin/env python3` → `"python"`
 /// - `#!/bin/bash` → `"bash"`
 /// - `#!/usr/bin/env node` → `"javascript"`
-///
+/// 
 /// The `-S` flag accepted by some `env` implementations is skipped automatically.
 /// Version suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.
-///
+/// 
 /// Returns `None` when content does not start with `#!`, the shebang is
 /// malformed, or the interpreter is not recognised.
-///
+/// 
 /// ```
 /// use tree_sitter_language_pack::detect_language_from_content;
 /// assert_eq!(detect_language_from_content("#!/usr/bin/env python3\npass"), Some("python"));
 /// assert_eq!(detect_language_from_content("#!/bin/bash\necho hi"), Some("bash"));
 /// assert_eq!(detect_language_from_content("no shebang here"), None);
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_detect_language_from_content(content: *const std::ffi::c_char) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_detect_language_from_content(
+    content: *const std::ffi::c_char
+) -> *mut std::ffi::c_char {
     clear_last_error();
     if content.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'content'");
@@ -3262,25 +3553,30 @@ pub unsafe extern "C" fn tslp_detect_language_from_content(content: *const std::
     };
     let result = tree_sitter_language_pack::detect_language_from_content(&content_rs);
     match result {
-        Some(val) => match CString::new(val) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Validate an extraction config without running it.
-///
+/// 
 /// Checks that the language exists and all query patterns compile. Returns
 /// detailed diagnostics per pattern.
-///
+/// 
 /// # Errors
-///
+/// 
 /// Returns an error if the language cannot be loaded.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_validate_extraction(
-    config: *const tree_sitter_language_pack::ExtractionConfig,
+    config: *const tree_sitter_language_pack::ExtractionConfig
 ) -> *mut tree_sitter_language_pack::ValidationResult {
     clear_last_error();
     if config.is_null() {
@@ -3290,7 +3586,9 @@ pub unsafe extern "C" fn tslp_validate_extraction(
     let config_rs = unsafe { &*config }.clone();
     let result = tree_sitter_language_pack::validate_extraction(&config_rs);
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => {
+            Box::into_raw(Box::new(val.clone()))
+        }
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -3299,136 +3597,177 @@ pub unsafe extern "C" fn tslp_validate_extraction(
 }
 
 /// Process source code: parse once, extract intelligence based on config, and return it.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_process(
-    _source: *const std::ffi::c_char,
-    _config: *const tree_sitter_language_pack::ProcessConfig,
-    _registry: *const tree_sitter_language_pack::LanguageRegistry,
+    source: *const std::ffi::c_char,
+    config: *const tree_sitter_language_pack::ProcessConfig,
+    registry: *const tree_sitter_language_pack::LanguageRegistry
 ) -> *mut tree_sitter_language_pack::ProcessResult {
     clear_last_error();
     todo!("wire up process — requires manual FFI bridge")
 }
 
 /// Extract a `NodeInfo` from a tree-sitter `Node`.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_node_info_from_node(
-    _node: *const std::ffi::c_char,
+    node: *const std::ffi::c_char
 ) -> *mut tree_sitter_language_pack::NodeInfo {
     clear_last_error();
     todo!("wire up node_info_from_node — requires manual FFI bridge")
 }
 
 /// Get a `NodeInfo` snapshot of the root node.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_root_node_info(
-    _tree: *const tree_sitter_language_pack::Tree,
+    tree: *const tree_sitter_language_pack::Tree
 ) -> *mut tree_sitter_language_pack::NodeInfo {
     clear_last_error();
     todo!("wire up root_node_info — requires manual FFI bridge")
 }
 
 /// Find all nodes matching the given type name, returning their `NodeInfo`.
-///
+/// 
 /// Performs a depth-first traversal. Returns an empty vec if no matches.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_find_nodes_by_type(
-    _tree: *const tree_sitter_language_pack::Tree,
-    _node_type: *const std::ffi::c_char,
+    tree: *const tree_sitter_language_pack::Tree,
+    node_type: *const std::ffi::c_char
 ) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up find_nodes_by_type — requires manual FFI bridge")
 }
 
 /// Get `NodeInfo` for all named children of the root node.
-///
+/// 
 /// Useful for understanding the top-level structure of a file
 /// (e.g., list of function definitions, class declarations, imports).
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_named_children_info(
-    _tree: *const tree_sitter_language_pack::Tree,
+    tree: *const tree_sitter_language_pack::Tree
 ) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up named_children_info — requires manual FFI bridge")
 }
 
 /// Parse source code with the named language, returning the syntax tree.
-///
+/// 
 /// Uses the global registry to look up the language by name.
-///
+/// 
 /// # Examples
-///
+/// 
 /// ```no_run
 /// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
 /// assert_eq!(tree.root_node().kind(), "module");
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_parse_string(
-    _language: *const std::ffi::c_char,
-    _source: *const u8,
-    _source_len: usize,
+    language: *const std::ffi::c_char,
+    source: *const u8,
+    source_len: usize
 ) -> *mut tree_sitter_language_pack::Tree {
     clear_last_error();
     todo!("wire up parse_string — requires manual FFI bridge")
 }
 
 /// Check whether any node in the tree matches the given type name.
-///
+/// 
 /// Performs a depth-first traversal using `TreeCursor`.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_tree_contains_node_type(
-    _tree: *const tree_sitter_language_pack::Tree,
-    _node_type: *const std::ffi::c_char,
+    tree: *const tree_sitter_language_pack::Tree,
+    node_type: *const std::ffi::c_char
 ) -> i32 {
     clear_last_error();
     todo!("wire up tree_contains_node_type — requires manual FFI bridge")
 }
 
 /// Check whether the tree contains any ERROR or MISSING nodes.
-///
+/// 
 /// Useful for determining if the parse was clean or had syntax errors.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_tree_has_error_nodes(_tree: *const tree_sitter_language_pack::Tree) -> i32 {
+pub unsafe extern "C" fn tslp_tree_has_error_nodes(
+    tree: *const tree_sitter_language_pack::Tree
+) -> i32 {
     clear_last_error();
     todo!("wire up tree_has_error_nodes — requires manual FFI bridge")
 }
 
 /// Return the S-expression representation of the entire tree.
-///
+/// 
 /// This is the standard tree-sitter debug format, useful for logging,
 /// snapshot testing, and debugging grammars.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_tree_to_sexp(_tree: *const tree_sitter_language_pack::Tree) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_tree_to_sexp(
+    tree: *const tree_sitter_language_pack::Tree
+) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up tree_to_sexp — requires manual FFI bridge")
 }
 
 /// Count the number of ERROR and MISSING nodes in the tree.
-///
+/// 
 /// Returns 0 for a clean parse.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_tree_error_count(_tree: *const tree_sitter_language_pack::Tree) -> usize {
+pub unsafe extern "C" fn tslp_tree_error_count(
+    tree: *const tree_sitter_language_pack::Tree
+) -> usize {
     clear_last_error();
     todo!("wire up tree_error_count — requires manual FFI bridge")
 }
 
 /// Get the highlights query for a language, if bundled.
-///
+/// 
 /// Returns the contents of `highlights.scm` as a static string, or `None`
 /// if no highlights query is bundled for this language.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```
 /// use tree_sitter_language_pack::get_highlights_query;
-///
+/// 
 /// // Returns Some(...) for languages with bundled queries
 /// let query = get_highlights_query("python");
 /// // Returns None for languages without bundled highlights queries
 /// let missing = get_highlights_query("nonexistent_lang");
 /// assert!(missing.is_none());
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_get_highlights_query(language: *const std::ffi::c_char) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_get_highlights_query(
+    language: *const std::ffi::c_char
+) -> *mut std::ffi::c_char {
     clear_last_error();
     if language.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'language'");
@@ -3443,31 +3782,38 @@ pub unsafe extern "C" fn tslp_get_highlights_query(language: *const std::ffi::c_
     };
     let result = tree_sitter_language_pack::get_highlights_query(&language_rs);
     match result {
-        Some(val) => match CString::new(val) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the injections query for a language, if bundled.
-///
+/// 
 /// Returns the contents of `injections.scm` as a static string, or `None`
 /// if no injections query is bundled for this language.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```
 /// use tree_sitter_language_pack::get_injections_query;
-///
+/// 
 /// let query = get_injections_query("markdown");
 /// // Returns None for languages without bundled injections queries
 /// let missing = get_injections_query("nonexistent_lang");
 /// assert!(missing.is_none());
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_get_injections_query(language: *const std::ffi::c_char) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_get_injections_query(
+    language: *const std::ffi::c_char
+) -> *mut std::ffi::c_char {
     clear_last_error();
     if language.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'language'");
@@ -3482,31 +3828,38 @@ pub unsafe extern "C" fn tslp_get_injections_query(language: *const std::ffi::c_
     };
     let result = tree_sitter_language_pack::get_injections_query(&language_rs);
     match result {
-        Some(val) => match CString::new(val) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Get the locals query for a language, if bundled.
-///
+/// 
 /// Returns the contents of `locals.scm` as a static string, or `None`
 /// if no locals query is bundled for this language.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```
 /// use tree_sitter_language_pack::get_locals_query;
-///
+/// 
 /// let query = get_locals_query("python");
 /// // Returns None for languages without bundled locals queries
 /// let missing = get_locals_query("nonexistent_lang");
 /// assert!(missing.is_none());
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_get_locals_query(language: *const std::ffi::c_char) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_get_locals_query(
+    language: *const std::ffi::c_char
+) -> *mut std::ffi::c_char {
     clear_last_error();
     if language.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'language'");
@@ -3521,32 +3874,34 @@ pub unsafe extern "C" fn tslp_get_locals_query(language: *const std::ffi::c_char
     };
     let result = tree_sitter_language_pack::get_locals_query(&language_rs);
     match result {
-        Some(val) => match CString::new(val) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Some(val) => {
+            match CString::new(val) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         None => std::ptr::null_mut(),
     }
 }
 
 /// Execute a tree-sitter query pattern against a parsed tree.
-///
+/// 
 /// The `query_source` is an S-expression pattern like:
 /// ```text
 /// (function_definition name: (identifier) @name)
 /// ```
-///
+/// 
 /// Returns all matches with their captured nodes.
-///
+/// 
 /// # Arguments
-///
+/// 
 /// * `tree` - The parsed syntax tree to query.
 /// * `language` - Language name (used to compile the query pattern).
 /// * `query_source` - The tree-sitter query pattern string.
 /// * `source` - The original source code bytes (needed for capture resolution).
-///
+/// 
 /// # Examples
-///
+/// 
 /// ```no_run
 /// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
 /// let matches = tree_sitter_language_pack::query::run_query(
@@ -3557,13 +3912,16 @@ pub unsafe extern "C" fn tslp_get_locals_query(language: *const std::ffi::c_char
 /// ).unwrap();
 /// assert!(!matches.is_empty());
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_run_query(
-    _tree: *const tree_sitter_language_pack::Tree,
-    _language: *const std::ffi::c_char,
-    _query_source: *const std::ffi::c_char,
-    _source: *const u8,
-    _source_len: usize,
+    tree: *const tree_sitter_language_pack::Tree,
+    language: *const std::ffi::c_char,
+    query_source: *const std::ffi::c_char,
+    source: *const u8,
+    source_len: usize
 ) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up run_query — requires manual FFI bridge")
@@ -3571,7 +3929,7 @@ pub unsafe extern "C" fn tslp_run_query(
 
 /// Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
 /// Returns a list of `(start_byte, end_byte)` ranges.
-///
+/// 
 /// The algorithm works by:
 /// 1. Walking the tree-sitter AST to collect all nodes with their depth.
 /// 2. Using depth as a semantic level: shallower nodes (functions, classes) are
@@ -3580,48 +3938,51 @@ pub unsafe extern "C" fn tslp_run_query(
 ///    each chunk under `max_chunk_size` bytes.
 /// 4. When no AST node boundary fits, falling back to line boundaries and
 ///    ultimately to raw byte splits.
-///
+/// 
 /// The function never splits in the middle of a token/leaf node when an AST
 /// boundary is available.
-///
+/// 
 /// # Arguments
-///
+/// 
 /// * `source` - The full source code string.
 /// * `tree`   - A tree-sitter `Tree` previously parsed from `source`.
 /// * `max_chunk_size` - Maximum size in bytes for each chunk.
-///
+/// 
 /// # Returns
-///
+/// 
 /// A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
 /// entire source. Ranges are non-overlapping, contiguous, and each range is
 /// at most `max_chunk_size` bytes (except when a single indivisible token
 /// exceeds that limit).
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_split_code(
-    _source: *const std::ffi::c_char,
-    _tree: *const tree_sitter_language_pack::Tree,
-    _max_chunk_size: usize,
+    source: *const std::ffi::c_char,
+    tree: *const tree_sitter_language_pack::Tree,
+    max_chunk_size: usize
 ) -> *mut std::ffi::c_char {
     clear_last_error();
     todo!("wire up split_code — requires manual FFI bridge")
 }
 
 /// Get a tree-sitter [`Language`] by name using the global registry.
-///
+/// 
 /// Resolves language aliases (e.g., `"shell"` maps to `"bash"`).
 /// When the `download` feature is enabled (default), automatically downloads
 /// the parser from GitHub releases if not found locally.
-///
+/// 
 /// # Errors
-///
+/// 
 /// Returns [`Error::LanguageNotFound`] if the language is not recognized,
 /// or [`Error::Download`] if auto-download fails.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::get_language;
-///
+/// 
 /// let lang = get_language("python").unwrap();
 /// // Use the Language with a tree-sitter Parser
 /// let mut parser = tree_sitter::Parser::new();
@@ -3629,54 +3990,69 @@ pub unsafe extern "C" fn tslp_split_code(
 /// let tree = parser.parse("x = 1", None).unwrap();
 /// assert_eq!(tree.root_node().kind(), "module");
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_get_language(_name: *const std::ffi::c_char) -> *mut tree_sitter_language_pack::Language {
+pub unsafe extern "C" fn tslp_get_language(
+    name: *const std::ffi::c_char
+) -> *mut tree_sitter_language_pack::Language {
     clear_last_error();
     todo!("wire up get_language — requires manual FFI bridge")
 }
 
 /// Get a tree-sitter [`Parser`] pre-configured for the given language.
-///
+/// 
 /// This is a convenience function that calls [`get_language`] and configures
 /// a new parser in one step.
-///
+/// 
 /// # Errors
-///
+/// 
 /// Returns [`Error::LanguageNotFound`] if the language is not recognized, or
 /// [`Error::ParserSetup`] if the language cannot be applied to the parser.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::get_parser;
-///
+/// 
 /// let mut parser = get_parser("rust").unwrap();
 /// let tree = parser.parse("fn main() {}", None).unwrap();
 /// assert!(!tree.root_node().has_error());
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_get_parser(_name: *const std::ffi::c_char) -> *mut tree_sitter_language_pack::Parser {
+pub unsafe extern "C" fn tslp_get_parser(
+    name: *const std::ffi::c_char
+) -> *mut tree_sitter_language_pack::Parser {
     clear_last_error();
     todo!("wire up get_parser — requires manual FFI bridge")
 }
 
 /// List all available language names (sorted, deduplicated, includes aliases).
-///
+/// 
 /// Returns names of both statically compiled and dynamically loadable languages,
 /// plus any configured aliases.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::available_languages;
-///
+/// 
 /// let langs = available_languages();
 /// for name in &langs {
 ///     println!("{}", name);
 /// }
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_available_languages() -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_available_languages(
+
+) -> *mut std::ffi::c_char {
     clear_last_error();
     let result = tree_sitter_language_pack::available_languages();
     match serde_json::to_string(&result) {
@@ -3689,21 +4065,26 @@ pub unsafe extern "C" fn tslp_available_languages() -> *mut std::ffi::c_char {
 }
 
 /// Check if a language is available by name or alias.
-///
+/// 
 /// Returns `true` if the language can be loaded (statically compiled,
 /// dynamically available, or a known alias for one of these).
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::has_language;
-///
+/// 
 /// assert!(has_language("python"));
 /// assert!(has_language("shell")); // alias for "bash"
 /// assert!(!has_language("nonexistent_language"));
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_has_language(name: *const std::ffi::c_char) -> i32 {
+pub unsafe extern "C" fn tslp_has_language(
+    name: *const std::ffi::c_char
+) -> i32 {
     clear_last_error();
     if name.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'name'");
@@ -3721,40 +4102,45 @@ pub unsafe extern "C" fn tslp_has_language(name: *const std::ffi::c_char) -> i32
 }
 
 /// Return the number of available languages.
-///
+/// 
 /// Includes statically compiled languages, dynamically loadable languages,
 /// and aliases.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::language_count;
-///
+/// 
 /// let count = language_count();
 /// println!("{} languages available", count);
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_language_count() -> usize {
+pub unsafe extern "C" fn tslp_language_count(
+
+) -> usize {
     clear_last_error();
-    
-    tree_sitter_language_pack::language_count()
+    let result = tree_sitter_language_pack::language_count();
+    result
 }
 
 /// Run extraction patterns against source code.
-///
+/// 
 /// Convenience wrapper around [`extract::extract`].
-///
+/// 
 /// # Errors
-///
+/// 
 /// Returns an error if the language is not found, parsing fails, or a query
 /// pattern is invalid.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use ahash::AHashMap;
 /// use tree_sitter_language_pack::{ExtractionConfig, ExtractionPattern, CaptureOutput, extract_patterns};
-///
+/// 
 /// let mut patterns = AHashMap::new();
 /// patterns.insert("fns".to_string(), ExtractionPattern {
 ///     query: "(function_definition name: (identifier) @fn_name)".to_string(),
@@ -3766,10 +4152,13 @@ pub unsafe extern "C" fn tslp_language_count() -> usize {
 /// let config = ExtractionConfig { language: "python".to_string(), patterns };
 /// let result = extract_patterns("def hello(): pass", &config).unwrap();
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_extract_patterns(
     source: *const std::ffi::c_char,
-    config: *const tree_sitter_language_pack::ExtractionConfig,
+    config: *const tree_sitter_language_pack::ExtractionConfig
 ) -> *mut tree_sitter_language_pack::ExtractionResult {
     clear_last_error();
     if source.is_null() {
@@ -3790,7 +4179,9 @@ pub unsafe extern "C" fn tslp_extract_patterns(
     let config_rs = unsafe { &*config }.clone();
     let result = tree_sitter_language_pack::extract_patterns(&source_rs, &config_rs);
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => {
+            Box::into_raw(Box::new(val.clone()))
+        }
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -3799,20 +4190,20 @@ pub unsafe extern "C" fn tslp_extract_patterns(
 }
 
 /// Initialize the language pack with the given configuration.
-///
+/// 
 /// Applies any custom cache directory, then downloads all languages and groups
 /// specified in the config. This is the recommended entry point when you want
 /// to pre-warm the cache before use.
-///
+/// 
 /// # Errors
-///
+/// 
 /// Returns an error if configuration cannot be applied or if downloads fail.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::{PackConfig, init};
-///
+/// 
 /// let config = PackConfig {
 ///     cache_dir: None,
 ///     languages: Some(vec!["python".to_string(), "rust".to_string()]),
@@ -3820,8 +4211,13 @@ pub unsafe extern "C" fn tslp_extract_patterns(
 /// };
 /// init(&config).unwrap();
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_init(config: *const tree_sitter_language_pack::PackConfig) -> i32 {
+pub unsafe extern "C" fn tslp_init(
+    config: *const tree_sitter_language_pack::PackConfig
+) -> i32 {
     clear_last_error();
     if config.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'config'");
@@ -3839,22 +4235,22 @@ pub unsafe extern "C" fn tslp_init(config: *const tree_sitter_language_pack::Pac
 }
 
 /// Apply download configuration without downloading anything.
-///
+/// 
 /// Use this to set a custom cache directory before the first call to
 /// [`get_language`] or any download function. Changing the cache dir
 /// after languages have been registered has no effect on already-loaded
 /// languages.
-///
+/// 
 /// # Errors
-///
+/// 
 /// Returns an error if the lock cannot be acquired.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use std::path::PathBuf;
 /// use tree_sitter_language_pack::{PackConfig, configure};
-///
+/// 
 /// let config = PackConfig {
 ///     cache_dir: Some(PathBuf::from("/tmp/my-parsers")),
 ///     languages: None,
@@ -3862,8 +4258,13 @@ pub unsafe extern "C" fn tslp_init(config: *const tree_sitter_language_pack::Pac
 /// };
 /// configure(&config).unwrap();
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_configure(config: *const tree_sitter_language_pack::PackConfig) -> i32 {
+pub unsafe extern "C" fn tslp_configure(
+    config: *const tree_sitter_language_pack::PackConfig
+) -> i32 {
     clear_last_error();
     if config.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'config'");
@@ -3881,27 +4282,34 @@ pub unsafe extern "C" fn tslp_configure(config: *const tree_sitter_language_pack
 }
 
 /// Download all available languages from the remote manifest.
-///
+/// 
 /// Returns the number of newly downloaded languages.
-///
+/// 
 /// # Errors
-///
+/// 
 /// Returns an error if the manifest cannot be fetched or a download fails.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::download_all;
-///
+/// 
 /// let count = download_all().unwrap();
 /// println!("Downloaded {} languages", count);
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_download_all() -> usize {
+pub unsafe extern "C" fn tslp_download_all(
+
+) -> usize {
     clear_last_error();
     let result = tree_sitter_language_pack::download_all();
     match result {
-        Ok(val) => val,
+        Ok(val) => {
+            val
+        }
         Err(e) => {
             set_last_error(2, &e.to_string());
             0
@@ -3910,35 +4318,42 @@ pub unsafe extern "C" fn tslp_download_all() -> usize {
 }
 
 /// Return all language names available in the remote manifest (248).
-///
+/// 
 /// Fetches (and caches) the remote manifest to discover the full list of
 /// downloadable languages. Use [`downloaded_languages`] to list what is
 /// already cached locally.
-///
+/// 
 /// # Errors
-///
+/// 
 /// Returns an error if the manifest cannot be fetched.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::manifest_languages;
-///
+/// 
 /// let langs = manifest_languages().unwrap();
 /// println!("{} languages available for download", langs.len());
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_manifest_languages() -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_manifest_languages(
+
+) -> *mut std::ffi::c_char {
     clear_last_error();
     let result = tree_sitter_language_pack::manifest_languages();
     match result {
-        Ok(val) => match serde_json::to_string(&val) {
-            Ok(s) => match CString::new(s) {
-                Ok(cs) => cs.into_raw(),
+        Ok(val) => {
+            match serde_json::to_string(&val) {
+                Ok(s) => match CString::new(s) {
+                    Ok(cs) => cs.into_raw(),
+                    Err(_) => std::ptr::null_mut(),
+                },
                 Err(_) => std::ptr::null_mut(),
-            },
-            Err(_) => std::ptr::null_mut(),
-        },
+            }
+        }
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -3947,20 +4362,25 @@ pub unsafe extern "C" fn tslp_manifest_languages() -> *mut std::ffi::c_char {
 }
 
 /// Return languages that are already downloaded and cached locally.
-///
+/// 
 /// Does not perform any network requests. Returns an empty list if the
 /// cache directory does not exist or cannot be read.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::downloaded_languages;
-///
+/// 
 /// let langs = downloaded_languages();
 /// println!("{} languages already cached", langs.len());
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_downloaded_languages() -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_downloaded_languages(
+
+) -> *mut std::ffi::c_char {
     clear_last_error();
     let result = tree_sitter_language_pack::downloaded_languages();
     match serde_json::to_string(&result) {
@@ -3973,24 +4393,29 @@ pub unsafe extern "C" fn tslp_downloaded_languages() -> *mut std::ffi::c_char {
 }
 
 /// Delete all cached parser shared libraries.
-///
+/// 
 /// Resets the cache registration so the next call to [`get_language`] or
 /// a download function will re-register the (now empty) cache directory.
-///
+/// 
 /// # Errors
-///
+/// 
 /// Returns an error if the cache directory cannot be removed.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::clean_cache;
-///
+/// 
 /// clean_cache().unwrap();
 /// println!("Cache cleared");
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_clean_cache() -> i32 {
+pub unsafe extern "C" fn tslp_clean_cache(
+
+) -> i32 {
     clear_last_error();
     let result = tree_sitter_language_pack::clean_cache();
     match result {
@@ -4003,31 +4428,38 @@ pub unsafe extern "C" fn tslp_clean_cache() -> i32 {
 }
 
 /// Return the effective cache directory path.
-///
+/// 
 /// This is either the custom path set via [`configure`] / [`init`] or the
 /// default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
-///
+/// 
 /// # Errors
-///
+/// 
 /// Returns an error if the system cache directory cannot be determined.
-///
+/// 
 /// # Example
-///
+/// 
 /// ```no_run
 /// use tree_sitter_language_pack::cache_dir;
-///
+/// 
 /// let dir = cache_dir().unwrap();
 /// println!("Cache directory: {}", dir.display());
 /// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_cache_dir() -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn tslp_cache_dir(
+
+) -> *mut std::ffi::c_char {
     clear_last_error();
     let result = tree_sitter_language_pack::cache_dir();
     match result {
-        Ok(val) => match CString::new(val.to_string_lossy().to_string()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
+        Ok(val) => {
+            match CString::new(val.to_string_lossy().to_string()) {
+                Ok(cs) => cs.into_raw(),
+                Err(_) => std::ptr::null_mut(),
+            }
+        }
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()

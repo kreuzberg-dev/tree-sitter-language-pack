@@ -7,20 +7,20 @@ namespace TreeSitterLanguagePack;
 
 /// <summary>
 /// Configuration for the `process()` function.
-///
+/// 
 /// Controls which analysis features are enabled and whether chunking is performed.
-///
+/// 
 /// # Examples
-///
+/// 
 /// ```
 /// use tree_sitter_language_pack::ProcessConfig;
-///
+/// 
 /// // Defaults: structure + imports + exports enabled
 /// let config = ProcessConfig::new("python");
-///
+/// 
 /// // With chunking
 /// let config = ProcessConfig::new("python").with_chunking(1000);
-///
+/// 
 /// // Everything enabled
 /// let config = ProcessConfig::new("python").all();
 /// ```

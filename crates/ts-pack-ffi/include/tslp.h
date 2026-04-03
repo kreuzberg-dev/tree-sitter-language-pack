@@ -12,796 +12,1140 @@
 
 /**
  * Return the last error code (0 means no error).
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_last_error_code(void);
 
 /**
  * Return the last error message. The pointer is valid until the next FFI call on this thread.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 const char *tslp_last_error_context(void);
 
 /**
  * Free a string previously returned by this library.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_free_string(char *ptr);
 
 /**
  * Return the library version string. The pointer is static and must NOT be freed.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 const char *tslp_version(void);
 
 /**
  * Create a `ExtractionPattern` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_extraction_pattern_free`.
  */
 TSLPExtractionPattern *tslp_extraction_pattern_from_json(const char *json);
 
 /**
  * Free a `ExtractionPattern` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_extraction_pattern_free(TSLPExtractionPattern *ptr);
 
 /**
  * Get the `query` field from a `ExtractionPattern`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_extraction_pattern_query(const TSLPExtractionPattern *ptr);
 
 /**
  * Get the `capture_output` field from a `ExtractionPattern`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPCaptureOutput *tslp_extraction_pattern_capture_output(const TSLPExtractionPattern *ptr);
 
 /**
  * Get the `child_fields` field from a `ExtractionPattern`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_extraction_pattern_child_fields(const TSLPExtractionPattern *ptr);
 
 /**
  * Get the `max_results` field from a `ExtractionPattern`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_extraction_pattern_max_results(const TSLPExtractionPattern *ptr);
 
 /**
  * Create a `ExtractionConfig` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_extraction_config_free`.
  */
 TSLPExtractionConfig *tslp_extraction_config_from_json(const char *json);
 
 /**
  * Free a `ExtractionConfig` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_extraction_config_free(TSLPExtractionConfig *ptr);
 
 /**
  * Get the `language` field from a `ExtractionConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_extraction_config_language(const TSLPExtractionConfig *ptr);
 
 /**
  * Create a `CaptureResult` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_capture_result_free`.
  */
 TSLPCaptureResult *tslp_capture_result_from_json(const char *json);
 
 /**
  * Free a `CaptureResult` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_capture_result_free(TSLPCaptureResult *ptr);
 
 /**
  * Get the `name` field from a `CaptureResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_capture_result_name(const TSLPCaptureResult *ptr);
 
 /**
  * Get the `node` field from a `CaptureResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPNodeInfo *tslp_capture_result_node(const TSLPCaptureResult *ptr);
 
 /**
  * Get the `text` field from a `CaptureResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_capture_result_text(const TSLPCaptureResult *ptr);
 
 /**
  * Get the `start_byte` field from a `CaptureResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_capture_result_start_byte(const TSLPCaptureResult *ptr);
 
 /**
  * Create a `MatchResult` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_match_result_free`.
  */
 TSLPMatchResult *tslp_match_result_from_json(const char *json);
 
 /**
  * Free a `MatchResult` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_match_result_free(TSLPMatchResult *ptr);
 
 /**
  * Get the `pattern_index` field from a `MatchResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_match_result_pattern_index(const TSLPMatchResult *ptr);
 
 /**
  * Get the `captures` field from a `MatchResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_match_result_captures(const TSLPMatchResult *ptr);
 
 /**
  * Create a `PatternResult` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_pattern_result_free`.
  */
 TSLPPatternResult *tslp_pattern_result_from_json(const char *json);
 
 /**
  * Free a `PatternResult` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_pattern_result_free(TSLPPatternResult *ptr);
 
 /**
  * Get the `matches` field from a `PatternResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_pattern_result_matches(const TSLPPatternResult *ptr);
 
 /**
  * Get the `total_count` field from a `PatternResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_pattern_result_total_count(const TSLPPatternResult *ptr);
 
 /**
  * Create a `ExtractionResult` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_extraction_result_free`.
  */
 TSLPExtractionResult *tslp_extraction_result_from_json(const char *json);
 
 /**
  * Free a `ExtractionResult` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_extraction_result_free(TSLPExtractionResult *ptr);
 
 /**
  * Get the `language` field from a `ExtractionResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_extraction_result_language(const TSLPExtractionResult *ptr);
 
 /**
  * Create a `PatternValidation` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_pattern_validation_free`.
  */
 TSLPPatternValidation *tslp_pattern_validation_from_json(const char *json);
 
 /**
  * Free a `PatternValidation` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_pattern_validation_free(TSLPPatternValidation *ptr);
 
 /**
  * Get the `valid` field from a `PatternValidation`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_pattern_validation_valid(const TSLPPatternValidation *ptr);
 
 /**
  * Get the `capture_names` field from a `PatternValidation`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_pattern_validation_capture_names(const TSLPPatternValidation *ptr);
 
 /**
  * Get the `pattern_count` field from a `PatternValidation`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_pattern_validation_pattern_count(const TSLPPatternValidation *ptr);
 
 /**
  * Get the `warnings` field from a `PatternValidation`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_pattern_validation_warnings(const TSLPPatternValidation *ptr);
 
 /**
  * Get the `errors` field from a `PatternValidation`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_pattern_validation_errors(const TSLPPatternValidation *ptr);
 
 /**
  * Create a `ValidationResult` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_validation_result_free`.
  */
 TSLPValidationResult *tslp_validation_result_from_json(const char *json);
 
 /**
  * Free a `ValidationResult` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_validation_result_free(TSLPValidationResult *ptr);
 
 /**
  * Get the `valid` field from a `ValidationResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_validation_result_valid(const TSLPValidationResult *ptr);
 
 /**
  * Create a `Span` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_span_free`.
  */
 TSLPSpan *tslp_span_from_json(const char *json);
 
 /**
  * Free a `Span` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_span_free(TSLPSpan *ptr);
 
 /**
  * Get the `start_byte` field from a `Span`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_span_start_byte(const TSLPSpan *ptr);
 
 /**
  * Get the `end_byte` field from a `Span`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_span_end_byte(const TSLPSpan *ptr);
 
 /**
  * Get the `start_line` field from a `Span`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_span_start_line(const TSLPSpan *ptr);
 
 /**
  * Get the `start_column` field from a `Span`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_span_start_column(const TSLPSpan *ptr);
 
 /**
  * Get the `end_line` field from a `Span`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_span_end_line(const TSLPSpan *ptr);
 
 /**
  * Get the `end_column` field from a `Span`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_span_end_column(const TSLPSpan *ptr);
 
 /**
  * Create a `ProcessResult` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_process_result_free`.
  */
 TSLPProcessResult *tslp_process_result_from_json(const char *json);
 
 /**
  * Free a `ProcessResult` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_process_result_free(TSLPProcessResult *ptr);
 
 /**
  * Get the `language` field from a `ProcessResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_process_result_language(const TSLPProcessResult *ptr);
 
 /**
  * Get the `metrics` field from a `ProcessResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPFileMetrics *tslp_process_result_metrics(const TSLPProcessResult *ptr);
 
 /**
  * Get the `structure` field from a `ProcessResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_process_result_structure(const TSLPProcessResult *ptr);
 
 /**
  * Get the `imports` field from a `ProcessResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_process_result_imports(const TSLPProcessResult *ptr);
 
 /**
  * Get the `exports` field from a `ProcessResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_process_result_exports(const TSLPProcessResult *ptr);
 
 /**
  * Get the `comments` field from a `ProcessResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_process_result_comments(const TSLPProcessResult *ptr);
 
 /**
  * Get the `docstrings` field from a `ProcessResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_process_result_docstrings(const TSLPProcessResult *ptr);
 
 /**
  * Get the `symbols` field from a `ProcessResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_process_result_symbols(const TSLPProcessResult *ptr);
 
 /**
  * Get the `diagnostics` field from a `ProcessResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_process_result_diagnostics(const TSLPProcessResult *ptr);
 
 /**
  * Get the `chunks` field from a `ProcessResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_process_result_chunks(const TSLPProcessResult *ptr);
 
 /**
  * Create a `FileMetrics` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_file_metrics_free`.
  */
 TSLPFileMetrics *tslp_file_metrics_from_json(const char *json);
 
 /**
  * Free a `FileMetrics` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_file_metrics_free(TSLPFileMetrics *ptr);
 
 /**
  * Get the `total_lines` field from a `FileMetrics`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_file_metrics_total_lines(const TSLPFileMetrics *ptr);
 
 /**
  * Get the `code_lines` field from a `FileMetrics`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_file_metrics_code_lines(const TSLPFileMetrics *ptr);
 
 /**
  * Get the `comment_lines` field from a `FileMetrics`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_file_metrics_comment_lines(const TSLPFileMetrics *ptr);
 
 /**
  * Get the `blank_lines` field from a `FileMetrics`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_file_metrics_blank_lines(const TSLPFileMetrics *ptr);
 
 /**
  * Get the `total_bytes` field from a `FileMetrics`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_file_metrics_total_bytes(const TSLPFileMetrics *ptr);
 
 /**
  * Get the `node_count` field from a `FileMetrics`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_file_metrics_node_count(const TSLPFileMetrics *ptr);
 
 /**
  * Get the `error_count` field from a `FileMetrics`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_file_metrics_error_count(const TSLPFileMetrics *ptr);
 
 /**
  * Get the `max_depth` field from a `FileMetrics`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_file_metrics_max_depth(const TSLPFileMetrics *ptr);
 
 /**
  * Create a `StructureItem` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_structure_item_free`.
  */
 TSLPStructureItem *tslp_structure_item_from_json(const char *json);
 
 /**
  * Free a `StructureItem` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_structure_item_free(TSLPStructureItem *ptr);
 
 /**
  * Get the `kind` field from a `StructureItem`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPStructureKind *tslp_structure_item_kind(const TSLPStructureItem *ptr);
 
 /**
  * Get the `name` field from a `StructureItem`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_structure_item_name(const TSLPStructureItem *ptr);
 
 /**
  * Get the `visibility` field from a `StructureItem`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_structure_item_visibility(const TSLPStructureItem *ptr);
 
 /**
  * Get the `span` field from a `StructureItem`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPSpan *tslp_structure_item_span(const TSLPStructureItem *ptr);
 
 /**
  * Get the `children` field from a `StructureItem`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_structure_item_children(const TSLPStructureItem *ptr);
 
 /**
  * Get the `decorators` field from a `StructureItem`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_structure_item_decorators(const TSLPStructureItem *ptr);
 
 /**
  * Get the `doc_comment` field from a `StructureItem`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_structure_item_doc_comment(const TSLPStructureItem *ptr);
 
 /**
  * Get the `signature` field from a `StructureItem`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_structure_item_signature(const TSLPStructureItem *ptr);
 
 /**
  * Get the `body_span` field from a `StructureItem`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPSpan *tslp_structure_item_body_span(const TSLPStructureItem *ptr);
 
 /**
  * Create a `CommentInfo` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_comment_info_free`.
  */
 TSLPCommentInfo *tslp_comment_info_from_json(const char *json);
 
 /**
  * Free a `CommentInfo` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_comment_info_free(TSLPCommentInfo *ptr);
 
 /**
  * Get the `text` field from a `CommentInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_comment_info_text(const TSLPCommentInfo *ptr);
 
 /**
  * Get the `kind` field from a `CommentInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPCommentKind *tslp_comment_info_kind(const TSLPCommentInfo *ptr);
 
 /**
  * Get the `span` field from a `CommentInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPSpan *tslp_comment_info_span(const TSLPCommentInfo *ptr);
 
 /**
  * Get the `associated_node` field from a `CommentInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_comment_info_associated_node(const TSLPCommentInfo *ptr);
 
 /**
  * Create a `DocstringInfo` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_docstring_info_free`.
  */
 TSLPDocstringInfo *tslp_docstring_info_from_json(const char *json);
 
 /**
  * Free a `DocstringInfo` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_docstring_info_free(TSLPDocstringInfo *ptr);
 
 /**
  * Get the `text` field from a `DocstringInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_docstring_info_text(const TSLPDocstringInfo *ptr);
 
 /**
  * Get the `format` field from a `DocstringInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPDocstringFormat *tslp_docstring_info_format(const TSLPDocstringInfo *ptr);
 
 /**
  * Get the `span` field from a `DocstringInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPSpan *tslp_docstring_info_span(const TSLPDocstringInfo *ptr);
 
 /**
  * Get the `associated_item` field from a `DocstringInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_docstring_info_associated_item(const TSLPDocstringInfo *ptr);
 
 /**
  * Get the `parsed_sections` field from a `DocstringInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_docstring_info_parsed_sections(const TSLPDocstringInfo *ptr);
 
 /**
  * Create a `DocSection` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_doc_section_free`.
  */
 TSLPDocSection *tslp_doc_section_from_json(const char *json);
 
 /**
  * Free a `DocSection` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_doc_section_free(TSLPDocSection *ptr);
 
 /**
  * Get the `kind` field from a `DocSection`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_doc_section_kind(const TSLPDocSection *ptr);
 
 /**
  * Get the `name` field from a `DocSection`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_doc_section_name(const TSLPDocSection *ptr);
 
 /**
  * Get the `description` field from a `DocSection`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_doc_section_description(const TSLPDocSection *ptr);
 
 /**
  * Create a `ImportInfo` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_import_info_free`.
  */
 TSLPImportInfo *tslp_import_info_from_json(const char *json);
 
 /**
  * Free a `ImportInfo` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_import_info_free(TSLPImportInfo *ptr);
 
 /**
  * Get the `source` field from a `ImportInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_import_info_source(const TSLPImportInfo *ptr);
 
 /**
  * Get the `items` field from a `ImportInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_import_info_items(const TSLPImportInfo *ptr);
 
 /**
  * Get the `alias` field from a `ImportInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_import_info_alias(const TSLPImportInfo *ptr);
 
 /**
  * Get the `is_wildcard` field from a `ImportInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_import_info_is_wildcard(const TSLPImportInfo *ptr);
 
 /**
  * Get the `span` field from a `ImportInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPSpan *tslp_import_info_span(const TSLPImportInfo *ptr);
 
 /**
  * Create a `ExportInfo` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_export_info_free`.
  */
 TSLPExportInfo *tslp_export_info_from_json(const char *json);
 
 /**
  * Free a `ExportInfo` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_export_info_free(TSLPExportInfo *ptr);
 
 /**
  * Get the `name` field from a `ExportInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_export_info_name(const TSLPExportInfo *ptr);
 
 /**
  * Get the `kind` field from a `ExportInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPExportKind *tslp_export_info_kind(const TSLPExportInfo *ptr);
 
 /**
  * Get the `span` field from a `ExportInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPSpan *tslp_export_info_span(const TSLPExportInfo *ptr);
 
 /**
  * Create a `SymbolInfo` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_symbol_info_free`.
  */
 TSLPSymbolInfo *tslp_symbol_info_from_json(const char *json);
 
 /**
  * Free a `SymbolInfo` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_symbol_info_free(TSLPSymbolInfo *ptr);
 
 /**
  * Get the `name` field from a `SymbolInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_symbol_info_name(const TSLPSymbolInfo *ptr);
 
 /**
  * Get the `kind` field from a `SymbolInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPSymbolKind *tslp_symbol_info_kind(const TSLPSymbolInfo *ptr);
 
 /**
  * Get the `span` field from a `SymbolInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPSpan *tslp_symbol_info_span(const TSLPSymbolInfo *ptr);
 
 /**
  * Get the `type_annotation` field from a `SymbolInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_symbol_info_type_annotation(const TSLPSymbolInfo *ptr);
 
 /**
  * Get the `doc` field from a `SymbolInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_symbol_info_doc(const TSLPSymbolInfo *ptr);
 
 /**
  * Create a `Diagnostic` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_diagnostic_free`.
  */
 TSLPDiagnostic *tslp_diagnostic_from_json(const char *json);
 
 /**
  * Free a `Diagnostic` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_diagnostic_free(TSLPDiagnostic *ptr);
 
 /**
  * Get the `message` field from a `Diagnostic`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_diagnostic_message(const TSLPDiagnostic *ptr);
 
 /**
  * Get the `severity` field from a `Diagnostic`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPDiagnosticSeverity *tslp_diagnostic_severity(const TSLPDiagnostic *ptr);
 
 /**
  * Get the `span` field from a `Diagnostic`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPSpan *tslp_diagnostic_span(const TSLPDiagnostic *ptr);
 
 /**
  * Create a `CodeChunk` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_code_chunk_free`.
  */
 TSLPCodeChunk *tslp_code_chunk_from_json(const char *json);
 
 /**
  * Free a `CodeChunk` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_code_chunk_free(TSLPCodeChunk *ptr);
 
 /**
  * Get the `content` field from a `CodeChunk`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_code_chunk_content(const TSLPCodeChunk *ptr);
 
 /**
  * Get the `start_byte` field from a `CodeChunk`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_code_chunk_start_byte(const TSLPCodeChunk *ptr);
 
 /**
  * Get the `end_byte` field from a `CodeChunk`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_code_chunk_end_byte(const TSLPCodeChunk *ptr);
 
 /**
  * Get the `start_line` field from a `CodeChunk`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_code_chunk_start_line(const TSLPCodeChunk *ptr);
 
 /**
  * Get the `end_line` field from a `CodeChunk`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_code_chunk_end_line(const TSLPCodeChunk *ptr);
 
 /**
  * Get the `metadata` field from a `CodeChunk`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 TSLPChunkContext *tslp_code_chunk_metadata(const TSLPCodeChunk *ptr);
 
 /**
  * Create a `ChunkContext` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_chunk_context_free`.
  */
 TSLPChunkContext *tslp_chunk_context_from_json(const char *json);
 
 /**
  * Free a `ChunkContext` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_chunk_context_free(TSLPChunkContext *ptr);
 
 /**
  * Get the `language` field from a `ChunkContext`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_chunk_context_language(const TSLPChunkContext *ptr);
 
 /**
  * Get the `chunk_index` field from a `ChunkContext`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_chunk_context_chunk_index(const TSLPChunkContext *ptr);
 
 /**
  * Get the `total_chunks` field from a `ChunkContext`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_chunk_context_total_chunks(const TSLPChunkContext *ptr);
 
 /**
  * Get the `node_types` field from a `ChunkContext`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_chunk_context_node_types(const TSLPChunkContext *ptr);
 
 /**
  * Get the `context_path` field from a `ChunkContext`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_chunk_context_context_path(const TSLPChunkContext *ptr);
 
 /**
  * Get the `symbols_defined` field from a `ChunkContext`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_chunk_context_symbols_defined(const TSLPChunkContext *ptr);
 
 /**
  * Get the `comments` field from a `ChunkContext`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_chunk_context_comments(const TSLPChunkContext *ptr);
 
 /**
  * Get the `docstrings` field from a `ChunkContext`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_chunk_context_docstrings(const TSLPChunkContext *ptr);
 
 /**
  * Get the `has_error_nodes` field from a `ChunkContext`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_chunk_context_has_error_nodes(const TSLPChunkContext *ptr);
 
 /**
  * Create a `NodeInfo` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_node_info_free`.
  */
 TSLPNodeInfo *tslp_node_info_from_json(const char *json);
 
 /**
  * Free a `NodeInfo` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_node_info_free(TSLPNodeInfo *ptr);
 
 /**
  * Get the `is_named` field from a `NodeInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_node_info_is_named(const TSLPNodeInfo *ptr);
 
 /**
  * Get the `start_byte` field from a `NodeInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_node_info_start_byte(const TSLPNodeInfo *ptr);
 
 /**
  * Get the `end_byte` field from a `NodeInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_node_info_end_byte(const TSLPNodeInfo *ptr);
 
 /**
  * Get the `start_row` field from a `NodeInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_node_info_start_row(const TSLPNodeInfo *ptr);
 
 /**
  * Get the `start_col` field from a `NodeInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_node_info_start_col(const TSLPNodeInfo *ptr);
 
 /**
  * Get the `end_row` field from a `NodeInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_node_info_end_row(const TSLPNodeInfo *ptr);
 
 /**
  * Get the `end_col` field from a `NodeInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_node_info_end_col(const TSLPNodeInfo *ptr);
 
 /**
  * Get the `named_child_count` field from a `NodeInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_node_info_named_child_count(const TSLPNodeInfo *ptr);
 
 /**
  * Get the `is_error` field from a `NodeInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_node_info_is_error(const TSLPNodeInfo *ptr);
 
 /**
  * Get the `is_missing` field from a `NodeInfo`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_node_info_is_missing(const TSLPNodeInfo *ptr);
 
 /**
  * Create a `PackConfig` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_pack_config_free`.
  */
 TSLPPackConfig *tslp_pack_config_from_json(const char *json);
 
 /**
  * Free a `PackConfig` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_pack_config_free(TSLPPackConfig *ptr);
 
 /**
  * Get the `cache_dir` field from a `PackConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_pack_config_cache_dir(const TSLPPackConfig *ptr);
 
 /**
  * Get the `languages` field from a `PackConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_pack_config_languages(const TSLPPackConfig *ptr);
 
 /**
  * Get the `groups` field from a `PackConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 char *tslp_pack_config_groups(const TSLPPackConfig *ptr);
 
@@ -820,8 +1164,11 @@ char *tslp_pack_config_groups(const TSLPPackConfig *ptr);
  *
  * let config = PackConfig::from_toml_file(Path::new("language-pack.toml")).unwrap();
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_pack_config_from_toml_file(const char *_path);
+char *tslp_pack_config_from_toml_file(const char *path);
 
 /**
  * Discover configuration by searching for `language-pack.toml` in:
@@ -841,79 +1188,119 @@ char *tslp_pack_config_from_toml_file(const char *_path);
  *     println!("Found config with {:?} languages", config.languages);
  * }
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_pack_config_discover(void);
 
 /**
  * Create a `ProcessConfig` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `tslp_process_config_free`.
  */
 TSLPProcessConfig *tslp_process_config_from_json(const char *json);
 
 /**
  * Free a `ProcessConfig` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_process_config_free(TSLPProcessConfig *ptr);
 
 /**
  * Get the `structure` field from a `ProcessConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_process_config_structure(const TSLPProcessConfig *ptr);
 
 /**
  * Get the `imports` field from a `ProcessConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_process_config_imports(const TSLPProcessConfig *ptr);
 
 /**
  * Get the `exports` field from a `ProcessConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_process_config_exports(const TSLPProcessConfig *ptr);
 
 /**
  * Get the `comments` field from a `ProcessConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_process_config_comments(const TSLPProcessConfig *ptr);
 
 /**
  * Get the `docstrings` field from a `ProcessConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_process_config_docstrings(const TSLPProcessConfig *ptr);
 
 /**
  * Get the `symbols` field from a `ProcessConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_process_config_symbols(const TSLPProcessConfig *ptr);
 
 /**
  * Get the `diagnostics` field from a `ProcessConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 int32_t tslp_process_config_diagnostics(const TSLPProcessConfig *ptr);
 
 /**
  * Get the `chunk_max_size` field from a `ProcessConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
 uintptr_t tslp_process_config_chunk_max_size(const TSLPProcessConfig *ptr);
 
+/**
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
 char *tslp_process_config_default(void);
 
 /**
  * Enable chunking with the given maximum chunk size in bytes.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_process_config_with_chunking(TSLPProcessConfig *_this,
-                                        uintptr_t _max_size);
+char *tslp_process_config_with_chunking(TSLPProcessConfig *this_,
+                                        uintptr_t max_size);
 
 /**
  * Enable all analysis features.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_process_config_all(TSLPProcessConfig *_this);
+char *tslp_process_config_all(TSLPProcessConfig *this_);
 
 /**
  * Disable all analysis features (only metrics computed).
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_process_config_minimal(TSLPProcessConfig *_this);
+char *tslp_process_config_minimal(TSLPProcessConfig *this_);
 
 /**
  * Free a `LanguageRegistry` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_language_registry_free(TSLPLanguageRegistry *ptr);
 
@@ -922,8 +1309,11 @@ void tslp_language_registry_free(TSLPLanguageRegistry *ptr);
  *
  * Overrides the default build-time library directory. Useful when
  * dynamic grammar shared libraries are stored in a non-standard location.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_language_registry_with_libs_dir(const char *_libs_dir);
+char *tslp_language_registry_with_libs_dir(const char *libs_dir);
 
 /**
  * Add an additional directory to search for dynamic libraries.
@@ -935,6 +1325,9 @@ char *tslp_language_registry_with_libs_dir(const char *_libs_dir);
  * Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
  * mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
  * immutable while the directory list is updated.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 void tslp_language_registry_add_extra_libs_dir(const TSLPLanguageRegistry *this_,
                                                const char *dir);
@@ -950,15 +1343,21 @@ void tslp_language_registry_add_extra_libs_dir(const TSLPLanguageRegistry *this_
  *
  * Returns [`Error::LanguageNotFound`] if the name (after alias resolution)
  * does not match any known grammar.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TSLPLanguage *tslp_language_registry_get_language(const TSLPLanguageRegistry *_this,
-                                                  const char *_name);
+TSLPLanguage *tslp_language_registry_get_language(const TSLPLanguageRegistry *this_,
+                                                  const char *name);
 
 /**
  * List all available language names, sorted and deduplicated.
  *
  * Includes statically compiled languages, dynamically loadable languages
  * (if the `dynamic-loading` feature is enabled), and all configured aliases.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_language_registry_available_languages(const TSLPLanguageRegistry *this_);
 
@@ -967,106 +1366,161 @@ char *tslp_language_registry_available_languages(const TSLPLanguageRegistry *thi
  *
  * Returns `true` if the language can be loaded, either from the static
  * table or from a dynamic library on disk.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_language_registry_has_language(const TSLPLanguageRegistry *this_,
                                             const char *name);
 
 /**
  * Return the total number of available languages (including aliases).
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 uintptr_t tslp_language_registry_language_count(const TSLPLanguageRegistry *this_);
 
 /**
  * Parse source code and extract file intelligence based on config in a single pass.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TSLPProcessResult *tslp_language_registry_process(const TSLPLanguageRegistry *this_,
                                                   const char *source,
                                                   const TSLPProcessConfig *config);
 
+/**
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
 char *tslp_language_registry_default(void);
 
 /**
- * Free a `Tree` handle.
- */
-void tslp_tree_free(TSLPTree *ptr);
-
-/**
  * Free a `Language` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_language_free(TSLPLanguage *ptr);
 
 /**
  * Free a `Parser` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
  */
 void tslp_parser_free(TSLPParser *ptr);
 
 /**
+ * Free a `Tree` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void tslp_tree_free(TSLPTree *ptr);
+
+/**
  * Convert an integer to a `CaptureOutput` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_capture_output_from_i32(int32_t value);
 
 /**
  * Convert a `CaptureOutput` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
 int32_t tslp_capture_output_from_str(const char *name);
 
 /**
  * Convert an integer to a `StructureKind` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_structure_kind_from_i32(int32_t value);
 
 /**
  * Convert a `StructureKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
 int32_t tslp_structure_kind_from_str(const char *name);
 
 /**
  * Convert an integer to a `CommentKind` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_comment_kind_from_i32(int32_t value);
 
 /**
  * Convert a `CommentKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
 int32_t tslp_comment_kind_from_str(const char *name);
 
 /**
  * Convert an integer to a `DocstringFormat` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_docstring_format_from_i32(int32_t value);
 
 /**
  * Convert a `DocstringFormat` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
 int32_t tslp_docstring_format_from_str(const char *name);
 
 /**
  * Convert an integer to a `ExportKind` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_export_kind_from_i32(int32_t value);
 
 /**
  * Convert a `ExportKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
 int32_t tslp_export_kind_from_str(const char *name);
 
 /**
  * Convert an integer to a `SymbolKind` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_symbol_kind_from_i32(int32_t value);
 
 /**
  * Convert a `SymbolKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
 int32_t tslp_symbol_kind_from_str(const char *name);
 
 /**
  * Convert an integer to a `DiagnosticSeverity` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_diagnostic_severity_from_i32(int32_t value);
 
 /**
  * Convert a `DiagnosticSeverity` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
 int32_t tslp_diagnostic_severity_from_str(const char *name);
 
@@ -1081,6 +1535,9 @@ int32_t tslp_diagnostic_severity_from_str(const char *name);
  * assert_eq!(detect_language_from_extension("RS"), Some("rust"));
  * assert_eq!(detect_language_from_extension("xyz"), None);
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_detect_language_from_extension(const char *ext);
 
@@ -1096,6 +1553,9 @@ char *tslp_detect_language_from_extension(const char *ext);
  * assert_eq!(detect_language_from_path("README.md"), Some("markdown"));
  * assert_eq!(detect_language_from_path("Makefile"), None);
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_detect_language_from_path(const char *path);
 
@@ -1119,9 +1579,17 @@ char *tslp_detect_language_from_path(const char *path);
  * // .py is unambiguous
  * assert!(extension_ambiguity("py").is_none());
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_extension_ambiguity(const char *_ext);
+char *tslp_extension_ambiguity(const char *ext);
 
+/**
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
 char *tslp_extension_ambiguity_json(const char *ext);
 
 /**
@@ -1147,6 +1615,9 @@ char *tslp_extension_ambiguity_json(const char *ext);
  * assert_eq!(detect_language_from_content("#!/bin/bash\necho hi"), Some("bash"));
  * assert_eq!(detect_language_from_content("no shebang here"), None);
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_detect_language_from_content(const char *content);
 
@@ -1159,41 +1630,59 @@ char *tslp_detect_language_from_content(const char *content);
  * # Errors
  *
  * Returns an error if the language cannot be loaded.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TSLPValidationResult *tslp_validate_extraction(const TSLPExtractionConfig *config);
 
 /**
  * Process source code: parse once, extract intelligence based on config, and return it.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TSLPProcessResult *tslp_process(const char *_source,
-                                const TSLPProcessConfig *_config,
-                                const TSLPLanguageRegistry *_registry);
+TSLPProcessResult *tslp_process(const char *source,
+                                const TSLPProcessConfig *config,
+                                const TSLPLanguageRegistry *registry);
 
 /**
  * Extract a `NodeInfo` from a tree-sitter `Node`.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TSLPNodeInfo *tslp_node_info_from_node(const char *_node);
+TSLPNodeInfo *tslp_node_info_from_node(const char *node);
 
 /**
  * Get a `NodeInfo` snapshot of the root node.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TSLPNodeInfo *tslp_root_node_info(const TSLPTree *_tree);
+TSLPNodeInfo *tslp_root_node_info(const TSLPTree *tree);
 
 /**
  * Find all nodes matching the given type name, returning their `NodeInfo`.
  *
  * Performs a depth-first traversal. Returns an empty vec if no matches.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_find_nodes_by_type(const TSLPTree *_tree,
-                              const char *_node_type);
+char *tslp_find_nodes_by_type(const TSLPTree *tree,
+                              const char *node_type);
 
 /**
  * Get `NodeInfo` for all named children of the root node.
  *
  * Useful for understanding the top-level structure of a file
  * (e.g., list of function definitions, class declarations, imports).
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_named_children_info(const TSLPTree *_tree);
+char *tslp_named_children_info(const TSLPTree *tree);
 
 /**
  * Parse source code with the named language, returning the syntax tree.
@@ -1206,40 +1695,55 @@ char *tslp_named_children_info(const TSLPTree *_tree);
  * let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
  * assert_eq!(tree.root_node().kind(), "module");
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TSLPTree *tslp_parse_string(const char *_language,
-                            const uint8_t *_source,
-                            uintptr_t _source_len);
+TSLPTree *tslp_parse_string(const char *language,
+                            const uint8_t *source,
+                            uintptr_t source_len);
 
 /**
  * Check whether any node in the tree matches the given type name.
  *
  * Performs a depth-first traversal using `TreeCursor`.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-int32_t tslp_tree_contains_node_type(const TSLPTree *_tree,
-                                     const char *_node_type);
+int32_t tslp_tree_contains_node_type(const TSLPTree *tree,
+                                     const char *node_type);
 
 /**
  * Check whether the tree contains any ERROR or MISSING nodes.
  *
  * Useful for determining if the parse was clean or had syntax errors.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-int32_t tslp_tree_has_error_nodes(const TSLPTree *_tree);
+int32_t tslp_tree_has_error_nodes(const TSLPTree *tree);
 
 /**
  * Return the S-expression representation of the entire tree.
  *
  * This is the standard tree-sitter debug format, useful for logging,
  * snapshot testing, and debugging grammars.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_tree_to_sexp(const TSLPTree *_tree);
+char *tslp_tree_to_sexp(const TSLPTree *tree);
 
 /**
  * Count the number of ERROR and MISSING nodes in the tree.
  *
  * Returns 0 for a clean parse.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-uintptr_t tslp_tree_error_count(const TSLPTree *_tree);
+uintptr_t tslp_tree_error_count(const TSLPTree *tree);
 
 /**
  * Get the highlights query for a language, if bundled.
@@ -1258,6 +1762,9 @@ uintptr_t tslp_tree_error_count(const TSLPTree *_tree);
  * let missing = get_highlights_query("nonexistent_lang");
  * assert!(missing.is_none());
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_get_highlights_query(const char *language);
 
@@ -1277,6 +1784,9 @@ char *tslp_get_highlights_query(const char *language);
  * let missing = get_injections_query("nonexistent_lang");
  * assert!(missing.is_none());
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_get_injections_query(const char *language);
 
@@ -1296,6 +1806,9 @@ char *tslp_get_injections_query(const char *language);
  * let missing = get_locals_query("nonexistent_lang");
  * assert!(missing.is_none());
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_get_locals_query(const char *language);
 
@@ -1328,12 +1841,15 @@ char *tslp_get_locals_query(const char *language);
  * ).unwrap();
  * assert!(!matches.is_empty());
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_run_query(const TSLPTree *_tree,
-                     const char *_language,
-                     const char *_query_source,
-                     const uint8_t *_source,
-                     uintptr_t _source_len);
+char *tslp_run_query(const TSLPTree *tree,
+                     const char *language,
+                     const char *query_source,
+                     const uint8_t *source,
+                     uintptr_t source_len);
 
 /**
  * Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
@@ -1363,10 +1879,13 @@ char *tslp_run_query(const TSLPTree *_tree,
  * entire source. Ranges are non-overlapping, contiguous, and each range is
  * at most `max_chunk_size` bytes (except when a single indivisible token
  * exceeds that limit).
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *tslp_split_code(const char *_source,
-                      const TSLPTree *_tree,
-                      uintptr_t _max_chunk_size);
+char *tslp_split_code(const char *source,
+                      const TSLPTree *tree,
+                      uintptr_t max_chunk_size);
 
 /**
  * Get a tree-sitter [`Language`] by name using the global registry.
@@ -1392,8 +1911,11 @@ char *tslp_split_code(const char *_source,
  * let tree = parser.parse("x = 1", None).unwrap();
  * assert_eq!(tree.root_node().kind(), "module");
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TSLPLanguage *tslp_get_language(const char *_name);
+TSLPLanguage *tslp_get_language(const char *name);
 
 /**
  * Get a tree-sitter [`Parser`] pre-configured for the given language.
@@ -1415,8 +1937,11 @@ TSLPLanguage *tslp_get_language(const char *_name);
  * let tree = parser.parse("fn main() {}", None).unwrap();
  * assert!(!tree.root_node().has_error());
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TSLPParser *tslp_get_parser(const char *_name);
+TSLPParser *tslp_get_parser(const char *name);
 
 /**
  * List all available language names (sorted, deduplicated, includes aliases).
@@ -1434,6 +1959,9 @@ TSLPParser *tslp_get_parser(const char *_name);
  *     println!("{}", name);
  * }
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_available_languages(void);
 
@@ -1452,6 +1980,9 @@ char *tslp_available_languages(void);
  * assert!(has_language("shell")); // alias for "bash"
  * assert!(!has_language("nonexistent_language"));
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_has_language(const char *name);
 
@@ -1469,6 +2000,9 @@ int32_t tslp_has_language(const char *name);
  * let count = language_count();
  * println!("{} languages available", count);
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 uintptr_t tslp_language_count(void);
 
@@ -1499,6 +2033,9 @@ uintptr_t tslp_language_count(void);
  * let config = ExtractionConfig { language: "python".to_string(), patterns };
  * let result = extract_patterns("def hello(): pass", &config).unwrap();
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TSLPExtractionResult *tslp_extract_patterns(const char *source,
                                             const TSLPExtractionConfig *config);
@@ -1526,6 +2063,9 @@ TSLPExtractionResult *tslp_extract_patterns(const char *source,
  * };
  * init(&config).unwrap();
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_init(const TSLPPackConfig *config);
 
@@ -1554,6 +2094,9 @@ int32_t tslp_init(const TSLPPackConfig *config);
  * };
  * configure(&config).unwrap();
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_configure(const TSLPPackConfig *config);
 
@@ -1574,6 +2117,9 @@ int32_t tslp_configure(const TSLPPackConfig *config);
  * let count = download_all().unwrap();
  * println!("Downloaded {} languages", count);
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 uintptr_t tslp_download_all(void);
 
@@ -1596,6 +2142,9 @@ uintptr_t tslp_download_all(void);
  * let langs = manifest_languages().unwrap();
  * println!("{} languages available for download", langs.len());
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_manifest_languages(void);
 
@@ -1613,6 +2162,9 @@ char *tslp_manifest_languages(void);
  * let langs = downloaded_languages();
  * println!("{} languages already cached", langs.len());
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_downloaded_languages(void);
 
@@ -1634,6 +2186,9 @@ char *tslp_downloaded_languages(void);
  * clean_cache().unwrap();
  * println!("Cache cleared");
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t tslp_clean_cache(void);
 
@@ -1655,6 +2210,9 @@ int32_t tslp_clean_cache(void);
  * let dir = cache_dir().unwrap();
  * println!("Cache directory: {}", dir.display());
  * ```
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_cache_dir(void);
 

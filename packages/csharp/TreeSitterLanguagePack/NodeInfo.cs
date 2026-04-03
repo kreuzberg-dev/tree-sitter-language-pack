@@ -7,7 +7,7 @@ namespace TreeSitterLanguagePack;
 
 /// <summary>
 /// Lightweight snapshot of a tree-sitter node's properties.
-///
+/// 
 /// Contains only primitive types for easy cross-language serialization.
 /// This is an owned type that can be passed across FFI boundaries, unlike
 /// `tree_sitter::Node` which borrows from the tree.

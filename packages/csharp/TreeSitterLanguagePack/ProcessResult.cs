@@ -7,13 +7,13 @@ namespace TreeSitterLanguagePack;
 
 /// <summary>
 /// Complete analysis result from processing a source file.
-///
+/// 
 /// Contains metrics, structural analysis, imports/exports, comments,
 /// docstrings, symbols, diagnostics, and optionally chunked code segments.
 /// Fields are populated based on the [`crate::ProcessConfig`] flags.
-///
+/// 
 /// # Fields
-///
+/// 
 /// - `language` - The language used for parsing
 /// - `metrics` - Always computed: line counts, byte sizes, error counts
 /// - `structure` - Functions, classes, structs (when `config.structure = true`)
