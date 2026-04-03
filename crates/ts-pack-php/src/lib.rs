@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use tree_sitter_language_pack;
 use std::sync::Arc;
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct ExtractionPattern {
     pub query: String,
@@ -20,7 +20,7 @@ impl ExtractionPattern {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct ExtractionConfig {
     pub language: String,
@@ -34,7 +34,7 @@ impl ExtractionConfig {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct CaptureResult {
     pub name: String,
@@ -51,7 +51,7 @@ impl CaptureResult {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct MatchResult {
     pub pattern_index: i64,
@@ -65,7 +65,7 @@ impl MatchResult {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct PatternResult {
     pub matches: Vec<MatchResult>,
@@ -79,7 +79,7 @@ impl PatternResult {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct ExtractionResult {
     pub language: String,
@@ -93,7 +93,7 @@ impl ExtractionResult {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct PatternValidation {
     pub valid: bool,
@@ -116,7 +116,7 @@ impl PatternValidation {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct ValidationResult {
     pub valid: bool,
@@ -130,7 +130,7 @@ impl ValidationResult {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct Span {
     pub start_byte: i64,
@@ -148,7 +148,7 @@ impl Span {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct ProcessResult {
     pub language: String,
@@ -171,7 +171,7 @@ impl ProcessResult {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct FileMetrics {
     pub total_lines: i64,
@@ -200,7 +200,7 @@ impl FileMetrics {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct StructureItem {
     pub kind: String,
@@ -221,7 +221,7 @@ impl StructureItem {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct CommentInfo {
     pub text: String,
@@ -237,7 +237,7 @@ impl CommentInfo {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct DocstringInfo {
     pub text: String,
@@ -254,7 +254,7 @@ impl DocstringInfo {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct DocSection {
     pub kind: String,
@@ -269,7 +269,7 @@ impl DocSection {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct ImportInfo {
     pub source: String,
@@ -286,7 +286,7 @@ impl ImportInfo {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct ExportInfo {
     pub name: String,
@@ -301,7 +301,7 @@ impl ExportInfo {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct SymbolInfo {
     pub name: String,
@@ -318,7 +318,7 @@ impl SymbolInfo {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct Diagnostic {
     pub message: String,
@@ -333,7 +333,7 @@ impl Diagnostic {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct CodeChunk {
     pub content: String,
@@ -351,7 +351,7 @@ impl CodeChunk {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct ChunkContext {
     pub language: String,
@@ -372,7 +372,7 @@ impl ChunkContext {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct NodeInfo {
     pub kind: String,
@@ -407,7 +407,7 @@ impl NodeInfo {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct PackConfig {
     pub cache_dir: Option<String>,
@@ -430,7 +430,7 @@ impl PackConfig {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 #[php_class]
 pub struct ProcessConfig {
     pub language: String,
