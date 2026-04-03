@@ -2313,6 +2313,20 @@ pub async fn index_workspace(
                         }
                         let tokens = tokenize_normalized(&source_bytes[start..end]);
                         if tokens.len() < WINNOW_MIN_TOKENS {
+                            let kgrams = kgram_hashes(&tokens, WINNOW_SMALL_K);
+                            if kgrams.is_empty() {
+                                continue;
+                            }
+                            let token_set: HashSet<u64> = tokens.into_iter().collect();
+                            let span_len = sym.end_line.saturating_sub(sym.start_line);
+                            local_clone_candidates.push(CloneCandidate {
+                                symbol_id: sym.id.clone(),
+                                filepath: sym.filepath.clone(),
+                                span_len,
+                                token_set,
+                                fingerprints: vec![HashSet::new(), HashSet::new(), HashSet::new()],
+                                kgrams,
+                            });
                             continue;
                         }
                         let mut fps_small = HashSet::new();
@@ -2321,17 +2335,21 @@ pub async fn index_workspace(
                         let mut kgrams = HashSet::new();
                         if tokens.len() < WINNOW_SMALL_TOKEN_THRESHOLD {
                             kgrams = kgram_hashes(&tokens, WINNOW_SMALL_K);
+                            fps_small = winnow_fingerprints(&tokens, WINNOW_SMALL_K, WINNOW_SMALL_W);
+                            if fps_small.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
+                                fps_small.clear();
+                            }
                         } else {
                             fps_small = winnow_fingerprints(&tokens, WINNOW_SMALL_K, WINNOW_SMALL_W);
-                            if fps_small.len() < WINNOW_MIN_FINGERPRINTS {
+                            if fps_small.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
                                 fps_small.clear();
                             }
                             fps_medium = winnow_fingerprints(&tokens, WINNOW_MEDIUM_K, WINNOW_MEDIUM_W);
-                            if fps_medium.len() < WINNOW_MIN_FINGERPRINTS {
+                            if fps_medium.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
                                 fps_medium.clear();
                             }
                             fps_large = winnow_fingerprints(&tokens, WINNOW_LARGE_K, WINNOW_LARGE_W);
-                            if fps_large.len() < WINNOW_MIN_FINGERPRINTS {
+                            if fps_large.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
                                 fps_large.clear();
                             }
                             if fps_small.is_empty() && fps_medium.is_empty() && fps_large.is_empty() {
