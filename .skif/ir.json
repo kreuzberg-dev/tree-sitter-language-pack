@@ -1511,7 +1511,8 @@
           "error_type": null,
           "doc": "",
           "receiver": null,
-          "sanitized": false
+          "sanitized": false,
+          "trait_source": null
         },
         {
           "name": "with_chunking",
@@ -1534,7 +1535,8 @@
           "error_type": null,
           "doc": "Enable chunking with the given maximum chunk size in bytes.",
           "receiver": "Owned",
-          "sanitized": false
+          "sanitized": false,
+          "trait_source": null
         },
         {
           "name": "all",
@@ -1547,7 +1549,8 @@
           "error_type": null,
           "doc": "Enable all analysis features.",
           "receiver": "Owned",
-          "sanitized": false
+          "sanitized": false,
+          "trait_source": null
         },
         {
           "name": "minimal",
@@ -1560,7 +1563,8 @@
           "error_type": null,
           "doc": "Disable all analysis features (only metrics computed).",
           "receiver": "Owned",
-          "sanitized": false
+          "sanitized": false,
+          "trait_source": null
         }
       ],
       "is_opaque": false,
@@ -1593,7 +1597,8 @@
           "error_type": "Error",
           "doc": "Get a tree-sitter [`Language`] by name.\n\nResolves aliases (e.g., `\"shell\"` -> `\"bash\"`, `\"makefile\"` -> `\"make\"`),\nthen looks up the language in the static table. When the `dynamic-loading`\nfeature is enabled, falls back to loading a shared library on demand.\n\n# Errors\n\nReturns [`Error::LanguageNotFound`] if the name (after alias resolution)\ndoes not match any known grammar.",
           "receiver": "Ref",
-          "sanitized": false
+          "sanitized": false,
+          "trait_source": null
         },
         {
           "name": "available_languages",
@@ -1606,7 +1611,8 @@
           "error_type": null,
           "doc": "List all available language names, sorted and deduplicated.\n\nIncludes statically compiled languages, dynamically loadable languages\n(if the `dynamic-loading` feature is enabled), and all configured aliases.",
           "receiver": "Ref",
-          "sanitized": false
+          "sanitized": false,
+          "trait_source": null
         },
         {
           "name": "has_language",
@@ -1627,7 +1633,8 @@
           "error_type": null,
           "doc": "Check whether a language is available by name or alias.\n\nReturns `true` if the language can be loaded, either from the static\ntable or from a dynamic library on disk.",
           "receiver": "Ref",
-          "sanitized": false
+          "sanitized": false,
+          "trait_source": null
         },
         {
           "name": "language_count",
@@ -1640,7 +1647,8 @@
           "error_type": null,
           "doc": "Return the total number of available languages (including aliases).",
           "receiver": "Ref",
-          "sanitized": false
+          "sanitized": false,
+          "trait_source": null
         },
         {
           "name": "process",
@@ -1670,7 +1678,8 @@
           "error_type": "Error",
           "doc": "Parse source code and extract file intelligence based on config in a single pass.",
           "receiver": "Ref",
-          "sanitized": false
+          "sanitized": false,
+          "trait_source": null
         },
         {
           "name": "default",
@@ -1683,7 +1692,8 @@
           "error_type": null,
           "doc": "",
           "receiver": null,
-          "sanitized": false
+          "sanitized": false,
+          "trait_source": null
         }
       ],
       "is_opaque": true,

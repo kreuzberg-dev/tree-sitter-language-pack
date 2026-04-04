@@ -8,7 +8,7 @@
 use ext_php_rs::prelude::*;
 use std::sync::Arc;
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct ExtractionPattern {
     pub query: String,
@@ -25,7 +25,7 @@ impl ExtractionPattern {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct ExtractionConfig {
     pub language: String,
@@ -39,7 +39,7 @@ impl ExtractionConfig {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct CaptureResult {
     pub name: String,
@@ -56,7 +56,7 @@ impl CaptureResult {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct MatchResult {
     pub pattern_index: i64,
@@ -70,7 +70,7 @@ impl MatchResult {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct PatternResult {
     pub matches: Vec<MatchResult>,
@@ -84,7 +84,7 @@ impl PatternResult {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct ExtractionResult {
     pub language: String,
@@ -98,7 +98,7 @@ impl ExtractionResult {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct PatternValidation {
     pub valid: bool,
@@ -121,7 +121,7 @@ impl PatternValidation {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct ValidationResult {
     pub valid: bool,
@@ -135,7 +135,7 @@ impl ValidationResult {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct Span {
     pub start_byte: i64,
@@ -153,7 +153,7 @@ impl Span {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct ProcessResult {
     pub language: String,
@@ -176,7 +176,7 @@ impl ProcessResult {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct FileMetrics {
     pub total_lines: i64,
@@ -205,7 +205,7 @@ impl FileMetrics {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct StructureItem {
     pub kind: String,
@@ -226,7 +226,7 @@ impl StructureItem {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct CommentInfo {
     pub text: String,
@@ -242,7 +242,7 @@ impl CommentInfo {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct DocstringInfo {
     pub text: String,
@@ -259,7 +259,7 @@ impl DocstringInfo {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct DocSection {
     pub kind: String,
@@ -274,7 +274,7 @@ impl DocSection {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct ImportInfo {
     pub source: String,
@@ -291,7 +291,7 @@ impl ImportInfo {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct ExportInfo {
     pub name: String,
@@ -306,7 +306,7 @@ impl ExportInfo {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct SymbolInfo {
     pub name: String,
@@ -323,7 +323,7 @@ impl SymbolInfo {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct Diagnostic {
     pub message: String,
@@ -338,7 +338,7 @@ impl Diagnostic {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct CodeChunk {
     pub content: String,
@@ -356,7 +356,7 @@ impl CodeChunk {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct ChunkContext {
     pub language: String,
@@ -377,7 +377,7 @@ impl ChunkContext {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct NodeInfo {
     pub kind: String,
@@ -412,7 +412,7 @@ impl NodeInfo {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct PackConfig {
     pub cache_dir: Option<String>,
@@ -427,7 +427,7 @@ impl PackConfig {
     }
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone)]
 #[php_class]
 pub struct ProcessConfig {
     pub language: String,
@@ -767,6 +767,66 @@ pub fn cache_dir() -> PhpResult<String> {
     Err(ext_php_rs::exception::PhpException::default("Not implemented: cache_dir".to_string()).into())
 }
 
+impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {
+    fn from(val: tree_sitter_language_pack::ExtractionPattern) -> Self {
+        Self {
+            query: val.query,
+            capture_output: format!("{:?}", val.capture_output),
+            child_fields: val.child_fields,
+            max_results: val.max_results.map(|v| v as i64),
+            byte_range: val.byte_range.as_ref().map(|v| format!("{:?}", v)),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ExtractionConfig> for ExtractionConfig {
+    fn from(val: tree_sitter_language_pack::ExtractionConfig) -> Self {
+        Self {
+            language: val.language,
+            patterns: format!("{:?}", val.patterns),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::CaptureResult> for CaptureResult {
+    fn from(val: tree_sitter_language_pack::CaptureResult) -> Self {
+        Self {
+            name: val.name,
+            node: val.node.map(Into::into),
+            text: val.text,
+            child_fields: format!("{:?}", val.child_fields),
+            start_byte: val.start_byte as i64,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::MatchResult> for MatchResult {
+    fn from(val: tree_sitter_language_pack::MatchResult) -> Self {
+        Self {
+            pattern_index: val.pattern_index as i64,
+            captures: val.captures.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternResult> for PatternResult {
+    fn from(val: tree_sitter_language_pack::PatternResult) -> Self {
+        Self {
+            matches: val.matches.into_iter().map(Into::into).collect(),
+            total_count: val.total_count as i64,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ExtractionResult> for ExtractionResult {
+    fn from(val: tree_sitter_language_pack::ExtractionResult) -> Self {
+        Self {
+            language: val.language,
+            results: format!("{:?}", val.results),
+        }
+    }
+}
+
 impl From<PatternValidation> for tree_sitter_language_pack::PatternValidation {
     fn from(val: PatternValidation) -> Self {
         Self {
@@ -787,6 +847,15 @@ impl From<tree_sitter_language_pack::PatternValidation> for PatternValidation {
             pattern_count: val.pattern_count as i64,
             warnings: val.warnings,
             errors: val.errors,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ValidationResult> for ValidationResult {
+    fn from(val: tree_sitter_language_pack::ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: format!("{:?}", val.patterns),
         }
     }
 }
@@ -817,6 +886,24 @@ impl From<tree_sitter_language_pack::Span> for Span {
     }
 }
 
+impl From<tree_sitter_language_pack::ProcessResult> for ProcessResult {
+    fn from(val: tree_sitter_language_pack::ProcessResult) -> Self {
+        Self {
+            language: val.language,
+            metrics: val.metrics.into(),
+            structure: val.structure.into_iter().map(Into::into).collect(),
+            imports: val.imports.into_iter().map(Into::into).collect(),
+            exports: val.exports.into_iter().map(Into::into).collect(),
+            comments: val.comments.into_iter().map(Into::into).collect(),
+            docstrings: val.docstrings.into_iter().map(Into::into).collect(),
+            symbols: val.symbols.into_iter().map(Into::into).collect(),
+            diagnostics: val.diagnostics.into_iter().map(Into::into).collect(),
+            chunks: val.chunks.into_iter().map(Into::into).collect(),
+            extractions: format!("{:?}", val.extractions),
+        }
+    }
+}
+
 impl From<FileMetrics> for tree_sitter_language_pack::FileMetrics {
     fn from(val: FileMetrics) -> Self {
         Self {
@@ -843,6 +930,45 @@ impl From<tree_sitter_language_pack::FileMetrics> for FileMetrics {
             node_count: val.node_count as i64,
             error_count: val.error_count as i64,
             max_depth: val.max_depth as i64,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::StructureItem> for StructureItem {
+    fn from(val: tree_sitter_language_pack::StructureItem) -> Self {
+        Self {
+            kind: format!("{:?}", val.kind),
+            name: val.name,
+            visibility: val.visibility,
+            span: val.span.into(),
+            children: val.children.into_iter().map(Into::into).collect(),
+            decorators: val.decorators,
+            doc_comment: val.doc_comment,
+            signature: val.signature,
+            body_span: val.body_span.map(Into::into),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::CommentInfo> for CommentInfo {
+    fn from(val: tree_sitter_language_pack::CommentInfo) -> Self {
+        Self {
+            text: val.text,
+            kind: format!("{:?}", val.kind),
+            span: val.span.into(),
+            associated_node: val.associated_node,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::DocstringInfo> for DocstringInfo {
+    fn from(val: tree_sitter_language_pack::DocstringInfo) -> Self {
+        Self {
+            text: val.text,
+            format: format!("{:?}", val.format),
+            span: val.span.into(),
+            associated_item: val.associated_item,
+            parsed_sections: val.parsed_sections.into_iter().map(Into::into).collect(),
         }
     }
 }
@@ -891,15 +1017,34 @@ impl From<tree_sitter_language_pack::ImportInfo> for ImportInfo {
     }
 }
 
-impl From<CodeChunk> for tree_sitter_language_pack::CodeChunk {
-    fn from(val: CodeChunk) -> Self {
+impl From<tree_sitter_language_pack::ExportInfo> for ExportInfo {
+    fn from(val: tree_sitter_language_pack::ExportInfo) -> Self {
         Self {
-            content: val.content,
-            start_byte: val.start_byte as usize,
-            end_byte: val.end_byte as usize,
-            start_line: val.start_line as usize,
-            end_line: val.end_line as usize,
-            metadata: val.metadata.into(),
+            name: val.name,
+            kind: format!("{:?}", val.kind),
+            span: val.span.into(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::SymbolInfo> for SymbolInfo {
+    fn from(val: tree_sitter_language_pack::SymbolInfo) -> Self {
+        Self {
+            name: val.name,
+            kind: format!("{:?}", val.kind),
+            span: val.span.into(),
+            type_annotation: val.type_annotation,
+            doc: val.doc,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::Diagnostic> for Diagnostic {
+    fn from(val: tree_sitter_language_pack::Diagnostic) -> Self {
+        Self {
+            message: val.message,
+            severity: format!("{:?}", val.severity),
+            span: val.span.into(),
         }
     }
 }
@@ -917,22 +1062,6 @@ impl From<tree_sitter_language_pack::CodeChunk> for CodeChunk {
     }
 }
 
-impl From<ChunkContext> for tree_sitter_language_pack::ChunkContext {
-    fn from(val: ChunkContext) -> Self {
-        Self {
-            language: val.language,
-            chunk_index: val.chunk_index as usize,
-            total_chunks: val.total_chunks as usize,
-            node_types: val.node_types,
-            context_path: val.context_path,
-            symbols_defined: val.symbols_defined,
-            comments: val.comments,
-            docstrings: val.docstrings,
-            has_error_nodes: val.has_error_nodes,
-        }
-    }
-}
-
 impl From<tree_sitter_language_pack::ChunkContext> for ChunkContext {
     fn from(val: tree_sitter_language_pack::ChunkContext) -> Self {
         Self {
@@ -942,9 +1071,27 @@ impl From<tree_sitter_language_pack::ChunkContext> for ChunkContext {
             node_types: val.node_types,
             context_path: val.context_path,
             symbols_defined: val.symbols_defined,
-            comments: val.comments,
-            docstrings: val.docstrings,
+            comments: val.comments.into_iter().map(Into::into).collect(),
+            docstrings: val.docstrings.into_iter().map(Into::into).collect(),
             has_error_nodes: val.has_error_nodes,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::NodeInfo> for NodeInfo {
+    fn from(val: tree_sitter_language_pack::NodeInfo) -> Self {
+        Self {
+            kind: format!("{:?}", val.kind),
+            is_named: val.is_named,
+            start_byte: val.start_byte as i64,
+            end_byte: val.end_byte as i64,
+            start_row: val.start_row as i64,
+            start_col: val.start_col as i64,
+            end_row: val.end_row as i64,
+            end_col: val.end_col as i64,
+            named_child_count: val.named_child_count as i64,
+            is_error: val.is_error,
+            is_missing: val.is_missing,
         }
     }
 }
@@ -965,6 +1112,23 @@ impl From<tree_sitter_language_pack::PackConfig> for PackConfig {
             cache_dir: val.cache_dir.map(|p| p.to_string_lossy().to_string()),
             languages: val.languages,
             groups: val.groups,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ProcessConfig> for ProcessConfig {
+    fn from(val: tree_sitter_language_pack::ProcessConfig) -> Self {
+        Self {
+            language: format!("{:?}", val.language),
+            structure: val.structure,
+            imports: val.imports,
+            exports: val.exports,
+            comments: val.comments,
+            docstrings: val.docstrings,
+            symbols: val.symbols,
+            diagnostics: val.diagnostics,
+            chunk_max_size: val.chunk_max_size.map(|v| v as i64),
+            extractions: val.extractions.as_ref().map(|v| format!("{:?}", v)),
         }
     }
 }
