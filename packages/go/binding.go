@@ -1,10 +1,9 @@
 package treesitterlanguagepackgo
 
 /*
-#cgo LDFLAGS: -lts_pack_ffi
 #include "tslp.h"
-import "C"
 */
+import "C"
 
 import (
     "encoding/json"
@@ -29,24 +28,12 @@ func lastError() error {
 // Covers language lookup failures, parse errors, query errors, and I/O issues.
 // Feature-gated variants are included when `config`, `download`, or related
 // features are enabled.
-type Error string
-
-const (
-    ErrorLanguageNotFound Error = "language_not_found"
-    ErrorDynamicLoad Error = "dynamic_load"
-    ErrorNullLanguagePointer Error = "null_language_pointer"
-    ErrorParserSetup Error = "parser_setup"
-    ErrorLockPoisoned Error = "lock_poisoned"
-    ErrorConfig Error = "config"
-    ErrorParseFailed Error = "parse_failed"
-    ErrorQueryError Error = "query_error"
-    ErrorInvalidRange Error = "invalid_range"
-    ErrorIo Error = "io"
-    ErrorJson Error = "json"
-    ErrorToml Error = "toml"
-    ErrorDownload Error = "download"
-    ErrorChecksumMismatch Error = "checksum_mismatch"
-)
+// Variants: LanguageNotFound, DynamicLoad, NullLanguagePointer, ParserSetup, LockPoisoned, Config, ParseFailed, QueryError, InvalidRange, Io, Json, Toml, Download, ChecksumMismatch
+type Error struct {
+    File *string `json:"file,omitempty"`
+    Expected *string `json:"expected,omitempty"`
+    Actual *string `json:"actual,omitempty"`
+}
 
 
 // Controls what data is captured for each query match.
@@ -67,21 +54,9 @@ const (
 // Categorizes top-level and nested declarations such as functions, classes,
 // structs, enums, traits, and more. Use [`Other`](StructureKind::Other) for
 // language-specific constructs that do not fit a standard category.
-type StructureKind string
-
-const (
-    StructureKindFunction StructureKind = "function"
-    StructureKindMethod StructureKind = "method"
-    StructureKindClass StructureKind = "class"
-    StructureKindStruct StructureKind = "struct"
-    StructureKindInterface StructureKind = "interface"
-    StructureKindEnum StructureKind = "enum"
-    StructureKindModule StructureKind = "module"
-    StructureKindTrait StructureKind = "trait"
-    StructureKindImpl StructureKind = "impl"
-    StructureKindNamespace StructureKind = "namespace"
-    StructureKindOther StructureKind = "other"
-)
+// Variants: Function, Method, Class, Struct, Interface, Enum, Module, Trait, Impl, Namespace, Other
+type StructureKind struct {
+}
 
 
 // The kind of a comment found in source code.
@@ -101,16 +76,9 @@ const (
 //
 // Identifies the docstring convention used, which varies by language
 // (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
-type DocstringFormat string
-
-const (
-    DocstringFormatPythonTripleQuote DocstringFormat = "python_triple_quote"
-    DocstringFormatJsDoc DocstringFormat = "js_doc"
-    DocstringFormatRustdoc DocstringFormat = "rustdoc"
-    DocstringFormatGoDoc DocstringFormat = "go_doc"
-    DocstringFormatJavaDoc DocstringFormat = "java_doc"
-    DocstringFormatOther DocstringFormat = "other"
-)
+// Variants: PythonTripleQuote, JSDoc, Rustdoc, GoDoc, JavaDoc, Other
+type DocstringFormat struct {
+}
 
 
 // The kind of an export statement found in source code.
@@ -129,19 +97,9 @@ const (
 //
 // Categorizes symbol definitions such as variables, constants, functions,
 // classes, types, interfaces, enums, and modules.
-type SymbolKind string
-
-const (
-    SymbolKindVariable SymbolKind = "variable"
-    SymbolKindConstant SymbolKind = "constant"
-    SymbolKindFunction SymbolKind = "function"
-    SymbolKindClass SymbolKind = "class"
-    SymbolKindType SymbolKind = "type"
-    SymbolKindInterface SymbolKind = "interface"
-    SymbolKindEnum SymbolKind = "enum"
-    SymbolKindModule SymbolKind = "module"
-    SymbolKindOther SymbolKind = "other"
-)
+// Variants: Variable, Constant, Function, Class, Type, Interface, Enum, Module, Other
+type SymbolKind struct {
+}
 
 
 // Severity level of a diagnostic produced during parsing.
@@ -540,6 +498,11 @@ type LanguageRegistry struct {
 }
 
 
+// Tree is a type.
+type Tree struct {
+}
+
+
 // Language is a type.
 type Language struct {
 }
@@ -547,11 +510,6 @@ type Language struct {
 
 // Parser is a type.
 type Parser struct {
-}
-
-
-// Tree is a type.
-type Tree struct {
 }
 
 
@@ -663,32 +621,8 @@ func DetectLanguageFromContent(content string) **string {
 }
 
 
-// Validate an extraction config without running it.
-//
-// Checks that the language exists and all query patterns compile. Returns
-// detailed diagnostics per pattern.
-//
-// # Errors
-//
-// Returns an error if the language cannot be loaded.
-func ValidateExtraction(config ExtractionConfig) *ValidationResult, error {
-    jsonBytes, err := json.Marshal(config)
-    if err != nil {
-        return fmt.Errorf("failed to marshal: %w", err)
-    }
-    cConfig := C.CString(string(jsonBytes))
-    defer C.free(unsafe.Pointer(cConfig))
-
-    ptr := C.tslp_validate_extraction(cConfig)
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return unmarshalValidationResult(ptr), nil
-}
-
-
 // Process source code: parse once, extract intelligence based on config, and return it.
-func Process(source string, config ProcessConfig, registry LanguageRegistry) *ProcessResult, error {
+func Process(source string, config ProcessConfig, registry LanguageRegistry) (*ProcessResult, error) {
     cSource := C.CString(source)
     defer C.free(unsafe.Pointer(cSource))
 
@@ -761,30 +695,6 @@ func NamedChildrenInfo(tree Tree) *[]NodeInfo {
 
     ptr := C.tslp_named_children_info(cTree)
     return unmarshalListNodeInfo(ptr)
-}
-
-
-// Parse source code with the named language, returning the syntax tree.
-//
-// Uses the global registry to look up the language by name.
-//
-// # Examples
-//
-// ```no_run
-// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
-// assert_eq!(tree.root_node().kind(), "module");
-// ```
-func ParseString(language string, source []byte) *Tree, error {
-    cLanguage := C.CString(language)
-    defer C.free(unsafe.Pointer(cLanguage))
-
-    cSource := (*C.uchar)(unsafe.Pointer(&source[0]))
-
-    ptr := C.tslp_parse_string(cLanguage, cSource)
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return unmarshalTree(ptr), nil
 }
 
 
@@ -973,72 +883,6 @@ func SplitCode(source string, tree Tree, max_chunk_size uint) *[]string {
 }
 
 
-// Get a tree-sitter [`Language`] by name using the global registry.
-//
-// Resolves language aliases (e.g., `"shell"` maps to `"bash"`).
-// When the `download` feature is enabled (default), automatically downloads
-// the parser from GitHub releases if not found locally.
-//
-// # Errors
-//
-// Returns [`Error::LanguageNotFound`] if the language is not recognized,
-// or [`Error::Download`] if auto-download fails.
-//
-// # Example
-//
-// ```no_run
-// use tree_sitter_language_pack::get_language;
-//
-// let lang = get_language("python").unwrap();
-// // Use the Language with a tree-sitter Parser
-// let mut parser = tree_sitter::Parser::new();
-// parser.set_language(&lang).unwrap();
-// let tree = parser.parse("x = 1", None).unwrap();
-// assert_eq!(tree.root_node().kind(), "module");
-// ```
-func GetLanguage(name string) *Language, error {
-    cName := C.CString(name)
-    defer C.free(unsafe.Pointer(cName))
-
-    ptr := C.tslp_get_language(cName)
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return unmarshalLanguage(ptr), nil
-}
-
-
-// Get a tree-sitter [`Parser`] pre-configured for the given language.
-//
-// This is a convenience function that calls [`get_language`] and configures
-// a new parser in one step.
-//
-// # Errors
-//
-// Returns [`Error::LanguageNotFound`] if the language is not recognized, or
-// [`Error::ParserSetup`] if the language cannot be applied to the parser.
-//
-// # Example
-//
-// ```no_run
-// use tree_sitter_language_pack::get_parser;
-//
-// let mut parser = get_parser("rust").unwrap();
-// let tree = parser.parse("fn main() {}", None).unwrap();
-// assert!(!tree.root_node().has_error());
-// ```
-func GetParser(name string) *Parser, error {
-    cName := C.CString(name)
-    defer C.free(unsafe.Pointer(cName))
-
-    ptr := C.tslp_get_parser(cName)
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return unmarshalParser(ptr), nil
-}
-
-
 // List all available language names (sorted, deduplicated, includes aliases).
 //
 // Returns names of both statically compiled and dynamically loadable languages,
@@ -1102,271 +946,9 @@ func LanguageCount() *uint {
 }
 
 
-// Run extraction patterns against source code.
-//
-// Convenience wrapper around [`extract::extract`].
-//
-// # Errors
-//
-// Returns an error if the language is not found, parsing fails, or a query
-// pattern is invalid.
-//
-// # Example
-//
-// ```no_run
-// use ahash::AHashMap;
-// use tree_sitter_language_pack::{ExtractionConfig, ExtractionPattern, CaptureOutput, extract_patterns};
-//
-// let mut patterns = AHashMap::new();
-// patterns.insert("fns".to_string(), ExtractionPattern {
-// query: "(function_definition name: (identifier) @fn_name)".to_string(),
-// capture_output: CaptureOutput::default(),
-// child_fields: Vec::new(),
-// max_results: None,
-// byte_range: None,
-// });
-// let config = ExtractionConfig { language: "python".to_string(), patterns };
-// let result = extract_patterns("def hello(): pass", &config).unwrap();
-// ```
-func ExtractPatterns(source string, config ExtractionConfig) *ExtractionResult, error {
-    cSource := C.CString(source)
-    defer C.free(unsafe.Pointer(cSource))
-
-    jsonBytes, err := json.Marshal(config)
-    if err != nil {
-        return fmt.Errorf("failed to marshal: %w", err)
-    }
-    cConfig := C.CString(string(jsonBytes))
-    defer C.free(unsafe.Pointer(cConfig))
-
-    ptr := C.tslp_extract_patterns(cSource, cConfig)
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return unmarshalExtractionResult(ptr), nil
-}
-
-
-// Initialize the language pack with the given configuration.
-//
-// Applies any custom cache directory, then downloads all languages and groups
-// specified in the config. This is the recommended entry point when you want
-// to pre-warm the cache before use.
-//
-// # Errors
-//
-// Returns an error if configuration cannot be applied or if downloads fail.
-//
-// # Example
-//
-// ```no_run
-// use tree_sitter_language_pack::{PackConfig, init};
-//
-// let config = PackConfig {
-// cache_dir: None,
-// languages: Some(vec!["python".to_string(), "rust".to_string()]),
-// groups: None,
-// };
-// init(&config).unwrap();
-// ```
-func Init(config PackConfig) error {
-    jsonBytes, err := json.Marshal(config)
-    if err != nil {
-        return fmt.Errorf("failed to marshal: %w", err)
-    }
-    cConfig := C.CString(string(jsonBytes))
-    defer C.free(unsafe.Pointer(cConfig))
-
-    C.tslp_init(cConfig)
-    return lastError()
-}
-
-
-// Apply download configuration without downloading anything.
-//
-// Use this to set a custom cache directory before the first call to
-// [`get_language`] or any download function. Changing the cache dir
-// after languages have been registered has no effect on already-loaded
-// languages.
-//
-// # Errors
-//
-// Returns an error if the lock cannot be acquired.
-//
-// # Example
-//
-// ```no_run
-// use std::path::PathBuf;
-// use tree_sitter_language_pack::{PackConfig, configure};
-//
-// let config = PackConfig {
-// cache_dir: Some(PathBuf::from("/tmp/my-parsers")),
-// languages: None,
-// groups: None,
-// };
-// configure(&config).unwrap();
-// ```
-func Configure(config PackConfig) error {
-    jsonBytes, err := json.Marshal(config)
-    if err != nil {
-        return fmt.Errorf("failed to marshal: %w", err)
-    }
-    cConfig := C.CString(string(jsonBytes))
-    defer C.free(unsafe.Pointer(cConfig))
-
-    C.tslp_configure(cConfig)
-    return lastError()
-}
-
-
-// Download all available languages from the remote manifest.
-//
-// Returns the number of newly downloaded languages.
-//
-// # Errors
-//
-// Returns an error if the manifest cannot be fetched or a download fails.
-//
-// # Example
-//
-// ```no_run
-// use tree_sitter_language_pack::download_all;
-//
-// let count = download_all().unwrap();
-// println!("Downloaded {} languages", count);
-// ```
-func DownloadAll() *uint, error {
-    ptr := C.tslp_download_all()
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return unmarshalUsize(ptr), nil
-}
-
-
-// Return all language names available in the remote manifest (248).
-//
-// Fetches (and caches) the remote manifest to discover the full list of
-// downloadable languages. Use [`downloaded_languages`] to list what is
-// already cached locally.
-//
-// # Errors
-//
-// Returns an error if the manifest cannot be fetched.
-//
-// # Example
-//
-// ```no_run
-// use tree_sitter_language_pack::manifest_languages;
-//
-// let langs = manifest_languages().unwrap();
-// println!("{} languages available for download", langs.len());
-// ```
-func ManifestLanguages() *[]string, error {
-    ptr := C.tslp_manifest_languages()
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return unmarshalListString(ptr), nil
-}
-
-
-// Return languages that are already downloaded and cached locally.
-//
-// Does not perform any network requests. Returns an empty list if the
-// cache directory does not exist or cannot be read.
-//
-// # Example
-//
-// ```no_run
-// use tree_sitter_language_pack::downloaded_languages;
-//
-// let langs = downloaded_languages();
-// println!("{} languages already cached", langs.len());
-// ```
-func DownloadedLanguages() *[]string {
-    ptr := C.tslp_downloaded_languages()
-    return unmarshalListString(ptr)
-}
-
-
-// Delete all cached parser shared libraries.
-//
-// Resets the cache registration so the next call to [`get_language`] or
-// a download function will re-register the (now empty) cache directory.
-//
-// # Errors
-//
-// Returns an error if the cache directory cannot be removed.
-//
-// # Example
-//
-// ```no_run
-// use tree_sitter_language_pack::clean_cache;
-//
-// clean_cache().unwrap();
-// println!("Cache cleared");
-// ```
-func CleanCache() error {
-    C.tslp_clean_cache()
-    return lastError()
-}
-
-
-// Return the effective cache directory path.
-//
-// This is either the custom path set via [`configure`] / [`init`] or the
-// default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
-//
-// # Errors
-//
-// Returns an error if the system cache directory cannot be determined.
-//
-// # Example
-//
-// ```no_run
-// use tree_sitter_language_pack::cache_dir;
-//
-// let dir = cache_dir().unwrap();
-// println!("Cache directory: {}", dir.display());
-// ```
-func CacheDir() *string, error {
-    ptr := C.tslp_cache_dir()
-    if err := lastError(); err != nil {
-        if ptr != nil {
-            C.tslp_free_string(ptr)
-        }
-        return nil, err
-    }
-    defer C.tslp_free_string(ptr)
-    return unmarshalPath(ptr), nil
-}
-
-
 // Default is a method.
 func (r *ProcessConfig) Default() *ProcessConfig {
     ptr := C.tslp_process_config_default (unsafe.Pointer(r), )
-    return unmarshalProcessConfig(ptr)
-}
-
-
-// Enable chunking with the given maximum chunk size in bytes.
-func (r *ProcessConfig) WithChunking(max_size uint) *ProcessConfig {
-    ptr := C.tslp_process_config_with_chunking (unsafe.Pointer(r), cMaxSize)
-    return unmarshalProcessConfig(ptr)
-}
-
-
-// Enable all analysis features.
-func (r *ProcessConfig) All() *ProcessConfig {
-    ptr := C.tslp_process_config_all (unsafe.Pointer(r), )
-    return unmarshalProcessConfig(ptr)
-}
-
-
-// Disable all analysis features (only metrics computed).
-func (r *ProcessConfig) Minimal() *ProcessConfig {
-    ptr := C.tslp_process_config_minimal (unsafe.Pointer(r), )
     return unmarshalProcessConfig(ptr)
 }
 
@@ -1381,7 +963,7 @@ func (r *ProcessConfig) Minimal() *ProcessConfig {
 //
 // Returns [`Error::LanguageNotFound`] if the name (after alias resolution)
 // does not match any known grammar.
-func (r *LanguageRegistry) GetLanguage(name string) *Language, error {
+func (r *LanguageRegistry) GetLanguage(name string) (*Language, error) {
     cName := C.CString(name)
     defer C.free(unsafe.Pointer(cName))
 
@@ -1424,7 +1006,7 @@ func (r *LanguageRegistry) LanguageCount() *uint {
 
 
 // Parse source code and extract file intelligence based on config in a single pass.
-func (r *LanguageRegistry) Process(source string, config ProcessConfig) *ProcessResult, error {
+func (r *LanguageRegistry) Process(source string, config ProcessConfig) (*ProcessResult, error) {
     cSource := C.CString(source)
     defer C.free(unsafe.Pointer(cSource))
 

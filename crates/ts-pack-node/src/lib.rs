@@ -320,20 +320,23 @@ pub struct JsLanguageRegistry {
 impl JsLanguageRegistry {
     #[napi(js_name = "getLanguage")]
     pub fn get_language(&self, name: String) -> Result<JsLanguage> {
-        Err(napi::Error::new(
-            napi::Status::GenericFailure,
-            "Not implemented: get_language",
-        ))
+        let result = self
+            .inner
+            .get_language(&name)
+            .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+        Ok(JsLanguage {
+            inner: Arc::new(result),
+        })
     }
 
     #[napi(js_name = "availableLanguages")]
     pub fn available_languages(&self) -> Vec<String> {
-        Vec::new()
+        self.inner.available_languages().into_iter().collect()
     }
 
     #[napi(js_name = "hasLanguage")]
     pub fn has_language(&self, name: String) -> bool {
-        false
+        self.inner.has_language(&name)
     }
 
     #[napi(js_name = "languageCount")]
@@ -345,15 +348,26 @@ impl JsLanguageRegistry {
     pub fn process(&self, source: String, config: JsProcessConfig) -> Result<JsProcessResult> {
         Err(napi::Error::new(
             napi::Status::GenericFailure,
-            "Not implemented: process",
+            "Not implemented: LanguageRegistry.process",
         ))
     }
 
     #[napi]
     pub fn default() -> JsLanguageRegistry {
-        todo!("Not auto-delegatable: default -- return type requires custom implementation")
+        Self {
+            inner: Arc::new(tree_sitter_language_pack::LanguageRegistry::default()),
+        }
     }
 }
+
+#[derive(Clone)]
+#[napi]
+pub struct JsTree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
+}
+
+#[napi]
+impl JsTree {}
 
 #[derive(Clone)]
 #[napi]
@@ -372,15 +386,6 @@ pub struct JsParser {
 
 #[napi]
 impl JsParser {}
-
-#[derive(Clone)]
-#[napi]
-pub struct JsTree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
-}
-
-#[napi]
-impl JsTree {}
 
 #[napi(string_enum)]
 #[derive(Clone)]
@@ -476,12 +481,12 @@ pub enum JsDiagnosticSeverity {
 
 #[napi(js_name = "detectLanguageFromExtension")]
 pub fn detect_language_from_extension(ext: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::detect_language_from_extension(&ext).map(Into::into)
 }
 
 #[napi(js_name = "detectLanguageFromPath")]
 pub fn detect_language_from_path(path: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::detect_language_from_path(&path).map(Into::into)
 }
 
 #[napi(js_name = "extensionAmbiguity")]
@@ -491,132 +496,42 @@ pub fn extension_ambiguity(ext: String) -> Option<String> {
 
 #[napi(js_name = "extensionAmbiguityJson")]
 pub fn extension_ambiguity_json(ext: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::extension_ambiguity_json(&ext)
 }
 
 #[napi(js_name = "detectLanguageFromContent")]
 pub fn detect_language_from_content(content: String) -> Option<String> {
-    None
-}
-
-#[napi(js_name = "validateExtraction")]
-pub fn validate_extraction(config: JsExtractionConfig) -> Result<JsValidationResult> {
-    Err(napi::Error::new(
-        napi::Status::GenericFailure,
-        "Not implemented: validate_extraction",
-    ))
-}
-
-#[napi(js_name = "parseString")]
-pub fn parse_string(language: String, source: Vec<u8>) -> Result<JsTree> {
-    Err(napi::Error::new(
-        napi::Status::GenericFailure,
-        "Not implemented: parse_string",
-    ))
+    tree_sitter_language_pack::detect_language_from_content(&content).map(Into::into)
 }
 
 #[napi(js_name = "getHighlightsQuery")]
 pub fn get_highlights_query(language: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::get_highlights_query(&language).map(Into::into)
 }
 
 #[napi(js_name = "getInjectionsQuery")]
 pub fn get_injections_query(language: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::get_injections_query(&language).map(Into::into)
 }
 
 #[napi(js_name = "getLocalsQuery")]
 pub fn get_locals_query(language: String) -> Option<String> {
-    None
-}
-
-#[napi(js_name = "getLanguage")]
-pub fn get_language(name: String) -> Result<JsLanguage> {
-    Err(napi::Error::new(
-        napi::Status::GenericFailure,
-        "Not implemented: get_language",
-    ))
-}
-
-#[napi(js_name = "getParser")]
-pub fn get_parser(name: String) -> Result<JsParser> {
-    Err(napi::Error::new(
-        napi::Status::GenericFailure,
-        "Not implemented: get_parser",
-    ))
+    tree_sitter_language_pack::get_locals_query(&language).map(Into::into)
 }
 
 #[napi(js_name = "availableLanguages")]
 pub fn available_languages() -> Vec<String> {
-    Vec::new()
+    tree_sitter_language_pack::available_languages().into_iter().collect()
 }
 
 #[napi(js_name = "hasLanguage")]
 pub fn has_language(name: String) -> bool {
-    false
+    tree_sitter_language_pack::has_language(&name)
 }
 
 #[napi(js_name = "languageCount")]
 pub fn language_count() -> i64 {
-    0
-}
-
-#[napi(js_name = "extractPatterns")]
-pub fn extract_patterns(source: String, config: JsExtractionConfig) -> Result<JsExtractionResult> {
-    Err(napi::Error::new(
-        napi::Status::GenericFailure,
-        "Not implemented: extract_patterns",
-    ))
-}
-
-#[napi]
-pub fn init(config: JsPackConfig) -> Result<()> {
-    Err(napi::Error::new(napi::Status::GenericFailure, "Not implemented: init"))
-}
-
-#[napi]
-pub fn configure(config: JsPackConfig) -> Result<()> {
-    Err(napi::Error::new(
-        napi::Status::GenericFailure,
-        "Not implemented: configure",
-    ))
-}
-
-#[napi(js_name = "downloadAll")]
-pub fn download_all() -> Result<i64> {
-    Err(napi::Error::new(
-        napi::Status::GenericFailure,
-        "Not implemented: download_all",
-    ))
-}
-
-#[napi(js_name = "manifestLanguages")]
-pub fn manifest_languages() -> Result<Vec<String>> {
-    Err(napi::Error::new(
-        napi::Status::GenericFailure,
-        "Not implemented: manifest_languages",
-    ))
-}
-
-#[napi(js_name = "downloadedLanguages")]
-pub fn downloaded_languages() -> Vec<String> {
-    Vec::new()
-}
-
-#[napi(js_name = "cleanCache")]
-pub fn clean_cache() -> Result<()> {
-    Err(napi::Error::new(
-        napi::Status::GenericFailure,
-        "Not implemented: clean_cache",
-    ))
-}
-
-#[napi(js_name = "cacheDir")]
-pub fn cache_dir() -> Result<String> {
-    Err(napi::Error::new(
-        napi::Status::GenericFailure,
-        "Not implemented: cache_dir",
-    ))
+    tree_sitter_language_pack::language_count() as i64
 }
 
 impl From<JsPatternValidation> for tree_sitter_language_pack::PatternValidation {

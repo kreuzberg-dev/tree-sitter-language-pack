@@ -32,11 +32,6 @@ internal static partial class NativeMethods
         [MarshalAs(UnmanagedType.LPStr)] string content
     );
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_validate_extraction")]
-    internal static extern IntPtr ValidateExtraction(
-        ExtractionConfig config
-    );
-
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_process")]
     internal static extern IntPtr Process(
         [MarshalAs(UnmanagedType.LPStr)] string source,
@@ -58,12 +53,6 @@ internal static partial class NativeMethods
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_named_children_info")]
     internal static extern IntPtr NamedChildrenInfo(
         Tree tree
-    );
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_parse_string")]
-    internal static extern IntPtr ParseString(
-        [MarshalAs(UnmanagedType.LPStr)] string language,
-        byte[] source
     );
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_tree_contains_node_type")]
@@ -109,16 +98,6 @@ internal static partial class NativeMethods
         nuint maxChunkSize
     );
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_get_language")]
-    internal static extern IntPtr GetLanguage(
-        [MarshalAs(UnmanagedType.LPStr)] string name
-    );
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_get_parser")]
-    internal static extern IntPtr GetParser(
-        [MarshalAs(UnmanagedType.LPStr)] string name
-    );
-
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_available_languages")]
     internal static extern IntPtr AvailableLanguages();
 
@@ -130,50 +109,13 @@ internal static partial class NativeMethods
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_language_count")]
     internal static extern nuint LanguageCount();
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_extract_patterns")]
-    internal static extern IntPtr ExtractPatterns(
-        [MarshalAs(UnmanagedType.LPStr)] string source,
-        ExtractionConfig config
-    );
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_init")]
-    internal static extern void Init(
-        PackConfig config
-    );
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_configure")]
-    internal static extern void Configure(
-        PackConfig config
-    );
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_download_all")]
-    internal static extern nuint DownloadAll();
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_manifest_languages")]
-    internal static extern IntPtr ManifestLanguages();
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_downloaded_languages")]
-    internal static extern IntPtr DownloadedLanguages();
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_clean_cache")]
-    internal static extern void CleanCache();
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_cache_dir")]
-    internal static extern IntPtr CacheDir();
-
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_default")]
     internal static extern IntPtr Default();
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_with_chunking")]
-    internal static extern IntPtr WithChunking(
-        nuint maxSize
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_get_language")]
+    internal static extern IntPtr GetLanguage(
+        [MarshalAs(UnmanagedType.LPStr)] string name
     );
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_all")]
-    internal static extern IntPtr All();
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_minimal")]
-    internal static extern IntPtr Minimal();
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tslp_last_error_code")]
     internal static extern int LastErrorCode();

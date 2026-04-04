@@ -1378,18 +1378,6 @@ impl ProcessConfig {
     fn extractions(&self) -> Option<String> {
         self.extractions.clone()
     }
-
-    fn with_chunking(&self, max_size: usize) -> ProcessConfig {
-        todo!("Not auto-delegatable: with_chunking -- return type requires custom implementation")
-    }
-
-    fn all(&self) -> ProcessConfig {
-        todo!("Not auto-delegatable: all -- return type requires custom implementation")
-    }
-
-    fn minimal(&self) -> ProcessConfig {
-        todo!("Not auto-delegatable: minimal -- return type requires custom implementation")
-    }
 }
 
 #[derive(Clone)]
@@ -1410,22 +1398,25 @@ unsafe impl TryConvertOwned for LanguageRegistry {}
 
 impl LanguageRegistry {
     fn get_language(&self, name: String) -> Result<Language, Error> {
-        Err(magnus::Error::new(
-            magnus::exception::runtime_error(),
-            "Not implemented: get_language",
-        ))
+        let result = self
+            .inner
+            .get_language(&name)
+            .map_err(|e| magnus::Error::new(magnus::exception::runtime_error(), e.to_string()))?;
+        Ok(Language {
+            inner: Arc::new(result),
+        })
     }
 
     fn available_languages(&self) -> Vec<String> {
-        Vec::new()
+        self.inner.available_languages().into_iter().map(Into::into).collect()
     }
 
     fn has_language(&self, name: String) -> bool {
-        false
+        self.inner.has_language(&name)
     }
 
     fn language_count(&self) -> usize {
-        0
+        self.inner.language_count()
     }
 
     fn process(&self, source: String, config: ProcessConfig) -> Result<ProcessResult, Error> {
@@ -1435,6 +1426,24 @@ impl LanguageRegistry {
         ))
     }
 }
+
+#[derive(Clone)]
+#[magnus::wrap(class = "Kreuzberg::Tree")]
+pub struct Tree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
+}
+
+unsafe impl IntoValueFromNative for Tree {}
+
+impl magnus::TryConvert for Tree {
+    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
+        let r: &Tree = magnus::TryConvert::try_convert(val)?;
+        Ok(r.clone())
+    }
+}
+unsafe impl TryConvertOwned for Tree {}
+
+impl Tree {}
 
 #[derive(Clone)]
 #[magnus::wrap(class = "Kreuzberg::Language")]
@@ -1471,24 +1480,6 @@ impl magnus::TryConvert for Parser {
 unsafe impl TryConvertOwned for Parser {}
 
 impl Parser {}
-
-#[derive(Clone)]
-#[magnus::wrap(class = "Kreuzberg::Tree")]
-pub struct Tree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
-}
-
-unsafe impl IntoValueFromNative for Tree {}
-
-impl magnus::TryConvert for Tree {
-    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Tree = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
-    }
-}
-unsafe impl TryConvertOwned for Tree {}
-
-impl Tree {}
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum CaptureOutput {
@@ -1794,11 +1785,11 @@ unsafe impl IntoValueFromNative for DiagnosticSeverity {}
 unsafe impl TryConvertOwned for DiagnosticSeverity {}
 
 fn detect_language_from_extension(ext: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::detect_language_from_extension(&ext).map(Into::into)
 }
 
 fn detect_language_from_path(path: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::detect_language_from_path(&path).map(Into::into)
 }
 
 fn extension_ambiguity(ext: String) -> Option<String> {
@@ -1806,18 +1797,11 @@ fn extension_ambiguity(ext: String) -> Option<String> {
 }
 
 fn extension_ambiguity_json(ext: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::extension_ambiguity_json(&ext).map(Into::into)
 }
 
 fn detect_language_from_content(content: String) -> Option<String> {
-    None
-}
-
-fn validate_extraction(config: ExtractionConfig) -> Result<ValidationResult, Error> {
-    Err(magnus::Error::new(
-        magnus::exception::runtime_error(),
-        "Not implemented: validate_extraction",
-    ))
+    tree_sitter_language_pack::detect_language_from_content(&content).map(Into::into)
 }
 
 fn process(source: String, config: ProcessConfig, registry: LanguageRegistry) -> Result<ProcessResult, Error> {
@@ -1828,126 +1812,708 @@ fn process(source: String, config: ProcessConfig, registry: LanguageRegistry) ->
 }
 
 fn root_node_info(tree: Tree) -> NodeInfo {
-    todo!("Not auto-delegatable: root_node_info -- return type requires custom implementation")
+    tree_sitter_language_pack::root_node_info(&tree.inner).into()
 }
 
 fn find_nodes_by_type(tree: Tree, node_type: String) -> Vec<NodeInfo> {
-    Vec::new()
+    tree_sitter_language_pack::find_nodes_by_type(&tree.inner, &node_type)
+        .into_iter()
+        .map(Into::into)
+        .collect()
 }
 
 fn named_children_info(tree: Tree) -> Vec<NodeInfo> {
-    Vec::new()
-}
-
-fn parse_string(language: String, source: Vec<u8>) -> Result<Tree, Error> {
-    Err(magnus::Error::new(
-        magnus::exception::runtime_error(),
-        "Not implemented: parse_string",
-    ))
+    tree_sitter_language_pack::named_children_info(&tree.inner)
+        .into_iter()
+        .map(Into::into)
+        .collect()
 }
 
 fn tree_contains_node_type(tree: Tree, node_type: String) -> bool {
-    false
+    tree_sitter_language_pack::tree_contains_node_type(&tree.inner, &node_type)
 }
 
 fn tree_has_error_nodes(tree: Tree) -> bool {
-    false
+    tree_sitter_language_pack::tree_has_error_nodes(&tree.inner)
 }
 
 fn tree_to_sexp(tree: Tree) -> String {
-    String::from("[unimplemented: tree_to_sexp]")
+    tree_sitter_language_pack::tree_to_sexp(&tree.inner).into()
 }
 
 fn tree_error_count(tree: Tree) -> usize {
-    0
+    tree_sitter_language_pack::tree_error_count(&tree.inner)
 }
 
 fn get_highlights_query(language: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::get_highlights_query(&language).map(Into::into)
 }
 
 fn get_injections_query(language: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::get_injections_query(&language).map(Into::into)
 }
 
 fn get_locals_query(language: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::get_locals_query(&language).map(Into::into)
 }
 
 fn split_code(source: String, tree: Tree, max_chunk_size: usize) -> Vec<String> {
     Vec::new()
 }
 
-fn get_language(name: String) -> Result<Language, Error> {
-    Err(magnus::Error::new(
-        magnus::exception::runtime_error(),
-        "Not implemented: get_language",
-    ))
-}
-
-fn get_parser(name: String) -> Result<Parser, Error> {
-    Err(magnus::Error::new(
-        magnus::exception::runtime_error(),
-        "Not implemented: get_parser",
-    ))
-}
-
 fn available_languages() -> Vec<String> {
-    Vec::new()
+    tree_sitter_language_pack::available_languages()
+        .into_iter()
+        .map(Into::into)
+        .collect()
 }
 
 fn has_language(name: String) -> bool {
-    false
+    tree_sitter_language_pack::has_language(&name)
 }
 
 fn language_count() -> usize {
-    0
+    tree_sitter_language_pack::language_count()
 }
 
-fn extract_patterns(source: String, config: ExtractionConfig) -> Result<ExtractionResult, Error> {
-    Err(magnus::Error::new(
-        magnus::exception::runtime_error(),
-        "Not implemented: extract_patterns",
-    ))
+impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {
+    fn from(val: tree_sitter_language_pack::ExtractionPattern) -> Self {
+        Self {
+            query: val.query,
+            capture_output: val.capture_output.into(),
+            child_fields: val.child_fields,
+            max_results: val.max_results,
+            byte_range: val.byte_range.as_ref().map(|v| format!("{:?}", v)),
+        }
+    }
 }
 
-fn configure(config: PackConfig) -> Result<(), Error> {
-    Err(magnus::Error::new(
-        magnus::exception::runtime_error(),
-        "Not implemented: configure",
-    ))
+impl From<tree_sitter_language_pack::ExtractionConfig> for ExtractionConfig {
+    fn from(val: tree_sitter_language_pack::ExtractionConfig) -> Self {
+        Self {
+            language: val.language,
+            patterns: format!("{:?}", val.patterns),
+        }
+    }
 }
 
-fn download_all() -> Result<usize, Error> {
-    Err(magnus::Error::new(
-        magnus::exception::runtime_error(),
-        "Not implemented: download_all",
-    ))
+impl From<tree_sitter_language_pack::CaptureResult> for CaptureResult {
+    fn from(val: tree_sitter_language_pack::CaptureResult) -> Self {
+        Self {
+            name: val.name,
+            node: val.node.map(Into::into),
+            text: val.text,
+            child_fields: format!("{:?}", val.child_fields),
+            start_byte: val.start_byte,
+        }
+    }
 }
 
-fn manifest_languages() -> Result<Vec<String>, Error> {
-    Err(magnus::Error::new(
-        magnus::exception::runtime_error(),
-        "Not implemented: manifest_languages",
-    ))
+impl From<tree_sitter_language_pack::MatchResult> for MatchResult {
+    fn from(val: tree_sitter_language_pack::MatchResult) -> Self {
+        Self {
+            pattern_index: val.pattern_index,
+            captures: val.captures.into_iter().map(Into::into).collect(),
+        }
+    }
 }
 
-fn downloaded_languages() -> Vec<String> {
-    Vec::new()
+impl From<tree_sitter_language_pack::PatternResult> for PatternResult {
+    fn from(val: tree_sitter_language_pack::PatternResult) -> Self {
+        Self {
+            matches: val.matches.into_iter().map(Into::into).collect(),
+            total_count: val.total_count,
+        }
+    }
 }
 
-fn clean_cache() -> Result<(), Error> {
-    Err(magnus::Error::new(
-        magnus::exception::runtime_error(),
-        "Not implemented: clean_cache",
-    ))
+impl From<tree_sitter_language_pack::ExtractionResult> for ExtractionResult {
+    fn from(val: tree_sitter_language_pack::ExtractionResult) -> Self {
+        Self {
+            language: val.language,
+            results: format!("{:?}", val.results),
+        }
+    }
 }
 
-fn cache_dir() -> Result<String, Error> {
-    Err(magnus::Error::new(
-        magnus::exception::runtime_error(),
-        "Not implemented: cache_dir",
-    ))
+impl From<PatternValidation> for tree_sitter_language_pack::PatternValidation {
+    fn from(val: PatternValidation) -> Self {
+        Self {
+            valid: val.valid,
+            capture_names: val.capture_names,
+            pattern_count: val.pattern_count,
+            warnings: val.warnings,
+            errors: val.errors,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternValidation> for PatternValidation {
+    fn from(val: tree_sitter_language_pack::PatternValidation) -> Self {
+        Self {
+            valid: val.valid,
+            capture_names: val.capture_names,
+            pattern_count: val.pattern_count,
+            warnings: val.warnings,
+            errors: val.errors,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ValidationResult> for ValidationResult {
+    fn from(val: tree_sitter_language_pack::ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: format!("{:?}", val.patterns),
+        }
+    }
+}
+
+impl From<Span> for tree_sitter_language_pack::Span {
+    fn from(val: Span) -> Self {
+        Self {
+            start_byte: val.start_byte,
+            end_byte: val.end_byte,
+            start_line: val.start_line,
+            start_column: val.start_column,
+            end_line: val.end_line,
+            end_column: val.end_column,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::Span> for Span {
+    fn from(val: tree_sitter_language_pack::Span) -> Self {
+        Self {
+            start_byte: val.start_byte,
+            end_byte: val.end_byte,
+            start_line: val.start_line,
+            start_column: val.start_column,
+            end_line: val.end_line,
+            end_column: val.end_column,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ProcessResult> for ProcessResult {
+    fn from(val: tree_sitter_language_pack::ProcessResult) -> Self {
+        Self {
+            language: val.language,
+            metrics: val.metrics.into(),
+            structure: val.structure.into_iter().map(Into::into).collect(),
+            imports: val.imports.into_iter().map(Into::into).collect(),
+            exports: val.exports.into_iter().map(Into::into).collect(),
+            comments: val.comments.into_iter().map(Into::into).collect(),
+            docstrings: val.docstrings.into_iter().map(Into::into).collect(),
+            symbols: val.symbols.into_iter().map(Into::into).collect(),
+            diagnostics: val.diagnostics.into_iter().map(Into::into).collect(),
+            chunks: val.chunks.into_iter().map(Into::into).collect(),
+            extractions: format!("{:?}", val.extractions),
+        }
+    }
+}
+
+impl From<FileMetrics> for tree_sitter_language_pack::FileMetrics {
+    fn from(val: FileMetrics) -> Self {
+        Self {
+            total_lines: val.total_lines,
+            code_lines: val.code_lines,
+            comment_lines: val.comment_lines,
+            blank_lines: val.blank_lines,
+            total_bytes: val.total_bytes,
+            node_count: val.node_count,
+            error_count: val.error_count,
+            max_depth: val.max_depth,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::FileMetrics> for FileMetrics {
+    fn from(val: tree_sitter_language_pack::FileMetrics) -> Self {
+        Self {
+            total_lines: val.total_lines,
+            code_lines: val.code_lines,
+            comment_lines: val.comment_lines,
+            blank_lines: val.blank_lines,
+            total_bytes: val.total_bytes,
+            node_count: val.node_count,
+            error_count: val.error_count,
+            max_depth: val.max_depth,
+        }
+    }
+}
+
+impl From<StructureItem> for tree_sitter_language_pack::StructureItem {
+    fn from(val: StructureItem) -> Self {
+        Self {
+            kind: val.kind.into(),
+            name: val.name,
+            visibility: val.visibility,
+            span: val.span.into(),
+            children: val.children.into_iter().map(Into::into).collect(),
+            decorators: val.decorators,
+            doc_comment: val.doc_comment,
+            signature: val.signature,
+            body_span: val.body_span.map(Into::into),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::StructureItem> for StructureItem {
+    fn from(val: tree_sitter_language_pack::StructureItem) -> Self {
+        Self {
+            kind: val.kind.into(),
+            name: val.name,
+            visibility: val.visibility,
+            span: val.span.into(),
+            children: val.children.into_iter().map(Into::into).collect(),
+            decorators: val.decorators,
+            doc_comment: val.doc_comment,
+            signature: val.signature,
+            body_span: val.body_span.map(Into::into),
+        }
+    }
+}
+
+impl From<CommentInfo> for tree_sitter_language_pack::CommentInfo {
+    fn from(val: CommentInfo) -> Self {
+        Self {
+            text: val.text,
+            kind: val.kind.into(),
+            span: val.span.into(),
+            associated_node: val.associated_node,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::CommentInfo> for CommentInfo {
+    fn from(val: tree_sitter_language_pack::CommentInfo) -> Self {
+        Self {
+            text: val.text,
+            kind: val.kind.into(),
+            span: val.span.into(),
+            associated_node: val.associated_node,
+        }
+    }
+}
+
+impl From<DocstringInfo> for tree_sitter_language_pack::DocstringInfo {
+    fn from(val: DocstringInfo) -> Self {
+        Self {
+            text: val.text,
+            format: val.format.into(),
+            span: val.span.into(),
+            associated_item: val.associated_item,
+            parsed_sections: val.parsed_sections.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::DocstringInfo> for DocstringInfo {
+    fn from(val: tree_sitter_language_pack::DocstringInfo) -> Self {
+        Self {
+            text: val.text,
+            format: val.format.into(),
+            span: val.span.into(),
+            associated_item: val.associated_item,
+            parsed_sections: val.parsed_sections.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<DocSection> for tree_sitter_language_pack::DocSection {
+    fn from(val: DocSection) -> Self {
+        Self {
+            kind: val.kind,
+            name: val.name,
+            description: val.description,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::DocSection> for DocSection {
+    fn from(val: tree_sitter_language_pack::DocSection) -> Self {
+        Self {
+            kind: val.kind,
+            name: val.name,
+            description: val.description,
+        }
+    }
+}
+
+impl From<ImportInfo> for tree_sitter_language_pack::ImportInfo {
+    fn from(val: ImportInfo) -> Self {
+        Self {
+            source: val.source,
+            items: val.items,
+            alias: val.alias,
+            is_wildcard: val.is_wildcard,
+            span: val.span.into(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ImportInfo> for ImportInfo {
+    fn from(val: tree_sitter_language_pack::ImportInfo) -> Self {
+        Self {
+            source: val.source,
+            items: val.items,
+            alias: val.alias,
+            is_wildcard: val.is_wildcard,
+            span: val.span.into(),
+        }
+    }
+}
+
+impl From<ExportInfo> for tree_sitter_language_pack::ExportInfo {
+    fn from(val: ExportInfo) -> Self {
+        Self {
+            name: val.name,
+            kind: val.kind.into(),
+            span: val.span.into(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ExportInfo> for ExportInfo {
+    fn from(val: tree_sitter_language_pack::ExportInfo) -> Self {
+        Self {
+            name: val.name,
+            kind: val.kind.into(),
+            span: val.span.into(),
+        }
+    }
+}
+
+impl From<SymbolInfo> for tree_sitter_language_pack::SymbolInfo {
+    fn from(val: SymbolInfo) -> Self {
+        Self {
+            name: val.name,
+            kind: val.kind.into(),
+            span: val.span.into(),
+            type_annotation: val.type_annotation,
+            doc: val.doc,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::SymbolInfo> for SymbolInfo {
+    fn from(val: tree_sitter_language_pack::SymbolInfo) -> Self {
+        Self {
+            name: val.name,
+            kind: val.kind.into(),
+            span: val.span.into(),
+            type_annotation: val.type_annotation,
+            doc: val.doc,
+        }
+    }
+}
+
+impl From<Diagnostic> for tree_sitter_language_pack::Diagnostic {
+    fn from(val: Diagnostic) -> Self {
+        Self {
+            message: val.message,
+            severity: val.severity.into(),
+            span: val.span.into(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::Diagnostic> for Diagnostic {
+    fn from(val: tree_sitter_language_pack::Diagnostic) -> Self {
+        Self {
+            message: val.message,
+            severity: val.severity.into(),
+            span: val.span.into(),
+        }
+    }
+}
+
+impl From<CodeChunk> for tree_sitter_language_pack::CodeChunk {
+    fn from(val: CodeChunk) -> Self {
+        Self {
+            content: val.content,
+            start_byte: val.start_byte,
+            end_byte: val.end_byte,
+            start_line: val.start_line,
+            end_line: val.end_line,
+            metadata: val.metadata.into(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::CodeChunk> for CodeChunk {
+    fn from(val: tree_sitter_language_pack::CodeChunk) -> Self {
+        Self {
+            content: val.content,
+            start_byte: val.start_byte,
+            end_byte: val.end_byte,
+            start_line: val.start_line,
+            end_line: val.end_line,
+            metadata: val.metadata.into(),
+        }
+    }
+}
+
+impl From<ChunkContext> for tree_sitter_language_pack::ChunkContext {
+    fn from(val: ChunkContext) -> Self {
+        Self {
+            language: val.language,
+            chunk_index: val.chunk_index,
+            total_chunks: val.total_chunks,
+            node_types: val.node_types,
+            context_path: val.context_path,
+            symbols_defined: val.symbols_defined,
+            comments: val.comments.into_iter().map(Into::into).collect(),
+            docstrings: val.docstrings.into_iter().map(Into::into).collect(),
+            has_error_nodes: val.has_error_nodes,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ChunkContext> for ChunkContext {
+    fn from(val: tree_sitter_language_pack::ChunkContext) -> Self {
+        Self {
+            language: val.language,
+            chunk_index: val.chunk_index,
+            total_chunks: val.total_chunks,
+            node_types: val.node_types,
+            context_path: val.context_path,
+            symbols_defined: val.symbols_defined,
+            comments: val.comments.into_iter().map(Into::into).collect(),
+            docstrings: val.docstrings.into_iter().map(Into::into).collect(),
+            has_error_nodes: val.has_error_nodes,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::NodeInfo> for NodeInfo {
+    fn from(val: tree_sitter_language_pack::NodeInfo) -> Self {
+        Self {
+            kind: format!("{:?}", val.kind),
+            is_named: val.is_named,
+            start_byte: val.start_byte,
+            end_byte: val.end_byte,
+            start_row: val.start_row,
+            start_col: val.start_col,
+            end_row: val.end_row,
+            end_col: val.end_col,
+            named_child_count: val.named_child_count,
+            is_error: val.is_error,
+            is_missing: val.is_missing,
+        }
+    }
+}
+
+impl From<PackConfig> for tree_sitter_language_pack::PackConfig {
+    fn from(val: PackConfig) -> Self {
+        Self {
+            cache_dir: val.cache_dir.map(Into::into),
+            languages: val.languages,
+            groups: val.groups,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PackConfig> for PackConfig {
+    fn from(val: tree_sitter_language_pack::PackConfig) -> Self {
+        Self {
+            cache_dir: val.cache_dir.map(|p| p.to_string_lossy().to_string()),
+            languages: val.languages,
+            groups: val.groups,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ProcessConfig> for ProcessConfig {
+    fn from(val: tree_sitter_language_pack::ProcessConfig) -> Self {
+        Self {
+            language: format!("{:?}", val.language),
+            structure: val.structure,
+            imports: val.imports,
+            exports: val.exports,
+            comments: val.comments,
+            docstrings: val.docstrings,
+            symbols: val.symbols,
+            diagnostics: val.diagnostics,
+            chunk_max_size: val.chunk_max_size,
+            extractions: val.extractions.as_ref().map(|v| format!("{:?}", v)),
+        }
+    }
+}
+
+impl From<CaptureOutput> for tree_sitter_language_pack::CaptureOutput {
+    fn from(val: CaptureOutput) -> Self {
+        match val {
+            CaptureOutput::Text => Self::Text,
+            CaptureOutput::Node => Self::Node,
+            CaptureOutput::Full => Self::Full,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::CaptureOutput> for CaptureOutput {
+    fn from(val: tree_sitter_language_pack::CaptureOutput) -> Self {
+        match val {
+            tree_sitter_language_pack::CaptureOutput::Text => Self::Text,
+            tree_sitter_language_pack::CaptureOutput::Node => Self::Node,
+            tree_sitter_language_pack::CaptureOutput::Full => Self::Full,
+        }
+    }
+}
+
+impl From<StructureKind> for tree_sitter_language_pack::StructureKind {
+    fn from(val: StructureKind) -> Self {
+        match val {
+            StructureKind::Function => Self::Function,
+            StructureKind::Method => Self::Method,
+            StructureKind::Class => Self::Class,
+            StructureKind::Struct => Self::Struct,
+            StructureKind::Interface => Self::Interface,
+            StructureKind::Enum => Self::Enum,
+            StructureKind::Module => Self::Module,
+            StructureKind::Trait => Self::Trait,
+            StructureKind::Impl => Self::Impl,
+            StructureKind::Namespace => Self::Namespace,
+            StructureKind::Other => Self::Other(Default::default()),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::StructureKind> for StructureKind {
+    fn from(val: tree_sitter_language_pack::StructureKind) -> Self {
+        match val {
+            tree_sitter_language_pack::StructureKind::Function => Self::Function,
+            tree_sitter_language_pack::StructureKind::Method => Self::Method,
+            tree_sitter_language_pack::StructureKind::Class => Self::Class,
+            tree_sitter_language_pack::StructureKind::Struct => Self::Struct,
+            tree_sitter_language_pack::StructureKind::Interface => Self::Interface,
+            tree_sitter_language_pack::StructureKind::Enum => Self::Enum,
+            tree_sitter_language_pack::StructureKind::Module => Self::Module,
+            tree_sitter_language_pack::StructureKind::Trait => Self::Trait,
+            tree_sitter_language_pack::StructureKind::Impl => Self::Impl,
+            tree_sitter_language_pack::StructureKind::Namespace => Self::Namespace,
+            tree_sitter_language_pack::StructureKind::Other(..) => Self::Other,
+        }
+    }
+}
+
+impl From<CommentKind> for tree_sitter_language_pack::CommentKind {
+    fn from(val: CommentKind) -> Self {
+        match val {
+            CommentKind::Line => Self::Line,
+            CommentKind::Block => Self::Block,
+            CommentKind::Doc => Self::Doc,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::CommentKind> for CommentKind {
+    fn from(val: tree_sitter_language_pack::CommentKind) -> Self {
+        match val {
+            tree_sitter_language_pack::CommentKind::Line => Self::Line,
+            tree_sitter_language_pack::CommentKind::Block => Self::Block,
+            tree_sitter_language_pack::CommentKind::Doc => Self::Doc,
+        }
+    }
+}
+
+impl From<DocstringFormat> for tree_sitter_language_pack::DocstringFormat {
+    fn from(val: DocstringFormat) -> Self {
+        match val {
+            DocstringFormat::PythonTripleQuote => Self::PythonTripleQuote,
+            DocstringFormat::JSDoc => Self::JSDoc,
+            DocstringFormat::Rustdoc => Self::Rustdoc,
+            DocstringFormat::GoDoc => Self::GoDoc,
+            DocstringFormat::JavaDoc => Self::JavaDoc,
+            DocstringFormat::Other => Self::Other(Default::default()),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::DocstringFormat> for DocstringFormat {
+    fn from(val: tree_sitter_language_pack::DocstringFormat) -> Self {
+        match val {
+            tree_sitter_language_pack::DocstringFormat::PythonTripleQuote => Self::PythonTripleQuote,
+            tree_sitter_language_pack::DocstringFormat::JSDoc => Self::JSDoc,
+            tree_sitter_language_pack::DocstringFormat::Rustdoc => Self::Rustdoc,
+            tree_sitter_language_pack::DocstringFormat::GoDoc => Self::GoDoc,
+            tree_sitter_language_pack::DocstringFormat::JavaDoc => Self::JavaDoc,
+            tree_sitter_language_pack::DocstringFormat::Other(..) => Self::Other,
+        }
+    }
+}
+
+impl From<ExportKind> for tree_sitter_language_pack::ExportKind {
+    fn from(val: ExportKind) -> Self {
+        match val {
+            ExportKind::Named => Self::Named,
+            ExportKind::Default => Self::Default,
+            ExportKind::ReExport => Self::ReExport,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ExportKind> for ExportKind {
+    fn from(val: tree_sitter_language_pack::ExportKind) -> Self {
+        match val {
+            tree_sitter_language_pack::ExportKind::Named => Self::Named,
+            tree_sitter_language_pack::ExportKind::Default => Self::Default,
+            tree_sitter_language_pack::ExportKind::ReExport => Self::ReExport,
+        }
+    }
+}
+
+impl From<SymbolKind> for tree_sitter_language_pack::SymbolKind {
+    fn from(val: SymbolKind) -> Self {
+        match val {
+            SymbolKind::Variable => Self::Variable,
+            SymbolKind::Constant => Self::Constant,
+            SymbolKind::Function => Self::Function,
+            SymbolKind::Class => Self::Class,
+            SymbolKind::Type => Self::Type,
+            SymbolKind::Interface => Self::Interface,
+            SymbolKind::Enum => Self::Enum,
+            SymbolKind::Module => Self::Module,
+            SymbolKind::Other => Self::Other(Default::default()),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::SymbolKind> for SymbolKind {
+    fn from(val: tree_sitter_language_pack::SymbolKind) -> Self {
+        match val {
+            tree_sitter_language_pack::SymbolKind::Variable => Self::Variable,
+            tree_sitter_language_pack::SymbolKind::Constant => Self::Constant,
+            tree_sitter_language_pack::SymbolKind::Function => Self::Function,
+            tree_sitter_language_pack::SymbolKind::Class => Self::Class,
+            tree_sitter_language_pack::SymbolKind::Type => Self::Type,
+            tree_sitter_language_pack::SymbolKind::Interface => Self::Interface,
+            tree_sitter_language_pack::SymbolKind::Enum => Self::Enum,
+            tree_sitter_language_pack::SymbolKind::Module => Self::Module,
+            tree_sitter_language_pack::SymbolKind::Other(..) => Self::Other,
+        }
+    }
+}
+
+impl From<DiagnosticSeverity> for tree_sitter_language_pack::DiagnosticSeverity {
+    fn from(val: DiagnosticSeverity) -> Self {
+        match val {
+            DiagnosticSeverity::Error => Self::Error,
+            DiagnosticSeverity::Warning => Self::Warning,
+            DiagnosticSeverity::Info => Self::Info,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::DiagnosticSeverity> for DiagnosticSeverity {
+    fn from(val: tree_sitter_language_pack::DiagnosticSeverity) -> Self {
+        match val {
+            tree_sitter_language_pack::DiagnosticSeverity::Error => Self::Error,
+            tree_sitter_language_pack::DiagnosticSeverity::Warning => Self::Warning,
+            tree_sitter_language_pack::DiagnosticSeverity::Info => Self::Info,
+        }
+    }
 }
 
 #[magnus::init]
@@ -2151,9 +2717,6 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_method("diagnostics", method!(ProcessConfig::diagnostics, 0))?;
     class.define_method("chunk_max_size", method!(ProcessConfig::chunk_max_size, 0))?;
     class.define_method("extractions", method!(ProcessConfig::extractions, 0))?;
-    class.define_method("with_chunking", method!(ProcessConfig::with_chunking, 1))?;
-    class.define_method("all", method!(ProcessConfig::all, 0))?;
-    class.define_method("minimal", method!(ProcessConfig::minimal, 0))?;
 
     let class = module.define_class("LanguageRegistry", ruby.class_object())?;
     class.define_method("get_language", method!(LanguageRegistry::get_language, 1))?;
@@ -2162,11 +2725,11 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_method("language_count", method!(LanguageRegistry::language_count, 0))?;
     class.define_method("process", method!(LanguageRegistry::process, 2))?;
 
+    let class = module.define_class("Tree", ruby.class_object())?;
+
     let class = module.define_class("Language", ruby.class_object())?;
 
     let class = module.define_class("Parser", ruby.class_object())?;
-
-    let class = module.define_class("Tree", ruby.class_object())?;
 
     module.define_module_function(
         "detect_language_from_extension",
@@ -2179,12 +2742,10 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
         "detect_language_from_content",
         function!(detect_language_from_content, 1),
     )?;
-    module.define_module_function("validate_extraction", function!(validate_extraction, 1))?;
     module.define_module_function("process", function!(process, 3))?;
     module.define_module_function("root_node_info", function!(root_node_info, 1))?;
     module.define_module_function("find_nodes_by_type", function!(find_nodes_by_type, 2))?;
     module.define_module_function("named_children_info", function!(named_children_info, 1))?;
-    module.define_module_function("parse_string", function!(parse_string, 2))?;
     module.define_module_function("tree_contains_node_type", function!(tree_contains_node_type, 2))?;
     module.define_module_function("tree_has_error_nodes", function!(tree_has_error_nodes, 1))?;
     module.define_module_function("tree_to_sexp", function!(tree_to_sexp, 1))?;
@@ -2193,18 +2754,9 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_module_function("get_injections_query", function!(get_injections_query, 1))?;
     module.define_module_function("get_locals_query", function!(get_locals_query, 1))?;
     module.define_module_function("split_code", function!(split_code, 3))?;
-    module.define_module_function("get_language", function!(get_language, 1))?;
-    module.define_module_function("get_parser", function!(get_parser, 1))?;
     module.define_module_function("available_languages", function!(available_languages, 0))?;
     module.define_module_function("has_language", function!(has_language, 1))?;
     module.define_module_function("language_count", function!(language_count, 0))?;
-    module.define_module_function("extract_patterns", function!(extract_patterns, 2))?;
-    module.define_module_function("configure", function!(configure, 1))?;
-    module.define_module_function("download_all", function!(download_all, 0))?;
-    module.define_module_function("manifest_languages", function!(manifest_languages, 0))?;
-    module.define_module_function("downloaded_languages", function!(downloaded_languages, 0))?;
-    module.define_module_function("clean_cache", function!(clean_cache, 0))?;
-    module.define_module_function("cache_dir", function!(cache_dir, 0))?;
 
     Ok(())
 }

@@ -1513,58 +1513,6 @@
           "receiver": null,
           "sanitized": false,
           "trait_source": null
-        },
-        {
-          "name": "with_chunking",
-          "params": [
-            {
-              "name": "max_size",
-              "ty": {
-                "Primitive": "Usize"
-              },
-              "optional": false,
-              "default": null,
-              "sanitized": false
-            }
-          ],
-          "return_type": {
-            "Named": "ProcessConfig"
-          },
-          "is_async": false,
-          "is_static": false,
-          "error_type": null,
-          "doc": "Enable chunking with the given maximum chunk size in bytes.",
-          "receiver": "Owned",
-          "sanitized": false,
-          "trait_source": null
-        },
-        {
-          "name": "all",
-          "params": [],
-          "return_type": {
-            "Named": "ProcessConfig"
-          },
-          "is_async": false,
-          "is_static": false,
-          "error_type": null,
-          "doc": "Enable all analysis features.",
-          "receiver": "Owned",
-          "sanitized": false,
-          "trait_source": null
-        },
-        {
-          "name": "minimal",
-          "params": [],
-          "return_type": {
-            "Named": "ProcessConfig"
-          },
-          "is_async": false,
-          "is_static": false,
-          "error_type": null,
-          "doc": "Disable all analysis features (only metrics computed).",
-          "receiver": "Owned",
-          "sanitized": false,
-          "trait_source": null
         }
       ],
       "is_opaque": false,
@@ -1703,6 +1651,17 @@
       "is_trait": false
     },
     {
+      "name": "Tree",
+      "rust_path": "tree_sitter_language_pack::Tree",
+      "fields": [],
+      "methods": [],
+      "is_opaque": true,
+      "is_clone": false,
+      "doc": "",
+      "cfg": null,
+      "is_trait": false
+    },
+    {
       "name": "Language",
       "rust_path": "tree_sitter_language_pack::Language",
       "fields": [],
@@ -1716,17 +1675,6 @@
     {
       "name": "Parser",
       "rust_path": "tree_sitter_language_pack::Parser",
-      "fields": [],
-      "methods": [],
-      "is_opaque": true,
-      "is_clone": false,
-      "doc": "",
-      "cfg": null,
-      "is_trait": false
-    },
-    {
-      "name": "Tree",
-      "rust_path": "tree_sitter_language_pack::Tree",
       "fields": [],
       "methods": [],
       "is_opaque": true,
@@ -1839,29 +1787,6 @@
       "is_async": false,
       "error_type": null,
       "doc": "Detect language name from file content using the shebang line (`#!`).\n\nInspects only the first line of `content`. If it begins with `#!`, the\ninterpreter name is extracted and mapped to a language name.\n\nHandles common patterns:\n- `#!/usr/bin/env python3` → `\"python\"`\n- `#!/bin/bash` → `\"bash\"`\n- `#!/usr/bin/env node` → `\"javascript\"`\n\nThe `-S` flag accepted by some `env` implementations is skipped automatically.\nVersion suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.\n\nReturns `None` when content does not start with `#!`, the shebang is\nmalformed, or the interpreter is not recognised.\n\n```\nuse tree_sitter_language_pack::detect_language_from_content;\nassert_eq!(detect_language_from_content(\"#!/usr/bin/env python3\\npass\"), Some(\"python\"));\nassert_eq!(detect_language_from_content(\"#!/bin/bash\\necho hi\"), Some(\"bash\"));\nassert_eq!(detect_language_from_content(\"no shebang here\"), None);\n```",
-      "cfg": null,
-      "sanitized": false
-    },
-    {
-      "name": "validate_extraction",
-      "rust_path": "tree-sitter-language-pack::extract::validate_extraction",
-      "params": [
-        {
-          "name": "config",
-          "ty": {
-            "Named": "ExtractionConfig"
-          },
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        }
-      ],
-      "return_type": {
-        "Named": "ValidationResult"
-      },
-      "is_async": false,
-      "error_type": "Error",
-      "doc": "Validate an extraction config without running it.\n\nChecks that the language exists and all query patterns compile. Returns\ndetailed diagnostics per pattern.\n\n# Errors\n\nReturns an error if the language cannot be loaded.",
       "cfg": null,
       "sanitized": false
     },
@@ -1981,34 +1906,6 @@
       "is_async": false,
       "error_type": null,
       "doc": "Get `NodeInfo` for all named children of the root node.\n\nUseful for understanding the top-level structure of a file\n(e.g., list of function definitions, class declarations, imports).",
-      "cfg": null,
-      "sanitized": false
-    },
-    {
-      "name": "parse_string",
-      "rust_path": "tree-sitter-language-pack::parse_string",
-      "params": [
-        {
-          "name": "language",
-          "ty": "String",
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        },
-        {
-          "name": "source",
-          "ty": "Bytes",
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        }
-      ],
-      "return_type": {
-        "Named": "Tree"
-      },
-      "is_async": false,
-      "error_type": "Error",
-      "doc": "Parse source code with the named language, returning the syntax tree.\n\nUses the global registry to look up the language by name.\n\n# Examples\n\n```no_run\nlet tree = tree_sitter_language_pack::parse::parse_string(\"python\", b\"def hello(): pass\").unwrap();\nassert_eq!(tree.root_node().kind(), \"module\");\n```",
       "cfg": null,
       "sanitized": false
     },
@@ -2212,48 +2109,6 @@
       "sanitized": true
     },
     {
-      "name": "get_language",
-      "rust_path": "tree-sitter-language-pack::get_language",
-      "params": [
-        {
-          "name": "name",
-          "ty": "String",
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        }
-      ],
-      "return_type": {
-        "Named": "Language"
-      },
-      "is_async": false,
-      "error_type": "Error",
-      "doc": "Get a tree-sitter [`Language`] by name using the global registry.\n\nResolves language aliases (e.g., `\"shell\"` maps to `\"bash\"`).\nWhen the `download` feature is enabled (default), automatically downloads\nthe parser from GitHub releases if not found locally.\n\n# Errors\n\nReturns [`Error::LanguageNotFound`] if the language is not recognized,\nor [`Error::Download`] if auto-download fails.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::get_language;\n\nlet lang = get_language(\"python\").unwrap();\n// Use the Language with a tree-sitter Parser\nlet mut parser = tree_sitter::Parser::new();\nparser.set_language(&lang).unwrap();\nlet tree = parser.parse(\"x = 1\", None).unwrap();\nassert_eq!(tree.root_node().kind(), \"module\");\n```",
-      "cfg": null,
-      "sanitized": false
-    },
-    {
-      "name": "get_parser",
-      "rust_path": "tree-sitter-language-pack::get_parser",
-      "params": [
-        {
-          "name": "name",
-          "ty": "String",
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        }
-      ],
-      "return_type": {
-        "Named": "Parser"
-      },
-      "is_async": false,
-      "error_type": "Error",
-      "doc": "Get a tree-sitter [`Parser`] pre-configured for the given language.\n\nThis is a convenience function that calls [`get_language`] and configures\na new parser in one step.\n\n# Errors\n\nReturns [`Error::LanguageNotFound`] if the language is not recognized, or\n[`Error::ParserSetup`] if the language cannot be applied to the parser.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::get_parser;\n\nlet mut parser = get_parser(\"rust\").unwrap();\nlet tree = parser.parse(\"fn main() {}\", None).unwrap();\nassert!(!tree.root_node().has_error());\n```",
-      "cfg": null,
-      "sanitized": false
-    },
-    {
       "name": "available_languages",
       "rust_path": "tree-sitter-language-pack::available_languages",
       "params": [],
@@ -2298,139 +2153,6 @@
       "error_type": null,
       "doc": "Return the number of available languages.\n\nIncludes statically compiled languages, dynamically loadable languages,\nand aliases.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::language_count;\n\nlet count = language_count();\nprintln!(\"{} languages available\", count);\n```",
       "cfg": null,
-      "sanitized": false
-    },
-    {
-      "name": "extract_patterns",
-      "rust_path": "tree-sitter-language-pack::extract_patterns",
-      "params": [
-        {
-          "name": "source",
-          "ty": "String",
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        },
-        {
-          "name": "config",
-          "ty": {
-            "Named": "ExtractionConfig"
-          },
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        }
-      ],
-      "return_type": {
-        "Named": "ExtractionResult"
-      },
-      "is_async": false,
-      "error_type": "Error",
-      "doc": "Run extraction patterns against source code.\n\nConvenience wrapper around [`extract::extract`].\n\n# Errors\n\nReturns an error if the language is not found, parsing fails, or a query\npattern is invalid.\n\n# Example\n\n```no_run\nuse ahash::AHashMap;\nuse tree_sitter_language_pack::{ExtractionConfig, ExtractionPattern, CaptureOutput, extract_patterns};\n\nlet mut patterns = AHashMap::new();\npatterns.insert(\"fns\".to_string(), ExtractionPattern {\n    query: \"(function_definition name: (identifier) @fn_name)\".to_string(),\n    capture_output: CaptureOutput::default(),\n    child_fields: Vec::new(),\n    max_results: None,\n    byte_range: None,\n});\nlet config = ExtractionConfig { language: \"python\".to_string(), patterns };\nlet result = extract_patterns(\"def hello(): pass\", &config).unwrap();\n```",
-      "cfg": null,
-      "sanitized": false
-    },
-    {
-      "name": "init",
-      "rust_path": "tree-sitter-language-pack::init",
-      "params": [
-        {
-          "name": "config",
-          "ty": {
-            "Named": "PackConfig"
-          },
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        }
-      ],
-      "return_type": "Unit",
-      "is_async": false,
-      "error_type": "Error",
-      "doc": "Initialize the language pack with the given configuration.\n\nApplies any custom cache directory, then downloads all languages and groups\nspecified in the config. This is the recommended entry point when you want\nto pre-warm the cache before use.\n\n# Errors\n\nReturns an error if configuration cannot be applied or if downloads fail.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::{PackConfig, init};\n\nlet config = PackConfig {\n    cache_dir: None,\n    languages: Some(vec![\"python\".to_string(), \"rust\".to_string()]),\n    groups: None,\n};\ninit(&config).unwrap();\n```",
-      "cfg": "feature = \"download\"",
-      "sanitized": false
-    },
-    {
-      "name": "configure",
-      "rust_path": "tree-sitter-language-pack::configure",
-      "params": [
-        {
-          "name": "config",
-          "ty": {
-            "Named": "PackConfig"
-          },
-          "optional": false,
-          "default": null,
-          "sanitized": false
-        }
-      ],
-      "return_type": "Unit",
-      "is_async": false,
-      "error_type": "Error",
-      "doc": "Apply download configuration without downloading anything.\n\nUse this to set a custom cache directory before the first call to\n[`get_language`] or any download function. Changing the cache dir\nafter languages have been registered has no effect on already-loaded\nlanguages.\n\n# Errors\n\nReturns an error if the lock cannot be acquired.\n\n# Example\n\n```no_run\nuse std::path::PathBuf;\nuse tree_sitter_language_pack::{PackConfig, configure};\n\nlet config = PackConfig {\n    cache_dir: Some(PathBuf::from(\"/tmp/my-parsers\")),\n    languages: None,\n    groups: None,\n};\nconfigure(&config).unwrap();\n```",
-      "cfg": "feature = \"download\"",
-      "sanitized": false
-    },
-    {
-      "name": "download_all",
-      "rust_path": "tree-sitter-language-pack::download_all",
-      "params": [],
-      "return_type": {
-        "Primitive": "Usize"
-      },
-      "is_async": false,
-      "error_type": "Error",
-      "doc": "Download all available languages from the remote manifest.\n\nReturns the number of newly downloaded languages.\n\n# Errors\n\nReturns an error if the manifest cannot be fetched or a download fails.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::download_all;\n\nlet count = download_all().unwrap();\nprintln!(\"Downloaded {} languages\", count);\n```",
-      "cfg": "feature = \"download\"",
-      "sanitized": false
-    },
-    {
-      "name": "manifest_languages",
-      "rust_path": "tree-sitter-language-pack::manifest_languages",
-      "params": [],
-      "return_type": {
-        "Vec": "String"
-      },
-      "is_async": false,
-      "error_type": "Error",
-      "doc": "Return all language names available in the remote manifest (248).\n\nFetches (and caches) the remote manifest to discover the full list of\ndownloadable languages. Use [`downloaded_languages`] to list what is\nalready cached locally.\n\n# Errors\n\nReturns an error if the manifest cannot be fetched.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::manifest_languages;\n\nlet langs = manifest_languages().unwrap();\nprintln!(\"{} languages available for download\", langs.len());\n```",
-      "cfg": "feature = \"download\"",
-      "sanitized": false
-    },
-    {
-      "name": "downloaded_languages",
-      "rust_path": "tree-sitter-language-pack::downloaded_languages",
-      "params": [],
-      "return_type": {
-        "Vec": "String"
-      },
-      "is_async": false,
-      "error_type": null,
-      "doc": "Return languages that are already downloaded and cached locally.\n\nDoes not perform any network requests. Returns an empty list if the\ncache directory does not exist or cannot be read.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::downloaded_languages;\n\nlet langs = downloaded_languages();\nprintln!(\"{} languages already cached\", langs.len());\n```",
-      "cfg": "feature = \"download\"",
-      "sanitized": false
-    },
-    {
-      "name": "clean_cache",
-      "rust_path": "tree-sitter-language-pack::clean_cache",
-      "params": [],
-      "return_type": "Unit",
-      "is_async": false,
-      "error_type": "Error",
-      "doc": "Delete all cached parser shared libraries.\n\nResets the cache registration so the next call to [`get_language`] or\na download function will re-register the (now empty) cache directory.\n\n# Errors\n\nReturns an error if the cache directory cannot be removed.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::clean_cache;\n\nclean_cache().unwrap();\nprintln!(\"Cache cleared\");\n```",
-      "cfg": "feature = \"download\"",
-      "sanitized": false
-    },
-    {
-      "name": "cache_dir",
-      "rust_path": "tree-sitter-language-pack::cache_dir",
-      "params": [],
-      "return_type": "Path",
-      "is_async": false,
-      "error_type": "Error",
-      "doc": "Return the effective cache directory path.\n\nThis is either the custom path set via [`configure`] / [`init`] or the\ndefault: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.\n\n# Errors\n\nReturns an error if the system cache directory cannot be determined.\n\n# Example\n\n```no_run\nuse tree_sitter_language_pack::cache_dir;\n\nlet dir = cache_dir().unwrap();\nprintln!(\"Cache directory: {}\", dir.display());\n```",
-      "cfg": "feature = \"download\"",
       "sanitized": false
     }
   ],

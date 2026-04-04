@@ -1957,22 +1957,7 @@ impl JsProcessConfig {
 
     #[wasm_bindgen]
     pub fn default() -> JsProcessConfig {
-        todo!("Not auto-delegatable: default -- return type requires custom implementation")
-    }
-
-    #[wasm_bindgen(js_name = "withChunking")]
-    pub fn with_chunking(&self, max_size: usize) -> JsProcessConfig {
-        todo!("Not auto-delegatable: with_chunking -- return type requires custom implementation")
-    }
-
-    #[wasm_bindgen]
-    pub fn all(&self) -> JsProcessConfig {
-        todo!("Not auto-delegatable: all -- return type requires custom implementation")
-    }
-
-    #[wasm_bindgen]
-    pub fn minimal(&self) -> JsProcessConfig {
-        todo!("Not auto-delegatable: minimal -- return type requires custom implementation")
+        tree_sitter_language_pack::ProcessConfig::default().into()
     }
 }
 
@@ -1986,17 +1971,23 @@ pub struct JsLanguageRegistry {
 impl JsLanguageRegistry {
     #[wasm_bindgen(js_name = "getLanguage")]
     pub fn get_language(&self, name: String) -> Result<JsLanguage, JsValue> {
-        Err(JsValue::from_str("Not implemented: get_language"))
+        let result = self
+            .inner
+            .get_language(&name)
+            .map_err(|e| JsValue::from_str(&e.to_string()))?;
+        Ok(JsLanguage {
+            inner: Arc::new(result),
+        })
     }
 
     #[wasm_bindgen(js_name = "availableLanguages")]
     pub fn available_languages(&self) -> Vec<String> {
-        Vec::new()
+        self.inner.available_languages().into_iter().map(Into::into).collect()
     }
 
     #[wasm_bindgen(js_name = "hasLanguage")]
     pub fn has_language(&self, name: String) -> bool {
-        false
+        self.inner.has_language(&name)
     }
 
     #[wasm_bindgen(js_name = "languageCount")]
@@ -2010,10 +2001,21 @@ impl JsLanguageRegistry {
     }
 
     #[wasm_bindgen]
-    pub fn default(&self) -> JsLanguageRegistry {
-        todo!("Not auto-delegatable: default -- return type requires custom implementation")
+    pub fn default() -> JsLanguageRegistry {
+        Self {
+            inner: Arc::new(tree_sitter_language_pack::LanguageRegistry::default()),
+        }
     }
 }
+
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct JsTree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
+}
+
+#[wasm_bindgen]
+impl JsTree {}
 
 #[derive(Clone)]
 #[wasm_bindgen]
@@ -2032,15 +2034,6 @@ pub struct JsParser {
 
 #[wasm_bindgen]
 impl JsParser {}
-
-#[derive(Clone)]
-#[wasm_bindgen]
-pub struct JsTree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
-}
-
-#[wasm_bindgen]
-impl JsTree {}
 
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -2136,12 +2129,12 @@ pub enum JsDiagnosticSeverity {
 
 #[wasm_bindgen(js_name = "detectLanguageFromExtension")]
 pub fn detect_language_from_extension(ext: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::detect_language_from_extension(&ext).map(Into::into)
 }
 
 #[wasm_bindgen(js_name = "detectLanguageFromPath")]
 pub fn detect_language_from_path(path: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::detect_language_from_path(&path).map(Into::into)
 }
 
 #[wasm_bindgen(js_name = "extensionAmbiguity")]
@@ -2151,17 +2144,12 @@ pub fn extension_ambiguity(ext: String) -> Option<String> {
 
 #[wasm_bindgen(js_name = "extensionAmbiguityJson")]
 pub fn extension_ambiguity_json(ext: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::extension_ambiguity_json(&ext).map(Into::into)
 }
 
 #[wasm_bindgen(js_name = "detectLanguageFromContent")]
 pub fn detect_language_from_content(content: String) -> Option<String> {
-    None
-}
-
-#[wasm_bindgen(js_name = "validateExtraction")]
-pub fn validate_extraction(config: JsExtractionConfig) -> Result<JsValidationResult, JsValue> {
-    Err(JsValue::from_str("Not implemented: validate_extraction"))
+    tree_sitter_language_pack::detect_language_from_content(&content).map(Into::into)
 }
 
 #[wasm_bindgen]
@@ -2175,57 +2163,58 @@ pub fn process(
 
 #[wasm_bindgen(js_name = "rootNodeInfo")]
 pub fn root_node_info(tree: JsTree) -> JsNodeInfo {
-    todo!("Not auto-delegatable: root_node_info -- return type requires custom implementation")
+    tree_sitter_language_pack::root_node_info(&tree.inner).into()
 }
 
 #[wasm_bindgen(js_name = "findNodesByType")]
 pub fn find_nodes_by_type(tree: JsTree, node_type: String) -> Vec<JsNodeInfo> {
-    Vec::new()
+    tree_sitter_language_pack::find_nodes_by_type(&tree.inner, &node_type)
+        .into_iter()
+        .map(Into::into)
+        .collect()
 }
 
 #[wasm_bindgen(js_name = "namedChildrenInfo")]
 pub fn named_children_info(tree: JsTree) -> Vec<JsNodeInfo> {
-    Vec::new()
-}
-
-#[wasm_bindgen(js_name = "parseString")]
-pub fn parse_string(language: String, source: Vec<u8>) -> Result<JsTree, JsValue> {
-    Err(JsValue::from_str("Not implemented: parse_string"))
+    tree_sitter_language_pack::named_children_info(&tree.inner)
+        .into_iter()
+        .map(Into::into)
+        .collect()
 }
 
 #[wasm_bindgen(js_name = "treeContainsNodeType")]
 pub fn tree_contains_node_type(tree: JsTree, node_type: String) -> bool {
-    false
+    tree_sitter_language_pack::tree_contains_node_type(&tree.inner, &node_type)
 }
 
 #[wasm_bindgen(js_name = "treeHasErrorNodes")]
 pub fn tree_has_error_nodes(tree: JsTree) -> bool {
-    false
+    tree_sitter_language_pack::tree_has_error_nodes(&tree.inner)
 }
 
 #[wasm_bindgen(js_name = "treeToSexp")]
 pub fn tree_to_sexp(tree: JsTree) -> String {
-    String::from("[unimplemented: tree_to_sexp]")
+    tree_sitter_language_pack::tree_to_sexp(&tree.inner).into()
 }
 
 #[wasm_bindgen(js_name = "treeErrorCount")]
 pub fn tree_error_count(tree: JsTree) -> usize {
-    0
+    tree_sitter_language_pack::tree_error_count(&tree.inner)
 }
 
 #[wasm_bindgen(js_name = "getHighlightsQuery")]
 pub fn get_highlights_query(language: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::get_highlights_query(&language).map(Into::into)
 }
 
 #[wasm_bindgen(js_name = "getInjectionsQuery")]
 pub fn get_injections_query(language: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::get_injections_query(&language).map(Into::into)
 }
 
 #[wasm_bindgen(js_name = "getLocalsQuery")]
 pub fn get_locals_query(language: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::get_locals_query(&language).map(Into::into)
 }
 
 #[wasm_bindgen(js_name = "splitCode")]
@@ -2233,69 +2222,82 @@ pub fn split_code(source: String, tree: JsTree, max_chunk_size: usize) -> Vec<St
     Vec::new()
 }
 
-#[wasm_bindgen(js_name = "getLanguage")]
-pub fn get_language(name: String) -> Result<JsLanguage, JsValue> {
-    Err(JsValue::from_str("Not implemented: get_language"))
-}
-
-#[wasm_bindgen(js_name = "getParser")]
-pub fn get_parser(name: String) -> Result<JsParser, JsValue> {
-    Err(JsValue::from_str("Not implemented: get_parser"))
-}
-
 #[wasm_bindgen(js_name = "availableLanguages")]
 pub fn available_languages() -> Vec<String> {
-    Vec::new()
+    tree_sitter_language_pack::available_languages()
+        .into_iter()
+        .map(Into::into)
+        .collect()
 }
 
 #[wasm_bindgen(js_name = "hasLanguage")]
 pub fn has_language(name: String) -> bool {
-    false
+    tree_sitter_language_pack::has_language(&name)
 }
 
 #[wasm_bindgen(js_name = "languageCount")]
 pub fn language_count() -> usize {
-    0
+    tree_sitter_language_pack::language_count()
 }
 
-#[wasm_bindgen(js_name = "extractPatterns")]
-pub fn extract_patterns(source: String, config: JsExtractionConfig) -> Result<JsExtractionResult, JsValue> {
-    Err(JsValue::from_str("Not implemented: extract_patterns"))
+impl From<tree_sitter_language_pack::ExtractionPattern> for JsExtractionPattern {
+    fn from(val: tree_sitter_language_pack::ExtractionPattern) -> Self {
+        Self {
+            query: val.query,
+            capture_output: val.capture_output.into(),
+            child_fields: val.child_fields,
+            max_results: val.max_results,
+            byte_range: val.byte_range.as_ref().map(|v| format!("{:?}", v)),
+        }
+    }
 }
 
-#[wasm_bindgen]
-pub fn init(config: JsPackConfig) -> Result<(), JsValue> {
-    Err(JsValue::from_str("Not implemented: init"))
+impl From<tree_sitter_language_pack::ExtractionConfig> for JsExtractionConfig {
+    fn from(val: tree_sitter_language_pack::ExtractionConfig) -> Self {
+        Self {
+            language: val.language,
+            patterns: format!("{:?}", val.patterns),
+        }
+    }
 }
 
-#[wasm_bindgen]
-pub fn configure(config: JsPackConfig) -> Result<(), JsValue> {
-    Err(JsValue::from_str("Not implemented: configure"))
+impl From<tree_sitter_language_pack::CaptureResult> for JsCaptureResult {
+    fn from(val: tree_sitter_language_pack::CaptureResult) -> Self {
+        Self {
+            name: val.name,
+            node: val.node.map(Into::into),
+            text: val.text,
+            child_fields: format!("{:?}", val.child_fields),
+            start_byte: val.start_byte,
+        }
+    }
 }
 
-#[wasm_bindgen(js_name = "downloadAll")]
-pub fn download_all() -> Result<usize, JsValue> {
-    Err(JsValue::from_str("Not implemented: download_all"))
+impl From<tree_sitter_language_pack::MatchResult> for JsMatchResult {
+    fn from(val: tree_sitter_language_pack::MatchResult) -> Self {
+        Self {
+            pattern_index: val.pattern_index,
+            captures: val.captures.into_iter().map(Into::into).collect(),
+        }
+    }
 }
 
-#[wasm_bindgen(js_name = "manifestLanguages")]
-pub fn manifest_languages() -> Result<Vec<String>, JsValue> {
-    Err(JsValue::from_str("Not implemented: manifest_languages"))
+impl From<tree_sitter_language_pack::PatternResult> for JsPatternResult {
+    fn from(val: tree_sitter_language_pack::PatternResult) -> Self {
+        Self {
+            matches: val.matches.into_iter().map(Into::into).collect(),
+            total_count: val.total_count,
+        }
+    }
 }
 
-#[wasm_bindgen(js_name = "downloadedLanguages")]
-pub fn downloaded_languages() -> Vec<String> {
-    Vec::new()
-}
-
-#[wasm_bindgen(js_name = "cleanCache")]
-pub fn clean_cache() -> Result<(), JsValue> {
-    Err(JsValue::from_str("Not implemented: clean_cache"))
-}
-
-#[wasm_bindgen(js_name = "cacheDir")]
-pub fn cache_dir() -> Result<String, JsValue> {
-    Err(JsValue::from_str("Not implemented: cache_dir"))
+impl From<tree_sitter_language_pack::ExtractionResult> for JsExtractionResult {
+    fn from(val: tree_sitter_language_pack::ExtractionResult) -> Self {
+        Self {
+            language: val.language,
+            results: format!("{:?}", val.results),
+        }
+    }
 }
 
 impl From<JsPatternValidation> for tree_sitter_language_pack::PatternValidation {
@@ -2322,6 +2324,15 @@ impl From<tree_sitter_language_pack::PatternValidation> for JsPatternValidation 
     }
 }
 
+impl From<tree_sitter_language_pack::ValidationResult> for JsValidationResult {
+    fn from(val: tree_sitter_language_pack::ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: format!("{:?}", val.patterns),
+        }
+    }
+}
+
 impl From<JsSpan> for tree_sitter_language_pack::Span {
     fn from(val: JsSpan) -> Self {
         Self {
@@ -2344,6 +2355,24 @@ impl From<tree_sitter_language_pack::Span> for JsSpan {
             start_column: val.start_column,
             end_line: val.end_line,
             end_column: val.end_column,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ProcessResult> for JsProcessResult {
+    fn from(val: tree_sitter_language_pack::ProcessResult) -> Self {
+        Self {
+            language: val.language,
+            metrics: val.metrics.into(),
+            structure: val.structure.into_iter().map(Into::into).collect(),
+            imports: val.imports.into_iter().map(Into::into).collect(),
+            exports: val.exports.into_iter().map(Into::into).collect(),
+            comments: val.comments.into_iter().map(Into::into).collect(),
+            docstrings: val.docstrings.into_iter().map(Into::into).collect(),
+            symbols: val.symbols.into_iter().map(Into::into).collect(),
+            diagnostics: val.diagnostics.into_iter().map(Into::into).collect(),
+            chunks: val.chunks.into_iter().map(Into::into).collect(),
+            extractions: format!("{:?}", val.extractions),
         }
     }
 }
@@ -2622,6 +2651,24 @@ impl From<tree_sitter_language_pack::ChunkContext> for JsChunkContext {
     }
 }
 
+impl From<tree_sitter_language_pack::NodeInfo> for JsNodeInfo {
+    fn from(val: tree_sitter_language_pack::NodeInfo) -> Self {
+        Self {
+            kind: format!("{:?}", val.kind),
+            is_named: val.is_named,
+            start_byte: val.start_byte,
+            end_byte: val.end_byte,
+            start_row: val.start_row,
+            start_col: val.start_col,
+            end_row: val.end_row,
+            end_col: val.end_col,
+            named_child_count: val.named_child_count,
+            is_error: val.is_error,
+            is_missing: val.is_missing,
+        }
+    }
+}
+
 impl From<JsPackConfig> for tree_sitter_language_pack::PackConfig {
     fn from(val: JsPackConfig) -> Self {
         Self {
@@ -2638,6 +2685,23 @@ impl From<tree_sitter_language_pack::PackConfig> for JsPackConfig {
             cache_dir: val.cache_dir.map(|p| p.to_string_lossy().to_string()),
             languages: val.languages,
             groups: val.groups,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ProcessConfig> for JsProcessConfig {
+    fn from(val: tree_sitter_language_pack::ProcessConfig) -> Self {
+        Self {
+            language: format!("{:?}", val.language),
+            structure: val.structure,
+            imports: val.imports,
+            exports: val.exports,
+            comments: val.comments,
+            docstrings: val.docstrings,
+            symbols: val.symbols,
+            diagnostics: val.diagnostics,
+            chunk_max_size: val.chunk_max_size,
+            extractions: val.extractions.as_ref().map(|v| format!("{:?}", v)),
         }
     }
 }

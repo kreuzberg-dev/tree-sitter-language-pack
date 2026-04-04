@@ -264,6 +264,13 @@ pub struct LanguageRegistry {
 impl rustler::Resource for LanguageRegistry {}
 
 #[derive(Clone)]
+pub struct Tree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
+}
+
+impl rustler::Resource for Tree {}
+
+#[derive(Clone)]
 pub struct Language {
     inner: Arc<tree_sitter_language_pack::Language>,
 }
@@ -276,13 +283,6 @@ pub struct Parser {
 }
 
 impl rustler::Resource for Parser {}
-
-#[derive(Clone)]
-pub struct Tree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
-}
-
-impl rustler::Resource for Tree {}
 
 #[derive(Debug, Clone, Copy, rustler::NifUnitEnum)]
 pub enum Error {
@@ -370,12 +370,12 @@ pub enum DiagnosticSeverity {
 
 #[rustler::nif]
 pub fn detect_language_from_extension(ext: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::detect_language_from_extension(&ext)
 }
 
 #[rustler::nif]
 pub fn detect_language_from_path(path: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::detect_language_from_path(&path)
 }
 
 #[rustler::nif]
@@ -385,17 +385,12 @@ pub fn extension_ambiguity(ext: String) -> Option<String> {
 
 #[rustler::nif]
 pub fn extension_ambiguity_json(ext: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::extension_ambiguity_json(&ext)
 }
 
 #[rustler::nif]
 pub fn detect_language_from_content(content: String) -> Option<String> {
-    None
-}
-
-#[rustler::nif]
-pub fn validate_extraction(config: ExtractionConfig) -> Result<ValidationResult, String> {
-    Err(String::from("Not implemented: validate_extraction"))
+    tree_sitter_language_pack::detect_language_from_content(&content)
 }
 
 #[rustler::nif]
@@ -405,57 +400,52 @@ pub fn process(source: String, config: ProcessConfig, registry: ResourceArc<Lang
 
 #[rustler::nif]
 pub fn root_node_info(tree: ResourceArc<Tree>) -> NodeInfo {
-    todo!("Not auto-delegatable: root_node_info -- return type requires custom implementation")
+    tree_sitter_language_pack::root_node_info(&tree.inner).into()
 }
 
 #[rustler::nif]
 pub fn find_nodes_by_type(tree: ResourceArc<Tree>, node_type: String) -> Vec<NodeInfo> {
-    Vec::new()
+    tree_sitter_language_pack::find_nodes_by_type(&tree.inner, &node_type)
 }
 
 #[rustler::nif]
 pub fn named_children_info(tree: ResourceArc<Tree>) -> Vec<NodeInfo> {
-    Vec::new()
-}
-
-#[rustler::nif]
-pub fn parse_string(language: String, source: Vec<u8>) -> Result<ResourceArc<Tree>, String> {
-    Err(String::from("Not implemented: parse_string"))
+    tree_sitter_language_pack::named_children_info(&tree.inner)
 }
 
 #[rustler::nif]
 pub fn tree_contains_node_type(tree: ResourceArc<Tree>, node_type: String) -> bool {
-    false
+    tree_sitter_language_pack::tree_contains_node_type(&tree.inner, &node_type)
 }
 
 #[rustler::nif]
 pub fn tree_has_error_nodes(tree: ResourceArc<Tree>) -> bool {
-    false
+    tree_sitter_language_pack::tree_has_error_nodes(&tree.inner)
 }
 
 #[rustler::nif]
 pub fn tree_to_sexp(tree: ResourceArc<Tree>) -> String {
-    String::from("[unimplemented: tree_to_sexp]")
+    tree_sitter_language_pack::tree_to_sexp(&tree.inner).into()
 }
 
 #[rustler::nif]
 pub fn tree_error_count(tree: ResourceArc<Tree>) -> usize {
-    0
+    tree_sitter_language_pack::tree_error_count(&tree.inner)
 }
 
 #[rustler::nif]
 pub fn get_highlights_query(language: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::get_highlights_query(&language)
 }
 
 #[rustler::nif]
 pub fn get_injections_query(language: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::get_injections_query(&language)
 }
 
 #[rustler::nif]
 pub fn get_locals_query(language: String) -> Option<String> {
-    None
+    tree_sitter_language_pack::get_locals_query(&language)
 }
 
 #[rustler::nif]
@@ -464,108 +454,44 @@ pub fn split_code(source: String, tree: ResourceArc<Tree>, max_chunk_size: usize
 }
 
 #[rustler::nif]
-pub fn get_language(name: String) -> Result<ResourceArc<Language>, String> {
-    Err(String::from("Not implemented: get_language"))
-}
-
-#[rustler::nif]
-pub fn get_parser(name: String) -> Result<ResourceArc<Parser>, String> {
-    Err(String::from("Not implemented: get_parser"))
-}
-
-#[rustler::nif]
 pub fn available_languages() -> Vec<String> {
-    Vec::new()
+    tree_sitter_language_pack::available_languages()
 }
 
 #[rustler::nif]
 pub fn has_language(name: String) -> bool {
-    false
+    tree_sitter_language_pack::has_language(&name)
 }
 
 #[rustler::nif]
 pub fn language_count() -> usize {
-    0
-}
-
-#[rustler::nif]
-pub fn extract_patterns(source: String, config: ExtractionConfig) -> Result<ExtractionResult, String> {
-    Err(String::from("Not implemented: extract_patterns"))
-}
-
-#[rustler::nif]
-pub fn init(config: PackConfig) -> Result<(), String> {
-    Err(String::from("Not implemented: init"))
-}
-
-#[rustler::nif]
-pub fn configure(config: PackConfig) -> Result<(), String> {
-    Err(String::from("Not implemented: configure"))
-}
-
-#[rustler::nif]
-pub fn download_all() -> Result<usize, String> {
-    Err(String::from("Not implemented: download_all"))
-}
-
-#[rustler::nif]
-pub fn manifest_languages() -> Result<Vec<String>, String> {
-    Err(String::from("Not implemented: manifest_languages"))
-}
-
-#[rustler::nif]
-pub fn downloaded_languages() -> Vec<String> {
-    Vec::new()
-}
-
-#[rustler::nif]
-pub fn clean_cache() -> Result<(), String> {
-    Err(String::from("Not implemented: clean_cache"))
-}
-
-#[rustler::nif]
-pub fn cache_dir() -> Result<String, String> {
-    Err(String::from("Not implemented: cache_dir"))
+    tree_sitter_language_pack::language_count()
 }
 
 #[rustler::nif]
 pub fn processconfig_default() -> ProcessConfig {
-    todo!("Not auto-delegatable: processconfig_default -- return type requires custom implementation")
-}
-
-#[rustler::nif]
-pub fn processconfig_with_chunking(obj: ProcessConfig, max_size: usize) -> ProcessConfig {
-    todo!("Not auto-delegatable: processconfig_with_chunking -- return type requires custom implementation")
-}
-
-#[rustler::nif]
-pub fn processconfig_all(obj: ProcessConfig) -> ProcessConfig {
-    todo!("Not auto-delegatable: processconfig_all -- return type requires custom implementation")
-}
-
-#[rustler::nif]
-pub fn processconfig_minimal(obj: ProcessConfig) -> ProcessConfig {
-    todo!("Not auto-delegatable: processconfig_minimal -- return type requires custom implementation")
+    tree_sitter_language_pack::ProcessConfig::from(obj).default().into()
 }
 
 #[rustler::nif]
 pub fn languageregistry_get_language(resource: ResourceArc<LanguageRegistry>, name: String) -> Result<ResourceArc<Language>, String> {
-    Err(String::from("Not implemented: languageregistry_get_language"))
+    let result = resource.inner.get_language(&name).map_err(|e| e.to_string())?;
+    Ok(ResourceArc::new(Language { inner: Arc::new(result) }))
 }
 
 #[rustler::nif]
 pub fn languageregistry_available_languages(resource: ResourceArc<LanguageRegistry>) -> Vec<String> {
-    Vec::new()
+    resource.inner.available_languages()
 }
 
 #[rustler::nif]
 pub fn languageregistry_has_language(resource: ResourceArc<LanguageRegistry>, name: String) -> bool {
-    false
+    resource.inner.has_language(&name)
 }
 
 #[rustler::nif]
 pub fn languageregistry_language_count(resource: ResourceArc<LanguageRegistry>) -> usize {
-    0
+    resource.inner.language_count()
 }
 
 #[rustler::nif]
@@ -575,7 +501,7 @@ pub fn languageregistry_process(resource: ResourceArc<LanguageRegistry>, source:
 
 #[rustler::nif]
 pub fn languageregistry_default() -> ResourceArc<LanguageRegistry> {
-    todo!("Not auto-delegatable: languageregistry_default -- return type requires custom implementation")
+    ResourceArc::new(LanguageRegistry { inner: Arc::new(resource.inner.default()) })
 }
 
 impl From<PatternValidation> for tree_sitter_language_pack::PatternValidation {
@@ -1096,4 +1022,4 @@ impl From<tree_sitter_language_pack::DiagnosticSeverity> for DiagnosticSeverity 
     }
 }
 
-rustler::init!("elixir_module", [detect_language_from_extension, detect_language_from_path, extension_ambiguity, extension_ambiguity_json, detect_language_from_content, validate_extraction, process, root_node_info, find_nodes_by_type, named_children_info, parse_string, tree_contains_node_type, tree_has_error_nodes, tree_to_sexp, tree_error_count, get_highlights_query, get_injections_query, get_locals_query, split_code, get_language, get_parser, available_languages, has_language, language_count, extract_patterns, init, configure, download_all, manifest_languages, downloaded_languages, clean_cache, cache_dir, processconfig_default, processconfig_with_chunking, processconfig_all, processconfig_minimal, languageregistry_get_language, languageregistry_available_languages, languageregistry_has_language, languageregistry_language_count, languageregistry_process, languageregistry_default]);
+rustler::init!("elixir_module", [detect_language_from_extension, detect_language_from_path, extension_ambiguity, extension_ambiguity_json, detect_language_from_content, process, root_node_info, find_nodes_by_type, named_children_info, tree_contains_node_type, tree_has_error_nodes, tree_to_sexp, tree_error_count, get_highlights_query, get_injections_query, get_locals_query, split_code, available_languages, has_language, language_count, processconfig_default, languageregistry_get_language, languageregistry_available_languages, languageregistry_has_language, languageregistry_language_count, languageregistry_process, languageregistry_default]);

@@ -459,20 +459,8 @@ impl ProcessConfig {
         Self { language, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunk_max_size, extractions }
     }
 
-    pub fn with_chunking(&self) -> ProcessConfig {
-        todo!("Not auto-delegatable: with_chunking -- return type requires custom implementation")
-    }
-
-    pub fn all(&self) -> ProcessConfig {
-        todo!("Not auto-delegatable: all -- return type requires custom implementation")
-    }
-
-    pub fn minimal(&self) -> ProcessConfig {
-        todo!("Not auto-delegatable: minimal -- return type requires custom implementation")
-    }
-
     pub fn default() -> ProcessConfig {
-        todo!("Not auto-delegatable: default -- return type requires custom implementation")
+        tree_sitter_language_pack::ProcessConfig::default().into()
     }
 }
 
@@ -484,29 +472,40 @@ pub struct LanguageRegistry {
 
 #[php_impl]
 impl LanguageRegistry {
-    pub fn get_language(&self) -> PhpResult<Language> {
-        Err(ext_php_rs::exception::PhpException::default("Not implemented: get_language".to_string()).into())
+    pub fn get_language(&self, name: String) -> PhpResult<Language> {
+        let result = self.inner.get_language(&name).map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
+        Ok(Language { inner: Arc::new(result) })
     }
 
     pub fn available_languages(&self) -> Vec<String> {
-        Vec::new()
+        self.inner.available_languages().into_iter().map(Into::into).collect()
     }
 
-    pub fn has_language(&self) -> bool {
-        false
+    pub fn has_language(&self, name: String) -> bool {
+        self.inner.has_language(&name)
     }
 
     pub fn language_count(&self) -> i64 {
-        0
+        self.inner.language_count()
     }
 
-    pub fn process(&self) -> PhpResult<ProcessResult> {
+    pub fn process(&self, source: String, config: ProcessConfig) -> PhpResult<ProcessResult> {
         Err(ext_php_rs::exception::PhpException::default("Not implemented: process".to_string()).into())
     }
 
     pub fn default() -> LanguageRegistry {
-        todo!("Not auto-delegatable: default -- return type requires custom implementation")
+        Self { inner: Arc::new(tree_sitter_language_pack::LanguageRegistry::default()) }
     }
+}
+
+#[derive(Clone)]
+#[php_class]
+pub struct Tree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
+}
+
+#[php_impl]
+impl Tree {
 }
 
 #[derive(Clone)]
@@ -527,16 +526,6 @@ pub struct Parser {
 
 #[php_impl]
 impl Parser {
-}
-
-#[derive(Clone)]
-#[php_class]
-pub struct Tree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
-}
-
-#[php_impl]
-impl Tree {
 }
 
 // Error enum values
@@ -608,163 +597,103 @@ pub const DIAGNOSTICSEVERITY_WARNING: &str = "Warning";
 pub const DIAGNOSTICSEVERITY_INFO: &str = "Info";
 
 #[php_function]
-pub fn detect_language_from_extension() -> Option<String> {
+pub fn detect_language_from_extension(ext: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_extension(&ext).map(Into::into)
+}
+
+#[php_function]
+pub fn detect_language_from_path(path: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_path(&path).map(Into::into)
+}
+
+#[php_function]
+pub fn extension_ambiguity(ext: String) -> Option<String> {
     None
 }
 
 #[php_function]
-pub fn detect_language_from_path() -> Option<String> {
-    None
+pub fn extension_ambiguity_json(ext: String) -> Option<String> {
+    tree_sitter_language_pack::extension_ambiguity_json(&ext).map(Into::into)
 }
 
 #[php_function]
-pub fn extension_ambiguity() -> Option<String> {
-    None
+pub fn detect_language_from_content(content: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_content(&content).map(Into::into)
 }
 
 #[php_function]
-pub fn extension_ambiguity_json() -> Option<String> {
-    None
-}
-
-#[php_function]
-pub fn detect_language_from_content() -> Option<String> {
-    None
-}
-
-#[php_function]
-pub fn validate_extraction() -> PhpResult<ValidationResult> {
-    Err(ext_php_rs::exception::PhpException::default("Not implemented: validate_extraction".to_string()).into())
-}
-
-#[php_function]
-pub fn process() -> PhpResult<ProcessResult> {
+pub fn process(source: String, config: ProcessConfig, registry: LanguageRegistry) -> PhpResult<ProcessResult> {
     Err(ext_php_rs::exception::PhpException::default("Not implemented: process".to_string()).into())
 }
 
 #[php_function]
-pub fn root_node_info() -> NodeInfo {
-    todo!("Not auto-delegatable: root_node_info -- return type requires custom implementation")
+pub fn root_node_info(tree: Tree) -> NodeInfo {
+    tree_sitter_language_pack::root_node_info(&tree.inner).into()
 }
 
 #[php_function]
-pub fn find_nodes_by_type() -> Vec<NodeInfo> {
+pub fn find_nodes_by_type(tree: Tree, node_type: String) -> Vec<NodeInfo> {
+    tree_sitter_language_pack::find_nodes_by_type(&tree.inner, &node_type).into_iter().map(Into::into).collect()
+}
+
+#[php_function]
+pub fn named_children_info(tree: Tree) -> Vec<NodeInfo> {
+    tree_sitter_language_pack::named_children_info(&tree.inner).into_iter().map(Into::into).collect()
+}
+
+#[php_function]
+pub fn tree_contains_node_type(tree: Tree, node_type: String) -> bool {
+    tree_sitter_language_pack::tree_contains_node_type(&tree.inner, &node_type)
+}
+
+#[php_function]
+pub fn tree_has_error_nodes(tree: Tree) -> bool {
+    tree_sitter_language_pack::tree_has_error_nodes(&tree.inner)
+}
+
+#[php_function]
+pub fn tree_to_sexp(tree: Tree) -> String {
+    tree_sitter_language_pack::tree_to_sexp(&tree.inner).into()
+}
+
+#[php_function]
+pub fn tree_error_count(tree: Tree) -> i64 {
+    tree_sitter_language_pack::tree_error_count(&tree.inner)
+}
+
+#[php_function]
+pub fn get_highlights_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_highlights_query(&language).map(Into::into)
+}
+
+#[php_function]
+pub fn get_injections_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_injections_query(&language).map(Into::into)
+}
+
+#[php_function]
+pub fn get_locals_query(language: String) -> Option<String> {
+    tree_sitter_language_pack::get_locals_query(&language).map(Into::into)
+}
+
+#[php_function]
+pub fn split_code(source: String, tree: Tree, max_chunk_size: i64) -> Vec<String> {
     Vec::new()
-}
-
-#[php_function]
-pub fn named_children_info() -> Vec<NodeInfo> {
-    Vec::new()
-}
-
-#[php_function]
-pub fn parse_string() -> PhpResult<Tree> {
-    Err(ext_php_rs::exception::PhpException::default("Not implemented: parse_string".to_string()).into())
-}
-
-#[php_function]
-pub fn tree_contains_node_type() -> bool {
-    false
-}
-
-#[php_function]
-pub fn tree_has_error_nodes() -> bool {
-    false
-}
-
-#[php_function]
-pub fn tree_to_sexp() -> String {
-    String::from("[unimplemented: tree_to_sexp]")
-}
-
-#[php_function]
-pub fn tree_error_count() -> i64 {
-    0
-}
-
-#[php_function]
-pub fn get_highlights_query() -> Option<String> {
-    None
-}
-
-#[php_function]
-pub fn get_injections_query() -> Option<String> {
-    None
-}
-
-#[php_function]
-pub fn get_locals_query() -> Option<String> {
-    None
-}
-
-#[php_function]
-pub fn split_code() -> Vec<String> {
-    Vec::new()
-}
-
-#[php_function]
-pub fn get_language() -> PhpResult<Language> {
-    Err(ext_php_rs::exception::PhpException::default("Not implemented: get_language".to_string()).into())
-}
-
-#[php_function]
-pub fn get_parser() -> PhpResult<Parser> {
-    Err(ext_php_rs::exception::PhpException::default("Not implemented: get_parser".to_string()).into())
 }
 
 #[php_function]
 pub fn available_languages() -> Vec<String> {
-    Vec::new()
+    tree_sitter_language_pack::available_languages().into_iter().map(Into::into).collect()
 }
 
 #[php_function]
-pub fn has_language() -> bool {
-    false
+pub fn has_language(name: String) -> bool {
+    tree_sitter_language_pack::has_language(&name)
 }
 
 #[php_function]
 pub fn language_count() -> i64 {
-    0
-}
-
-#[php_function]
-pub fn extract_patterns() -> PhpResult<ExtractionResult> {
-    Err(ext_php_rs::exception::PhpException::default("Not implemented: extract_patterns".to_string()).into())
-}
-
-#[php_function]
-pub fn init() -> PhpResult<()> {
-    Err(ext_php_rs::exception::PhpException::default("Not implemented: init".to_string()).into())
-}
-
-#[php_function]
-pub fn configure() -> PhpResult<()> {
-    Err(ext_php_rs::exception::PhpException::default("Not implemented: configure".to_string()).into())
-}
-
-#[php_function]
-pub fn download_all() -> PhpResult<i64> {
-    Err(ext_php_rs::exception::PhpException::default("Not implemented: download_all".to_string()).into())
-}
-
-#[php_function]
-pub fn manifest_languages() -> PhpResult<Vec<String>> {
-    Err(ext_php_rs::exception::PhpException::default("Not implemented: manifest_languages".to_string()).into())
-}
-
-#[php_function]
-pub fn downloaded_languages() -> Vec<String> {
-    Vec::new()
-}
-
-#[php_function]
-pub fn clean_cache() -> PhpResult<()> {
-    Err(ext_php_rs::exception::PhpException::default("Not implemented: clean_cache".to_string()).into())
-}
-
-#[php_function]
-pub fn cache_dir() -> PhpResult<String> {
-    Err(ext_php_rs::exception::PhpException::default("Not implemented: cache_dir".to_string()).into())
+    tree_sitter_language_pack::language_count()
 }
 
 impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {

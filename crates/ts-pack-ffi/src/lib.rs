@@ -2882,62 +2882,6 @@ pub unsafe extern "C" fn tslp_process_config_default() -> *mut tree_sitter_langu
     Box::into_raw(Box::new(result))
 }
 
-/// Enable chunking with the given maximum chunk size in bytes.
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_config_with_chunking(
-    this: *mut tree_sitter_language_pack::ProcessConfig,
-    max_size: usize,
-) -> *mut tree_sitter_language_pack::ProcessConfig {
-    clear_last_error();
-    if this.is_null() {
-        set_last_error(1, "Null pointer passed for self");
-        return std::ptr::null_mut();
-    }
-    let obj = unsafe { *Box::from_raw(this) };
-    let max_size_rs = max_size;
-    let result = obj.with_chunking(max_size_rs);
-    Box::into_raw(Box::new(result))
-}
-
-/// Enable all analysis features.
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_config_all(
-    this: *mut tree_sitter_language_pack::ProcessConfig,
-) -> *mut tree_sitter_language_pack::ProcessConfig {
-    clear_last_error();
-    if this.is_null() {
-        set_last_error(1, "Null pointer passed for self");
-        return std::ptr::null_mut();
-    }
-    let obj = unsafe { *Box::from_raw(this) };
-    let result = obj.all();
-    Box::into_raw(Box::new(result))
-}
-
-/// Disable all analysis features (only metrics computed).
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_process_config_minimal(
-    this: *mut tree_sitter_language_pack::ProcessConfig,
-) -> *mut tree_sitter_language_pack::ProcessConfig {
-    clear_last_error();
-    if this.is_null() {
-        set_last_error(1, "Null pointer passed for self");
-        return std::ptr::null_mut();
-    }
-    let obj = unsafe { *Box::from_raw(this) };
-    let result = obj.minimal();
-    Box::into_raw(Box::new(result))
-}
-
 /// Free a `LanguageRegistry` handle.
 /// # Safety
 /// Pointer must have been returned by this library, or be null.
@@ -3103,6 +3047,18 @@ pub unsafe extern "C" fn tslp_language_registry_default() -> *mut tree_sitter_la
     std::ptr::null_mut()
 }
 
+/// Free a `Tree` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn tslp_tree_free(ptr: *mut tree_sitter_language_pack::Tree) {
+    if !ptr.is_null() {
+        unsafe {
+            drop(Box::from_raw(ptr));
+        }
+    }
+}
+
 /// Free a `Language` handle.
 /// # Safety
 /// Pointer must have been returned by this library, or be null.
@@ -3120,18 +3076,6 @@ pub unsafe extern "C" fn tslp_language_free(ptr: *mut tree_sitter_language_pack:
 /// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn tslp_parser_free(ptr: *mut tree_sitter_language_pack::Parser) {
-    if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
-    }
-}
-
-/// Free a `Tree` handle.
-/// # Safety
-/// Pointer must have been returned by this library, or be null.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_tree_free(ptr: *mut tree_sitter_language_pack::Tree) {
     if !ptr.is_null() {
         unsafe {
             drop(Box::from_raw(ptr));
@@ -3661,37 +3605,6 @@ pub unsafe extern "C" fn tslp_detect_language_from_content(content: *const std::
     }
 }
 
-/// Validate an extraction config without running it.
-///
-/// Checks that the language exists and all query patterns compile. Returns
-/// detailed diagnostics per pattern.
-///
-/// # Errors
-///
-/// Returns an error if the language cannot be loaded.
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_validate_extraction(
-    config: *const tree_sitter_language_pack::ExtractionConfig,
-) -> *mut tree_sitter_language_pack::ValidationResult {
-    clear_last_error();
-    if config.is_null() {
-        set_last_error(1, "Null pointer passed for parameter 'config'");
-        return std::ptr::null_mut();
-    }
-    let config_rs = unsafe { &*config }.clone();
-    let result = tree_sitter_language_pack::validate_extraction(&config_rs);
-    match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
-        Err(e) => {
-            set_last_error(2, &e.to_string());
-            std::ptr::null_mut()
-        }
-    }
-}
-
 /// Process source code: parse once, extract intelligence based on config, and return it.
 /// # Safety
 /// Caller must ensure all pointer arguments are valid or null.
@@ -3749,30 +3662,6 @@ pub unsafe extern "C" fn tslp_named_children_info(
 ) -> *mut std::ffi::c_char {
     clear_last_error();
     set_last_error(99, "Not implemented: named_children_info");
-    std::ptr::null_mut()
-}
-
-/// Parse source code with the named language, returning the syntax tree.
-///
-/// Uses the global registry to look up the language by name.
-///
-/// # Examples
-///
-/// ```no_run
-/// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
-/// assert_eq!(tree.root_node().kind(), "module");
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_parse_string(
-    language: *const std::ffi::c_char,
-    source: *const u8,
-    source_len: usize,
-) -> *mut tree_sitter_language_pack::Tree {
-    clear_last_error();
-    set_last_error(99, "Not implemented: parse_string");
     std::ptr::null_mut()
 }
 
@@ -4000,68 +3889,6 @@ pub unsafe extern "C" fn tslp_split_code(
     std::ptr::null_mut()
 }
 
-/// Get a tree-sitter [`Language`] by name using the global registry.
-///
-/// Resolves language aliases (e.g., `"shell"` maps to `"bash"`).
-/// When the `download` feature is enabled (default), automatically downloads
-/// the parser from GitHub releases if not found locally.
-///
-/// # Errors
-///
-/// Returns [`Error::LanguageNotFound`] if the language is not recognized,
-/// or [`Error::Download`] if auto-download fails.
-///
-/// # Example
-///
-/// ```no_run
-/// use tree_sitter_language_pack::get_language;
-///
-/// let lang = get_language("python").unwrap();
-/// // Use the Language with a tree-sitter Parser
-/// let mut parser = tree_sitter::Parser::new();
-/// parser.set_language(&lang).unwrap();
-/// let tree = parser.parse("x = 1", None).unwrap();
-/// assert_eq!(tree.root_node().kind(), "module");
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_get_language(name: *const std::ffi::c_char) -> *mut tree_sitter_language_pack::Language {
-    clear_last_error();
-    set_last_error(99, "Not implemented: get_language");
-    std::ptr::null_mut()
-}
-
-/// Get a tree-sitter [`Parser`] pre-configured for the given language.
-///
-/// This is a convenience function that calls [`get_language`] and configures
-/// a new parser in one step.
-///
-/// # Errors
-///
-/// Returns [`Error::LanguageNotFound`] if the language is not recognized, or
-/// [`Error::ParserSetup`] if the language cannot be applied to the parser.
-///
-/// # Example
-///
-/// ```no_run
-/// use tree_sitter_language_pack::get_parser;
-///
-/// let mut parser = get_parser("rust").unwrap();
-/// let tree = parser.parse("fn main() {}", None).unwrap();
-/// assert!(!tree.root_node().has_error());
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_get_parser(name: *const std::ffi::c_char) -> *mut tree_sitter_language_pack::Parser {
-    clear_last_error();
-    set_last_error(99, "Not implemented: get_parser");
-    std::ptr::null_mut()
-}
-
 /// List all available language names (sorted, deduplicated, includes aliases).
 ///
 /// Returns names of both statically compiled and dynamically loadable languages,
@@ -4149,323 +3976,4 @@ pub unsafe extern "C" fn tslp_language_count() -> usize {
     clear_last_error();
 
     tree_sitter_language_pack::language_count()
-}
-
-/// Run extraction patterns against source code.
-///
-/// Convenience wrapper around [`extract::extract`].
-///
-/// # Errors
-///
-/// Returns an error if the language is not found, parsing fails, or a query
-/// pattern is invalid.
-///
-/// # Example
-///
-/// ```no_run
-/// use ahash::AHashMap;
-/// use tree_sitter_language_pack::{ExtractionConfig, ExtractionPattern, CaptureOutput, extract_patterns};
-///
-/// let mut patterns = AHashMap::new();
-/// patterns.insert("fns".to_string(), ExtractionPattern {
-///     query: "(function_definition name: (identifier) @fn_name)".to_string(),
-///     capture_output: CaptureOutput::default(),
-///     child_fields: Vec::new(),
-///     max_results: None,
-///     byte_range: None,
-/// });
-/// let config = ExtractionConfig { language: "python".to_string(), patterns };
-/// let result = extract_patterns("def hello(): pass", &config).unwrap();
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_extract_patterns(
-    source: *const std::ffi::c_char,
-    config: *const tree_sitter_language_pack::ExtractionConfig,
-) -> *mut tree_sitter_language_pack::ExtractionResult {
-    clear_last_error();
-    if source.is_null() {
-        set_last_error(1, "Null pointer passed for parameter 'source'");
-        return std::ptr::null_mut();
-    }
-    let source_rs = match unsafe { CStr::from_ptr(source) }.to_str() {
-        Ok(s) => s.to_string(),
-        Err(_) => {
-            set_last_error(1, "Invalid UTF-8 in parameter 'source'");
-            return std::ptr::null_mut();
-        }
-    };
-    if config.is_null() {
-        set_last_error(1, "Null pointer passed for parameter 'config'");
-        return std::ptr::null_mut();
-    }
-    let config_rs = unsafe { &*config }.clone();
-    let result = tree_sitter_language_pack::extract_patterns(&source_rs, &config_rs);
-    match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
-        Err(e) => {
-            set_last_error(2, &e.to_string());
-            std::ptr::null_mut()
-        }
-    }
-}
-
-/// Initialize the language pack with the given configuration.
-///
-/// Applies any custom cache directory, then downloads all languages and groups
-/// specified in the config. This is the recommended entry point when you want
-/// to pre-warm the cache before use.
-///
-/// # Errors
-///
-/// Returns an error if configuration cannot be applied or if downloads fail.
-///
-/// # Example
-///
-/// ```no_run
-/// use tree_sitter_language_pack::{PackConfig, init};
-///
-/// let config = PackConfig {
-///     cache_dir: None,
-///     languages: Some(vec!["python".to_string(), "rust".to_string()]),
-///     groups: None,
-/// };
-/// init(&config).unwrap();
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_init(config: *const tree_sitter_language_pack::PackConfig) -> i32 {
-    clear_last_error();
-    if config.is_null() {
-        set_last_error(1, "Null pointer passed for parameter 'config'");
-        return -1;
-    }
-    let config_rs = unsafe { &*config }.clone();
-    let result = tree_sitter_language_pack::init(&config_rs);
-    match result {
-        Ok(()) => 0,
-        Err(e) => {
-            set_last_error(2, &e.to_string());
-            -1
-        }
-    }
-}
-
-/// Apply download configuration without downloading anything.
-///
-/// Use this to set a custom cache directory before the first call to
-/// [`get_language`] or any download function. Changing the cache dir
-/// after languages have been registered has no effect on already-loaded
-/// languages.
-///
-/// # Errors
-///
-/// Returns an error if the lock cannot be acquired.
-///
-/// # Example
-///
-/// ```no_run
-/// use std::path::PathBuf;
-/// use tree_sitter_language_pack::{PackConfig, configure};
-///
-/// let config = PackConfig {
-///     cache_dir: Some(PathBuf::from("/tmp/my-parsers")),
-///     languages: None,
-///     groups: None,
-/// };
-/// configure(&config).unwrap();
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_configure(config: *const tree_sitter_language_pack::PackConfig) -> i32 {
-    clear_last_error();
-    if config.is_null() {
-        set_last_error(1, "Null pointer passed for parameter 'config'");
-        return -1;
-    }
-    let config_rs = unsafe { &*config }.clone();
-    let result = tree_sitter_language_pack::configure(&config_rs);
-    match result {
-        Ok(()) => 0,
-        Err(e) => {
-            set_last_error(2, &e.to_string());
-            -1
-        }
-    }
-}
-
-/// Download all available languages from the remote manifest.
-///
-/// Returns the number of newly downloaded languages.
-///
-/// # Errors
-///
-/// Returns an error if the manifest cannot be fetched or a download fails.
-///
-/// # Example
-///
-/// ```no_run
-/// use tree_sitter_language_pack::download_all;
-///
-/// let count = download_all().unwrap();
-/// println!("Downloaded {} languages", count);
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_download_all() -> usize {
-    clear_last_error();
-    let result = tree_sitter_language_pack::download_all();
-    match result {
-        Ok(val) => val,
-        Err(e) => {
-            set_last_error(2, &e.to_string());
-            0
-        }
-    }
-}
-
-/// Return all language names available in the remote manifest (248).
-///
-/// Fetches (and caches) the remote manifest to discover the full list of
-/// downloadable languages. Use [`downloaded_languages`] to list what is
-/// already cached locally.
-///
-/// # Errors
-///
-/// Returns an error if the manifest cannot be fetched.
-///
-/// # Example
-///
-/// ```no_run
-/// use tree_sitter_language_pack::manifest_languages;
-///
-/// let langs = manifest_languages().unwrap();
-/// println!("{} languages available for download", langs.len());
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_manifest_languages() -> *mut std::ffi::c_char {
-    clear_last_error();
-    let result = tree_sitter_language_pack::manifest_languages();
-    match result {
-        Ok(val) => match serde_json::to_string(&val) {
-            Ok(s) => match CString::new(s) {
-                Ok(cs) => cs.into_raw(),
-                Err(_) => std::ptr::null_mut(),
-            },
-            Err(_) => std::ptr::null_mut(),
-        },
-        Err(e) => {
-            set_last_error(2, &e.to_string());
-            std::ptr::null_mut()
-        }
-    }
-}
-
-/// Return languages that are already downloaded and cached locally.
-///
-/// Does not perform any network requests. Returns an empty list if the
-/// cache directory does not exist or cannot be read.
-///
-/// # Example
-///
-/// ```no_run
-/// use tree_sitter_language_pack::downloaded_languages;
-///
-/// let langs = downloaded_languages();
-/// println!("{} languages already cached", langs.len());
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_downloaded_languages() -> *mut std::ffi::c_char {
-    clear_last_error();
-    let result = tree_sitter_language_pack::downloaded_languages();
-    match serde_json::to_string(&result) {
-        Ok(s) => match CString::new(s) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
-        Err(_) => std::ptr::null_mut(),
-    }
-}
-
-/// Delete all cached parser shared libraries.
-///
-/// Resets the cache registration so the next call to [`get_language`] or
-/// a download function will re-register the (now empty) cache directory.
-///
-/// # Errors
-///
-/// Returns an error if the cache directory cannot be removed.
-///
-/// # Example
-///
-/// ```no_run
-/// use tree_sitter_language_pack::clean_cache;
-///
-/// clean_cache().unwrap();
-/// println!("Cache cleared");
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_clean_cache() -> i32 {
-    clear_last_error();
-    let result = tree_sitter_language_pack::clean_cache();
-    match result {
-        Ok(()) => 0,
-        Err(e) => {
-            set_last_error(2, &e.to_string());
-            -1
-        }
-    }
-}
-
-/// Return the effective cache directory path.
-///
-/// This is either the custom path set via [`configure`] / [`init`] or the
-/// default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
-///
-/// # Errors
-///
-/// Returns an error if the system cache directory cannot be determined.
-///
-/// # Example
-///
-/// ```no_run
-/// use tree_sitter_language_pack::cache_dir;
-///
-/// let dir = cache_dir().unwrap();
-/// println!("Cache directory: {}", dir.display());
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn tslp_cache_dir() -> *mut std::ffi::c_char {
-    clear_last_error();
-    let result = tree_sitter_language_pack::cache_dir();
-    match result {
-        Ok(val) => match CString::new(val.to_string_lossy().to_string()) {
-            Ok(cs) => cs.into_raw(),
-            Err(_) => std::ptr::null_mut(),
-        },
-        Err(e) => {
-            set_last_error(2, &e.to_string());
-            std::ptr::null_mut()
-        }
-    }
 }

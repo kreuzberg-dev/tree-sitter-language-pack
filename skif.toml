@@ -39,6 +39,24 @@ functions = [
     "extract",              # collides with module name
     "node_info_from_node",  # takes tree_sitter::Node, can't cross FFI
     "run_query",            # returns QueryMatch with Cow tuples, can't cross FFI cleanly
+    "validate_extraction",  # takes non-FFI ProcessConfig param
+    "parse_string",         # returns Tree opaque (sanitized)
+    "get_language",         # returns Language opaque
+    "get_parser",           # returns Parser opaque
+    "extract_patterns",     # sanitized params
+    "init",                 # takes PackConfig (sanitized)
+    "configure",            # takes PackConfig (sanitized)
+    "cache_dir",            # download feature
+    "clean_cache",          # download feature
+    "download_all",         # download feature
+    "downloaded_languages", # download feature
+    "manifest_languages",   # download feature
+]
+# Methods with non-delegatable returns (opaque Named without Default)
+methods = [
+    "ProcessConfig.with_chunking", # owned receiver, non-opaque builder
+    "ProcessConfig.all",           # owned receiver, non-opaque builder
+    "ProcessConfig.minimal",       # owned receiver, non-opaque builder
 ]
 
 [output]

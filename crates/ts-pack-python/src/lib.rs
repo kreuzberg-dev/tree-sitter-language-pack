@@ -841,57 +841,6 @@ impl ProcessConfig {
         }
     }
 
-    #[pyo3(signature = (max_size))]
-    pub fn with_chunking(&self, max_size: usize) -> ProcessConfig {
-        let core_self = tree_sitter_language_pack::ProcessConfig {
-            language: Default::default(),
-            structure: self.structure,
-            imports: self.imports,
-            exports: self.exports,
-            comments: self.comments,
-            docstrings: self.docstrings,
-            symbols: self.symbols,
-            diagnostics: self.diagnostics,
-            chunk_max_size: self.chunk_max_size,
-            extractions: Default::default(),
-        };
-        core_self.with_chunking(max_size).into()
-    }
-
-    #[pyo3(signature = ())]
-    pub fn all(&self) -> ProcessConfig {
-        let core_self = tree_sitter_language_pack::ProcessConfig {
-            language: Default::default(),
-            structure: self.structure,
-            imports: self.imports,
-            exports: self.exports,
-            comments: self.comments,
-            docstrings: self.docstrings,
-            symbols: self.symbols,
-            diagnostics: self.diagnostics,
-            chunk_max_size: self.chunk_max_size,
-            extractions: Default::default(),
-        };
-        core_self.all().into()
-    }
-
-    #[pyo3(signature = ())]
-    pub fn minimal(&self) -> ProcessConfig {
-        let core_self = tree_sitter_language_pack::ProcessConfig {
-            language: Default::default(),
-            structure: self.structure,
-            imports: self.imports,
-            exports: self.exports,
-            comments: self.comments,
-            docstrings: self.docstrings,
-            symbols: self.symbols,
-            diagnostics: self.diagnostics,
-            chunk_max_size: self.chunk_max_size,
-            extractions: Default::default(),
-        };
-        core_self.minimal().into()
-    }
-
     #[staticmethod]
     #[pyo3(signature = ())]
     pub fn default() -> ProcessConfig {
@@ -920,7 +869,7 @@ impl LanguageRegistry {
 
     #[pyo3(signature = ())]
     pub fn available_languages(&self) -> Vec<String> {
-        self.inner.available_languages()
+        self.inner.available_languages().into_iter().map(Into::into).collect()
     }
 
     #[pyo3(signature = (name))]
@@ -957,6 +906,12 @@ impl LanguageRegistry {
 
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
+pub struct Tree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
+}
+
+#[derive(Clone)]
+#[pyclass(frozen, from_py_object)]
 pub struct Language {
     inner: Arc<tree_sitter_language_pack::Language>,
 }
@@ -965,12 +920,6 @@ pub struct Language {
 #[pyclass(frozen, from_py_object)]
 pub struct Parser {
     inner: Arc<tree_sitter_language_pack::Parser>,
-}
-
-#[derive(Clone)]
-#[pyclass(frozen, from_py_object)]
-pub struct Tree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
 }
 
 #[derive(Clone, PartialEq, serde::Serialize)]
@@ -1096,18 +1045,6 @@ pub fn detect_language_from_content(content: String) -> Option<String> {
 }
 
 #[pyfunction]
-#[pyo3(signature = (config))]
-pub fn validate_extraction(config: ExtractionConfig) -> PyResult<ValidationResult> {
-    let config_json =
-        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    let config_core: tree_sitter_language_pack::ExtractionConfig =
-        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    tree_sitter_language_pack::extract::validate_extraction(&config_core)
-        .map(|val| val.into())
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
-}
-
-#[pyfunction]
 #[pyo3(signature = (source, config, registry))]
 pub fn process(source: String, config: ProcessConfig, registry: LanguageRegistry) -> PyResult<ProcessResult> {
     let config_json =
@@ -1141,14 +1078,6 @@ pub fn named_children_info(tree: Tree) -> Vec<NodeInfo> {
         .into_iter()
         .map(Into::into)
         .collect()
-}
-
-#[pyfunction]
-#[pyo3(signature = (language, source))]
-pub fn parse_string(language: String, source: Vec<u8>) -> PyResult<Tree> {
-    tree_sitter_language_pack::parse_string(&language, &source)
-        .map(|val| Tree { inner: Arc::new(val) })
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
 #[pyfunction]
@@ -1200,22 +1129,6 @@ pub fn split_code(source: String, tree: Tree, max_chunk_size: usize) -> Vec<Stri
 }
 
 #[pyfunction]
-#[pyo3(signature = (name))]
-pub fn get_language(name: String) -> PyResult<Language> {
-    tree_sitter_language_pack::get_language(&name)
-        .map(|val| Language { inner: Arc::new(val) })
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
-}
-
-#[pyfunction]
-#[pyo3(signature = (name))]
-pub fn get_parser(name: String) -> PyResult<Parser> {
-    tree_sitter_language_pack::get_parser(&name)
-        .map(|val| Parser { inner: Arc::new(val) })
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
-}
-
-#[pyfunction]
 #[pyo3(signature = ())]
 pub fn available_languages() -> Vec<String> {
     tree_sitter_language_pack::available_languages()
@@ -1234,79 +1147,6 @@ pub fn has_language(name: String) -> bool {
 #[pyo3(signature = ())]
 pub fn language_count() -> usize {
     tree_sitter_language_pack::language_count()
-}
-
-#[pyfunction]
-#[pyo3(signature = (source, config))]
-pub fn extract_patterns(source: String, config: ExtractionConfig) -> PyResult<ExtractionResult> {
-    let config_json =
-        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    let config_core: tree_sitter_language_pack::ExtractionConfig =
-        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    tree_sitter_language_pack::extract_patterns(&source, &config_core)
-        .map(|val| val.into())
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
-}
-
-#[pyfunction]
-#[pyo3(signature = (config))]
-pub fn init(config: PackConfig) -> PyResult<()> {
-    let config_json =
-        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    let config_core: tree_sitter_language_pack::PackConfig =
-        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    tree_sitter_language_pack::init(&config_core)
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    Ok(())
-}
-
-#[pyfunction]
-#[pyo3(signature = (config))]
-pub fn configure(config: PackConfig) -> PyResult<()> {
-    let config_json =
-        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    let config_core: tree_sitter_language_pack::PackConfig =
-        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    tree_sitter_language_pack::configure(&config_core)
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    Ok(())
-}
-
-#[pyfunction]
-#[pyo3(signature = ())]
-pub fn download_all() -> PyResult<usize> {
-    tree_sitter_language_pack::download_all().map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
-}
-
-#[pyfunction]
-#[pyo3(signature = ())]
-pub fn manifest_languages() -> PyResult<Vec<String>> {
-    tree_sitter_language_pack::manifest_languages()
-        .map(|val| val.into_iter().map(Into::into).collect())
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
-}
-
-#[pyfunction]
-#[pyo3(signature = ())]
-pub fn downloaded_languages() -> Vec<String> {
-    tree_sitter_language_pack::downloaded_languages()
-        .into_iter()
-        .map(Into::into)
-        .collect()
-}
-
-#[pyfunction]
-#[pyo3(signature = ())]
-pub fn clean_cache() -> PyResult<()> {
-    tree_sitter_language_pack::clean_cache().map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
-}
-
-#[pyfunction]
-#[pyo3(signature = ())]
-pub fn cache_dir() -> PyResult<String> {
-    tree_sitter_language_pack::cache_dir()
-        .map(|val| val.to_string_lossy().to_string())
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
 impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {
@@ -1976,9 +1816,9 @@ pub fn _tree_sitter_language_pack(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PackConfig>()?;
     m.add_class::<ProcessConfig>()?;
     m.add_class::<LanguageRegistry>()?;
+    m.add_class::<Tree>()?;
     m.add_class::<Language>()?;
     m.add_class::<Parser>()?;
-    m.add_class::<Tree>()?;
     m.add_class::<Error>()?;
     m.add_class::<CaptureOutput>()?;
     m.add_class::<StructureKind>()?;
@@ -1992,12 +1832,10 @@ pub fn _tree_sitter_language_pack(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(extension_ambiguity, m)?)?;
     m.add_function(wrap_pyfunction!(extension_ambiguity_json, m)?)?;
     m.add_function(wrap_pyfunction!(detect_language_from_content, m)?)?;
-    m.add_function(wrap_pyfunction!(validate_extraction, m)?)?;
     m.add_function(wrap_pyfunction!(process, m)?)?;
     m.add_function(wrap_pyfunction!(root_node_info, m)?)?;
     m.add_function(wrap_pyfunction!(find_nodes_by_type, m)?)?;
     m.add_function(wrap_pyfunction!(named_children_info, m)?)?;
-    m.add_function(wrap_pyfunction!(parse_string, m)?)?;
     m.add_function(wrap_pyfunction!(tree_contains_node_type, m)?)?;
     m.add_function(wrap_pyfunction!(tree_has_error_nodes, m)?)?;
     m.add_function(wrap_pyfunction!(tree_to_sexp, m)?)?;
@@ -2006,18 +1844,8 @@ pub fn _tree_sitter_language_pack(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_injections_query, m)?)?;
     m.add_function(wrap_pyfunction!(get_locals_query, m)?)?;
     m.add_function(wrap_pyfunction!(split_code, m)?)?;
-    m.add_function(wrap_pyfunction!(get_language, m)?)?;
-    m.add_function(wrap_pyfunction!(get_parser, m)?)?;
     m.add_function(wrap_pyfunction!(available_languages, m)?)?;
     m.add_function(wrap_pyfunction!(has_language, m)?)?;
     m.add_function(wrap_pyfunction!(language_count, m)?)?;
-    m.add_function(wrap_pyfunction!(extract_patterns, m)?)?;
-    m.add_function(wrap_pyfunction!(init, m)?)?;
-    m.add_function(wrap_pyfunction!(configure, m)?)?;
-    m.add_function(wrap_pyfunction!(download_all, m)?)?;
-    m.add_function(wrap_pyfunction!(manifest_languages, m)?)?;
-    m.add_function(wrap_pyfunction!(downloaded_languages, m)?)?;
-    m.add_function(wrap_pyfunction!(clean_cache, m)?)?;
-    m.add_function(wrap_pyfunction!(cache_dir, m)?)?;
     Ok(())
 }

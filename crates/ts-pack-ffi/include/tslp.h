@@ -1228,31 +1228,6 @@ uintptr_t tslp_process_config_chunk_max_size(const TSLPProcessConfig *ptr);
 TSLPProcessConfig *tslp_process_config_default(void);
 
 /**
- * Enable chunking with the given maximum chunk size in bytes.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TSLPProcessConfig *tslp_process_config_with_chunking(TSLPProcessConfig *this_,
-                                                     uintptr_t max_size);
-
-/**
- * Enable all analysis features.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TSLPProcessConfig *tslp_process_config_all(TSLPProcessConfig *this_);
-
-/**
- * Disable all analysis features (only metrics computed).
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TSLPProcessConfig *tslp_process_config_minimal(TSLPProcessConfig *this_);
-
-/**
  * Free a `LanguageRegistry` handle.
  * # Safety
  * Pointer must have been returned by this library, or be null.
@@ -1326,6 +1301,13 @@ TSLPProcessResult *tslp_language_registry_process(const TSLPLanguageRegistry *th
 TSLPLanguageRegistry *tslp_language_registry_default(void);
 
 /**
+ * Free a `Tree` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void tslp_tree_free(TSLPTree *ptr);
+
+/**
  * Free a `Language` handle.
  * # Safety
  * Pointer must have been returned by this library, or be null.
@@ -1338,13 +1320,6 @@ void tslp_language_free(TSLPLanguage *ptr);
  * Pointer must have been returned by this library, or be null.
  */
 void tslp_parser_free(TSLPParser *ptr);
-
-/**
- * Free a `Tree` handle.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void tslp_tree_free(TSLPTree *ptr);
 
 /**
  * Convert an integer to a `CaptureOutput` variant. Returns -1 on invalid input.
@@ -1549,21 +1524,6 @@ char *tslp_extension_ambiguity_json(const char *ext);
 char *tslp_detect_language_from_content(const char *content);
 
 /**
- * Validate an extraction config without running it.
- *
- * Checks that the language exists and all query patterns compile. Returns
- * detailed diagnostics per pattern.
- *
- * # Errors
- *
- * Returns an error if the language cannot be loaded.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TSLPValidationResult *tslp_validate_extraction(const TSLPExtractionConfig *config);
-
-/**
  * Process source code: parse once, extract intelligence based on config, and return it.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -1602,25 +1562,6 @@ char *tslp_find_nodes_by_type(const TSLPTree *tree,
  * Returned pointers must be freed with the appropriate free function.
  */
 char *tslp_named_children_info(const TSLPTree *tree);
-
-/**
- * Parse source code with the named language, returning the syntax tree.
- *
- * Uses the global registry to look up the language by name.
- *
- * # Examples
- *
- * ```no_run
- * let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
- * assert_eq!(tree.root_node().kind(), "module");
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TSLPTree *tslp_parse_string(const char *language,
-                            const uint8_t *source,
-                            uintptr_t source_len);
 
 /**
  * Check whether any node in the tree matches the given type name.
@@ -1768,62 +1709,6 @@ char *tslp_split_code(const char *source,
                       uintptr_t max_chunk_size);
 
 /**
- * Get a tree-sitter [`Language`] by name using the global registry.
- *
- * Resolves language aliases (e.g., `"shell"` maps to `"bash"`).
- * When the `download` feature is enabled (default), automatically downloads
- * the parser from GitHub releases if not found locally.
- *
- * # Errors
- *
- * Returns [`Error::LanguageNotFound`] if the language is not recognized,
- * or [`Error::Download`] if auto-download fails.
- *
- * # Example
- *
- * ```no_run
- * use tree_sitter_language_pack::get_language;
- *
- * let lang = get_language("python").unwrap();
- * // Use the Language with a tree-sitter Parser
- * let mut parser = tree_sitter::Parser::new();
- * parser.set_language(&lang).unwrap();
- * let tree = parser.parse("x = 1", None).unwrap();
- * assert_eq!(tree.root_node().kind(), "module");
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TSLPLanguage *tslp_get_language(const char *name);
-
-/**
- * Get a tree-sitter [`Parser`] pre-configured for the given language.
- *
- * This is a convenience function that calls [`get_language`] and configures
- * a new parser in one step.
- *
- * # Errors
- *
- * Returns [`Error::LanguageNotFound`] if the language is not recognized, or
- * [`Error::ParserSetup`] if the language cannot be applied to the parser.
- *
- * # Example
- *
- * ```no_run
- * use tree_sitter_language_pack::get_parser;
- *
- * let mut parser = get_parser("rust").unwrap();
- * let tree = parser.parse("fn main() {}", None).unwrap();
- * assert!(!tree.root_node().has_error());
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TSLPParser *tslp_get_parser(const char *name);
-
-/**
  * List all available language names (sorted, deduplicated, includes aliases).
  *
  * Returns names of both statically compiled and dynamically loadable languages,
@@ -1885,215 +1770,5 @@ int32_t tslp_has_language(const char *name);
  * Returned pointers must be freed with the appropriate free function.
  */
 uintptr_t tslp_language_count(void);
-
-/**
- * Run extraction patterns against source code.
- *
- * Convenience wrapper around [`extract::extract`].
- *
- * # Errors
- *
- * Returns an error if the language is not found, parsing fails, or a query
- * pattern is invalid.
- *
- * # Example
- *
- * ```no_run
- * use ahash::AHashMap;
- * use tree_sitter_language_pack::{ExtractionConfig, ExtractionPattern, CaptureOutput, extract_patterns};
- *
- * let mut patterns = AHashMap::new();
- * patterns.insert("fns".to_string(), ExtractionPattern {
- *     query: "(function_definition name: (identifier) @fn_name)".to_string(),
- *     capture_output: CaptureOutput::default(),
- *     child_fields: Vec::new(),
- *     max_results: None,
- *     byte_range: None,
- * });
- * let config = ExtractionConfig { language: "python".to_string(), patterns };
- * let result = extract_patterns("def hello(): pass", &config).unwrap();
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TSLPExtractionResult *tslp_extract_patterns(const char *source,
-                                            const TSLPExtractionConfig *config);
-
-/**
- * Initialize the language pack with the given configuration.
- *
- * Applies any custom cache directory, then downloads all languages and groups
- * specified in the config. This is the recommended entry point when you want
- * to pre-warm the cache before use.
- *
- * # Errors
- *
- * Returns an error if configuration cannot be applied or if downloads fail.
- *
- * # Example
- *
- * ```no_run
- * use tree_sitter_language_pack::{PackConfig, init};
- *
- * let config = PackConfig {
- *     cache_dir: None,
- *     languages: Some(vec!["python".to_string(), "rust".to_string()]),
- *     groups: None,
- * };
- * init(&config).unwrap();
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t tslp_init(const TSLPPackConfig *config);
-
-/**
- * Apply download configuration without downloading anything.
- *
- * Use this to set a custom cache directory before the first call to
- * [`get_language`] or any download function. Changing the cache dir
- * after languages have been registered has no effect on already-loaded
- * languages.
- *
- * # Errors
- *
- * Returns an error if the lock cannot be acquired.
- *
- * # Example
- *
- * ```no_run
- * use std::path::PathBuf;
- * use tree_sitter_language_pack::{PackConfig, configure};
- *
- * let config = PackConfig {
- *     cache_dir: Some(PathBuf::from("/tmp/my-parsers")),
- *     languages: None,
- *     groups: None,
- * };
- * configure(&config).unwrap();
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t tslp_configure(const TSLPPackConfig *config);
-
-/**
- * Download all available languages from the remote manifest.
- *
- * Returns the number of newly downloaded languages.
- *
- * # Errors
- *
- * Returns an error if the manifest cannot be fetched or a download fails.
- *
- * # Example
- *
- * ```no_run
- * use tree_sitter_language_pack::download_all;
- *
- * let count = download_all().unwrap();
- * println!("Downloaded {} languages", count);
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-uintptr_t tslp_download_all(void);
-
-/**
- * Return all language names available in the remote manifest (248).
- *
- * Fetches (and caches) the remote manifest to discover the full list of
- * downloadable languages. Use [`downloaded_languages`] to list what is
- * already cached locally.
- *
- * # Errors
- *
- * Returns an error if the manifest cannot be fetched.
- *
- * # Example
- *
- * ```no_run
- * use tree_sitter_language_pack::manifest_languages;
- *
- * let langs = manifest_languages().unwrap();
- * println!("{} languages available for download", langs.len());
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-char *tslp_manifest_languages(void);
-
-/**
- * Return languages that are already downloaded and cached locally.
- *
- * Does not perform any network requests. Returns an empty list if the
- * cache directory does not exist or cannot be read.
- *
- * # Example
- *
- * ```no_run
- * use tree_sitter_language_pack::downloaded_languages;
- *
- * let langs = downloaded_languages();
- * println!("{} languages already cached", langs.len());
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-char *tslp_downloaded_languages(void);
-
-/**
- * Delete all cached parser shared libraries.
- *
- * Resets the cache registration so the next call to [`get_language`] or
- * a download function will re-register the (now empty) cache directory.
- *
- * # Errors
- *
- * Returns an error if the cache directory cannot be removed.
- *
- * # Example
- *
- * ```no_run
- * use tree_sitter_language_pack::clean_cache;
- *
- * clean_cache().unwrap();
- * println!("Cache cleared");
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t tslp_clean_cache(void);
-
-/**
- * Return the effective cache directory path.
- *
- * This is either the custom path set via [`configure`] / [`init`] or the
- * default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
- *
- * # Errors
- *
- * Returns an error if the system cache directory cannot be determined.
- *
- * # Example
- *
- * ```no_run
- * use tree_sitter_language_pack::cache_dir;
- *
- * let dir = cache_dir().unwrap();
- * println!("Cache directory: {}", dir.display());
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-char *tslp_cache_dir(void);
 
 #endif  /* TSLP_H */

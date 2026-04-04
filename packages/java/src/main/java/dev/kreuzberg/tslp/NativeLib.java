@@ -38,10 +38,6 @@ final class NativeLib {
         LIB.find("tslp_detect_language_from_content").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
     );
-    static final MethodHandle TSLP_VALIDATE_EXTRACTION = LINKER.downcallHandle(
-        LIB.find("tslp_validate_extraction").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
     static final MethodHandle TSLP_PROCESS = LINKER.downcallHandle(
         LIB.find("tslp_process").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
@@ -57,10 +53,6 @@ final class NativeLib {
     static final MethodHandle TSLP_NAMED_CHILDREN_INFO = LINKER.downcallHandle(
         LIB.find("tslp_named_children_info").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-    static final MethodHandle TSLP_PARSE_STRING = LINKER.downcallHandle(
-        LIB.find("tslp_parse_string").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
     );
     static final MethodHandle TSLP_TREE_CONTAINS_NODE_TYPE = LINKER.downcallHandle(
         LIB.find("tslp_tree_contains_node_type").orElseThrow(),
@@ -94,14 +86,6 @@ final class NativeLib {
         LIB.find("tslp_split_code").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG)
     );
-    static final MethodHandle TSLP_GET_LANGUAGE = LINKER.downcallHandle(
-        LIB.find("tslp_get_language").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-    static final MethodHandle TSLP_GET_PARSER = LINKER.downcallHandle(
-        LIB.find("tslp_get_parser").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
     static final MethodHandle TSLP_AVAILABLE_LANGUAGES = LINKER.downcallHandle(
         LIB.find("tslp_available_languages").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS)
@@ -113,38 +97,6 @@ final class NativeLib {
     static final MethodHandle TSLP_LANGUAGE_COUNT = LINKER.downcallHandle(
         LIB.find("tslp_language_count").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.JAVA_LONG)
-    );
-    static final MethodHandle TSLP_EXTRACT_PATTERNS = LINKER.downcallHandle(
-        LIB.find("tslp_extract_patterns").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-    static final MethodHandle TSLP_INIT = LINKER.downcallHandle(
-        LIB.find("tslp_init").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
-    );
-    static final MethodHandle TSLP_CONFIGURE = LINKER.downcallHandle(
-        LIB.find("tslp_configure").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
-    );
-    static final MethodHandle TSLP_DOWNLOAD_ALL = LINKER.downcallHandle(
-        LIB.find("tslp_download_all").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.JAVA_LONG)
-    );
-    static final MethodHandle TSLP_MANIFEST_LANGUAGES = LINKER.downcallHandle(
-        LIB.find("tslp_manifest_languages").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS)
-    );
-    static final MethodHandle TSLP_DOWNLOADED_LANGUAGES = LINKER.downcallHandle(
-        LIB.find("tslp_downloaded_languages").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS)
-    );
-    static final MethodHandle TSLP_CLEAN_CACHE = LINKER.downcallHandle(
-        LIB.find("tslp_clean_cache").orElseThrow(),
-        FunctionDescriptor.ofVoid()
-    );
-    static final MethodHandle TSLP_CACHE_DIR = LINKER.downcallHandle(
-        LIB.find("tslp_cache_dir").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS)
     );
 
     static final MethodHandle TSLP_FREE_STRING = LINKER.downcallHandle(
