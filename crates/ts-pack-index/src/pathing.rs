@@ -143,6 +143,10 @@ fn insert_module_files(map: &mut HashMap<String, Vec<String>>, module: String, f
     }
 }
 
+fn is_swift_source_file(path: &str) -> bool {
+    path.ends_with(".swift")
+}
+
 fn collect_files_for_prefix(prefix: &str, files_set: &HashSet<String>) -> Vec<String> {
     let normalized = prefix.trim_end_matches('/').to_string() + "/";
     let mut files = Vec::new();
@@ -291,7 +295,11 @@ fn build_swift_module_map_from_xcode(project_root: &str, files_set: &HashSet<Str
             let mut files = Vec::new();
             for group_id in group_ids {
                 if let Some(path) = root_groups.get(&group_id) {
-                    files.extend(collect_files_for_prefix(path, files_set));
+                    files.extend(
+                        collect_files_for_prefix(path, files_set)
+                            .into_iter()
+                            .filter(|fp| is_swift_source_file(fp)),
+                    );
                 }
             }
             insert_module_files(&mut map, target, files);
@@ -344,14 +352,14 @@ pub(crate) fn build_swift_module_map(project_root: &str, files_set: &HashSet<Str
                 if !sources.is_empty() {
                     for src in sources {
                         let joined = format!("{}/{}", base_path.trim_end_matches('/'), src);
-                        if files_set.contains(&joined) {
+                        if files_set.contains(&joined) && is_swift_source_file(&joined) {
                             files.push(joined);
                         }
                     }
                 } else {
                     let prefix = base_path.trim_end_matches('/').to_string() + "/";
                     for fp in files_set {
-                        if fp.starts_with(&prefix) {
+                        if fp.starts_with(&prefix) && is_swift_source_file(fp) {
                             files.push(fp.clone());
                         }
                     }
@@ -656,6 +664,48 @@ mod tests {
         let map = build_swift_module_map(root.to_str().unwrap(), &files);
         assert_eq!(map.get("App"), Some(&vec!["Sources/App/main.swift".to_string()]));
         assert_eq!(map.get("Lib"), Some(&vec!["Sources/Lib/util.swift".to_string()]));
+
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn excludes_non_swift_files_from_xcode_swift_module_map() {
+        let root = unique_temp_dir("xcode-swift-only");
+        fs::create_dir_all(root.join("FrameCreator.xcodeproj")).unwrap();
+        fs::write(
+            root.join("FrameCreator.xcodeproj/project.pbxproj"),
+            r#"
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+AA = {
+    isa = PBXFileSystemSynchronizedRootGroup;
+    path = FrameCreator;
+};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXNativeTarget section */
+BB = {
+    isa = PBXNativeTarget;
+    name = FrameCreator;
+    fileSystemSynchronizedGroups = (
+        AA,
+    );
+};
+/* End PBXNativeTarget section */
+            "#,
+        )
+        .unwrap();
+
+        let files = HashSet::from([
+            "FrameCreator/Views/ContentView.swift".to_string(),
+            "FrameCreator/Assets.xcassets/Contents.json".to_string(),
+            "FrameCreator/Assets.xcassets/AppIcon.appiconset/Contents.json".to_string(),
+        ]);
+
+        let map = build_swift_module_map(root.to_str().unwrap(), &files);
+        assert_eq!(
+            map.get("FrameCreator"),
+            Some(&vec!["FrameCreator/Views/ContentView.swift".to_string()])
+        );
 
         let _ = fs::remove_dir_all(root);
     }

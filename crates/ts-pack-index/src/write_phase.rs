@@ -48,6 +48,10 @@ pub(crate) async fn run_write_phases(
     project_id: &Arc<str>,
     inputs: WriteInputs,
 ) -> WritePhaseSummary {
+    // Symbol-edge writes touch the same File/Node relationship groups heavily and
+    // have proven prone to Neo4j deadlocks when batched concurrently.
+    let symbol_edge_concurrency = 1usize;
+
     let WriteInputs {
         all_files,
         all_symbols,
@@ -279,7 +283,7 @@ pub(crate) async fn run_write_phases(
         let t_imp = Instant::now();
         let imp_count = import_symbol_edges.len();
         stream::iter(import_symbol_edges.chunks(CALLS_BATCH_SIZE))
-            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+            .for_each_concurrent(symbol_edge_concurrency, |chunk| {
                 let g = Arc::clone(graph);
                 async move { writers::write_import_symbol_edges(&g, chunk).await }
             })
@@ -295,7 +299,7 @@ pub(crate) async fn run_write_phases(
         let t_imp = Instant::now();
         let imp_count = implicit_import_symbol_edges.len();
         stream::iter(implicit_import_symbol_edges.chunks(CALLS_BATCH_SIZE))
-            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+            .for_each_concurrent(symbol_edge_concurrency, |chunk| {
                 let g = Arc::clone(graph);
                 async move { writers::write_implicit_import_symbol_edges(&g, chunk).await }
             })
@@ -311,7 +315,7 @@ pub(crate) async fn run_write_phases(
         let t_exp = Instant::now();
         let exp_count = export_symbol_edges.len();
         stream::iter(export_symbol_edges.chunks(CALLS_BATCH_SIZE))
-            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+            .for_each_concurrent(symbol_edge_concurrency, |chunk| {
                 let g = Arc::clone(graph);
                 async move { writers::write_export_symbol_edges(&g, chunk).await }
             })

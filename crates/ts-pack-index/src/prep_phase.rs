@@ -218,8 +218,8 @@ pub(crate) fn prepare_graph_facts(
                         if fp == src_fp {
                             continue;
                         }
-                        if let Some(sym_map) = symbols_by_file.get(fp) {
-                            for sym_id in sym_map.values() {
+                        if let Some(exported) = exported_symbols_by_file.get(fp) {
+                            for sym_id in exported {
                                 if seen_import_symbol.contains(&(src_id.clone(), sym_id.clone())) {
                                     continue;
                                 }
@@ -377,6 +377,9 @@ pub(crate) fn prepare_graph_facts(
 mod tests {
     use super::*;
 
+    use std::path::PathBuf;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
     use crate::tags::CallSite;
 
     fn file_node(id: &str, filepath: &str) -> FileNode {
@@ -423,6 +426,11 @@ mod tests {
             }
         }
         result
+    }
+
+    fn unique_temp_dir(name: &str) -> PathBuf {
+        let nanos = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+        std::env::temp_dir().join(format!("ts-pack-index-prep-{name}-{nanos}"))
     }
 
     #[test]
@@ -537,5 +545,66 @@ mod tests {
         assert_eq!(out.python_inferred_call_rows[0].caller_id, "sym:main");
         assert_eq!(out.python_inferred_call_rows[0].callee, "run");
         assert_eq!(out.python_inferred_call_rows[0].callee_filepath, "pkg/helpers.py");
+    }
+
+    #[test]
+    fn prepares_swift_implicit_imports_for_exported_symbols_only() {
+        let mut all_symbols = HashMap::new();
+        all_symbols.insert(
+            "Function",
+            vec![
+                symbol_node("sym:public", "PublicThing", "Sources/App/Public.swift", true),
+                symbol_node("sym:internal", "InternalThing", "Sources/App/Internal.swift", false),
+            ],
+        );
+        let all_files = vec![
+            file_node("file:main", "Sources/App/Main.swift"),
+            file_node("file:public", "Sources/App/Public.swift"),
+            file_node("file:internal", "Sources/App/Internal.swift"),
+        ];
+        let swift_ctx = SwiftFileContext {
+            file_id: "file:main".to_string(),
+            filepath: "Sources/App/Main.swift".to_string(),
+            symbol_spans: vec![],
+            extension_spans: vec![],
+            type_spans: vec![],
+            call_sites: vec![],
+            var_types: HashMap::new(),
+        };
+        let project_root = unique_temp_dir("swift-implicit-exports");
+        std::fs::create_dir_all(project_root.join("Sources/App")).unwrap();
+        std::fs::write(
+            project_root.join("Package.swift"),
+            r#"
+            let package = Package(
+              name: "Demo",
+              targets: [
+                .target(name: "App", path: "Sources/App")
+              ]
+            )
+            "#,
+        )
+        .unwrap();
+
+        let out = with_env_var("TS_PACK_SWIFT_IMPLICIT_IMPORTS", Some("1"), || {
+            prepare_graph_facts(
+                &all_symbols,
+                &all_files,
+                &Arc::from("proj"),
+                project_root.to_str(),
+                &[],
+                &[],
+                &HashMap::new(),
+                &[swift_ctx],
+                &[],
+            )
+        });
+
+        assert!(out.implicit_import_symbol_edges.iter().any(|edge| {
+            edge.src == "file:main" && edge.tgt == "sym:public"
+        }));
+        assert!(!out.implicit_import_symbol_edges.iter().any(|edge| edge.tgt == "sym:internal"));
+
+        let _ = std::fs::remove_dir_all(project_root);
     }
 }
