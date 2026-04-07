@@ -64,7 +64,10 @@ pub use extract::{
     CaptureOutput, CaptureResult, CompiledExtraction, ExtractionConfig, ExtractionPattern, ExtractionResult,
     MatchResult, PatternResult, PatternValidation, ValidationResult,
 };
-pub use facts::{FileFacts, HttpCallFact, ResourceRefFact, RouteDefFact, extract_file_facts};
+pub use facts::{
+    AppleBundledFileFact, AppleSchemeTargetFact, AppleSyncedGroupFact, AppleTargetFact,
+    AppleWorkspaceProjectFact, FileFacts, HttpCallFact, ResourceRefFact, RouteDefFact, extract_file_facts,
+};
 pub use intel::types::{
     ChunkContext, CodeChunk, CommentInfo, CommentKind, Diagnostic, DiagnosticSeverity, DocSection, DocstringFormat,
     DocstringInfo, ExportInfo, ExportKind, FileMetrics, ImportInfo, ProcessResult, Span, StructureItem, StructureKind,
@@ -119,21 +122,7 @@ static CUSTOM_CACHE_DIR: LazyLock<RwLock<Option<std::path::PathBuf>>> = LazyLock
 /// assert_eq!(tree.root_node().kind(), "module");
 /// ```
 pub fn get_language(name: &str) -> Result<Language, Error> {
-    // Fast path: check registry directly (no outer lock needed)
-    if let Ok(lang) = REGISTRY.get_language(name) {
-        return Ok(lang);
-    }
-    // Slow path: auto-download if feature enabled
-    #[cfg(feature = "download")]
-    {
-        ensure_cache_registered()?;
-        let cache_dir = effective_cache_dir()?;
-        let mut dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
-        dm.ensure_languages(&[name])?;
-        REGISTRY.get_language(name)
-    }
-    #[cfg(not(feature = "download"))]
-    Err(Error::LanguageNotFound(name.to_string()))
+    REGISTRY.get_language(name)
 }
 
 /// Get a tree-sitter [`Parser`] pre-configured for the given language.
@@ -300,6 +289,16 @@ fn ensure_cache_registered() -> Result<(), Error> {
     let cache_dir = effective_cache_dir()?;
     // add_extra_libs_dir uses interior mutability — no outer write lock needed
     REGISTRY.add_extra_libs_dir(cache_dir);
+
+    #[cfg(feature = "download")]
+    REGISTRY.set_on_language_missing(|name| {
+        // We need the effective cache dir and version to create a DownloadManager
+        let cache_dir = effective_cache_dir()?;
+        let mut dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+        dm.ensure_languages(&[name])?;
+        Ok(())
+    });
+
     CACHE_REGISTERED.store(true, std::sync::atomic::Ordering::Release);
     Ok(())
 }

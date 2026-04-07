@@ -1,4 +1,5 @@
 use ahash::AHashMap;
+use regex::Regex;
 use std::path::Path;
 
 use crate::Error;
@@ -16,6 +17,16 @@ pub struct FileFacts {
     pub http_calls: Vec<HttpCallFact>,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub resource_refs: Vec<ResourceRefFact>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
+    pub apple_targets: Vec<AppleTargetFact>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
+    pub apple_bundled_files: Vec<AppleBundledFileFact>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
+    pub apple_synced_groups: Vec<AppleSyncedGroupFact>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
+    pub apple_workspace_projects: Vec<AppleWorkspaceProjectFact>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
+    pub apple_scheme_targets: Vec<AppleSchemeTargetFact>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -42,16 +53,57 @@ pub struct ResourceRefFact {
     pub callee: String,
 }
 
-pub fn extract_file_facts(source: &str, language: &str, file_path: Option<&str>) -> Result<FileFacts, Error> {
-    let Some(config) = config_for_language(language) else {
-        return Ok(FileFacts::default());
-    };
-    let raw = crate::extract_patterns(source, &config)?;
-    Ok(parse_file_facts(&raw, language, file_path))
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct AppleTargetFact {
+    pub target_id: String,
+    pub name: String,
+    pub project_file: String,
 }
 
-fn parse_file_facts(raw: &ExtractionResult, language: &str, file_path: Option<&str>) -> FileFacts {
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct AppleBundledFileFact {
+    pub target_id: String,
+    pub filepath: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct AppleSyncedGroupFact {
+    pub target_id: String,
+    pub group_path: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct AppleWorkspaceProjectFact {
+    pub workspace_path: String,
+    pub project_file: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct AppleSchemeTargetFact {
+    pub scheme_path: String,
+    pub scheme_name: String,
+    pub container_path: String,
+    pub target_id: String,
+}
+
+pub fn extract_file_facts(source: &str, language: &str, file_path: Option<&str>) -> Result<FileFacts, Error> {
     let mut facts = FileFacts::default();
+    if let Some(path) = file_path {
+        parse_apple_file_facts(source, path, &mut facts);
+    }
+    let Some(config) = config_for_language(language) else {
+        return Ok(finalize_file_facts(facts));
+    };
+    let raw = crate::extract_patterns(source, &config)?;
+    Ok(parse_file_facts(&raw, language, file_path, facts))
+}
+
+fn parse_file_facts(raw: &ExtractionResult, language: &str, file_path: Option<&str>, mut facts: FileFacts) -> FileFacts {
     let lang = language.to_ascii_lowercase();
 
     if matches!(lang.as_str(), "typescript" | "tsx" | "javascript") {
@@ -148,13 +200,277 @@ fn parse_file_facts(raw: &ExtractionResult, language: &str, file_path: Option<&s
         }
     }
 
+    finalize_file_facts(facts)
+}
+
+fn finalize_file_facts(mut facts: FileFacts) -> FileFacts {
     facts.route_defs.sort();
     facts.route_defs.dedup();
     facts.http_calls.sort();
     facts.http_calls.dedup();
     facts.resource_refs.sort();
     facts.resource_refs.dedup();
+    facts.apple_targets.sort();
+    facts.apple_targets.dedup();
+    facts.apple_bundled_files.sort();
+    facts.apple_bundled_files.dedup();
+    facts.apple_synced_groups.sort();
+    facts.apple_synced_groups.dedup();
+    facts.apple_workspace_projects.sort();
+    facts.apple_workspace_projects.dedup();
+    facts.apple_scheme_targets.sort();
+    facts.apple_scheme_targets.dedup();
     facts
+}
+
+fn parse_apple_file_facts(source: &str, file_path: &str, facts: &mut FileFacts) {
+    let normalized = file_path.replace('\\', "/");
+    if normalized.ends_with(".xcodeproj/project.pbxproj") {
+        parse_pbxproj_facts(source, &normalized, facts);
+    } else if normalized.ends_with(".xcworkspace/contents.xcworkspacedata") {
+        parse_workspace_facts(source, &normalized, facts);
+    } else if normalized.ends_with(".xcscheme") {
+        parse_scheme_facts(source, &normalized, facts);
+    }
+}
+
+fn parse_pbxproj_facts(source: &str, file_path: &str, facts: &mut FileFacts) {
+    let project_file = file_path.trim_end_matches("/project.pbxproj").to_string();
+    let target_re = Regex::new(
+        r#"(?s)([A-F0-9]{8,}) /\* [^*]+ \*/ = \{\s*isa = PBXNativeTarget;.*?\bname = ([^;]+);"#,
+    )
+    .unwrap();
+    for caps in target_re.captures_iter(source) {
+        let target_id = caps.get(1).map(|m| m.as_str().to_string()).unwrap_or_default();
+        let name = caps
+            .get(2)
+            .map(|m| m.as_str().trim().trim_matches('"').to_string())
+            .unwrap_or_default();
+        if !target_id.is_empty() && !name.is_empty() {
+            facts.apple_targets.push(AppleTargetFact {
+                target_id,
+                name,
+                project_file: project_file.clone(),
+            });
+        }
+    }
+
+    let build_file_re = Regex::new(
+        r#"([A-F0-9]{8,}) /\* [^*]+ \*/ = \{\s*isa = PBXBuildFile;\s*fileRef = ([A-F0-9]{8,})"#,
+    )
+    .unwrap();
+    let file_ref_re = Regex::new(
+        r#"(?s)([A-F0-9]{8,}) /\* [^*]+ \*/ = \{\s*isa = PBXFileReference;.*?\bpath = ([^;]+);.*?\bsourceTree = ([^;]+);"#,
+    )
+    .unwrap();
+    let resources_re = Regex::new(
+        r#"(?s)([A-F0-9]{8,}) /\* Resources \*/ = \{\s*isa = PBXResourcesBuildPhase;.*?\bfiles = \((.*?)\);"#,
+    )
+    .unwrap();
+    let target_phases_re = Regex::new(
+        r#"(?s)([A-F0-9]{8,}) /\* [^*]+ \*/ = \{\s*isa = PBXNativeTarget;.*?\bbuildPhases = \((.*?)\);"#,
+    )
+    .unwrap();
+    let synced_group_re = Regex::new(
+        r#"(?s)([A-F0-9]{8,}) /\* [^*]+ \*/ = \{\s*isa = PBXFileSystemSynchronizedRootGroup;.*?\bpath = ([^;]+);"#,
+    )
+    .unwrap();
+    let target_synced_re = Regex::new(
+        r#"(?s)([A-F0-9]{8,}) /\* [^*]+ \*/ = \{\s*isa = PBXNativeTarget;.*?\bfileSystemSynchronizedGroups = \((.*?)\);"#,
+    )
+    .unwrap();
+    let id_re = Regex::new(r#"([A-F0-9]{8,}) /\*"#).unwrap();
+
+    let mut build_file_to_ref: AHashMap<String, String> = AHashMap::new();
+    for caps in build_file_re.captures_iter(source) {
+        build_file_to_ref.insert(caps[1].to_string(), caps[2].to_string());
+    }
+
+    let mut file_ref_to_path: AHashMap<String, String> = AHashMap::new();
+    for caps in file_ref_re.captures_iter(source) {
+        let clean_path = caps[2].trim().trim_matches('"');
+        let source_tree = caps[3].trim().trim_matches('"');
+        if !clean_path.is_empty() && source_tree != "BUILT_PRODUCTS_DIR" {
+            file_ref_to_path.insert(caps[1].to_string(), clean_path.to_string());
+        }
+    }
+
+    let mut phase_to_files: AHashMap<String, Vec<String>> = AHashMap::new();
+    for caps in resources_re.captures_iter(source) {
+        phase_to_files.insert(
+            caps[1].to_string(),
+            id_re
+                .captures_iter(caps.get(2).map(|m| m.as_str()).unwrap_or_default())
+                .map(|m| m[1].to_string())
+                .collect(),
+        );
+    }
+
+    let mut target_to_phases: AHashMap<String, Vec<String>> = AHashMap::new();
+    for caps in target_phases_re.captures_iter(source) {
+        target_to_phases.insert(
+            caps[1].to_string(),
+            id_re
+                .captures_iter(caps.get(2).map(|m| m.as_str()).unwrap_or_default())
+                .map(|m| m[1].to_string())
+                .collect(),
+        );
+    }
+
+    for (target_id, phase_ids) in target_to_phases {
+        for phase_id in phase_ids {
+            for build_file_id in phase_to_files.get(&phase_id).cloned().unwrap_or_default() {
+                if let Some(file_ref_id) = build_file_to_ref.get(&build_file_id)
+                    && let Some(path) = file_ref_to_path.get(file_ref_id)
+                {
+                    facts.apple_bundled_files.push(AppleBundledFileFact {
+                        target_id: target_id.clone(),
+                        filepath: normalize_pbxproj_relative_path(&project_file, path),
+                    });
+                }
+            }
+        }
+    }
+
+    let mut synced_group_paths: AHashMap<String, String> = AHashMap::new();
+    for caps in synced_group_re.captures_iter(source) {
+        let path = caps[2].trim().trim_matches('"');
+        if !path.is_empty() {
+            synced_group_paths.insert(caps[1].to_string(), path.to_string());
+        }
+    }
+    for caps in target_synced_re.captures_iter(source) {
+        let target_id = caps[1].to_string();
+        for group_caps in id_re.captures_iter(caps.get(2).map(|m| m.as_str()).unwrap_or_default()) {
+            if let Some(group_path) = synced_group_paths.get(&group_caps[1]) {
+                facts.apple_synced_groups.push(AppleSyncedGroupFact {
+                    target_id: target_id.clone(),
+                    group_path: normalize_pbxproj_relative_path(&project_file, group_path),
+                });
+            }
+        }
+    }
+}
+
+fn parse_workspace_facts(source: &str, file_path: &str, facts: &mut FileFacts) {
+    let workspace_dir = Path::new(file_path)
+        .parent()
+        .map(|p| p.to_string_lossy().replace('\\', "/"))
+        .unwrap_or_default();
+    let file_ref_re = Regex::new(r#"location\s*=\s*"([^"]+)""#).unwrap();
+    for caps in file_ref_re.captures_iter(source) {
+        let location = caps.get(1).map(|m| m.as_str()).unwrap_or_default().trim();
+        if location == "self:" {
+            let project_file = Path::new(&workspace_dir)
+                .parent()
+                .map(|p| format!("{}/project.pbxproj", p.to_string_lossy().replace('\\', "/")))
+                .unwrap_or_default();
+            if !project_file.is_empty() {
+                facts.apple_workspace_projects.push(AppleWorkspaceProjectFact {
+                    workspace_path: file_path.to_string(),
+                    project_file,
+                });
+            }
+            continue;
+        }
+        let rel_ref = location.split_once(':').map(|(_, rhs)| rhs).unwrap_or(location).trim();
+        if !rel_ref.ends_with(".xcodeproj") {
+            continue;
+        }
+        let project_file = normalize_workspace_project_path(file_path, rel_ref);
+        facts.apple_workspace_projects.push(AppleWorkspaceProjectFact {
+            workspace_path: file_path.to_string(),
+            project_file,
+        });
+    }
+}
+
+fn parse_scheme_facts(source: &str, file_path: &str, facts: &mut FileFacts) {
+    let scheme_name = Path::new(file_path)
+        .file_stem()
+        .and_then(|value| value.to_str())
+        .unwrap_or_default()
+        .to_string();
+    let buildable_re = Regex::new(
+        r#"BlueprintIdentifier\s*=\s*"([^"]+)".*?ReferencedContainer\s*=\s*"([^"]+)""#,
+    )
+    .unwrap();
+    for caps in buildable_re.captures_iter(source) {
+        let target_id = caps.get(1).map(|m| m.as_str().trim().to_string()).unwrap_or_default();
+        let container = caps.get(2).map(|m| m.as_str().trim()).unwrap_or_default();
+        let container_path = normalize_scheme_container_path(file_path, container);
+        if !target_id.is_empty() {
+            facts.apple_scheme_targets.push(AppleSchemeTargetFact {
+                scheme_path: file_path.to_string(),
+                scheme_name: scheme_name.clone(),
+                container_path,
+                target_id,
+            });
+        }
+    }
+}
+
+fn normalize_pbxproj_relative_path(project_file: &str, raw_path: &str) -> String {
+    let clean = raw_path.trim().trim_matches('"').trim_start_matches("./");
+    if clean.is_empty() {
+        return clean.to_string();
+    }
+    let project_dir = Path::new(project_file)
+        .parent()
+        .map(|p| p.to_string_lossy().replace('\\', "/"))
+        .unwrap_or_default();
+    if project_dir.is_empty() {
+        clean.to_string()
+    } else {
+        format!("{project_dir}/{clean}")
+    }
+}
+
+fn normalize_workspace_project_path(workspace_path: &str, rel_ref: &str) -> String {
+    let clean = rel_ref.trim().trim_start_matches("./");
+    if clean.ends_with(".xcodeproj") {
+        return format!("{clean}/project.pbxproj");
+    }
+    let workspace_dir = Path::new(workspace_path)
+        .parent()
+        .map(|p| p.to_string_lossy().replace('\\', "/"))
+        .unwrap_or_default();
+    let candidate = if workspace_dir.is_empty() {
+        clean.to_string()
+    } else {
+        format!("{workspace_dir}/{clean}")
+    };
+    if candidate.ends_with(".xcodeproj") {
+        format!("{candidate}/project.pbxproj")
+    } else {
+        candidate
+    }
+}
+
+fn normalize_scheme_container_path(scheme_path: &str, container_ref: &str) -> String {
+    let rel_ref = container_ref
+        .split_once(':')
+        .map(|(_, rhs)| rhs)
+        .unwrap_or(container_ref)
+        .trim()
+        .trim_start_matches("./");
+    if rel_ref.ends_with(".xcodeproj") {
+        return format!("{rel_ref}/project.pbxproj");
+    }
+    let scheme_dir = Path::new(scheme_path)
+        .parent()
+        .map(|p| p.to_string_lossy().replace('\\', "/"))
+        .unwrap_or_default();
+    let candidate = if scheme_dir.is_empty() {
+        rel_ref.to_string()
+    } else {
+        format!("{scheme_dir}/{rel_ref}")
+    };
+    if candidate.ends_with(".xcodeproj") {
+        format!("{candidate}/project.pbxproj")
+    } else {
+        candidate
+    }
 }
 
 fn first_capture<'a>(caps: &'a AHashMap<String, Vec<String>>, name: &str) -> Option<&'a str> {
@@ -441,6 +757,76 @@ mod tests {
         assert_eq!(
             route_path_from_file("apps/web/src/app/projects/[id]/route.ts"),
             Some("/projects/[id]".to_string())
+        );
+    }
+
+    #[test]
+    fn extracts_xcode_project_facts() {
+        let source = r#"
+AA000001 /* App */ = {
+    isa = PBXNativeTarget;
+    buildPhases = (
+        AA000010 /* Resources */,
+    );
+    fileSystemSynchronizedGroups = (
+        AA000020 /* App */,
+    );
+    name = App;
+};
+AA000010 /* Resources */ = {
+    isa = PBXResourcesBuildPhase;
+    files = (
+        AA000101 /* Main.storyboard in Resources */,
+    );
+};
+AA000101 /* Main.storyboard in Resources */ = { isa = PBXBuildFile; fileRef = AA000201 /* Main.storyboard */; };
+AA000201 /* Main.storyboard */ = { isa = PBXFileReference; path = "App/Main.storyboard"; sourceTree = "<group>"; };
+AA000020 /* App */ = { isa = PBXFileSystemSynchronizedRootGroup; path = App; sourceTree = "<group>"; };
+"#;
+        let facts = extract_file_facts(source, "text", Some("ios/App.xcodeproj/project.pbxproj")).unwrap();
+        assert!(facts.apple_targets.iter().any(|item| item.name == "App" && item.target_id == "AA000001"));
+        assert!(facts.apple_bundled_files.iter().any(|item| item.filepath == "ios/App/Main.storyboard"));
+        assert!(facts.apple_synced_groups.iter().any(|item| item.group_path == "ios/App"));
+    }
+
+    #[test]
+    fn extracts_xcode_workspace_and_scheme_facts() {
+        let workspace = r#"<Workspace version="1.0"><FileRef location="self:" /></Workspace>"#;
+        let scheme = r#"
+<Scheme>
+  <BuildAction>
+    <BuildActionEntries>
+      <BuildActionEntry>
+        <BuildableReference BlueprintIdentifier="AA000001" ReferencedContainer="container:App.xcodeproj" />
+      </BuildActionEntry>
+    </BuildActionEntries>
+  </BuildAction>
+</Scheme>
+"#;
+        let workspace_facts = extract_file_facts(
+            workspace,
+            "text",
+            Some("ios/App.xcodeproj/project.xcworkspace/contents.xcworkspacedata"),
+        )
+        .unwrap();
+        assert!(
+            workspace_facts
+                .apple_workspace_projects
+                .iter()
+                .any(|item| item.project_file == "ios/App.xcodeproj/project.pbxproj")
+        );
+
+        let scheme_facts = extract_file_facts(
+            scheme,
+            "text",
+            Some("ios/App.xcodeproj/xcshareddata/xcschemes/App.xcscheme"),
+        )
+        .unwrap();
+        assert!(
+            scheme_facts
+                .apple_scheme_targets
+                .iter()
+                .any(|item| item.target_id == "AA000001" && item.container_path == "App.xcodeproj/project.pbxproj")
         );
     }
 }

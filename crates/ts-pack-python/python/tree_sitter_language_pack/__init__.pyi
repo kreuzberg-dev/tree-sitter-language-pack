@@ -234,10 +234,38 @@ class ResourceRefFact(TypedDict):
     name: str
     callee: str
 
+class AppleTargetFact(TypedDict):
+    target_id: str
+    name: str
+    project_file: str
+
+class AppleBundledFileFact(TypedDict):
+    target_id: str
+    filepath: str
+
+class AppleSyncedGroupFact(TypedDict):
+    target_id: str
+    group_path: str
+
+class AppleWorkspaceProjectFact(TypedDict):
+    workspace_path: str
+    project_file: str
+
+class AppleSchemeTargetFact(TypedDict):
+    scheme_path: str
+    scheme_name: str
+    container_path: str
+    target_id: str
+
 class FileFacts(TypedDict, total=False):
     route_defs: list[RouteDefFact]
     http_calls: list[HttpCallFact]
     resource_refs: list[ResourceRefFact]
+    apple_targets: list[AppleTargetFact]
+    apple_bundled_files: list[AppleBundledFileFact]
+    apple_synced_groups: list[AppleSyncedGroupFact]
+    apple_workspace_projects: list[AppleWorkspaceProjectFact]
+    apple_scheme_targets: list[AppleSchemeTargetFact]
 
 class StructureItem(TypedDict):
     kind: str  # "Function", "Class", "Method", etc.
