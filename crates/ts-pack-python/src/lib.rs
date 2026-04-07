@@ -1431,6 +1431,52 @@ async fn await_py_callable1(callable: &Py<PyAny>, arg: Py<PyAny>) -> PyResult<Py
     await_python_awaitable(awaitable).await
 }
 
+#[pyfunction(signature = (cursor, batch, project_id, expected_dim = None, created_at = None))]
+fn execute_codebase_embedding_upsert(
+    py: Python<'_>,
+    cursor: Py<PyAny>,
+    batch: Vec<Py<PyAny>>,
+    project_id: String,
+    expected_dim: Option<usize>,
+    created_at: Option<f64>,
+) -> PyResult<Py<PyAny>> {
+    let cursor_obj = cursor.clone_ref(py);
+    Ok(
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let rows = Python::attach(|py| {
+                build_codebase_embedding_rows(py, batch, project_id, expected_dim, created_at)
+            })?;
+
+            let row_count = Python::attach(|py| -> PyResult<usize> {
+                Ok(rows.bind(py).cast::<PyList>()?.len())
+            })?;
+            if row_count == 0 {
+                return Python::attach(|py| Ok(0_i64.into_pyobject(py)?.into_any().unbind()));
+            }
+
+            let sql = "INSERT INTO codebase_embeddings
+  (chunk_id, project_id, file_path, ref_type, chunk_index,
+   content, embedding, metadata, created_at)
+VALUES (%s, %s, %s, %s, %s, %s, %s::vector, %s::jsonb, to_timestamp(%s))
+ON CONFLICT (chunk_id) DO NOTHING";
+
+            let args = Python::attach(|py| -> PyResult<Py<PyTuple>> {
+                Ok(PyTuple::new(
+                    py,
+                    [
+                        sql.into_pyobject(py)?.into_any(),
+                        rows.bind(py).clone().into_any().unbind().into_bound(py).into_any(),
+                    ],
+                )?
+                .unbind())
+            })?;
+            let _ = await_py_method1(&cursor_obj, "executemany", args).await?;
+            Python::attach(|py| Ok((row_count as i64).into_pyobject(py)?.into_any().unbind()))
+        })?
+        .unbind(),
+    )
+}
+
 #[pyfunction(signature = (conn, project_id, manifest_paths, all_chunks, embed_batch_fn, write_batch_fn, rebuild = false, batch_size = 128, concurrency = 4, progress_fn = None))]
 fn execute_semantic_index_driver(
     py: Python<'_>,
@@ -1772,6 +1818,7 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(build_codebase_embedding_rows, m)?)?;
     m.add_function(wrap_pyfunction!(build_semantic_index_round_plan, m)?)?;
     m.add_function(wrap_pyfunction!(build_semantic_index_driver_plan, m)?)?;
+    m.add_function(wrap_pyfunction!(execute_codebase_embedding_upsert, m)?)?;
     m.add_function(wrap_pyfunction!(execute_semantic_index_driver, m)?)?;
     Ok(())
 }

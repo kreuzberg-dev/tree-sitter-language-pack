@@ -240,7 +240,7 @@ from ._semantic_payload import (
     build_semantic_payload,
     build_semantic_sync_plan,
     build_swift_chunks as _python_build_swift_chunks,
-    execute_codebase_embedding_upsert,
+    execute_codebase_embedding_upsert as _python_execute_codebase_embedding_upsert,
     execute_semantic_index_driver as _python_execute_semantic_index_driver,
 )
 
@@ -258,6 +258,11 @@ execute_semantic_index_driver = getattr(
     _native,
     "execute_semantic_index_driver",
     _python_execute_semantic_index_driver,
+)
+execute_codebase_embedding_upsert = getattr(
+    _native,
+    "execute_codebase_embedding_upsert",
+    _python_execute_codebase_embedding_upsert,
 )
 
 try:
