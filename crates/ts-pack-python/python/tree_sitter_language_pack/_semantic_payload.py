@@ -612,6 +612,7 @@ async def execute_semantic_index_rounds(
     embed_batch_fn: Any,
     write_batch_fn: Any,
     progress_fn: Any | None = None,
+    round_plan: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     total_new = len(new_chunks)
     total_written = 0
@@ -619,27 +620,30 @@ async def execute_semantic_index_rounds(
     if total_new <= 0:
         return {"written": 0, "rounds": 0}
 
-    round_plan_builder = getattr(_native, "build_semantic_index_round_plan", None)
-    if round_plan_builder is not None:
-        round_plan = list(round_plan_builder(new_chunks, batch_size, concurrency) or [])
+    if round_plan is not None:
+        round_plan = list(round_plan)
     else:
-        safe_batch_size = max(1, batch_size)
-        safe_concurrency = max(1, concurrency)
-        window = safe_batch_size * safe_concurrency
-        n_rounds = (total_new + window - 1) // window
-        round_plan = []
-        for round_idx in range(n_rounds):
-            group = new_chunks[round_idx * window : (round_idx + 1) * window]
-            sub_batches = [group[i : i + safe_batch_size] for i in range(0, len(group), safe_batch_size)]
-            round_plan.append(
-                {
-                    "round_index": round_idx,
-                    "rounds": n_rounds,
-                    "group_size": len(group),
-                    "batch_count": len(sub_batches),
-                    "sub_batches": sub_batches,
-                }
-            )
+        round_plan_builder = getattr(_native, "build_semantic_index_round_plan", None)
+        if round_plan_builder is not None:
+            round_plan = list(round_plan_builder(new_chunks, batch_size, concurrency) or [])
+        else:
+            safe_batch_size = max(1, batch_size)
+            safe_concurrency = max(1, concurrency)
+            window = safe_batch_size * safe_concurrency
+            n_rounds = (total_new + window - 1) // window
+            round_plan = []
+            for round_idx in range(n_rounds):
+                group = new_chunks[round_idx * window : (round_idx + 1) * window]
+                sub_batches = [group[i : i + safe_batch_size] for i in range(0, len(group), safe_batch_size)]
+                round_plan.append(
+                    {
+                        "round_index": round_idx,
+                        "rounds": n_rounds,
+                        "group_size": len(group),
+                        "batch_count": len(sub_batches),
+                        "sub_batches": sub_batches,
+                    }
+                )
 
     rounds = len(round_plan)
     for round_info in round_plan:
@@ -714,13 +718,79 @@ async def execute_semantic_index_driver(
     write_batch_fn: Any,
     progress_fn: Any | None = None,
 ) -> dict[str, Any]:
-    sync_plan = await execute_semantic_index_prepare(
-        conn,
-        project_id,
-        manifest_paths,
-        all_chunks,
-        rebuild=rebuild,
-    )
+    driver_plan_builder = getattr(_native, "build_semantic_index_driver_plan", None)
+
+    existing_ids: set[str] = set()
+    db_paths: set[str] = set()
+    if driver_plan_builder is not None:
+        cur = await conn.execute(
+            "SELECT chunk_id FROM codebase_embeddings WHERE project_id = %s",
+            [project_id],
+        )
+        existing_ids = {row[0] for row in await cur.fetchall()}
+
+        rows_cursor = await conn.execute(
+            "SELECT DISTINCT file_path FROM codebase_embeddings WHERE project_id = %s",
+            (project_id,),
+        )
+        db_paths = {row[0] async for row in rows_cursor}
+
+        sync_plan = dict(
+            driver_plan_builder(
+                all_chunks,
+                sorted(existing_ids),
+                manifest_paths,
+                sorted(db_paths),
+                rebuild=rebuild,
+                batch_size=batch_size,
+                concurrency=concurrency,
+            )
+            or {}
+        )
+        if rebuild:
+            await conn.execute(
+                "DELETE FROM codebase_embeddings WHERE project_id = %s",
+                (project_id,),
+            )
+        orphan_pruned = 0
+        for path in sync_plan.get("orphan_paths") or []:
+            await conn.execute(
+                "DELETE FROM codebase_embeddings WHERE project_id = %s AND file_path = %s",
+                (project_id, path),
+            )
+            orphan_pruned += 1
+
+        pruned_total = 0
+        prune_targets = sync_plan.get("prune_targets") or []
+        if prune_targets:
+            async with conn.cursor() as prune_cursor:
+                for target in prune_targets:
+                    file_path = target.get("file_path")
+                    chunk_ids = target.get("chunk_ids") or []
+                    if not file_path or not chunk_ids:
+                        continue
+                    await prune_cursor.execute(
+                        """
+                        DELETE FROM codebase_embeddings
+                        WHERE project_id = %s
+                          AND file_path = %s
+                          AND NOT (chunk_id = ANY(%s))
+                        """,
+                        (project_id, file_path, chunk_ids),
+                    )
+                    pruned_total += getattr(prune_cursor, "rowcount", 0) or 0
+
+        sync_plan["existing_ids"] = existing_ids
+        sync_plan["orphan_pruned"] = orphan_pruned
+        sync_plan["pruned_total"] = pruned_total
+    else:
+        sync_plan = await execute_semantic_index_prepare(
+            conn,
+            project_id,
+            manifest_paths,
+            all_chunks,
+            rebuild=rebuild,
+        )
     round_result = await execute_semantic_index_rounds(
         sync_plan.get("new_chunks") or [],
         batch_size=batch_size,
@@ -728,6 +798,7 @@ async def execute_semantic_index_driver(
         embed_batch_fn=embed_batch_fn,
         write_batch_fn=write_batch_fn,
         progress_fn=progress_fn,
+        round_plan=sync_plan.get("round_plan"),
     )
     return {
         **sync_plan,

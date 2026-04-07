@@ -1015,6 +1015,90 @@ fn build_semantic_index_round_plan(
     Ok(result.into_any().unbind())
 }
 
+#[pyfunction(signature = (all_chunks, existing_ids = None, manifest_paths = None, db_paths = None, rebuild = false, batch_size = 128, concurrency = 4))]
+fn build_semantic_index_driver_plan(
+    py: Python<'_>,
+    all_chunks: Vec<Vec<Py<PyAny>>>,
+    existing_ids: Option<Vec<String>>,
+    manifest_paths: Option<Vec<String>>,
+    db_paths: Option<Vec<String>>,
+    rebuild: bool,
+    batch_size: usize,
+    concurrency: usize,
+) -> PyResult<Py<PyAny>> {
+    let existing: HashSet<String> = existing_ids.unwrap_or_default().into_iter().collect();
+    let manifest_path_set: HashSet<String> = manifest_paths.unwrap_or_default().into_iter().collect();
+    let db_path_set: HashSet<String> = db_paths.unwrap_or_default().into_iter().collect();
+    let orphan_paths: Vec<String> = db_path_set
+        .difference(&manifest_path_set)
+        .cloned()
+        .collect();
+
+    let new_chunks = PyList::empty(py);
+    let prune_targets = PyList::empty(py);
+    let mut total_chunks: usize = 0;
+
+    for file_chunks in all_chunks {
+        if file_chunks.is_empty() {
+            continue;
+        }
+        total_chunks += file_chunks.len();
+
+        let mut file_path: Option<String> = None;
+        let mut chunk_ids: Vec<String> = Vec::new();
+
+        for chunk in &file_chunks {
+            let chunk_any = chunk.bind(py);
+            let chunk_dict = chunk_any.cast::<PyDict>()?;
+            if let Some(ref_id_any) = chunk_dict.get_item("ref_id")? {
+                let ref_id = ref_id_any.extract::<String>()?;
+                if !existing.contains(&ref_id) {
+                    new_chunks.append(chunk_any)?;
+                }
+                chunk_ids.push(ref_id);
+            }
+            if file_path.is_none() {
+                if let Some(meta_any) = chunk_dict.get_item("metadata")? {
+                    if let Ok(meta_dict) = meta_any.cast::<PyDict>() {
+                        if let Some(file_any) = meta_dict.get_item("file")? {
+                            file_path = Some(file_any.extract::<String>()?);
+                        }
+                    }
+                }
+            }
+        }
+
+        if let Some(path) = file_path {
+            if !chunk_ids.is_empty() {
+                let target = PyDict::new(py);
+                target.set_item("file_path", path)?;
+                target.set_item("chunk_ids", chunk_ids)?;
+                prune_targets.append(target)?;
+            }
+        }
+    }
+
+    let round_plan = build_semantic_index_round_plan(
+        py,
+        new_chunks
+            .iter()
+            .map(|item| item.clone().unbind())
+            .collect(),
+        batch_size,
+        concurrency,
+    )?;
+
+    let result = PyDict::new(py);
+    result.set_item("new_chunks", &new_chunks)?;
+    result.set_item("skipped_chunks", total_chunks.saturating_sub(new_chunks.len()))?;
+    result.set_item("prune_targets", prune_targets)?;
+    result.set_item("total_chunks", total_chunks)?;
+    result.set_item("orphan_paths", orphan_paths)?;
+    result.set_item("wiped", rebuild)?;
+    result.set_item("round_plan", round_plan)?;
+    Ok(result.into_any().unbind())
+}
+
 // ---------------------------------------------------------------------------
 // Module registration
 // ---------------------------------------------------------------------------
@@ -1061,5 +1145,6 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(build_semantic_sync_plan, m)?)?;
     m.add_function(wrap_pyfunction!(build_codebase_embedding_rows, m)?)?;
     m.add_function(wrap_pyfunction!(build_semantic_index_round_plan, m)?)?;
+    m.add_function(wrap_pyfunction!(build_semantic_index_driver_plan, m)?)?;
     Ok(())
 }
