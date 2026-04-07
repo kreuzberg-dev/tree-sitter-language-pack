@@ -220,11 +220,11 @@ def _normalize_apple_facts(facts: dict[str, Any]) -> dict[str, Any]:
     return facts
 
 
-def extract_file_facts(source: bytes | str, file_path: str, language: str | None = None) -> dict[str, Any]:
-    facts = _native.extract_file_facts(source, file_path, language) or {}
-    normalized_path = file_path.replace("\\", "/")
+def extract_file_facts(source: bytes | str, language: str, file_path: str | None = None) -> dict[str, Any]:
+    facts = _native.extract_file_facts(source, language, file_path) or {}
+    normalized_path = (file_path or "").replace("\\", "/")
     extras: dict[str, list[dict[str, Any]]] = {}
-    if normalized_path.endswith(".xcodeproj/project.pbxproj"):
+    if normalized_path.endswith(".xcodeproj/project.pbxproj") and file_path:
         extras = _extract_pbxproj_facts(file_path)
     elif normalized_path.endswith(".xcworkspace/contents.xcworkspacedata"):
         extras = _extract_workspace_projects(source, normalized_path)

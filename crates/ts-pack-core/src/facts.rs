@@ -216,6 +216,22 @@ fn parse_file_facts(raw: &ExtractionResult, language: &str, file_path: Option<&s
                 });
             }
         }
+
+        let wrapper_specs = collect_js_http_wrappers(raw);
+        for m in pattern_matches(raw, "http_wrapper_calls") {
+            let caps = capture_texts(m);
+            let wrapper = first_capture(&caps, "wrapper");
+            let path = first_capture(&caps, "path").and_then(normalize_wrapper_call_path);
+            if let (Some(wrapper), Some(path)) = (wrapper, path)
+                && let Some((client, method)) = wrapper_specs.get(wrapper)
+            {
+                facts.http_calls.push(HttpCallFact {
+                    client: client.clone(),
+                    method: method.clone(),
+                    path,
+                });
+            }
+        }
     }
 
     if lang == "swift" {
@@ -777,6 +793,81 @@ fn normalize_method(value: Option<&str>) -> Option<String> {
     }
 }
 
+fn normalize_wrapper_call_path(value: &str) -> Option<String> {
+    let trimmed = value.trim();
+    if !trimmed.starts_with('/') {
+        return None;
+    }
+    let no_query = trimmed
+        .split('?')
+        .next()
+        .unwrap_or(trimmed)
+        .split('#')
+        .next()
+        .unwrap_or(trimmed)
+        .trim_end_matches('/');
+    if no_query.is_empty() {
+        None
+    } else {
+        Some(no_query.replace("//", "/"))
+    }
+}
+
+fn collect_js_http_wrappers(raw: &ExtractionResult) -> AHashMap<String, (String, String)> {
+    let mut wrappers = AHashMap::new();
+    for m in pattern_matches(raw, "http_wrapper_defs") {
+        let caps = capture_texts(m);
+        let wrapper = first_capture(&caps, "wrapper");
+        let arg = first_capture(&caps, "params").and_then(parse_single_js_param);
+        let body = first_capture(&caps, "body");
+        if let (Some(wrapper), Some(arg), Some(body)) = (wrapper, arg, body)
+            && let Some(spec) = infer_js_http_wrapper(body, arg)
+        {
+            wrappers.insert(wrapper.to_string(), spec);
+        }
+    }
+    wrappers
+}
+
+fn parse_single_js_param(params: &str) -> Option<&str> {
+    let trimmed = params.trim();
+    let inner = trimmed.strip_prefix('(')?.strip_suffix(')')?.trim();
+    if inner.is_empty() || inner.contains(',') || inner.contains('{') || inner.contains('[') {
+        return None;
+    }
+    let before_type = inner.split(':').next().unwrap_or(inner).trim();
+    let name = before_type.strip_prefix("...").unwrap_or(before_type).trim();
+    if name.is_empty() {
+        None
+    } else {
+        Some(name)
+    }
+}
+
+fn infer_js_http_wrapper(body: &str, arg: &str) -> Option<(String, String)> {
+    let escaped_arg = regex::escape(arg);
+    let fetch_re = Regex::new(&format!(r"fetch\s*\(\s*{}\s*(?:,|\))", escaped_arg)).ok()?;
+    if fetch_re.is_match(body) {
+        let method_re = Regex::new(r#"method\s*:\s*["'](?P<method>[A-Za-z]+)["']"#).ok()?;
+        let method = method_re
+            .captures(body)
+            .and_then(|caps| caps.name("method").map(|m| m.as_str()))
+            .and_then(|m| normalize_method(Some(m)))
+            .unwrap_or_else(|| "GET".to_string());
+        return Some(("fetch".to_string(), method));
+    }
+
+    let member_re = Regex::new(&format!(
+        r"(?P<client>[A-Za-z_][A-Za-z0-9_]*)\s*\.\s*(?P<method>get|post|put|patch|delete|head|options)\s*\(\s*{}\s*(?:,|\))",
+        escaped_arg
+    ))
+    .ok()?;
+    let caps = member_re.captures(body)?;
+    let client = caps.name("client")?.as_str().to_string();
+    let method = normalize_method(caps.name("method").map(|m| m.as_str()))?;
+    Some((client, method))
+}
+
 fn parse_rust_route_attr(attr: &str) -> Option<(String, String, String)> {
     let trimmed = attr.trim();
     let route_re = Regex::new(
@@ -870,6 +961,40 @@ fn web_patterns() -> AHashMap<String, ExtractionPattern> {
                function: (identifier) @client \
                arguments: (arguments (string (string_fragment) @path))) @http_call \
              (#eq? @client \"fetch\")",
+            200,
+        ),
+    );
+    patterns.insert(
+        "http_wrapper_defs".to_string(),
+        text_pattern(
+            "[(function_declaration \
+                name: (identifier) @wrapper \
+                parameters: (formal_parameters) @params \
+                body: (statement_block) @body) \
+              (lexical_declaration \
+                (variable_declarator \
+                  name: (identifier) @wrapper \
+                  value: (arrow_function \
+                    parameters: (formal_parameters) @params \
+                    body: [(statement_block) @body (call_expression) @body]))) \
+              (lexical_declaration \
+                (variable_declarator \
+                  name: (identifier) @wrapper \
+                  value: (function_expression \
+                    parameters: (formal_parameters) @params \
+                    body: (statement_block) @body)))] @wrapper_def",
+            200,
+        ),
+    );
+    patterns.insert(
+        "http_wrapper_calls".to_string(),
+        text_pattern(
+            "[(call_expression \
+                function: (identifier) @wrapper \
+                arguments: (arguments (string (string_fragment) @path))) \
+              (call_expression \
+                function: (identifier) @wrapper \
+                arguments: (arguments (template_string (string_fragment) @path)))] @wrapper_call",
             200,
         ),
     );
@@ -1079,6 +1204,67 @@ mod tests {
                 .http_calls
                 .iter()
                 .any(|item| item.client == "client" && item.method == "GET" && item.path == "/api/properties")
+        );
+    }
+
+    #[test]
+    fn extracts_typescript_wrapper_http_facts() {
+        if !crate::has_language("typescript") {
+            return;
+        }
+
+        let source = r#"
+            async function api(path) {
+                return fetch(path, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+            }
+
+            const postJson = (path) => client.post(path, { ok: true });
+
+            await api(`/api/financials/tax-package?year=${year}`);
+            await postJson("/api/leases");
+        "#;
+
+        let facts = extract_file_facts(source, "typescript", Some("src/public/assets/financial-summary.js")).unwrap();
+        assert!(
+            facts
+                .http_calls
+                .iter()
+                .any(|item| item.client == "fetch" && item.method == "GET" && item.path == "/api/financials/tax-package")
+        );
+        assert!(
+            facts
+                .http_calls
+                .iter()
+                .any(|item| item.client == "client" && item.method == "POST" && item.path == "/api/leases")
+        );
+    }
+
+    #[test]
+    fn extracts_multiline_express_route_defs() {
+        if !crate::has_language("typescript") {
+            return;
+        }
+
+        let source = r#"
+            export const registerFinanceAdminRoutes = (router: Router) => {
+              router.get(
+                "/financials/tax-package",
+                requireRole(["admin"]),
+                async (req, res) => {
+                  res.json({});
+                }
+              );
+            };
+        "#;
+
+        let facts = extract_file_facts(source, "typescript", Some("src/api/routes/financeAdminRoutes.ts")).unwrap();
+        assert!(
+            facts
+                .route_defs
+                .iter()
+                .any(|item| item.method == "GET" && item.path == "/financials/tax-package")
         );
     }
 

@@ -310,15 +310,7 @@ fn collect_api_edges(
 ) -> (Vec<FileEdgeRow>, Vec<ApiRouteCallRow>, Vec<ApiRouteHandlerRow>) {
     let api_target_paths: Vec<String> = file_id_by_path
         .keys()
-        .filter(|fp| {
-            (fp.ends_with("openapi.yaml")
-                || fp.ends_with("openapi.json")
-                || fp.ends_with("routes.ts")
-                || fp.ends_with("routes.js")
-                || fp.ends_with("route.ts")
-                || fp.ends_with("route.js"))
-                && (fp.contains("/api/") || fp.starts_with("api/") || fp.contains("/pages/api/") || fp.contains("/app/"))
-        })
+        .filter(|fp| is_api_target_path(fp))
         .cloned()
         .collect();
 
@@ -330,7 +322,7 @@ fn collect_api_edges(
                 let method = normalize_method(&route.method);
                 if route.path.starts_with('/') {
                     route_targets.entry((route.path.clone(), method.clone())).or_insert(fid.clone());
-                    if fp.contains("/api/") || fp.starts_with("api/") {
+                    if is_api_route_source(fp) {
                         express_routes.push((route.path.clone(), method, fid.clone()));
                     }
                 }
@@ -440,6 +432,25 @@ fn collect_api_edges(
     }
 
     (api_edges, route_calls, route_handlers)
+}
+
+fn is_api_route_source(fp: &str) -> bool {
+    let normalized = fp.replace('\\', "/");
+    if !(normalized.contains("/api/") || normalized.starts_with("api/") || normalized.contains("/pages/api/") || normalized.contains("/app/")) {
+        return false;
+    }
+    normalized.ends_with(".ts")
+        || normalized.ends_with(".js")
+        || normalized.ends_with(".tsx")
+        || normalized.ends_with(".jsx")
+}
+
+fn is_api_target_path(fp: &str) -> bool {
+    let normalized = fp.replace('\\', "/");
+    if normalized.ends_with("openapi.yaml") || normalized.ends_with("openapi.json") {
+        return true;
+    }
+    is_api_route_source(&normalized)
 }
 
 fn find_filepath(file_id: &str, file_id_by_path: &HashMap<String, String>) -> Option<String> {
@@ -953,6 +964,7 @@ fn workspace_display_name(workspace_path: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tree_sitter_language_pack::facts::{HttpCallFact, RouteDefFact};
     use tree_sitter_language_pack::facts::{CargoDependencyFact, CargoPackageFact, CargoWorkspaceMemberFact};
 
     #[test]
@@ -1018,6 +1030,68 @@ mod tests {
         assert!(crate_files.iter().any(|row| row.crate_name == "api" && row.manifest_path == "crates/api/Cargo.toml"));
         assert!(dependencies.iter().any(|row| {
             row.src_crate_name == "api" && row.tgt_crate_name == "serde" && row.section == "dependencies"
+        }));
+    }
+
+    #[test]
+    fn collects_api_route_edges_from_named_route_files_under_api_routes() {
+        let file_id_by_path = HashMap::from([
+            ("src/public/assets/financial-summary.js".to_string(), "f1".to_string()),
+            ("src/api/routes/financeAdminRoutes.ts".to_string(), "f2".to_string()),
+            ("src/app.ts".to_string(), "f3".to_string()),
+        ]);
+
+        let file_facts = HashMap::from([
+            (
+                "src/public/assets/financial-summary.js".to_string(),
+                ts_pack::FileFacts {
+                    http_calls: vec![HttpCallFact {
+                        client: "fetch".to_string(),
+                        method: "GET".to_string(),
+                        path: "/api/financials/tax-package".to_string(),
+                    }],
+                    ..Default::default()
+                },
+            ),
+            (
+                "src/api/routes/financeAdminRoutes.ts".to_string(),
+                ts_pack::FileFacts {
+                    route_defs: vec![RouteDefFact {
+                        framework: "express".to_string(),
+                        method: "GET".to_string(),
+                        path: "/financials/tax-package".to_string(),
+                    }],
+                    ..Default::default()
+                },
+            ),
+        ]);
+
+        let manifest_abs = HashMap::from([
+            (
+                "src/app.ts".to_string(),
+                "/tmp/src/app.ts".to_string(),
+            ),
+        ]);
+
+        std::fs::create_dir_all("/tmp/src").ok();
+        std::fs::write("/tmp/src/app.ts", r#"app.use("/api", router);"#).unwrap();
+
+        let (api_edges, route_calls, route_handlers) =
+            collect_api_edges(&file_id_by_path, &file_facts, &manifest_abs, &Arc::from("proj"));
+
+        assert!(api_edges.iter().any(|row| {
+            row.src_filepath == "src/public/assets/financial-summary.js"
+                && row.tgt_filepath == "src/api/routes/financeAdminRoutes.ts"
+        }));
+        assert!(route_calls.iter().any(|row| {
+            row.src_filepath == "src/public/assets/financial-summary.js"
+                && row.path == "/api/financials/tax-package"
+                && row.method == "GET"
+        }));
+        assert!(route_handlers.iter().any(|row| {
+            row.tgt_filepath == "src/api/routes/financeAdminRoutes.ts"
+                && row.path == "/api/financials/tax-package"
+                && row.method == "GET"
         }));
     }
 }

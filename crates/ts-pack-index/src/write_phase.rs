@@ -81,6 +81,9 @@ pub(crate) async fn run_write_phases(
     // relationship groups. Serializing these batches avoids transient deadlocks
     // from overlapping MERGE lock acquisition across concurrent transactions.
     let call_edge_concurrency = 1usize;
+    // CALLS_DB_MODEL writes MERGE shared File/Model pairs and can deadlock on
+    // larger repos when chunked concurrently. Keep this path serialized too.
+    let db_model_edge_concurrency = 1usize;
 
     let WriteInputs {
         all_files,
@@ -205,7 +208,7 @@ pub(crate) async fn run_write_phases(
         let t_dbm = Instant::now();
         let dbm_count = db_model_edges.len();
         stream::iter(db_model_edges.chunks(CALLS_BATCH_SIZE))
-            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+            .for_each_concurrent(db_model_edge_concurrency, |chunk| {
                 let g = Arc::clone(graph);
                 async move { writers::write_db_model_edges(&g, chunk).await }
             })
