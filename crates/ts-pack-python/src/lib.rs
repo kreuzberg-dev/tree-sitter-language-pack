@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
-use pyo3::types::{PyDict, PyList};
+use pyo3::types::{PyDict, PyList, PyTuple};
+use std::collections::HashSet;
 use std::path::Path;
 use std::sync::Mutex;
 
@@ -802,6 +803,175 @@ fn cache_dir(_py: Python<'_>) -> PyResult<String> {
     Ok(dir.to_string_lossy().into_owned())
 }
 
+#[pyfunction(signature = (all_chunks, existing_ids = None))]
+fn build_semantic_sync_plan(
+    py: Python<'_>,
+    all_chunks: Vec<Vec<Py<PyAny>>>,
+    existing_ids: Option<Vec<String>>,
+) -> PyResult<Py<PyAny>> {
+    let existing: HashSet<String> = existing_ids.unwrap_or_default().into_iter().collect();
+    let new_chunks = PyList::empty(py);
+    let prune_targets = PyList::empty(py);
+    let mut total_chunks: usize = 0;
+
+    for file_chunks in all_chunks {
+        if file_chunks.is_empty() {
+            continue;
+        }
+        total_chunks += file_chunks.len();
+
+        let mut file_path: Option<String> = None;
+        let mut chunk_ids: Vec<String> = Vec::new();
+
+        for chunk in &file_chunks {
+            let chunk_any = chunk.bind(py);
+            let chunk_dict = chunk_any.cast::<PyDict>()?;
+            if let Some(ref_id_any) = chunk_dict.get_item("ref_id")? {
+                let ref_id = ref_id_any.extract::<String>()?;
+                if !existing.contains(&ref_id) {
+                    new_chunks.append(chunk_any)?;
+                }
+                chunk_ids.push(ref_id);
+            }
+            if file_path.is_none() {
+                if let Some(meta_any) = chunk_dict.get_item("metadata")? {
+                    if let Ok(meta_dict) = meta_any.cast::<PyDict>() {
+                        if let Some(file_any) = meta_dict.get_item("file")? {
+                            file_path = Some(file_any.extract::<String>()?);
+                        }
+                    }
+                }
+            }
+        }
+
+        if let Some(path) = file_path {
+            if !chunk_ids.is_empty() {
+                let target = PyDict::new(py);
+                target.set_item("file_path", path)?;
+                target.set_item("chunk_ids", chunk_ids)?;
+                prune_targets.append(target)?;
+            }
+        }
+    }
+
+    let result = PyDict::new(py);
+    result.set_item("new_chunks", &new_chunks)?;
+    result.set_item("skipped_chunks", total_chunks.saturating_sub(new_chunks.len()))?;
+    result.set_item("prune_targets", prune_targets)?;
+    result.set_item("total_chunks", total_chunks)?;
+    Ok(result.into_any().unbind())
+}
+
+#[pyfunction(signature = (batch, project_id, expected_dim = None, created_at = None))]
+fn build_codebase_embedding_rows(
+    py: Python<'_>,
+    batch: Vec<Py<PyAny>>,
+    project_id: String,
+    expected_dim: Option<usize>,
+    created_at: Option<f64>,
+) -> PyResult<Py<PyAny>> {
+    let rows = PyList::empty(py);
+    let mut now = created_at;
+    let json_mod = py.import("json")?;
+    let dumps = json_mod.getattr("dumps")?;
+
+    for item in batch {
+        let item_any = item.bind(py);
+        let item_dict = item_any.cast::<PyDict>()?;
+
+        let Some(chunk_id_any) = item_dict.get_item("ref_id")? else {
+            continue;
+        };
+        let chunk_id = chunk_id_any.extract::<String>()?;
+
+        let Some(text_any) = item_dict.get_item("text")? else {
+            continue;
+        };
+        let text = match text_any.extract::<String>() {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+
+        let Some(vector_any) = item_dict.get_item("vector")? else {
+            continue;
+        };
+        let vector_list = match vector_any.cast::<PyList>() {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+        if let Some(dim) = expected_dim {
+            if vector_list.len() != dim {
+                continue;
+            }
+        }
+
+        let created = if let Some(ts) = now {
+            ts
+        } else {
+            let time_mod = py.import("time")?;
+            let ts = time_mod.getattr("time")?.call0()?.extract::<f64>()?;
+            now = Some(ts);
+            ts
+        };
+
+        let metadata_obj = item_dict.get_item("metadata")?;
+        let (file_path, chunk_index, metadata_json) = if let Some(meta_any) = metadata_obj {
+            if let Ok(meta_dict) = meta_any.cast::<PyDict>() {
+                let file_path = match meta_dict.get_item("file")? {
+                    Some(v) => v.extract::<String>().unwrap_or_default(),
+                    None => String::new(),
+                };
+                let chunk_index = match meta_dict.get_item("chunk_index")? {
+                    Some(v) => v.extract::<i64>().ok(),
+                    None => None,
+                }
+                .or_else(|| match meta_dict.get_item("start_line") {
+                    Ok(Some(v)) => v.extract::<i64>().ok(),
+                    _ => None,
+                })
+                .unwrap_or(0);
+                let metadata_json = dumps.call1((meta_any,))?.extract::<String>()?;
+                (file_path, chunk_index, metadata_json)
+            } else {
+                (String::new(), 0_i64, "{}".to_string())
+            }
+        } else {
+            (String::new(), 0_i64, "{}".to_string())
+        };
+
+        let vector_text = {
+            let mut values = Vec::with_capacity(vector_list.len());
+            for value in vector_list.iter() {
+                values.push(value.extract::<f64>()?.to_string());
+            }
+            format!("[{}]", values.join(","))
+        };
+
+        let ref_type = match item_dict.get_item("ref_type")? {
+            Some(v) => v.extract::<String>().unwrap_or_else(|_| "code_chunk".to_string()),
+            None => "code_chunk".to_string(),
+        };
+
+        let row = PyTuple::new(
+            py,
+            [
+                chunk_id.into_pyobject(py)?.into_any(),
+                project_id.clone().into_pyobject(py)?.into_any(),
+                file_path.into_pyobject(py)?.into_any(),
+                ref_type.into_pyobject(py)?.into_any(),
+                chunk_index.into_pyobject(py)?.into_any(),
+                text.into_pyobject(py)?.into_any(),
+                vector_text.into_pyobject(py)?.into_any(),
+                metadata_json.into_pyobject(py)?.into_any(),
+                created.into_pyobject(py)?.into_any(),
+            ],
+        )?;
+        rows.append(row)?;
+    }
+
+    Ok(rows.into_any().unbind())
+}
+
 // ---------------------------------------------------------------------------
 // Module registration
 // ---------------------------------------------------------------------------
@@ -845,5 +1015,7 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(downloaded_languages, m)?)?;
     m.add_function(wrap_pyfunction!(clean_cache, m)?)?;
     m.add_function(wrap_pyfunction!(cache_dir, m)?)?;
+    m.add_function(wrap_pyfunction!(build_semantic_sync_plan, m)?)?;
+    m.add_function(wrap_pyfunction!(build_codebase_embedding_rows, m)?)?;
     Ok(())
 }

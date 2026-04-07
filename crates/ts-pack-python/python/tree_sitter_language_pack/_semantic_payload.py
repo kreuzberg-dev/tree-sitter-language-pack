@@ -7,6 +7,7 @@ from typing import Any
 import json
 
 from . import extract_file_facts, process, ProcessConfig
+from . import _native as _native
 
 _TS_QUERYRAW_TAGGED_TEMPLATE_RE = re.compile(r"\$queryRaw(?:Unsafe)?\s*<.+>\s*`")
 
@@ -462,6 +463,41 @@ def build_codebase_embedding_rows(
             )
         )
     return rows
+
+
+_native_build_semantic_sync_plan = getattr(_native, "build_semantic_sync_plan", None)
+if _native_build_semantic_sync_plan is not None:
+    _python_build_semantic_sync_plan = build_semantic_sync_plan
+
+    def build_semantic_sync_plan(
+        all_chunks: list[list[dict[str, Any]]],
+        existing_ids: set[str] | None = None,
+    ) -> dict[str, Any]:
+        payload = _native_build_semantic_sync_plan(
+            all_chunks,
+            sorted(existing_ids) if existing_ids else None,
+        )
+        return dict(payload or {})
+
+
+_native_build_codebase_embedding_rows = getattr(_native, "build_codebase_embedding_rows", None)
+if _native_build_codebase_embedding_rows is not None:
+    _python_build_codebase_embedding_rows = build_codebase_embedding_rows
+
+    def build_codebase_embedding_rows(
+        batch: list[dict[str, Any]],
+        project_id: str,
+        *,
+        expected_dim: int | None = None,
+        created_at: float | None = None,
+    ) -> list[tuple[Any, ...]]:
+        rows = _native_build_codebase_embedding_rows(
+            batch,
+            project_id,
+            expected_dim=expected_dim,
+            created_at=created_at,
+        )
+        return list(rows or [])
 
 
 CODEBASE_EMBEDDINGS_UPSERT_SQL = """\
