@@ -242,9 +242,6 @@ from ._semantic_payload import (
     build_swift_chunks,
     execute_codebase_embedding_upsert,
     execute_semantic_index_driver as _python_execute_semantic_index_driver,
-    execute_semantic_index_prepare,
-    execute_semantic_index_rounds,
-    execute_semantic_sync,
 )
 
 execute_semantic_index_driver = getattr(
@@ -306,9 +303,6 @@ __all__ = [
     "downloaded_languages",
     "execute_codebase_embedding_upsert",
     "execute_semantic_index_driver",
-    "execute_semantic_index_prepare",
-    "execute_semantic_index_rounds",
-    "execute_semantic_sync",
     "extract",
     "extract_file_facts",
     "extract_swift_semantic_facts",

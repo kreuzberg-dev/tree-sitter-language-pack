@@ -447,9 +447,6 @@ __all__ = [
     "build_semantic_payload",
     "execute_codebase_embedding_upsert",
     "execute_semantic_index_driver",
-    "execute_semantic_index_prepare",
-    "execute_semantic_index_rounds",
-    "execute_semantic_sync",
     "extract",
     "enrich_swift_graph",
     "extract_swift_semantic_facts",
@@ -530,23 +527,6 @@ async def execute_codebase_embedding_upsert(
     expected_dim: int | None = None,
     created_at: float | None = None,
 ) -> int: ...
-async def execute_semantic_index_prepare(
-    conn: Any,
-    project_id: str,
-    manifest_paths: list[str],
-    all_chunks: list[list[dict[str, Any]]],
-    *,
-    rebuild: bool = False,
-) -> dict[str, Any]: ...
-async def execute_semantic_index_rounds(
-    new_chunks: list[dict[str, Any]],
-    *,
-    batch_size: int,
-    concurrency: int,
-    embed_batch_fn: Any,
-    write_batch_fn: Any,
-    progress_fn: Any | None = None,
-) -> dict[str, Any]: ...
 async def execute_semantic_index_driver(
     conn: Any,
     project_id: str,
@@ -559,11 +539,6 @@ async def execute_semantic_index_driver(
     embed_batch_fn: Any,
     write_batch_fn: Any,
     progress_fn: Any | None = None,
-) -> dict[str, Any]: ...
-async def execute_semantic_sync(
-    conn: Any,
-    project_id: str,
-    all_chunks: list[list[dict[str, Any]]],
 ) -> dict[str, Any]: ...
 def extract(source: str, config: dict[str, object]) -> dict[str, Any]: ...
 def validate_extraction(config: dict[str, object]) -> dict[str, Any]: ...
