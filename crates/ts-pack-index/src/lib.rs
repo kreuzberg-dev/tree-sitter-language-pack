@@ -1,12 +1,12 @@
 mod clone_enrich;
 mod pathing;
+mod parse_phase;
 mod swift;
 mod tags;
 mod writers;
 
 use futures::{StreamExt, stream};
 use neo4rs::{Graph, Query};
-use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -64,36 +64,32 @@ const REL_CONCURRENCY: usize = 2;
 const MANIFEST_BATCH_SIZE: usize = 1000;
 
 /// Max source file size: skip files larger than 1 MB
-const MAX_FILE_BYTES: usize = 1_000_000;
+pub(crate) const MAX_FILE_BYTES: usize = 1_000_000;
 
 // ---------------------------------------------------------------------------
 // Clone grouping (winnow) defaults
 // ---------------------------------------------------------------------------
 
-const WINNOW_MIN_TOKENS: usize = 20;
-const WINNOW_MIN_FINGERPRINTS: usize = 12;
-const WINNOW_BUCKET_LIMIT: usize = 40;
-const WINNOW_FALLBACK_HASHES: usize = 6;
-const WINNOW_FORCE_ALL_HASHES_MAX_FPS: usize = 25;
-const WINNOW_MIN_OVERLAP: f64 = 0.6;
-const WINNOW_TOKEN_SIM_THRESHOLD: f64 = 0.65;
-const WINNOW_KGRAM_SIM_THRESHOLD: f64 = 0.7;
-const WINNOW_MIN_SCORE: f64 = 0.85;
-const WINNOW_SMALL_TOKEN_THRESHOLD: usize = 50;
+pub(crate) const WINNOW_MIN_TOKENS: usize = 20;
+pub(crate) const WINNOW_MIN_FINGERPRINTS: usize = 12;
+pub(crate) const WINNOW_BUCKET_LIMIT: usize = 40;
+pub(crate) const WINNOW_FALLBACK_HASHES: usize = 6;
+pub(crate) const WINNOW_FORCE_ALL_HASHES_MAX_FPS: usize = 25;
+pub(crate) const WINNOW_MIN_OVERLAP: f64 = 0.6;
+pub(crate) const WINNOW_TOKEN_SIM_THRESHOLD: f64 = 0.65;
+pub(crate) const WINNOW_KGRAM_SIM_THRESHOLD: f64 = 0.7;
+pub(crate) const WINNOW_MIN_SCORE: f64 = 0.85;
+pub(crate) const WINNOW_SMALL_TOKEN_THRESHOLD: usize = 50;
 
-const WINNOW_SMALL_K: usize = 5;
-const WINNOW_SMALL_W: usize = 3;
-const WINNOW_MEDIUM_K: usize = 9;
-const WINNOW_MEDIUM_W: usize = 5;
-const WINNOW_LARGE_K: usize = 15;
-const WINNOW_LARGE_W: usize = 7;
+pub(crate) const WINNOW_SMALL_K: usize = 5;
+pub(crate) const WINNOW_SMALL_W: usize = 3;
+pub(crate) const WINNOW_MEDIUM_K: usize = 9;
+pub(crate) const WINNOW_MEDIUM_W: usize = 5;
+pub(crate) const WINNOW_LARGE_K: usize = 15;
+pub(crate) const WINNOW_LARGE_W: usize = 7;
 
 fn external_api_id(project_id: &str, url: &str) -> String {
     pathing::external_api_id(project_id, url)
-}
-
-fn join_url(base: &str, path: &str) -> Option<String> {
-    pathing::join_url(base, path)
 }
 
 fn clean_import_name(name: &str) -> String {
@@ -155,77 +151,46 @@ fn normalize_swift_type(raw: &str) -> Option<String> {
     swift::normalize_swift_type(raw)
 }
 
-fn parse_swift_var_types(source: &str) -> std::collections::HashMap<String, String> {
-    swift::parse_swift_var_types(source)
-}
-
-fn tokenize_normalized(source: &[u8]) -> Vec<u64> {
-    clone_enrich::tokenize_normalized(source)
-}
-
-fn winnow_fingerprints(tokens: &[u64], k: usize, window: usize) -> HashSet<u64> {
-    clone_enrich::winnow_fingerprints(tokens, k, window)
-}
-
-fn kgram_hashes(tokens: &[u64], k: usize) -> HashSet<u64> {
-    clone_enrich::kgram_hashes(tokens, k)
-}
-
-fn collect_swift_extensions(
-    items: &[ts_pack::StructureItem],
-    map: &mut std::collections::HashMap<String, std::collections::HashSet<String>>,
-) {
-    swift::collect_swift_extensions(items, map)
-}
-
-fn collect_swift_extension_spans(items: &[ts_pack::StructureItem], spans: &mut Vec<(usize, usize, String)>) {
-    swift::collect_swift_extension_spans(items, spans)
-}
-
-fn collect_swift_type_spans(items: &[ts_pack::StructureItem], spans: &mut Vec<(usize, usize, String)>) {
-    swift::collect_swift_type_spans(items, spans)
-}
-
 // ---------------------------------------------------------------------------
 // Typed payload structs (avoids serde_json::json! round-trips in hot loops)
 // ---------------------------------------------------------------------------
 
 pub(crate) struct FileNode {
-    id: String,
-    name: String,
-    filepath: String,
-    project_id: Arc<str>,
+    pub(crate) id: String,
+    pub(crate) name: String,
+    pub(crate) filepath: String,
+    pub(crate) project_id: Arc<str>,
 }
 
 pub(crate) struct SymbolNode {
-    id: String,
-    name: String,
-    kind: String,
-    qualified_name: Option<String>,
-    filepath: String,
-    project_id: Arc<str>,
-    start_line: u32,
-    end_line: u32,
-    start_byte: usize,
-    end_byte: usize,
-    signature: Option<String>,
-    visibility: Option<String>,
-    is_exported: bool,
-    doc_comment: Option<String>,
+    pub(crate) id: String,
+    pub(crate) name: String,
+    pub(crate) kind: String,
+    pub(crate) qualified_name: Option<String>,
+    pub(crate) filepath: String,
+    pub(crate) project_id: Arc<str>,
+    pub(crate) start_line: u32,
+    pub(crate) end_line: u32,
+    pub(crate) start_byte: usize,
+    pub(crate) end_byte: usize,
+    pub(crate) signature: Option<String>,
+    pub(crate) visibility: Option<String>,
+    pub(crate) is_exported: bool,
+    pub(crate) doc_comment: Option<String>,
 }
 
 pub(crate) struct RelRow {
-    parent: String,
-    child: String,
+    pub(crate) parent: String,
+    pub(crate) child: String,
 }
 
 /// One resolved call edge: caller is a Symbol (or File as fallback) → callee symbol name.
 pub(crate) struct SymbolCallRow {
-    caller_id: String, // id of the calling Symbol node (or File if at file scope)
-    callee: String,    // name of the callee symbol
-    project_id: Arc<str>,
-    caller_filepath: String, // to exclude self-calls from the MATCH filter
-    allow_same_file: bool,
+    pub(crate) caller_id: String, // id of the calling Symbol node (or File if at file scope)
+    pub(crate) callee: String,    // name of the callee symbol
+    pub(crate) project_id: Arc<str>,
+    pub(crate) caller_filepath: String, // to exclude self-calls from the MATCH filter
+    pub(crate) allow_same_file: bool,
 }
 
 /// One inferred call edge (Swift extension resolution).
@@ -317,11 +282,11 @@ pub(crate) struct LaunchEdgeRow {
     project_id: String,
 }
 
-struct ImportSymbolRequest {
-    src_id: String,
-    src_filepath: String,
-    module: String,
-    items: Vec<String>,
+pub(crate) struct ImportSymbolRequest {
+    pub(crate) src_id: String,
+    pub(crate) src_filepath: String,
+    pub(crate) module: String,
+    pub(crate) items: Vec<String>,
 }
 
 pub(crate) struct ImportSymbolEdgeRow {
@@ -339,22 +304,22 @@ pub(crate) struct ExportSymbolEdgeRow {
     tgt: String,
 }
 
-struct SwiftFileContext {
-    file_id: String,
-    filepath: String,
-    symbol_spans: Vec<(usize, usize, String)>,
-    extension_spans: Vec<(usize, usize, String)>,
-    type_spans: Vec<(usize, usize, String)>,
-    call_sites: Vec<tags::CallSite>,
-    var_types: std::collections::HashMap<String, String>,
+pub(crate) struct SwiftFileContext {
+    pub(crate) file_id: String,
+    pub(crate) filepath: String,
+    pub(crate) symbol_spans: Vec<(usize, usize, String)>,
+    pub(crate) extension_spans: Vec<(usize, usize, String)>,
+    pub(crate) type_spans: Vec<(usize, usize, String)>,
+    pub(crate) call_sites: Vec<tags::CallSite>,
+    pub(crate) var_types: std::collections::HashMap<String, String>,
 }
 
-struct PythonFileContext {
-    file_id: String,
-    filepath: String,
-    symbol_spans: Vec<(usize, usize, String)>,
-    call_sites: Vec<tags::CallSite>,
-    module_aliases: std::collections::HashMap<String, String>,
+pub(crate) struct PythonFileContext {
+    pub(crate) file_id: String,
+    pub(crate) filepath: String,
+    pub(crate) symbol_spans: Vec<(usize, usize, String)>,
+    pub(crate) call_sites: Vec<tags::CallSite>,
+    pub(crate) module_aliases: std::collections::HashMap<String, String>,
 }
 
 pub(crate) struct CloneCandidate {
@@ -598,13 +563,13 @@ impl LaunchEdgeRow {
 }
 
 pub(crate) struct ImportNode {
-    id: String,
-    file_id: String,
-    name: String,
-    source: String,
-    is_wildcard: bool,
-    project_id: Arc<str>,
-    filepath: String,
+    pub(crate) id: String,
+    pub(crate) file_id: String,
+    pub(crate) name: String,
+    pub(crate) source: String,
+    pub(crate) is_wildcard: bool,
+    pub(crate) project_id: Arc<str>,
+    pub(crate) filepath: String,
 }
 
 // Conversion to BoltType-compatible Value (we still use Value here to stay
@@ -765,106 +730,6 @@ async fn write_launch_edges(graph: &Arc<Graph>, batch: &[LaunchEdgeRow]) {
 }
 
 // ---------------------------------------------------------------------------
-// Per-file parse output
-// ---------------------------------------------------------------------------
-
-struct FileResult {
-    file_node: FileNode,
-    symbols: HashMap<&'static str, Vec<SymbolNode>>,
-    relations: Vec<RelRow>,
-    imports: Vec<ImportNode>,
-    import_rels: Vec<RelRow>,
-    symbol_calls: Vec<SymbolCallRow>, // attributed call edges (Symbol→Symbol or File→Symbol)
-    swift_extensions: Option<std::collections::HashMap<String, std::collections::HashSet<String>>>,
-    swift_context: Option<SwiftFileContext>,
-    python_context: Option<PythonFileContext>,
-    clone_candidates: Vec<CloneCandidate>,
-    db_delegates: Vec<String>,
-    external_urls: Vec<String>,
-    import_symbol_requests: Vec<ImportSymbolRequest>,
-    launch_calls: Vec<String>,
-}
-
-// ---------------------------------------------------------------------------
-// Symbol-tree walker (recursive, avoids re-allocating label strings)
-// ---------------------------------------------------------------------------
-
-fn walk_item(
-    item: &ts_pack::StructureItem,
-    parent_id: &str,
-    filepath: &str,
-    project_id: Arc<str>,
-    exported_names: &std::collections::HashSet<String>,
-    symbols: &mut HashMap<&'static str, Vec<SymbolNode>>,
-    relations: &mut Vec<RelRow>,
-) {
-    let label: &'static str = match item.kind {
-        ts_pack::StructureKind::Class => "Class",
-        ts_pack::StructureKind::Function | ts_pack::StructureKind::Method => "Function",
-        ts_pack::StructureKind::Interface => "Interface",
-        ts_pack::StructureKind::Protocol => "Protocol",
-        ts_pack::StructureKind::Trait => "Trait",
-        ts_pack::StructureKind::Impl => "Impl",
-        ts_pack::StructureKind::Struct => "Struct",
-        ts_pack::StructureKind::Enum => "Enum",
-        ts_pack::StructureKind::EnumCase => "EnumCase",
-        ts_pack::StructureKind::Extension => "Extension",
-        ts_pack::StructureKind::TypeAlias => "TypeAlias",
-        ts_pack::StructureKind::AssociatedType => "AssociatedType",
-        ts_pack::StructureKind::Module | ts_pack::StructureKind::Namespace => "Namespace",
-        ts_pack::StructureKind::Section => "Section",
-        _ => "Symbol",
-    };
-
-    let name = item.name.as_deref().unwrap_or("unnamed");
-    // ID encodes project, kind, file, and name. Position (start_line/start_byte)
-    // is intentionally excluded so that MERGE correctly matches an existing symbol
-    // node after the file is edited and line numbers shift — avoiding ghost duplicates.
-    let node_id = format!("{}:{}:{}:{}", project_id, label.to_ascii_lowercase(), filepath, name,);
-
-    // is_exported: true if visibility is public/pub, or if the name appears in result.exports
-    let is_exported = item
-        .visibility
-        .as_deref()
-        .map(|v| v == "public" || v == "pub" || v.starts_with("pub("))
-        .unwrap_or(false)
-        || exported_names.contains(name);
-
-    symbols.entry(label).or_default().push(SymbolNode {
-        id: node_id.clone(),
-        name: name.to_string(),
-        kind: format!("{:?}", item.kind),
-        qualified_name: item.qualified_name.clone(),
-        filepath: filepath.to_string(),
-        project_id: Arc::clone(&project_id),
-        start_line: (item.span.start_line + 1) as u32,
-        end_line: (item.span.end_line + 1) as u32,
-        start_byte: item.span.start_byte,
-        end_byte: item.span.end_byte,
-        signature: item.signature.clone(),
-        visibility: item.visibility.clone(),
-        is_exported,
-        doc_comment: item.doc_comment.clone(),
-    });
-    relations.push(RelRow {
-        parent: parent_id.to_string(),
-        child: node_id.clone(),
-    });
-
-    for child in &item.children {
-        walk_item(
-            child,
-            &node_id,
-            filepath,
-            Arc::clone(&project_id),
-            exported_names,
-            symbols,
-            relations,
-        );
-    }
-}
-
-// ---------------------------------------------------------------------------
 // Main entry point
 // ---------------------------------------------------------------------------
 
@@ -964,411 +829,7 @@ pub async fn index_workspace(
             batch_start + batch.len(),
         );
 
-        let pid = Arc::clone(&project_id);
-        let parse_entry = |entry: &ManifestEntry| {
-            let rel_basename = entry
-                .rel_path
-                .rsplit('/')
-                .next()
-                .unwrap_or(entry.rel_path.as_str());
-            if matches!(
-                rel_basename,
-                ".gitignore" | ".indexignore" | ".env" | ".env.example"
-            ) {
-                return None;
-            }
-            // Language detection
-            let lang_name = if entry.ext == "svg" {
-                "xml"
-            } else {
-                match ts_pack::detect_language_from_extension(&entry.ext) {
-                    Some(lang) => lang,
-                    None => {
-                        eprintln!(
-                            "[ts-pack-index] detect_language_from_extension failed: {}",
-                            entry.rel_path
-                        );
-                        return None;
-                    }
-                }
-            };
-            if !ts_pack::has_language(lang_name) {
-                if let Err(err) = ts_pack::download(&[lang_name]) {
-                    eprintln!("[ts-pack-index] download failed: {lang} ({err})", lang = lang_name);
-                    return None;
-                }
-            }
-
-            // Read source — skip oversized files
-            let source = match std::fs::read_to_string(&entry.abs_path) {
-                Ok(source) => source,
-                Err(err) => {
-                    eprintln!("[ts-pack-index] read failed: {} ({})", entry.rel_path, err);
-                    return None;
-                }
-            };
-            if source.len() > MAX_FILE_BYTES {
-                eprintln!(
-                    "[ts-pack-index] skipped oversized file: {} ({})",
-                    entry.rel_path,
-                    source.len()
-                );
-                return None;
-            }
-
-            let proc_config = ts_pack::ProcessConfig::new(lang_name).all();
-            let result = match ts_pack::process(&source, &proc_config) {
-                Ok(result) => result,
-                Err(err) => {
-                    eprintln!("[ts-pack-index] process failed: {} ({})", entry.rel_path, err);
-                    return None;
-                }
-            };
-
-            if entry.rel_path.contains("duplication_demo") {
-                eprintln!(
-                    "[ts-pack-index] debug structure: {} (structure={}, symbols={}, imports={})",
-                    entry.rel_path,
-                    result.structure.len(),
-                    result.symbols.len(),
-                    result.imports.len(),
-                );
-            }
-
-            let rel_path = &entry.rel_path;
-            let file_name = PathBuf::from(&entry.abs_path)
-                .file_name()
-                .map(|n| n.to_string_lossy().into_owned())
-                .unwrap_or_default();
-            let file_id = format!("{}:file:{}", pid, rel_path);
-
-            let file_node = FileNode {
-                id: file_id.clone(),
-                name: file_name,
-                filepath: rel_path.clone(),
-                project_id: Arc::clone(&pid),
-            };
-
-            let mut symbols: HashMap<&'static str, Vec<SymbolNode>> = HashMap::new();
-            let mut relations: Vec<RelRow> = Vec::new();
-            let mut imports: Vec<ImportNode> = Vec::new();
-            let mut import_rels: Vec<RelRow> = Vec::new();
-            let mut swift_extensions: Option<std::collections::HashMap<String, std::collections::HashSet<String>>> =
-                None;
-            let mut swift_context: Option<SwiftFileContext> = None;
-            let mut python_context: Option<PythonFileContext> = None;
-            let mut local_clone_candidates: Vec<CloneCandidate> = Vec::new();
-
-            // Build exported-name set from structural result + tags visibility
-            let mut exported_names: std::collections::HashSet<String> =
-                result.exports.iter().map(|e| e.name.clone()).collect();
-            let tags_result = ts_pack::parse_string(lang_name, source.as_bytes())
-                .ok()
-                .and_then(|tree| tags::run_tags(lang_name, &tree, source.as_bytes()));
-
-            // --- Consume tags result: split into exported names + call sites ---
-            let (tag_exported, raw_call_sites, db_delegates, external_calls, const_strings, launch_calls) =
-                match tags_result {
-                    Some(tr) => (
-                        tr.exported_names,
-                        tr.call_sites,
-                        tr.db_delegates,
-                        tr.external_calls,
-                        tr.const_strings,
-                        tr.launch_calls,
-                    ),
-                    None => (
-                        std::collections::HashSet::new(),
-                        Vec::new(),
-                        std::collections::HashSet::new(),
-                        Vec::new(),
-                        std::collections::HashMap::new(),
-                        Vec::new(),
-                    ),
-                };
-            exported_names.extend(tag_exported);
-            let call_sites = raw_call_sites;
-            let db_delegates = db_delegates.into_iter().collect::<Vec<_>>();
-            let mut external_urls: Vec<String> = Vec::new();
-            for call in external_calls {
-                let url = match call.arg {
-                    tags::ExternalCallArg::Literal(value) => Some(value),
-                    tags::ExternalCallArg::Identifier(name) => const_strings.get(&name).cloned(),
-                    tags::ExternalCallArg::ConcatIdentLiteral { ident, literal } => {
-                        const_strings.get(&ident).map(|base| format!("{base}{literal}"))
-                    }
-                    tags::ExternalCallArg::ConcatLiteralIdent { literal, ident } => {
-                        const_strings.get(&ident).map(|base| format!("{literal}{base}"))
-                    }
-                    tags::ExternalCallArg::UrlLiteral { path, base } => join_url(&base, &path),
-                    tags::ExternalCallArg::UrlWithBaseIdent { path, base_ident } => {
-                        const_strings.get(&base_ident).and_then(|base| join_url(base, &path))
-                    }
-                };
-                if let Some(url) = url {
-                    if url.starts_with("http://") || url.starts_with("https://") || url.starts_with("env://") {
-                        external_urls.push(url);
-                    }
-                }
-            }
-            let is_backend = rel_path.starts_with("src/api/")
-                || rel_path.starts_with("src/services/")
-                || rel_path.starts_with("src/webhooks/")
-                || rel_path.starts_with("src/jobs/")
-                || rel_path.starts_with("src/db/")
-                || rel_path.starts_with("src/seed/")
-                || rel_path == "src/server.ts";
-            let is_public = rel_path.starts_with("src/public/");
-            let is_backend = is_backend && !is_public;
-
-            // Walk structural tree (populates `symbols` with start/end bytes)
-            for item in &result.structure {
-                walk_item(
-                    item,
-                    &file_id,
-                    rel_path,
-                    Arc::clone(&pid),
-                    &exported_names,
-                    &mut symbols,
-                    &mut relations,
-                );
-            }
-
-            // --- Span correlation: attribute each call site to its enclosing symbol ---
-            // Build a flat list of (start_byte, end_byte, symbol_id) from all SymbolNodes.
-            // The innermost (smallest) enclosing span wins — handles nested functions.
-            let symbol_spans: Vec<(usize, usize, String)> = symbols
-                .values()
-                .flat_map(|v| v.iter())
-                .map(|s| (s.start_byte, s.end_byte, s.id.clone()))
-                .collect();
-
-            if std::env::var("LM_PROXY_CLONE_ENRICH")
-                .ok()
-                .map(|v| v != "0" && !v.eq_ignore_ascii_case("false"))
-                .unwrap_or(true)
-            {
-                if let Some(functions) = symbols.get("Function") {
-                    let source_bytes = source.as_bytes();
-                    for sym in functions {
-                        let start = sym.start_byte.min(source_bytes.len());
-                        let end = sym.end_byte.min(source_bytes.len());
-                        if end <= start {
-                            continue;
-                        }
-                        let tokens = tokenize_normalized(&source_bytes[start..end]);
-                        if tokens.len() < WINNOW_MIN_TOKENS {
-                            let kgrams = kgram_hashes(&tokens, WINNOW_SMALL_K);
-                            if kgrams.is_empty() {
-                                continue;
-                            }
-                            let token_set: HashSet<u64> = tokens.into_iter().collect();
-                            let span_len = sym.end_line.saturating_sub(sym.start_line);
-                            local_clone_candidates.push(CloneCandidate {
-                                symbol_id: sym.id.clone(),
-                                filepath: sym.filepath.clone(),
-                                span_len,
-                                token_set,
-                                fingerprints: vec![HashSet::new(), HashSet::new(), HashSet::new()],
-                                kgrams,
-                            });
-                            continue;
-                        }
-                        let mut fps_small: HashSet<u64>;
-                        let mut fps_medium: HashSet<u64>;
-                        let mut fps_large: HashSet<u64>;
-                        let mut kgrams: HashSet<u64>;
-                        if tokens.len() < WINNOW_SMALL_TOKEN_THRESHOLD {
-                            kgrams = kgram_hashes(&tokens, WINNOW_SMALL_K);
-                            fps_small = winnow_fingerprints(&tokens, WINNOW_SMALL_K, WINNOW_SMALL_W);
-                            if fps_small.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
-                                fps_small.clear();
-                            }
-                            fps_medium = HashSet::new();
-                            fps_large = HashSet::new();
-                        } else {
-                            fps_small = winnow_fingerprints(&tokens, WINNOW_SMALL_K, WINNOW_SMALL_W);
-                            if fps_small.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
-                                fps_small.clear();
-                            }
-                            fps_medium = winnow_fingerprints(&tokens, WINNOW_MEDIUM_K, WINNOW_MEDIUM_W);
-                            if fps_medium.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
-                                fps_medium.clear();
-                            }
-                            fps_large = winnow_fingerprints(&tokens, WINNOW_LARGE_K, WINNOW_LARGE_W);
-                            if fps_large.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
-                                fps_large.clear();
-                            }
-                            kgrams = HashSet::new();
-                            if fps_small.is_empty() && fps_medium.is_empty() && fps_large.is_empty() {
-                                kgrams = kgram_hashes(&tokens, WINNOW_SMALL_K);
-                            }
-                        }
-                        if fps_small.is_empty() && fps_medium.is_empty() && fps_large.is_empty() && kgrams.is_empty() {
-                            continue;
-                        }
-                        let token_set: HashSet<u64> = tokens.into_iter().collect();
-                        let span_len = sym.end_line.saturating_sub(sym.start_line);
-                        local_clone_candidates.push(CloneCandidate {
-                            symbol_id: sym.id.clone(),
-                            filepath: sym.filepath.clone(),
-                            span_len,
-                            token_set,
-                            fingerprints: vec![fps_small, fps_medium, fps_large],
-                            kgrams,
-                        });
-                    }
-                }
-            }
-
-            let mut seen_calls: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
-
-            let allow_same_file = std::env::var("TS_PACK_INCLUDE_INTRA_FILE_CALLS")
-                .ok()
-                .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
-                .unwrap_or(false);
-
-            let symbol_calls: Vec<SymbolCallRow> = call_sites
-                .clone()
-                .into_iter()
-                .filter_map(|cs| {
-                    // Find the innermost enclosing symbol (smallest span containing cs.start_byte)
-                    let caller_id = symbol_spans
-                        .iter()
-                        .filter(|(sb, eb, _)| *sb <= cs.start_byte && cs.start_byte < *eb)
-                        .min_by_key(|(sb, eb, _)| eb - sb)
-                        .map(|(_, _, id)| id.clone())
-                        .unwrap_or_else(|| file_id.clone()); // fallback: attribute to file
-
-                    // Deduplicate (caller_id, callee) pairs within this file
-                    if seen_calls.insert((caller_id.clone(), cs.callee.clone())) {
-                        Some(SymbolCallRow {
-                            caller_id,
-                            callee: cs.callee,
-                            project_id: Arc::clone(&pid),
-                            caller_filepath: rel_path.clone(),
-                            allow_same_file,
-                        })
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-
-            if lang_name == "swift" {
-                let mut ext_map: std::collections::HashMap<String, std::collections::HashSet<String>> =
-                    std::collections::HashMap::new();
-                collect_swift_extensions(&result.structure, &mut ext_map);
-                if !ext_map.is_empty() {
-                    swift_extensions = Some(ext_map);
-                }
-
-                let mut ext_spans: Vec<(usize, usize, String)> = Vec::new();
-                collect_swift_extension_spans(&result.structure, &mut ext_spans);
-
-                let mut type_spans: Vec<(usize, usize, String)> = Vec::new();
-                collect_swift_type_spans(&result.structure, &mut type_spans);
-
-                let var_types = parse_swift_var_types(&source);
-                if !var_types.is_empty() {
-                    swift_context = Some(SwiftFileContext {
-                        file_id: file_id.clone(),
-                        filepath: rel_path.clone(),
-                        symbol_spans: symbol_spans.clone(),
-                        extension_spans: ext_spans.clone(),
-                        type_spans: type_spans.clone(),
-                        call_sites: call_sites.clone(),
-                        var_types,
-                    });
-                } else if !call_sites.is_empty() {
-                    swift_context = Some(SwiftFileContext {
-                        file_id: file_id.clone(),
-                        filepath: rel_path.clone(),
-                        symbol_spans: symbol_spans.clone(),
-                        extension_spans: ext_spans.clone(),
-                        type_spans: type_spans.clone(),
-                        call_sites: call_sites.clone(),
-                        var_types: std::collections::HashMap::new(),
-                    });
-                }
-            }
-
-            if lang_name == "python" {
-                let mut module_aliases: std::collections::HashMap<String, String> = std::collections::HashMap::new();
-                for imp in &result.imports {
-                    if imp.alias.is_none() || !imp.items.is_empty() {
-                        continue;
-                    }
-                    let Some(alias) = imp.alias.as_ref() else {
-                        continue;
-                    };
-                    if alias.is_empty() || imp.source.is_empty() {
-                        continue;
-                    }
-                    module_aliases.insert(alias.clone(), imp.source.clone());
-                }
-                if !call_sites.is_empty() && !module_aliases.is_empty() {
-                    python_context = Some(PythonFileContext {
-                        file_id: file_id.clone(),
-                        filepath: rel_path.clone(),
-                        symbol_spans: symbol_spans.clone(),
-                        call_sites: call_sites.clone(),
-                        module_aliases,
-                    });
-                }
-            }
-
-            let mut import_symbol_requests: Vec<ImportSymbolRequest> = Vec::new();
-            // Collect imports
-            for imp in &result.imports {
-                let import_id = format!("{}:import:{}:{}", pid, rel_path, imp.source);
-                imports.push(ImportNode {
-                    id: import_id.clone(),
-                    file_id: file_id.clone(),
-                    name: imp.source.clone(),
-                    source: imp.source.clone(),
-                    is_wildcard: imp.is_wildcard,
-                    project_id: Arc::clone(&pid),
-                    filepath: rel_path.clone(),
-                });
-                import_rels.push(RelRow {
-                    parent: file_id.clone(),
-                    child: import_id,
-                });
-
-                if !imp.source.is_empty() {
-                    import_symbol_requests.push(ImportSymbolRequest {
-                        src_id: file_id.clone(),
-                        src_filepath: rel_path.clone(),
-                        module: imp.source.clone(),
-                        items: imp.items.clone(),
-                    });
-                }
-            }
-
-            Some(FileResult {
-                file_node,
-                symbols,
-                relations,
-                imports,
-                import_rels,
-                symbol_calls,
-                swift_extensions,
-                swift_context,
-                python_context,
-                clone_candidates: local_clone_candidates,
-                db_delegates: if is_backend { db_delegates } else { Vec::new() },
-                external_urls,
-                import_symbol_requests,
-                launch_calls,
-            })
-        };
-
-        let batch_results: Vec<FileResult> = if std::env::var("TS_PACK_SERIAL_PARSE").is_ok() {
-            batch.iter().filter_map(parse_entry).collect()
-        } else {
-            batch.par_iter().filter_map(parse_entry).collect()
-        };
+        let batch_results = parse_phase::parse_manifest_batch(batch, Arc::clone(&project_id));
 
         // Merge batch results into global reservoirs
         for res in batch_results {
