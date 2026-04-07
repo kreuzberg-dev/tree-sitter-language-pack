@@ -568,6 +568,81 @@ async def execute_semantic_index_prepare(
     return sync_plan
 
 
+async def execute_semantic_index_rounds(
+    new_chunks: list[dict[str, Any]],
+    *,
+    batch_size: int,
+    concurrency: int,
+    embed_batch_fn: Any,
+    write_batch_fn: Any,
+    progress_fn: Any | None = None,
+) -> dict[str, Any]:
+    window = batch_size * concurrency
+    total_new = len(new_chunks)
+    total_written = 0
+    rounds = 0
+
+    if total_new <= 0:
+        return {"written": 0, "rounds": 0}
+
+    n_rounds = (total_new + window - 1) // window
+    for round_idx in range(n_rounds):
+        group = new_chunks[round_idx * window : (round_idx + 1) * window]
+        sub_batches = [group[i : i + batch_size] for i in range(0, len(group), batch_size)]
+        rounds += 1
+
+        if progress_fn is not None:
+            await progress_fn(
+                {
+                    "round_index": round_idx,
+                    "rounds": n_rounds,
+                    "group_size": len(group),
+                    "batch_count": len(sub_batches),
+                    "written_so_far": total_written,
+                    "total_new": total_new,
+                    "phase": "embed_start",
+                }
+            )
+
+        embedded_batches = await __import__("asyncio").gather(
+            *[embed_batch_fn(batch) for batch in sub_batches]
+        )
+
+        if progress_fn is not None:
+            await progress_fn(
+                {
+                    "round_index": round_idx,
+                    "rounds": n_rounds,
+                    "group_size": len(group),
+                    "batch_count": len(sub_batches),
+                    "written_so_far": total_written,
+                    "total_new": total_new,
+                    "phase": "write_start",
+                }
+            )
+
+        write_counts = await __import__("asyncio").gather(
+            *[write_batch_fn(batch) for batch in embedded_batches]
+        )
+        total_written += sum(int(count or 0) for count in write_counts)
+
+        if progress_fn is not None:
+            await progress_fn(
+                {
+                    "round_index": round_idx,
+                    "rounds": n_rounds,
+                    "group_size": len(group),
+                    "batch_count": len(sub_batches),
+                    "written_so_far": total_written,
+                    "total_new": total_new,
+                    "phase": "round_done",
+                    "round_written": sum(int(count or 0) for count in write_counts),
+                }
+            )
+
+    return {"written": total_written, "rounds": rounds}
+
+
 def build_semantic_payload(
     source: str,
     language: str,

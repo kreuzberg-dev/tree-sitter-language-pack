@@ -242,6 +242,7 @@ from ._semantic_payload import (
     build_swift_chunks,
     execute_codebase_embedding_upsert,
     execute_semantic_index_prepare,
+    execute_semantic_index_rounds,
     execute_semantic_sync,
 )
 
@@ -298,6 +299,7 @@ __all__ = [
     "downloaded_languages",
     "execute_codebase_embedding_upsert",
     "execute_semantic_index_prepare",
+    "execute_semantic_index_rounds",
     "execute_semantic_sync",
     "extract",
     "extract_file_facts",
