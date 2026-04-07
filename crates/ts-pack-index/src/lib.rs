@@ -1,13 +1,15 @@
+mod pathing;
+mod swift;
 mod tags;
+mod writers;
 
 use futures::{StreamExt, stream};
-use neo4rs::{BoltType, Graph, Query};
+use neo4rs::{Graph, Query};
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Instant;
@@ -86,576 +88,31 @@ const WINNOW_LARGE_K: usize = 15;
 const WINNOW_LARGE_W: usize = 7;
 
 fn external_api_id(project_id: &str, url: &str) -> String {
-    let mut hasher = std::collections::hash_map::DefaultHasher::new();
-    url.hash(&mut hasher);
-    format!("{}:external:{}", project_id, format!("{:x}", hasher.finish()))
+    pathing::external_api_id(project_id, url)
 }
 
 fn join_url(base: &str, path: &str) -> Option<String> {
-    if base.is_empty() || path.is_empty() {
-        return None;
-    }
-    if path.starts_with("http://") || path.starts_with("https://") {
-        return Some(path.to_string());
-    }
-    if !(base.starts_with("http://") || base.starts_with("https://") || base.starts_with("env://")) {
-        return None;
-    }
-    let mut base = base.to_string();
-    let mut path = path.to_string();
-    if base.ends_with('/') && path.starts_with('/') {
-        path.remove(0);
-    } else if !base.ends_with('/') && !path.starts_with('/') {
-        base.push('/');
-    }
-    Some(format!("{base}{path}"))
+    pathing::join_url(base, path)
 }
 
 fn clean_import_name(name: &str) -> String {
-    let mut out = name.trim().to_string();
-    for prefix in ["type ", "typeof "] {
-        if out.starts_with(prefix) {
-            out = out[prefix.len()..].trim().to_string();
-        }
-    }
-    if let Some((before, _)) = out.split_once(" as ") {
-        out = before.trim().to_string();
-    }
-    out
+    pathing::clean_import_name(name)
 }
 
 fn project_root_from_manifest(manifest: &[ManifestEntry]) -> Option<String> {
-    let first = manifest.first()?;
-    if let Some(root) = first.abs_path.strip_suffix(&first.rel_path) {
-        return Some(root.trim_end_matches('/').to_string());
-    }
-    let path = PathBuf::from(&first.abs_path);
-    path.parent().and_then(|p| p.to_str()).map(|p| p.to_string())
-}
-
-fn extract_string_value(block: &str, key: &str) -> Option<String> {
-    let idx = block.find(key)?;
-    let rest = &block[idx + key.len()..];
-    let quote_start = rest.find('"')?;
-    let rest = &rest[quote_start + 1..];
-    let quote_end = rest.find('"')?;
-    Some(rest[..quote_end].to_string())
-}
-
-fn extract_string_array(block: &str, key: &str) -> Vec<String> {
-    let mut out = Vec::new();
-    let idx = match block.find(key) {
-        Some(idx) => idx,
-        None => return out,
-    };
-    let rest = &block[idx + key.len()..];
-    let start = match rest.find('[') {
-        Some(pos) => pos,
-        None => return out,
-    };
-    let rest = &rest[start + 1..];
-    let end = match rest.find(']') {
-        Some(pos) => pos,
-        None => return out,
-    };
-    let inner = &rest[..end];
-    for part in inner.split(',') {
-        let trimmed = part.trim();
-        if trimmed.starts_with('"') && trimmed.ends_with('"') && trimmed.len() >= 2 {
-            out.push(trimmed[1..trimmed.len() - 1].to_string());
-        }
-    }
-    out
-}
-
-fn extract_pbx_value(block: &str, key: &str) -> Option<String> {
-    let needle = format!("{key} =");
-    let idx = block.find(&needle)?;
-    let rest = block[idx + needle.len()..].trim_start();
-    let end = rest.find(';')?;
-    let raw = rest[..end].trim();
-    Some(raw.trim_matches('"').to_string())
-}
-
-fn extract_pbx_id_array(block: &str, key: &str) -> Vec<String> {
-    let needle = format!("{key} =");
-    let idx = match block.find(&needle) {
-        Some(idx) => idx,
-        None => return Vec::new(),
-    };
-    let rest = &block[idx + needle.len()..];
-    let start = match rest.find('(') {
-        Some(pos) => pos,
-        None => return Vec::new(),
-    };
-    let rest = &rest[start + 1..];
-    let end = match rest.find(')') {
-        Some(pos) => pos,
-        None => return Vec::new(),
-    };
-    let inner = &rest[..end];
-    let mut out = Vec::new();
-    for part in inner.split(',') {
-        let trimmed = part.trim();
-        if trimmed.is_empty() {
-            continue;
-        }
-        let id = trimmed.split_whitespace().next().unwrap_or("");
-        if !id.is_empty() {
-            out.push(id.to_string());
-        }
-    }
-    out
-}
-
-fn normalize_pbx_path(value: &str) -> String {
-    value.trim().trim_matches('"').replace('\\', "/")
-}
-
-fn insert_module_files(map: &mut HashMap<String, Vec<String>>, module: String, files: Vec<String>) {
-    if files.is_empty() {
-        return;
-    }
-    let entry = map.entry(module).or_default();
-    for fp in files {
-        if !entry.contains(&fp) {
-            entry.push(fp);
-        }
-    }
-}
-
-fn collect_files_for_prefix(prefix: &str, files_set: &HashSet<String>) -> Vec<String> {
-    let normalized = prefix.trim_end_matches('/').to_string() + "/";
-    let mut files = Vec::new();
-    for fp in files_set.iter() {
-        if fp.starts_with(&normalized) {
-            files.push(fp.clone());
-        }
-    }
-    files
-}
-
-fn find_xcode_project_files(project_root: &str) -> Vec<PathBuf> {
-    let mut out = Vec::new();
-    let root = Path::new(project_root);
-    if root
-        .extension()
-        .and_then(|ext| ext.to_str())
-        .map(|ext| ext == "xcodeproj")
-        .unwrap_or(false)
-    {
-        let pbx = root.join("project.pbxproj");
-        if pbx.exists() {
-            out.push(pbx);
-        }
-        return out;
-    }
-
-    let Ok(entries) = std::fs::read_dir(root) else {
-        return out;
-    };
-    for entry in entries.flatten() {
-        let path = entry.path();
-        if !path.is_dir() {
-            continue;
-        }
-        if path
-            .extension()
-            .and_then(|ext| ext.to_str())
-            .map(|ext| ext == "xcodeproj")
-            .unwrap_or(false)
-        {
-            let pbx = path.join("project.pbxproj");
-            if pbx.exists() {
-                out.push(pbx);
-            }
-            continue;
-        }
-
-        let Ok(subentries) = std::fs::read_dir(&path) else {
-            continue;
-        };
-        for subentry in subentries.flatten() {
-            let subpath = subentry.path();
-            if !subpath.is_dir() {
-                continue;
-            }
-            if subpath
-                .extension()
-                .and_then(|ext| ext.to_str())
-                .map(|ext| ext == "xcodeproj")
-                .unwrap_or(false)
-            {
-                let pbx = subpath.join("project.pbxproj");
-                if pbx.exists() {
-                    out.push(pbx);
-                }
-            }
-        }
-    }
-    out
-}
-
-fn build_swift_module_map_from_xcode(project_root: &str, files_set: &HashSet<String>) -> HashMap<String, Vec<String>> {
-    let mut map = HashMap::new();
-    let pbx_paths = find_xcode_project_files(project_root);
-    if pbx_paths.is_empty() {
-        return map;
-    }
-
-    for pbx in pbx_paths {
-        let Ok(contents) = std::fs::read_to_string(&pbx) else {
-            continue;
-        };
-
-        let mut in_root_group = false;
-        let mut in_native_target = false;
-        let mut current_id = String::new();
-        let mut current_block = String::new();
-        let mut depth = 0i32;
-        let mut root_groups: HashMap<String, String> = HashMap::new();
-        let mut target_groups: HashMap<String, Vec<String>> = HashMap::new();
-
-        for line in contents.lines() {
-            if line.contains("Begin PBXFileSystemSynchronizedRootGroup section") {
-                in_root_group = true;
-                continue;
-            }
-            if line.contains("End PBXFileSystemSynchronizedRootGroup section") {
-                in_root_group = false;
-                continue;
-            }
-            if line.contains("Begin PBXNativeTarget section") {
-                in_native_target = true;
-                continue;
-            }
-            if line.contains("End PBXNativeTarget section") {
-                in_native_target = false;
-                continue;
-            }
-
-            if !(in_root_group || in_native_target) {
-                continue;
-            }
-
-            if depth == 0 && line.contains("= {") {
-                current_id = line.split_whitespace().next().unwrap_or("").to_string();
-                current_block.clear();
-            }
-
-            if !current_id.is_empty() {
-                current_block.push_str(line);
-                current_block.push('\n');
-                for ch in line.chars() {
-                    if ch == '{' {
-                        depth += 1;
-                    } else if ch == '}' {
-                        depth -= 1;
-                    }
-                }
-
-                if depth == 0 {
-                    if in_root_group {
-                        if let Some(path) = extract_pbx_value(&current_block, "path") {
-                            root_groups.insert(current_id.clone(), normalize_pbx_path(&path));
-                        }
-                    } else if in_native_target {
-                        let name = extract_pbx_value(&current_block, "name");
-                        let groups = extract_pbx_id_array(&current_block, "fileSystemSynchronizedGroups");
-                        if let (Some(name), false) = (name, groups.is_empty()) {
-                            target_groups.insert(name, groups);
-                        }
-                    }
-                    current_id.clear();
-                    current_block.clear();
-                }
-            }
-        }
-
-        for (target, group_ids) in target_groups {
-            let mut files = Vec::new();
-            for group_id in group_ids {
-                if let Some(path) = root_groups.get(&group_id) {
-                    files.extend(collect_files_for_prefix(path, files_set));
-                }
-            }
-            insert_module_files(&mut map, target, files);
-        }
-    }
-
-    map
+    pathing::project_root_from_manifest(manifest)
 }
 
 fn build_swift_module_map(project_root: &str, files_set: &HashSet<String>) -> HashMap<String, Vec<String>> {
-    let mut map = HashMap::new();
-    let pkg_path = Path::new(project_root).join("Package.swift");
-    let Ok(contents) = std::fs::read_to_string(&pkg_path) else {
-        return build_swift_module_map_from_xcode(project_root, files_set);
-    };
-
-    let mut current = String::new();
-    let mut depth = 0i32;
-    let mut in_target = false;
-    for line in contents.lines() {
-        let trimmed = line.trim();
-        if trimmed.starts_with(".target(")
-            || trimmed.starts_with(".executableTarget(")
-            || trimmed.starts_with(".testTarget(")
-        {
-            in_target = true;
-            depth = 0;
-            current.clear();
-        }
-        if in_target {
-            for ch in trimmed.chars() {
-                if ch == '(' {
-                    depth += 1;
-                } else if ch == ')' {
-                    depth -= 1;
-                }
-            }
-            current.push_str(trimmed);
-            current.push('\n');
-            if depth <= 0 {
-                in_target = false;
-                let name = extract_string_value(&current, "name:");
-                let path = extract_string_value(&current, "path:");
-                let sources = extract_string_array(&current, "sources:");
-                let Some(name) = name else {
-                    continue;
-                };
-                let base_path = path.unwrap_or_else(|| format!("Sources/{name}"));
-                let mut files: Vec<String> = Vec::new();
-                if !sources.is_empty() {
-                    for src in sources {
-                        let joined = format!("{}/{}", base_path.trim_end_matches('/'), src);
-                        if files_set.contains(&joined) {
-                            files.push(joined);
-                        }
-                    }
-                } else {
-                    let prefix = base_path.trim_end_matches('/').to_string() + "/";
-                    for fp in files_set.iter() {
-                        if fp.starts_with(&prefix) {
-                            files.push(fp.clone());
-                        }
-                    }
-                }
-                insert_module_files(&mut map, name, files);
-            }
-        }
-    }
-
-    let xcode_map = build_swift_module_map_from_xcode(project_root, files_set);
-    for (name, files) in xcode_map {
-        insert_module_files(&mut map, name, files);
-    }
-
-    map
+    pathing::build_swift_module_map(project_root, files_set)
 }
 
 fn resolve_module_path(src_fp: &str, module: &str, files_set: &HashSet<String>) -> Option<String> {
-    let module = module.trim();
-    if module.is_empty() {
-        return None;
-    }
-
-    let base = if module.starts_with("./") || module.starts_with("../") {
-        let mut base = std::path::PathBuf::from(src_fp);
-        base.pop();
-        base.push(module);
-        let mut parts: Vec<String> = Vec::new();
-        for comp in base.components() {
-            use std::path::Component;
-            match comp {
-                Component::ParentDir => {
-                    parts.pop();
-                }
-                Component::CurDir => {}
-                Component::Normal(val) => parts.push(val.to_string_lossy().to_string()),
-                _ => {}
-            }
-        }
-        parts.join("/")
-    } else if module.starts_with("@/") || module.starts_with("~/") {
-        module[2..].to_string()
-    } else if module.starts_with("src/") {
-        module.to_string()
-    } else if src_fp.ends_with(".rs") {
-        let mut mod_str = module.to_string();
-        if let Some(idx) = mod_str.rfind("use ") {
-            mod_str = mod_str[idx + 4..].to_string();
-        }
-        mod_str = mod_str.trim().trim_end_matches(';').to_string();
-        if let Some((before, _)) = mod_str.split_once(" as ") {
-            mod_str = before.trim().to_string();
-        }
-        if let Some((before, _)) = mod_str.split_once('{') {
-            mod_str = before.trim().trim_end_matches("::").to_string();
-        }
-        mod_str = mod_str.trim_end_matches("::").to_string();
-        if mod_str.is_empty() {
-            return None;
-        }
-
-        let mut module_dir = if src_fp.ends_with("/mod.rs") {
-            src_fp.trim_end_matches("/mod.rs").to_string()
-        } else {
-            src_fp.trim_end_matches(".rs").to_string()
-        };
-
-        let mut crate_root: Option<String> = None;
-        if let Some(idx) = src_fp.rfind("/src/") {
-            crate_root = Some(src_fp[..idx + 4].to_string());
-        } else if src_fp.starts_with("src/") {
-            crate_root = Some("src".to_string());
-        }
-
-        let mut tail = mod_str.as_str();
-        let mut super_count = 0usize;
-        while tail.starts_with("super::") {
-            super_count += 1;
-            tail = &tail[7..];
-        }
-
-        let base_dir = if mod_str.starts_with("crate::") {
-            tail = &mod_str[7..];
-            crate_root?
-        } else if tail.starts_with("self::") {
-            tail = &tail[6..];
-            module_dir.clone()
-        } else if super_count > 0 {
-            for _ in 0..super_count {
-                if let Some(idx) = module_dir.rfind('/') {
-                    module_dir.truncate(idx);
-                } else {
-                    return None;
-                }
-            }
-            module_dir.clone()
-        } else {
-            return None;
-        };
-
-        let tail = tail.trim_matches(':').trim();
-        let mut base_path = base_dir.trim_end_matches('/').to_string();
-        if !tail.is_empty() {
-            base_path.push('/');
-            base_path.push_str(&tail.replace("::", "/"));
-        }
-
-        let mut candidates: Vec<String> = Vec::new();
-        if tail.is_empty() {
-            candidates.push(format!("{base_path}/lib.rs"));
-            candidates.push(format!("{base_path}/main.rs"));
-        }
-        candidates.push(format!("{base_path}.rs"));
-        candidates.push(format!("{base_path}/mod.rs"));
-
-        for candidate in candidates {
-            if files_set.contains(&candidate) {
-                return Some(candidate);
-            }
-        }
-        return None;
-    } else if src_fp.ends_with(".py") {
-        let mut mod_str = module.to_string();
-        let mut dot_count = 0usize;
-        while mod_str.starts_with('.') {
-            dot_count += 1;
-            mod_str.remove(0);
-        }
-
-        let base = if dot_count > 0 {
-            let mut base = std::path::PathBuf::from(src_fp);
-            base.pop();
-            for _ in 1..dot_count {
-                base.pop();
-            }
-            if !mod_str.is_empty() {
-                base.push(mod_str.replace('.', "/"));
-            }
-            base
-        } else {
-            std::path::PathBuf::from(mod_str.replace('.', "/"))
-        };
-
-        let base_str = base
-            .to_string_lossy()
-            .replace('\\', "/")
-            .trim_end_matches('/')
-            .to_string();
-        if base_str.is_empty() {
-            return None;
-        }
-        for suf in [".py", "/__init__.py"] {
-            let candidate = format!("{base_str}{suf}");
-            if files_set.contains(&candidate) {
-                return Some(candidate);
-            }
-        }
-        return None;
-    } else {
-        return None;
-    };
-
-    for suf in [
-        "",
-        ".ts",
-        ".tsx",
-        ".js",
-        ".jsx",
-        "/index.ts",
-        "/index.tsx",
-        "/index.js",
-        "/index.jsx",
-    ] {
-        let candidate = format!("{base}{suf}");
-        if files_set.contains(&candidate) {
-            return Some(candidate);
-        }
-    }
-
-    None
+    pathing::resolve_module_path(src_fp, module, files_set)
 }
 
 fn resolve_launch_path(src_fp: &str, raw: &str, project_root: &str, files_set: &HashSet<String>) -> Option<String> {
-    let mut candidate = raw.trim().replace('\\', "/");
-    if candidate.is_empty() {
-        return None;
-    }
-    if candidate.starts_with("./") {
-        candidate = candidate[2..].to_string();
-    }
-    if candidate.starts_with("/") {
-        if let Some(stripped) = candidate.strip_prefix(project_root) {
-            candidate = stripped.trim_start_matches('/').to_string();
-        } else {
-            return None;
-        }
-    }
-    if candidate.starts_with("../") {
-        let mut base = std::path::PathBuf::from(src_fp);
-        base.pop();
-        base.push(candidate);
-        let mut parts: Vec<String> = Vec::new();
-        for comp in base.components() {
-            use std::path::Component;
-            match comp {
-                Component::ParentDir => {
-                    parts.pop();
-                }
-                Component::CurDir => {}
-                Component::Normal(val) => parts.push(val.to_string_lossy().to_string()),
-                _ => {}
-            }
-        }
-        candidate = parts.join("/");
-    }
-    if candidate.ends_with(".py") && files_set.contains(&candidate) {
-        return Some(candidate);
-    }
-    None
+    pathing::resolve_launch_path(src_fp, raw, project_root, files_set)
 }
 
 fn extract_prisma_models(schema_text: &str) -> Vec<String> {
@@ -694,157 +151,11 @@ fn extract_prisma_models(schema_text: &str) -> Vec<String> {
 // ---------------------------------------------------------------------------
 
 fn normalize_swift_type(raw: &str) -> Option<String> {
-    let mut s = raw.trim().trim_end_matches('?').trim_end_matches('!').to_string();
-    if let Some(idx) = s.find('<') {
-        s.truncate(idx);
-    }
-    if s.is_empty() { None } else { Some(s) }
+    swift::normalize_swift_type(raw)
 }
 
 fn parse_swift_var_types(source: &str) -> std::collections::HashMap<String, String> {
-    let mut map = std::collections::HashMap::new();
-    let extract_type_from_rhs = |rhs: &str| -> Option<String> {
-        let mut rhs = rhs.trim();
-        if rhs.is_empty() {
-            return None;
-        }
-        if let Some(idx) = rhs.find(" as? ") {
-            rhs = rhs[idx + 5..].trim();
-        } else if let Some(idx) = rhs.find(" as ") {
-            rhs = rhs[idx + 4..].trim();
-        }
-        let mut ty = String::new();
-        for ch in rhs.chars() {
-            if ch.is_alphanumeric() || ch == '_' || ch == '.' || ch == '<' || ch == '>' || ch == '?' || ch == '!' {
-                ty.push(ch);
-            } else {
-                break;
-            }
-        }
-        if let Some(tn) = normalize_swift_type(&ty) {
-            if let Some((head, _)) = tn.split_once('.') {
-                return normalize_swift_type(head);
-            }
-            return Some(tn);
-        }
-        None
-    };
-
-    let extract_receiver_from_chain = |rhs: &str| -> Option<String> {
-        let mut rhs = rhs.trim();
-        if rhs.is_empty() {
-            return None;
-        }
-        if let Some(idx) = rhs.find(" as? ") {
-            rhs = rhs[..idx].trim();
-        } else if let Some(idx) = rhs.find(" as ") {
-            rhs = rhs[..idx].trim();
-        }
-        let mut name = String::new();
-        for ch in rhs.chars() {
-            if ch.is_alphanumeric() || ch == '_' {
-                name.push(ch);
-            } else {
-                break;
-            }
-        }
-        if name.is_empty() { None } else { Some(name) }
-    };
-
-    for line in source.lines() {
-        let trimmed = line.trim();
-        let (kw, rest) = if let Some(r) = trimmed.strip_prefix("let ") {
-            ("let", r)
-        } else if let Some(r) = trimmed.strip_prefix("var ") {
-            ("var", r)
-        } else if let Some(r) = trimmed.strip_prefix("if let ") {
-            ("if let", r)
-        } else if let Some(r) = trimmed.strip_prefix("guard let ") {
-            ("guard let", r)
-        } else {
-            // Try reassignment: name = Type(...)
-            if trimmed.contains('=')
-                && !trimmed.contains("==")
-                && !trimmed.contains("!=")
-                && !trimmed.contains(">=")
-                && !trimmed.contains("<=")
-            {
-                if let Some(eq_idx) = trimmed.find('=') {
-                    let lhs = trimmed[..eq_idx].trim();
-                    let rhs = trimmed[eq_idx + 1..].trim();
-                    let mut name = String::new();
-                    for ch in lhs.chars().rev() {
-                        if ch.is_alphanumeric() || ch == '_' {
-                            name.push(ch);
-                        } else if !name.is_empty() {
-                            break;
-                        }
-                    }
-                    let name = name.chars().rev().collect::<String>();
-                    if !name.is_empty() {
-                        if let Some(tn) = extract_type_from_rhs(rhs) {
-                            map.insert(name, tn);
-                        } else if rhs.contains('.') {
-                            if let Some(recv) = extract_receiver_from_chain(rhs) {
-                                if let Some(tn) = map.get(&recv).cloned() {
-                                    map.insert(name, tn);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            continue;
-        };
-        let rest = rest.trim();
-        if rest.is_empty() {
-            continue;
-        }
-
-        let mut name = String::new();
-        for ch in rest.chars() {
-            if ch.is_alphanumeric() || ch == '_' {
-                name.push(ch);
-            } else {
-                break;
-            }
-        }
-        if name.is_empty() {
-            continue;
-        }
-
-        if let Some(idx) = rest.find(':') {
-            let type_part = rest[idx + 1..].trim();
-            let mut ty = String::new();
-            for ch in type_part.chars() {
-                if ch.is_alphanumeric() || ch == '_' || ch == '.' || ch == '<' || ch == '>' || ch == '?' || ch == '!' {
-                    ty.push(ch);
-                } else {
-                    break;
-                }
-            }
-            if let Some(tn) = normalize_swift_type(&ty) {
-                map.insert(name, tn);
-            }
-            continue;
-        }
-
-        if let Some(eq_idx) = rest.find('=') {
-            let rhs = rest[eq_idx + 1..].trim();
-            if let Some(tn) = extract_type_from_rhs(rhs) {
-                map.insert(name, tn);
-            } else if rhs.contains('.') {
-                if let Some(recv) = extract_receiver_from_chain(rhs) {
-                    if let Some(tn) = map.get(&recv).cloned() {
-                        map.insert(name, tn);
-                    }
-                }
-            }
-        }
-
-        let _ = kw; // silence unused warning if config changes
-    }
-    map
+    swift::parse_swift_var_types(source)
 }
 
 fn stable_hash_hex(input: &str) -> String {
@@ -984,72 +295,29 @@ fn collect_swift_extensions(
     items: &[ts_pack::StructureItem],
     map: &mut std::collections::HashMap<String, std::collections::HashSet<String>>,
 ) {
-    for item in items {
-        if item.kind == ts_pack::StructureKind::Extension {
-            if let Some(type_name) = item.name.as_ref().and_then(|n| normalize_swift_type(n)) {
-                let entry = map.entry(type_name).or_default();
-                for child in &item.children {
-                    if matches!(
-                        child.kind,
-                        ts_pack::StructureKind::Method | ts_pack::StructureKind::Function
-                    ) {
-                        if let Some(name) = child.name.as_ref() {
-                            entry.insert(name.clone());
-                        }
-                    }
-                }
-            }
-        }
-        if !item.children.is_empty() {
-            collect_swift_extensions(&item.children, map);
-        }
-    }
+    swift::collect_swift_extensions(items, map)
 }
 
 fn collect_swift_extension_spans(items: &[ts_pack::StructureItem], spans: &mut Vec<(usize, usize, String)>) {
-    for item in items {
-        if item.kind == ts_pack::StructureKind::Extension {
-            if let Some(type_name) = item.name.as_ref().and_then(|n| normalize_swift_type(n)) {
-                spans.push((item.span.start_byte, item.span.end_byte, type_name));
-            }
-        }
-        if !item.children.is_empty() {
-            collect_swift_extension_spans(&item.children, spans);
-        }
-    }
+    swift::collect_swift_extension_spans(items, spans)
 }
 
 fn collect_swift_type_spans(items: &[ts_pack::StructureItem], spans: &mut Vec<(usize, usize, String)>) {
-    for item in items {
-        if matches!(
-            item.kind,
-            ts_pack::StructureKind::Class
-                | ts_pack::StructureKind::Struct
-                | ts_pack::StructureKind::Enum
-                | ts_pack::StructureKind::Protocol
-        ) {
-            if let Some(name) = item.name.as_ref().and_then(|n| normalize_swift_type(n)) {
-                spans.push((item.span.start_byte, item.span.end_byte, name));
-            }
-        }
-        if !item.children.is_empty() {
-            collect_swift_type_spans(&item.children, spans);
-        }
-    }
+    swift::collect_swift_type_spans(items, spans)
 }
 
 // ---------------------------------------------------------------------------
 // Typed payload structs (avoids serde_json::json! round-trips in hot loops)
 // ---------------------------------------------------------------------------
 
-struct FileNode {
+pub(crate) struct FileNode {
     id: String,
     name: String,
     filepath: String,
     project_id: Arc<str>,
 }
 
-struct SymbolNode {
+pub(crate) struct SymbolNode {
     id: String,
     name: String,
     kind: String,
@@ -1066,13 +334,13 @@ struct SymbolNode {
     doc_comment: Option<String>,
 }
 
-struct RelRow {
+pub(crate) struct RelRow {
     parent: String,
     child: String,
 }
 
 /// One resolved call edge: caller is a Symbol (or File as fallback) → callee symbol name.
-struct SymbolCallRow {
+pub(crate) struct SymbolCallRow {
     caller_id: String, // id of the calling Symbol node (or File if at file scope)
     callee: String,    // name of the callee symbol
     project_id: Arc<str>,
@@ -1081,7 +349,7 @@ struct SymbolCallRow {
 }
 
 /// One inferred call edge (Swift extension resolution).
-struct InferredCallRow {
+pub(crate) struct InferredCallRow {
     caller_id: String,
     callee: String,
     receiver_type: String,
@@ -1090,7 +358,7 @@ struct InferredCallRow {
     allow_same_file: bool,
 }
 
-struct PythonInferredCallRow {
+pub(crate) struct PythonInferredCallRow {
     caller_id: String,
     callee: String,
     callee_filepath: String,
@@ -1099,29 +367,29 @@ struct PythonInferredCallRow {
     allow_same_file: bool,
 }
 
-struct DbEdgeRow {
+pub(crate) struct DbEdgeRow {
     src: String,
     tgt: String,
 }
 
-struct DbModelEdgeRow {
+pub(crate) struct DbModelEdgeRow {
     src: String,
     model: String,
     project_id: Arc<str>,
 }
 
-struct ExternalApiNode {
+pub(crate) struct ExternalApiNode {
     id: String,
     url: String,
     project_id: Arc<str>,
 }
 
-struct ExternalApiEdgeRow {
+pub(crate) struct ExternalApiEdgeRow {
     src: String,
     tgt: String,
 }
 
-struct CloneGroupRow {
+pub(crate) struct CloneGroupRow {
     id: String,
     project_id: String,
     size: usize,
@@ -1131,17 +399,17 @@ struct CloneGroupRow {
     score_avg: f64,
 }
 
-struct CloneMemberRow {
+pub(crate) struct CloneMemberRow {
     gid: String,
     sid: String,
 }
 
-struct CloneCanonRow {
+pub(crate) struct CloneCanonRow {
     gid: String,
     sid: String,
 }
 
-struct FileCloneGroupRow {
+pub(crate) struct FileCloneGroupRow {
     id: String,
     project_id: String,
     size: usize,
@@ -1151,19 +419,19 @@ struct FileCloneGroupRow {
     score_avg: f64,
 }
 
-struct FileCloneMemberRow {
+pub(crate) struct FileCloneMemberRow {
     gid: String,
     filepath: String,
     project_id: String,
 }
 
-struct FileCloneCanonRow {
+pub(crate) struct FileCloneCanonRow {
     gid: String,
     filepath: String,
     project_id: String,
 }
 
-struct LaunchEdgeRow {
+pub(crate) struct LaunchEdgeRow {
     src_filepath: String,
     tgt_filepath: String,
     project_id: String,
@@ -1176,17 +444,17 @@ struct ImportSymbolRequest {
     items: Vec<String>,
 }
 
-struct ImportSymbolEdgeRow {
+pub(crate) struct ImportSymbolEdgeRow {
     src: String,
     tgt: String,
 }
 
-struct ImplicitImportSymbolEdgeRow {
+pub(crate) struct ImplicitImportSymbolEdgeRow {
     src: String,
     tgt: String,
 }
 
-struct ExportSymbolEdgeRow {
+pub(crate) struct ExportSymbolEdgeRow {
     src: String,
     tgt: String,
 }
@@ -1449,7 +717,7 @@ impl LaunchEdgeRow {
     }
 }
 
-struct ImportNode {
+pub(crate) struct ImportNode {
     id: String,
     file_id: String,
     name: String,
@@ -1556,382 +824,88 @@ impl RelRow {
     }
 }
 
-// ---------------------------------------------------------------------------
-// JSON → BoltType adapter (used only at the neo4rs boundary)
-// ---------------------------------------------------------------------------
-
-fn json_to_bolt(v: Value) -> BoltType {
-    match v {
-        Value::String(s) => BoltType::from(s),
-        Value::Number(n) => {
-            if let Some(i) = n.as_i64() {
-                BoltType::from(i)
-            } else if let Some(f) = n.as_f64() {
-                BoltType::from(f)
-            } else {
-                BoltType::from(0i64)
-            }
-        }
-        Value::Bool(b) => BoltType::from(b),
-        Value::Null => BoltType::Null(neo4rs::BoltNull),
-        Value::Array(arr) => BoltType::from(arr.into_iter().map(json_to_bolt).collect::<Vec<_>>()),
-        Value::Object(map) => {
-            let mut bolt_map = HashMap::new();
-            for (k, val) in map {
-                bolt_map.insert(k, json_to_bolt(val));
-            }
-            BoltType::from(bolt_map)
-        }
-    }
-}
-
-/// Convert a slice of rows to a BoltType list without an intermediate Vec clone.
-fn rows_to_bolt<T, F: Fn(&T) -> Value>(rows: &[T], f: F) -> BoltType {
-    BoltType::from(rows.iter().map(|r| json_to_bolt(f(r))).collect::<Vec<_>>())
-}
-
-// ---------------------------------------------------------------------------
-// Write helpers — one per entity kind
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Write helpers — ON CREATE / ON MATCH split on every MERGE.
-//
-// WHY: On a non-empty graph every unconditional SET dirties the page even
-// when nothing changed. ON CREATE SET runs once; ON MATCH SET updates only
-// what can legitimately change across re-index runs (name, line numbers).
-// This halves write-amplification on warm re-indexes.
-// ---------------------------------------------------------------------------
-
 async fn write_file_nodes(graph: &Arc<Graph>, batch: &[FileNode]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MERGE (n:Node {id: item.id}) \
-         ON CREATE SET n:File, \
-                       n.name       = item.name, \
-                       n.filepath   = item.filepath, \
-                       n.project_id = item.project_id \
-         ON MATCH SET  n.name       = item.name"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_file_nodes(graph, batch).await;
 }
 
 async fn write_symbol_nodes(graph: &Arc<Graph>, batch: &[SymbolNode], label: &str) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    // ON CREATE: write all properties and add the specific label.
-    // ON MATCH:  only update line numbers (the only thing that moves on edit).
-    //            The extra label is NOT re-applied on match — Neo4j ignores
-    //            SET n:Label when the label is already present, but skipping
-    //            it here avoids the label-index re-evaluation overhead.
-    let cypher = format!(
-        "UNWIND $batch AS item \
-         MERGE (n:Node {{id: item.id}}) \
-         ON CREATE SET n:{label}, \
-                       n.name        = item.name, \
-                       n.kind        = item.kind, \
-                       n.qualified_name = item.qualified_name, \
-                       n.project_id  = item.project_id, \
-                       n.filepath    = item.filepath, \
-                       n.start_line  = item.start_line, \
-                       n.end_line    = item.end_line, \
-                       n.start_byte  = item.start_byte, \
-                       n.end_byte    = item.end_byte, \
-                       n.signature   = item.signature, \
-                       n.visibility  = item.visibility, \
-                       n.is_exported = item.is_exported, \
-                       n.doc_comment = item.doc_comment \
-         ON MATCH SET  n.start_line  = item.start_line, \
-                       n.end_line    = item.end_line, \
-                       n.qualified_name = item.qualified_name, \
-                       n.signature   = item.signature, \
-                       n.visibility  = item.visibility, \
-                       n.is_exported = item.is_exported, \
-                       n.doc_comment = item.doc_comment \
-         FOREACH (_ IN CASE WHEN item.kind = 'Method' THEN [1] ELSE [] END | SET n:Method)"
-    );
-    let q = Query::new(cypher).param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_symbol_nodes(graph, batch, label).await;
 }
 
 async fn write_import_nodes(graph: &Arc<Graph>, batch: &[ImportNode]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MERGE (n:Node {id: item.id}) \
-         ON CREATE SET n:Import, \
-                       n.name        = item.name, \
-                       n.source      = item.source, \
-                       n.is_wildcard = item.is_wildcard, \
-                       n.project_id  = item.project_id, \
-                       n.filepath    = item.filepath"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_import_nodes(graph, batch).await;
 }
 
 async fn write_relationships(graph: &Arc<Graph>, batch: &[RelRow]) {
-    // Relationship MERGE is the most lock-sensitive query:
-    // each row acquires write locks on p, c, and scans p's outgoing edges.
-    // Keep batch size ≤ 1000 and concurrency ≤ 2 (see REL_CONCURRENCY).
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (p:Node {id: item.p}) \
-         MATCH (c:Node {id: item.c}) \
-         MERGE (p)-[:CONTAINS]->(c)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_relationships(graph, batch).await;
 }
 
 async fn write_calls(graph: &Arc<Graph>, batch: &[SymbolCallRow]) {
-    // For each (caller, callee_name) pair, MERGE a :CALLS edge from the caller
-    // Symbol (or File) node to any matching Symbol in the same project whose
-    // filepath differs from the caller's file (no self-file edges).
-    // Multiple symbols with the same name all receive the edge — intentional.
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (caller:Node {id: item.caller_id}) \
-         MATCH (callee:Node {project_id: item.pid, name: item.callee}) \
-         WHERE (callee:Function OR callee:Class OR callee:Struct OR callee:Method) \
-           AND (item.allow_same_file = true OR callee.filepath <> item.caller_fp) \
-         MERGE (caller)-[:CALLS]->(callee)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_calls(graph, batch).await;
 }
 
 async fn write_inferred_calls(graph: &Arc<Graph>, batch: &[InferredCallRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (caller:Node {id: item.caller_id}) \
-         MATCH (callee:Node {project_id: item.pid, name: item.callee}) \
-         WHERE (callee:Function OR callee:Class OR callee:Struct OR callee:Method) \
-           AND callee.qualified_name IS NOT NULL \
-           AND callee.qualified_name STARTS WITH item.recv + '.' \
-           AND (item.allow_same_file = true OR callee.filepath <> item.caller_fp) \
-         MERGE (caller)-[:CALLS_INFERRED]->(callee)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_inferred_calls(graph, batch).await;
 }
 
 async fn write_python_inferred_calls(graph: &Arc<Graph>, batch: &[PythonInferredCallRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (caller:Node {id: item.caller_id}) \
-         MATCH (callee:Node {project_id: item.pid, name: item.callee, filepath: item.callee_fp}) \
-         WHERE (callee:Function OR callee:Class OR callee:Struct OR callee:Method) \
-           AND (item.allow_same_file = true OR callee.filepath <> item.caller_fp) \
-         MERGE (caller)-[:CALLS_INFERRED]->(callee)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_python_inferred_calls(graph, batch).await;
 }
 
 async fn write_db_edges(graph: &Arc<Graph>, batch: &[DbEdgeRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (a:File {id: item.src}) \
-         MATCH (b:File {id: item.tgt}) \
-         MERGE (a)-[:CALLS_DB]->(b)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_db_edges(graph, batch).await;
 }
 
 async fn write_db_model_edges(graph: &Arc<Graph>, batch: &[DbModelEdgeRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MERGE (m:Model {id: item.pid + ':model:' + item.model}) \
-         SET m.project_id = item.pid, m.name = item.model \
-         WITH item, m \
-         MATCH (a:File {id: item.src}) \
-         MERGE (a)-[:CALLS_DB_MODEL]->(m)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_db_model_edges(graph, batch).await;
 }
 
 async fn write_external_api_nodes(graph: &Arc<Graph>, batch: &[ExternalApiNode]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MERGE (e:ExternalAPI {id: item.id}) \
-         SET e.project_id = item.pid, \
-             e.url = item.url"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_external_api_nodes(graph, batch).await;
 }
 
 async fn write_clone_groups(graph: &Arc<Graph>, batch: &[CloneGroupRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MERGE (g:CloneGroup {id: item.id}) \
-         SET g.project_id = item.project_id, \
-             g.size = item.size, \
-             g.method = item.method, \
-             g.score_min = item.score_min, \
-             g.score_max = item.score_max, \
-             g.score_avg = item.score_avg, \
-             g.created_at = timestamp()"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_clone_groups(graph, batch).await;
 }
 
 async fn write_clone_members(graph: &Arc<Graph>, batch: &[CloneMemberRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (g:CloneGroup {id: item.gid}) \
-         MATCH (s:Node {id: item.sid}) \
-         MERGE (s)-[:MEMBER_OF_CLONE_GROUP]->(g)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_clone_members(graph, batch).await;
 }
 
 async fn write_clone_canon(graph: &Arc<Graph>, batch: &[CloneCanonRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (g:CloneGroup {id: item.gid}) \
-         MATCH (s:Node {id: item.sid}) \
-         MERGE (g)-[:HAS_CANONICAL]->(s)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_clone_canon(graph, batch).await;
 }
 
 async fn write_file_clone_groups(graph: &Arc<Graph>, batch: &[FileCloneGroupRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MERGE (g:FileCloneGroup {id: item.id}) \
-         SET g.project_id = item.project_id, \
-             g.size = item.size, \
-             g.method = item.method, \
-             g.score_min = item.score_min, \
-             g.score_max = item.score_max, \
-             g.score_avg = item.score_avg, \
-             g.created_at = timestamp()"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_file_clone_groups(graph, batch).await;
 }
 
 async fn write_file_clone_members(graph: &Arc<Graph>, batch: &[FileCloneMemberRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (g:FileCloneGroup {id: item.gid}) \
-         MATCH (f:File {project_id: item.project_id, filepath: item.filepath}) \
-         MERGE (f)-[:MEMBER_OF_FILE_CLONE_GROUP]->(g)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_file_clone_members(graph, batch).await;
 }
 
 async fn write_file_clone_canon(graph: &Arc<Graph>, batch: &[FileCloneCanonRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (g:FileCloneGroup {id: item.gid}) \
-         MATCH (f:File {project_id: item.project_id, filepath: item.filepath}) \
-         MERGE (g)-[:HAS_CANONICAL]->(f)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_file_clone_canon(graph, batch).await;
 }
 
 async fn write_external_api_edges(graph: &Arc<Graph>, batch: &[ExternalApiEdgeRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (a:File {id: item.src}) \
-         MATCH (b:ExternalAPI {id: item.tgt}) \
-         MERGE (a)-[:CALLS_API_EXTERNAL]->(b)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_external_api_edges(graph, batch).await;
 }
 
 async fn write_import_symbol_edges(graph: &Arc<Graph>, batch: &[ImportSymbolEdgeRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (a:File {id: item.src}) \
-         MATCH (b:Node {id: item.tgt}) \
-         MERGE (a)-[:IMPORTS_SYMBOL]->(b)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_import_symbol_edges(graph, batch).await;
 }
 
 async fn write_implicit_import_symbol_edges(graph: &Arc<Graph>, batch: &[ImplicitImportSymbolEdgeRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (a:File {id: item.src}) \
-         MATCH (b:Node {id: item.tgt}) \
-         MERGE (a)-[:IMPLICIT_IMPORTS_SYMBOL]->(b)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_implicit_import_symbol_edges(graph, batch).await;
 }
 
 async fn write_export_symbol_edges(graph: &Arc<Graph>, batch: &[ExportSymbolEdgeRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (a:File {id: item.src}) \
-         MATCH (b:Node {id: item.tgt}) \
-         MERGE (a)-[:EXPORTS_SYMBOL]->(b)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_export_symbol_edges(graph, batch).await;
 }
 
 async fn write_launch_edges(graph: &Arc<Graph>, batch: &[LaunchEdgeRow]) {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (a:File {project_id: item.pid, filepath: item.src}) \
-         MATCH (b:File {project_id: item.pid, filepath: item.tgt}) \
-         MERGE (a)-[:LAUNCHES]->(b)"
-            .to_string(),
-    )
-    .param("batch", bolt);
-    let _ = graph.run(q).await;
+    writers::write_launch_edges(graph, batch).await;
 }
 
 // ---------------------------------------------------------------------------
@@ -2136,15 +1110,30 @@ pub async fn index_workspace(
 
         let pid = Arc::clone(&project_id);
         let parse_entry = |entry: &ManifestEntry| {
+            let rel_basename = entry
+                .rel_path
+                .rsplit('/')
+                .next()
+                .unwrap_or(entry.rel_path.as_str());
+            if matches!(
+                rel_basename,
+                ".gitignore" | ".indexignore" | ".env" | ".env.example"
+            ) {
+                return None;
+            }
             // Language detection
-            let lang_name = match ts_pack::detect_language_from_extension(&entry.ext) {
-                Some(lang) => lang,
-                None => {
-                    eprintln!(
-                        "[ts-pack-index] detect_language_from_extension failed: {}",
-                        entry.rel_path
-                    );
-                    return None;
+            let lang_name = if entry.ext == "svg" {
+                "xml"
+            } else {
+                match ts_pack::detect_language_from_extension(&entry.ext) {
+                    Some(lang) => lang,
+                    None => {
+                        eprintln!(
+                            "[ts-pack-index] detect_language_from_extension failed: {}",
+                            entry.rel_path
+                        );
+                        return None;
+                    }
                 }
             };
             if !ts_pack::has_language(lang_name) {
@@ -2329,16 +1318,18 @@ pub async fn index_workspace(
                             });
                             continue;
                         }
-                        let mut fps_small = HashSet::new();
-                        let mut fps_medium = HashSet::new();
-                        let mut fps_large = HashSet::new();
-                        let mut kgrams = HashSet::new();
+                        let mut fps_small: HashSet<u64>;
+                        let mut fps_medium: HashSet<u64>;
+                        let mut fps_large: HashSet<u64>;
+                        let mut kgrams: HashSet<u64>;
                         if tokens.len() < WINNOW_SMALL_TOKEN_THRESHOLD {
                             kgrams = kgram_hashes(&tokens, WINNOW_SMALL_K);
                             fps_small = winnow_fingerprints(&tokens, WINNOW_SMALL_K, WINNOW_SMALL_W);
                             if fps_small.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
                                 fps_small.clear();
                             }
+                            fps_medium = HashSet::new();
+                            fps_large = HashSet::new();
                         } else {
                             fps_small = winnow_fingerprints(&tokens, WINNOW_SMALL_K, WINNOW_SMALL_W);
                             if fps_small.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
@@ -2352,6 +1343,7 @@ pub async fn index_workspace(
                             if fps_large.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
                                 fps_large.clear();
                             }
+                            kgrams = HashSet::new();
                             if fps_small.is_empty() && fps_medium.is_empty() && fps_large.is_empty() {
                                 kgrams = kgram_hashes(&tokens, WINNOW_SMALL_K);
                             }
