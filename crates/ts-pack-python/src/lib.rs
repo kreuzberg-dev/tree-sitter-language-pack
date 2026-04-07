@@ -998,6 +998,319 @@ fn merge_metadata_dict<'py>(
     Ok(())
 }
 
+fn value_as_str<'a>(value: &'a serde_json::Value) -> Option<&'a str> {
+    value.as_str()
+}
+
+fn value_as_i64(value: &serde_json::Value) -> Option<i64> {
+    value.as_i64().or_else(|| value.as_u64().map(|v| v as i64))
+}
+
+fn compact_imports(imports: &[serde_json::Value]) -> serde_json::Value {
+    let mut out = Vec::new();
+    for item in imports {
+        let Some(obj) = item.as_object() else { continue };
+        let source = obj
+            .get("source")
+            .and_then(value_as_str)
+            .or_else(|| obj.get("module").and_then(value_as_str));
+        let Some(source) = source else { continue };
+        let names = obj
+            .get("names")
+            .and_then(|v| v.as_array())
+            .map(|arr| serde_json::Value::Array(arr.iter().take(10).cloned().collect()))
+            .unwrap_or_else(|| serde_json::Value::Array(Vec::new()));
+        out.push(serde_json::json!({ "source": source, "names": names }));
+        if out.len() >= 80 {
+            break;
+        }
+    }
+    serde_json::Value::Array(out)
+}
+
+fn compact_exports(exports: &[serde_json::Value]) -> serde_json::Value {
+    let mut out = Vec::new();
+    for item in exports {
+        let Some(obj) = item.as_object() else { continue };
+        let Some(name) = obj.get("name").and_then(value_as_str) else { continue };
+        out.push(serde_json::json!({
+            "name": name,
+            "kind": obj.get("kind").cloned().unwrap_or(serde_json::Value::Null),
+        }));
+        if out.len() >= 80 {
+            break;
+        }
+    }
+    serde_json::Value::Array(out)
+}
+
+fn compact_symbols(symbols: &[serde_json::Value]) -> serde_json::Value {
+    let mut seen = HashSet::new();
+    let mut out = Vec::new();
+    for item in symbols {
+        let name = if let Some(obj) = item.as_object() {
+            obj.get("name")
+                .and_then(value_as_str)
+                .or_else(|| obj.get("symbol").and_then(value_as_str))
+                .or_else(|| obj.get("text").and_then(value_as_str))
+        } else {
+            item.as_str()
+        };
+        let Some(name) = name else { continue };
+        if seen.insert(name.to_string()) {
+            out.push(serde_json::Value::String(name.to_string()));
+            if out.len() >= 200 {
+                break;
+            }
+        }
+    }
+    serde_json::Value::Array(out)
+}
+
+fn compact_diagnostics(diags: &[serde_json::Value]) -> serde_json::Value {
+    let items: Vec<serde_json::Value> = diags
+        .iter()
+        .take(10)
+        .filter_map(|diag| {
+            let obj = diag.as_object()?;
+            let span = obj.get("span").and_then(|v| v.as_object());
+            Some(serde_json::json!({
+                "message": obj.get("message").cloned().unwrap_or(serde_json::Value::Null),
+                "start_line": obj.get("start_line").cloned()
+                    .or_else(|| span.and_then(|s| s.get("start_row").cloned()))
+                    .unwrap_or(serde_json::Value::Null),
+                "start_col": obj.get("start_col").cloned()
+                    .or_else(|| span.and_then(|s| s.get("start_col").cloned()))
+                    .unwrap_or(serde_json::Value::Null),
+            }))
+        })
+        .collect();
+    serde_json::json!({
+        "count": diags.len(),
+        "items": items,
+    })
+}
+
+fn extract_metrics(metrics: Option<&serde_json::Map<String, serde_json::Value>>) -> serde_json::Value {
+    let mut out = serde_json::Map::new();
+    let Some(metrics) = metrics else {
+        return serde_json::Value::Object(out);
+    };
+    for (out_key, keys) in [
+        ("total_lines", ["total_lines", "totalLines"]),
+        ("code_lines", ["code_lines", "codeLines"]),
+        ("comment_lines", ["comment_lines", "commentLines"]),
+        ("blank_lines", ["blank_lines", "blankLines"]),
+        ("error_count", ["error_count", "errorCount"]),
+        ("node_count", ["node_count", "nodeCount"]),
+        ("max_depth", ["max_depth", "maxDepth"]),
+        ("total_bytes", ["total_bytes", "totalBytes"]),
+    ] {
+        for key in keys {
+            if let Some(value) = metrics.get(key) {
+                out.insert(out_key.into(), value.clone());
+                break;
+            }
+        }
+    }
+    serde_json::Value::Object(out)
+}
+
+fn compact_extractions(extractions: Option<&serde_json::Map<String, serde_json::Value>>) -> serde_json::Value {
+    let mut out = serde_json::Map::new();
+    let Some(extractions) = extractions else {
+        return serde_json::Value::Object(out);
+    };
+    for (name, payload) in extractions {
+        let Some(matches) = payload.as_object().and_then(|p| p.get("matches")).and_then(|v| v.as_array()) else {
+            continue;
+        };
+        let mut values = Vec::new();
+        for item in matches.iter().take(50) {
+            let Some(captures) = item.as_object().and_then(|m| m.get("captures")).and_then(|v| v.as_array()) else {
+                continue;
+            };
+            for capture in captures {
+                if let Some(text) = capture.as_object().and_then(|c| c.get("text")).and_then(value_as_str) {
+                    values.push(serde_json::Value::String(text.to_string()));
+                }
+            }
+        }
+        if !values.is_empty() {
+            out.insert(name.clone(), serde_json::Value::Array(values.into_iter().take(50).collect()));
+        }
+    }
+    serde_json::Value::Object(out)
+}
+
+fn normalize_ts_pack_result(source: &str, language: &str, mut result: serde_json::Value) -> serde_json::Value {
+    if !matches!(language, "typescript" | "tsx") {
+        return result;
+    }
+    let Some(root) = result.as_object_mut() else {
+        return result;
+    };
+    let Some(diags) = root.get("diagnostics").and_then(|v| v.as_array()) else {
+        return result;
+    };
+    let lines: Vec<&str> = source.lines().collect();
+    let mut filtered = Vec::new();
+    let mut dropped = 0_i64;
+    for diag in diags {
+        let Some(obj) = diag.as_object() else {
+            filtered.push(diag.clone());
+            continue;
+        };
+        let message = obj.get("message").and_then(value_as_str).unwrap_or("");
+        let line_idx = obj
+            .get("span")
+            .and_then(|v| v.as_object())
+            .and_then(|span| span.get("start_line").or_else(|| span.get("start_row")))
+            .and_then(value_as_i64)
+            .unwrap_or(-1);
+        let line_text = if line_idx >= 0 {
+            lines.get(line_idx as usize).copied().unwrap_or("")
+        } else {
+            ""
+        };
+        let drop_diag = message == "Missing expected node: !"
+            && line_text.contains("$queryRaw")
+            && line_text.contains('`');
+        if drop_diag {
+            dropped += 1;
+        } else {
+            filtered.push(diag.clone());
+        }
+    }
+    if dropped > 0 {
+        root.insert("diagnostics".into(), serde_json::Value::Array(filtered));
+        if let Some(metrics) = root.get_mut("metrics").and_then(|v| v.as_object_mut()) {
+            for key in ["error_count", "errorCount"] {
+                if let Some(value) = metrics.get_mut(key) {
+                    if let Some(cur) = value_as_i64(value) {
+                        *value = serde_json::Value::from((cur - dropped).max(0));
+                    }
+                }
+            }
+        }
+    }
+    result
+}
+
+#[pyfunction(signature = (source, language, file_path, project_id, chunk_id_version = "v6".to_string(), chunk_max_size = 4000, _chunk_overlap = 200))]
+fn build_semantic_payload(
+    py: Python<'_>,
+    source: &str,
+    language: String,
+    file_path: String,
+    project_id: String,
+    chunk_id_version: String,
+    chunk_max_size: usize,
+    _chunk_overlap: usize,
+) -> PyResult<Py<PyAny>> {
+    let config = tree_sitter_language_pack::ProcessConfig {
+        language: std::borrow::Cow::Owned(language.clone()),
+        structure: true,
+        imports: true,
+        exports: true,
+        comments: true,
+        docstrings: true,
+        symbols: true,
+        diagnostics: true,
+        chunk_max_size: if language == "swift" { None } else { Some(chunk_max_size) },
+        extractions: None,
+    };
+    let raw_result = tree_sitter_language_pack::process(source, &config)
+        .map_err(|e| ParseError::new_err(format!("{e}")))?;
+    let result = normalize_ts_pack_result(
+        source,
+        &language,
+        serde_json::to_value(&raw_result)
+            .map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))?,
+    );
+    let file_facts = tree_sitter_language_pack::extract_file_facts(source, &language, Some(file_path.as_str()))
+        .map_err(|e| ParseError::new_err(format!("{e}")))?;
+    let file_facts_value = serde_json::to_value(&file_facts)
+        .map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))?;
+    let result_obj = result
+        .as_object()
+        .ok_or_else(|| ParseError::new_err("process result was not an object"))?;
+    let imports = result_obj.get("imports").and_then(|v| v.as_array()).map(Vec::as_slice).unwrap_or(&[]);
+    let exports = result_obj.get("exports").and_then(|v| v.as_array()).map(Vec::as_slice).unwrap_or(&[]);
+    let symbols = result_obj.get("symbols").and_then(|v| v.as_array()).map(Vec::as_slice).unwrap_or(&[]);
+    let diagnostics = result_obj.get("diagnostics").and_then(|v| v.as_array()).map(Vec::as_slice).unwrap_or(&[]);
+
+    let mut file_meta = serde_json::Map::new();
+    file_meta.insert("file_imports".into(), compact_imports(imports));
+    file_meta.insert("file_exports".into(), compact_exports(exports));
+    file_meta.insert("file_symbols".into(), compact_symbols(symbols));
+    file_meta.insert("file_diagnostics".into(), compact_diagnostics(diagnostics));
+    file_meta.insert(
+        "file_metrics".into(),
+        extract_metrics(result_obj.get("metrics").and_then(|v| v.as_object())),
+    );
+    file_meta.insert(
+        "file_extractions".into(),
+        compact_extractions(result_obj.get("extractions").and_then(|v| v.as_object())),
+    );
+    if !file_facts_value.is_null()
+        && !(file_facts_value.is_object() && file_facts_value.as_object().is_some_and(|m| m.is_empty()))
+    {
+        file_meta.insert("file_facts".into(), file_facts_value);
+    }
+
+    let file_header = format!("// File: {file_path}\n");
+    let mut chunks = Vec::new();
+    for chunk in result_obj.get("chunks").and_then(|v| v.as_array()).into_iter().flatten() {
+        let Some(chunk_obj) = chunk.as_object() else { continue };
+        let cmeta = chunk_obj.get("metadata").and_then(|v| v.as_object());
+        if cmeta.and_then(|m| m.get("has_error_nodes")).and_then(|v| v.as_bool()).unwrap_or(false) {
+            continue;
+        }
+        let content = chunk_obj.get("content").and_then(value_as_str).unwrap_or("");
+        if content.trim().is_empty() {
+            continue;
+        }
+        let start_byte = chunk_obj.get("start_byte").and_then(value_as_i64).unwrap_or(0).max(0) as usize;
+        let mut meta = serde_json::Map::new();
+        meta.insert("file".into(), serde_json::Value::String(file_path.clone()));
+        meta.insert("project_id".into(), serde_json::Value::String(project_id.clone()));
+        meta.insert("language".into(), serde_json::Value::String(language.clone()));
+        meta.insert(
+            "symbols".into(),
+            cmeta.and_then(|m| m.get("symbols_defined")).cloned().unwrap_or_else(|| serde_json::Value::Array(Vec::new())),
+        );
+        meta.insert(
+            "start_line".into(),
+            serde_json::Value::from(chunk_obj.get("start_line").and_then(value_as_i64).unwrap_or(0) + 1),
+        );
+        meta.insert(
+            "end_line".into(),
+            serde_json::Value::from(chunk_obj.get("end_line").and_then(value_as_i64).unwrap_or(0) + 1),
+        );
+        for key in ["docstrings", "context_path", "node_types", "comments", "has_error_nodes"] {
+            meta.insert(key.into(), cmeta.and_then(|m| m.get(key)).cloned().unwrap_or(serde_json::Value::Null));
+        }
+        for (key, value) in &file_meta {
+            meta.insert(key.clone(), value.clone());
+        }
+        chunks.push(serde_json::json!({
+            "ref_id": chunk_id(&project_id, &file_path, start_byte, content, &chunk_id_version),
+            "text": format!("{file_header}{content}"),
+            "metadata": meta,
+        }));
+    }
+
+    json_value_to_py(
+        py,
+        &serde_json::json!({
+            "result": result,
+            "file_meta": file_meta,
+            "chunks": chunks,
+        }),
+    )
+}
+
 #[pyfunction(signature = (source, file_path, project_id, language = None, file_meta = None, chunk_id_version = "v6", chunk_lines = 60, overlap_lines = 10))]
 fn build_line_window_chunks(
     py: Python<'_>,
@@ -1814,6 +2127,7 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(cache_dir, m)?)?;
     m.add_function(wrap_pyfunction!(build_line_window_chunks, m)?)?;
     m.add_function(wrap_pyfunction!(build_swift_chunks, m)?)?;
+    m.add_function(wrap_pyfunction!(build_semantic_payload, m)?)?;
     m.add_function(wrap_pyfunction!(build_semantic_sync_plan, m)?)?;
     m.add_function(wrap_pyfunction!(build_codebase_embedding_rows, m)?)?;
     m.add_function(wrap_pyfunction!(build_semantic_index_round_plan, m)?)?;

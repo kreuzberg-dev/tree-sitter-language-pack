@@ -237,7 +237,7 @@ from ._semantic_payload import (
     CODEBASE_EMBEDDINGS_UPSERT_SQL,
     build_codebase_embedding_rows,
     build_line_window_chunks as _python_build_line_window_chunks,
-    build_semantic_payload,
+    build_semantic_payload as _python_build_semantic_payload,
     build_semantic_sync_plan,
     build_swift_chunks as _python_build_swift_chunks,
     execute_codebase_embedding_upsert as _python_execute_codebase_embedding_upsert,
@@ -253,6 +253,11 @@ build_swift_chunks = getattr(
     _native,
     "build_swift_chunks",
     _python_build_swift_chunks,
+)
+build_semantic_payload = getattr(
+    _native,
+    "build_semantic_payload",
+    _python_build_semantic_payload,
 )
 execute_semantic_index_driver = getattr(
     _native,
