@@ -5,6 +5,7 @@ from typing import Any, TypeAlias
 from xml.etree import ElementTree
 
 from tree_sitter_language_pack import _native as _native
+from tree_sitter_language_pack._swift_semantic import extract_swift_semantic_facts
 
 DownloadError = _native.DownloadError
 LanguageNotFoundError = _native.LanguageNotFoundError
@@ -276,6 +277,7 @@ __all__ = [
     "downloaded_languages",
     "extract",
     "extract_file_facts",
+    "extract_swift_semantic_facts",
     "get_binding",
     "get_language",
     "get_parser",

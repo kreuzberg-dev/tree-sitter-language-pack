@@ -257,6 +257,17 @@ class AppleSchemeTargetFact(TypedDict):
     container_path: str
     target_id: str
 
+class SwiftSemanticFact(TypedDict):
+    filepath: str
+    name: str
+    base_name: str
+    kind: str
+    start_line: int
+    end_line: int
+    usr: str | None
+    doc_comment: str | None
+    inherited_types: list[str]
+
 class FileFacts(TypedDict, total=False):
     route_defs: list[RouteDefFact]
     http_calls: list[HttpCallFact]
@@ -429,6 +440,7 @@ __all__ = [
     "download_all",
     "downloaded_languages",
     "extract",
+    "extract_swift_semantic_facts",
     "extension_ambiguity",
     "get_binding",
     "get_highlights_query",
@@ -456,6 +468,7 @@ def process(source: str, config: ProcessConfig) -> ProcessResult: ...
 def extract(source: str, config: dict[str, object]) -> dict[str, Any]: ...
 def validate_extraction(config: dict[str, object]) -> dict[str, Any]: ...
 def extract_file_facts(source: str, language: str, file_path: str | None = None) -> FileFacts: ...
+def extract_swift_semantic_facts(project_path: str) -> dict[str, list[SwiftSemanticFact]]: ...
 def init(config: dict[str, object]) -> None: ...
 def configure(*, cache_dir: str | None = None) -> None: ...
 def download(names: list[str]) -> int: ...
