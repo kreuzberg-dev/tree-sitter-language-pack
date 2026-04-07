@@ -530,6 +530,44 @@ async def execute_semantic_sync(
     return sync_plan
 
 
+async def execute_semantic_index_prepare(
+    conn: Any,
+    project_id: str,
+    manifest_paths: list[str],
+    all_chunks: list[list[dict[str, Any]]],
+    *,
+    rebuild: bool = False,
+) -> dict[str, Any]:
+    wiped = False
+    orphan_pruned = 0
+
+    if rebuild:
+        await conn.execute(
+            "DELETE FROM codebase_embeddings WHERE project_id = %s",
+            (project_id,),
+        )
+        wiped = True
+
+    rows_cursor = await conn.execute(
+        "SELECT DISTINCT file_path FROM codebase_embeddings WHERE project_id = %s",
+        (project_id,),
+    )
+    db_paths = {row[0] async for row in rows_cursor}
+    manifest_path_set = {path for path in manifest_paths if path}
+    orphans = db_paths - manifest_path_set
+    for path in orphans:
+        await conn.execute(
+            "DELETE FROM codebase_embeddings WHERE project_id = %s AND file_path = %s",
+            (project_id, path),
+        )
+        orphan_pruned += 1
+
+    sync_plan = await execute_semantic_sync(conn, project_id, all_chunks)
+    sync_plan["wiped"] = wiped
+    sync_plan["orphan_pruned"] = orphan_pruned
+    return sync_plan
+
+
 def build_semantic_payload(
     source: str,
     language: str,

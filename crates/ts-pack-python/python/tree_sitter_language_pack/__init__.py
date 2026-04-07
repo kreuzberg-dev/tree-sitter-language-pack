@@ -241,6 +241,7 @@ from ._semantic_payload import (
     build_semantic_sync_plan,
     build_swift_chunks,
     execute_codebase_embedding_upsert,
+    execute_semantic_index_prepare,
     execute_semantic_sync,
 )
 
@@ -296,6 +297,7 @@ __all__ = [
     "download_all",
     "downloaded_languages",
     "execute_codebase_embedding_upsert",
+    "execute_semantic_index_prepare",
     "execute_semantic_sync",
     "extract",
     "extract_file_facts",
