@@ -158,7 +158,7 @@ fn clean_inherited_type_name(value: &str) -> String {
     cleaned
 }
 
-fn json_to_bolt(v: Value) -> neo4rs::BoltType {
+pub(crate) fn json_to_bolt(v: Value) -> neo4rs::BoltType {
     match v {
         Value::String(s) => neo4rs::BoltType::from(s),
         Value::Number(n) => {

@@ -34,6 +34,7 @@ extract = _native.extract
 validate_extraction = _native.validate_extraction
 extract_swift_semantic_facts = _native.extract_swift_semantic_facts
 enrich_swift_graph = _native.enrich_swift_graph
+finalize_struct_graph = _native.finalize_struct_graph
 
 
 def _safe_list(value: Any) -> list[Any]:

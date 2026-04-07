@@ -442,6 +442,7 @@ __all__ = [
     "extract",
     "enrich_swift_graph",
     "extract_swift_semantic_facts",
+    "finalize_struct_graph",
     "extension_ambiguity",
     "get_binding",
     "get_highlights_query",
@@ -473,6 +474,16 @@ def extract_swift_semantic_facts(project_path: str) -> dict[str, list[SwiftSeman
 def enrich_swift_graph(
     project_path: str,
     project_id: str,
+    indexed_files: list[str],
+    neo4j_uri: str,
+    neo4j_user: str,
+    neo4j_pass: str,
+    neo4j_db: str = "proxy",
+) -> dict[str, Any]: ...
+def finalize_struct_graph(
+    project_path: str,
+    project_id: str,
+    manifest_file: str,
     indexed_files: list[str],
     neo4j_uri: str,
     neo4j_user: str,

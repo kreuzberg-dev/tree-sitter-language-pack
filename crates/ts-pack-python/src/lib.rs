@@ -4,6 +4,7 @@ use std::path::Path;
 use std::sync::Mutex;
 
 mod swift_semantic;
+mod graph_finalize;
 
 /// Execute a closure with the Python GIL released.
 fn without_gil<F, R>(f: F) -> R
@@ -644,6 +645,38 @@ fn enrich_swift_graph(
     json_value_to_py(py, &value)
 }
 
+/// Run the Rust-owned post-index graph finalization pipeline.
+#[pyfunction]
+#[pyo3(signature = (project_path, project_id, manifest_file, indexed_files, neo4j_uri, neo4j_user, neo4j_pass, neo4j_db = "proxy".to_string()))]
+fn finalize_struct_graph(
+    py: Python<'_>,
+    project_path: &str,
+    project_id: &str,
+    manifest_file: &str,
+    indexed_files: Vec<String>,
+    neo4j_uri: &str,
+    neo4j_user: &str,
+    neo4j_pass: &str,
+    neo4j_db: String,
+) -> PyResult<Py<PyAny>> {
+    let value = without_gil(|| {
+        let rt = tokio::runtime::Runtime::new()
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+        rt.block_on(graph_finalize::finalize_struct_graph_async(
+            project_path,
+            project_id,
+            manifest_file,
+            &indexed_files,
+            neo4j_uri,
+            neo4j_user,
+            neo4j_pass,
+            &neo4j_db,
+        ))
+        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+    })?;
+    json_value_to_py(py, &value)
+}
+
 /// Convert a Python dict to a serde_json::Value.
 fn py_dict_to_json_value(dict: &pyo3::Bound<'_, PyDict>) -> PyResult<serde_json::Value> {
     let py = dict.py();
@@ -803,6 +836,7 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(extract_file_facts, m)?)?;
     m.add_function(wrap_pyfunction!(extract_swift_semantic_facts, m)?)?;
     m.add_function(wrap_pyfunction!(enrich_swift_graph, m)?)?;
+    m.add_function(wrap_pyfunction!(finalize_struct_graph, m)?)?;
     m.add_function(wrap_pyfunction!(init, m)?)?;
     m.add_function(wrap_pyfunction!(configure, m)?)?;
     m.add_function(wrap_pyfunction!(download, m)?)?;
