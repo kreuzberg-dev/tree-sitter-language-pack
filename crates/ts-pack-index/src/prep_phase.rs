@@ -202,7 +202,7 @@ pub(crate) fn prepare_graph_facts(
     }
 
     let mut implicit_import_symbol_edges = Vec::new();
-    let swift_implicit_imports = std::env::var("TS_PACK_SWIFT_IMPLICIT_IMPORTS")
+    let swift_implicit_imports = std::env::var("TS_PACK_ENABLE_HEURISTIC_IMPLICIT_IMPORTS_SYMBOL")
         .ok()
         .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
         .unwrap_or(false);
@@ -586,7 +586,7 @@ mod tests {
         )
         .unwrap();
 
-        let out = with_env_var("TS_PACK_SWIFT_IMPLICIT_IMPORTS", Some("1"), || {
+        let out = with_env_var("TS_PACK_ENABLE_HEURISTIC_IMPLICIT_IMPORTS_SYMBOL", Some("1"), || {
             prepare_graph_facts(
                 &all_symbols,
                 &all_files,
