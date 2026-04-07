@@ -26,6 +26,8 @@ language_count = _native.language_count
 manifest_languages = _native.manifest_languages
 parse_string = _native.parse_string
 process = _native.process
+extract = _native.extract
+validate_extraction = _native.validate_extraction
 
 try:
     detect_language_from_extension = _native.detect_language_from_extension
@@ -72,6 +74,7 @@ __all__ = [
     "download",
     "download_all",
     "downloaded_languages",
+    "extract",
     "get_binding",
     "get_language",
     "get_parser",
@@ -82,4 +85,5 @@ __all__ = [
     "manifest_languages",
     "parse_string",
     "process",
+    "validate_extraction",
 ]

@@ -1,4 +1,4 @@
-from typing import Literal, TypeAlias, TypedDict
+from typing import Any, Literal, TypeAlias, TypedDict
 
 from tree_sitter import Language, Parser
 
@@ -289,6 +289,7 @@ class ProcessResult(TypedDict):
     symbols: list[SymbolInfo]
     diagnostics: list[Diagnostic]
     chunks: list[CodeChunk]
+    extractions: dict[str, Any]
 
 class QueryCapture(TypedDict):
     capture_name: str
@@ -379,6 +380,7 @@ __all__ = [
     "download",
     "download_all",
     "downloaded_languages",
+    "extract",
     "extension_ambiguity",
     "get_binding",
     "get_highlights_query",
@@ -392,6 +394,7 @@ __all__ = [
     "manifest_languages",
     "parse_string",
     "process",
+    "validate_extraction",
 ]
 
 def get_binding(name: SupportedLanguage) -> object: ...
@@ -402,6 +405,8 @@ def has_language(name: str) -> bool: ...
 def language_count() -> int: ...
 def parse_string(language: str, source: str) -> TreeHandle: ...
 def process(source: str, config: ProcessConfig) -> ProcessResult: ...
+def extract(source: str, config: dict[str, object]) -> dict[str, Any]: ...
+def validate_extraction(config: dict[str, object]) -> dict[str, Any]: ...
 def init(config: dict[str, object]) -> None: ...
 def configure(*, cache_dir: str | None = None) -> None: ...
 def download(names: list[str]) -> int: ...
