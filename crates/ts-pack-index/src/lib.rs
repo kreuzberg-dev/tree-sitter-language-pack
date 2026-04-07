@@ -4,9 +4,9 @@ mod parse_phase;
 mod prep_phase;
 mod swift;
 mod tags;
+mod write_phase;
 mod writers;
 
-use futures::{StreamExt, stream};
 use neo4rs::{Graph, Query};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -42,24 +42,24 @@ pub struct IndexerConfig {
 // ---------------------------------------------------------------------------
 
 /// Number of nodes per UNWIND batch (file nodes, symbol nodes)
-const NODE_BATCH_SIZE: usize = 5000;
+pub(crate) const NODE_BATCH_SIZE: usize = 5000;
 /// Number of :CONTAINS / :IMPORTS relationships per UNWIND batch.
 /// Smaller than nodes: each row acquires 2 read locks + 1 write scan.
-const REL_BATCH_SIZE: usize = 1000;
+pub(crate) const REL_BATCH_SIZE: usize = 1000;
 /// Number of Import nodes per UNWIND batch
-const IMPORT_BATCH_SIZE: usize = 2000;
+pub(crate) const IMPORT_BATCH_SIZE: usize = 2000;
 /// Number of CallSiteRow items per CALLS write batch (each may unwind many callees)
-const CALLS_BATCH_SIZE: usize = 200;
+pub(crate) const CALLS_BATCH_SIZE: usize = 200;
 
 /// Concurrent writers for node phases.
 /// Neo4j Community Edition serialises above 4 concurrent writers internally;
 /// higher values just add connection + lock-queue overhead.
-const NODE_CONCURRENCY: usize = 4;
+pub(crate) const NODE_CONCURRENCY: usize = 4;
 
 /// Concurrent writers for relationship MERGE.
 /// Relationship MERGE scans all edges from the parent node (O(degree)).
 /// 2 is the sweet spot on Community Edition for this query shape.
-const REL_CONCURRENCY: usize = 2;
+pub(crate) const REL_CONCURRENCY: usize = 2;
 
 /// Max files processed in one Rayon + Neo4j cycle before writing
 const MANIFEST_BATCH_SIZE: usize = 1000;
@@ -89,7 +89,7 @@ pub(crate) const WINNOW_MEDIUM_W: usize = 5;
 pub(crate) const WINNOW_LARGE_K: usize = 15;
 pub(crate) const WINNOW_LARGE_W: usize = 7;
 
-fn external_api_id(project_id: &str, url: &str) -> String {
+pub(crate) fn external_api_id(project_id: &str, url: &str) -> String {
     pathing::external_api_id(project_id, url)
 }
 
@@ -97,7 +97,7 @@ fn project_root_from_manifest(manifest: &[ManifestEntry]) -> Option<String> {
     pathing::project_root_from_manifest(manifest)
 }
 
-fn extract_prisma_models(schema_text: &str) -> Vec<String> {
+pub(crate) fn extract_prisma_models(schema_text: &str) -> Vec<String> {
     let mut models: HashSet<String> = HashSet::new();
     let tree = match ts_pack::parse_string("prisma", schema_text.as_bytes()) {
         Ok(tree) => tree,
@@ -190,20 +190,20 @@ pub(crate) struct PythonInferredCallRow {
 }
 
 pub(crate) struct DbEdgeRow {
-    src: String,
-    tgt: String,
+    pub(crate) src: String,
+    pub(crate) tgt: String,
 }
 
 pub(crate) struct DbModelEdgeRow {
-    src: String,
-    model: String,
-    project_id: Arc<str>,
+    pub(crate) src: String,
+    pub(crate) model: String,
+    pub(crate) project_id: Arc<str>,
 }
 
 pub(crate) struct ExternalApiNode {
-    id: String,
-    url: String,
-    project_id: Arc<str>,
+    pub(crate) id: String,
+    pub(crate) url: String,
+    pub(crate) project_id: Arc<str>,
 }
 
 pub(crate) struct ExternalApiEdgeRow {
@@ -646,66 +646,6 @@ impl RelRow {
     }
 }
 
-async fn write_file_nodes(graph: &Arc<Graph>, batch: &[FileNode]) {
-    writers::write_file_nodes(graph, batch).await;
-}
-
-async fn write_symbol_nodes(graph: &Arc<Graph>, batch: &[SymbolNode], label: &str) {
-    writers::write_symbol_nodes(graph, batch, label).await;
-}
-
-async fn write_import_nodes(graph: &Arc<Graph>, batch: &[ImportNode]) {
-    writers::write_import_nodes(graph, batch).await;
-}
-
-async fn write_relationships(graph: &Arc<Graph>, batch: &[RelRow]) {
-    writers::write_relationships(graph, batch).await;
-}
-
-async fn write_calls(graph: &Arc<Graph>, batch: &[SymbolCallRow]) {
-    writers::write_calls(graph, batch).await;
-}
-
-async fn write_inferred_calls(graph: &Arc<Graph>, batch: &[InferredCallRow]) {
-    writers::write_inferred_calls(graph, batch).await;
-}
-
-async fn write_python_inferred_calls(graph: &Arc<Graph>, batch: &[PythonInferredCallRow]) {
-    writers::write_python_inferred_calls(graph, batch).await;
-}
-
-async fn write_db_edges(graph: &Arc<Graph>, batch: &[DbEdgeRow]) {
-    writers::write_db_edges(graph, batch).await;
-}
-
-async fn write_db_model_edges(graph: &Arc<Graph>, batch: &[DbModelEdgeRow]) {
-    writers::write_db_model_edges(graph, batch).await;
-}
-
-async fn write_external_api_nodes(graph: &Arc<Graph>, batch: &[ExternalApiNode]) {
-    writers::write_external_api_nodes(graph, batch).await;
-}
-
-async fn write_external_api_edges(graph: &Arc<Graph>, batch: &[ExternalApiEdgeRow]) {
-    writers::write_external_api_edges(graph, batch).await;
-}
-
-async fn write_import_symbol_edges(graph: &Arc<Graph>, batch: &[ImportSymbolEdgeRow]) {
-    writers::write_import_symbol_edges(graph, batch).await;
-}
-
-async fn write_implicit_import_symbol_edges(graph: &Arc<Graph>, batch: &[ImplicitImportSymbolEdgeRow]) {
-    writers::write_implicit_import_symbol_edges(graph, batch).await;
-}
-
-async fn write_export_symbol_edges(graph: &Arc<Graph>, batch: &[ExportSymbolEdgeRow]) {
-    writers::write_export_symbol_edges(graph, batch).await;
-}
-
-async fn write_launch_edges(graph: &Arc<Graph>, batch: &[LaunchEdgeRow]) {
-    writers::write_launch_edges(graph, batch).await;
-}
-
 // ---------------------------------------------------------------------------
 // Main entry point
 // ---------------------------------------------------------------------------
@@ -910,361 +850,31 @@ pub async fn index_workspace(
     for entry in &manifest {
         manifest_abs.insert(entry.rel_path.clone(), entry.abs_path.clone());
     }
-
-    let schema_id = all_files
-        .iter()
-        .find(|f| f.filepath == "prisma/schema.prisma")
-        .map(|f| f.id.clone());
-    if let Some(schema_id) = schema_id {
-        let _ = graph
-            .run(
-                Query::new("MATCH (:File {project_id: $pid})-[r:CALLS_DB]->() DELETE r".to_string())
-                    .param("pid", project_id.to_string()),
-            )
-            .await;
-        let mut seen: std::collections::HashSet<String> = std::collections::HashSet::new();
-        let mut db_edges: Vec<DbEdgeRow> = Vec::new();
-        for src in &db_sources {
-            if seen.insert(src.clone()) {
-                db_edges.push(DbEdgeRow {
-                    src: src.clone(),
-                    tgt: schema_id.clone(),
-                });
-            }
-        }
-        if !db_edges.is_empty() {
-            let t_db = Instant::now();
-            let db_count = db_edges.len();
-            stream::iter(db_edges.chunks(CALLS_BATCH_SIZE))
-                .for_each_concurrent(REL_CONCURRENCY, |chunk| {
-                    let g = Arc::clone(&graph);
-                    async move { write_db_edges(&g, chunk).await }
-                })
-                .await;
-            eprintln!(
-                "[ts-pack-index] CALLS_DB writes done in {:.2}s (rows={})",
-                t_db.elapsed().as_secs_f64(),
-                db_count,
-            );
-        }
-
-        if let Some(schema_abs) = manifest_abs.get("prisma/schema.prisma") {
-            if let Ok(schema_text) = std::fs::read_to_string(schema_abs) {
-                let mut model_map: HashMap<String, String> = HashMap::new();
-                let models = extract_prisma_models(&schema_text);
-                for model in models {
-                    if model.is_empty() {
-                        continue;
-                    }
-                    model_map.insert(model.to_lowercase(), model.clone());
-                    if let Some(first) = model.chars().next() {
-                        let delegate = first.to_lowercase().collect::<String>() + &model[1..];
-                        model_map.insert(delegate.to_lowercase(), model.clone());
-                    }
-                }
-
-                let mut db_model_edges: Vec<DbModelEdgeRow> = Vec::new();
-                for (file_id, delegate) in &db_delegates_by_file {
-                    if let Some(model) = model_map.get(&delegate.to_lowercase()) {
-                        db_model_edges.push(DbModelEdgeRow {
-                            src: file_id.clone(),
-                            model: model.clone(),
-                            project_id: Arc::clone(&project_id),
-                        });
-                    }
-                }
-
-                let _ = graph
-                    .run(
-                        Query::new("MATCH (m:Model {project_id: $pid}) DETACH DELETE m".to_string())
-                            .param("pid", project_id.to_string()),
-                    )
-                    .await;
-                if !db_model_edges.is_empty() {
-                    let t_dbm = Instant::now();
-                    let dbm_count = db_model_edges.len();
-                    stream::iter(db_model_edges.chunks(CALLS_BATCH_SIZE))
-                        .for_each_concurrent(REL_CONCURRENCY, |chunk| {
-                            let g = Arc::clone(&graph);
-                            async move { write_db_model_edges(&g, chunk).await }
-                        })
-                        .await;
-                    eprintln!(
-                        "[ts-pack-index] CALLS_DB_MODEL writes done in {:.2}s (rows={})",
-                        t_dbm.elapsed().as_secs_f64(),
-                        dbm_count,
-                    );
-                }
-            }
-        }
-    }
-
-    let _ = graph
-        .run(
-            Query::new("MATCH (:File {project_id: $pid})-[r:CALLS_API_EXTERNAL]->() DELETE r".to_string())
-                .param("pid", project_id.to_string()),
-        )
-        .await;
-    let _ = graph
-        .run(
-            Query::new("MATCH (e:ExternalAPI {project_id: $pid}) DETACH DELETE e".to_string())
-                .param("pid", project_id.to_string()),
-        )
-        .await;
-    if !external_api_urls.is_empty() && !external_api_edges.is_empty() {
-        let t_ext = Instant::now();
-        let mut external_nodes: Vec<ExternalApiNode> = Vec::new();
-        for url in &external_api_urls {
-            external_nodes.push(ExternalApiNode {
-                id: external_api_id(&project_id, url),
-                url: url.clone(),
-                project_id: Arc::clone(&project_id),
-            });
-        }
-        stream::iter(external_nodes.chunks(NODE_BATCH_SIZE))
-            .for_each_concurrent(NODE_CONCURRENCY, |chunk| {
-                let g = Arc::clone(&graph);
-                async move { write_external_api_nodes(&g, chunk).await }
-            })
-            .await;
-        let ext_count = external_api_edges.len();
-        stream::iter(external_api_edges.chunks(CALLS_BATCH_SIZE))
-            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
-                let g = Arc::clone(&graph);
-                async move { write_external_api_edges(&g, chunk).await }
-            })
-            .await;
-        eprintln!(
-            "[ts-pack-index] CALLS_API_EXTERNAL writes done in {:.2}s (rows={})",
-            t_ext.elapsed().as_secs_f64(),
-            ext_count,
-        );
-    }
-
-    let _ = graph
-        .run(
-            Query::new("MATCH (:File {project_id: $pid})-[r:IMPORTS_SYMBOL]->() DELETE r".to_string())
-                .param("pid", project_id.to_string()),
-        )
-        .await;
-    let _ = graph
-        .run(
-            Query::new("MATCH (:File {project_id: $pid})-[r:IMPLICIT_IMPORTS_SYMBOL]->() DELETE r".to_string())
-                .param("pid", project_id.to_string()),
-        )
-        .await;
-    let _ = graph
-        .run(
-            Query::new("MATCH (:File {project_id: $pid})-[r:EXPORTS_SYMBOL]->() DELETE r".to_string())
-                .param("pid", project_id.to_string()),
-        )
-        .await;
-
-    // --- Phase 2: Write file nodes ----------------------------------------
-    let t_nodes = Instant::now();
-
-    stream::iter(all_files.chunks(NODE_BATCH_SIZE))
-        .for_each_concurrent(NODE_CONCURRENCY, |chunk| {
-            let g = Arc::clone(&graph);
-            async move { write_file_nodes(&g, chunk).await }
-        })
-        .await;
-
-    // Write symbol nodes per label group
-    let symbol_labels: Vec<(&'static str, Vec<SymbolNode>)> = all_symbols.into_iter().collect();
-    for (label, nodes) in &symbol_labels {
-        stream::iter(nodes.chunks(NODE_BATCH_SIZE))
-            .for_each_concurrent(NODE_CONCURRENCY, |chunk| {
-                let g = Arc::clone(&graph);
-                async move { write_symbol_nodes(&g, chunk, label).await }
-            })
-            .await;
-    }
-
-    let node_elapsed = t_nodes.elapsed();
-    let total_symbols: usize = symbol_labels.iter().map(|(_, v)| v.len()).sum();
-    eprintln!(
-        "[ts-pack-index] Node writes done in {:.2}s (files={}, symbols={})",
-        node_elapsed.as_secs_f64(),
-        all_files.len(),
-        total_symbols,
-    );
-
-    if !import_symbol_edges.is_empty() {
-        let t_imp = Instant::now();
-        let imp_count = import_symbol_edges.len();
-        stream::iter(import_symbol_edges.chunks(CALLS_BATCH_SIZE))
-            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
-                let g = Arc::clone(&graph);
-                async move { write_import_symbol_edges(&g, chunk).await }
-            })
-            .await;
-        eprintln!(
-            "[ts-pack-index] IMPORTS_SYMBOL writes done in {:.2}s (rows={})",
-            t_imp.elapsed().as_secs_f64(),
-            imp_count,
-        );
-    }
-
-    if !implicit_import_symbol_edges.is_empty() {
-        let t_imp = Instant::now();
-        let imp_count = implicit_import_symbol_edges.len();
-        stream::iter(implicit_import_symbol_edges.chunks(CALLS_BATCH_SIZE))
-            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
-                let g = Arc::clone(&graph);
-                async move { write_implicit_import_symbol_edges(&g, chunk).await }
-            })
-            .await;
-        eprintln!(
-            "[ts-pack-index] IMPLICIT_IMPORTS_SYMBOL writes done in {:.2}s (rows={})",
-            t_imp.elapsed().as_secs_f64(),
-            imp_count,
-        );
-    }
-
-    if !export_symbol_edges.is_empty() {
-        let t_exp = Instant::now();
-        let exp_count = export_symbol_edges.len();
-        stream::iter(export_symbol_edges.chunks(CALLS_BATCH_SIZE))
-            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
-                let g = Arc::clone(&graph);
-                async move { write_export_symbol_edges(&g, chunk).await }
-            })
-            .await;
-        eprintln!(
-            "[ts-pack-index] EXPORTS_SYMBOL writes done in {:.2}s (rows={})",
-            t_exp.elapsed().as_secs_f64(),
-            exp_count,
-        );
-    }
-
-    if !launch_edges.is_empty() {
-        let t_launch = Instant::now();
-        let launch_count = launch_edges.len();
-        stream::iter(launch_edges.chunks(CALLS_BATCH_SIZE))
-            .for_each_concurrent(REL_CONCURRENCY, |chunk| {
-                let g = Arc::clone(&graph);
-                async move { write_launch_edges(&g, chunk).await }
-            })
-            .await;
-        eprintln!(
-            "[ts-pack-index] LAUNCHES writes done in {:.2}s (rows={})",
-            t_launch.elapsed().as_secs_f64(),
-            launch_count,
-        );
-    }
-
-    // --- Phase 3: Write import nodes -------------------------------------
-    let t_imports = Instant::now();
-    let import_count = all_imports.len();
-
-    stream::iter(all_imports.chunks(IMPORT_BATCH_SIZE))
-        .for_each_concurrent(NODE_CONCURRENCY, |chunk| {
-            let g = Arc::clone(&graph);
-            async move { write_import_nodes(&g, chunk).await }
-        })
-        .await;
-
-    eprintln!(
-        "[ts-pack-index] Import writes done in {:.2}s (count={})",
-        t_imports.elapsed().as_secs_f64(),
-        import_count,
-    );
-
-    // --- Phase 4: Write CONTAINS relationships ---------------------------
-    // Combine structural and import-edge relations into one flush.
-    all_rels.extend(all_import_rels);
-    let rel_count = all_rels.len();
-
-    let t_rels = Instant::now();
-
-    // Relationship MERGE: lowest concurrency to minimise lock contention.
-    stream::iter(all_rels.chunks(REL_BATCH_SIZE))
-        .for_each_concurrent(REL_CONCURRENCY, |chunk| {
-            let g = Arc::clone(&graph);
-            async move { write_relationships(&g, chunk).await }
-        })
-        .await;
-
-    eprintln!(
-        "[ts-pack-index] Relationship writes done in {:.2}s (count={})",
-        t_rels.elapsed().as_secs_f64(),
-        rel_count,
-    );
-
-    // --- Phase 5: Write CALLS relationships --------------------------------
-    // Resolve symbol-level call edges (Symbol→Symbol, File→Symbol fallback).
-    let t_calls = Instant::now();
-    let calls_row_count = all_symbol_call_rows.len();
-
-    stream::iter(all_symbol_call_rows.chunks(CALLS_BATCH_SIZE))
-        .for_each_concurrent(REL_CONCURRENCY, |chunk| {
-            let g = Arc::clone(&graph);
-            async move { write_calls(&g, chunk).await }
-        })
-        .await;
-
-    // --- Phase 6: Clone grouping (Rust) ------------------------------------
-    let clone_enabled = std::env::var("LM_PROXY_CLONE_ENRICH")
-        .ok()
-        .map(|v| v != "0" && !v.eq_ignore_ascii_case("false"))
-        .unwrap_or(true);
-    if clone_enabled && !clone_candidates.is_empty() {
-        let cfg = clone_enrich::CloneConfig {
-            min_overlap: WINNOW_MIN_OVERLAP,
-            token_sim_threshold: WINNOW_TOKEN_SIM_THRESHOLD,
-            kgram_sim_threshold: WINNOW_KGRAM_SIM_THRESHOLD,
-            min_score: WINNOW_MIN_SCORE,
-            bucket_limit: WINNOW_BUCKET_LIMIT,
-            fallback_hashes: WINNOW_FALLBACK_HASHES,
-            force_all_hashes_max_fps: WINNOW_FORCE_ALL_HASHES_MAX_FPS,
-        };
-        clone_enrich::write_clone_enrichment(
-            &graph,
-            project_id.as_ref(),
-            &clone_candidates,
-            REL_BATCH_SIZE,
-            REL_CONCURRENCY,
-            &cfg,
-        )
-        .await;
-    }
-
-    eprintln!(
-        "[ts-pack-index] CALLS writes done in {:.2}s (rows={})",
-        t_calls.elapsed().as_secs_f64(),
-        calls_row_count,
-    );
-
-    if !inferred_call_rows.is_empty() || !python_inferred_call_rows.is_empty() {
-        let t_inf = Instant::now();
-        let swift_count = inferred_call_rows.len();
-        let py_count = python_inferred_call_rows.len();
-
-        if !inferred_call_rows.is_empty() {
-            stream::iter(inferred_call_rows.chunks(CALLS_BATCH_SIZE))
-                .for_each_concurrent(REL_CONCURRENCY, |chunk| {
-                    let g = Arc::clone(&graph);
-                    async move { write_inferred_calls(&g, chunk).await }
-                })
-                .await;
-        }
-
-        if !python_inferred_call_rows.is_empty() {
-            stream::iter(python_inferred_call_rows.chunks(CALLS_BATCH_SIZE))
-                .for_each_concurrent(REL_CONCURRENCY, |chunk| {
-                    let g = Arc::clone(&graph);
-                    async move { write_python_inferred_calls(&g, chunk).await }
-                })
-                .await;
-        }
-
-        eprintln!(
-            "[ts-pack-index] CALLS_INFERRED writes done in {:.2}s (rows={})",
-            t_inf.elapsed().as_secs_f64(),
-            swift_count + py_count,
-        );
-    }
+    let write_summary = write_phase::run_write_phases(
+        &graph,
+        &project_id,
+        write_phase::WriteInputs {
+            all_files,
+            all_symbols,
+            all_imports,
+            all_rels,
+            all_import_rels,
+            all_symbol_call_rows,
+            clone_candidates,
+            inferred_call_rows,
+            python_inferred_call_rows,
+            db_sources,
+            db_delegates_by_file,
+            external_api_edges,
+            external_api_urls,
+            import_symbol_edges,
+            implicit_import_symbol_edges,
+            export_symbol_edges,
+            launch_edges,
+            manifest_abs,
+        },
+    )
+    .await;
 
     // --- Summary ----------------------------------------------------------
     let total_elapsed = t0.elapsed();
@@ -1272,10 +882,10 @@ pub async fn index_workspace(
         "[ts-pack-index] Done — {total_files} files | \
          parse={:.2}s nodes={:.2}s imports={:.2}s rels={:.2}s calls={:.2}s total={:.2}s",
         parse_elapsed.as_secs_f64(),
-        node_elapsed.as_secs_f64(),
-        t_imports.elapsed().as_secs_f64(),
-        t_rels.elapsed().as_secs_f64(),
-        t_calls.elapsed().as_secs_f64(),
+        write_summary.node_elapsed.as_secs_f64(),
+        write_summary.import_elapsed.as_secs_f64(),
+        write_summary.rel_elapsed.as_secs_f64(),
+        write_summary.calls_elapsed.as_secs_f64(),
         total_elapsed.as_secs_f64(),
     );
 
