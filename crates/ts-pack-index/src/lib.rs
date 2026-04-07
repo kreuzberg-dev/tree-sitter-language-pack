@@ -1,6 +1,7 @@
 mod clone_enrich;
 mod pathing;
 mod parse_phase;
+mod prep_phase;
 mod swift;
 mod tags;
 mod writers;
@@ -92,24 +93,8 @@ fn external_api_id(project_id: &str, url: &str) -> String {
     pathing::external_api_id(project_id, url)
 }
 
-fn clean_import_name(name: &str) -> String {
-    pathing::clean_import_name(name)
-}
-
 fn project_root_from_manifest(manifest: &[ManifestEntry]) -> Option<String> {
     pathing::project_root_from_manifest(manifest)
-}
-
-fn build_swift_module_map(project_root: &str, files_set: &HashSet<String>) -> HashMap<String, Vec<String>> {
-    pathing::build_swift_module_map(project_root, files_set)
-}
-
-fn resolve_module_path(src_fp: &str, module: &str, files_set: &HashSet<String>) -> Option<String> {
-    pathing::resolve_module_path(src_fp, module, files_set)
-}
-
-fn resolve_launch_path(src_fp: &str, raw: &str, project_root: &str, files_set: &HashSet<String>) -> Option<String> {
-    pathing::resolve_launch_path(src_fp, raw, project_root, files_set)
 }
 
 fn extract_prisma_models(schema_text: &str) -> Vec<String> {
@@ -141,14 +126,6 @@ fn extract_prisma_models(schema_text: &str) -> Vec<String> {
         }
     }
     models.into_iter().collect()
-}
-
-// ---------------------------------------------------------------------------
-// Swift inference helpers
-// ---------------------------------------------------------------------------
-
-fn normalize_swift_type(raw: &str) -> Option<String> {
-    swift::normalize_swift_type(raw)
 }
 
 // ---------------------------------------------------------------------------
@@ -195,21 +172,21 @@ pub(crate) struct SymbolCallRow {
 
 /// One inferred call edge (Swift extension resolution).
 pub(crate) struct InferredCallRow {
-    caller_id: String,
-    callee: String,
-    receiver_type: String,
-    project_id: Arc<str>,
-    caller_filepath: String,
-    allow_same_file: bool,
+    pub(crate) caller_id: String,
+    pub(crate) callee: String,
+    pub(crate) receiver_type: String,
+    pub(crate) project_id: Arc<str>,
+    pub(crate) caller_filepath: String,
+    pub(crate) allow_same_file: bool,
 }
 
 pub(crate) struct PythonInferredCallRow {
-    caller_id: String,
-    callee: String,
-    callee_filepath: String,
-    project_id: Arc<str>,
-    caller_filepath: String,
-    allow_same_file: bool,
+    pub(crate) caller_id: String,
+    pub(crate) callee: String,
+    pub(crate) callee_filepath: String,
+    pub(crate) project_id: Arc<str>,
+    pub(crate) caller_filepath: String,
+    pub(crate) allow_same_file: bool,
 }
 
 pub(crate) struct DbEdgeRow {
@@ -230,8 +207,8 @@ pub(crate) struct ExternalApiNode {
 }
 
 pub(crate) struct ExternalApiEdgeRow {
-    src: String,
-    tgt: String,
+    pub(crate) src: String,
+    pub(crate) tgt: String,
 }
 
 pub(crate) struct CloneGroupRow {
@@ -277,9 +254,9 @@ pub(crate) struct FileCloneCanonRow {
 }
 
 pub(crate) struct LaunchEdgeRow {
-    src_filepath: String,
-    tgt_filepath: String,
-    project_id: String,
+    pub(crate) src_filepath: String,
+    pub(crate) tgt_filepath: String,
+    pub(crate) project_id: String,
 }
 
 pub(crate) struct ImportSymbolRequest {
@@ -290,18 +267,18 @@ pub(crate) struct ImportSymbolRequest {
 }
 
 pub(crate) struct ImportSymbolEdgeRow {
-    src: String,
-    tgt: String,
+    pub(crate) src: String,
+    pub(crate) tgt: String,
 }
 
 pub(crate) struct ImplicitImportSymbolEdgeRow {
-    src: String,
-    tgt: String,
+    pub(crate) src: String,
+    pub(crate) tgt: String,
 }
 
 pub(crate) struct ExportSymbolEdgeRow {
-    src: String,
-    tgt: String,
+    pub(crate) src: String,
+    pub(crate) tgt: String,
 }
 
 pub(crate) struct SwiftFileContext {
@@ -810,8 +787,6 @@ pub async fn index_workspace(
     let mut implicit_import_symbol_edges: Vec<ImplicitImportSymbolEdgeRow> = Vec::new();
     let mut export_symbol_edges: Vec<ExportSymbolEdgeRow> = Vec::new();
     let mut launch_requests: Vec<(String, String)> = Vec::new();
-    let mut seen_import_symbol: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
-    let mut seen_implicit_import_symbol: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
     let mut seen_export_symbol: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
     let mut import_symbol_requests: Vec<ImportSymbolRequest> = Vec::new();
 
@@ -914,295 +889,22 @@ pub async fn index_workspace(
         all_imports.len(),
     );
 
-    let mut symbols_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
-    let mut exported_symbols_by_file: HashMap<String, Vec<String>> = HashMap::new();
-    let mut exported_symbols_by_prefix: HashMap<String, Vec<String>> = HashMap::new();
-    for syms in all_symbols.values() {
-        for sym in syms {
-            symbols_by_file
-                .entry(sym.filepath.clone())
-                .or_default()
-                .insert(sym.name.clone(), sym.id.clone());
-            if sym.is_exported {
-                exported_symbols_by_file
-                    .entry(sym.filepath.clone())
-                    .or_default()
-                    .push(sym.id.clone());
-                if let Some((prefix, _)) = sym.filepath.split_once('/') {
-                    exported_symbols_by_prefix
-                        .entry(prefix.to_string())
-                        .or_default()
-                        .push(sym.id.clone());
-                }
-            }
-        }
-    }
-    let file_id_by_path: HashMap<String, String> =
-        all_files.iter().map(|f| (f.filepath.clone(), f.id.clone())).collect();
-    let files_set: HashSet<String> = all_files.iter().map(|f| f.filepath.clone()).collect();
-    let project_root_str = project_root.as_deref().unwrap_or("");
-    let mut launch_edges: Vec<LaunchEdgeRow> = Vec::new();
-    if std::env::var("TS_PACK_LAUNCH_EDGES")
-        .ok()
-        .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
-        .unwrap_or(false)
-    {
-        let mut seen_launch: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
-        for (src_fp, raw) in &launch_requests {
-            let Some(tgt_fp) = resolve_launch_path(src_fp, raw, project_root_str, &files_set) else {
-                continue;
-            };
-            if src_fp == &tgt_fp {
-                continue;
-            }
-            if seen_launch.insert((src_fp.clone(), tgt_fp.clone())) {
-                launch_edges.push(LaunchEdgeRow {
-                    src_filepath: src_fp.clone(),
-                    tgt_filepath: tgt_fp,
-                    project_id: project_id.to_string(),
-                });
-            }
-        }
-    }
-    let swift_module_map = project_root
-        .as_deref()
-        .map(|root| build_swift_module_map(root, &files_set))
-        .unwrap_or_default();
-    let mut swift_file_modules: HashMap<String, Vec<String>> = HashMap::new();
-    for (module, module_files) in &swift_module_map {
-        for fp in module_files {
-            swift_file_modules.entry(fp.clone()).or_default().push(module.clone());
-        }
-    }
-    let swift_implicit_imports = std::env::var("TS_PACK_SWIFT_IMPLICIT_IMPORTS")
-        .ok()
-        .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
-        .unwrap_or(false);
-    for req in &import_symbol_requests {
-        let target_fp = resolve_module_path(&req.src_filepath, &req.module, &files_set);
-        let sym_map = target_fp.as_ref().and_then(|fp| symbols_by_file.get(fp));
-        if req.items.is_empty() {
-            if let Some(fp) = target_fp.as_ref() {
-                if let Some(exported) = exported_symbols_by_file.get(fp) {
-                    for sym_id in exported {
-                        if seen_import_symbol.insert((req.src_id.clone(), sym_id.clone())) {
-                            import_symbol_edges.push(ImportSymbolEdgeRow {
-                                src: req.src_id.clone(),
-                                tgt: sym_id.clone(),
-                            });
-                        }
-                    }
-                    continue;
-                }
-            }
-            if req.src_filepath.ends_with(".swift") {
-                if let Some(module_files) = swift_module_map.get(&req.module) {
-                    for fp in module_files {
-                        if let Some(exported) = exported_symbols_by_file.get(fp) {
-                            for sym_id in exported {
-                                if seen_import_symbol.insert((req.src_id.clone(), sym_id.clone())) {
-                                    import_symbol_edges.push(ImportSymbolEdgeRow {
-                                        src: req.src_id.clone(),
-                                        tgt: sym_id.clone(),
-                                    });
-                                }
-                            }
-                        }
-                    }
-                    continue;
-                }
-            }
-            if let Some(prefix) = req.module.split('.').next().filter(|p| !p.is_empty()) {
-                if let Some(exported) = exported_symbols_by_prefix.get(prefix) {
-                    for sym_id in exported {
-                        if seen_import_symbol.insert((req.src_id.clone(), sym_id.clone())) {
-                            import_symbol_edges.push(ImportSymbolEdgeRow {
-                                src: req.src_id.clone(),
-                                tgt: sym_id.clone(),
-                            });
-                        }
-                    }
-                }
-            }
-            continue;
-        }
-
-        for item in &req.items {
-            let name = clean_import_name(item);
-            if name.is_empty() {
-                continue;
-            }
-            if let Some(sym_map) = sym_map {
-                if let Some(sym_id) = sym_map.get(&name) {
-                    if seen_import_symbol.insert((req.src_id.clone(), sym_id.clone())) {
-                        import_symbol_edges.push(ImportSymbolEdgeRow {
-                            src: req.src_id.clone(),
-                            tgt: sym_id.clone(),
-                        });
-                    }
-                }
-            }
-        }
-    }
-
-    if swift_implicit_imports {
-        for (src_fp, modules) in &swift_file_modules {
-            let Some(src_id) = file_id_by_path.get(src_fp) else {
-                continue;
-            };
-            for module in modules {
-                if let Some(module_files) = swift_module_map.get(module) {
-                    for fp in module_files {
-                        if fp == src_fp {
-                            continue;
-                        }
-                        if let Some(sym_map) = symbols_by_file.get(fp) {
-                            for sym_id in sym_map.values() {
-                                if seen_import_symbol.contains(&(src_id.clone(), sym_id.clone())) {
-                                    continue;
-                                }
-                                if seen_implicit_import_symbol.insert((src_id.clone(), sym_id.clone())) {
-                                    implicit_import_symbol_edges.push(ImplicitImportSymbolEdgeRow {
-                                        src: src_id.clone(),
-                                        tgt: sym_id.clone(),
-                                    });
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if !swift_extension_map.is_empty() && !swift_contexts.is_empty() {
-        let allow_same_file = std::env::var("TS_PACK_INCLUDE_INTRA_FILE_CALLS")
-            .ok()
-            .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
-            .unwrap_or(false);
-        let mut seen: std::collections::HashSet<(String, String, String)> = std::collections::HashSet::new();
-        for ctx in &swift_contexts {
-            for call in &ctx.call_sites {
-                let Some(recv_raw) = &call.receiver else {
-                    continue;
-                };
-
-                let recv = recv_raw.trim_end_matches(|c| c == '?' || c == '!');
-                if recv.is_empty() {
-                    continue;
-                }
-
-                let mut norm_ty = ctx.var_types.get(recv).and_then(|t| normalize_swift_type(t));
-
-                if norm_ty.is_none() {
-                    if recv == "self" || recv == "Self" {
-                        norm_ty = ctx
-                            .extension_spans
-                            .iter()
-                            .filter(|(sb, eb, _)| *sb <= call.start_byte && call.start_byte < *eb)
-                            .min_by_key(|(sb, eb, _)| eb - sb)
-                            .map(|(_, _, ty)| ty.clone())
-                            .or_else(|| {
-                                ctx.type_spans
-                                    .iter()
-                                    .filter(|(sb, eb, _)| *sb <= call.start_byte && call.start_byte < *eb)
-                                    .min_by_key(|(sb, eb, _)| eb - sb)
-                                    .map(|(_, _, ty)| ty.clone())
-                            });
-                    } else if swift_extension_map.contains_key(recv) {
-                        norm_ty = normalize_swift_type(recv);
-                    }
-                }
-
-                let Some(norm_ty) = norm_ty else {
-                    continue;
-                };
-
-                let mut candidates = Vec::new();
-                if let Some(methods) = swift_extension_map.get(&norm_ty) {
-                    if methods.contains(&call.callee) {
-                        candidates.push(norm_ty.clone());
-                    }
-                }
-                if candidates.is_empty() {
-                    if let Some((_, short)) = norm_ty.rsplit_once('.') {
-                        if let Some(methods) = swift_extension_map.get(short) {
-                            if methods.contains(&call.callee) {
-                                candidates.push(short.to_string());
-                            }
-                        }
-                    }
-                }
-                if candidates.is_empty() {
-                    continue;
-                }
-
-                let caller_id = ctx
-                    .symbol_spans
-                    .iter()
-                    .filter(|(sb, eb, _)| *sb <= call.start_byte && call.start_byte < *eb)
-                    .min_by_key(|(sb, eb, _)| eb - sb)
-                    .map(|(_, _, id)| id.clone())
-                    .unwrap_or_else(|| ctx.file_id.clone());
-
-                for ty in candidates {
-                    if seen.insert((caller_id.clone(), call.callee.clone(), ty.clone())) {
-                        inferred_call_rows.push(InferredCallRow {
-                            caller_id: caller_id.clone(),
-                            callee: call.callee.clone(),
-                            receiver_type: ty,
-                            project_id: Arc::clone(&project_id),
-                            caller_filepath: ctx.filepath.clone(),
-                            allow_same_file,
-                        });
-                    }
-                }
-            }
-        }
-    }
-
-    let python_attr_calls = std::env::var("TS_PACK_PY_ATTR_CALLS")
-        .ok()
-        .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
-        .unwrap_or(false);
-    if python_attr_calls && !python_contexts.is_empty() {
-        let allow_same_file = std::env::var("TS_PACK_INCLUDE_INTRA_FILE_CALLS")
-            .ok()
-            .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
-            .unwrap_or(false);
-        let mut seen: std::collections::HashSet<(String, String, String)> = std::collections::HashSet::new();
-        for ctx in &python_contexts {
-            for call in &ctx.call_sites {
-                let Some(recv) = &call.receiver else {
-                    continue;
-                };
-                let Some(module) = ctx.module_aliases.get(recv) else {
-                    continue;
-                };
-                let Some(module_fp) = resolve_module_path(&ctx.filepath, module, &files_set) else {
-                    continue;
-                };
-
-                let caller_id = ctx
-                    .symbol_spans
-                    .iter()
-                    .filter(|(sb, eb, _)| *sb <= call.start_byte && call.start_byte < *eb)
-                    .min_by_key(|(sb, eb, _)| eb - sb)
-                    .map(|(_, _, id)| id.clone())
-                    .unwrap_or_else(|| ctx.file_id.clone());
-                if seen.insert((caller_id.clone(), call.callee.clone(), module_fp.clone())) {
-                    python_inferred_call_rows.push(PythonInferredCallRow {
-                        caller_id,
-                        callee: call.callee.clone(),
-                        callee_filepath: module_fp,
-                        project_id: Arc::clone(&project_id),
-                        caller_filepath: ctx.filepath.clone(),
-                        allow_same_file,
-                    });
-                }
-            }
-        }
-    }
+    let prep = prep_phase::prepare_graph_facts(
+        &all_symbols,
+        &all_files,
+        &project_id,
+        project_root.as_deref(),
+        &launch_requests,
+        &import_symbol_requests,
+        &swift_extension_map,
+        &swift_contexts,
+        &python_contexts,
+    );
+    import_symbol_edges.extend(prep.import_symbol_edges);
+    implicit_import_symbol_edges.extend(prep.implicit_import_symbol_edges);
+    inferred_call_rows.extend(prep.inferred_call_rows);
+    python_inferred_call_rows.extend(prep.python_inferred_call_rows);
+    let launch_edges = prep.launch_edges;
 
     let mut manifest_abs: HashMap<String, String> = HashMap::new();
     for entry in &manifest {
