@@ -544,6 +544,102 @@ pub(crate) fn resolve_module_path(
     None
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::fs;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn unique_temp_dir(name: &str) -> PathBuf {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        std::env::temp_dir().join(format!("ts-pack-index-{name}-{nanos}"))
+    }
+
+    #[test]
+    fn joins_urls_consistently() {
+        assert_eq!(
+            join_url("https://api.example.com", "/v1/test"),
+            Some("https://api.example.com/v1/test".to_string())
+        );
+        assert_eq!(
+            join_url("https://api.example.com/", "/v1/test"),
+            Some("https://api.example.com/v1/test".to_string())
+        );
+        assert_eq!(join_url("not-a-url", "/v1/test"), None);
+    }
+
+    #[test]
+    fn resolves_relative_ts_module_paths() {
+        let files = HashSet::from([
+            "src/main.ts".to_string(),
+            "src/api/routes.ts".to_string(),
+            "src/api/index.ts".to_string(),
+        ]);
+
+        assert_eq!(
+            resolve_module_path("src/main.ts", "./api/routes", &files),
+            Some("src/api/routes.ts".to_string())
+        );
+        assert_eq!(
+            resolve_module_path("src/main.ts", "./api/index", &files),
+            Some("src/api/index.ts".to_string())
+        );
+    }
+
+    #[test]
+    fn resolves_python_relative_module_paths() {
+        let files = HashSet::from([
+            "pkg/main.py".to_string(),
+            "pkg/helpers.py".to_string(),
+            "pkg/sub/__init__.py".to_string(),
+        ]);
+
+        assert_eq!(
+            resolve_module_path("pkg/main.py", ".helpers", &files),
+            Some("pkg/helpers.py".to_string())
+        );
+        assert_eq!(
+            resolve_module_path("pkg/main.py", ".sub", &files),
+            Some("pkg/sub/__init__.py".to_string())
+        );
+    }
+
+    #[test]
+    fn builds_swift_module_map_from_package_manifest() {
+        let root = unique_temp_dir("package");
+        fs::create_dir_all(root.join("Sources/App")).unwrap();
+        fs::create_dir_all(root.join("Sources/Lib")).unwrap();
+        fs::write(
+            root.join("Package.swift"),
+            r#"
+            let package = Package(
+              name: "Demo",
+              targets: [
+                .target(name: "App", path: "Sources/App"),
+                .target(name: "Lib", path: "Sources/Lib")
+              ]
+            )
+            "#,
+        )
+        .unwrap();
+
+        let files = HashSet::from([
+            "Sources/App/main.swift".to_string(),
+            "Sources/Lib/util.swift".to_string(),
+        ]);
+
+        let map = build_swift_module_map(root.to_str().unwrap(), &files);
+        assert_eq!(map.get("App"), Some(&vec!["Sources/App/main.swift".to_string()]));
+        assert_eq!(map.get("Lib"), Some(&vec!["Sources/Lib/util.swift".to_string()]));
+
+        let _ = fs::remove_dir_all(root);
+    }
+}
+
 pub(crate) fn resolve_launch_path(
     src_fp: &str,
     raw: &str,

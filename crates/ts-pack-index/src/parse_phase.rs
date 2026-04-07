@@ -504,3 +504,54 @@ pub(crate) fn parse_manifest_batch(batch: &[ManifestEntry], project_id: Arc<str>
         batch.par_iter().filter_map(parse).collect()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::fs;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn unique_temp_dir(name: &str) -> PathBuf {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        std::env::temp_dir().join(format!("ts-pack-index-parse-{name}-{nanos}"))
+    }
+
+    #[test]
+    fn parses_python_manifest_batch_and_extracts_symbols() {
+        let root = unique_temp_dir("python");
+        fs::create_dir_all(root.join("pkg")).unwrap();
+        let file_abs = root.join("pkg").join("main.py");
+        fs::write(
+            &file_abs,
+            r#"
+from .helpers import run
+
+def main():
+    run()
+"#,
+        )
+        .unwrap();
+
+        let manifest = vec![ManifestEntry {
+            abs_path: file_abs.to_string_lossy().to_string(),
+            rel_path: "pkg/main.py".to_string(),
+            ext: "py".to_string(),
+            size: fs::metadata(&file_abs).unwrap().len(),
+        }];
+
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        assert_eq!(results.len(), 1);
+        let result = &results[0];
+        assert_eq!(result.file_node.filepath, "pkg/main.py");
+        assert!(!result.symbols.is_empty());
+        assert!(!result.symbol_calls.is_empty());
+        assert_eq!(result.import_symbol_requests.len(), 1);
+        assert_eq!(result.import_symbol_requests[0].module, ".helpers");
+
+        let _ = fs::remove_dir_all(root);
+    }
+}
