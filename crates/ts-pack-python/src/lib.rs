@@ -972,6 +972,49 @@ fn build_codebase_embedding_rows(
     Ok(rows.into_any().unbind())
 }
 
+#[pyfunction]
+fn build_semantic_index_round_plan(
+    py: Python<'_>,
+    new_chunks: Vec<Py<PyAny>>,
+    batch_size: usize,
+    concurrency: usize,
+) -> PyResult<Py<PyAny>> {
+    let safe_batch_size = batch_size.max(1);
+    let safe_concurrency = concurrency.max(1);
+    let window = safe_batch_size.saturating_mul(safe_concurrency).max(1);
+    let total_new = new_chunks.len();
+    let rounds = if total_new == 0 {
+        0
+    } else {
+        total_new.div_ceil(window)
+    };
+
+    let result = PyList::empty(py);
+    for round_idx in 0..rounds {
+        let start = round_idx * window;
+        let end = std::cmp::min(start + window, total_new);
+        let group = &new_chunks[start..end];
+        let sub_batches = PyList::empty(py);
+        for batch in group.chunks(safe_batch_size) {
+            let sub_batch = PyList::empty(py);
+            for item in batch {
+                sub_batch.append(item.bind(py))?;
+            }
+            sub_batches.append(sub_batch)?;
+        }
+
+        let round_payload = PyDict::new(py);
+        round_payload.set_item("round_index", round_idx)?;
+        round_payload.set_item("rounds", rounds)?;
+        round_payload.set_item("group_size", group.len())?;
+        round_payload.set_item("batch_count", sub_batches.len())?;
+        round_payload.set_item("sub_batches", sub_batches)?;
+        result.append(round_payload)?;
+    }
+
+    Ok(result.into_any().unbind())
+}
+
 // ---------------------------------------------------------------------------
 // Module registration
 // ---------------------------------------------------------------------------
@@ -1017,5 +1060,6 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(cache_dir, m)?)?;
     m.add_function(wrap_pyfunction!(build_semantic_sync_plan, m)?)?;
     m.add_function(wrap_pyfunction!(build_codebase_embedding_rows, m)?)?;
+    m.add_function(wrap_pyfunction!(build_semantic_index_round_plan, m)?)?;
     Ok(())
 }

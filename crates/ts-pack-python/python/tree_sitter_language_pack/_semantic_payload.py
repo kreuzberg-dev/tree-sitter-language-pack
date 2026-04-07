@@ -613,27 +613,49 @@ async def execute_semantic_index_rounds(
     write_batch_fn: Any,
     progress_fn: Any | None = None,
 ) -> dict[str, Any]:
-    window = batch_size * concurrency
     total_new = len(new_chunks)
     total_written = 0
-    rounds = 0
 
     if total_new <= 0:
         return {"written": 0, "rounds": 0}
 
-    n_rounds = (total_new + window - 1) // window
-    for round_idx in range(n_rounds):
-        group = new_chunks[round_idx * window : (round_idx + 1) * window]
-        sub_batches = [group[i : i + batch_size] for i in range(0, len(group), batch_size)]
-        rounds += 1
+    round_plan_builder = getattr(_native, "build_semantic_index_round_plan", None)
+    if round_plan_builder is not None:
+        round_plan = list(round_plan_builder(new_chunks, batch_size, concurrency) or [])
+    else:
+        safe_batch_size = max(1, batch_size)
+        safe_concurrency = max(1, concurrency)
+        window = safe_batch_size * safe_concurrency
+        n_rounds = (total_new + window - 1) // window
+        round_plan = []
+        for round_idx in range(n_rounds):
+            group = new_chunks[round_idx * window : (round_idx + 1) * window]
+            sub_batches = [group[i : i + safe_batch_size] for i in range(0, len(group), safe_batch_size)]
+            round_plan.append(
+                {
+                    "round_index": round_idx,
+                    "rounds": n_rounds,
+                    "group_size": len(group),
+                    "batch_count": len(sub_batches),
+                    "sub_batches": sub_batches,
+                }
+            )
+
+    rounds = len(round_plan)
+    for round_info in round_plan:
+        round_idx = int(round_info.get("round_index") or 0)
+        n_rounds = int(round_info.get("rounds") or rounds or 1)
+        sub_batches = list(round_info.get("sub_batches") or [])
+        group_size = int(round_info.get("group_size") or sum(len(batch) for batch in sub_batches))
+        batch_count = int(round_info.get("batch_count") or len(sub_batches))
 
         if progress_fn is not None:
             await progress_fn(
                 {
                     "round_index": round_idx,
                     "rounds": n_rounds,
-                    "group_size": len(group),
-                    "batch_count": len(sub_batches),
+                    "group_size": group_size,
+                    "batch_count": batch_count,
                     "written_so_far": total_written,
                     "total_new": total_new,
                     "phase": "embed_start",
@@ -649,8 +671,8 @@ async def execute_semantic_index_rounds(
                 {
                     "round_index": round_idx,
                     "rounds": n_rounds,
-                    "group_size": len(group),
-                    "batch_count": len(sub_batches),
+                    "group_size": group_size,
+                    "batch_count": batch_count,
                     "written_so_far": total_written,
                     "total_new": total_new,
                     "phase": "write_start",
@@ -667,8 +689,8 @@ async def execute_semantic_index_rounds(
                 {
                     "round_index": round_idx,
                     "rounds": n_rounds,
-                    "group_size": len(group),
-                    "batch_count": len(sub_batches),
+                    "group_size": group_size,
+                    "batch_count": batch_count,
                     "written_so_far": total_written,
                     "total_new": total_new,
                     "phase": "round_done",
