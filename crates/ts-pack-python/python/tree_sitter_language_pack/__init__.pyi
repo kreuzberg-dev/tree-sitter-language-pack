@@ -409,6 +409,7 @@ __all__ = [
     "ChunkContext",
     "CodeChunk",
     "CommentInfo",
+    "CODEBASE_EMBEDDINGS_UPSERT_SQL",
     "Diagnostic",
     "DocstringInfo",
     "DownloadError",
@@ -444,6 +445,7 @@ __all__ = [
     "download_all",
     "downloaded_languages",
     "build_semantic_payload",
+    "execute_codebase_embedding_upsert",
     "extract",
     "enrich_swift_graph",
     "extract_swift_semantic_facts",
@@ -515,6 +517,15 @@ def build_codebase_embedding_rows(
     expected_dim: int | None = None,
     created_at: float | None = None,
 ) -> list[tuple[Any, ...]]: ...
+CODEBASE_EMBEDDINGS_UPSERT_SQL: str
+async def execute_codebase_embedding_upsert(
+    cursor: Any,
+    batch: list[dict[str, Any]],
+    project_id: str,
+    *,
+    expected_dim: int | None = None,
+    created_at: float | None = None,
+) -> int: ...
 def extract(source: str, config: dict[str, object]) -> dict[str, Any]: ...
 def validate_extraction(config: dict[str, object]) -> dict[str, Any]: ...
 def extract_file_facts(source: str, language: str, file_path: str | None = None) -> FileFacts: ...

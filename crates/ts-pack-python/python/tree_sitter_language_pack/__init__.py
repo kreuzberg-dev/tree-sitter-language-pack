@@ -234,11 +234,13 @@ def extract_file_facts(source: bytes | str, file_path: str, language: str | None
 
 
 from ._semantic_payload import (
+    CODEBASE_EMBEDDINGS_UPSERT_SQL,
     build_codebase_embedding_rows,
     build_line_window_chunks,
     build_semantic_payload,
     build_semantic_sync_plan,
     build_swift_chunks,
+    execute_codebase_embedding_upsert,
 )
 
 try:
@@ -279,6 +281,7 @@ __all__ = [
     "cache_dir",
     "clean_cache",
     "configure",
+    "CODEBASE_EMBEDDINGS_UPSERT_SQL",
     "build_codebase_embedding_rows",
     "build_line_window_chunks",
     "build_semantic_payload",
@@ -291,6 +294,7 @@ __all__ = [
     "download",
     "download_all",
     "downloaded_languages",
+    "execute_codebase_embedding_upsert",
     "extract",
     "extract_file_facts",
     "extract_swift_semantic_facts",

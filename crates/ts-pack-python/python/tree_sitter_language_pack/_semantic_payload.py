@@ -464,6 +464,35 @@ def build_codebase_embedding_rows(
     return rows
 
 
+CODEBASE_EMBEDDINGS_UPSERT_SQL = """\
+INSERT INTO codebase_embeddings
+  (chunk_id, project_id, file_path, ref_type, chunk_index,
+   content, embedding, metadata, created_at)
+VALUES (%s, %s, %s, %s, %s, %s, %s::vector, %s::jsonb, to_timestamp(%s))
+ON CONFLICT (chunk_id) DO NOTHING
+"""
+
+
+async def execute_codebase_embedding_upsert(
+    cursor: Any,
+    batch: list[dict[str, Any]],
+    project_id: str,
+    *,
+    expected_dim: int | None = None,
+    created_at: float | None = None,
+) -> int:
+    rows = build_codebase_embedding_rows(
+        batch,
+        project_id,
+        expected_dim=expected_dim,
+        created_at=created_at,
+    )
+    if not rows:
+        return 0
+    await cursor.executemany(CODEBASE_EMBEDDINGS_UPSERT_SQL, rows)
+    return len(rows)
+
+
 def build_semantic_payload(
     source: str,
     language: str,
