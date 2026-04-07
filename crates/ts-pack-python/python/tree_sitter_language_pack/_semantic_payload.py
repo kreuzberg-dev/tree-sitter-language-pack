@@ -4,6 +4,7 @@ import hashlib
 import re
 from copy import deepcopy
 from typing import Any
+import json
 
 from . import extract_file_facts, process, ProcessConfig
 
@@ -388,6 +389,79 @@ def build_swift_chunks(
 
     _walk(tree.root_node, [])
     return chunks
+
+
+def build_semantic_sync_plan(
+    all_chunks: list[list[dict[str, Any]]],
+    existing_ids: set[str] | None = None,
+) -> dict[str, Any]:
+    existing_ids = existing_ids or set()
+    new_chunks: list[dict[str, Any]] = []
+    prune_targets: list[dict[str, Any]] = []
+    total_chunks = 0
+
+    for file_chunks in all_chunks:
+        if not file_chunks:
+            continue
+        total_chunks += len(file_chunks)
+        file_path = file_chunks[0].get("metadata", {}).get("file")
+        chunk_ids = [chunk.get("ref_id") for chunk in file_chunks if chunk.get("ref_id")]
+        if file_path and chunk_ids:
+            prune_targets.append({"file_path": file_path, "chunk_ids": chunk_ids})
+        for chunk in file_chunks:
+            if chunk.get("ref_id") not in existing_ids:
+                new_chunks.append(chunk)
+
+    return {
+        "new_chunks": new_chunks,
+        "skipped_chunks": total_chunks - len(new_chunks),
+        "prune_targets": prune_targets,
+        "total_chunks": total_chunks,
+    }
+
+
+def build_codebase_embedding_rows(
+    batch: list[dict[str, Any]],
+    project_id: str,
+    *,
+    expected_dim: int | None = None,
+    created_at: float | None = None,
+) -> list[tuple[Any, ...]]:
+    rows: list[tuple[Any, ...]] = []
+    now = created_at
+    for item in batch:
+        chunk_id = item.get("ref_id")
+        text = item.get("text")
+        meta = item.get("metadata", {})
+        vec = item.get("vector", [])
+        if not chunk_id or not isinstance(text, str):
+            continue
+        if not isinstance(vec, list):
+            continue
+        if expected_dim is not None and len(vec) != expected_dim:
+            continue
+        if now is None:
+            import time as _time
+
+            now = _time.time()
+        file_path = meta.get("file", "") if isinstance(meta, dict) else ""
+        chunk_index = 0
+        if isinstance(meta, dict):
+            chunk_index = int(meta.get("chunk_index") or meta.get("start_line") or 0)
+        rows.append(
+            (
+                chunk_id,
+                project_id,
+                file_path,
+                item.get("ref_type", "code_chunk"),
+                chunk_index,
+                text,
+                "[" + ",".join(str(v) for v in vec) + "]",
+                json.dumps(meta if isinstance(meta, dict) else {}),
+                now,
+            )
+        )
+    return rows
 
 
 def build_semantic_payload(

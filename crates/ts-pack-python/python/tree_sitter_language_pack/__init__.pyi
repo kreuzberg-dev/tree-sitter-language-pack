@@ -432,8 +432,10 @@ __all__ = [
     "cache_dir",
     "clean_cache",
     "configure",
+    "build_codebase_embedding_rows",
     "build_line_window_chunks",
     "build_swift_chunks",
+    "build_semantic_sync_plan",
     "detect_language",
     "detect_language_from_content",
     "detect_language_from_extension",
@@ -502,6 +504,17 @@ def build_swift_chunks(
     chunk_lines: int = 60,
     overlap_lines: int = 10,
 ) -> list[dict[str, Any]]: ...
+def build_semantic_sync_plan(
+    all_chunks: list[list[dict[str, Any]]],
+    existing_ids: set[str] | None = None,
+) -> dict[str, Any]: ...
+def build_codebase_embedding_rows(
+    batch: list[dict[str, Any]],
+    project_id: str,
+    *,
+    expected_dim: int | None = None,
+    created_at: float | None = None,
+) -> list[tuple[Any, ...]]: ...
 def extract(source: str, config: dict[str, object]) -> dict[str, Any]: ...
 def validate_extraction(config: dict[str, object]) -> dict[str, Any]: ...
 def extract_file_facts(source: str, language: str, file_path: str | None = None) -> FileFacts: ...

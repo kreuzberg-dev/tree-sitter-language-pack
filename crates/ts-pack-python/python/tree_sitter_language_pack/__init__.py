@@ -234,8 +234,10 @@ def extract_file_facts(source: bytes | str, file_path: str, language: str | None
 
 
 from ._semantic_payload import (
+    build_codebase_embedding_rows,
     build_line_window_chunks,
     build_semantic_payload,
+    build_semantic_sync_plan,
     build_swift_chunks,
 )
 
@@ -277,8 +279,10 @@ __all__ = [
     "cache_dir",
     "clean_cache",
     "configure",
+    "build_codebase_embedding_rows",
     "build_line_window_chunks",
     "build_semantic_payload",
+    "build_semantic_sync_plan",
     "build_swift_chunks",
     "detect_language",
     "detect_language_from_content",
