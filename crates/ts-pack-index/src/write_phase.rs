@@ -77,6 +77,10 @@ pub(crate) async fn run_write_phases(
     // Symbol-edge writes touch the same File/Node relationship groups heavily and
     // have proven prone to Neo4j deadlocks when batched concurrently.
     let symbol_edge_concurrency = 1usize;
+    // CALLS/CALLS_INFERRED writes also contend on the same caller/callee node
+    // relationship groups. Serializing these batches avoids transient deadlocks
+    // from overlapping MERGE lock acquisition across concurrent transactions.
+    let call_edge_concurrency = 1usize;
 
     let WriteInputs {
         all_files,
@@ -645,7 +649,7 @@ pub(crate) async fn run_write_phases(
     let t_calls = Instant::now();
     let calls_row_count = all_symbol_call_rows.len();
     stream::iter(all_symbol_call_rows.chunks(CALLS_BATCH_SIZE))
-        .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+        .for_each_concurrent(call_edge_concurrency, |chunk| {
             let g = Arc::clone(graph);
             async move { writers::write_calls(&g, chunk).await }
         })
@@ -689,7 +693,7 @@ pub(crate) async fn run_write_phases(
         let py_count = python_inferred_call_rows.len();
         if !inferred_call_rows.is_empty() {
             stream::iter(inferred_call_rows.chunks(CALLS_BATCH_SIZE))
-                .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+                .for_each_concurrent(call_edge_concurrency, |chunk| {
                     let g = Arc::clone(graph);
                     async move { writers::write_inferred_calls(&g, chunk).await }
                 })
@@ -697,7 +701,7 @@ pub(crate) async fn run_write_phases(
         }
         if !python_inferred_call_rows.is_empty() {
             stream::iter(python_inferred_call_rows.chunks(CALLS_BATCH_SIZE))
-                .for_each_concurrent(REL_CONCURRENCY, |chunk| {
+                .for_each_concurrent(call_edge_concurrency, |chunk| {
                     let g = Arc::clone(graph);
                     async move { writers::write_python_inferred_calls(&g, chunk).await }
                 })
