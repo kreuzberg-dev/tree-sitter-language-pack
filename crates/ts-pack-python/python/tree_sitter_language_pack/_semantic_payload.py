@@ -58,6 +58,16 @@ def _chunk_id(project_id: str, file_path: str, start_byte: int, text: str, versi
     return f"{project_id}:{version}:{file_path}:{digest}"
 
 
+def _chunk_id_with_header(
+    project_id: str,
+    file_path: str,
+    start_byte: int,
+    text: str,
+    version: str,
+) -> str:
+    return _chunk_id(project_id, file_path, start_byte, text, version)
+
+
 def _compact_list(items: list, limit: int) -> list:
     if not items:
         return []
@@ -204,6 +214,180 @@ def _build_process_config(language: str, *, chunk_max_size: int, chunk_overlap: 
         kwargs.pop("chunk_overlap", None)
         kwargs.pop("extractions", None)
         return ProcessConfig(language, **kwargs)
+
+
+def build_line_window_chunks(
+    source: str,
+    file_path: str,
+    project_id: str,
+    *,
+    language: str | None = None,
+    file_meta: dict[str, Any] | None = None,
+    chunk_id_version: str = "v6",
+    chunk_lines: int = 60,
+    overlap_lines: int = 10,
+) -> list[dict[str, Any]]:
+    file_header = f"// File: {file_path}\n"
+    chunks: list[dict[str, Any]] = []
+    lines = source.splitlines()
+    i = 0
+    metadata_base = dict(file_meta or {})
+    while i < len(lines):
+        block = lines[i : i + chunk_lines]
+        if not block:
+            break
+        text = file_header + "\n".join(block)
+        chunks.append(
+            {
+                "ref_id": _chunk_id_with_header(project_id, file_path, i, text, chunk_id_version),
+                "text": text,
+                "metadata": {
+                    "file": file_path,
+                    "project_id": project_id,
+                    "language": language,
+                    **metadata_base,
+                },
+            }
+        )
+        i += chunk_lines - overlap_lines
+    return chunks
+
+
+def build_swift_chunks(
+    source: str,
+    file_path: str,
+    project_id: str,
+    *,
+    file_meta: dict[str, Any] | None = None,
+    chunk_id_version: str = "v6",
+    chunk_max_size: int = 4000,
+    chunk_lines: int = 60,
+    overlap_lines: int = 10,
+) -> list[dict[str, Any]]:
+    from . import get_parser
+
+    member_types = {
+        "property_declaration",
+        "function_declaration",
+        "subscript_declaration",
+        "typealias_declaration",
+        "init_declaration",
+        "deinit_declaration",
+        "protocol_function_declaration",
+        "protocol_property_declaration",
+        "enum_entry",
+    }
+    container_types = {
+        "class_declaration",
+        "struct_declaration",
+        "enum_declaration",
+        "protocol_declaration",
+        "extension_declaration",
+    }
+
+    try:
+        parser = get_parser("swift")
+        src_b = source.encode("utf-8")
+        tree = parser.parse(src_b)
+    except Exception:
+        return []
+
+    file_header = f"// File: {file_path}\n"
+    metadata_base = dict(file_meta or {})
+    chunks: list[dict[str, Any]] = []
+
+    def _name_of(node) -> str:
+        for child in node.children:
+            if child.type == "pattern":
+                return src_b[child.start_byte : child.end_byte].decode("utf-8", errors="replace")
+            if child.type in ("simple_identifier", "type_identifier"):
+                return src_b[child.start_byte : child.end_byte].decode("utf-8", errors="replace")
+        return ""
+
+    def _append_chunk(
+        text: str,
+        start_byte: int,
+        name: str,
+        start_line: int,
+        end_line: int,
+        context_path: list[str],
+    ) -> None:
+        if not text:
+            return
+        chunks.append(
+            {
+                "ref_id": _chunk_id(project_id, file_path, start_byte, text, chunk_id_version),
+                "text": file_header + text,
+                "metadata": {
+                    "file": file_path,
+                    "project_id": project_id,
+                    "language": "swift",
+                    "symbols": [name] if name else [],
+                    "start_line": start_line,
+                    "end_line": end_line,
+                    "context_path": context_path,
+                    **metadata_base,
+                },
+            }
+        )
+
+    def _emit_text(
+        text: str,
+        start_byte: int,
+        name: str,
+        start_line: int,
+        end_line: int,
+        context_path: list[str],
+    ) -> None:
+        text = text.strip()
+        if not text:
+            return
+        if len(text.encode("utf-8")) <= chunk_max_size:
+            _append_chunk(text, start_byte, name, start_line, end_line, context_path)
+            return
+
+        lines = text.splitlines()
+        i = 0
+        while i < len(lines):
+            block = "\n".join(lines[i : i + chunk_lines]).strip()
+            if block:
+                _append_chunk(
+                    block,
+                    start_byte + i,
+                    name,
+                    start_line + i,
+                    start_line + min(i + chunk_lines, len(lines)) - 1,
+                    context_path,
+                )
+            i += chunk_lines - overlap_lines
+
+    def _walk(node, context_path: list[str]) -> None:
+        if node.type in member_types:
+            name = _name_of(node)
+            text = src_b[node.start_byte : node.end_byte].decode("utf-8", errors="replace")
+            next_context = context_path + ([name] if name else [])
+            _emit_text(
+                text,
+                node.start_byte,
+                name,
+                node.start_point[0] + 1,
+                node.end_point[0] + 1,
+                next_context,
+            )
+            return
+
+        if node.type in container_types:
+            name = _name_of(node)
+            next_context = context_path + ([name] if name else [])
+            for child in node.children:
+                _walk(child, next_context)
+            return
+
+        for child in node.children:
+            _walk(child, context_path)
+
+    _walk(tree.root_node, [])
+    return chunks
 
 
 def build_semantic_payload(

@@ -432,6 +432,8 @@ __all__ = [
     "cache_dir",
     "clean_cache",
     "configure",
+    "build_line_window_chunks",
+    "build_swift_chunks",
     "detect_language",
     "detect_language_from_content",
     "detect_language_from_extension",
@@ -478,6 +480,28 @@ def build_semantic_payload(
     chunk_max_size: int = 4000,
     chunk_overlap: int = 200,
 ) -> dict[str, Any]: ...
+def build_line_window_chunks(
+    source: str,
+    file_path: str,
+    project_id: str,
+    *,
+    language: str | None = None,
+    file_meta: dict[str, Any] | None = None,
+    chunk_id_version: str = "v6",
+    chunk_lines: int = 60,
+    overlap_lines: int = 10,
+) -> list[dict[str, Any]]: ...
+def build_swift_chunks(
+    source: str,
+    file_path: str,
+    project_id: str,
+    *,
+    file_meta: dict[str, Any] | None = None,
+    chunk_id_version: str = "v6",
+    chunk_max_size: int = 4000,
+    chunk_lines: int = 60,
+    overlap_lines: int = 10,
+) -> list[dict[str, Any]]: ...
 def extract(source: str, config: dict[str, object]) -> dict[str, Any]: ...
 def validate_extraction(config: dict[str, object]) -> dict[str, Any]: ...
 def extract_file_facts(source: str, language: str, file_path: str | None = None) -> FileFacts: ...
