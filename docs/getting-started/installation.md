@@ -286,13 +286,7 @@ The `ts-pack` binary provides parser management and code analysis from the termi
 === "Cargo"
 
     ```bash
-    cargo install ts-pack
-    ```
-
-=== "Install script"
-
-    ```bash
-    curl -fsSL https://raw.githubusercontent.com/kreuzberg-dev/tree-sitter-language-pack/main/install.sh | bash
+    cargo install ts-pack-cli
     ```
 
 Verify:

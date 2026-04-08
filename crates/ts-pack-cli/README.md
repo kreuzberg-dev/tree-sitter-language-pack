@@ -58,7 +58,7 @@ Command-line tool for managing tree-sitter language parsers with download utilit
 ## Installation
 
 ```sh
-cargo install ts-pack
+cargo install ts-pack-cli
 ```
 
 Or install via Homebrew:

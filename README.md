@@ -196,7 +196,7 @@ See [C/C++ (FFI) README](crates/ts-pack-ffi/README.md) for full documentation.
 ### CLI
 
 ```sh
-cargo install ts-pack
+cargo install ts-pack-cli
 ```
 
 See [CLI README](crates/ts-pack-cli/README.md) for full documentation.

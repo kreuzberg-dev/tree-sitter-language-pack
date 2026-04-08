@@ -1654,9 +1654,11 @@ jobs:
         if: ${{ inputs.dry_run }}
         run: |
           cargo package -p tree-sitter-language-pack --allow-dirty 2>&1 | tail -5
+          cargo package -p ts-pack-cli --allow-dirty 2>&1 | tail -5
           {
             echo "## Crates Dry Run"
             echo "- tree-sitter-language-pack: packaged successfully"
+            echo "- ts-pack-cli: packaged successfully"
           } >> "$GITHUB_STEP_SUMMARY"
         env:
           PROJECT_ROOT: ${{ github.workspace }}
@@ -1667,6 +1669,21 @@ jobs:
           output=$(cargo publish -p tree-sitter-language-pack 2>&1) || {
             if echo "$output" | grep -qiE "(already uploaded|already exists)"; then
               echo "::notice::tree-sitter-language-pack already published; skipping."
+            else
+              echo "$output"
+              exit 1
+            fi
+          }
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Publish ts-pack-cli
+        if: ${{ !inputs.dry_run }}
+        run: |
+          output=$(cargo publish -p ts-pack-cli 2>&1) || {
+            if echo "$output" | grep -qiE "(already uploaded|already exists)"; then
+              echo "::notice::ts-pack-cli already published; skipping."
             else
               echo "$output"
               exit 1
