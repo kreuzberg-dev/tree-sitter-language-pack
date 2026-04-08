@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - "docs/**"
-      - "mkdocs.yaml"
+      - "zensical.toml"
       - "pyproject.toml"
       - "sources/language_definitions.json"
       - "scripts/generate_grammar_table.py"
