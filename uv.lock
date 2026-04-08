@@ -603,7 +603,7 @@ wheels = [
 
 [[package]]
 name = "tree-sitter-language-pack"
-version = "1.4.2"
+version = "1.5.0"
 source = { virtual = "." }
 
 [package.dev-dependencies]
@@ -619,6 +619,7 @@ dev = [
     { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "typing-extensions" },
     { name = "uv-bump" },
+    { name = "zensical" },
 ]
 doc = [
     { name = "zensical" },
@@ -639,6 +640,7 @@ dev = [
     { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.2.1" },
     { name = "typing-extensions", specifier = ">=4.15.0" },
     { name = "uv-bump", git = "https://github.com/Goldziher/uv-bump" },
+    { name = "zensical", specifier = ">=0.0.32" },
 ]
 doc = [{ name = "zensical" }]
 
