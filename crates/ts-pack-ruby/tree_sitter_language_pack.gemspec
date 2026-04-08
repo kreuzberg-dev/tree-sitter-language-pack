@@ -2,12 +2,12 @@
 
 Gem::Specification.new do |spec|
   spec.name = 'tree_sitter_language_pack'
-  spec.version = '1.4.2'
+  spec.version = '1.5.0'
   spec.authors = ['kreuzberg.dev']
   spec.email = ['dev@kreuzberg.dev']
 
   spec.summary = 'Ruby bindings for tree-sitter-language-pack'
-  spec.description = '197 pre-compiled tree-sitter language parsers with Ruby bindings via Magnus native extensions.'
+  spec.description = '305 pre-compiled tree-sitter language parsers with Ruby bindings via Magnus native extensions.'
   spec.homepage = 'https://github.com/kreuzberg-dev/tree-sitter-language-pack'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.4.0'

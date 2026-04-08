@@ -93,7 +93,7 @@ The binding crates contain no parsing logic, no query definitions, and no chunki
 
 Tree-sitter parsers are not compiled into the package. Instead:
 
-1. A `parsers.json` manifest (hosted on GitHub releases) lists all 248 languages with their download URLs per platform.
+1. A `parsers.json` manifest (hosted on GitHub releases) lists all 305 languages with their download URLs per platform.
 2. On first use of a language, the matching binary is downloaded and written to the local cache directory.
 3. The binary is opened at runtime with `dlopen` / `LoadLibrary` and the `tree_sitter_<language>` symbol is resolved.
 

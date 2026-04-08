@@ -53,7 +53,7 @@
   </a>
 </div>
 
-WebAssembly bindings for tree-sitter-language-pack. Includes a curated subset of 30 languages optimized for browser and edge runtimes. For all 248 languages, use native bindings (Python, Node.js, etc.).
+WebAssembly bindings for tree-sitter-language-pack. Includes a curated subset of 30 languages optimized for browser and edge runtimes. For all 305 languages, use native bindings (Python, Node.js, etc.).
 
 ## Installation
 

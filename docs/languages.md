@@ -1,9 +1,9 @@
 ---
 title: Supported Languages
-description: "All 248 languages supported by tree-sitter-language-pack."
+description: "All 305 languages supported by tree-sitter-language-pack."
 ---
 
-tree-sitter-language-pack supports **248 languages**. All parsers are available for download on demand via `ts-pack download <language>` or automatically on first use.
+tree-sitter-language-pack supports **305 languages**. All parsers are available for download on demand via `ts-pack download <language>` or automatically on first use.
 
 ## Language List
 
@@ -196,7 +196,7 @@ tree-sitter-language-pack supports **248 languages**. All parsers are available 
 
     print(has_language("python"))      # True
     print(has_language("brainfuck"))   # False
-    print(language_count())            # 248
+    print(language_count())            # 305
 
     for lang in sorted(available_languages()):
         print(lang)
@@ -208,7 +208,7 @@ tree-sitter-language-pack supports **248 languages**. All parsers are available 
     import { hasLanguage, availableLanguages, languageCount } from "@kreuzberg/tree-sitter-language-pack";
 
     console.log(hasLanguage("python"));     // true
-    console.log(languageCount());           // 248
+    console.log(languageCount());           // 305
 
     for (const lang of availableLanguages().sort()) {
       console.log(lang);
@@ -219,7 +219,7 @@ tree-sitter-language-pack supports **248 languages**. All parsers are available 
 
     ```bash
     ts-pack list
-    ts-pack list | wc -l   # 248
+    ts-pack list | wc -l   # 305
     ```
 
 ## Requesting a Language

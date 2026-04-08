@@ -53,7 +53,7 @@
   </a>
 </div>
 
-Python bindings for tree-sitter-language-pack, providing access to 248 pre-compiled tree-sitter parsers with on-demand downloads.
+Python bindings for tree-sitter-language-pack, providing access to 305 pre-compiled tree-sitter parsers with on-demand downloads.
 
 ## Installation
 

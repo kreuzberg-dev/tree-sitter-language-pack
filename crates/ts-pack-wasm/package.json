@@ -1,7 +1,7 @@
 {
 	"name": "@kreuzberg/tree-sitter-language-pack-wasm",
-	"version": "1.4.2",
-	"description": "Tree-sitter language pack - pre-compiled parsers for 248 languages (WebAssembly bindings)",
+	"version": "1.5.0",
+	"description": "Tree-sitter language pack - pre-compiled parsers for 305 languages (WebAssembly bindings)",
 	"type": "module",
 	"main": "pkg/ts_pack_wasm.js",
 	"types": "pkg/ts_pack_wasm.d.ts",

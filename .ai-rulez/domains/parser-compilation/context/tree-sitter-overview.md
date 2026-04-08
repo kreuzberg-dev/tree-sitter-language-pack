@@ -12,4 +12,4 @@ Key concepts:
 - **ABI Version**: Binary interface version for runtime compatibility
 - **Language Pack**: A collection of pre-compiled parsers bundled for multi-language use
 
-This project compiles 248 grammars into a single Rust crate with bindings for Python, Node.js, Ruby, Go, Java, Elixir, and WebAssembly.
+This project compiles 305 grammars into a single Rust crate with bindings for Python, Node.js, Ruby, Go, Java, Elixir, and WebAssembly.

@@ -31,7 +31,7 @@ Verify the installation:
 
 ```python
 import tree_sitter_language_pack as tslp
-print(tslp.language_count())  # 248
+print(tslp.language_count())  # 305
 ```
 
 ## Node.js
@@ -60,7 +60,7 @@ Verify:
 
 ```javascript
 const tslp = require("@kreuzberg/tree-sitter-language-pack");
-console.log(tslp.languageCount()); // 248
+console.log(tslp.languageCount()); // 305
 ```
 
 The package ships pre-built native binaries for Linux (x64, arm64), macOS (x64, arm64), and Windows (x64).
@@ -84,7 +84,7 @@ Verify:
 
 ```rust
 fn main() {
-    println!("{}", ts_pack_core::language_count()); // 248
+    println!("{}", ts_pack_core::language_count()); // 305
 }
 ```
 
@@ -100,7 +100,7 @@ go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1
 import tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
 
 func main() {
-    fmt.Println(tslp.LanguageCount()) // 248
+    fmt.Println(tslp.LanguageCount()) // 305
 }
 ```
 
@@ -141,7 +141,7 @@ import dev.kreuzberg.TreeSitterLanguagePack;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println(TreeSitterLanguagePack.languageCount()); // 248
+        System.out.println(TreeSitterLanguagePack.languageCount()); // 305
     }
 }
 ```
@@ -171,7 +171,7 @@ Requires .NET 10+.
 ```csharp
 using TreeSitterLanguagePack;
 
-Console.WriteLine(TsPackClient.LanguageCount()); // 248
+Console.WriteLine(TsPackClient.LanguageCount()); // 305
 ```
 
 ## Ruby
@@ -197,7 +197,7 @@ Requires Ruby 3.4+.
 ```ruby
 require "tree_sitter_language_pack"
 
-puts TreeSitterLanguagePack.language_count # 248
+puts TreeSitterLanguagePack.language_count # 305
 ```
 
 ## Elixir
@@ -219,7 +219,7 @@ Requires Elixir 1.14+ and OTP 25+.
     ```
 
 ```elixir
-IO.puts TreeSitterLanguagePack.language_count() # 248
+IO.puts TreeSitterLanguagePack.language_count() # 305
 ```
 
 ## PHP
@@ -244,7 +244,7 @@ Requires PHP 8.2+.
 
 ```php
 <?php
-echo \ts_pack_language_count(); // 248
+echo \ts_pack_language_count(); // 305
 ```
 
 ## WebAssembly
@@ -293,11 +293,11 @@ Verify:
 
 ```bash
 ts-pack --version
-ts-pack list | wc -l  # 248
+ts-pack list | wc -l  # 305
 ```
 
 ## Next Steps
 
 - [Quick Start guide](quickstart.md) — parse your first file in 5 minutes
 - [Download model](../concepts/download-model.md) — understand how parser caching works
-- [Languages](../languages.md) — full list of 248 supported languages
+- [Languages](../languages.md) — full list of 305 supported languages

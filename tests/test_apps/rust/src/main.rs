@@ -5,7 +5,7 @@ use tree_sitter_language_pack::{
     tree_has_error_nodes, DownloadManager, LanguageRegistry, PackConfig, ProcessConfig,
 };
 
-const VERSION: &str = "1.4.2";
+const VERSION: &str = "1.5.0";
 
 #[derive(Deserialize)]
 struct BasicFixture {
@@ -215,7 +215,7 @@ fn run_download_api_tests() {
     assert!(!dir_str.is_empty(), "cache_dir() should return non-empty path");
     println!("  PASS: cache_dir_returns_string ({})", dir_str);
 
-    // Test: manifest_languages() returns 248 languages (network)
+    // Test: manifest_languages() returns 305 languages (network)
     match manifest_languages() {
         Ok(manifest) => {
             assert!(

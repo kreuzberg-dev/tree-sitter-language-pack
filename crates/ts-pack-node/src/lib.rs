@@ -274,7 +274,7 @@ pub fn js_download(names: Vec<String>) -> napi::Result<u32> {
         .map_err(|e| napi::Error::from_reason(format!("{e}")))
 }
 
-/// Download all 248 available languages from the remote manifest.
+/// Download all 305 available languages from the remote manifest.
 ///
 /// Returns the number of languages successfully downloaded.
 /// Throws an error if download fails.

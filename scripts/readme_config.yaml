@@ -1,10 +1,10 @@
 project:
   name: tree-sitter-language-pack
-  version: "1.4.2"
+  version: "1.5.0"
   description: "A comprehensive collection of tree-sitter language parsers with polyglot bindings"
   repository: "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
   license: "MIT"
-  language_count: 248
+  language_count: 305
   discord: "https://discord.gg/xt9WY3GnKR"
   banner_url: "https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8"
 
@@ -67,7 +67,7 @@ languages:
     output_path: crates/ts-pack-core/README.md
     package_name: ts-pack-core
     package_manager: [cargo]
-    description: "Rust core library providing access to 248 tree-sitter parsers with on-demand download and caching support."
+    description: "Rust core library providing access to 305 tree-sitter parsers with on-demand download and caching support."
     install_command: 'cargo add ts-pack-core'
     quick_start: |
       use ts_pack_core::{get_language, get_parser, available_languages};
@@ -108,7 +108,7 @@ languages:
     output_path: crates/ts-pack-python/README.md
     package_name: tree-sitter-language-pack
     package_manager: [pip, uv]
-    description: "Python bindings for tree-sitter-language-pack, providing access to 248 pre-compiled tree-sitter parsers with on-demand downloads."
+    description: "Python bindings for tree-sitter-language-pack, providing access to 305 pre-compiled tree-sitter parsers with on-demand downloads."
     install_commands:
       pip: "pip install tree-sitter-language-pack"
       uv: "uv add tree-sitter-language-pack"
@@ -309,7 +309,7 @@ languages:
     output_path: crates/ts-pack-wasm/README.md
     package_name: "@kreuzberg/tree-sitter-language-pack-wasm"
     package_manager: [npm, pnpm, yarn]
-    description: "WebAssembly bindings for tree-sitter-language-pack. Includes a curated subset of 30 languages optimized for browser and edge runtimes. For all 248 languages, use native bindings (Python, Node.js, etc.)."
+    description: "WebAssembly bindings for tree-sitter-language-pack. Includes a curated subset of 30 languages optimized for browser and edge runtimes. For all 305 languages, use native bindings (Python, Node.js, etc.)."
     install_commands:
       npm: "npm install @kreuzberg/tree-sitter-language-pack-wasm"
       pnpm: "pnpm add @kreuzberg/tree-sitter-language-pack-wasm"

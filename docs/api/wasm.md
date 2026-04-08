@@ -423,13 +423,13 @@ The following functions exist for API parity but are stubs. WASM cannot perform 
 
 ## Language Support
 
-The WASM package includes a curated subset of languages optimized for browser and edge runtime use cases. Compiling all 248 supported languages into a single WASM binary exceeds the memory limits of standard build environments. Native bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP) include all 248 languages.
+The WASM package includes a curated subset of languages optimized for browser and edge runtime use cases. Compiling all 305 supported languages into a single WASM binary exceeds the memory limits of standard build environments. Native bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP) include all 305 languages.
 
 Use `availableLanguages()` at runtime to get the exact list of included languages.
 
 ## Limitations
 
-1. **Language subset**: Not all 248 languages are included. For the full set, use native bindings.
+1. **Language subset**: Not all 305 languages are included. For the full set, use native bindings.
 2. **No download API**: Grammars are pre-bundled. Download functions throw errors.
 3. **Single-threaded**: Run CPU-intensive parsing in Web Workers.
 4. **No file I/O**: Read files into memory before parsing.

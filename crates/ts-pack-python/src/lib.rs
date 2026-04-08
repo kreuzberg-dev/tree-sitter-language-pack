@@ -656,7 +656,7 @@ fn download_all(_py: Python<'_>) -> PyResult<usize> {
 
 /// Fetch all language names available in the remote manifest.
 ///
-/// Returns a sorted list of all 248 downloadable languages.
+/// Returns a sorted list of all 305 downloadable languages.
 #[pyfunction]
 fn manifest_languages(py: Python<'_>) -> PyResult<Py<PyAny>> {
     let langs = without_gil(tree_sitter_language_pack::manifest_languages)

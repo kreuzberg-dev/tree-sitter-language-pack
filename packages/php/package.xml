@@ -26,10 +26,10 @@
   </stability>
   <license uri="https://opensource.org/licenses/MIT">MIT</license>
   <notes>
-    Stable release with support for 248 programming languages.
+    Stable release with support for 305 programming languages.
 
     Features:
-    - Parse source code in 248 languages
+    - Parse source code in 305 languages
     - Extract structure, imports, exports, comments, symbols
     - Code chunking for RAG applications
     - Language detection from file paths and content

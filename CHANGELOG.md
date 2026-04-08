@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-04-08
+
+### Added
+
+- 57 new permissively-licensed grammars — 305 languages total
+    - abl, c3, cel, cfml, chuck, cst, dhall, elvish, gap, gdshader, glimmer, gnuplot, gotmpl, gowork, gpg, hjson, hocon, hoon, htmldjango, jai, javadoc, json5, kcl, mlir, nasm, norg_meta, ocamllex, openscad, phpdoc, poe_filter, prql, rasi, razor, rbs, roc, rtf, slang, smalltalk, sml, snakemake, souffle, sourcepawn, sql_bigquery, stan, superhtml, sway, systemverilog, tact, tera, typespec, typoscript, vhs, vrl, wgsl_bevy, x86asm, ziggy, ziggy_schema
+- CI license validation job in `ci-validate.yaml` — blocks PRs that introduce non-permissive (GPL/AGPL/LGPL/MPL) grammars
+
+### Fixed
+
+- `less` grammar: regenerated parser from ABI 11 to ABI 14 (was incompatible with tree-sitter 0.26)
+- `corn` smoke fixture: replaced invalid `"x"` snippet with valid corn syntax
+
 ## [1.4.1] - 2026-03-31
 
 ### Fixed

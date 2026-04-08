@@ -1,10 +1,10 @@
 # tree-sitter-language-pack
 
-> Universal code parser for 248 programming languages with code intelligence, syntax-aware chunking, and polyglot bindings.
+> Universal code parser for 305 programming languages with code intelligence, syntax-aware chunking, and polyglot bindings.
 
 ## About
 
-tree-sitter-language-pack provides pre-compiled tree-sitter grammars for 248 programming languages with a unified API for parsing, structure extraction, import/export detection, and intelligent code chunking for LLMs. Built in Rust with thin bindings for every major platform.
+tree-sitter-language-pack provides pre-compiled tree-sitter grammars for 305 programming languages with a unified API for parsing, structure extraction, import/export detection, and intelligent code chunking for LLMs. Built in Rust with thin bindings for every major platform.
 
 Parsers are downloaded on demand and cached locally — the initial package is small (~3MB) and parsers (~50KB each) are fetched automatically on first use.
 
@@ -30,13 +30,13 @@ Part of the kreuzberg.dev ecosystem:
 - `process(source, config)` — Extract code intelligence (structure, imports, exports, comments, symbols, chunks)
 - `parse_string(language, source)` — Parse source code into a syntax tree
 - `available_languages()` — List locally available languages
-- `manifest_languages()` — List all 248 available from remote manifest
+- `manifest_languages()` — List all 305 available from remote manifest
 - `ProcessConfig` — Configure which analysis features to enable and chunking parameters
 - `PackConfig` — Configure cache directory and languages to pre-download
 
 ## CLI
 
-The `ts-pack` CLI bundles all 248 parsers into a single static binary:
+The `ts-pack` CLI bundles all 305 parsers into a single static binary:
 - `ts-pack download [languages]` — Download parser libraries
 - `ts-pack parse <file> --language <lang>` — Parse source code
 - `ts-pack process <file> --all` — Run full code intelligence pipeline
@@ -50,4 +50,4 @@ Rust (crates.io), Python (PyPI), Node.js (npm), Ruby (RubyGems), Go (pkg.go.dev)
 
 ## Supported Languages
 
-248 languages including: Python, JavaScript, TypeScript, Rust, Go, Java, C, C++, C#, Ruby, PHP, Swift, Kotlin, Scala, Haskell, Elixir, Erlang, Lua, R, Julia, Dart, Zig, Nim, and more.
+305 languages including: Python, JavaScript, TypeScript, Rust, Go, Java, C, C++, C#, Ruby, PHP, Swift, Kotlin, Scala, Haskell, Elixir, Erlang, Lua, R, Julia, Dart, Zig, Nim, and more.

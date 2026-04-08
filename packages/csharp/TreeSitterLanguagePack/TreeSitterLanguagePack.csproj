@@ -7,10 +7,10 @@
     <LangVersion>latest</LangVersion>
 
     <PackageId>TreeSitterLanguagePack</PackageId>
-    <Version>1.4.2</Version>
+    <Version>1.5.0</Version>
     <Authors>kreuzberg-dev</Authors>
     <Company>kreuzberg-dev</Company>
-    <Description>Tree-sitter language pack - pre-compiled parsers for 248 languages (.NET P/Invoke bindings)</Description>
+    <Description>Tree-sitter language pack - pre-compiled parsers for 305 languages (.NET P/Invoke bindings)</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/kreuzberg-dev/tree-sitter-language-pack</PackageProjectUrl>
     <RepositoryUrl>https://github.com/kreuzberg-dev/tree-sitter-language-pack</RepositoryUrl>

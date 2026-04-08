@@ -1,9 +1,9 @@
 ---
 title: tree-sitter-language-pack
-description: "Comprehensive tree-sitter grammar compilation with bindings for Python, TypeScript, Rust, Go, Java, C#, Ruby, Elixir, PHP, and WebAssembly — 248 languages."
+description: "Comprehensive tree-sitter grammar compilation with bindings for Python, TypeScript, Rust, Go, Java, C#, Ruby, Elixir, PHP, and WebAssembly — 305 languages."
 ---
 
-**Universal code parser for 248 languages** — parse, analyze, and chunk source code across every major programming language.
+**Universal code parser for 305 languages** — parse, analyze, and chunk source code across every major programming language.
 
 <div class="hero-badges" markdown>
 [:material-lightning-bolt: Quick Start](getting-started/quickstart.md){ .md-button .md-button--primary }
@@ -15,7 +15,7 @@ description: "Comprehensive tree-sitter grammar compilation with bindings for Py
 
 <div class="grid cards" markdown>
 
-- :material-language-python:{ .lg .middle } **248 Languages**
+- :material-language-python:{ .lg .middle } **305 Languages**
 
     ---
 

@@ -1270,7 +1270,7 @@
 		"branch": "master",
 		"extensions": ["scala"],
 		"repo": "https://github.com/tree-sitter/tree-sitter-scala",
-		"rev": "14c5cfd2b8e0f057ba0f4f72ee4812b0ae6cdce3"
+		"rev": "22af0ac923c90cef50a31085b27049d50c94c70f"
 	},
 	"scheme": {
 		"extensions": ["scm"],
@@ -1657,6 +1657,6 @@
 	"zsh": {
 		"extensions": ["zsh"],
 		"repo": "https://github.com/georgeharker/tree-sitter-zsh",
-		"rev": "bd344c23a7683e293d077c6648e88f209782fedb"
+		"rev": "a1741eec390116d5dd95745c58f9ec8e958fa98c"
 	}
 }

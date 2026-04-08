@@ -21,7 +21,7 @@ defmodule TreeSitterLanguagePack do
 
       # Get the number of available languages
       TreeSitterLanguagePack.language_count()
-      #=> 165
+      #=> 305
 
       # Get the raw TSLanguage pointer (for interop with tree-sitter bindings)
       TreeSitterLanguagePack.get_language_ptr("python")
@@ -34,7 +34,7 @@ defmodule TreeSitterLanguagePack do
   check availability before calling these functions if you want to avoid handling errors.
   """
 
-  @version "1.4.2"
+  @version "1.5.0"
 
   @force_build System.get_env("TSLP_BUILD") in ["1", "true"]
 

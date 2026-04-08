@@ -68,7 +68,7 @@ ts-pack list [OPTIONS]
 **Examples:**
 
 ```bash
-# List all 248 languages
+# List all 305 languages
 ts-pack list
 
 # List only what's downloaded locally
@@ -95,7 +95,7 @@ ts-pack download [LANGUAGES...] [OPTIONS]
 
 | Flag | Description |
 |------|-------------|
-| `--all` | Download all 248 parsers |
+| `--all` | Download all 305 parsers |
 | `--force` | Re-download even if already cached |
 
 **Examples:**

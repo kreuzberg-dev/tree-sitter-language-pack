@@ -105,7 +105,7 @@ Retrieve a tree-sitter Language object by name. This is the low-level handle tha
     // lang is now a &Language, ready for parsing
     ```
 
-**Language names** are case-insensitive. Common names include: `python`, `javascript`, `typescript`, `rust`, `java`, `go`, `ruby`, `php`, `c`, `cpp`, `csharp`, `kotlin`, `swift`, `elixir`, `bash`, `sql`, and [248 others](../languages.md).
+**Language names** are case-insensitive. Common names include: `python`, `javascript`, `typescript`, `rust`, `java`, `go`, `ruby`, `php`, `c`, `cpp`, `csharp`, `kotlin`, `swift`, `elixir`, `bash`, `sql`, and [305 others](../languages.md).
 
 ### `get_parser(name: str) → Parser`
 

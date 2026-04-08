@@ -1,5 +1,5 @@
 site_name: tree-sitter-language-pack
-site_description: "Pre-compiled tree-sitter parsers for 248 languages with code intelligence, chunking, and polyglot bindings."
+site_description: "Pre-compiled tree-sitter parsers for 305 languages with code intelligence, chunking, and polyglot bindings."
 site_url: https://docs.tree-sitter-language-pack.kreuzberg.dev
 site_author: kreuzberg.dev
 repo_name: kreuzberg-dev/tree-sitter-language-pack
