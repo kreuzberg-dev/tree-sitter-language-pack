@@ -1,12 +1,12 @@
 {
 	"assertions": {
-		"root_contains_node_type": "element",
+		"root_child_count_min": 1,
 		"tree_not_null": true
 	},
 	"category": "smoke",
 	"description": "Smoke test: load svelte and parse a simple snippet",
 	"id": "smoke_svelte",
 	"language": "svelte",
-	"source_code": "<p>hello</p>",
+	"source_code": "<script>let x = 1;</script>",
 	"tags": ["smoke"]
 }

@@ -4,6 +4,19 @@ package e2e_tests
 
 import "testing"
 
+func TestSmokeAbl(t *testing.T) {
+	// Smoke test: load abl and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "abl")
+	ptr, err := reg.GetLanguage("abl")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "abl", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "abl")
+	}
+}
+
 func TestSmokeActionscript(t *testing.T) {
 	// Smoke test: load actionscript and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -43,6 +56,32 @@ func TestSmokeAgda(t *testing.T) {
 	}
 }
 
+func TestSmokeAl(t *testing.T) {
+	// Smoke test: load al and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "al")
+	ptr, err := reg.GetLanguage("al")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "al", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "al")
+	}
+}
+
+func TestSmokeAngular(t *testing.T) {
+	// Smoke test: load angular and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "angular")
+	ptr, err := reg.GetLanguage("angular")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "angular", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "angular")
+	}
+}
+
 func TestSmokeApex(t *testing.T) {
 	// Smoke test: load apex and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -66,6 +105,19 @@ func TestSmokeArduino(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "arduino")
+	}
+}
+
+func TestSmokeAsciidoc(t *testing.T) {
+	// Smoke test: load asciidoc and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "asciidoc")
+	ptr, err := reg.GetLanguage("asciidoc")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "asciidoc", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "asciidoc")
 	}
 }
 
@@ -95,6 +147,19 @@ func TestSmokeAstro(t *testing.T) {
 	}
 }
 
+func TestSmokeAwk(t *testing.T) {
+	// Smoke test: load awk and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "awk")
+	ptr, err := reg.GetLanguage("awk")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "awk", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "awk")
+	}
+}
+
 func TestSmokeBash(t *testing.T) {
 	// Smoke test: load bash and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -105,6 +170,32 @@ func TestSmokeBash(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "bash")
+	}
+}
+
+func TestSmokeBass(t *testing.T) {
+	// Smoke test: load bass and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "bass")
+	ptr, err := reg.GetLanguage("bass")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "bass", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "bass")
+	}
+}
+
+func TestSmokeBatch(t *testing.T) {
+	// Smoke test: load batch and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "batch")
+	ptr, err := reg.GetLanguage("batch")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "batch", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "batch")
 	}
 }
 
@@ -160,6 +251,32 @@ func TestSmokeBitbake(t *testing.T) {
 	}
 }
 
+func TestSmokeBlade(t *testing.T) {
+	// Smoke test: load blade and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "blade")
+	ptr, err := reg.GetLanguage("blade")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "blade", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "blade")
+	}
+}
+
+func TestSmokeBrightscript(t *testing.T) {
+	// Smoke test: load brightscript and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "brightscript")
+	ptr, err := reg.GetLanguage("brightscript")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "brightscript", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "brightscript")
+	}
+}
+
 func TestSmokeBsl(t *testing.T) {
 	// Smoke test: load bsl and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -183,6 +300,32 @@ func TestSmokeC(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "c")
+	}
+}
+
+func TestSmokeC3(t *testing.T) {
+	// Smoke test: load c3 and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "c3")
+	ptr, err := reg.GetLanguage("c3")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "c3", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "c3")
+	}
+}
+
+func TestSmokeCaddy(t *testing.T) {
+	// Smoke test: load caddy and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "caddy")
+	ptr, err := reg.GetLanguage("caddy")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "caddy", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "caddy")
 	}
 }
 
@@ -212,6 +355,58 @@ func TestSmokeCapnp(t *testing.T) {
 	}
 }
 
+func TestSmokeCedar(t *testing.T) {
+	// Smoke test: load cedar and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "cedar")
+	ptr, err := reg.GetLanguage("cedar")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "cedar", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "cedar")
+	}
+}
+
+func TestSmokeCedarschema(t *testing.T) {
+	// Smoke test: load cedarschema and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "cedarschema")
+	ptr, err := reg.GetLanguage("cedarschema")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "cedarschema", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "cedarschema")
+	}
+}
+
+func TestSmokeCel(t *testing.T) {
+	// Smoke test: load cel and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "cel")
+	ptr, err := reg.GetLanguage("cel")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "cel", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "cel")
+	}
+}
+
+func TestSmokeCfml(t *testing.T) {
+	// Smoke test: load cfml and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "cfml")
+	ptr, err := reg.GetLanguage("cfml")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "cfml", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "cfml")
+	}
+}
+
 func TestSmokeChatito(t *testing.T) {
 	// Smoke test: load chatito and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -222,6 +417,32 @@ func TestSmokeChatito(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "chatito")
+	}
+}
+
+func TestSmokeChuck(t *testing.T) {
+	// Smoke test: load chuck and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "chuck")
+	ptr, err := reg.GetLanguage("chuck")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "chuck", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "chuck")
+	}
+}
+
+func TestSmokeCircom(t *testing.T) {
+	// Smoke test: load circom and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "circom")
+	ptr, err := reg.GetLanguage("circom")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "circom", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "circom")
 	}
 }
 
@@ -303,6 +524,32 @@ func TestSmokeCommonlisp(t *testing.T) {
 	}
 }
 
+func TestSmokeCooklang(t *testing.T) {
+	// Smoke test: load cooklang and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "cooklang")
+	ptr, err := reg.GetLanguage("cooklang")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "cooklang", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "cooklang")
+	}
+}
+
+func TestSmokeCorn(t *testing.T) {
+	// Smoke test: load corn and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "corn")
+	ptr, err := reg.GetLanguage("corn")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "corn", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "corn")
+	}
+}
+
 func TestSmokeCpon(t *testing.T) {
 	// Smoke test: load cpon and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -326,6 +573,19 @@ func TestSmokeCpp(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "cpp")
+	}
+}
+
+func TestSmokeCrystal(t *testing.T) {
+	// Smoke test: load crystal and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "crystal")
+	ptr, err := reg.GetLanguage("crystal")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "crystal", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "crystal")
 	}
 }
 
@@ -355,6 +615,19 @@ func TestSmokeCss(t *testing.T) {
 	}
 }
 
+func TestSmokeCst(t *testing.T) {
+	// Smoke test: load cst and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "cst")
+	ptr, err := reg.GetLanguage("cst")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "cst", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "cst")
+	}
+}
+
 func TestSmokeCsv(t *testing.T) {
 	// Smoke test: load csv and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -378,6 +651,32 @@ func TestSmokeCuda(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "cuda")
+	}
+}
+
+func TestSmokeCue(t *testing.T) {
+	// Smoke test: load cue and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "cue")
+	ptr, err := reg.GetLanguage("cue")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "cue", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "cue")
+	}
+}
+
+func TestSmokeCylc(t *testing.T) {
+	// Smoke test: load cylc and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "cylc")
+	ptr, err := reg.GetLanguage("cylc")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "cylc", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "cylc")
 	}
 }
 
@@ -407,6 +706,71 @@ func TestSmokeDart(t *testing.T) {
 	}
 }
 
+func TestSmokeDesktop(t *testing.T) {
+	// Smoke test: load desktop and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "desktop")
+	ptr, err := reg.GetLanguage("desktop")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "desktop", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "desktop")
+	}
+}
+
+func TestSmokeDevicetree(t *testing.T) {
+	// Smoke test: load devicetree and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "devicetree")
+	ptr, err := reg.GetLanguage("devicetree")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "devicetree", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "devicetree")
+	}
+}
+
+func TestSmokeDhall(t *testing.T) {
+	// Smoke test: load dhall and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "dhall")
+	ptr, err := reg.GetLanguage("dhall")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "dhall", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "dhall")
+	}
+}
+
+func TestSmokeDiff(t *testing.T) {
+	// Smoke test: load diff and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "diff")
+	ptr, err := reg.GetLanguage("diff")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "diff", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "diff")
+	}
+}
+
+func TestSmokeDjot(t *testing.T) {
+	// Smoke test: load djot and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "djot")
+	ptr, err := reg.GetLanguage("djot")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "djot", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "djot")
+	}
+}
+
 func TestSmokeDockerfile(t *testing.T) {
 	// Smoke test: load dockerfile and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -417,6 +781,19 @@ func TestSmokeDockerfile(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "dockerfile")
+	}
+}
+
+func TestSmokeDot(t *testing.T) {
+	// Smoke test: load dot and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "dot")
+	ptr, err := reg.GetLanguage("dot")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "dot", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "dot")
 	}
 }
 
@@ -443,6 +820,71 @@ func TestSmokeDtd(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "dtd")
+	}
+}
+
+func TestSmokeEarthfile(t *testing.T) {
+	// Smoke test: load earthfile and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "earthfile")
+	ptr, err := reg.GetLanguage("earthfile")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "earthfile", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "earthfile")
+	}
+}
+
+func TestSmokeEbnf(t *testing.T) {
+	// Smoke test: load ebnf and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "ebnf")
+	ptr, err := reg.GetLanguage("ebnf")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "ebnf", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "ebnf")
+	}
+}
+
+func TestSmokeEditorconfig(t *testing.T) {
+	// Smoke test: load editorconfig and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "editorconfig")
+	ptr, err := reg.GetLanguage("editorconfig")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "editorconfig", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "editorconfig")
+	}
+}
+
+func TestSmokeEds(t *testing.T) {
+	// Smoke test: load eds and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "eds")
+	ptr, err := reg.GetLanguage("eds")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "eds", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "eds")
+	}
+}
+
+func TestSmokeEex(t *testing.T) {
+	// Smoke test: load eex and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "eex")
+	ptr, err := reg.GetLanguage("eex")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "eex", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "eex")
 	}
 }
 
@@ -485,6 +927,32 @@ func TestSmokeElm(t *testing.T) {
 	}
 }
 
+func TestSmokeElsa(t *testing.T) {
+	// Smoke test: load elsa and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "elsa")
+	ptr, err := reg.GetLanguage("elsa")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "elsa", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "elsa")
+	}
+}
+
+func TestSmokeElvish(t *testing.T) {
+	// Smoke test: load elvish and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "elvish")
+	ptr, err := reg.GetLanguage("elvish")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "elvish", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "elvish")
+	}
+}
+
 func TestSmokeEmbeddedtemplate(t *testing.T) {
 	// Smoke test: load embeddedtemplate and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -495,6 +963,19 @@ func TestSmokeEmbeddedtemplate(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "embeddedtemplate")
+	}
+}
+
+func TestSmokeEnforce(t *testing.T) {
+	// Smoke test: load enforce and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "enforce")
+	ptr, err := reg.GetLanguage("enforce")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "enforce", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "enforce")
 	}
 }
 
@@ -511,6 +992,32 @@ func TestSmokeErlang(t *testing.T) {
 	}
 }
 
+func TestSmokeFacility(t *testing.T) {
+	// Smoke test: load facility and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "facility")
+	ptr, err := reg.GetLanguage("facility")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "facility", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "facility")
+	}
+}
+
+func TestSmokeFaust(t *testing.T) {
+	// Smoke test: load faust and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "faust")
+	ptr, err := reg.GetLanguage("faust")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "faust", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "faust")
+	}
+}
+
 func TestSmokeFennel(t *testing.T) {
 	// Smoke test: load fennel and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -521,6 +1028,19 @@ func TestSmokeFennel(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "fennel")
+	}
+}
+
+func TestSmokeFidl(t *testing.T) {
+	// Smoke test: load fidl and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "fidl")
+	ptr, err := reg.GetLanguage("fidl")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "fidl", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "fidl")
 	}
 }
 
@@ -547,6 +1067,32 @@ func TestSmokeFish(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "fish")
+	}
+}
+
+func TestSmokeFoam(t *testing.T) {
+	// Smoke test: load foam and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "foam")
+	ptr, err := reg.GetLanguage("foam")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "foam", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "foam")
+	}
+}
+
+func TestSmokeForth(t *testing.T) {
+	// Smoke test: load forth and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "forth")
+	ptr, err := reg.GetLanguage("forth")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "forth", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "forth")
 	}
 }
 
@@ -602,6 +1148,19 @@ func TestSmokeFunc(t *testing.T) {
 	}
 }
 
+func TestSmokeGap(t *testing.T) {
+	// Smoke test: load gap and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "gap")
+	ptr, err := reg.GetLanguage("gap")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "gap", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "gap")
+	}
+}
+
 func TestSmokeGdscript(t *testing.T) {
 	// Smoke test: load gdscript and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -612,6 +1171,45 @@ func TestSmokeGdscript(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "gdscript")
+	}
+}
+
+func TestSmokeGdshader(t *testing.T) {
+	// Smoke test: load gdshader and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "gdshader")
+	ptr, err := reg.GetLanguage("gdshader")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "gdshader", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "gdshader")
+	}
+}
+
+func TestSmokeGitConfig(t *testing.T) {
+	// Smoke test: load git_config and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "git_config")
+	ptr, err := reg.GetLanguage("git_config")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "git_config", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "git_config")
+	}
+}
+
+func TestSmokeGitRebase(t *testing.T) {
+	// Smoke test: load git_rebase and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "git_rebase")
+	ptr, err := reg.GetLanguage("git_rebase")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "git_rebase", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "git_rebase")
 	}
 }
 
@@ -667,6 +1265,19 @@ func TestSmokeGleam(t *testing.T) {
 	}
 }
 
+func TestSmokeGlimmer(t *testing.T) {
+	// Smoke test: load glimmer and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "glimmer")
+	ptr, err := reg.GetLanguage("glimmer")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "glimmer", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "glimmer")
+	}
+}
+
 func TestSmokeGlsl(t *testing.T) {
 	// Smoke test: load glsl and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -693,6 +1304,19 @@ func TestSmokeGn(t *testing.T) {
 	}
 }
 
+func TestSmokeGnuplot(t *testing.T) {
+	// Smoke test: load gnuplot and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "gnuplot")
+	ptr, err := reg.GetLanguage("gnuplot")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "gnuplot", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "gnuplot")
+	}
+}
+
 func TestSmokeGo(t *testing.T) {
 	// Smoke test: load go and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -703,6 +1327,19 @@ func TestSmokeGo(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "go")
+	}
+}
+
+func TestSmokeGodotResource(t *testing.T) {
+	// Smoke test: load godot_resource and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "godot_resource")
+	ptr, err := reg.GetLanguage("godot_resource")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "godot_resource", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "godot_resource")
 	}
 }
 
@@ -729,6 +1366,45 @@ func TestSmokeGosum(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "gosum")
+	}
+}
+
+func TestSmokeGotmpl(t *testing.T) {
+	// Smoke test: load gotmpl and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "gotmpl")
+	ptr, err := reg.GetLanguage("gotmpl")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "gotmpl", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "gotmpl")
+	}
+}
+
+func TestSmokeGowork(t *testing.T) {
+	// Smoke test: load gowork and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "gowork")
+	ptr, err := reg.GetLanguage("gowork")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "gowork", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "gowork")
+	}
+}
+
+func TestSmokeGpg(t *testing.T) {
+	// Smoke test: load gpg and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "gpg")
+	ptr, err := reg.GetLanguage("gpg")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "gpg", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "gpg")
 	}
 }
 
@@ -849,6 +1525,19 @@ func TestSmokeHeex(t *testing.T) {
 	}
 }
 
+func TestSmokeHjson(t *testing.T) {
+	// Smoke test: load hjson and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "hjson")
+	ptr, err := reg.GetLanguage("hjson")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "hjson", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "hjson")
+	}
+}
+
 func TestSmokeHlsl(t *testing.T) {
 	// Smoke test: load hlsl and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -859,6 +1548,32 @@ func TestSmokeHlsl(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "hlsl")
+	}
+}
+
+func TestSmokeHocon(t *testing.T) {
+	// Smoke test: load hocon and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "hocon")
+	ptr, err := reg.GetLanguage("hocon")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "hocon", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "hocon")
+	}
+}
+
+func TestSmokeHoon(t *testing.T) {
+	// Smoke test: load hoon and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "hoon")
+	ptr, err := reg.GetLanguage("hoon")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "hoon", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "hoon")
 	}
 }
 
@@ -875,6 +1590,45 @@ func TestSmokeHtml(t *testing.T) {
 	}
 }
 
+func TestSmokeHtmldjango(t *testing.T) {
+	// Smoke test: load htmldjango and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "htmldjango")
+	ptr, err := reg.GetLanguage("htmldjango")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "htmldjango", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "htmldjango")
+	}
+}
+
+func TestSmokeHttp(t *testing.T) {
+	// Smoke test: load http and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "http")
+	ptr, err := reg.GetLanguage("http")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "http", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "http")
+	}
+}
+
+func TestSmokeHurl(t *testing.T) {
+	// Smoke test: load hurl and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "hurl")
+	ptr, err := reg.GetLanguage("hurl")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "hurl", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "hurl")
+	}
+}
+
 func TestSmokeHyprlang(t *testing.T) {
 	// Smoke test: load hyprlang and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -885,6 +1639,19 @@ func TestSmokeHyprlang(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "hyprlang")
+	}
+}
+
+func TestSmokeIdris(t *testing.T) {
+	// Smoke test: load idris and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "idris")
+	ptr, err := reg.GetLanguage("idris")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "idris", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "idris")
 	}
 }
 
@@ -914,6 +1681,19 @@ func TestSmokeIspc(t *testing.T) {
 	}
 }
 
+func TestSmokeJai(t *testing.T) {
+	// Smoke test: load jai and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "jai")
+	ptr, err := reg.GetLanguage("jai")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "jai", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "jai")
+	}
+}
+
 func TestSmokeJanet(t *testing.T) {
 	// Smoke test: load janet and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -940,6 +1720,19 @@ func TestSmokeJava(t *testing.T) {
 	}
 }
 
+func TestSmokeJavadoc(t *testing.T) {
+	// Smoke test: load javadoc and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "javadoc")
+	ptr, err := reg.GetLanguage("javadoc")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "javadoc", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "javadoc")
+	}
+}
+
 func TestSmokeJavascript(t *testing.T) {
 	// Smoke test: load javascript and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -950,6 +1743,32 @@ func TestSmokeJavascript(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "javascript")
+	}
+}
+
+func TestSmokeJinja2(t *testing.T) {
+	// Smoke test: load jinja2 and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "jinja2")
+	ptr, err := reg.GetLanguage("jinja2")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "jinja2", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "jinja2")
+	}
+}
+
+func TestSmokeJq(t *testing.T) {
+	// Smoke test: load jq and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "jq")
+	ptr, err := reg.GetLanguage("jq")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "jq", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "jq")
 	}
 }
 
@@ -979,6 +1798,19 @@ func TestSmokeJson(t *testing.T) {
 	}
 }
 
+func TestSmokeJson5(t *testing.T) {
+	// Smoke test: load json5 and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "json5")
+	ptr, err := reg.GetLanguage("json5")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "json5", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "json5")
+	}
+}
+
 func TestSmokeJsonnet(t *testing.T) {
 	// Smoke test: load jsonnet and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1002,6 +1834,32 @@ func TestSmokeJulia(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "julia")
+	}
+}
+
+func TestSmokeJust(t *testing.T) {
+	// Smoke test: load just and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "just")
+	ptr, err := reg.GetLanguage("just")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "just", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "just")
+	}
+}
+
+func TestSmokeKcl(t *testing.T) {
+	// Smoke test: load kcl and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "kcl")
+	ptr, err := reg.GetLanguage("kcl")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "kcl", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "kcl")
 	}
 }
 
@@ -1057,6 +1915,45 @@ func TestSmokeLatex(t *testing.T) {
 	}
 }
 
+func TestSmokeLean(t *testing.T) {
+	// Smoke test: load lean and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "lean")
+	ptr, err := reg.GetLanguage("lean")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "lean", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "lean")
+	}
+}
+
+func TestSmokeLedger(t *testing.T) {
+	// Smoke test: load ledger and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "ledger")
+	ptr, err := reg.GetLanguage("ledger")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "ledger", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "ledger")
+	}
+}
+
+func TestSmokeLess(t *testing.T) {
+	// Smoke test: load less and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "less")
+	ptr, err := reg.GetLanguage("less")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "less", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "less")
+	}
+}
+
 func TestSmokeLinkerscript(t *testing.T) {
 	// Smoke test: load linkerscript and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1067,6 +1964,19 @@ func TestSmokeLinkerscript(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "linkerscript")
+	}
+}
+
+func TestSmokeLiquid(t *testing.T) {
+	// Smoke test: load liquid and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "liquid")
+	ptr, err := reg.GetLanguage("liquid")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "liquid", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "liquid")
 	}
 }
 
@@ -1226,6 +2136,58 @@ func TestSmokeMeson(t *testing.T) {
 	}
 }
 
+func TestSmokeMlir(t *testing.T) {
+	// Smoke test: load mlir and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "mlir")
+	ptr, err := reg.GetLanguage("mlir")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "mlir", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "mlir")
+	}
+}
+
+func TestSmokeMojo(t *testing.T) {
+	// Smoke test: load mojo and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "mojo")
+	ptr, err := reg.GetLanguage("mojo")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "mojo", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "mojo")
+	}
+}
+
+func TestSmokeMove(t *testing.T) {
+	// Smoke test: load move and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "move")
+	ptr, err := reg.GetLanguage("move")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "move", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "move")
+	}
+}
+
+func TestSmokeNasm(t *testing.T) {
+	// Smoke test: load nasm and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "nasm")
+	ptr, err := reg.GetLanguage("nasm")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "nasm", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "nasm")
+	}
+}
+
 func TestSmokeNetlinx(t *testing.T) {
 	// Smoke test: load netlinx and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1236,6 +2198,32 @@ func TestSmokeNetlinx(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "netlinx")
+	}
+}
+
+func TestSmokeNginx(t *testing.T) {
+	// Smoke test: load nginx and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "nginx")
+	ptr, err := reg.GetLanguage("nginx")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "nginx", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "nginx")
+	}
+}
+
+func TestSmokeNickel(t *testing.T) {
+	// Smoke test: load nickel and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "nickel")
+	ptr, err := reg.GetLanguage("nickel")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "nickel", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "nickel")
 	}
 }
 
@@ -1275,6 +2263,32 @@ func TestSmokeNix(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "nix")
+	}
+}
+
+func TestSmokeNorg(t *testing.T) {
+	// Smoke test: load norg and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "norg")
+	ptr, err := reg.GetLanguage("norg")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "norg", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "norg")
+	}
+}
+
+func TestSmokeNorgMeta(t *testing.T) {
+	// Smoke test: load norg_meta and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "norg_meta")
+	ptr, err := reg.GetLanguage("norg_meta")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "norg_meta", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "norg_meta")
 	}
 }
 
@@ -1343,6 +2357,19 @@ func TestSmokeOcamlInterface(t *testing.T) {
 	}
 }
 
+func TestSmokeOcamllex(t *testing.T) {
+	// Smoke test: load ocamllex and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "ocamllex")
+	ptr, err := reg.GetLanguage("ocamllex")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "ocamllex", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "ocamllex")
+	}
+}
+
 func TestSmokeOdin(t *testing.T) {
 	// Smoke test: load odin and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1353,6 +2380,19 @@ func TestSmokeOdin(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "odin")
+	}
+}
+
+func TestSmokeOpenscad(t *testing.T) {
+	// Smoke test: load openscad and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "openscad")
+	ptr, err := reg.GetLanguage("openscad")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "openscad", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "openscad")
 	}
 }
 
@@ -1434,6 +2474,32 @@ func TestSmokePhp(t *testing.T) {
 	}
 }
 
+func TestSmokePhpdoc(t *testing.T) {
+	// Smoke test: load phpdoc and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "phpdoc")
+	ptr, err := reg.GetLanguage("phpdoc")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "phpdoc", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "phpdoc")
+	}
+}
+
+func TestSmokePkl(t *testing.T) {
+	// Smoke test: load pkl and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "pkl")
+	ptr, err := reg.GetLanguage("pkl")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "pkl", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "pkl")
+	}
+}
+
 func TestSmokePo(t *testing.T) {
 	// Smoke test: load po and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1447,6 +2513,19 @@ func TestSmokePo(t *testing.T) {
 	}
 }
 
+func TestSmokePoeFilter(t *testing.T) {
+	// Smoke test: load poe_filter and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "poe_filter")
+	ptr, err := reg.GetLanguage("poe_filter")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "poe_filter", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "poe_filter")
+	}
+}
+
 func TestSmokePony(t *testing.T) {
 	// Smoke test: load pony and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1457,6 +2536,19 @@ func TestSmokePony(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "pony")
+	}
+}
+
+func TestSmokePostscript(t *testing.T) {
+	// Smoke test: load postscript and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "postscript")
+	ptr, err := reg.GetLanguage("postscript")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "postscript", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "postscript")
 	}
 }
 
@@ -1499,6 +2591,32 @@ func TestSmokePrisma(t *testing.T) {
 	}
 }
 
+func TestSmokeProlog(t *testing.T) {
+	// Smoke test: load prolog and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "prolog")
+	ptr, err := reg.GetLanguage("prolog")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "prolog", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "prolog")
+	}
+}
+
+func TestSmokePromql(t *testing.T) {
+	// Smoke test: load promql and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "promql")
+	ptr, err := reg.GetLanguage("promql")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "promql", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "promql")
+	}
+}
+
 func TestSmokeProperties(t *testing.T) {
 	// Smoke test: load properties and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1525,6 +2643,19 @@ func TestSmokeProto(t *testing.T) {
 	}
 }
 
+func TestSmokePrql(t *testing.T) {
+	// Smoke test: load prql and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "prql")
+	ptr, err := reg.GetLanguage("prql")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "prql", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "prql")
+	}
+}
+
 func TestSmokePsv(t *testing.T) {
 	// Smoke test: load psv and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1535,6 +2666,19 @@ func TestSmokePsv(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "psv")
+	}
+}
+
+func TestSmokePug(t *testing.T) {
+	// Smoke test: load pug and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "pug")
+	ptr, err := reg.GetLanguage("pug")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "pug", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "pug")
 	}
 }
 
@@ -1587,6 +2731,19 @@ func TestSmokePython(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "python")
+	}
+}
+
+func TestSmokeQl(t *testing.T) {
+	// Smoke test: load ql and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "ql")
+	ptr, err := reg.GetLanguage("ql")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "ql", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "ql")
 	}
 }
 
@@ -1655,6 +2812,45 @@ func TestSmokeRacket(t *testing.T) {
 	}
 }
 
+func TestSmokeRasi(t *testing.T) {
+	// Smoke test: load rasi and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "rasi")
+	ptr, err := reg.GetLanguage("rasi")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "rasi", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "rasi")
+	}
+}
+
+func TestSmokeRazor(t *testing.T) {
+	// Smoke test: load razor and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "razor")
+	ptr, err := reg.GetLanguage("razor")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "razor", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "razor")
+	}
+}
+
+func TestSmokeRbs(t *testing.T) {
+	// Smoke test: load rbs and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "rbs")
+	ptr, err := reg.GetLanguage("rbs")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "rbs", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "rbs")
+	}
+}
+
 func TestSmokeRe2c(t *testing.T) {
 	// Smoke test: load re2c and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1678,6 +2874,19 @@ func TestSmokeReadline(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "readline")
+	}
+}
+
+func TestSmokeRegex(t *testing.T) {
+	// Smoke test: load regex and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "regex")
+	ptr, err := reg.GetLanguage("regex")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "regex", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "regex")
 	}
 }
 
@@ -1707,6 +2916,45 @@ func TestSmokeRequirements(t *testing.T) {
 	}
 }
 
+func TestSmokeRescript(t *testing.T) {
+	// Smoke test: load rescript and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "rescript")
+	ptr, err := reg.GetLanguage("rescript")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "rescript", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "rescript")
+	}
+}
+
+func TestSmokeRobot(t *testing.T) {
+	// Smoke test: load robot and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "robot")
+	ptr, err := reg.GetLanguage("robot")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "robot", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "robot")
+	}
+}
+
+func TestSmokeRoc(t *testing.T) {
+	// Smoke test: load roc and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "roc")
+	ptr, err := reg.GetLanguage("roc")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "roc", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "roc")
+	}
+}
+
 func TestSmokeRon(t *testing.T) {
 	// Smoke test: load ron and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1730,6 +2978,19 @@ func TestSmokeRst(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "rst")
+	}
+}
+
+func TestSmokeRtf(t *testing.T) {
+	// Smoke test: load rtf and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "rtf")
+	ptr, err := reg.GetLanguage("rtf")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "rtf", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "rtf")
 	}
 }
 
@@ -1798,6 +3059,19 @@ func TestSmokeScss(t *testing.T) {
 	}
 }
 
+func TestSmokeSlang(t *testing.T) {
+	// Smoke test: load slang and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "slang")
+	ptr, err := reg.GetLanguage("slang")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "slang", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "slang")
+	}
+}
+
 func TestSmokeSmali(t *testing.T) {
 	// Smoke test: load smali and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1808,6 +3082,19 @@ func TestSmokeSmali(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "smali")
+	}
+}
+
+func TestSmokeSmalltalk(t *testing.T) {
+	// Smoke test: load smalltalk and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "smalltalk")
+	ptr, err := reg.GetLanguage("smalltalk")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "smalltalk", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "smalltalk")
 	}
 }
 
@@ -1824,6 +3111,32 @@ func TestSmokeSmithy(t *testing.T) {
 	}
 }
 
+func TestSmokeSml(t *testing.T) {
+	// Smoke test: load sml and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "sml")
+	ptr, err := reg.GetLanguage("sml")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "sml", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "sml")
+	}
+}
+
+func TestSmokeSnakemake(t *testing.T) {
+	// Smoke test: load snakemake and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "snakemake")
+	ptr, err := reg.GetLanguage("snakemake")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "snakemake", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "snakemake")
+	}
+}
+
 func TestSmokeSolidity(t *testing.T) {
 	// Smoke test: load solidity and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1834,6 +3147,32 @@ func TestSmokeSolidity(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "solidity")
+	}
+}
+
+func TestSmokeSouffle(t *testing.T) {
+	// Smoke test: load souffle and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "souffle")
+	ptr, err := reg.GetLanguage("souffle")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "souffle", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "souffle")
+	}
+}
+
+func TestSmokeSourcepawn(t *testing.T) {
+	// Smoke test: load sourcepawn and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "sourcepawn")
+	ptr, err := reg.GetLanguage("sourcepawn")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "sourcepawn", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "sourcepawn")
 	}
 }
 
@@ -1863,6 +3202,19 @@ func TestSmokeSql(t *testing.T) {
 	}
 }
 
+func TestSmokeSqlBigquery(t *testing.T) {
+	// Smoke test: load sql_bigquery and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "sql_bigquery")
+	ptr, err := reg.GetLanguage("sql_bigquery")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "sql_bigquery", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "sql_bigquery")
+	}
+}
+
 func TestSmokeSquirrel(t *testing.T) {
 	// Smoke test: load squirrel and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1873,6 +3225,32 @@ func TestSmokeSquirrel(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "squirrel")
+	}
+}
+
+func TestSmokeSshConfig(t *testing.T) {
+	// Smoke test: load ssh_config and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "ssh_config")
+	ptr, err := reg.GetLanguage("ssh_config")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "ssh_config", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "ssh_config")
+	}
+}
+
+func TestSmokeStan(t *testing.T) {
+	// Smoke test: load stan and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "stan")
+	ptr, err := reg.GetLanguage("stan")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "stan", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "stan")
 	}
 }
 
@@ -1889,6 +3267,19 @@ func TestSmokeStarlark(t *testing.T) {
 	}
 }
 
+func TestSmokeSuperhtml(t *testing.T) {
+	// Smoke test: load superhtml and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "superhtml")
+	ptr, err := reg.GetLanguage("superhtml")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "superhtml", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "superhtml")
+	}
+}
+
 func TestSmokeSvelte(t *testing.T) {
 	// Smoke test: load svelte and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1899,6 +3290,19 @@ func TestSmokeSvelte(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "svelte")
+	}
+}
+
+func TestSmokeSway(t *testing.T) {
+	// Smoke test: load sway and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "sway")
+	ptr, err := reg.GetLanguage("sway")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "sway", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "sway")
 	}
 }
 
@@ -1915,6 +3319,19 @@ func TestSmokeSwift(t *testing.T) {
 	}
 }
 
+func TestSmokeSystemverilog(t *testing.T) {
+	// Smoke test: load systemverilog and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "systemverilog")
+	ptr, err := reg.GetLanguage("systemverilog")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "systemverilog", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "systemverilog")
+	}
+}
+
 func TestSmokeTablegen(t *testing.T) {
 	// Smoke test: load tablegen and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1928,6 +3345,19 @@ func TestSmokeTablegen(t *testing.T) {
 	}
 }
 
+func TestSmokeTact(t *testing.T) {
+	// Smoke test: load tact and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "tact")
+	ptr, err := reg.GetLanguage("tact")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "tact", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "tact")
+	}
+}
+
 func TestSmokeTcl(t *testing.T) {
 	// Smoke test: load tcl and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1938,6 +3368,45 @@ func TestSmokeTcl(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "tcl")
+	}
+}
+
+func TestSmokeTeal(t *testing.T) {
+	// Smoke test: load teal and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "teal")
+	ptr, err := reg.GetLanguage("teal")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "teal", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "teal")
+	}
+}
+
+func TestSmokeTempl(t *testing.T) {
+	// Smoke test: load templ and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "templ")
+	ptr, err := reg.GetLanguage("templ")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "templ", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "templ")
+	}
+}
+
+func TestSmokeTera(t *testing.T) {
+	// Smoke test: load tera and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "tera")
+	ptr, err := reg.GetLanguage("tera")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "tera", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "tera")
 	}
 }
 
@@ -1967,6 +3436,19 @@ func TestSmokeTest(t *testing.T) {
 	}
 }
 
+func TestSmokeTextproto(t *testing.T) {
+	// Smoke test: load textproto and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "textproto")
+	ptr, err := reg.GetLanguage("textproto")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "textproto", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "textproto")
+	}
+}
+
 func TestSmokeThrift(t *testing.T) {
 	// Smoke test: load thrift and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -1977,6 +3459,45 @@ func TestSmokeThrift(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "thrift")
+	}
+}
+
+func TestSmokeTlaplus(t *testing.T) {
+	// Smoke test: load tlaplus and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "tlaplus")
+	ptr, err := reg.GetLanguage("tlaplus")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "tlaplus", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "tlaplus")
+	}
+}
+
+func TestSmokeTmux(t *testing.T) {
+	// Smoke test: load tmux and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "tmux")
+	ptr, err := reg.GetLanguage("tmux")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "tmux", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "tmux")
+	}
+}
+
+func TestSmokeTodotxt(t *testing.T) {
+	// Smoke test: load todotxt and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "todotxt")
+	ptr, err := reg.GetLanguage("todotxt")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "todotxt", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "todotxt")
 	}
 }
 
@@ -2019,6 +3540,19 @@ func TestSmokeTsx(t *testing.T) {
 	}
 }
 
+func TestSmokeTurtle(t *testing.T) {
+	// Smoke test: load turtle and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "turtle")
+	ptr, err := reg.GetLanguage("turtle")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "turtle", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "turtle")
+	}
+}
+
 func TestSmokeTwig(t *testing.T) {
 	// Smoke test: load twig and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -2042,6 +3576,32 @@ func TestSmokeTypescript(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "typescript")
+	}
+}
+
+func TestSmokeTypespec(t *testing.T) {
+	// Smoke test: load typespec and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "typespec")
+	ptr, err := reg.GetLanguage("typespec")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "typespec", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "typespec")
+	}
+}
+
+func TestSmokeTyposcript(t *testing.T) {
+	// Smoke test: load typoscript and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "typoscript")
+	ptr, err := reg.GetLanguage("typoscript")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "typoscript", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "typoscript")
 	}
 }
 
@@ -2149,6 +3709,19 @@ func TestSmokeVhdl(t *testing.T) {
 	}
 }
 
+func TestSmokeVhs(t *testing.T) {
+	// Smoke test: load vhs and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "vhs")
+	ptr, err := reg.GetLanguage("vhs")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "vhs", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "vhs")
+	}
+}
+
 func TestSmokeVim(t *testing.T) {
 	// Smoke test: load vim and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -2159,6 +3732,32 @@ func TestSmokeVim(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "vim")
+	}
+}
+
+func TestSmokeVimdoc(t *testing.T) {
+	// Smoke test: load vimdoc and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "vimdoc")
+	ptr, err := reg.GetLanguage("vimdoc")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "vimdoc", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "vimdoc")
+	}
+}
+
+func TestSmokeVrl(t *testing.T) {
+	// Smoke test: load vrl and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "vrl")
+	ptr, err := reg.GetLanguage("vrl")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "vrl", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "vrl")
 	}
 }
 
@@ -2214,6 +3813,58 @@ func TestSmokeWgsl(t *testing.T) {
 	}
 }
 
+func TestSmokeWgslBevy(t *testing.T) {
+	// Smoke test: load wgsl_bevy and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "wgsl_bevy")
+	ptr, err := reg.GetLanguage("wgsl_bevy")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "wgsl_bevy", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "wgsl_bevy")
+	}
+}
+
+func TestSmokeWit(t *testing.T) {
+	// Smoke test: load wit and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "wit")
+	ptr, err := reg.GetLanguage("wit")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "wit", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "wit")
+	}
+}
+
+func TestSmokeWolfram(t *testing.T) {
+	// Smoke test: load wolfram and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "wolfram")
+	ptr, err := reg.GetLanguage("wolfram")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "wolfram", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "wolfram")
+	}
+}
+
+func TestSmokeX86asm(t *testing.T) {
+	// Smoke test: load x86asm and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "x86asm")
+	ptr, err := reg.GetLanguage("x86asm")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "x86asm", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "x86asm")
+	}
+}
+
 func TestSmokeXcompose(t *testing.T) {
 	// Smoke test: load xcompose and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -2240,6 +3891,19 @@ func TestSmokeXml(t *testing.T) {
 	}
 }
 
+func TestSmokeYaml(t *testing.T) {
+	// Smoke test: load yaml and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "yaml")
+	ptr, err := reg.GetLanguage("yaml")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "yaml", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "yaml")
+	}
+}
+
 func TestSmokeYuck(t *testing.T) {
 	// Smoke test: load yuck and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -2263,5 +3927,44 @@ func TestSmokeZig(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "zig")
+	}
+}
+
+func TestSmokeZiggy(t *testing.T) {
+	// Smoke test: load ziggy and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "ziggy")
+	ptr, err := reg.GetLanguage("ziggy")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "ziggy", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "ziggy")
+	}
+}
+
+func TestSmokeZiggySchema(t *testing.T) {
+	// Smoke test: load ziggy_schema and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "ziggy_schema")
+	ptr, err := reg.GetLanguage("ziggy_schema")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "ziggy_schema", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "ziggy_schema")
+	}
+}
+
+func TestSmokeZsh(t *testing.T) {
+	// Smoke test: load zsh and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "zsh")
+	ptr, err := reg.GetLanguage("zsh")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "zsh", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "zsh")
 	}
 }

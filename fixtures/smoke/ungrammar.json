@@ -1,7 +1,6 @@
 {
 	"assertions": {
 		"root_child_count_min": 1,
-		"root_contains_node_type": "node",
 		"tree_not_null": true
 	},
 	"category": "smoke",

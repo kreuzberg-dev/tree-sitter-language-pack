@@ -1,0 +1,12 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load teal and parse a simple snippet",
+	"id": "smoke_teal",
+	"language": "teal",
+	"source_code": "x",
+	"tags": ["smoke"]
+}

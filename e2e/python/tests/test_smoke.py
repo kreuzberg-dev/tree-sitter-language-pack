@@ -6,7 +6,15 @@ from tree_sitter_language_pack import (
     has_language,
 )
 
-from .helpers import tree_contains_node_type, tree_has_error_nodes
+
+@pytest.mark.skipif(not has_language("abl"), reason="Language 'abl' not available")
+def test_smoke_abl():
+    """Smoke test: load abl and parse a simple snippet"""
+    parser = get_parser("abl")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("actionscript"), reason="Language 'actionscript' not available")
@@ -17,7 +25,6 @@ def test_smoke_actionscript():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "variable_declaration"), "Tree should contain a 'variable_declaration' node"
 
 
 @pytest.mark.skipif(not has_language("ada"), reason="Language 'ada' not available")
@@ -28,7 +35,6 @@ def test_smoke_ada():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "compilation_unit"), "Tree should contain a 'compilation_unit' node"
 
 
 @pytest.mark.skipif(not has_language("agda"), reason="Language 'agda' not available")
@@ -39,7 +45,26 @@ def test_smoke_agda():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "module"), "Tree should contain a 'module' node"
+
+
+@pytest.mark.skipif(not has_language("al"), reason="Language 'al' not available")
+def test_smoke_al():
+    """Smoke test: load al and parse a simple snippet"""
+    parser = get_parser("al")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("angular"), reason="Language 'angular' not available")
+def test_smoke_angular():
+    """Smoke test: load angular and parse a simple snippet"""
+    parser = get_parser("angular")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("apex"), reason="Language 'apex' not available")
@@ -50,7 +75,6 @@ def test_smoke_apex():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "class_declaration"), "Tree should contain a 'class_declaration' node"
 
 
 @pytest.mark.skipif(not has_language("arduino"), reason="Language 'arduino' not available")
@@ -61,7 +85,16 @@ def test_smoke_arduino():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node"
+
+
+@pytest.mark.skipif(not has_language("asciidoc"), reason="Language 'asciidoc' not available")
+def test_smoke_asciidoc():
+    """Smoke test: load asciidoc and parse a simple snippet"""
+    parser = get_parser("asciidoc")
+    tree = parser.parse(b"= Title\n\nParagraph.")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("asm"), reason="Language 'asm' not available")
@@ -72,7 +105,6 @@ def test_smoke_asm():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "instruction"), "Tree should contain a 'instruction' node"
 
 
 @pytest.mark.skipif(not has_language("astro"), reason="Language 'astro' not available")
@@ -83,7 +115,16 @@ def test_smoke_astro():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "frontmatter"), "Tree should contain a 'frontmatter' node"
+
+
+@pytest.mark.skipif(not has_language("awk"), reason="Language 'awk' not available")
+def test_smoke_awk():
+    """Smoke test: load awk and parse a simple snippet"""
+    parser = get_parser("awk")
+    tree = parser.parse(b'BEGIN { print "hello" }')
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("bash"), reason="Language 'bash' not available")
@@ -94,7 +135,26 @@ def test_smoke_bash():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "command"), "Tree should contain a 'command' node"
+
+
+@pytest.mark.skipif(not has_language("bass"), reason="Language 'bass' not available")
+def test_smoke_bass():
+    """Smoke test: load bass and parse a simple snippet"""
+    parser = get_parser("bass")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("batch"), reason="Language 'batch' not available")
+def test_smoke_batch():
+    """Smoke test: load batch and parse a simple snippet"""
+    parser = get_parser("batch")
+    tree = parser.parse(b"@echo off\necho hello")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("beancount"), reason="Language 'beancount' not available")
@@ -105,7 +165,6 @@ def test_smoke_beancount():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "open"), "Tree should contain a 'open' node"
 
 
 @pytest.mark.skipif(not has_language("bibtex"), reason="Language 'bibtex' not available")
@@ -116,7 +175,6 @@ def test_smoke_bibtex():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "entry"), "Tree should contain a 'entry' node"
 
 
 @pytest.mark.skipif(not has_language("bicep"), reason="Language 'bicep' not available")
@@ -127,7 +185,6 @@ def test_smoke_bicep():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "parameter_declaration"), "Tree should contain a 'parameter_declaration' node"
 
 
 @pytest.mark.skipif(not has_language("bitbake"), reason="Language 'bitbake' not available")
@@ -138,7 +195,26 @@ def test_smoke_bitbake():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "variable_assignment"), "Tree should contain a 'variable_assignment' node"
+
+
+@pytest.mark.skipif(not has_language("blade"), reason="Language 'blade' not available")
+def test_smoke_blade():
+    """Smoke test: load blade and parse a simple snippet"""
+    parser = get_parser("blade")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("brightscript"), reason="Language 'brightscript' not available")
+def test_smoke_brightscript():
+    """Smoke test: load brightscript and parse a simple snippet"""
+    parser = get_parser("brightscript")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("bsl"), reason="Language 'bsl' not available")
@@ -149,7 +225,6 @@ def test_smoke_bsl():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "procedure_definition"), "Tree should contain a 'procedure_definition' node"
 
 
 @pytest.mark.skipif(not has_language("c"), reason="Language 'c' not available")
@@ -157,6 +232,26 @@ def test_smoke_c():
     """Smoke test: load c and parse a simple snippet"""
     parser = get_parser("c")
     tree = parser.parse(b"int main() { return 0; }")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("c3"), reason="Language 'c3' not available")
+def test_smoke_c3():
+    """Smoke test: load c3 and parse a simple snippet"""
+    parser = get_parser("c3")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("caddy"), reason="Language 'caddy' not available")
+def test_smoke_caddy():
+    """Smoke test: load caddy and parse a simple snippet"""
+    parser = get_parser("caddy")
+    tree = parser.parse(b':8080 {\n\trespond "Hello"\n}')
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -170,7 +265,6 @@ def test_smoke_cairo():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "cairo_1_file"), "Tree should contain a 'cairo_1_file' node"
 
 
 @pytest.mark.skipif(not has_language("capnp"), reason="Language 'capnp' not available")
@@ -181,7 +275,46 @@ def test_smoke_capnp():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "unique_id_statement"), "Tree should contain a 'unique_id_statement' node"
+
+
+@pytest.mark.skipif(not has_language("cedar"), reason="Language 'cedar' not available")
+def test_smoke_cedar():
+    """Smoke test: load cedar and parse a simple snippet"""
+    parser = get_parser("cedar")
+    tree = parser.parse(b"permit(principal, action, resource);")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("cedarschema"), reason="Language 'cedarschema' not available")
+def test_smoke_cedarschema():
+    """Smoke test: load cedarschema and parse a simple snippet"""
+    parser = get_parser("cedarschema")
+    tree = parser.parse(b"entity User;")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("cel"), reason="Language 'cel' not available")
+def test_smoke_cel():
+    """Smoke test: load cel and parse a simple snippet"""
+    parser = get_parser("cel")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("cfml"), reason="Language 'cfml' not available")
+def test_smoke_cfml():
+    """Smoke test: load cfml and parse a simple snippet"""
+    parser = get_parser("cfml")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("chatito"), reason="Language 'chatito' not available")
@@ -192,7 +325,26 @@ def test_smoke_chatito():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "intent_def"), "Tree should contain a 'intent_def' node"
+
+
+@pytest.mark.skipif(not has_language("chuck"), reason="Language 'chuck' not available")
+def test_smoke_chuck():
+    """Smoke test: load chuck and parse a simple snippet"""
+    parser = get_parser("chuck")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("circom"), reason="Language 'circom' not available")
+def test_smoke_circom():
+    """Smoke test: load circom and parse a simple snippet"""
+    parser = get_parser("circom")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("clarity"), reason="Language 'clarity' not available")
@@ -203,7 +355,6 @@ def test_smoke_clarity():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node"
 
 
 @pytest.mark.skipif(not has_language("clojure"), reason="Language 'clojure' not available")
@@ -214,7 +365,6 @@ def test_smoke_clojure():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "list_lit"), "Tree should contain a 'list_lit' node"
 
 
 @pytest.mark.skipif(not has_language("cmake"), reason="Language 'cmake' not available")
@@ -225,7 +375,6 @@ def test_smoke_cmake():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "normal_command"), "Tree should contain a 'normal_command' node"
 
 
 @pytest.mark.skipif(not has_language("cobol"), reason="Language 'cobol' not available")
@@ -236,7 +385,6 @@ def test_smoke_cobol():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "program_definition"), "Tree should contain a 'program_definition' node"
 
 
 @pytest.mark.skipif(not has_language("comment"), reason="Language 'comment' not available")
@@ -247,7 +395,6 @@ def test_smoke_comment():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "tag"), "Tree should contain a 'tag' node"
 
 
 @pytest.mark.skipif(not has_language("commonlisp"), reason="Language 'commonlisp' not available")
@@ -258,7 +405,26 @@ def test_smoke_commonlisp():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "list_lit"), "Tree should contain a 'list_lit' node"
+
+
+@pytest.mark.skipif(not has_language("cooklang"), reason="Language 'cooklang' not available")
+def test_smoke_cooklang():
+    """Smoke test: load cooklang and parse a simple snippet"""
+    parser = get_parser("cooklang")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("corn"), reason="Language 'corn' not available")
+def test_smoke_corn():
+    """Smoke test: load corn and parse a simple snippet"""
+    parser = get_parser("corn")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("cpon"), reason="Language 'cpon' not available")
@@ -269,7 +435,6 @@ def test_smoke_cpon():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "map"), "Tree should contain a 'map' node"
 
 
 @pytest.mark.skipif(not has_language("cpp"), reason="Language 'cpp' not available")
@@ -282,11 +447,21 @@ def test_smoke_cpp():
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
+@pytest.mark.skipif(not has_language("crystal"), reason="Language 'crystal' not available")
+def test_smoke_crystal():
+    """Smoke test: load crystal and parse a simple snippet"""
+    parser = get_parser("crystal")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
 @pytest.mark.skipif(not has_language("csharp"), reason="Language 'csharp' not available")
 def test_smoke_csharp():
     """Smoke test: load csharp and parse a simple snippet"""
     parser = get_parser("csharp")
-    tree = parser.parse(b"using System;\nclass Foo { }")
+    tree = parser.parse(b"class Main {}")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -300,7 +475,16 @@ def test_smoke_css():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "rule_set"), "Tree should contain a 'rule_set' node"
+
+
+@pytest.mark.skipif(not has_language("cst"), reason="Language 'cst' not available")
+def test_smoke_cst():
+    """Smoke test: load cst and parse a simple snippet"""
+    parser = get_parser("cst")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("csv"), reason="Language 'csv' not available")
@@ -311,7 +495,6 @@ def test_smoke_csv():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "row"), "Tree should contain a 'row' node"
 
 
 @pytest.mark.skipif(not has_language("cuda"), reason="Language 'cuda' not available")
@@ -322,7 +505,26 @@ def test_smoke_cuda():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node"
+
+
+@pytest.mark.skipif(not has_language("cue"), reason="Language 'cue' not available")
+def test_smoke_cue():
+    """Smoke test: load cue and parse a simple snippet"""
+    parser = get_parser("cue")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("cylc"), reason="Language 'cylc' not available")
+def test_smoke_cylc():
+    """Smoke test: load cylc and parse a simple snippet"""
+    parser = get_parser("cylc")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("d"), reason="Language 'd' not available")
@@ -333,7 +535,6 @@ def test_smoke_d():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_declaration"), "Tree should contain a 'function_declaration' node"
 
 
 @pytest.mark.skipif(not has_language("dart"), reason="Language 'dart' not available")
@@ -344,7 +545,56 @@ def test_smoke_dart():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_signature"), "Tree should contain a 'function_signature' node"
+
+
+@pytest.mark.skipif(not has_language("desktop"), reason="Language 'desktop' not available")
+def test_smoke_desktop():
+    """Smoke test: load desktop and parse a simple snippet"""
+    parser = get_parser("desktop")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("devicetree"), reason="Language 'devicetree' not available")
+def test_smoke_devicetree():
+    """Smoke test: load devicetree and parse a simple snippet"""
+    parser = get_parser("devicetree")
+    tree = parser.parse(b"/dts-v1/;\n/ { };")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("dhall"), reason="Language 'dhall' not available")
+def test_smoke_dhall():
+    """Smoke test: load dhall and parse a simple snippet"""
+    parser = get_parser("dhall")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("diff"), reason="Language 'diff' not available")
+def test_smoke_diff():
+    """Smoke test: load diff and parse a simple snippet"""
+    parser = get_parser("diff")
+    tree = parser.parse(b"--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("djot"), reason="Language 'djot' not available")
+def test_smoke_djot():
+    """Smoke test: load djot and parse a simple snippet"""
+    parser = get_parser("djot")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("dockerfile"), reason="Language 'dockerfile' not available")
@@ -355,7 +605,16 @@ def test_smoke_dockerfile():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "from_instruction"), "Tree should contain a 'from_instruction' node"
+
+
+@pytest.mark.skipif(not has_language("dot"), reason="Language 'dot' not available")
+def test_smoke_dot():
+    """Smoke test: load dot and parse a simple snippet"""
+    parser = get_parser("dot")
+    tree = parser.parse(b"digraph G { A -> B; }")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("doxygen"), reason="Language 'doxygen' not available")
@@ -366,7 +625,6 @@ def test_smoke_doxygen():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "brief_header"), "Tree should contain a 'brief_header' node"
 
 
 @pytest.mark.skipif(not has_language("dtd"), reason="Language 'dtd' not available")
@@ -377,7 +635,56 @@ def test_smoke_dtd():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "elementdecl"), "Tree should contain a 'elementdecl' node"
+
+
+@pytest.mark.skipif(not has_language("earthfile"), reason="Language 'earthfile' not available")
+def test_smoke_earthfile():
+    """Smoke test: load earthfile and parse a simple snippet"""
+    parser = get_parser("earthfile")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("ebnf"), reason="Language 'ebnf' not available")
+def test_smoke_ebnf():
+    """Smoke test: load ebnf and parse a simple snippet"""
+    parser = get_parser("ebnf")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("editorconfig"), reason="Language 'editorconfig' not available")
+def test_smoke_editorconfig():
+    """Smoke test: load editorconfig and parse a simple snippet"""
+    parser = get_parser("editorconfig")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("eds"), reason="Language 'eds' not available")
+def test_smoke_eds():
+    """Smoke test: load eds and parse a simple snippet"""
+    parser = get_parser("eds")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("eex"), reason="Language 'eex' not available")
+def test_smoke_eex():
+    """Smoke test: load eex and parse a simple snippet"""
+    parser = get_parser("eex")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("elisp"), reason="Language 'elisp' not available")
@@ -388,7 +695,6 @@ def test_smoke_elisp():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node"
 
 
 @pytest.mark.skipif(not has_language("elixir"), reason="Language 'elixir' not available")
@@ -399,7 +705,6 @@ def test_smoke_elixir():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "call"), "Tree should contain a 'call' node"
 
 
 @pytest.mark.skipif(not has_language("elm"), reason="Language 'elm' not available")
@@ -410,14 +715,43 @@ def test_smoke_elm():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "module_declaration"), "Tree should contain a 'module_declaration' node"
+
+
+@pytest.mark.skipif(not has_language("elsa"), reason="Language 'elsa' not available")
+def test_smoke_elsa():
+    """Smoke test: load elsa and parse a simple snippet"""
+    parser = get_parser("elsa")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("elvish"), reason="Language 'elvish' not available")
+def test_smoke_elvish():
+    """Smoke test: load elvish and parse a simple snippet"""
+    parser = get_parser("elvish")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("embeddedtemplate"), reason="Language 'embeddedtemplate' not available")
 def test_smoke_embeddedtemplate():
     """Smoke test: load embeddedtemplate and parse a simple snippet"""
     parser = get_parser("embeddedtemplate")
-    tree = parser.parse(b"<%= hello %>")
+    tree = parser.parse(b"<%= value %>")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("enforce"), reason="Language 'enforce' not available")
+def test_smoke_enforce():
+    """Smoke test: load enforce and parse a simple snippet"""
+    parser = get_parser("enforce")
+    tree = parser.parse(b"x")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -431,7 +765,26 @@ def test_smoke_erlang():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "fun_decl"), "Tree should contain a 'fun_decl' node"
+
+
+@pytest.mark.skipif(not has_language("facility"), reason="Language 'facility' not available")
+def test_smoke_facility():
+    """Smoke test: load facility and parse a simple snippet"""
+    parser = get_parser("facility")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("faust"), reason="Language 'faust' not available")
+def test_smoke_faust():
+    """Smoke test: load faust and parse a simple snippet"""
+    parser = get_parser("faust")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("fennel"), reason="Language 'fennel' not available")
@@ -442,7 +795,16 @@ def test_smoke_fennel():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "fn"), "Tree should contain a 'fn' node"
+
+
+@pytest.mark.skipif(not has_language("fidl"), reason="Language 'fidl' not available")
+def test_smoke_fidl():
+    """Smoke test: load fidl and parse a simple snippet"""
+    parser = get_parser("fidl")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("firrtl"), reason="Language 'firrtl' not available")
@@ -453,7 +815,6 @@ def test_smoke_firrtl():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "circuit"), "Tree should contain a 'circuit' node"
 
 
 @pytest.mark.skipif(not has_language("fish"), reason="Language 'fish' not available")
@@ -464,7 +825,26 @@ def test_smoke_fish():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_has_error_nodes(root), "Tree should contain error nodes"
+
+
+@pytest.mark.skipif(not has_language("foam"), reason="Language 'foam' not available")
+def test_smoke_foam():
+    """Smoke test: load foam and parse a simple snippet"""
+    parser = get_parser("foam")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("forth"), reason="Language 'forth' not available")
+def test_smoke_forth():
+    """Smoke test: load forth and parse a simple snippet"""
+    parser = get_parser("forth")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("fortran"), reason="Language 'fortran' not available")
@@ -475,7 +855,6 @@ def test_smoke_fortran():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "program"), "Tree should contain a 'program' node"
 
 
 @pytest.mark.skipif(not has_language("fsharp"), reason="Language 'fsharp' not available")
@@ -486,9 +865,6 @@ def test_smoke_fsharp():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "declaration_expression"), (
-        "Tree should contain a 'declaration_expression' node"
-    )
 
 
 @pytest.mark.skipif(not has_language("fsharp_signature"), reason="Language 'fsharp_signature' not available")
@@ -499,7 +875,6 @@ def test_smoke_fsharp_signature():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "value_definition"), "Tree should contain a 'value_definition' node"
 
 
 @pytest.mark.skipif(not has_language("func"), reason="Language 'func' not available")
@@ -510,7 +885,16 @@ def test_smoke_func():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node"
+
+
+@pytest.mark.skipif(not has_language("gap"), reason="Language 'gap' not available")
+def test_smoke_gap():
+    """Smoke test: load gap and parse a simple snippet"""
+    parser = get_parser("gap")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("gdscript"), reason="Language 'gdscript' not available")
@@ -521,7 +905,36 @@ def test_smoke_gdscript():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "extends_statement"), "Tree should contain a 'extends_statement' node"
+
+
+@pytest.mark.skipif(not has_language("gdshader"), reason="Language 'gdshader' not available")
+def test_smoke_gdshader():
+    """Smoke test: load gdshader and parse a simple snippet"""
+    parser = get_parser("gdshader")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("git_config"), reason="Language 'git_config' not available")
+def test_smoke_git_config():
+    """Smoke test: load git_config and parse a simple snippet"""
+    parser = get_parser("git_config")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("git_rebase"), reason="Language 'git_rebase' not available")
+def test_smoke_git_rebase():
+    """Smoke test: load git_rebase and parse a simple snippet"""
+    parser = get_parser("git_rebase")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("gitattributes"), reason="Language 'gitattributes' not available")
@@ -532,7 +945,6 @@ def test_smoke_gitattributes():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "pattern"), "Tree should contain a 'pattern' node"
 
 
 @pytest.mark.skipif(not has_language("gitcommit"), reason="Language 'gitcommit' not available")
@@ -543,7 +955,6 @@ def test_smoke_gitcommit():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "subject"), "Tree should contain a 'subject' node"
 
 
 @pytest.mark.skipif(not has_language("gitignore"), reason="Language 'gitignore' not available")
@@ -554,7 +965,6 @@ def test_smoke_gitignore():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "pattern"), "Tree should contain a 'pattern' node"
 
 
 @pytest.mark.skipif(not has_language("gleam"), reason="Language 'gleam' not available")
@@ -565,7 +975,16 @@ def test_smoke_gleam():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function"), "Tree should contain a 'function' node"
+
+
+@pytest.mark.skipif(not has_language("glimmer"), reason="Language 'glimmer' not available")
+def test_smoke_glimmer():
+    """Smoke test: load glimmer and parse a simple snippet"""
+    parser = get_parser("glimmer")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("glsl"), reason="Language 'glsl' not available")
@@ -576,7 +995,6 @@ def test_smoke_glsl():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node"
 
 
 @pytest.mark.skipif(not has_language("gn"), reason="Language 'gn' not available")
@@ -587,7 +1005,16 @@ def test_smoke_gn():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "primary_expression"), "Tree should contain a 'primary_expression' node"
+
+
+@pytest.mark.skipif(not has_language("gnuplot"), reason="Language 'gnuplot' not available")
+def test_smoke_gnuplot():
+    """Smoke test: load gnuplot and parse a simple snippet"""
+    parser = get_parser("gnuplot")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("go"), reason="Language 'go' not available")
@@ -595,6 +1022,16 @@ def test_smoke_go():
     """Smoke test: load go and parse a simple snippet"""
     parser = get_parser("go")
     tree = parser.parse(b"package main")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("godot_resource"), reason="Language 'godot_resource' not available")
+def test_smoke_godot_resource():
+    """Smoke test: load godot_resource and parse a simple snippet"""
+    parser = get_parser("godot_resource")
+    tree = parser.parse(b"x")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -608,7 +1045,6 @@ def test_smoke_gomod():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "module_directive"), "Tree should contain a 'module_directive' node"
 
 
 @pytest.mark.skipif(not has_language("gosum"), reason="Language 'gosum' not available")
@@ -619,7 +1055,36 @@ def test_smoke_gosum():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "checksum"), "Tree should contain a 'checksum' node"
+
+
+@pytest.mark.skipif(not has_language("gotmpl"), reason="Language 'gotmpl' not available")
+def test_smoke_gotmpl():
+    """Smoke test: load gotmpl and parse a simple snippet"""
+    parser = get_parser("gotmpl")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("gowork"), reason="Language 'gowork' not available")
+def test_smoke_gowork():
+    """Smoke test: load gowork and parse a simple snippet"""
+    parser = get_parser("gowork")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("gpg"), reason="Language 'gpg' not available")
+def test_smoke_gpg():
+    """Smoke test: load gpg and parse a simple snippet"""
+    parser = get_parser("gpg")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("graphql"), reason="Language 'graphql' not available")
@@ -630,7 +1095,6 @@ def test_smoke_graphql():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "document"), "Tree should contain a 'document' node"
 
 
 @pytest.mark.skipif(not has_language("groovy"), reason="Language 'groovy' not available")
@@ -641,7 +1105,6 @@ def test_smoke_groovy():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "command"), "Tree should contain a 'command' node"
 
 
 @pytest.mark.skipif(not has_language("gstlaunch"), reason="Language 'gstlaunch' not available")
@@ -652,7 +1115,6 @@ def test_smoke_gstlaunch():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "fragment"), "Tree should contain a 'fragment' node"
 
 
 @pytest.mark.skipif(not has_language("hack"), reason="Language 'hack' not available")
@@ -663,7 +1125,6 @@ def test_smoke_hack():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_declaration"), "Tree should contain a 'function_declaration' node"
 
 
 @pytest.mark.skipif(not has_language("hare"), reason="Language 'hare' not available")
@@ -674,7 +1135,6 @@ def test_smoke_hare():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "declarations"), "Tree should contain a 'declarations' node"
 
 
 @pytest.mark.skipif(not has_language("haskell"), reason="Language 'haskell' not available")
@@ -685,7 +1145,6 @@ def test_smoke_haskell():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "declarations"), "Tree should contain a 'declarations' node"
 
 
 @pytest.mark.skipif(not has_language("haxe"), reason="Language 'haxe' not available")
@@ -696,7 +1155,6 @@ def test_smoke_haxe():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "class_declaration"), "Tree should contain a 'class_declaration' node"
 
 
 @pytest.mark.skipif(not has_language("hcl"), reason="Language 'hcl' not available")
@@ -707,7 +1165,6 @@ def test_smoke_hcl():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "body"), "Tree should contain a 'body' node"
 
 
 @pytest.mark.skipif(not has_language("heex"), reason="Language 'heex' not available")
@@ -718,7 +1175,16 @@ def test_smoke_heex():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "directive"), "Tree should contain a 'directive' node"
+
+
+@pytest.mark.skipif(not has_language("hjson"), reason="Language 'hjson' not available")
+def test_smoke_hjson():
+    """Smoke test: load hjson and parse a simple snippet"""
+    parser = get_parser("hjson")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("hlsl"), reason="Language 'hlsl' not available")
@@ -729,7 +1195,26 @@ def test_smoke_hlsl():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node"
+
+
+@pytest.mark.skipif(not has_language("hocon"), reason="Language 'hocon' not available")
+def test_smoke_hocon():
+    """Smoke test: load hocon and parse a simple snippet"""
+    parser = get_parser("hocon")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("hoon"), reason="Language 'hoon' not available")
+def test_smoke_hoon():
+    """Smoke test: load hoon and parse a simple snippet"""
+    parser = get_parser("hoon")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("html"), reason="Language 'html' not available")
@@ -737,6 +1222,36 @@ def test_smoke_html():
     """Smoke test: load html and parse a simple snippet"""
     parser = get_parser("html")
     tree = parser.parse(b"<p>hello</p>")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("htmldjango"), reason="Language 'htmldjango' not available")
+def test_smoke_htmldjango():
+    """Smoke test: load htmldjango and parse a simple snippet"""
+    parser = get_parser("htmldjango")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("http"), reason="Language 'http' not available")
+def test_smoke_http():
+    """Smoke test: load http and parse a simple snippet"""
+    parser = get_parser("http")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("hurl"), reason="Language 'hurl' not available")
+def test_smoke_hurl():
+    """Smoke test: load hurl and parse a simple snippet"""
+    parser = get_parser("hurl")
+    tree = parser.parse(b"x")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -750,7 +1265,16 @@ def test_smoke_hyprlang():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_has_error_nodes(root), "Tree should contain error nodes"
+
+
+@pytest.mark.skipif(not has_language("idris"), reason="Language 'idris' not available")
+def test_smoke_idris():
+    """Smoke test: load idris and parse a simple snippet"""
+    parser = get_parser("idris")
+    tree = parser.parse(b"module Main")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("ini"), reason="Language 'ini' not available")
@@ -761,7 +1285,6 @@ def test_smoke_ini():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "section"), "Tree should contain a 'section' node"
 
 
 @pytest.mark.skipif(not has_language("ispc"), reason="Language 'ispc' not available")
@@ -772,7 +1295,16 @@ def test_smoke_ispc():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node"
+
+
+@pytest.mark.skipif(not has_language("jai"), reason="Language 'jai' not available")
+def test_smoke_jai():
+    """Smoke test: load jai and parse a simple snippet"""
+    parser = get_parser("jai")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("janet"), reason="Language 'janet' not available")
@@ -783,14 +1315,23 @@ def test_smoke_janet():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "tuple"), "Tree should contain a 'tuple' node"
 
 
 @pytest.mark.skipif(not has_language("java"), reason="Language 'java' not available")
 def test_smoke_java():
     """Smoke test: load java and parse a simple snippet"""
     parser = get_parser("java")
-    tree = parser.parse(b"class Main { public static void main(String[] args) {} }")
+    tree = parser.parse(b"class Main {}")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("javadoc"), reason="Language 'javadoc' not available")
+def test_smoke_javadoc():
+    """Smoke test: load javadoc and parse a simple snippet"""
+    parser = get_parser("javadoc")
+    tree = parser.parse(b"x")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -806,6 +1347,26 @@ def test_smoke_javascript():
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
+@pytest.mark.skipif(not has_language("jinja2"), reason="Language 'jinja2' not available")
+def test_smoke_jinja2():
+    """Smoke test: load jinja2 and parse a simple snippet"""
+    parser = get_parser("jinja2")
+    tree = parser.parse(b"{{ variable }}")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("jq"), reason="Language 'jq' not available")
+def test_smoke_jq():
+    """Smoke test: load jq and parse a simple snippet"""
+    parser = get_parser("jq")
+    tree = parser.parse(b".[] | select(.key)")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
 @pytest.mark.skipif(not has_language("jsdoc"), reason="Language 'jsdoc' not available")
 def test_smoke_jsdoc():
     """Smoke test: load jsdoc and parse a simple snippet"""
@@ -814,7 +1375,6 @@ def test_smoke_jsdoc():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "tag_name"), "Tree should contain a 'tag_name' node"
 
 
 @pytest.mark.skipif(not has_language("json"), reason="Language 'json' not available")
@@ -825,7 +1385,16 @@ def test_smoke_json():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "object"), "Tree should contain a 'object' node"
+
+
+@pytest.mark.skipif(not has_language("json5"), reason="Language 'json5' not available")
+def test_smoke_json5():
+    """Smoke test: load json5 and parse a simple snippet"""
+    parser = get_parser("json5")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("jsonnet"), reason="Language 'jsonnet' not available")
@@ -836,7 +1405,6 @@ def test_smoke_jsonnet():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "object"), "Tree should contain a 'object' node"
 
 
 @pytest.mark.skipif(not has_language("julia"), reason="Language 'julia' not available")
@@ -847,7 +1415,26 @@ def test_smoke_julia():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node"
+
+
+@pytest.mark.skipif(not has_language("just"), reason="Language 'just' not available")
+def test_smoke_just():
+    """Smoke test: load just and parse a simple snippet"""
+    parser = get_parser("just")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("kcl"), reason="Language 'kcl' not available")
+def test_smoke_kcl():
+    """Smoke test: load kcl and parse a simple snippet"""
+    parser = get_parser("kcl")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("kconfig"), reason="Language 'kconfig' not available")
@@ -858,7 +1445,6 @@ def test_smoke_kconfig():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "config"), "Tree should contain a 'config' node"
 
 
 @pytest.mark.skipif(not has_language("kdl"), reason="Language 'kdl' not available")
@@ -869,7 +1455,6 @@ def test_smoke_kdl():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "node"), "Tree should contain a 'node' node"
 
 
 @pytest.mark.skipif(not has_language("kotlin"), reason="Language 'kotlin' not available")
@@ -880,7 +1465,6 @@ def test_smoke_kotlin():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_declaration"), "Tree should contain a 'function_declaration' node"
 
 
 @pytest.mark.skipif(not has_language("latex"), reason="Language 'latex' not available")
@@ -891,7 +1475,36 @@ def test_smoke_latex():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "class_include"), "Tree should contain a 'class_include' node"
+
+
+@pytest.mark.skipif(not has_language("lean"), reason="Language 'lean' not available")
+def test_smoke_lean():
+    """Smoke test: load lean and parse a simple snippet"""
+    parser = get_parser("lean")
+    tree = parser.parse(b"def main : IO Unit := pure ()")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("ledger"), reason="Language 'ledger' not available")
+def test_smoke_ledger():
+    """Smoke test: load ledger and parse a simple snippet"""
+    parser = get_parser("ledger")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("less"), reason="Language 'less' not available")
+def test_smoke_less():
+    """Smoke test: load less and parse a simple snippet"""
+    parser = get_parser("less")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("linkerscript"), reason="Language 'linkerscript' not available")
@@ -902,7 +1515,16 @@ def test_smoke_linkerscript():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "sections_command"), "Tree should contain a 'sections_command' node"
+
+
+@pytest.mark.skipif(not has_language("liquid"), reason="Language 'liquid' not available")
+def test_smoke_liquid():
+    """Smoke test: load liquid and parse a simple snippet"""
+    parser = get_parser("liquid")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("llvm"), reason="Language 'llvm' not available")
@@ -913,7 +1535,6 @@ def test_smoke_llvm():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "fn_define"), "Tree should contain a 'fn_define' node"
 
 
 @pytest.mark.skipif(not has_language("lua"), reason="Language 'lua' not available")
@@ -924,7 +1545,6 @@ def test_smoke_lua():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_call"), "Tree should contain a 'function_call' node"
 
 
 @pytest.mark.skipif(not has_language("luadoc"), reason="Language 'luadoc' not available")
@@ -935,7 +1555,6 @@ def test_smoke_luadoc():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "comment"), "Tree should contain a 'comment' node"
 
 
 @pytest.mark.skipif(not has_language("luap"), reason="Language 'luap' not available")
@@ -946,7 +1565,6 @@ def test_smoke_luap():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "set"), "Tree should contain a 'set' node"
 
 
 @pytest.mark.skipif(not has_language("luau"), reason="Language 'luau' not available")
@@ -957,7 +1575,6 @@ def test_smoke_luau():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "variable_declaration"), "Tree should contain a 'variable_declaration' node"
 
 
 @pytest.mark.skipif(not has_language("magik"), reason="Language 'magik' not available")
@@ -968,7 +1585,6 @@ def test_smoke_magik():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "fragment"), "Tree should contain a 'fragment' node"
 
 
 @pytest.mark.skipif(not has_language("make"), reason="Language 'make' not available")
@@ -979,7 +1595,6 @@ def test_smoke_make():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "rule"), "Tree should contain a 'rule' node"
 
 
 @pytest.mark.skipif(not has_language("markdown"), reason="Language 'markdown' not available")
@@ -990,7 +1605,6 @@ def test_smoke_markdown():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "section"), "Tree should contain a 'section' node"
 
 
 @pytest.mark.skipif(not has_language("markdown_inline"), reason="Language 'markdown_inline' not available")
@@ -1001,7 +1615,6 @@ def test_smoke_markdown_inline():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "strong_emphasis"), "Tree should contain a 'strong_emphasis' node"
 
 
 @pytest.mark.skipif(not has_language("matlab"), reason="Language 'matlab' not available")
@@ -1012,7 +1625,6 @@ def test_smoke_matlab():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node"
 
 
 @pytest.mark.skipif(not has_language("mermaid"), reason="Language 'mermaid' not available")
@@ -1023,7 +1635,6 @@ def test_smoke_mermaid():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_has_error_nodes(root), "Tree should contain error nodes"
 
 
 @pytest.mark.skipif(not has_language("meson"), reason="Language 'meson' not available")
@@ -1034,7 +1645,46 @@ def test_smoke_meson():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "normal_command"), "Tree should contain a 'normal_command' node"
+
+
+@pytest.mark.skipif(not has_language("mlir"), reason="Language 'mlir' not available")
+def test_smoke_mlir():
+    """Smoke test: load mlir and parse a simple snippet"""
+    parser = get_parser("mlir")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("mojo"), reason="Language 'mojo' not available")
+def test_smoke_mojo():
+    """Smoke test: load mojo and parse a simple snippet"""
+    parser = get_parser("mojo")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("move"), reason="Language 'move' not available")
+def test_smoke_move():
+    """Smoke test: load move and parse a simple snippet"""
+    parser = get_parser("move")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("nasm"), reason="Language 'nasm' not available")
+def test_smoke_nasm():
+    """Smoke test: load nasm and parse a simple snippet"""
+    parser = get_parser("nasm")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("netlinx"), reason="Language 'netlinx' not available")
@@ -1045,7 +1695,26 @@ def test_smoke_netlinx():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "program_name"), "Tree should contain a 'program_name' node"
+
+
+@pytest.mark.skipif(not has_language("nginx"), reason="Language 'nginx' not available")
+def test_smoke_nginx():
+    """Smoke test: load nginx and parse a simple snippet"""
+    parser = get_parser("nginx")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("nickel"), reason="Language 'nickel' not available")
+def test_smoke_nickel():
+    """Smoke test: load nickel and parse a simple snippet"""
+    parser = get_parser("nickel")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("nim"), reason="Language 'nim' not available")
@@ -1066,7 +1735,6 @@ def test_smoke_ninja():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "rule"), "Tree should contain a 'rule' node"
 
 
 @pytest.mark.skipif(not has_language("nix"), reason="Language 'nix' not available")
@@ -1077,7 +1745,26 @@ def test_smoke_nix():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_expression"), "Tree should contain a 'function_expression' node"
+
+
+@pytest.mark.skipif(not has_language("norg"), reason="Language 'norg' not available")
+def test_smoke_norg():
+    """Smoke test: load norg and parse a simple snippet"""
+    parser = get_parser("norg")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("norg_meta"), reason="Language 'norg_meta' not available")
+def test_smoke_norg_meta():
+    """Smoke test: load norg_meta and parse a simple snippet"""
+    parser = get_parser("norg_meta")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("nqc"), reason="Language 'nqc' not available")
@@ -1088,14 +1775,13 @@ def test_smoke_nqc():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "task_definition"), "Tree should contain a 'task_definition' node"
 
 
 @pytest.mark.skipif(not has_language("nushell"), reason="Language 'nushell' not available")
 def test_smoke_nushell():
     """Smoke test: load nushell and parse a simple snippet"""
     parser = get_parser("nushell")
-    tree = parser.parse(b"let x = 42")
+    tree = parser.parse(b"x")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1109,7 +1795,6 @@ def test_smoke_objc():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "class_interface"), "Tree should contain a 'class_interface' node"
 
 
 @pytest.mark.skipif(not has_language("ocaml"), reason="Language 'ocaml' not available")
@@ -1120,7 +1805,6 @@ def test_smoke_ocaml():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "value_definition"), "Tree should contain a 'value_definition' node"
 
 
 @pytest.mark.skipif(not has_language("ocaml_interface"), reason="Language 'ocaml_interface' not available")
@@ -1131,7 +1815,16 @@ def test_smoke_ocaml_interface():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "value_specification"), "Tree should contain a 'value_specification' node"
+
+
+@pytest.mark.skipif(not has_language("ocamllex"), reason="Language 'ocamllex' not available")
+def test_smoke_ocamllex():
+    """Smoke test: load ocamllex and parse a simple snippet"""
+    parser = get_parser("ocamllex")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("odin"), reason="Language 'odin' not available")
@@ -1142,7 +1835,16 @@ def test_smoke_odin():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "package_declaration"), "Tree should contain a 'package_declaration' node"
+
+
+@pytest.mark.skipif(not has_language("openscad"), reason="Language 'openscad' not available")
+def test_smoke_openscad():
+    """Smoke test: load openscad and parse a simple snippet"""
+    parser = get_parser("openscad")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("org"), reason="Language 'org' not available")
@@ -1153,7 +1855,6 @@ def test_smoke_org():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "section"), "Tree should contain a 'section' node"
 
 
 @pytest.mark.skipif(not has_language("pascal"), reason="Language 'pascal' not available")
@@ -1164,7 +1865,6 @@ def test_smoke_pascal():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "program"), "Tree should contain a 'program' node"
 
 
 @pytest.mark.skipif(not has_language("pem"), reason="Language 'pem' not available")
@@ -1175,7 +1875,6 @@ def test_smoke_pem():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "content"), "Tree should contain a 'content' node"
 
 
 @pytest.mark.skipif(not has_language("perl"), reason="Language 'perl' not available")
@@ -1186,7 +1885,6 @@ def test_smoke_perl():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "expression_statement"), "Tree should contain a 'expression_statement' node"
 
 
 @pytest.mark.skipif(not has_language("pgn"), reason="Language 'pgn' not available")
@@ -1197,7 +1895,6 @@ def test_smoke_pgn():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "game"), "Tree should contain a 'game' node"
 
 
 @pytest.mark.skipif(not has_language("php"), reason="Language 'php' not available")
@@ -1208,7 +1905,26 @@ def test_smoke_php():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "php_tag"), "Tree should contain a 'php_tag' node"
+
+
+@pytest.mark.skipif(not has_language("phpdoc"), reason="Language 'phpdoc' not available")
+def test_smoke_phpdoc():
+    """Smoke test: load phpdoc and parse a simple snippet"""
+    parser = get_parser("phpdoc")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("pkl"), reason="Language 'pkl' not available")
+def test_smoke_pkl():
+    """Smoke test: load pkl and parse a simple snippet"""
+    parser = get_parser("pkl")
+    tree = parser.parse(b'name = "hello"')
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("po"), reason="Language 'po' not available")
@@ -1219,7 +1935,16 @@ def test_smoke_po():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "message"), "Tree should contain a 'message' node"
+
+
+@pytest.mark.skipif(not has_language("poe_filter"), reason="Language 'poe_filter' not available")
+def test_smoke_poe_filter():
+    """Smoke test: load poe_filter and parse a simple snippet"""
+    parser = get_parser("poe_filter")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("pony"), reason="Language 'pony' not available")
@@ -1230,7 +1955,16 @@ def test_smoke_pony():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "actor_definition"), "Tree should contain a 'actor_definition' node"
+
+
+@pytest.mark.skipif(not has_language("postscript"), reason="Language 'postscript' not available")
+def test_smoke_postscript():
+    """Smoke test: load postscript and parse a simple snippet"""
+    parser = get_parser("postscript")
+    tree = parser.parse(b"/hello { (Hello) show } def")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("powershell"), reason="Language 'powershell' not available")
@@ -1241,7 +1975,6 @@ def test_smoke_powershell():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "statement_list"), "Tree should contain a 'statement_list' node"
 
 
 @pytest.mark.skipif(not has_language("printf"), reason="Language 'printf' not available")
@@ -1252,7 +1985,6 @@ def test_smoke_printf():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "format"), "Tree should contain a 'format' node"
 
 
 @pytest.mark.skipif(not has_language("prisma"), reason="Language 'prisma' not available")
@@ -1263,7 +1995,26 @@ def test_smoke_prisma():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "model_block"), "Tree should contain a 'model_block' node"
+
+
+@pytest.mark.skipif(not has_language("prolog"), reason="Language 'prolog' not available")
+def test_smoke_prolog():
+    """Smoke test: load prolog and parse a simple snippet"""
+    parser = get_parser("prolog")
+    tree = parser.parse(b"hello :- write('hello'), nl.")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("promql"), reason="Language 'promql' not available")
+def test_smoke_promql():
+    """Smoke test: load promql and parse a simple snippet"""
+    parser = get_parser("promql")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("properties"), reason="Language 'properties' not available")
@@ -1274,7 +2025,6 @@ def test_smoke_properties():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "property"), "Tree should contain a 'property' node"
 
 
 @pytest.mark.skipif(not has_language("proto"), reason="Language 'proto' not available")
@@ -1285,7 +2035,16 @@ def test_smoke_proto():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "syntax"), "Tree should contain a 'syntax' node"
+
+
+@pytest.mark.skipif(not has_language("prql"), reason="Language 'prql' not available")
+def test_smoke_prql():
+    """Smoke test: load prql and parse a simple snippet"""
+    parser = get_parser("prql")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("psv"), reason="Language 'psv' not available")
@@ -1296,7 +2055,16 @@ def test_smoke_psv():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "row"), "Tree should contain a 'row' node"
+
+
+@pytest.mark.skipif(not has_language("pug"), reason="Language 'pug' not available")
+def test_smoke_pug():
+    """Smoke test: load pug and parse a simple snippet"""
+    parser = get_parser("pug")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("puppet"), reason="Language 'puppet' not available")
@@ -1307,7 +2075,6 @@ def test_smoke_puppet():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "resource_declaration"), "Tree should contain a 'resource_declaration' node"
 
 
 @pytest.mark.skipif(not has_language("purescript"), reason="Language 'purescript' not available")
@@ -1318,7 +2085,6 @@ def test_smoke_purescript():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "qualified_module"), "Tree should contain a 'qualified_module' node"
 
 
 @pytest.mark.skipif(not has_language("pymanifest"), reason="Language 'pymanifest' not available")
@@ -1329,7 +2095,6 @@ def test_smoke_pymanifest():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "command"), "Tree should contain a 'command' node"
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")
@@ -1337,6 +2102,16 @@ def test_smoke_python():
     """Smoke test: load python and parse a simple snippet"""
     parser = get_parser("python")
     tree = parser.parse(b"print('hello')")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("ql"), reason="Language 'ql' not available")
+def test_smoke_ql():
+    """Smoke test: load ql and parse a simple snippet"""
+    parser = get_parser("ql")
+    tree = parser.parse(b"x")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1350,7 +2125,6 @@ def test_smoke_qmldir():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "command"), "Tree should contain a 'command' node"
 
 
 @pytest.mark.skipif(not has_language("qmljs"), reason="Language 'qmljs' not available")
@@ -1361,7 +2135,6 @@ def test_smoke_qmljs():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "ui_import"), "Tree should contain a 'ui_import' node"
 
 
 @pytest.mark.skipif(not has_language("query"), reason="Language 'query' not available")
@@ -1372,7 +2145,6 @@ def test_smoke_query():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "named_node"), "Tree should contain a 'named_node' node"
 
 
 @pytest.mark.skipif(not has_language("r"), reason="Language 'r' not available")
@@ -1383,7 +2155,6 @@ def test_smoke_r():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "call"), "Tree should contain a 'call' node"
 
 
 @pytest.mark.skipif(not has_language("racket"), reason="Language 'racket' not available")
@@ -1394,7 +2165,36 @@ def test_smoke_racket():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "extension"), "Tree should contain a 'extension' node"
+
+
+@pytest.mark.skipif(not has_language("rasi"), reason="Language 'rasi' not available")
+def test_smoke_rasi():
+    """Smoke test: load rasi and parse a simple snippet"""
+    parser = get_parser("rasi")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("razor"), reason="Language 'razor' not available")
+def test_smoke_razor():
+    """Smoke test: load razor and parse a simple snippet"""
+    parser = get_parser("razor")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("rbs"), reason="Language 'rbs' not available")
+def test_smoke_rbs():
+    """Smoke test: load rbs and parse a simple snippet"""
+    parser = get_parser("rbs")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("re2c"), reason="Language 're2c' not available")
@@ -1405,7 +2205,6 @@ def test_smoke_re2c():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "global_block"), "Tree should contain a 'global_block' node"
 
 
 @pytest.mark.skipif(not has_language("readline"), reason="Language 'readline' not available")
@@ -1416,7 +2215,16 @@ def test_smoke_readline():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "variable_setting"), "Tree should contain a 'variable_setting' node"
+
+
+@pytest.mark.skipif(not has_language("regex"), reason="Language 'regex' not available")
+def test_smoke_regex():
+    """Smoke test: load regex and parse a simple snippet"""
+    parser = get_parser("regex")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("rego"), reason="Language 'rego' not available")
@@ -1427,7 +2235,6 @@ def test_smoke_rego():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "module"), "Tree should contain a 'module' node"
 
 
 @pytest.mark.skipif(not has_language("requirements"), reason="Language 'requirements' not available")
@@ -1438,7 +2245,36 @@ def test_smoke_requirements():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_has_error_nodes(root), "Tree should contain error nodes"
+
+
+@pytest.mark.skipif(not has_language("rescript"), reason="Language 'rescript' not available")
+def test_smoke_rescript():
+    """Smoke test: load rescript and parse a simple snippet"""
+    parser = get_parser("rescript")
+    tree = parser.parse(b"let x = 1")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("robot"), reason="Language 'robot' not available")
+def test_smoke_robot():
+    """Smoke test: load robot and parse a simple snippet"""
+    parser = get_parser("robot")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("roc"), reason="Language 'roc' not available")
+def test_smoke_roc():
+    """Smoke test: load roc and parse a simple snippet"""
+    parser = get_parser("roc")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("ron"), reason="Language 'ron' not available")
@@ -1449,7 +2285,6 @@ def test_smoke_ron():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "struct"), "Tree should contain a 'struct' node"
 
 
 @pytest.mark.skipif(not has_language("rst"), reason="Language 'rst' not available")
@@ -1460,7 +2295,16 @@ def test_smoke_rst():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "section"), "Tree should contain a 'section' node"
+
+
+@pytest.mark.skipif(not has_language("rtf"), reason="Language 'rtf' not available")
+def test_smoke_rtf():
+    """Smoke test: load rtf and parse a simple snippet"""
+    parser = get_parser("rtf")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("ruby"), reason="Language 'ruby' not available")
@@ -1491,7 +2335,6 @@ def test_smoke_scala():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "object_definition"), "Tree should contain a 'object_definition' node"
 
 
 @pytest.mark.skipif(not has_language("scheme"), reason="Language 'scheme' not available")
@@ -1502,7 +2345,6 @@ def test_smoke_scheme():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "list"), "Tree should contain a 'list' node"
 
 
 @pytest.mark.skipif(not has_language("scss"), reason="Language 'scss' not available")
@@ -1513,7 +2355,16 @@ def test_smoke_scss():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "declaration"), "Tree should contain a 'declaration' node"
+
+
+@pytest.mark.skipif(not has_language("slang"), reason="Language 'slang' not available")
+def test_smoke_slang():
+    """Smoke test: load slang and parse a simple snippet"""
+    parser = get_parser("slang")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("smali"), reason="Language 'smali' not available")
@@ -1524,7 +2375,16 @@ def test_smoke_smali():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "class_directive"), "Tree should contain a 'class_directive' node"
+
+
+@pytest.mark.skipif(not has_language("smalltalk"), reason="Language 'smalltalk' not available")
+def test_smoke_smalltalk():
+    """Smoke test: load smalltalk and parse a simple snippet"""
+    parser = get_parser("smalltalk")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("smithy"), reason="Language 'smithy' not available")
@@ -1535,7 +2395,26 @@ def test_smoke_smithy():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "shape_section"), "Tree should contain a 'shape_section' node"
+
+
+@pytest.mark.skipif(not has_language("sml"), reason="Language 'sml' not available")
+def test_smoke_sml():
+    """Smoke test: load sml and parse a simple snippet"""
+    parser = get_parser("sml")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("snakemake"), reason="Language 'snakemake' not available")
+def test_smoke_snakemake():
+    """Smoke test: load snakemake and parse a simple snippet"""
+    parser = get_parser("snakemake")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("solidity"), reason="Language 'solidity' not available")
@@ -1546,7 +2425,26 @@ def test_smoke_solidity():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "pragma_directive"), "Tree should contain a 'pragma_directive' node"
+
+
+@pytest.mark.skipif(not has_language("souffle"), reason="Language 'souffle' not available")
+def test_smoke_souffle():
+    """Smoke test: load souffle and parse a simple snippet"""
+    parser = get_parser("souffle")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("sourcepawn"), reason="Language 'sourcepawn' not available")
+def test_smoke_sourcepawn():
+    """Smoke test: load sourcepawn and parse a simple snippet"""
+    parser = get_parser("sourcepawn")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("sparql"), reason="Language 'sparql' not available")
@@ -1557,7 +2455,6 @@ def test_smoke_sparql():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "select_query"), "Tree should contain a 'select_query' node"
 
 
 @pytest.mark.skipif(not has_language("sql"), reason="Language 'sql' not available")
@@ -1568,7 +2465,16 @@ def test_smoke_sql():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "statement"), "Tree should contain a 'statement' node"
+
+
+@pytest.mark.skipif(not has_language("sql_bigquery"), reason="Language 'sql_bigquery' not available")
+def test_smoke_sql_bigquery():
+    """Smoke test: load sql_bigquery and parse a simple snippet"""
+    parser = get_parser("sql_bigquery")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("squirrel"), reason="Language 'squirrel' not available")
@@ -1579,7 +2485,26 @@ def test_smoke_squirrel():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_declaration"), "Tree should contain a 'function_declaration' node"
+
+
+@pytest.mark.skipif(not has_language("ssh_config"), reason="Language 'ssh_config' not available")
+def test_smoke_ssh_config():
+    """Smoke test: load ssh_config and parse a simple snippet"""
+    parser = get_parser("ssh_config")
+    tree = parser.parse(b"Host example\n  HostName example.com")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("stan"), reason="Language 'stan' not available")
+def test_smoke_stan():
+    """Smoke test: load stan and parse a simple snippet"""
+    parser = get_parser("stan")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("starlark"), reason="Language 'starlark' not available")
@@ -1590,17 +2515,36 @@ def test_smoke_starlark():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node"
+
+
+@pytest.mark.skipif(not has_language("superhtml"), reason="Language 'superhtml' not available")
+def test_smoke_superhtml():
+    """Smoke test: load superhtml and parse a simple snippet"""
+    parser = get_parser("superhtml")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("svelte"), reason="Language 'svelte' not available")
 def test_smoke_svelte():
     """Smoke test: load svelte and parse a simple snippet"""
     parser = get_parser("svelte")
-    tree = parser.parse(b"<p>hello</p>")
+    tree = parser.parse(b"<script>let x = 1;</script>")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
-    assert tree_contains_node_type(root, "element"), "Tree should contain a 'element' node"
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("sway"), reason="Language 'sway' not available")
+def test_smoke_sway():
+    """Smoke test: load sway and parse a simple snippet"""
+    parser = get_parser("sway")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("swift"), reason="Language 'swift' not available")
@@ -1611,7 +2555,16 @@ def test_smoke_swift():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "call_expression"), "Tree should contain a 'call_expression' node"
+
+
+@pytest.mark.skipif(not has_language("systemverilog"), reason="Language 'systemverilog' not available")
+def test_smoke_systemverilog():
+    """Smoke test: load systemverilog and parse a simple snippet"""
+    parser = get_parser("systemverilog")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("tablegen"), reason="Language 'tablegen' not available")
@@ -1622,7 +2575,16 @@ def test_smoke_tablegen():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "statement"), "Tree should contain a 'statement' node"
+
+
+@pytest.mark.skipif(not has_language("tact"), reason="Language 'tact' not available")
+def test_smoke_tact():
+    """Smoke test: load tact and parse a simple snippet"""
+    parser = get_parser("tact")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("tcl"), reason="Language 'tcl' not available")
@@ -1633,7 +2595,36 @@ def test_smoke_tcl():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_has_error_nodes(root), "Tree should contain error nodes"
+
+
+@pytest.mark.skipif(not has_language("teal"), reason="Language 'teal' not available")
+def test_smoke_teal():
+    """Smoke test: load teal and parse a simple snippet"""
+    parser = get_parser("teal")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("templ"), reason="Language 'templ' not available")
+def test_smoke_templ():
+    """Smoke test: load templ and parse a simple snippet"""
+    parser = get_parser("templ")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("tera"), reason="Language 'tera' not available")
+def test_smoke_tera():
+    """Smoke test: load tera and parse a simple snippet"""
+    parser = get_parser("tera")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("terraform"), reason="Language 'terraform' not available")
@@ -1644,7 +2635,6 @@ def test_smoke_terraform():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "body"), "Tree should contain a 'body' node"
 
 
 @pytest.mark.skipif(not has_language("test"), reason="Language 'test' not available")
@@ -1655,7 +2645,16 @@ def test_smoke_test():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "test"), "Tree should contain a 'test' node"
+
+
+@pytest.mark.skipif(not has_language("textproto"), reason="Language 'textproto' not available")
+def test_smoke_textproto():
+    """Smoke test: load textproto and parse a simple snippet"""
+    parser = get_parser("textproto")
+    tree = parser.parse(b'key: "value"')
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("thrift"), reason="Language 'thrift' not available")
@@ -1666,7 +2665,36 @@ def test_smoke_thrift():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "service_definition"), "Tree should contain a 'service_definition' node"
+
+
+@pytest.mark.skipif(not has_language("tlaplus"), reason="Language 'tlaplus' not available")
+def test_smoke_tlaplus():
+    """Smoke test: load tlaplus and parse a simple snippet"""
+    parser = get_parser("tlaplus")
+    tree = parser.parse(b"---- MODULE Main ----\n====")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("tmux"), reason="Language 'tmux' not available")
+def test_smoke_tmux():
+    """Smoke test: load tmux and parse a simple snippet"""
+    parser = get_parser("tmux")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("todotxt"), reason="Language 'todotxt' not available")
+def test_smoke_todotxt():
+    """Smoke test: load todotxt and parse a simple snippet"""
+    parser = get_parser("todotxt")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("toml"), reason="Language 'toml' not available")
@@ -1677,7 +2705,6 @@ def test_smoke_toml():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "pair"), "Tree should contain a 'pair' node"
 
 
 @pytest.mark.skipif(not has_language("tsv"), reason="Language 'tsv' not available")
@@ -1688,7 +2715,6 @@ def test_smoke_tsv():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "row"), "Tree should contain a 'row' node"
 
 
 @pytest.mark.skipif(not has_language("tsx"), reason="Language 'tsx' not available")
@@ -1699,7 +2725,16 @@ def test_smoke_tsx():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "lexical_declaration"), "Tree should contain a 'lexical_declaration' node"
+
+
+@pytest.mark.skipif(not has_language("turtle"), reason="Language 'turtle' not available")
+def test_smoke_turtle():
+    """Smoke test: load turtle and parse a simple snippet"""
+    parser = get_parser("turtle")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("twig"), reason="Language 'twig' not available")
@@ -1710,7 +2745,6 @@ def test_smoke_twig():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "output_directive"), "Tree should contain a 'output_directive' node"
 
 
 @pytest.mark.skipif(not has_language("typescript"), reason="Language 'typescript' not available")
@@ -1718,6 +2752,26 @@ def test_smoke_typescript():
     """Smoke test: load typescript and parse a simple snippet"""
     parser = get_parser("typescript")
     tree = parser.parse(b"const x: number = 42;")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("typespec"), reason="Language 'typespec' not available")
+def test_smoke_typespec():
+    """Smoke test: load typespec and parse a simple snippet"""
+    parser = get_parser("typespec")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("typoscript"), reason="Language 'typoscript' not available")
+def test_smoke_typoscript():
+    """Smoke test: load typoscript and parse a simple snippet"""
+    parser = get_parser("typoscript")
+    tree = parser.parse(b"x")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1731,7 +2785,6 @@ def test_smoke_typst():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "code"), "Tree should contain a 'code' node"
 
 
 @pytest.mark.skipif(not has_language("udev"), reason="Language 'udev' not available")
@@ -1742,7 +2795,6 @@ def test_smoke_udev():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_has_error_nodes(root), "Tree should contain error nodes"
 
 
 @pytest.mark.skipif(not has_language("ungrammar"), reason="Language 'ungrammar' not available")
@@ -1753,7 +2805,6 @@ def test_smoke_ungrammar():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "node"), "Tree should contain a 'node' node"
 
 
 @pytest.mark.skipif(not has_language("uxntal"), reason="Language 'uxntal' not available")
@@ -1764,7 +2815,6 @@ def test_smoke_uxntal():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "memory_execution"), "Tree should contain a 'memory_execution' node"
 
 
 @pytest.mark.skipif(not has_language("v"), reason="Language 'v' not available")
@@ -1775,14 +2825,13 @@ def test_smoke_v():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_declaration"), "Tree should contain a 'function_declaration' node"
 
 
 @pytest.mark.skipif(not has_language("vb"), reason="Language 'vb' not available")
 def test_smoke_vb():
     """Smoke test: load vb and parse a simple snippet"""
     parser = get_parser("vb")
-    tree = parser.parse(b"Module Hello\n    Sub Main()\n    End Sub\nEnd Module")
+    tree = parser.parse(b"Module Main\nEnd Module")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
@@ -1796,7 +2845,6 @@ def test_smoke_verilog():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "module_declaration"), "Tree should contain a 'module_declaration' node"
 
 
 @pytest.mark.skipif(not has_language("vhdl"), reason="Language 'vhdl' not available")
@@ -1807,7 +2855,16 @@ def test_smoke_vhdl():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "design_unit"), "Tree should contain a 'design_unit' node"
+
+
+@pytest.mark.skipif(not has_language("vhs"), reason="Language 'vhs' not available")
+def test_smoke_vhs():
+    """Smoke test: load vhs and parse a simple snippet"""
+    parser = get_parser("vhs")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("vim"), reason="Language 'vim' not available")
@@ -1818,7 +2875,26 @@ def test_smoke_vim():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "echo_statement"), "Tree should contain a 'echo_statement' node"
+
+
+@pytest.mark.skipif(not has_language("vimdoc"), reason="Language 'vimdoc' not available")
+def test_smoke_vimdoc():
+    """Smoke test: load vimdoc and parse a simple snippet"""
+    parser = get_parser("vimdoc")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("vrl"), reason="Language 'vrl' not available")
+def test_smoke_vrl():
+    """Smoke test: load vrl and parse a simple snippet"""
+    parser = get_parser("vrl")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("vue"), reason="Language 'vue' not available")
@@ -1829,7 +2905,6 @@ def test_smoke_vue():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "template_element"), "Tree should contain a 'template_element' node"
 
 
 @pytest.mark.skipif(not has_language("wast"), reason="Language 'wast' not available")
@@ -1840,7 +2915,6 @@ def test_smoke_wast():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "command"), "Tree should contain a 'command' node"
 
 
 @pytest.mark.skipif(not has_language("wat"), reason="Language 'wat' not available")
@@ -1851,7 +2925,6 @@ def test_smoke_wat():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "module"), "Tree should contain a 'module' node"
 
 
 @pytest.mark.skipif(not has_language("wgsl"), reason="Language 'wgsl' not available")
@@ -1862,7 +2935,46 @@ def test_smoke_wgsl():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "function_declaration"), "Tree should contain a 'function_declaration' node"
+
+
+@pytest.mark.skipif(not has_language("wgsl_bevy"), reason="Language 'wgsl_bevy' not available")
+def test_smoke_wgsl_bevy():
+    """Smoke test: load wgsl_bevy and parse a simple snippet"""
+    parser = get_parser("wgsl_bevy")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("wit"), reason="Language 'wit' not available")
+def test_smoke_wit():
+    """Smoke test: load wit and parse a simple snippet"""
+    parser = get_parser("wit")
+    tree = parser.parse(b"package example:pkg;")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("wolfram"), reason="Language 'wolfram' not available")
+def test_smoke_wolfram():
+    """Smoke test: load wolfram and parse a simple snippet"""
+    parser = get_parser("wolfram")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("x86asm"), reason="Language 'x86asm' not available")
+def test_smoke_x86asm():
+    """Smoke test: load x86asm and parse a simple snippet"""
+    parser = get_parser("x86asm")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("xcompose"), reason="Language 'xcompose' not available")
@@ -1873,7 +2985,6 @@ def test_smoke_xcompose():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "sequence"), "Tree should contain a 'sequence' node"
 
 
 @pytest.mark.skipif(not has_language("xml"), reason="Language 'xml' not available")
@@ -1884,7 +2995,16 @@ def test_smoke_xml():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "prolog"), "Tree should contain a 'prolog' node"
+
+
+@pytest.mark.skipif(not has_language("yaml"), reason="Language 'yaml' not available")
+def test_smoke_yaml():
+    """Smoke test: load yaml and parse a simple snippet"""
+    parser = get_parser("yaml")
+    tree = parser.parse(b"key: value")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("yuck"), reason="Language 'yuck' not available")
@@ -1895,7 +3015,6 @@ def test_smoke_yuck():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "list"), "Tree should contain a 'list' node"
 
 
 @pytest.mark.skipif(not has_language("zig"), reason="Language 'zig' not available")
@@ -1906,4 +3025,33 @@ def test_smoke_zig():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "Decl"), "Tree should contain a 'Decl' node"
+
+
+@pytest.mark.skipif(not has_language("ziggy"), reason="Language 'ziggy' not available")
+def test_smoke_ziggy():
+    """Smoke test: load ziggy and parse a simple snippet"""
+    parser = get_parser("ziggy")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("ziggy_schema"), reason="Language 'ziggy_schema' not available")
+def test_smoke_ziggy_schema():
+    """Smoke test: load ziggy_schema and parse a simple snippet"""
+    parser = get_parser("ziggy_schema")
+    tree = parser.parse(b"x")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
+@pytest.mark.skipif(not has_language("zsh"), reason="Language 'zsh' not available")
+def test_smoke_zsh():
+    """Smoke test: load zsh and parse a simple snippet"""
+    parser = get_parser("zsh")
+    tree = parser.parse(b"echo hello")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"

@@ -129,12 +129,12 @@ See [Go README](packages/go/v1/README.md) for full documentation.
 <dependency>
   <groupId>dev.kreuzberg</groupId>
   <artifactId>tree-sitter-language-pack</artifactId>
-  <version>1.4.1</version>
+  <version>1.4.2</version>
 </dependency>
 ```
 
 ```groovy
-implementation("dev.kreuzberg:tree-sitter-language-pack:1.4.1")
+implementation("dev.kreuzberg:tree-sitter-language-pack:1.4.2")
 ```
 
 See [Java README](crates/ts-pack-java/README.md) for full documentation.
@@ -196,7 +196,7 @@ See [C/C++ (FFI) README](crates/ts-pack-ffi/README.md) for full documentation.
 ### CLI
 
 ```sh
-cargo install ts-pack-cli
+cargo install ts-pack
 ```
 
 See [CLI README](crates/ts-pack-cli/README.md) for full documentation.

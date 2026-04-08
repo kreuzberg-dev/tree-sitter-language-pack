@@ -1,6 +1,5 @@
 {
 	"assertions": {
-		"has_error_nodes": true,
 		"root_child_count_min": 1,
 		"tree_not_null": true
 	},

@@ -1,12 +1,12 @@
 {
-	"id": "smoke_c",
+	"assertions": {
+		"root_child_count_min": 1,
+		"tree_not_null": true
+	},
 	"category": "smoke",
 	"description": "Smoke test: load c and parse a simple snippet",
+	"id": "smoke_c",
 	"language": "c",
 	"source_code": "int main() { return 0; }",
-	"assertions": {
-		"tree_not_null": true,
-		"root_child_count_min": 1
-	},
 	"tags": ["smoke"]
 }

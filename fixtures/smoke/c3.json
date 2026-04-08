@@ -1,0 +1,12 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load c3 and parse a simple snippet",
+	"id": "smoke_c3",
+	"language": "c3",
+	"source_code": "x",
+	"tags": ["smoke"]
+}

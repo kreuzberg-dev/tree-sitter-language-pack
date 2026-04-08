@@ -1,0 +1,12 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load dot and parse a simple snippet",
+	"id": "smoke_dot",
+	"language": "dot",
+	"source_code": "digraph G { A -> B; }",
+	"tags": ["smoke"]
+}

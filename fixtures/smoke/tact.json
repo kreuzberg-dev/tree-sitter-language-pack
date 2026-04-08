@@ -1,0 +1,12 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load tact and parse a simple snippet",
+	"id": "smoke_tact",
+	"language": "tact",
+	"source_code": "x",
+	"tags": ["smoke"]
+}

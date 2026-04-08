@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Core library for tree-sitter language pack - provides compiled parsers for 248 languages"
+description = "Core library for tree-sitter language pack - provides compiled parsers for 305 languages"
 
 [features]
 default = ["dynamic-loading", "download"]
@@ -270,6 +270,63 @@ all = [
     "lang-turtle",
     "lang-vimdoc",
     "lang-wolfram",
+    "lang-abl",
+    "lang-c3",
+    "lang-cel",
+    "lang-cfml",
+    "lang-chuck",
+    "lang-cst",
+    "lang-dhall",
+    "lang-elvish",
+    "lang-gap",
+    "lang-gdshader",
+    "lang-glimmer",
+    "lang-gnuplot",
+    "lang-gotmpl",
+    "lang-gowork",
+    "lang-gpg",
+    "lang-hjson",
+    "lang-hocon",
+    "lang-hoon",
+    "lang-htmldjango",
+    "lang-jai",
+    "lang-javadoc",
+    "lang-json5",
+    "lang-kcl",
+    "lang-mlir",
+    "lang-nasm",
+    "lang-norg_meta",
+    "lang-ocamllex",
+    "lang-openscad",
+    "lang-phpdoc",
+    "lang-poe_filter",
+    "lang-prql",
+    "lang-rasi",
+    "lang-razor",
+    "lang-rbs",
+    "lang-roc",
+    "lang-rtf",
+    "lang-slang",
+    "lang-smalltalk",
+    "lang-sml",
+    "lang-snakemake",
+    "lang-souffle",
+    "lang-sourcepawn",
+    "lang-sql_bigquery",
+    "lang-stan",
+    "lang-superhtml",
+    "lang-sway",
+    "lang-systemverilog",
+    "lang-tact",
+    "lang-tera",
+    "lang-typespec",
+    "lang-typoscript",
+    "lang-vhs",
+    "lang-vrl",
+    "lang-wgsl_bevy",
+    "lang-x86asm",
+    "lang-ziggy",
+    "lang-ziggy_schema",
 ]
 web = [
     "lang-html",
@@ -644,6 +701,63 @@ lang-todotxt = []
 lang-turtle = []
 lang-vimdoc = []
 lang-wolfram = []
+lang-ziggy_schema = []
+lang-ziggy = []
+lang-x86asm = []
+lang-wgsl_bevy = []
+lang-vrl = []
+lang-vhs = []
+lang-typoscript = []
+lang-typespec = []
+lang-tera = []
+lang-tact = []
+lang-systemverilog = []
+lang-sway = []
+lang-superhtml = []
+lang-stan = []
+lang-sql_bigquery = []
+lang-sourcepawn = []
+lang-souffle = []
+lang-snakemake = []
+lang-sml = []
+lang-smalltalk = []
+lang-slang = []
+lang-rtf = []
+lang-roc = []
+lang-rbs = []
+lang-razor = []
+lang-rasi = []
+lang-prql = []
+lang-poe_filter = []
+lang-phpdoc = []
+lang-openscad = []
+lang-ocamllex = []
+lang-norg_meta = []
+lang-nasm = []
+lang-mlir = []
+lang-kcl = []
+lang-json5 = []
+lang-javadoc = []
+lang-jai = []
+lang-htmldjango = []
+lang-hoon = []
+lang-hocon = []
+lang-hjson = []
+lang-gpg = []
+lang-gowork = []
+lang-gotmpl = []
+lang-gnuplot = []
+lang-glimmer = []
+lang-gdshader = []
+lang-gap = []
+lang-elvish = []
+lang-dhall = []
+lang-cst = []
+lang-chuck = []
+lang-cfml = []
+lang-cel = []
+lang-c3 = []
+lang-abl = []
 
 [dependencies]
 ahash = { workspace = true }

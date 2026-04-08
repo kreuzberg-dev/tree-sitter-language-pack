@@ -1,0 +1,12 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load diff and parse a simple snippet",
+	"id": "smoke_diff",
+	"language": "diff",
+	"source_code": "--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new",
+	"tags": ["smoke"]
+}

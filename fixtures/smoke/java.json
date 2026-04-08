@@ -1,12 +1,12 @@
 {
-	"id": "smoke_java",
+	"assertions": {
+		"root_child_count_min": 1,
+		"tree_not_null": true
+	},
 	"category": "smoke",
 	"description": "Smoke test: load java and parse a simple snippet",
+	"id": "smoke_java",
 	"language": "java",
-	"source_code": "class Main { public static void main(String[] args) {} }",
-	"assertions": {
-		"tree_not_null": true,
-		"root_child_count_min": 1
-	},
+	"source_code": "class Main {}",
 	"tags": ["smoke"]
 }

@@ -21,6 +21,7 @@ on:
       - "pyproject.toml"
       - "biome.json"
       - ".clang-format"
+      - "sources/**"
   pull_request:
     branches: [main]
     paths:
@@ -41,6 +42,7 @@ on:
       - "pyproject.toml"
       - "biome.json"
       - ".clang-format"
+      - "sources/**"
   workflow_run:
     workflows: ["Publish Release"]
     types: [completed]
@@ -179,3 +181,28 @@ jobs:
 
       - name: Validate documentation snippets
         run: ./target/release/snippet-runner validate --snippets docs/snippets --level syntax --timeout 120
+
+  license-check:
+    name: License validation
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install dependencies
+        run: uv sync --no-install-project
+
+      - name: Verify all grammar licenses are permissive
+        run: uv run --no-sync python scripts/lint_grammar_licenses.py --update-cache
+        env:
+          GH_TOKEN: ${{ github.token }}
