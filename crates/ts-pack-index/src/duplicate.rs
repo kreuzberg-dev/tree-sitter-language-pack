@@ -1548,6 +1548,92 @@ fn symbol_path_match_score(ctx: Option<&CandidateContext>, query: &QueryFeatures
     matched as f64 / query.aspects.len() as f64
 }
 
+fn split_identifier_tokens(value: &str) -> Vec<String> {
+    value
+        .split(|ch: char| !ch.is_ascii_alphanumeric() && ch != '_')
+        .flat_map(|part| {
+            let mut tokens = Vec::new();
+            let mut current = String::new();
+            let mut prev_lower = false;
+            for ch in part.chars() {
+                if ch == '_' || ch == '-' {
+                    if !current.is_empty() {
+                        tokens.push(current.to_lowercase());
+                        current.clear();
+                    }
+                    prev_lower = false;
+                    continue;
+                }
+                let is_upper = ch.is_ascii_uppercase();
+                if is_upper && prev_lower && !current.is_empty() {
+                    tokens.push(current.to_lowercase());
+                    current.clear();
+                }
+                current.push(ch);
+                prev_lower = ch.is_ascii_lowercase();
+            }
+            if !current.is_empty() {
+                tokens.push(current.to_lowercase());
+            }
+            tokens
+        })
+        .filter(|token| !token.is_empty())
+        .collect()
+}
+
+fn helper_focus_tokens(ctx: Option<&CandidateContext>) -> HashSet<String> {
+    let mut tokens = HashSet::new();
+    let Some(ctx) = ctx else {
+        return tokens;
+    };
+    if let Some(name) = ctx.file_path.rsplit('/').next() {
+        let stem = name.split('.').next().unwrap_or(name);
+        for token in split_identifier_tokens(stem) {
+            if token != "helper" && token != "util" && token != "utils" {
+                tokens.insert(token);
+            }
+        }
+    }
+    if let Some(symbols) = ctx.metadata.get("file_symbols").and_then(|v| v.as_array()) {
+        for symbol in symbols.iter().filter_map(|value| value.as_str()).take(3) {
+            for token in split_identifier_tokens(symbol) {
+                if token != "helper" && token != "util" && token != "utils" {
+                    tokens.insert(token);
+                }
+            }
+        }
+    }
+    tokens
+}
+
+fn helper_query_distinction(
+    left_ctx: Option<&CandidateContext>,
+    right_ctx: Option<&CandidateContext>,
+    query: &QueryFeatures,
+) -> f64 {
+    if query.aspects.is_empty() {
+        return 0.0;
+    }
+    let left_tokens = helper_focus_tokens(left_ctx);
+    let right_tokens = helper_focus_tokens(right_ctx);
+    if left_tokens.is_empty() && right_tokens.is_empty() {
+        return 0.0;
+    }
+    let left_query_matches: HashSet<&String> = left_tokens.intersection(&query.aspects).collect();
+    let right_query_matches: HashSet<&String> = right_tokens.intersection(&query.aspects).collect();
+    if left_query_matches.is_empty() && right_query_matches.is_empty() {
+        return 0.0;
+    }
+    if left_query_matches != right_query_matches {
+        return 0.32;
+    }
+    let overlap = jaccard_strings(
+        &left_tokens.iter().cloned().collect::<Vec<_>>(),
+        &right_tokens.iter().cloned().collect::<Vec<_>>(),
+    );
+    (1.0 - overlap).clamp(0.0, 0.18)
+}
+
 fn role_conflict(left_role: &str, right_role: &str) -> bool {
     if left_role == right_role {
         return false;
@@ -1597,6 +1683,11 @@ fn query_distinction_score(
     } else {
         0.0
     };
+    let helper_component = if left_role == "helper" && right_role == "helper" {
+        helper_query_distinction(contexts.get(left_idx), contexts.get(right_idx), query)
+    } else {
+        0.0
+    };
     let aspect_component = if aspect_conflict(&left_aspects, &right_aspects, query) {
         0.2
     } else {
@@ -1607,6 +1698,7 @@ fn query_distinction_score(
         + 0.2 * (left_path - right_path).abs()
         + 0.2 * (left_gain - right_gain).abs()
         + role_component
+        + helper_component
         + aspect_component)
         .clamp(0.0, 1.0)
 }
@@ -2208,5 +2300,56 @@ mod tests {
         assert!(narrow.selection.keep_indices.contains(&0));
         assert!(narrow.selection.keep_indices.contains(&1));
         assert_eq!(narrow.telemetry.experimental_suppressions, 0);
+    }
+
+    #[test]
+    fn helper_query_distinction_detects_entity_specific_helpers() {
+        let query = super::infer_query_features("user customer helper", "code");
+        let contexts = vec![
+            CandidateContext {
+                file_path: "src/helpers/user_helper.rs".to_string(),
+                metadata: serde_json::json!({"file_symbols":["create_user"],"node_types":["function_item"],"context_path":["Helper","Users"]}),
+            },
+            CandidateContext {
+                file_path: "src/helpers/customer_helper.rs".to_string(),
+                metadata: serde_json::json!({"file_symbols":["create_customer"],"node_types":["function_item"],"context_path":["Helper","Customer"]}),
+            },
+        ];
+        let score = super::helper_query_distinction(contexts.get(0), contexts.get(1), &query);
+        assert!(score >= 0.3, "expected helper-specific query distinction, got {score}");
+    }
+
+    #[test]
+    fn helper_clone_suppression_stays_off_for_query_targeted_helper_entities() {
+        let rows = vec![
+            "fn create_user(user_id: i64) { insert_user(user_id); audit_user(user_id); }".to_string(),
+            "fn create_customer(customer_id: i64) { insert_user(customer_id); audit_user(customer_id); }".to_string(),
+        ];
+        let contexts = vec![
+            CandidateContext {
+                file_path: "src/helpers/user_helper.rs".to_string(),
+                metadata: serde_json::json!({"file_symbols":["create_user"],"node_types":["function_item"],"context_path":["Helper","Users"]}),
+            },
+            CandidateContext {
+                file_path: "src/helpers/customer_helper.rs".to_string(),
+                metadata: serde_json::json!({"file_symbols":["create_customer"],"node_types":["function_item"],"context_path":["Helper","Customer"]}),
+            },
+        ];
+        let relevance = vec![0.97, 0.96];
+        let trace = rerank_diverse_trace_for_search_with_experiments(
+            &rows,
+            &relevance,
+            Some("user customer helper"),
+            Some("code"),
+            &contexts,
+            &ExperimentConfig {
+                helper_clone_suppression: true,
+                threshold_query_distinction: Some(0.22),
+                ..ExperimentConfig::default()
+            },
+        );
+        assert_eq!(trace.telemetry.experimental_suppressions, 0);
+        assert!(trace.selection.keep_indices.contains(&0));
+        assert!(trace.selection.keep_indices.contains(&1));
     }
 }
