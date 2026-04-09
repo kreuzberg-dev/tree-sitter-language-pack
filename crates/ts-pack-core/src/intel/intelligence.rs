@@ -555,6 +555,16 @@ pub(crate) fn extract_exports(root: &tree_sitter::Node, source: &str, language: 
     exports
 }
 
+fn parse_namespace_export_alias(text: &str) -> Option<String> {
+    let compact = text.split_whitespace().collect::<Vec<_>>().join(" ");
+    let after_as = compact.split(" as ").nth(1)?;
+    let alias = after_as.split(" from ").next()?.trim();
+    if alias.is_empty() || alias == "*" {
+        return None;
+    }
+    Some(alias.to_string())
+}
+
 fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, exports: &mut Vec<ExportInfo>) {
     let kind = node.kind();
     let is_export = match language {
@@ -662,7 +672,11 @@ fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, expor
                 }
             }
             if names.is_empty() && matches!(export_kind, ExportKind::ReExport) && text.contains('*') {
-                names.push("*".to_string());
+                if let Some(alias) = parse_namespace_export_alias(text) {
+                    names.push(format!("*\u{0}{alias}"));
+                } else {
+                    names.push("*".to_string());
+                }
             }
             if names.is_empty() {
                 names.push(text.lines().next().unwrap_or("").to_string());
@@ -1527,6 +1541,19 @@ mod tests {
         assert!(intel.structure.iter().any(|item| {
             item.kind == StructureKind::Impl && item.name.as_deref() == Some("impl Runner for Service")
         }));
+    }
+
+    #[test]
+    fn test_extract_typescript_namespace_reexport_alias() {
+        let source = r#"export * as routes from "./routes";"#;
+        let Some(tree) = parse_or_skip(source, "typescript") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "typescript", &tree);
+        assert_eq!(intel.exports.len(), 1);
+        assert_eq!(intel.exports[0].name, "*");
+        assert_eq!(intel.exports[0].exported_as.as_deref(), Some("routes"));
+        assert!(matches!(intel.exports[0].kind, ExportKind::ReExport));
     }
 
     #[test]

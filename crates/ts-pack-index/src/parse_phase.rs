@@ -712,6 +712,14 @@ fn parse_entry(entry: &ManifestEntry, pid: &Arc<str>) -> Option<FileResult> {
                         item,
                         exported_as: exported_as.clone(),
                     });
+                } else if export.kind == ts_pack::ExportKind::ReExport && export.name.trim() == "*" {
+                    export_alias_requests.push(ExportAliasRequest {
+                        src_id: file_id.clone(),
+                        src_filepath: rel_path.clone(),
+                        module: export.source.clone(),
+                        item: "*".to_string(),
+                        exported_as: format!("{exported_as}.*"),
+                    });
                 }
             }
             if export.kind != ts_pack::ExportKind::ReExport {
@@ -1064,6 +1072,7 @@ export const registerFinanceAdminRoutes = (router: Router) => {
 export { Foo, Bar as RenamedBar } from "./types";
 export type { Baz } from "./types";
 export * from "./helpers";
+export * as routes from "./routes";
 "#,
         )
         .unwrap();
@@ -1078,7 +1087,7 @@ export * from "./helpers";
         let results = parse_manifest_batch(&manifest, Arc::from("proj"));
         assert_eq!(results.len(), 1);
         let result = &results[0];
-        assert_eq!(result.reexport_symbol_requests.len(), 2);
+        assert_eq!(result.reexport_symbol_requests.len(), 3);
 
         let named = result
             .reexport_symbol_requests
@@ -1099,14 +1108,33 @@ export * from "./helpers";
         assert!(wildcard.is_wildcard);
         assert!(wildcard.items.is_empty());
 
+        let namespace = result
+            .reexport_symbol_requests
+            .iter()
+            .find(|req| req.module == "./routes")
+            .expect("namespace reexport request");
+        assert!(namespace.is_wildcard);
+        assert!(namespace.items.is_empty());
+
         let alias_requests: Vec<_> = result
             .export_alias_requests
             .iter()
-            .filter(|req| req.module.as_deref() == Some("./types"))
             .collect();
-        assert_eq!(alias_requests.len(), 1);
-        assert_eq!(alias_requests[0].item, "Bar");
-        assert_eq!(alias_requests[0].exported_as, "RenamedBar");
+        assert_eq!(alias_requests.len(), 2);
+
+        let renamed = alias_requests
+            .iter()
+            .find(|req| req.module.as_deref() == Some("./types"))
+            .expect("named alias request");
+        assert_eq!(renamed.item, "Bar");
+        assert_eq!(renamed.exported_as, "RenamedBar");
+
+        let namespace_alias = alias_requests
+            .iter()
+            .find(|req| req.module.as_deref() == Some("./routes"))
+            .expect("namespace alias request");
+        assert_eq!(namespace_alias.item, "*");
+        assert_eq!(namespace_alias.exported_as, "routes.*");
 
         let _ = fs::remove_dir_all(root);
     }

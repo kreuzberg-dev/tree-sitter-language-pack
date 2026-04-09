@@ -307,6 +307,35 @@ pub(crate) fn prepare_graph_facts(
     let mut export_alias_edges = Vec::new();
     let mut seen_export_alias: HashSet<(String, String, String)> = HashSet::new();
     for req in export_alias_requests.iter() {
+        if req.item == "*" {
+            let Some(module) = req.module.as_ref().filter(|module| !module.is_empty()) else {
+                continue;
+            };
+            let target_fp = pathing::resolve_module_path(&req.src_filepath, module, &files_set);
+            let Some(fp) = target_fp.as_ref() else {
+                continue;
+            };
+            let Some(exported) = exported_symbols_by_file.get(fp) else {
+                continue;
+            };
+            for sym_id in exported {
+                if seen_export_symbol.insert((req.src_id.clone(), sym_id.clone())) {
+                    export_symbol_edges.push(crate::ExportSymbolEdgeRow {
+                        src: req.src_id.clone(),
+                        tgt: sym_id.clone(),
+                    });
+                }
+                if seen_export_alias.insert((req.src_id.clone(), sym_id.clone(), req.exported_as.clone())) {
+                    export_alias_edges.push(crate::ExportAliasEdgeRow {
+                        src: req.src_id.clone(),
+                        tgt: sym_id.clone(),
+                        exported_as: req.exported_as.clone(),
+                    });
+                }
+            }
+            continue;
+        }
+
         let target_sym = if let Some(module) = req.module.as_ref().filter(|module| !module.is_empty()) {
             let target_fp = pathing::resolve_module_path(&req.src_filepath, module, &files_set);
             let sym_map = target_fp.as_ref().and_then(|fp| symbols_by_file.get(fp));
@@ -934,6 +963,53 @@ mod tests {
         assert_eq!(out.export_alias_edges[0].src, "file:src/index.ts");
         assert_eq!(out.export_alias_edges[0].tgt, "sym:foo");
         assert_eq!(out.export_alias_edges[0].exported_as, "PublicFoo");
+    }
+
+    #[test]
+    fn prepares_namespace_export_alias_edges_for_wildcard_reexports() {
+        let mut all_symbols = HashMap::new();
+        all_symbols.insert(
+            "Function",
+            vec![symbol_node("sym:buildRouter", "buildRouter", "src/routes.ts", true)],
+        );
+        all_symbols.insert(
+            "TypeAlias",
+            vec![symbol_node("sym:routeConfig", "RouteConfig", "src/routes.ts", true)],
+        );
+        let all_files = vec![
+            file_node("file:src/index.ts", "src/index.ts"),
+            file_node("file:src/routes.ts", "src/routes.ts"),
+        ];
+        let alias_requests = vec![ExportAliasRequest {
+            src_id: "file:src/index.ts".to_string(),
+            src_filepath: "src/index.ts".to_string(),
+            module: Some("./routes".to_string()),
+            item: "*".to_string(),
+            exported_as: "routes.*".to_string(),
+        }];
+
+        let out = prepare_graph_facts(
+            &all_symbols,
+            &all_files,
+            &Arc::from("proj"),
+            None,
+            &HashMap::new(),
+            &HashMap::new(),
+            &[],
+            &[],
+            &[],
+            &alias_requests,
+            &HashMap::new(),
+            &[],
+            &[],
+        );
+
+        assert_eq!(out.export_alias_edges.len(), 2);
+        assert_eq!(out.export_symbol_edges.len(), 2);
+        assert!(out
+            .export_alias_edges
+            .iter()
+            .all(|row| row.exported_as == "routes.*"));
     }
 
     #[test]
