@@ -185,18 +185,38 @@ async fn count_rel(graph: &Arc<Graph>, project_id: &str, rel: &str) -> Result<i6
     one_i64(graph, query(&cypher).param("pid", project_id.to_string()), "n").await
 }
 
+async fn count_file_nodes(graph: &Arc<Graph>, project_id: &str) -> Result<i64, Box<dyn std::error::Error>> {
+    one_i64(
+        graph,
+        query("MATCH (f:File {project_id: $pid}) RETURN count(f) AS n").param("pid", project_id.to_string()),
+        "n",
+    )
+    .await
+}
+
+fn rel_count_map(rels: &[String], counts: &[i64]) -> Value {
+    let mut obj = serde_json::Map::new();
+    for (rel, count) in rels.iter().zip(counts.iter()) {
+        obj.insert(rel.clone(), json!(count));
+    }
+    Value::Object(obj)
+}
+
 async fn project_file_graph(
     graph: &Arc<Graph>,
     graph_name: &str,
     project_id: &str,
     rels: &[String],
-) -> Result<bool, Box<dyn std::error::Error>> {
+) -> Result<(bool, Vec<i64>), Box<dyn std::error::Error>> {
+    let mut counts = Vec::with_capacity(rels.len());
     let mut sum = 0i64;
     for rel in rels {
-        sum += count_rel(graph, project_id, rel).await?;
+        let count = count_rel(graph, project_id, rel).await?;
+        counts.push(count);
+        sum += count;
     }
     if sum < 2 {
-        return Ok(false);
+        return Ok((false, counts));
     }
     let _ = run(
         graph,
@@ -217,7 +237,7 @@ async fn project_file_graph(
         .param("rels", strings_to_bolt(rels)),
     )
     .await?;
-    Ok(true)
+    Ok((true, counts))
 }
 
 async fn drop_graph(graph: &Arc<Graph>, graph_name: &str) {
@@ -293,12 +313,33 @@ async fn run_file_gds(
     write_cypher: &str,
     count_cypher: &str,
     count_key: &str,
-) -> Result<i64, Box<dyn std::error::Error>> {
+) -> Result<Value, Box<dyn std::error::Error>> {
     let name = graph_name(prefix, project_id);
-    if !project_file_graph(graph, &name, project_id, rels).await? {
-        return Ok(0);
+    let file_count = count_file_nodes(graph, project_id).await.unwrap_or(0);
+    let (projected, rel_counts) = project_file_graph(graph, &name, project_id, rels).await?;
+    let total_rel_count: i64 = rel_counts.iter().sum();
+    if !projected {
+        return Ok(json!({
+            "status": "skipped",
+            "updated": 0,
+            "file_nodes": file_count,
+            "file_rel_total": total_rel_count,
+            "file_rel_counts": rel_count_map(rels, &rel_counts),
+            "reason": if total_rel_count < 2 { "insufficient_file_relationships" } else { "projection_skipped" },
+        }));
     }
-    run(graph, query(write_cypher).param("name", name.clone())).await?;
+    let write_result = run(graph, query(write_cypher).param("name", name.clone())).await;
+    if let Err(err) = write_result {
+        drop_graph(graph, &name).await;
+        return Ok(json!({
+            "status": "failed",
+            "updated": 0,
+            "file_nodes": file_count,
+            "file_rel_total": total_rel_count,
+            "file_rel_counts": rel_count_map(rels, &rel_counts),
+            "error": err.to_string(),
+        }));
+    }
     let updated = one_i64(
         graph,
         query(count_cypher).param("pid", project_id.to_string()),
@@ -306,7 +347,13 @@ async fn run_file_gds(
     )
     .await?;
     drop_graph(graph, &name).await;
-    Ok(updated)
+    Ok(json!({
+        "status": "ok",
+        "updated": updated,
+        "file_nodes": file_count,
+        "file_rel_total": total_rel_count,
+        "file_rel_counts": rel_count_map(rels, &rel_counts),
+    }))
 }
 
 pub async fn finalize_struct_graph_async(
@@ -368,7 +415,7 @@ pub async fn finalize_struct_graph_async(
         "updated",
     )
     .await
-    .unwrap_or(0);
+    .unwrap_or_else(|err| json!({"status": "failed", "updated": 0, "error": err.to_string()}));
     let betweenness = run_file_gds(
         &graph,
         "betweenness",
@@ -379,41 +426,104 @@ pub async fn finalize_struct_graph_async(
         "updated",
     )
     .await
-    .unwrap_or(0);
+    .unwrap_or_else(|err| json!({"status": "failed", "updated": 0, "error": err.to_string()}));
     let wcc_graph = graph_name("wcc", project_id);
-    let isolated = if project_file_graph(&graph, &wcc_graph, project_id, &rels)
-        .await
-        .unwrap_or(false)
-    {
-        let _ = run(
-            &graph,
-            query("CALL gds.wcc.write($name, { writeProperty: 'wccComponent' })").param("name", wcc_graph.clone()),
-        )
-        .await;
-        let _ = run(
-            &graph,
-            query(
-                "MATCH (f:File {project_id: $pid})
-                 WHERE f.wccComponent IS NOT NULL
-                 WITH f.wccComponent AS comp, collect(f) AS members
-                 WITH members, size(members) AS sz
-                 FOREACH (f IN members | SET f.isolated = (sz = 1))",
+    let isolated = match project_file_graph(&graph, &wcc_graph, project_id, &rels).await {
+        Ok((true, rel_counts)) => {
+            let total_rel_count: i64 = rel_counts.iter().sum();
+            let file_count = count_file_nodes(&graph, project_id).await.unwrap_or(0);
+            let write_result = run(
+                &graph,
+                query("CALL gds.wcc.write($name, { writeProperty: 'wccComponent' })")
+                    .param("name", wcc_graph.clone()),
             )
-            .param("pid", project_id.to_string()),
-        )
-        .await;
-        let count = one_i64(
-            &graph,
-            query("MATCH (f:File {project_id: $pid}) WHERE f.isolated = true RETURN count(f) AS isolated")
+            .await;
+            if let Err(err) = write_result {
+                drop_graph(&graph, &wcc_graph).await;
+                return Ok(json!({
+                    "manifest_added": added_manifest,
+                    "parsed_marked": parsed_marked,
+                    "file_path_aliased": aliased,
+                    "swift_enrichment": swift_enrichment,
+                    "pagerank": pagerank,
+                    "louvain": louvain,
+                    "betweenness": betweenness,
+                    "isolated": {
+                        "status": "failed",
+                        "updated": 0,
+                        "file_nodes": file_count,
+                        "file_rel_total": total_rel_count,
+                        "file_rel_counts": rel_count_map(&rels, &rel_counts),
+                        "error": err.to_string(),
+                    },
+                }));
+            }
+            let mark_result = run(
+                &graph,
+                query(
+                    "MATCH (f:File {project_id: $pid})
+                     WHERE f.wccComponent IS NOT NULL
+                     WITH f.wccComponent AS comp, collect(f) AS members
+                     WITH members, size(members) AS sz
+                     FOREACH (f IN members | SET f.isolated = (sz = 1))",
+                )
                 .param("pid", project_id.to_string()),
-            "isolated",
-        )
-        .await
-        .unwrap_or(0);
-        drop_graph(&graph, &wcc_graph).await;
-        count
-    } else {
-        0
+            )
+            .await;
+            if let Err(err) = mark_result {
+                drop_graph(&graph, &wcc_graph).await;
+                return Ok(json!({
+                    "manifest_added": added_manifest,
+                    "parsed_marked": parsed_marked,
+                    "file_path_aliased": aliased,
+                    "swift_enrichment": swift_enrichment,
+                    "pagerank": pagerank,
+                    "louvain": louvain,
+                    "betweenness": betweenness,
+                    "isolated": {
+                        "status": "failed",
+                        "updated": 0,
+                        "file_nodes": file_count,
+                        "file_rel_total": total_rel_count,
+                        "file_rel_counts": rel_count_map(&rels, &rel_counts),
+                        "error": err.to_string(),
+                    },
+                }));
+            }
+            let count = one_i64(
+                &graph,
+                query("MATCH (f:File {project_id: $pid}) WHERE f.isolated = true RETURN count(f) AS isolated")
+                    .param("pid", project_id.to_string()),
+                "isolated",
+            )
+            .await
+            .unwrap_or(0);
+            drop_graph(&graph, &wcc_graph).await;
+            json!({
+                "status": "ok",
+                "updated": count,
+                "file_nodes": file_count,
+                "file_rel_total": total_rel_count,
+                "file_rel_counts": rel_count_map(&rels, &rel_counts),
+            })
+        }
+        Ok((false, rel_counts)) => {
+            let total_rel_count: i64 = rel_counts.iter().sum();
+            let file_count = count_file_nodes(&graph, project_id).await.unwrap_or(0);
+            json!({
+                "status": "skipped",
+                "updated": 0,
+                "file_nodes": file_count,
+                "file_rel_total": total_rel_count,
+                "file_rel_counts": rel_count_map(&rels, &rel_counts),
+                "reason": if total_rel_count < 2 { "insufficient_file_relationships" } else { "projection_skipped" },
+            })
+        }
+        Err(err) => json!({
+            "status": "failed",
+            "updated": 0,
+            "error": err.to_string(),
+        }),
     };
 
     Ok(json!({
