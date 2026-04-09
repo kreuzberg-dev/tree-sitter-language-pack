@@ -1229,20 +1229,17 @@ fn build_fixed_js_ts_bundle(lang: &str, is_typescript: bool) -> Option<TagQueryB
         call_key.to_string(),
         TagQuerySource::Prepared(ts_pack::prepare_query(lang, call_raw).ok()?),
     )];
-    if let Some(query) = valid_tags_query("js-ts:db", lang, JS_TS_DB_TAGS)
-        && let Ok(prepared) = ts_pack::prepare_query(lang, query.as_str())
+    if let Some(query) = prepare_valid_tags_query(lang, JS_TS_DB_TAGS)
     {
-        queries.push(("js-ts:db".to_string(), TagQuerySource::Prepared(prepared)));
+        queries.push(("js-ts:db".to_string(), TagQuerySource::Prepared(query)));
     }
-    if let Some(query) = valid_tags_query("js-ts:external", lang, JS_TS_EXTERNAL_TAGS)
-        && let Ok(prepared) = ts_pack::prepare_query(lang, query.as_str())
+    if let Some(query) = prepare_valid_tags_query(lang, JS_TS_EXTERNAL_TAGS)
     {
-        queries.push(("js-ts:external".to_string(), TagQuerySource::Prepared(prepared)));
+        queries.push(("js-ts:external".to_string(), TagQuerySource::Prepared(query)));
     }
-    if let Some(query) = valid_tags_query("js-ts:const", lang, JS_TS_CONST_TAGS)
-        && let Ok(prepared) = ts_pack::prepare_query(lang, query.as_str())
+    if let Some(query) = prepare_valid_tags_query(lang, JS_TS_CONST_TAGS)
     {
-        queries.push(("js-ts:const".to_string(), TagQuerySource::Prepared(prepared)));
+        queries.push(("js-ts:const".to_string(), TagQuerySource::Prepared(query)));
     }
     Some(TagQueryBundle::from_queries(queries))
 }
@@ -1292,6 +1289,18 @@ fn js_ts_query_sources(lang: &str, is_typescript: bool, source: &[u8]) -> Option
     }
 
     Some(queries)
+}
+
+fn prepare_valid_tags_query(lang: &str, raw_query: &'static str) -> Option<ts_pack::PreparedQuery> {
+    let valid_patterns: Vec<String> = split_query_patterns(raw_query)
+        .into_iter()
+        .filter(|pattern| ts_pack::query_compiles(lang, pattern))
+        .collect();
+    if valid_patterns.is_empty() {
+        return None;
+    }
+    let combined = valid_patterns.join("\n\n");
+    ts_pack::prepare_query(lang, &combined).ok()
 }
 
 fn filter_js_ts_bundle(bundle: &TagQueryBundle, source: &[u8]) -> TagQueryBundle {

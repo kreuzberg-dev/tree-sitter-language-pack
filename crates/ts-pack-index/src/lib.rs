@@ -381,6 +381,31 @@ pub async fn index_workspace(
             eprintln!("[ts-pack-index] Tags by language — {lang_summary}");
         }
         if query_profile_enabled {
+            let mut valid_rows = tags::summarize_valid_tags_query_aggregates();
+            valid_rows.sort_by(|a, b| {
+                b.total_secs
+                    .partial_cmp(&a.total_secs)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            });
+            let valid_summary = valid_rows
+                .into_iter()
+                .take(8)
+                .map(|row| {
+                    format!(
+                        "{}:{}={:.2}s hits={} misses={} max={:.2}ms",
+                        row.lang,
+                        row.cache_key,
+                        row.total_secs,
+                        row.hits,
+                        row.misses,
+                        row.max_secs * 1000.0,
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join(" ");
+            if !valid_summary.is_empty() {
+                eprintln!("[ts-pack-index] Tags query cache profile — {valid_summary}");
+            }
             let (mut by_label, mut by_file) = tags::summarize_query_profile_aggregates();
             by_label.sort_by(|a, b| {
                 b.total_elapsed_secs
