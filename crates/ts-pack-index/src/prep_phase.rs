@@ -525,6 +525,7 @@ mod tests {
             name: filepath.rsplit('/').next().unwrap_or(filepath).to_string(),
             filepath: filepath.to_string(),
             project_id: Arc::from("proj"),
+            is_test: false,
         }
     }
 

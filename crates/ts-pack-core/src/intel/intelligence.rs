@@ -653,6 +653,62 @@ pub(crate) fn extract_structure(root: &tree_sitter::Node, source: &str, language
 fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, items: &mut Vec<StructureItem>) {
     let kind = node.kind();
 
+    fn extract_visibility(node: &tree_sitter::Node, source: &str, language: &str) -> Option<String> {
+        let mut cursor = node.walk();
+        for child in node.children(&mut cursor) {
+            match child.kind() {
+                "visibility_modifier" => {
+                    let text = node_text(&child, source).trim().to_string();
+                    if !text.is_empty() {
+                        return Some(text);
+                    }
+                }
+                "modifiers" => {
+                    let lowered = node_text(&child, source).to_lowercase();
+                    for keyword in ["public", "open", "protected", "private", "internal", "fileprivate"] {
+                        if lowered.split_whitespace().any(|part| part == keyword) {
+                            return Some(keyword.to_string());
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        let header = node_text(node, source)
+            .lines()
+            .next()
+            .unwrap_or("")
+            .trim()
+            .to_lowercase();
+        match language {
+            "rust" => {
+                if header.starts_with("pub(") {
+                    return header.split_whitespace().next().map(|part| part.to_string());
+                }
+                if header.starts_with("pub ") {
+                    return Some("pub".to_string());
+                }
+            }
+            "swift" => {
+                for keyword in ["public", "open", "private", "fileprivate", "internal"] {
+                    if header.starts_with(&format!("{keyword} ")) {
+                        return Some(keyword.to_string());
+                    }
+                }
+            }
+            "java" | "c_sharp" | "csharp" => {
+                for keyword in ["public", "protected", "private", "internal"] {
+                    if header.starts_with(&format!("{keyword} ")) {
+                        return Some(keyword.to_string());
+                    }
+                }
+            }
+            _ => {}
+        }
+        None
+    }
+
     fn is_swift_method(node: &tree_sitter::Node) -> bool {
         let mut current = node.parent();
         for _ in 0..32 {
@@ -990,7 +1046,7 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
             kind: sk,
             name,
             qualified_name,
-            visibility: None,
+            visibility: extract_visibility(node, source, language),
             span: span_from_node(node),
             children,
             decorators: Vec::new(),
@@ -1423,6 +1479,32 @@ mod tests {
         let func = &intel.structure[0];
         assert_eq!(func.kind, StructureKind::Function);
         assert_eq!(func.name.as_deref(), Some("main"));
+    }
+
+    #[test]
+    fn test_extract_rust_visibility() {
+        let source = "pub(crate) fn main() {}\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+        let func = &intel.structure[0];
+        assert_eq!(func.visibility.as_deref(), Some("pub(crate)"));
+    }
+
+    #[test]
+    fn test_extract_swift_visibility() {
+        let source = "public struct Greeter {}\n";
+        let Some(tree) = parse_or_skip(source, "swift") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "swift", &tree);
+        let item = intel
+            .structure
+            .iter()
+            .find(|item| item.name.as_deref() == Some("Greeter"))
+            .expect("expected Greeter");
+        assert_eq!(item.visibility.as_deref(), Some("public"));
     }
 
     // -- Import extraction tests --

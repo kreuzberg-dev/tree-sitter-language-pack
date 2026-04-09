@@ -49,6 +49,7 @@ fn walk_item(
     exported_names: &HashSet<String>,
     symbols: &mut HashMap<&'static str, Vec<SymbolNode>>,
     relations: &mut Vec<RelRow>,
+    language: &str,
 ) {
     let label: &'static str = match item.kind {
         ts_pack::StructureKind::Class => "Class",
@@ -71,12 +72,15 @@ fn walk_item(
     let name = item.name.as_deref().unwrap_or("unnamed");
     let node_id = format!("{}:{}:{}:{}", project_id, label.to_ascii_lowercase(), filepath, name,);
 
-    let is_exported = item
-        .visibility
-        .as_deref()
-        .map(|v| v == "public" || v == "pub" || v.starts_with("pub("))
-        .unwrap_or(false)
-        || exported_names.contains(name);
+    let visibility = item.visibility.as_deref().unwrap_or("").trim().to_lowercase();
+    let name_is_public = match language {
+        "go" => name.chars().next().map(|ch| ch.is_uppercase()).unwrap_or(false),
+        _ => false,
+    };
+    let is_exported = matches!(visibility.as_str(), "public" | "open" | "pub")
+        || visibility.starts_with("pub(")
+        || exported_names.contains(name)
+        || name_is_public;
 
     symbols.entry(label).or_default().push(SymbolNode {
         id: node_id.clone(),
@@ -108,8 +112,25 @@ fn walk_item(
             exported_names,
             symbols,
             relations,
+            language,
         );
     }
+}
+
+fn is_test_like_path(path: &str) -> bool {
+    let normalized = path.replace('\\', "/").to_lowercase();
+    let basename = normalized.rsplit('/').next().unwrap_or(normalized.as_str());
+    normalized.starts_with("tests/")
+        || normalized.contains("/tests/")
+        || normalized.contains("/__tests__/")
+        || normalized.starts_with("spec/")
+        || normalized.contains("/spec/")
+        || normalized.contains(".test.")
+        || normalized.contains(".spec.")
+        || basename.starts_with("test_")
+        || basename.ends_with("_test.py")
+        || basename.ends_with("_test.rs")
+        || basename.ends_with("_test.go")
 }
 
 fn build_clone_candidates(symbols: &HashMap<&'static str, Vec<SymbolNode>>, source: &str) -> Vec<CloneCandidate> {
@@ -275,6 +296,7 @@ fn parse_entry(entry: &ManifestEntry, pid: &Arc<str>) -> Option<FileResult> {
         name: file_name,
         filepath: rel_path.clone(),
         project_id: Arc::clone(pid),
+        is_test: is_test_like_path(rel_path),
     };
 
     let mut symbols: HashMap<&'static str, Vec<SymbolNode>> = HashMap::new();
@@ -365,6 +387,7 @@ fn parse_entry(entry: &ManifestEntry, pid: &Arc<str>) -> Option<FileResult> {
                 &exported_names,
                 &mut symbols,
                 &mut relations,
+                lang_name,
             );
         }
     }
@@ -582,10 +605,64 @@ def main():
         assert_eq!(results.len(), 1);
         let result = &results[0];
         assert_eq!(result.file_node.filepath, "pkg/main.py");
+        assert!(!result.file_node.is_test);
         assert!(!result.symbols.is_empty());
         assert!(!result.symbol_calls.is_empty());
         assert_eq!(result.import_symbol_requests.len(), 1);
         assert_eq!(result.import_symbol_requests[0].module, ".helpers");
+
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn marks_test_like_files() {
+        let root = unique_temp_dir("test-file");
+        fs::create_dir_all(root.join("pkg")).unwrap();
+        let file_abs = root.join("pkg").join("main.test.ts");
+        fs::write(&file_abs, "export const x = 1;\n").unwrap();
+
+        let manifest = vec![ManifestEntry {
+            abs_path: file_abs.to_string_lossy().to_string(),
+            rel_path: "pkg/main.test.ts".to_string(),
+            ext: "ts".to_string(),
+            size: fs::metadata(&file_abs).unwrap().len(),
+        }];
+
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        assert_eq!(results.len(), 1);
+        assert!(results[0].file_node.is_test);
+
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn marks_go_exported_names_without_visibility_keyword() {
+        let root = unique_temp_dir("go-exports");
+        fs::create_dir_all(root.join("pkg")).unwrap();
+        let file_abs = root.join("pkg").join("main.go");
+        fs::write(
+            &file_abs,
+            "package pkg\n\nfunc PublicThing() {}\nfunc privateThing() {}\n",
+        )
+        .unwrap();
+
+        let manifest = vec![ManifestEntry {
+            abs_path: file_abs.to_string_lossy().to_string(),
+            rel_path: "pkg/main.go".to_string(),
+            ext: "go".to_string(),
+            size: fs::metadata(&file_abs).unwrap().len(),
+        }];
+
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        assert_eq!(results.len(), 1);
+        let funcs = results[0].symbols.get("Function").expect("functions");
+        let public = funcs.iter().find(|sym| sym.name == "PublicThing").expect("PublicThing");
+        let private = funcs
+            .iter()
+            .find(|sym| sym.name == "privateThing")
+            .expect("privateThing");
+        assert!(public.is_exported);
+        assert!(!private.is_exported);
 
         let _ = fs::remove_dir_all(root);
     }

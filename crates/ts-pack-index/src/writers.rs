@@ -102,8 +102,10 @@ pub(crate) async fn write_file_nodes(graph: &Arc<Graph>, batch: &[FileNode]) -> 
          ON CREATE SET n:File, \
                        n.name       = item.name, \
                        n.filepath   = item.filepath, \
-                       n.project_id = item.project_id \
-         ON MATCH SET  n.name       = item.name"
+                       n.project_id = item.project_id, \
+                       n.is_test    = item.is_test \
+         ON MATCH SET  n.name       = item.name, \
+                       n.is_test    = item.is_test"
             .to_string(),
     )
     .param("batch", bolt);

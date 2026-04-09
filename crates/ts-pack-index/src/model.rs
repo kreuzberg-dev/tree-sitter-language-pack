@@ -10,6 +10,7 @@ pub(crate) struct FileNode {
     pub(crate) name: String,
     pub(crate) filepath: String,
     pub(crate) project_id: Arc<str>,
+    pub(crate) is_test: bool,
 }
 
 pub(crate) struct SymbolNode {
@@ -851,6 +852,7 @@ impl FileNode {
             m.insert("name".into(), Value::String(self.name.clone()));
             m.insert("filepath".into(), Value::String(self.filepath.clone()));
             m.insert("project_id".into(), Value::String(self.project_id.to_string()));
+            m.insert("is_test".into(), Value::Bool(self.is_test));
             m
         })
     }
