@@ -321,6 +321,10 @@ impl CompiledExtraction {
         let mut results = AHashMap::new();
         let selected: Option<ahash::AHashSet<&str>> =
             pattern_names.map(|names| names.iter().copied().collect::<ahash::AHashSet<&str>>());
+        let debug_pattern_timings = std::env::var("TS_PACK_DEBUG_EXTRACT_PATTERNS")
+            .ok()
+            .map(|v| matches!(v.trim().to_ascii_lowercase().as_str(), "1" | "true" | "yes" | "on"))
+            .unwrap_or(false);
 
         for compiled in &self.patterns {
             if let Some(selected) = &selected
@@ -328,6 +332,11 @@ impl CompiledExtraction {
             {
                 continue;
             }
+            let pattern_started = if debug_pattern_timings {
+                Some(std::time::Instant::now())
+            } else {
+                None
+            };
             let mut cursor = tree_sitter::QueryCursor::new();
             let query = &compiled.query;
             let pat = &compiled.extraction_pattern;
@@ -424,6 +433,15 @@ impl CompiledExtraction {
                     total_count,
                 },
             );
+            if let Some(started) = pattern_started {
+                let elapsed_ms = started.elapsed().as_secs_f64() * 1000.0;
+                if elapsed_ms >= 5.0 {
+                    eprintln!(
+                        "[ts-pack:extract-pattern] lang={} pattern={} elapsed_ms={:.2} matches={}",
+                        self.language_name, compiled.name, elapsed_ms, total_count
+                    );
+                }
+            }
         }
 
         Ok(ExtractionResult {

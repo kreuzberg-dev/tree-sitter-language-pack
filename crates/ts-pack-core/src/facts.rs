@@ -223,13 +223,19 @@ fn selected_web_pattern_names(source: &str, file_path: Option<&str>) -> Vec<&'st
         }
     }
     if wants_http {
-        selected.push("http_member_calls");
-        selected.push("http_fetch_calls");
+        if has_member_method {
+            selected.push("http_member_calls");
+        }
+        if has_fetch {
+            selected.push("http_fetch_calls");
+        }
     }
     if wants_wrapper_analysis {
         selected.push("http_wrapper_defs");
         selected.push("http_wrapper_calls");
-        selected.push("http_method_props");
+        if has_fetch {
+            selected.push("http_method_props");
+        }
     }
     selected
 }
@@ -1057,19 +1063,47 @@ fn web_patterns() -> AHashMap<String, ExtractionPattern> {
             "[(function_declaration \
                 name: (identifier) @wrapper \
                 parameters: (formal_parameters) @params \
-                body: (statement_block) @body) \
+                body: (statement_block (return_statement (call_expression) @body))) \
+              (function_declaration \
+                name: (identifier) @wrapper \
+                parameters: (formal_parameters) @params \
+                body: (statement_block (return_statement (await_expression (call_expression) @body)))) \
               (lexical_declaration \
                 (variable_declarator \
                   name: (identifier) @wrapper \
                   value: (arrow_function \
                     parameters: (formal_parameters) @params \
-                    body: [(statement_block) @body (call_expression) @body]))) \
+                    body: (call_expression) @body))) \
+              (lexical_declaration \
+                (variable_declarator \
+                  name: (identifier) @wrapper \
+                  value: (arrow_function \
+                    parameters: (formal_parameters) @params \
+                    body: (await_expression (call_expression) @body)))) \
+              (lexical_declaration \
+                (variable_declarator \
+                  name: (identifier) @wrapper \
+                  value: (arrow_function \
+                    parameters: (formal_parameters) @params \
+                    body: (statement_block (return_statement (call_expression) @body))))) \
+              (lexical_declaration \
+                (variable_declarator \
+                  name: (identifier) @wrapper \
+                  value: (arrow_function \
+                    parameters: (formal_parameters) @params \
+                    body: (statement_block (return_statement (await_expression (call_expression) @body)))))) \
               (lexical_declaration \
                 (variable_declarator \
                   name: (identifier) @wrapper \
                   value: (function_expression \
                     parameters: (formal_parameters) @params \
-                    body: (statement_block) @body)))] @wrapper_def",
+                    body: (statement_block (return_statement (call_expression) @body))))) \
+              (lexical_declaration \
+                (variable_declarator \
+                  name: (identifier) @wrapper \
+                  value: (function_expression \
+                    parameters: (formal_parameters) @params \
+                    body: (statement_block (return_statement (await_expression (call_expression) @body))))))] @wrapper_def",
             200,
         ),
     );
