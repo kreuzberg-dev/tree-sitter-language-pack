@@ -14,6 +14,14 @@ const HTTP_METHODS: &[&str] = &["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD",
 const NON_HTTP_CLIENTS: &[&str] = &["router", "app", "server"];
 static FILE_FACTS_EXTRACTION_CACHE: LazyLock<RwLock<AHashMap<String, Arc<CompiledExtraction>>>> =
     LazyLock::new(|| RwLock::new(AHashMap::new()));
+static FETCH_METHOD_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"method\s*:\s*["'](?P<method>[A-Za-z]+)["']"#).unwrap());
+static HTTP_MEMBER_WRAPPER_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        r"(?P<client>[A-Za-z_][A-Za-z0-9_]*)\s*\.\s*(?P<method>get|post|put|patch|delete|head|options)\s*\(",
+    )
+    .unwrap()
+});
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -915,11 +923,17 @@ fn parse_single_js_param(params: &str) -> Option<&str> {
 }
 
 fn infer_js_http_wrapper(body: &str, arg: &str) -> Option<(String, String)> {
+    if !body.contains("fetch(") && !body.contains(".get(") && !body.contains(".post(") && !body.contains(".put(")
+        && !body.contains(".patch(") && !body.contains(".delete(") && !body.contains(".head(")
+        && !body.contains(".options(")
+    {
+        return None;
+    }
+
     let escaped_arg = regex::escape(arg);
     let fetch_re = Regex::new(&format!(r"fetch\s*\(\s*{}\s*(?:,|\))", escaped_arg)).ok()?;
     if fetch_re.is_match(body) {
-        let method_re = Regex::new(r#"method\s*:\s*["'](?P<method>[A-Za-z]+)["']"#).ok()?;
-        let method = method_re
+        let method = FETCH_METHOD_RE
             .captures(body)
             .and_then(|caps| caps.name("method").map(|m| m.as_str()))
             .and_then(|m| normalize_method(Some(m)))
@@ -927,15 +941,21 @@ fn infer_js_http_wrapper(body: &str, arg: &str) -> Option<(String, String)> {
         return Some(("fetch".to_string(), method));
     }
 
-    let member_re = Regex::new(&format!(
-        r"(?P<client>[A-Za-z_][A-Za-z0-9_]*)\s*\.\s*(?P<method>get|post|put|patch|delete|head|options)\s*\(\s*{}\s*(?:,|\))",
-        escaped_arg
-    ))
-    .ok()?;
-    let caps = member_re.captures(body)?;
-    let client = caps.name("client")?.as_str().to_string();
-    let method = normalize_method(caps.name("method").map(|m| m.as_str()))?;
-    Some((client, method))
+    for caps in HTTP_MEMBER_WRAPPER_RE.captures_iter(body) {
+        let Some(call) = caps.get(0) else {
+            continue;
+        };
+        let tail = &body[call.end()..];
+        let trimmed = tail.trim_start();
+        if !(trimmed.starts_with(arg) || trimmed.starts_with(&format!("{arg},")) || trimmed.starts_with(&format!("{arg})")))
+        {
+            continue;
+        }
+        let client = caps.name("client")?.as_str().to_string();
+        let method = normalize_method(caps.name("method").map(|m| m.as_str()))?;
+        return Some((client, method));
+    }
+    None
 }
 
 fn parse_rust_route_attr(attr: &str) -> Option<(String, String, String)> {
