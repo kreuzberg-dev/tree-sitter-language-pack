@@ -304,14 +304,35 @@ impl CompiledExtraction {
     ///
     /// Returns an error if query execution fails.
     pub fn extract_from_tree(&self, tree: &tree_sitter::Tree, source: &[u8]) -> Result<ExtractionResult, Error> {
+        self.extract_selected_from_tree(tree, source, None::<&[&str]>)
+    }
+
+    /// Extract from an already-parsed tree, restricted to a subset of named patterns.
+    ///
+    /// When `pattern_names` is `None`, all compiled patterns run.
+    pub fn extract_selected_from_tree<'a>(
+        &self,
+        tree: &tree_sitter::Tree,
+        source: &[u8],
+        pattern_names: Option<&'a [&'a str]>,
+    ) -> Result<ExtractionResult, Error> {
         use tree_sitter::StreamingIterator;
 
         let mut results = AHashMap::new();
+        let selected: Option<ahash::AHashSet<&str>> =
+            pattern_names.map(|names| names.iter().copied().collect::<ahash::AHashSet<&str>>());
 
         for compiled in &self.patterns {
+            if let Some(selected) = &selected
+                && !selected.contains(compiled.name.as_str())
+            {
+                continue;
+            }
             let mut cursor = tree_sitter::QueryCursor::new();
             let query = &compiled.query;
             let pat = &compiled.extraction_pattern;
+            let text_only_no_children =
+                matches!(pat.capture_output, CaptureOutput::Text) && pat.child_fields.is_empty();
 
             // Apply byte range restriction if configured.
             if let Some((start, end)) = pat.byte_range {
@@ -339,34 +360,43 @@ impl CompiledExtraction {
                         .get(cap.index as usize)
                         .ok_or_else(|| Error::QueryError(format!("invalid capture index {}", cap.index)))?;
                     let ts_node = cap.node;
-                    let info = node_info_from_node(ts_node);
-                    let capture_start_byte = info.start_byte;
+                    let capture_start_byte = ts_node.start_byte();
 
-                    let text = match pat.capture_output {
-                        CaptureOutput::Text | CaptureOutput::Full => {
-                            crate::node::extract_text(source, &info).ok().map(String::from)
-                        }
-                        CaptureOutput::Node => None,
-                    };
-
-                    let node = match pat.capture_output {
-                        CaptureOutput::Node | CaptureOutput::Full => Some(info),
-                        CaptureOutput::Text => None,
-                    };
-
-                    // Extract requested child fields from the actual tree_sitter::Node.
-                    let child_field_values = if pat.child_fields.is_empty() {
-                        AHashMap::new()
+                    let (text, node, child_field_values) = if text_only_no_children {
+                        let text = std::str::from_utf8(&source[ts_node.start_byte()..ts_node.end_byte()])
+                            .ok()
+                            .map(String::from);
+                        (text, None, AHashMap::new())
                     } else {
-                        let mut fields = AHashMap::with_capacity(pat.child_fields.len());
-                        for field_name in &pat.child_fields {
-                            let value = ts_node.child_by_field_name(field_name.as_str()).and_then(|child| {
-                                let child_info = node_info_from_node(child);
-                                crate::node::extract_text(source, &child_info).ok().map(String::from)
-                            });
-                            fields.insert(field_name.clone(), value);
-                        }
-                        fields
+                        let info = node_info_from_node(ts_node);
+
+                        let text = match pat.capture_output {
+                            CaptureOutput::Text | CaptureOutput::Full => {
+                                crate::node::extract_text(source, &info).ok().map(String::from)
+                            }
+                            CaptureOutput::Node => None,
+                        };
+
+                        let node = match pat.capture_output {
+                            CaptureOutput::Node | CaptureOutput::Full => Some(info),
+                            CaptureOutput::Text => None,
+                        };
+
+                        // Extract requested child fields from the actual tree_sitter::Node.
+                        let child_field_values = if pat.child_fields.is_empty() {
+                            AHashMap::new()
+                        } else {
+                            let mut fields = AHashMap::with_capacity(pat.child_fields.len());
+                            for field_name in &pat.child_fields {
+                                let value = ts_node.child_by_field_name(field_name.as_str()).and_then(|child| {
+                                    let child_info = node_info_from_node(child);
+                                    crate::node::extract_text(source, &child_info).ok().map(String::from)
+                                });
+                                fields.insert(field_name.clone(), value);
+                            }
+                            fields
+                        };
+                        (text, node, child_field_values)
                     };
 
                     captures.push(CaptureResult {

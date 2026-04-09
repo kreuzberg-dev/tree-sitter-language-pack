@@ -2,6 +2,7 @@ use ahash::AHashMap;
 use regex::Regex;
 use std::path::Path;
 use std::sync::{Arc, LazyLock, RwLock};
+use std::time::Instant;
 use toml::Value as TomlValue;
 
 use crate::Error;
@@ -154,6 +155,10 @@ pub fn extract_file_facts_from_tree(
     language: &str,
     file_path: Option<&str>,
 ) -> Result<FileFacts, Error> {
+    let debug_timings = std::env::var("TS_PACK_DEBUG_FILE_FACTS")
+        .ok()
+        .map(|v| matches!(v.trim().to_ascii_lowercase().as_str(), "1" | "true" | "yes" | "on"))
+        .unwrap_or(false);
     let mut facts = FileFacts::default();
     if let Some(path) = file_path {
         parse_apple_file_facts(source, path, &mut facts);
@@ -162,8 +167,63 @@ pub fn extract_file_facts_from_tree(
         return Ok(finalize_file_facts(facts));
     };
     let compiled = compiled_facts_extraction(&config)?;
-    let raw = compiled.extract_from_tree(tree, source.as_bytes())?;
-    Ok(parse_file_facts(&raw, language, file_path, facts))
+    let selected_patterns = selected_pattern_names(language, source, file_path);
+    let t_extract = Instant::now();
+    let raw = match selected_patterns.as_deref() {
+        Some(selected) => compiled.extract_selected_from_tree(tree, source.as_bytes(), Some(selected))?,
+        None => compiled.extract_from_tree(tree, source.as_bytes())?,
+    };
+    let extract_secs = t_extract.elapsed().as_secs_f64();
+    let t_parse = Instant::now();
+    let facts = parse_file_facts(&raw, language, file_path, facts);
+    let parse_secs = t_parse.elapsed().as_secs_f64();
+    if debug_timings && (extract_secs >= 0.005 || parse_secs >= 0.005) {
+        eprintln!(
+            "[ts-pack:file-facts] lang={} file={} extract_ms={:.2} parse_ms={:.2}",
+            language,
+            file_path.unwrap_or("<unknown>"),
+            extract_secs * 1000.0,
+            parse_secs * 1000.0,
+        );
+    }
+    Ok(facts)
+}
+
+fn selected_pattern_names<'a>(language: &str, source: &str, file_path: Option<&'a str>) -> Option<Vec<&'static str>> {
+    let normalized = language.to_ascii_lowercase();
+    match normalized.as_str() {
+        "javascript" | "typescript" | "tsx" => Some(selected_web_pattern_names(source, file_path)),
+        _ => None,
+    }
+}
+
+fn selected_web_pattern_names(source: &str, file_path: Option<&str>) -> Vec<&'static str> {
+    let method_hints = [".get(", ".post(", ".put(", ".patch(", ".delete(", ".head(", ".options("];
+    let has_member_method = method_hints.iter().any(|hint| source.contains(hint));
+    let has_fetch = source.contains("fetch(");
+    let has_route_file = file_path.and_then(route_path_from_file).is_some();
+
+    let wants_routes = has_route_file || has_member_method;
+    let wants_http = has_fetch || has_member_method;
+    let wants_wrapper_analysis = wants_http;
+
+    let mut selected = Vec::new();
+    if wants_routes {
+        selected.push("express_routes");
+        if has_route_file {
+            selected.push("route_methods");
+        }
+    }
+    if wants_http {
+        selected.push("http_member_calls");
+        selected.push("http_fetch_calls");
+    }
+    if wants_wrapper_analysis {
+        selected.push("http_wrapper_defs");
+        selected.push("http_wrapper_calls");
+        selected.push("http_method_props");
+    }
+    selected
 }
 
 fn compiled_facts_extraction(config: &ExtractionConfig) -> Result<Arc<CompiledExtraction>, Error> {
