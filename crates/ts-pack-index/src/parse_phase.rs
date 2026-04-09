@@ -5,7 +5,7 @@ use std::sync::Arc;
 use rayon::prelude::*;
 use tree_sitter_language_pack as ts_pack;
 
-use crate::clone_enrich;
+use crate::duplicate;
 use crate::pathing;
 use crate::swift;
 use crate::tags;
@@ -146,9 +146,9 @@ fn build_clone_candidates(symbols: &HashMap<&'static str, Vec<SymbolNode>>, sour
         if end <= start {
             continue;
         }
-        let tokens = clone_enrich::tokenize_normalized(&source_bytes[start..end]);
+        let tokens = duplicate::tokenize_normalized(&source_bytes[start..end]);
         if tokens.len() < WINNOW_MIN_TOKENS {
-            let kgrams = clone_enrich::kgram_hashes(&tokens, WINNOW_SMALL_K);
+            let kgrams = duplicate::kgram_hashes(&tokens, WINNOW_SMALL_K);
             if kgrams.is_empty() {
                 continue;
             }
@@ -170,29 +170,29 @@ fn build_clone_candidates(symbols: &HashMap<&'static str, Vec<SymbolNode>>, sour
         let mut fps_large: HashSet<u64>;
         let mut kgrams: HashSet<u64>;
         if tokens.len() < WINNOW_SMALL_TOKEN_THRESHOLD {
-            kgrams = clone_enrich::kgram_hashes(&tokens, WINNOW_SMALL_K);
-            fps_small = clone_enrich::winnow_fingerprints(&tokens, WINNOW_SMALL_K, WINNOW_SMALL_W);
+            kgrams = duplicate::kgram_hashes(&tokens, WINNOW_SMALL_K);
+            fps_small = duplicate::winnow_fingerprints(&tokens, WINNOW_SMALL_K, WINNOW_SMALL_W);
             if fps_small.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
                 fps_small.clear();
             }
             fps_medium = HashSet::new();
             fps_large = HashSet::new();
         } else {
-            fps_small = clone_enrich::winnow_fingerprints(&tokens, WINNOW_SMALL_K, WINNOW_SMALL_W);
+            fps_small = duplicate::winnow_fingerprints(&tokens, WINNOW_SMALL_K, WINNOW_SMALL_W);
             if fps_small.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
                 fps_small.clear();
             }
-            fps_medium = clone_enrich::winnow_fingerprints(&tokens, WINNOW_MEDIUM_K, WINNOW_MEDIUM_W);
+            fps_medium = duplicate::winnow_fingerprints(&tokens, WINNOW_MEDIUM_K, WINNOW_MEDIUM_W);
             if fps_medium.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
                 fps_medium.clear();
             }
-            fps_large = clone_enrich::winnow_fingerprints(&tokens, WINNOW_LARGE_K, WINNOW_LARGE_W);
+            fps_large = duplicate::winnow_fingerprints(&tokens, WINNOW_LARGE_K, WINNOW_LARGE_W);
             if fps_large.len() < WINNOW_MIN_FINGERPRINTS.saturating_sub(4) {
                 fps_large.clear();
             }
             kgrams = HashSet::new();
             if fps_small.is_empty() && fps_medium.is_empty() && fps_large.is_empty() {
-                kgrams = clone_enrich::kgram_hashes(&tokens, WINNOW_SMALL_K);
+                kgrams = duplicate::kgram_hashes(&tokens, WINNOW_SMALL_K);
             }
         }
 
