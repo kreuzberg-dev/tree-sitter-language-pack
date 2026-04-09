@@ -323,29 +323,35 @@ const JS_TS_EXTERNAL_TAGS: &str = r#"
 (call_expression
   function: (identifier) @external_callee
   arguments: (arguments (string) @external_arg))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (identifier) @external_callee
   arguments: (arguments (identifier) @external_arg))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (identifier) @external_callee
   arguments: (arguments (template_string) @external_arg))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (member_expression
     object: (identifier) @external_callee)
   arguments: (arguments (string) @external_arg))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (member_expression
     object: (identifier) @external_callee)
   arguments: (arguments (identifier) @external_arg))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (member_expression
     object: (identifier) @external_callee)
   arguments: (arguments (template_string) @external_arg))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (identifier) @external_callee
@@ -354,6 +360,7 @@ const JS_TS_EXTERNAL_TAGS: &str = r#"
       left: (identifier) @external_arg_left
       operator: "+"
       right: (string) @external_arg_right)))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (identifier) @external_callee
@@ -362,6 +369,7 @@ const JS_TS_EXTERNAL_TAGS: &str = r#"
       left: (string) @external_arg_left
       operator: "+"
       right: (identifier) @external_arg_right)))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (member_expression
@@ -371,6 +379,7 @@ const JS_TS_EXTERNAL_TAGS: &str = r#"
       left: (identifier) @external_arg_left
       operator: "+"
       right: (string) @external_arg_right)))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (member_expression
@@ -380,6 +389,7 @@ const JS_TS_EXTERNAL_TAGS: &str = r#"
       left: (string) @external_arg_left
       operator: "+"
       right: (identifier) @external_arg_right)))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (identifier) @external_callee
@@ -387,6 +397,7 @@ const JS_TS_EXTERNAL_TAGS: &str = r#"
     (new_expression
       constructor: (identifier) @external_url_ctor
       arguments: (arguments (string) @external_url_path (string) @external_url_base))))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (identifier) @external_callee
@@ -394,6 +405,7 @@ const JS_TS_EXTERNAL_TAGS: &str = r#"
     (new_expression
       constructor: (identifier) @external_url_ctor
       arguments: (arguments (string) @external_url_path (identifier) @external_url_base_ident))))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (member_expression
@@ -402,6 +414,7 @@ const JS_TS_EXTERNAL_TAGS: &str = r#"
     (new_expression
       constructor: (identifier) @external_url_ctor
       arguments: (arguments (string) @external_url_path (string) @external_url_base))))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 
 (call_expression
   function: (member_expression
@@ -410,6 +423,7 @@ const JS_TS_EXTERNAL_TAGS: &str = r#"
     (new_expression
       constructor: (identifier) @external_url_ctor
       arguments: (arguments (string) @external_url_path (identifier) @external_url_base_ident))))
+(#any-of? @external_callee "fetch" "axios" "ky" "ofetch" "$fetch")
 "#;
 
 const JS_TS_CONST_TAGS: &str = r#"
@@ -1042,7 +1056,10 @@ pub fn run_tags(
                     }
                 }
                 TagQuerySource::Prepared(prepared) => match ts_pack::run_prepared_query_profiled(tree, prepared, source) {
-                    Ok(result) => result,
+                    Ok((matches, mut profile)) => {
+                        profile.lookup_secs = 0.0;
+                        (matches, profile)
+                    }
                     Err(_) => continue,
                 },
             }
@@ -1256,33 +1273,25 @@ fn js_ts_query_sources(lang: &str, is_typescript: bool, source: &[u8]) -> Option
         TagQuerySource::QueryText(valid_tags_query(call_key, lang, call_raw)?),
     )];
     let source_text = std::str::from_utf8(source).ok().unwrap_or("");
-
-    if source_text.contains("prisma")
+    let wants_db = source_text.contains("prisma")
         || source_text.contains("prismaClient")
         || source_text.contains("tx.")
-        || source_text.contains("db.")
-    {
+        || source_text.contains("db.");
+    let wants_external = has_js_ts_external_call_hints(source_text);
+    let wants_const = wants_external || source_text.contains("process.env") || source_text.contains("import.meta.env");
+
+    if wants_db {
         if let Some(query) = valid_tags_query("js-ts:db", lang, JS_TS_DB_TAGS) {
             queries.push(("js-ts:db".to_string(), TagQuerySource::QueryText(query)));
         }
     }
 
-    if source_text.contains("fetch")
-        || source_text.contains("axios")
-        || source_text.contains("ofetch")
-        || source_text.contains("$fetch")
-        || source_text.contains("ky(")
-        || source_text.contains("new URL(")
-        || source_text.contains("http://")
-        || source_text.contains("https://")
-    {
+    if wants_external {
         if let Some(query) = valid_tags_query("js-ts:external", lang, JS_TS_EXTERNAL_TAGS) {
             queries.push(("js-ts:external".to_string(), TagQuerySource::QueryText(query)));
         }
-        if let Some(query) = valid_tags_query("js-ts:const", lang, JS_TS_CONST_TAGS) {
-            queries.push(("js-ts:const".to_string(), TagQuerySource::QueryText(query)));
-        }
-    } else if source_text.contains("process.env") || source_text.contains("import.meta.env") {
+    }
+    if wants_const {
         if let Some(query) = valid_tags_query("js-ts:const", lang, JS_TS_CONST_TAGS) {
             queries.push(("js-ts:const".to_string(), TagQuerySource::QueryText(query)));
         }
@@ -1309,14 +1318,7 @@ fn filter_js_ts_bundle(bundle: &TagQueryBundle, source: &[u8]) -> TagQueryBundle
         || source_text.contains("prismaClient")
         || source_text.contains("tx.")
         || source_text.contains("db.");
-    let wants_external = source_text.contains("fetch")
-        || source_text.contains("axios")
-        || source_text.contains("ofetch")
-        || source_text.contains("$fetch")
-        || source_text.contains("ky(")
-        || source_text.contains("new URL(")
-        || source_text.contains("http://")
-        || source_text.contains("https://");
+    let wants_external = has_js_ts_external_call_hints(source_text);
     let wants_const = wants_external || source_text.contains("process.env") || source_text.contains("import.meta.env");
 
     let queries = bundle
@@ -1331,6 +1333,15 @@ fn filter_js_ts_bundle(bundle: &TagQueryBundle, source: &[u8]) -> TagQueryBundle
         .cloned()
         .collect();
     TagQueryBundle::from_queries(queries)
+}
+
+fn has_js_ts_external_call_hints(source_text: &str) -> bool {
+    source_text.contains("fetch(")
+        || source_text.contains("axios(")
+        || source_text.contains("ofetch(")
+        || source_text.contains("$fetch(")
+        || source_text.contains("ky(")
+        || source_text.contains("new URL(")
 }
 
 fn collect_tag_match(
