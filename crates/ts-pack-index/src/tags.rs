@@ -999,8 +999,9 @@ fn query_sources_for(lang: &str, source: &[u8]) -> Option<Vec<(String, Arc<Strin
     match lang {
         "javascript" => js_ts_query_sources("javascript", false, source),
         "typescript" | "tsx" => js_ts_query_sources(lang, true, source),
-        _ => tags_query(lang)
-            .and_then(|query| valid_tags_query(lang, lang, query).map(|q| vec![(lang.to_string(), q)])),
+        _ => {
+            tags_query(lang).and_then(|query| valid_tags_query(lang, lang, query).map(|q| vec![(lang.to_string(), q)]))
+        }
     }
 }
 
