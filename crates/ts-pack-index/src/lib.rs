@@ -422,7 +422,7 @@ pub async fn index_workspace(
                 .take(8)
                 .map(|row| {
                     format!(
-                        "{}:{}=lookup:{:.2}s query:{:.2}s process:{:.2}s wall:{:.2}s/{}runs max_lookup={:.2}ms max_query={:.2}ms max_process={:.2}ms max_wall={:.2}ms matches={} max_matches={} limit_hits={}",
+                        "{}:{}=lookup:{:.2}s query:{:.2}s process:{:.2}s wall:{:.2}s/{}runs prepared={} text={} max_lookup={:.2}ms max_query={:.2}ms max_process={:.2}ms max_wall={:.2}ms matches={} max_matches={} limit_hits={}",
                         row.lang,
                         row.label,
                         row.total_lookup_secs,
@@ -430,6 +430,8 @@ pub async fn index_workspace(
                         row.total_process_secs,
                         row.total_wall_secs,
                         row.runs,
+                        row.prepared_runs,
+                        row.query_text_runs,
                         row.max_lookup_secs * 1000.0,
                         row.max_elapsed_secs * 1000.0,
                         row.max_process_secs * 1000.0,
@@ -449,7 +451,7 @@ pub async fn index_workspace(
                 .take(8)
                 .map(|row| {
                     format!(
-                        "{}:{}:{}=lookup:{:.2}s query:{:.2}s process:{:.2}s wall:{:.2}s/{}runs max_lookup={:.2}ms max_query={:.2}ms max_process={:.2}ms max_wall={:.2}ms matches={} max_matches={} limit_hits={}",
+                        "{}:{}:{}=lookup:{:.2}s query:{:.2}s process:{:.2}s wall:{:.2}s/{}runs prepared={} text={} max_lookup={:.2}ms max_query={:.2}ms max_process={:.2}ms max_wall={:.2}ms matches={} max_matches={} limit_hits={}",
                         row.lang,
                         row.label,
                         row.file_path.unwrap_or_default(),
@@ -458,6 +460,8 @@ pub async fn index_workspace(
                         row.total_process_secs,
                         row.total_wall_secs,
                         row.runs,
+                        row.prepared_runs,
+                        row.query_text_runs,
                         row.max_lookup_secs * 1000.0,
                         row.max_elapsed_secs * 1000.0,
                         row.max_process_secs * 1000.0,

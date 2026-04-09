@@ -27,6 +27,8 @@ static QUERY_PROFILE_BY_FILE: LazyLock<Mutex<HashMap<(String, String, String), Q
 #[derive(Debug, Clone, Copy, Default)]
 struct QueryProfileAggregate {
     runs: usize,
+    prepared_runs: usize,
+    query_text_runs: usize,
     total_matches: usize,
     total_lookup_secs: f64,
     total_elapsed_secs: f64,
@@ -41,8 +43,18 @@ struct QueryProfileAggregate {
 }
 
 impl QueryProfileAggregate {
-    fn record(&mut self, profile: ts_pack::QueryProfile, process_secs: f64, wall_secs: f64) {
+    fn record(
+        &mut self,
+        profile: ts_pack::QueryProfile,
+        process_secs: f64,
+        wall_secs: f64,
+        source_kind: QuerySourceKind,
+    ) {
         self.runs += 1;
+        match source_kind {
+            QuerySourceKind::Prepared => self.prepared_runs += 1,
+            QuerySourceKind::QueryText => self.query_text_runs += 1,
+        }
         self.total_matches += profile.match_count;
         self.total_lookup_secs += profile.lookup_secs;
         self.total_elapsed_secs += profile.elapsed_secs;
@@ -65,6 +77,8 @@ pub(crate) struct QueryProfileSummaryRow {
     pub(crate) label: String,
     pub(crate) file_path: Option<String>,
     pub(crate) runs: usize,
+    pub(crate) prepared_runs: usize,
+    pub(crate) query_text_runs: usize,
     pub(crate) total_matches: usize,
     pub(crate) total_lookup_secs: f64,
     pub(crate) total_elapsed_secs: f64,
@@ -120,6 +134,8 @@ pub(crate) fn summarize_query_profile_aggregates() -> (Vec<QueryProfileSummaryRo
                     label: label.clone(),
                     file_path: None,
                     runs: stats.runs,
+                    prepared_runs: stats.prepared_runs,
+                    query_text_runs: stats.query_text_runs,
                     total_matches: stats.total_matches,
                     total_lookup_secs: stats.total_lookup_secs,
                     total_elapsed_secs: stats.total_elapsed_secs,
@@ -145,6 +161,8 @@ pub(crate) fn summarize_query_profile_aggregates() -> (Vec<QueryProfileSummaryRo
                     label: label.clone(),
                     file_path: Some(file_path.clone()),
                     runs: stats.runs,
+                    prepared_runs: stats.prepared_runs,
+                    query_text_runs: stats.query_text_runs,
                     total_matches: stats.total_matches,
                     total_lookup_secs: stats.total_lookup_secs,
                     total_elapsed_secs: stats.total_elapsed_secs,
@@ -170,16 +188,17 @@ fn record_query_profile(
     profile: ts_pack::QueryProfile,
     process_secs: f64,
     wall_secs: f64,
+    source_kind: QuerySourceKind,
 ) {
     if let Ok(mut agg) = QUERY_PROFILE_BY_LABEL.lock() {
         agg.entry((lang_name.to_string(), query_label.to_string()))
             .or_default()
-            .record(profile, process_secs, wall_secs);
+            .record(profile, process_secs, wall_secs, source_kind);
     }
     if let Ok(mut agg) = QUERY_PROFILE_BY_FILE.lock() {
         agg.entry((lang_name.to_string(), query_label.to_string(), file_path.to_string()))
             .or_default()
-            .record(profile, process_secs, wall_secs);
+            .record(profile, process_secs, wall_secs, source_kind);
     }
 }
 
@@ -996,6 +1015,12 @@ enum TagQuerySource {
     Prepared(ts_pack::PreparedQuery),
 }
 
+#[derive(Clone, Copy)]
+enum QuerySourceKind {
+    QueryText,
+    Prepared,
+}
+
 #[derive(Clone, Default)]
 pub struct BatchTagQueryBundles {
     typescript: Option<TagQueryBundle>,
@@ -1047,6 +1072,10 @@ pub fn run_tags(
         .unwrap_or(false);
     for (query_label, query_src) in &query_sources {
         let wall_started = if profile_queries { Some(Instant::now()) } else { None };
+        let source_kind = match query_src {
+            TagQuerySource::QueryText(_) => QuerySourceKind::QueryText,
+            TagQuerySource::Prepared(_) => QuerySourceKind::Prepared,
+        };
         let (matches, profile) = if profile_queries {
             match query_src {
                 TagQuerySource::QueryText(query_str) => {
@@ -1110,7 +1139,7 @@ pub fn run_tags(
             let wall_secs = wall_started
                 .map(|started| started.elapsed().as_secs_f64())
                 .unwrap_or(profile.elapsed_secs + process_secs);
-            record_query_profile(lang_name, query_label, file_path, profile, process_secs, wall_secs);
+            record_query_profile(lang_name, query_label, file_path, profile, process_secs, wall_secs, source_kind);
             if profile_query_lines && process_secs >= 0.010 {
                 eprintln!(
                     "[ts-pack-index:query-process] lang={lang_name} label={} file={} matches={} process_ms={:.2}",
@@ -1122,9 +1151,13 @@ pub fn run_tags(
             }
             if profile_query_lines && wall_secs >= 0.010 && (wall_secs - profile.elapsed_secs - process_secs) >= 0.005 {
                 eprintln!(
-                    "[ts-pack-index:query-overhead] lang={lang_name} label={} file={} matches={} query_ms={:.2} process_ms={:.2} wall_ms={:.2}",
+                    "[ts-pack-index:query-overhead] lang={lang_name} label={} file={} source_kind={} matches={} query_ms={:.2} process_ms={:.2} wall_ms={:.2}",
                     query_label,
                     file_path,
+                    match source_kind {
+                        QuerySourceKind::Prepared => "prepared",
+                        QuerySourceKind::QueryText => "text",
+                    },
                     profile.match_count,
                     profile.elapsed_secs * 1000.0,
                     process_secs * 1000.0,
