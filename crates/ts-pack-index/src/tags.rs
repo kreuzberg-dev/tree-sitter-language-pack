@@ -10,6 +10,7 @@
 /// Queries that fail to compile (wrong node type for a grammar) are silently
 /// skipped — safe to add patterns for new languages without breaking existing ones.
 use std::collections::{HashMap, HashSet};
+use std::ops::Range;
 use std::sync::{Arc, LazyLock, Mutex, RwLock};
 use std::time::Instant;
 
@@ -1057,10 +1058,38 @@ pub fn run_tags(
 
     let is_external_callee = |name: &str| matches!(name, "fetch" | "axios" | "ky" | "ofetch" | "$fetch");
 
+    let debug_tag_source = std::env::var("TS_PACK_DEBUG_TAG_SOURCE")
+        .ok()
+        .map(|v| matches!(v.trim().to_ascii_lowercase().as_str(), "1" | "true" | "yes" | "on"))
+        .unwrap_or(false);
     let query_sources = match batch_bundle {
         Some(bundle) => bundle.as_slice().to_vec(),
         None => query_sources_for(lang_name, source)?,
     };
+    if debug_tag_source
+        && (file_path.ends_with("QuickBooksService.ts")
+            || file_path.ends_with("financials.js")
+            || file_path.ends_with("landlord-dashboard.js"))
+    {
+        let source_mode = if batch_bundle.is_some() { "batch" } else { "fallback" };
+        let kinds = query_sources
+            .iter()
+            .map(|(label, src)| {
+                format!(
+                    "{}:{}",
+                    label,
+                    match src {
+                        TagQuerySource::Prepared(_) => "prepared",
+                        TagQuerySource::QueryText(_) => "text",
+                    }
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(", ");
+        eprintln!(
+            "[ts-pack-index:tag-source] lang={lang_name} file={file_path} mode={source_mode} queries=[{kinds}]"
+        );
+    }
     let mut saw_match = false;
     let profile_queries = std::env::var("TS_PACK_DEBUG_QUERY_PROFILE")
         .ok()
@@ -1076,15 +1105,29 @@ pub fn run_tags(
             TagQuerySource::QueryText(_) => QuerySourceKind::QueryText,
             TagQuerySource::Prepared(_) => QuerySourceKind::Prepared,
         };
+        let byte_ranges = if query_label == "js-ts:external" {
+            external_query_ranges(source)
+        } else {
+            None
+        };
         let (matches, profile) = if profile_queries {
             match query_src {
-                TagQuerySource::QueryText(query_str) => {
-                    match ts_pack::run_query_profiled(tree, lang_name, query_str.as_str(), source) {
-                        Ok(result) => result,
-                        Err(_) => continue,
-                    }
-                }
-                TagQuerySource::Prepared(prepared) => match ts_pack::run_prepared_query_profiled(tree, prepared, source) {
+                TagQuerySource::QueryText(query_str) => match run_query_profiled_with_optional_ranges(
+                    tree,
+                    lang_name,
+                    query_str.as_str(),
+                    source,
+                    byte_ranges.as_deref(),
+                ) {
+                    Ok(result) => result,
+                    Err(_) => continue,
+                },
+                TagQuerySource::Prepared(prepared) => match run_prepared_query_profiled_with_optional_ranges(
+                    tree,
+                    prepared,
+                    source,
+                    byte_ranges.as_deref(),
+                ) {
                     Ok((matches, mut profile)) => {
                         profile.lookup_secs = 0.0;
                         (matches, profile)
@@ -1094,11 +1137,22 @@ pub fn run_tags(
             }
         } else {
             match query_src {
-                TagQuerySource::QueryText(query_str) => match ts_pack::run_query(tree, lang_name, query_str.as_str(), source) {
+                TagQuerySource::QueryText(query_str) => match run_query_with_optional_ranges(
+                    tree,
+                    lang_name,
+                    query_str.as_str(),
+                    source,
+                    byte_ranges.as_deref(),
+                ) {
                     Ok(matches) => (matches, ts_pack::QueryProfile::default()),
                     Err(_) => continue,
                 },
-                TagQuerySource::Prepared(prepared) => match ts_pack::run_prepared_query(tree, prepared, source) {
+                TagQuerySource::Prepared(prepared) => match run_prepared_query_with_optional_ranges(
+                    tree,
+                    prepared,
+                    source,
+                    byte_ranges.as_deref(),
+                ) {
                     Ok(matches) => (matches, ts_pack::QueryProfile::default()),
                     Err(_) => continue,
                 },
@@ -1250,6 +1304,11 @@ fn valid_tags_query(cache_key: &str, lang: &str, raw_query: &'static str) -> Opt
 }
 
 pub(crate) fn build_js_ts_query_bundles() -> BatchTagQueryBundles {
+    for lang in ["javascript", "typescript"] {
+        if !ts_pack::has_language(lang) {
+            let _ = ts_pack::download(&[lang]);
+        }
+    }
     BatchTagQueryBundles {
         typescript: build_fixed_js_ts_bundle("typescript", true),
         javascript: build_fixed_js_ts_bundle("javascript", false),
@@ -1277,7 +1336,7 @@ fn build_fixed_js_ts_bundle(lang: &str, is_typescript: bool) -> Option<TagQueryB
     let call_raw = if is_typescript { TS_CALL_TAGS } else { JS_CALL_TAGS };
     let mut queries = vec![(
         call_key.to_string(),
-        TagQuerySource::Prepared(ts_pack::prepare_query(lang, call_raw).ok()?),
+        TagQuerySource::Prepared(prepare_valid_tags_query(lang, call_raw)?),
     )];
     if let Some(query) = prepare_valid_tags_query(lang, JS_TS_DB_TAGS)
     {
@@ -1375,6 +1434,132 @@ fn has_js_ts_external_call_hints(source_text: &str) -> bool {
         || source_text.contains("$fetch(")
         || source_text.contains("ky(")
         || source_text.contains("new URL(")
+}
+
+fn external_query_ranges(source: &[u8]) -> Option<Vec<Range<usize>>> {
+    let source_text = std::str::from_utf8(source).ok()?;
+    const HINTS: &[&str] = &["fetch(", "axios(", "ofetch(", "$fetch(", "ky(", "new URL("];
+    let mut ranges: Vec<Range<usize>> = HINTS
+        .iter()
+        .flat_map(|hint| source_text.match_indices(hint).map(|(idx, _)| idx))
+        .map(|idx| {
+            let start = idx.saturating_sub(256);
+            let end = (idx + 4096).min(source.len());
+            start..end
+        })
+        .collect();
+    if ranges.is_empty() {
+        return None;
+    }
+    ranges.sort_by_key(|range| range.start);
+    let mut merged: Vec<Range<usize>> = Vec::with_capacity(ranges.len());
+    for range in ranges {
+        if let Some(last) = merged.last_mut() {
+            if range.start <= last.end {
+                last.end = last.end.max(range.end);
+                continue;
+            }
+        }
+        merged.push(range);
+    }
+    Some(merged)
+}
+
+fn run_query_with_optional_ranges(
+    tree: &ts_pack::Tree,
+    language: &str,
+    query_source: &str,
+    source: &[u8],
+    ranges: Option<&[Range<usize>]>,
+) -> Result<Vec<ts_pack::QueryMatch>, ts_pack::Error> {
+    let Some(ranges) = ranges else {
+        return ts_pack::run_query(tree, language, query_source, source);
+    };
+    let mut out = Vec::new();
+    for range in ranges {
+        out.extend(ts_pack::run_query_in_byte_range(
+            tree,
+            language,
+            query_source,
+            source,
+            range.clone(),
+        )?);
+    }
+    Ok(out)
+}
+
+fn run_query_profiled_with_optional_ranges(
+    tree: &ts_pack::Tree,
+    language: &str,
+    query_source: &str,
+    source: &[u8],
+    ranges: Option<&[Range<usize>]>,
+) -> Result<(Vec<ts_pack::QueryMatch>, ts_pack::QueryProfile), ts_pack::Error> {
+    let Some(ranges) = ranges else {
+        return ts_pack::run_query_profiled(tree, language, query_source, source);
+    };
+    let mut out = Vec::new();
+    let mut profile = ts_pack::QueryProfile::default();
+    for range in ranges {
+        let (matches, current) = ts_pack::run_query_in_byte_range_profiled(
+            tree,
+            language,
+            query_source,
+            source,
+            range.clone(),
+        )?;
+        out.extend(matches);
+        profile.lookup_secs += current.lookup_secs;
+        profile.match_count += current.match_count;
+        profile.exceeded_match_limit |= current.exceeded_match_limit;
+        profile.used_byte_range = true;
+        profile.elapsed_secs += current.elapsed_secs;
+    }
+    Ok((out, profile))
+}
+
+fn run_prepared_query_with_optional_ranges(
+    tree: &ts_pack::Tree,
+    prepared: &ts_pack::PreparedQuery,
+    source: &[u8],
+    ranges: Option<&[Range<usize>]>,
+) -> Result<Vec<ts_pack::QueryMatch>, ts_pack::Error> {
+    let Some(ranges) = ranges else {
+        return ts_pack::run_prepared_query(tree, prepared, source);
+    };
+    let mut out = Vec::new();
+    for range in ranges {
+        out.extend(ts_pack::run_prepared_query_in_byte_range(
+            tree,
+            prepared,
+            source,
+            range.clone(),
+        )?);
+    }
+    Ok(out)
+}
+
+fn run_prepared_query_profiled_with_optional_ranges(
+    tree: &ts_pack::Tree,
+    prepared: &ts_pack::PreparedQuery,
+    source: &[u8],
+    ranges: Option<&[Range<usize>]>,
+) -> Result<(Vec<ts_pack::QueryMatch>, ts_pack::QueryProfile), ts_pack::Error> {
+    let Some(ranges) = ranges else {
+        return ts_pack::run_prepared_query_profiled(tree, prepared, source);
+    };
+    let mut out = Vec::new();
+    let mut profile = ts_pack::QueryProfile::default();
+    for range in ranges {
+        let (matches, current) =
+            ts_pack::run_prepared_query_in_byte_range_profiled(tree, prepared, source, range.clone())?;
+        out.extend(matches);
+        profile.match_count += current.match_count;
+        profile.exceeded_match_limit |= current.exceeded_match_limit;
+        profile.used_byte_range = true;
+        profile.elapsed_secs += current.elapsed_secs;
+    }
+    Ok((out, profile))
 }
 
 fn collect_tag_match(
@@ -1777,6 +1962,13 @@ mod tests {
             ExternalCallArg::ConcatIdentLiteral { ident, literal }
                 if ident == "API_BASE" && literal == "/v1/items"
         ));
+    }
+
+    #[test]
+    fn builds_prepared_js_ts_batch_bundles() {
+        let bundles = build_js_ts_query_bundles();
+        assert!(bundles.javascript.is_some(), "expected javascript bundle");
+        assert!(bundles.typescript.is_some(), "expected typescript bundle");
     }
 
     #[test]

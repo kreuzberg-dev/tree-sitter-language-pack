@@ -106,6 +106,15 @@ pub fn run_prepared_query(
     collect_query_matches(tree, &prepared.0, source, None)
 }
 
+pub fn run_prepared_query_in_byte_range(
+    tree: &tree_sitter::Tree,
+    prepared: &PreparedQuery,
+    source: &[u8],
+    byte_range: Range<usize>,
+) -> Result<Vec<QueryMatch>, Error> {
+    collect_query_matches(tree, &prepared.0, source, Some(byte_range))
+}
+
 /// Execute a query and return both matches and profiling metadata.
 pub fn run_query_profiled(
     tree: &tree_sitter::Tree,
@@ -126,6 +135,15 @@ pub fn run_prepared_query_profiled(
     source: &[u8],
 ) -> Result<(Vec<QueryMatch>, QueryProfile), Error> {
     collect_query_matches_profiled(tree, &prepared.0, source, None)
+}
+
+pub fn run_prepared_query_in_byte_range_profiled(
+    tree: &tree_sitter::Tree,
+    prepared: &PreparedQuery,
+    source: &[u8],
+    byte_range: Range<usize>,
+) -> Result<(Vec<QueryMatch>, QueryProfile), Error> {
+    collect_query_matches_profiled(tree, &prepared.0, source, Some(byte_range))
 }
 
 /// Validate that a query compiles for the given language.
