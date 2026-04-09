@@ -571,6 +571,7 @@ fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, expor
                     name: text.lines().next().unwrap_or("").to_string(),
                     kind: ExportKind::Named,
                     source: None,
+                    exported_as: None,
                     span: span_from_node(node),
                 });
             }
@@ -613,21 +614,47 @@ fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, expor
                             if spec.kind() != "export_specifier" {
                                 continue;
                             }
-                            if let Some(name_node) = spec.child_by_field_name("name") {
-                                let name = node_text(&name_node, source).to_string();
-                                if !name.is_empty() {
-                                    names.push(name);
-                                }
-                            } else {
-                                let mut c3 = spec.walk();
-                                for n in spec.children(&mut c3) {
-                                    if n.kind() == "identifier" || n.kind() == "property_identifier" {
-                                        let name = node_text(&n, source).to_string();
-                                        if !name.is_empty() {
-                                            names.push(name);
-                                        }
-                                        break;
+                            let explicit_name = spec
+                                .child_by_field_name("name")
+                                .map(|n| node_text(&n, source).to_string());
+                            let explicit_alias = spec
+                                .child_by_field_name("alias")
+                                .map(|n| node_text(&n, source).to_string());
+
+                            let mut identifiers = Vec::new();
+                            let mut c3 = spec.walk();
+                            for n in spec.children(&mut c3) {
+                                if n.kind() == "identifier" || n.kind() == "property_identifier" {
+                                    let ident = node_text(&n, source).to_string();
+                                    if !ident.is_empty() {
+                                        identifiers.push(ident);
                                     }
+                                }
+                            }
+
+                            let source_name = explicit_name
+                                .filter(|name| !name.is_empty())
+                                .or_else(|| identifiers.first().cloned());
+                            let exported_as = explicit_alias.filter(|alias| !alias.is_empty()).or_else(|| {
+                                if spec.kind() == "export_specifier"
+                                    && node_text(&spec, source).contains(" as ")
+                                    && identifiers.len() >= 2
+                                {
+                                    identifiers.get(1).cloned()
+                                } else {
+                                    None
+                                }
+                            });
+
+                            if let Some(name) = source_name {
+                                let public_name = exported_as.filter(|alias| alias != &name);
+                                if public_name.is_some() {
+                                    names.push(format!(
+                                        "{name}\u{0}{public}",
+                                        public = public_name.as_deref().unwrap_or("")
+                                    ));
+                                } else {
+                                    names.push(name);
                                 }
                             }
                         }
@@ -641,10 +668,15 @@ fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, expor
                 names.push(text.lines().next().unwrap_or("").to_string());
             }
             for name in names {
+                let (name, exported_as) = match name.split_once('\0') {
+                    Some((name, alias)) => (name.to_string(), Some(alias.to_string())),
+                    None => (name, None),
+                };
                 exports.push(ExportInfo {
                     name,
                     kind: export_kind.clone(),
                     source: source_module.clone(),
+                    exported_as,
                     span: span_from_node(node),
                 });
             }
@@ -660,6 +692,7 @@ fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, expor
                 name: text.lines().next().unwrap_or("").to_string(),
                 kind: export_kind,
                 source: None,
+                exported_as: None,
                 span: span_from_node(node),
             });
         }
@@ -674,6 +707,7 @@ fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, expor
                             name,
                             kind: ExportKind::Named,
                             source: None,
+                            exported_as: None,
                             span: span_from_node(node),
                         });
                     }

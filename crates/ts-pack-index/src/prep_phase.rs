@@ -8,11 +8,12 @@ use crate::pathing;
 use crate::swift;
 use crate::{
     ApiRouteCallRow, ApiRouteHandlerRow, CargoCrateFileRow, CargoCrateRow, CargoDependencyEdgeRow,
-    CargoWorkspaceCrateRow, CargoWorkspaceRow, FileEdgeRow, FileImportEdgeRow, FileNode, ImplicitImportSymbolEdgeRow,
-    ImportSymbolEdgeRow, ImportSymbolRequest, InferredCallRow, LaunchEdgeRow, PythonFileContext, PythonInferredCallRow,
-    ReExportSymbolRequest, ResourceBackingRow, ResourceTargetEdgeRow, ResourceUsageRow, RustImplTraitEdgeRow,
-    RustImplTypeEdgeRow, SwiftFileContext, SymbolNode, XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow,
-    XcodeTargetFileRow, XcodeTargetRow, XcodeWorkspaceProjectRow, XcodeWorkspaceRow,
+    CargoWorkspaceCrateRow, CargoWorkspaceRow, ExportAliasRequest, FileEdgeRow, FileImportEdgeRow, FileNode,
+    ImplicitImportSymbolEdgeRow, ImportSymbolEdgeRow, ImportSymbolRequest, InferredCallRow, LaunchEdgeRow,
+    PythonFileContext, PythonInferredCallRow, ReExportSymbolRequest, ResourceBackingRow, ResourceTargetEdgeRow,
+    ResourceUsageRow, RustImplTraitEdgeRow, RustImplTypeEdgeRow, SwiftFileContext, SymbolNode, XcodeSchemeFileRow,
+    XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow, XcodeTargetRow, XcodeWorkspaceProjectRow,
+    XcodeWorkspaceRow,
 };
 
 pub(crate) struct PreparationOutputs {
@@ -39,6 +40,7 @@ pub(crate) struct PreparationOutputs {
     pub(crate) cargo_dependency_edges: Vec<CargoDependencyEdgeRow>,
     pub(crate) import_symbol_edges: Vec<ImportSymbolEdgeRow>,
     pub(crate) export_symbol_edges: Vec<crate::ExportSymbolEdgeRow>,
+    pub(crate) export_alias_edges: Vec<crate::ExportAliasEdgeRow>,
     pub(crate) implicit_import_symbol_edges: Vec<ImplicitImportSymbolEdgeRow>,
     pub(crate) rust_impl_trait_edges: Vec<RustImplTraitEdgeRow>,
     pub(crate) rust_impl_type_edges: Vec<RustImplTypeEdgeRow>,
@@ -57,6 +59,7 @@ pub(crate) fn prepare_graph_facts(
     launch_requests: &[(String, String)],
     import_symbol_requests: &[ImportSymbolRequest],
     reexport_symbol_requests: &[ReExportSymbolRequest],
+    export_alias_requests: &[ExportAliasRequest],
     swift_extension_map: &HashMap<String, HashSet<String>>,
     swift_contexts: &[SwiftFileContext],
     python_contexts: &[PythonFileContext],
@@ -266,6 +269,29 @@ pub(crate) fn prepare_graph_facts(
                         });
                     }
                 }
+            }
+        }
+    }
+
+    let mut export_alias_edges = Vec::new();
+    let mut seen_export_alias: HashSet<(String, String, String)> = HashSet::new();
+    for req in export_alias_requests.iter() {
+        let target_sym = if let Some(module) = req.module.as_ref().filter(|module| !module.is_empty()) {
+            let target_fp = pathing::resolve_module_path(&req.src_filepath, module, &files_set);
+            let sym_map = target_fp.as_ref().and_then(|fp| symbols_by_file.get(fp));
+            sym_map.and_then(|map| map.get(&req.item).cloned())
+        } else {
+            symbols_by_file
+                .get(&req.src_filepath)
+                .and_then(|map| map.get(&req.item).cloned())
+        };
+        if let Some(sym_id) = target_sym {
+            if seen_export_alias.insert((req.src_id.clone(), sym_id.clone(), req.exported_as.clone())) {
+                export_alias_edges.push(crate::ExportAliasEdgeRow {
+                    src: req.src_id.clone(),
+                    tgt: sym_id,
+                    exported_as: req.exported_as.clone(),
+                });
             }
         }
     }
@@ -504,6 +530,7 @@ pub(crate) fn prepare_graph_facts(
         cargo_dependency_edges: asset.cargo_dependency_edges,
         import_symbol_edges,
         export_symbol_edges,
+        export_alias_edges,
         implicit_import_symbol_edges,
         rust_impl_trait_edges,
         rust_impl_type_edges,
@@ -643,6 +670,7 @@ mod tests {
             &[],
             &requests,
             &[],
+            &[],
             &HashMap::new(),
             &[],
             &[],
@@ -685,6 +713,7 @@ mod tests {
             &[],
             &[],
             &requests,
+            &[],
             &HashMap::new(),
             &[],
             &[],
@@ -735,6 +764,7 @@ mod tests {
             &[],
             &[],
             &requests,
+            &[],
             &HashMap::new(),
             &[],
             &[],
@@ -743,6 +773,82 @@ mod tests {
         assert_eq!(out.export_symbol_edges.len(), 1);
         assert_eq!(out.export_symbol_edges[0].src, "file:src/index.ts");
         assert_eq!(out.export_symbol_edges[0].tgt, "sym:buildRouter");
+    }
+
+    #[test]
+    fn prepares_export_alias_edges_for_local_alias_exports() {
+        let mut all_symbols = HashMap::new();
+        all_symbols.insert(
+            "TypeAlias",
+            vec![symbol_node("sym:routeContext", "RouteContext", "src/context.ts", true)],
+        );
+        let all_files = vec![file_node("file:src/context.ts", "src/context.ts")];
+        let alias_requests = vec![ExportAliasRequest {
+            src_id: "file:src/context.ts".to_string(),
+            src_filepath: "src/context.ts".to_string(),
+            module: None,
+            item: "RouteContext".to_string(),
+            exported_as: "PublicRouteContext".to_string(),
+        }];
+
+        let out = prepare_graph_facts(
+            &all_symbols,
+            &all_files,
+            &Arc::from("proj"),
+            None,
+            &HashMap::new(),
+            &HashMap::new(),
+            &[],
+            &[],
+            &[],
+            &alias_requests,
+            &HashMap::new(),
+            &[],
+            &[],
+        );
+
+        assert_eq!(out.export_alias_edges.len(), 1);
+        assert_eq!(out.export_alias_edges[0].src, "file:src/context.ts");
+        assert_eq!(out.export_alias_edges[0].tgt, "sym:routeContext");
+        assert_eq!(out.export_alias_edges[0].exported_as, "PublicRouteContext");
+    }
+
+    #[test]
+    fn prepares_export_alias_edges_for_reexport_aliases() {
+        let mut all_symbols = HashMap::new();
+        all_symbols.insert("TypeAlias", vec![symbol_node("sym:foo", "Foo", "src/types.ts", true)]);
+        let all_files = vec![
+            file_node("file:src/index.ts", "src/index.ts"),
+            file_node("file:src/types.ts", "src/types.ts"),
+        ];
+        let alias_requests = vec![ExportAliasRequest {
+            src_id: "file:src/index.ts".to_string(),
+            src_filepath: "src/index.ts".to_string(),
+            module: Some("./types".to_string()),
+            item: "Foo".to_string(),
+            exported_as: "PublicFoo".to_string(),
+        }];
+
+        let out = prepare_graph_facts(
+            &all_symbols,
+            &all_files,
+            &Arc::from("proj"),
+            None,
+            &HashMap::new(),
+            &HashMap::new(),
+            &[],
+            &[],
+            &[],
+            &alias_requests,
+            &HashMap::new(),
+            &[],
+            &[],
+        );
+
+        assert_eq!(out.export_alias_edges.len(), 1);
+        assert_eq!(out.export_alias_edges[0].src, "file:src/index.ts");
+        assert_eq!(out.export_alias_edges[0].tgt, "sym:foo");
+        assert_eq!(out.export_alias_edges[0].exported_as, "PublicFoo");
     }
 
     #[test]
@@ -770,6 +876,7 @@ mod tests {
             None,
             &HashMap::new(),
             &HashMap::new(),
+            &[],
             &[],
             &[],
             &[],
@@ -810,6 +917,7 @@ mod tests {
                 None,
                 &HashMap::new(),
                 &HashMap::new(),
+                &[],
                 &[],
                 &[],
                 &[],
@@ -875,6 +983,7 @@ mod tests {
                 &[],
                 &[],
                 &[],
+                &[],
                 &HashMap::new(),
                 &[swift_ctx],
                 &[],
@@ -928,6 +1037,7 @@ mod tests {
             None,
             &HashMap::new(),
             &HashMap::new(),
+            &[],
             &[],
             &[],
             &[],

@@ -212,10 +212,12 @@ pub async fn index_workspace(
     let mut import_symbol_edges: Vec<ImportSymbolEdgeRow> = Vec::new();
     let mut implicit_import_symbol_edges: Vec<ImplicitImportSymbolEdgeRow> = Vec::new();
     let mut export_symbol_edges: Vec<ExportSymbolEdgeRow> = Vec::new();
+    let mut export_alias_edges: Vec<ExportAliasEdgeRow> = Vec::new();
     let mut launch_requests: Vec<(String, String)> = Vec::new();
     let mut seen_export_symbol: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
     let mut import_symbol_requests: Vec<ImportSymbolRequest> = Vec::new();
     let mut reexport_symbol_requests: Vec<ReExportSymbolRequest> = Vec::new();
+    let mut export_alias_requests: Vec<ExportAliasRequest> = Vec::new();
     let mut all_file_facts: HashMap<String, ts_pack::FileFacts> = HashMap::new();
     let timing_enabled = std::env::var("TS_PACK_DEBUG_PARSE_TIMINGS")
         .ok()
@@ -310,6 +312,9 @@ pub async fn index_workspace(
             }
             if !res.reexport_symbol_requests.is_empty() {
                 reexport_symbol_requests.extend(res.reexport_symbol_requests);
+            }
+            if !res.export_alias_requests.is_empty() {
+                export_alias_requests.extend(res.export_alias_requests);
             }
             if !res.launch_calls.is_empty() {
                 for target in res.launch_calls {
@@ -448,12 +453,14 @@ pub async fn index_workspace(
         &launch_requests,
         &import_symbol_requests,
         &reexport_symbol_requests,
+        &export_alias_requests,
         &swift_extension_map,
         &swift_contexts,
         &python_contexts,
     );
     import_symbol_edges.extend(prep.import_symbol_edges);
     export_symbol_edges.extend(prep.export_symbol_edges);
+    export_alias_edges.extend(prep.export_alias_edges);
     implicit_import_symbol_edges.extend(prep.implicit_import_symbol_edges);
     inferred_call_rows.extend(prep.inferred_call_rows);
     python_inferred_call_rows.extend(prep.python_inferred_call_rows);
@@ -503,6 +510,7 @@ pub async fn index_workspace(
             rust_impl_trait_edges: prep.rust_impl_trait_edges,
             rust_impl_type_edges: prep.rust_impl_type_edges,
             export_symbol_edges,
+            export_alias_edges,
             launch_edges,
             manifest_abs,
         },

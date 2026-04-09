@@ -9,13 +9,13 @@ use crate::clone_enrich;
 use crate::writers;
 use crate::{
     ApiRouteCallRow, ApiRouteHandlerRow, CALLS_BATCH_SIZE, CargoCrateFileRow, CargoCrateRow, CargoDependencyEdgeRow,
-    CargoWorkspaceCrateRow, CargoWorkspaceRow, CloneCandidate, DbEdgeRow, DbModelEdgeRow, ExportSymbolEdgeRow,
-    ExternalApiEdgeRow, ExternalApiNode, FileEdgeRow, FileImportEdgeRow, FileNode, IMPORT_BATCH_SIZE,
-    ImplicitImportSymbolEdgeRow, ImportNode, ImportSymbolEdgeRow, InferredCallRow, LaunchEdgeRow, NODE_BATCH_SIZE,
-    NODE_CONCURRENCY, PythonInferredCallRow, REL_BATCH_SIZE, REL_CONCURRENCY, RelRow, ResourceBackingRow,
-    ResourceTargetEdgeRow, ResourceUsageRow, RustImplTraitEdgeRow, RustImplTypeEdgeRow, SymbolCallRow, SymbolNode,
-    XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow, XcodeTargetRow,
-    XcodeWorkspaceProjectRow, XcodeWorkspaceRow, external_api_id, extract_prisma_models,
+    CargoWorkspaceCrateRow, CargoWorkspaceRow, CloneCandidate, DbEdgeRow, DbModelEdgeRow, ExportAliasEdgeRow,
+    ExportSymbolEdgeRow, ExternalApiEdgeRow, ExternalApiNode, FileEdgeRow, FileImportEdgeRow, FileNode,
+    IMPORT_BATCH_SIZE, ImplicitImportSymbolEdgeRow, ImportNode, ImportSymbolEdgeRow, InferredCallRow, LaunchEdgeRow,
+    NODE_BATCH_SIZE, NODE_CONCURRENCY, PythonInferredCallRow, REL_BATCH_SIZE, REL_CONCURRENCY, RelRow,
+    ResourceBackingRow, ResourceTargetEdgeRow, ResourceUsageRow, RustImplTraitEdgeRow, RustImplTypeEdgeRow,
+    SymbolCallRow, SymbolNode, XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow,
+    XcodeTargetRow, XcodeWorkspaceProjectRow, XcodeWorkspaceRow, external_api_id, extract_prisma_models,
 };
 
 pub(crate) struct WritePhaseSummary {
@@ -65,6 +65,7 @@ pub(crate) struct WriteInputs {
     pub(crate) rust_impl_trait_edges: Vec<RustImplTraitEdgeRow>,
     pub(crate) rust_impl_type_edges: Vec<RustImplTypeEdgeRow>,
     pub(crate) export_symbol_edges: Vec<ExportSymbolEdgeRow>,
+    pub(crate) export_alias_edges: Vec<ExportAliasEdgeRow>,
     pub(crate) launch_edges: Vec<LaunchEdgeRow>,
     pub(crate) manifest_abs: HashMap<String, String>,
 }
@@ -132,6 +133,7 @@ pub(crate) async fn run_write_phases(
         rust_impl_trait_edges,
         rust_impl_type_edges,
         export_symbol_edges,
+        export_alias_edges,
         launch_edges,
         manifest_abs,
     } = inputs;
@@ -617,6 +619,13 @@ pub(crate) async fn run_write_phases(
         "delete_exports_symbol",
     )
     .await?;
+    writers::run_query_logged(
+        graph,
+        Query::new("MATCH (:File {project_id: $pid})-[r:EXPORTS_SYMBOL_AS]->() DELETE r".to_string())
+            .param("pid", project_id.to_string()),
+        "delete_exports_symbol_as",
+    )
+    .await?;
 
     let t_nodes = Instant::now();
     let mut all_files = all_files;
@@ -701,6 +710,28 @@ pub(crate) async fn run_write_phases(
             "[ts-pack-index] EXPORTS_SYMBOL writes done in {:.2}s (rows={})",
             t_exp.elapsed().as_secs_f64(),
             exp_count,
+        );
+    }
+    if !export_alias_edges.is_empty() {
+        let mut export_alias_edges = export_alias_edges;
+        export_alias_edges.sort_by(|a, b| {
+            a.src
+                .cmp(&b.src)
+                .then_with(|| a.tgt.cmp(&b.tgt))
+                .then_with(|| a.exported_as.cmp(&b.exported_as))
+        });
+        let t_exp_alias = Instant::now();
+        let exp_alias_count = export_alias_edges.len();
+        ok_chunks(&export_alias_edges, CALLS_BATCH_SIZE)
+            .try_for_each_concurrent(symbol_edge_concurrency, |chunk| {
+                let g = Arc::clone(graph);
+                async move { writers::write_export_alias_edges(&g, chunk).await }
+            })
+            .await?;
+        eprintln!(
+            "[ts-pack-index] EXPORTS_SYMBOL_AS writes done in {:.2}s (rows={})",
+            t_exp_alias.elapsed().as_secs_f64(),
+            exp_alias_count,
         );
     }
     if !rust_impl_trait_edges.is_empty() {

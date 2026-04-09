@@ -8,12 +8,12 @@ use tokio::time::{Duration, sleep};
 use crate::{
     ApiRouteCallRow, ApiRouteHandlerRow, CargoCrateFileRow, CargoCrateRow, CargoDependencyEdgeRow,
     CargoWorkspaceCrateRow, CargoWorkspaceRow, CloneCanonRow, CloneGroupRow, CloneMemberRow, DbEdgeRow, DbModelEdgeRow,
-    ExportSymbolEdgeRow, ExternalApiEdgeRow, ExternalApiNode, FileCloneCanonRow, FileCloneGroupRow, FileCloneMemberRow,
-    FileEdgeRow, FileImportEdgeRow, FileNode, ImplicitImportSymbolEdgeRow, ImportNode, ImportSymbolEdgeRow,
-    InferredCallRow, LaunchEdgeRow, PythonInferredCallRow, RelRow, ResourceBackingRow, ResourceTargetEdgeRow,
-    ResourceUsageRow, RustImplTraitEdgeRow, RustImplTypeEdgeRow, SymbolCallRow, SymbolNode, XcodeSchemeFileRow,
-    XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow, XcodeTargetRow, XcodeWorkspaceProjectRow,
-    XcodeWorkspaceRow,
+    ExportAliasEdgeRow, ExportSymbolEdgeRow, ExternalApiEdgeRow, ExternalApiNode, FileCloneCanonRow, FileCloneGroupRow,
+    FileCloneMemberRow, FileEdgeRow, FileImportEdgeRow, FileNode, ImplicitImportSymbolEdgeRow, ImportNode,
+    ImportSymbolEdgeRow, InferredCallRow, LaunchEdgeRow, PythonInferredCallRow, RelRow, ResourceBackingRow,
+    ResourceTargetEdgeRow, ResourceUsageRow, RustImplTraitEdgeRow, RustImplTypeEdgeRow, SymbolCallRow, SymbolNode,
+    XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow, XcodeTargetRow,
+    XcodeWorkspaceProjectRow, XcodeWorkspaceRow,
 };
 
 fn json_to_bolt(v: Value) -> BoltType {
@@ -708,6 +708,19 @@ pub(crate) async fn write_export_symbol_edges(graph: &Arc<Graph>, batch: &[Expor
     )
     .param("batch", bolt);
     run_query_logged(graph, q, "write_export_symbol_edges").await
+}
+
+pub(crate) async fn write_export_alias_edges(graph: &Arc<Graph>, batch: &[ExportAliasEdgeRow]) -> neo4rs::Result<()> {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MATCH (a:File {id: item.src}) \
+         MATCH (b:Node {id: item.tgt}) \
+         MERGE (a)-[:EXPORTS_SYMBOL_AS {name: item.exported_as}]->(b)"
+            .to_string(),
+    )
+    .param("batch", bolt);
+    run_query_logged(graph, q, "write_export_alias_edges").await
 }
 
 pub(crate) async fn write_launch_edges(graph: &Arc<Graph>, batch: &[LaunchEdgeRow]) -> neo4rs::Result<()> {

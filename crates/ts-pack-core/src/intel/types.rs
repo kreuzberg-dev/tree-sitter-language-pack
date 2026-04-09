@@ -219,6 +219,8 @@ pub struct ExportInfo {
     pub kind: ExportKind,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     pub source: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
+    pub exported_as: Option<String>,
     pub span: Span,
 }
 

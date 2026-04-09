@@ -11,9 +11,9 @@ use crate::pathing;
 use crate::swift;
 use crate::tags;
 use crate::{
-    CloneCandidate, FileNode, ImportNode, ImportSymbolRequest, MAX_FILE_BYTES, ManifestEntry, PythonFileContext,
-    ReExportSymbolRequest, RelRow, SwiftFileContext, SymbolCallRow, SymbolNode, WINNOW_LARGE_K, WINNOW_LARGE_W,
-    WINNOW_MEDIUM_K, WINNOW_MEDIUM_W, WINNOW_MIN_FINGERPRINTS, WINNOW_MIN_TOKENS, WINNOW_SMALL_K,
+    CloneCandidate, ExportAliasRequest, FileNode, ImportNode, ImportSymbolRequest, MAX_FILE_BYTES, ManifestEntry,
+    PythonFileContext, ReExportSymbolRequest, RelRow, SwiftFileContext, SymbolCallRow, SymbolNode, WINNOW_LARGE_K,
+    WINNOW_LARGE_W, WINNOW_MEDIUM_K, WINNOW_MEDIUM_W, WINNOW_MIN_FINGERPRINTS, WINNOW_MIN_TOKENS, WINNOW_SMALL_K,
     WINNOW_SMALL_TOKEN_THRESHOLD, WINNOW_SMALL_W,
 };
 
@@ -34,6 +34,7 @@ pub(crate) struct FileResult {
     pub(crate) external_urls: Vec<String>,
     pub(crate) import_symbol_requests: Vec<ImportSymbolRequest>,
     pub(crate) reexport_symbol_requests: Vec<ReExportSymbolRequest>,
+    pub(crate) export_alias_requests: Vec<ExportAliasRequest>,
     pub(crate) launch_calls: Vec<String>,
     pub(crate) timings: ParseTimings,
 }
@@ -673,6 +674,7 @@ fn parse_entry(entry: &ManifestEntry, pid: &Arc<str>) -> Option<FileResult> {
 
     let mut import_symbol_requests = Vec::new();
     let mut reexport_groups: HashMap<(String, bool), Vec<String>> = HashMap::new();
+    let mut export_alias_requests = Vec::new();
     if let Some(result) = result.as_ref() {
         for imp in &result.imports {
             let import_id = format!("{}:import:{}:{}", pid, rel_path, imp.source);
@@ -701,6 +703,17 @@ fn parse_entry(entry: &ManifestEntry, pid: &Arc<str>) -> Option<FileResult> {
         }
 
         for export in &result.exports {
+            if let Some(exported_as) = export.exported_as.as_ref().filter(|alias| !alias.is_empty()) {
+                if let Some(item) = normalized_export_name(&export.name) {
+                    export_alias_requests.push(ExportAliasRequest {
+                        src_id: file_id.clone(),
+                        src_filepath: rel_path.clone(),
+                        module: export.source.clone(),
+                        item,
+                        exported_as: exported_as.clone(),
+                    });
+                }
+            }
             if export.kind != ts_pack::ExportKind::ReExport {
                 continue;
             }
@@ -750,6 +763,7 @@ fn parse_entry(entry: &ManifestEntry, pid: &Arc<str>) -> Option<FileResult> {
         external_urls,
         import_symbol_requests,
         reexport_symbol_requests,
+        export_alias_requests,
         launch_calls,
         timings: ParseTimings {
             parse_tree_secs,
@@ -925,6 +939,7 @@ def main():
         assert_eq!(result.import_symbol_requests.len(), 1);
         assert_eq!(result.import_symbol_requests[0].module, ".helpers");
         assert!(result.reexport_symbol_requests.is_empty());
+        assert!(result.export_alias_requests.is_empty());
 
         let _ = fs::remove_dir_all(root);
     }
@@ -1083,6 +1098,15 @@ export * from "./helpers";
             .expect("wildcard reexport request");
         assert!(wildcard.is_wildcard);
         assert!(wildcard.items.is_empty());
+
+        let alias_requests: Vec<_> = result
+            .export_alias_requests
+            .iter()
+            .filter(|req| req.module.as_deref() == Some("./types"))
+            .collect();
+        assert_eq!(alias_requests.len(), 1);
+        assert_eq!(alias_requests[0].item, "Bar");
+        assert_eq!(alias_requests[0].exported_as, "RenamedBar");
 
         let _ = fs::remove_dir_all(root);
     }

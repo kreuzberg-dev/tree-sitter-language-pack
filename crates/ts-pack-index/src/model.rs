@@ -284,6 +284,14 @@ pub(crate) struct ReExportSymbolRequest {
     pub(crate) is_wildcard: bool,
 }
 
+pub(crate) struct ExportAliasRequest {
+    pub(crate) src_id: String,
+    pub(crate) src_filepath: String,
+    pub(crate) module: Option<String>,
+    pub(crate) item: String,
+    pub(crate) exported_as: String,
+}
+
 pub(crate) struct ImportSymbolEdgeRow {
     pub(crate) src: String,
     pub(crate) tgt: String,
@@ -297,6 +305,12 @@ pub(crate) struct ImplicitImportSymbolEdgeRow {
 pub(crate) struct ExportSymbolEdgeRow {
     pub(crate) src: String,
     pub(crate) tgt: String,
+}
+
+pub(crate) struct ExportAliasEdgeRow {
+    pub(crate) src: String,
+    pub(crate) tgt: String,
+    pub(crate) exported_as: String,
 }
 
 pub(crate) struct SwiftFileContext {
@@ -835,6 +849,18 @@ impl ExportSymbolEdgeRow {
             let mut m = serde_json::Map::new();
             m.insert("src".into(), Value::String(self.src.clone()));
             m.insert("tgt".into(), Value::String(self.tgt.clone()));
+            m
+        })
+    }
+}
+
+impl ExportAliasEdgeRow {
+    pub(crate) fn to_value(&self) -> Value {
+        Value::Object({
+            let mut m = serde_json::Map::new();
+            m.insert("src".into(), Value::String(self.src.clone()));
+            m.insert("tgt".into(), Value::String(self.tgt.clone()));
+            m.insert("exported_as".into(), Value::String(self.exported_as.clone()));
             m
         })
     }
