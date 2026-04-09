@@ -1574,6 +1574,9 @@ fn collect_tag_match(
     launch_calls: &mut Vec<String>,
     is_external_callee: &dyn Fn(&str) -> bool,
 ) {
+    let is_db_object = |name: &str| {
+        matches!(name, "prisma" | "tx" | "prismaClient" | "db") || name.ends_with("Prisma")
+    };
     let capture_text = |node_info: &ts_pack::NodeInfo| -> Option<&str> {
         std::str::from_utf8(&source[node_info.start_byte..node_info.end_byte]).ok()
     };
@@ -1582,6 +1585,7 @@ fn collect_tag_match(
     let mut def_name: Option<String> = None;
     let mut callee_site: Option<(usize, String)> = None;
     let mut receiver_name: Option<String> = None;
+    let mut db_object: Option<String> = None;
     let mut external_callee: Option<String> = None;
     let mut external_arg: Option<ExternalCallArg> = None;
     let mut external_arg_left: Option<String> = None;
@@ -1636,8 +1640,17 @@ fn collect_tag_match(
                     receiver_name = Some(text.to_string());
                 }
             }
+            "dbobj" => {
+                if let Some(text) = capture_text(node_info) {
+                    db_object = Some(text.to_string());
+                }
+            }
             "db" => {
                 if source.get(node_info.start_byte).copied() != Some(b'$')
+                    && db_object
+                        .as_deref()
+                        .map(is_db_object)
+                        .unwrap_or(false)
                     && is_delegate_property_use(source, node_info.end_byte)
                 {
                     if let Some(text) = capture_text(node_info) {
@@ -2117,6 +2130,26 @@ mod tests {
         assert!(tags.db_models.contains("tenantCredit"));
         assert!(tags.db_models.contains("tenantCreditApplication"));
         assert!(!tags.db_models.contains("$queryRaw"));
+    }
+
+    #[test]
+    fn does_not_treat_non_prisma_member_chains_as_db_models() {
+        let source = r#"
+        export async function buildResponse(services: any, row: any) {
+          const report = await services.taxPackageService.getAnnualPackage();
+          return {
+            total: row.amount.toString(),
+            propertyName: row.property.name,
+            report,
+          };
+        }
+        "#;
+        let Some(tree) = maybe_parse("typescript", source) else {
+            return;
+        };
+        let tags = run_tags("typescript", &tree, source.as_bytes(), "fixture.ts", None).expect("tags");
+
+        assert!(tags.db_models.is_empty(), "non-prisma member chains should not be tagged as DB models");
     }
 }
 #[derive(Debug, Clone, Copy, Default)]
