@@ -1,8 +1,24 @@
 use std::borrow::Cow;
+use std::cell::RefCell;
+use std::sync::{Arc, LazyLock, RwLock};
 
 use crate::Error;
 use crate::node::{NodeInfo, node_info_from_node};
 use tree_sitter::StreamingIterator;
+
+#[derive(Debug)]
+struct CompiledQuery {
+    query: tree_sitter::Query,
+    capture_names: Vec<Cow<'static, str>>,
+}
+
+type QueryCacheMap = ahash::AHashMap<(String, String), Arc<CompiledQuery>>;
+
+static QUERY_CACHE: LazyLock<RwLock<QueryCacheMap>> = LazyLock::new(|| RwLock::new(QueryCacheMap::new()));
+
+thread_local! {
+    static LOCAL_QUERY_CACHE: RefCell<QueryCacheMap> = RefCell::new(QueryCacheMap::new());
+}
 
 /// A single match from a tree-sitter query, with captured nodes.
 #[derive(Debug, Clone)]
@@ -47,16 +63,10 @@ pub fn run_query(
     query_source: &str,
     source: &[u8],
 ) -> Result<Vec<QueryMatch>, Error> {
-    let lang = crate::get_language(language)?;
-    let query = tree_sitter::Query::new(&lang, query_source).map_err(|e| Error::QueryError(format!("{e}")))?;
-    let capture_names: Vec<Cow<'static, str>> = query
-        .capture_names()
-        .iter()
-        .map(|s| Cow::Owned(s.to_string()))
-        .collect();
+    let query = compiled_query(language, query_source)?;
 
     let mut cursor = tree_sitter::QueryCursor::new();
-    let mut matches = cursor.matches(&query, tree.root_node(), source);
+    let mut matches = cursor.matches(&query.query, tree.root_node(), source);
 
     // Tree-sitter 0.26+ evaluates standard text predicates (`#eq?`, `#not-eq?`,
     // `#match?`, `#not-match?`, `#any-of?`, `#not-any-of?`) internally via
@@ -70,7 +80,7 @@ pub fn run_query(
             .captures
             .iter()
             .map(|c| {
-                let name = capture_names[c.index as usize].clone();
+                let name = query.capture_names[c.index as usize].clone();
                 let info = node_info_from_node(c.node);
                 (name, info)
             })
@@ -81,6 +91,36 @@ pub fn run_query(
         });
     }
     Ok(results)
+}
+
+fn compiled_query(language: &str, query_source: &str) -> Result<Arc<CompiledQuery>, Error> {
+    let key = (language.to_string(), query_source.to_string());
+    if let Some(query) = LOCAL_QUERY_CACHE.with(|cache| cache.borrow().get(&key).cloned()) {
+        return Ok(query);
+    }
+    if let Some(query) = QUERY_CACHE.read().ok().and_then(|cache| cache.get(&key).cloned()) {
+        LOCAL_QUERY_CACHE.with(|cache| {
+            cache.borrow_mut().insert(key.clone(), Arc::clone(&query));
+        });
+        return Ok(query);
+    }
+
+    let lang = crate::get_language(language)?;
+    let query = tree_sitter::Query::new(&lang, query_source).map_err(|e| Error::QueryError(format!("{e}")))?;
+    let capture_names = query
+        .capture_names()
+        .iter()
+        .map(|s| Cow::Owned(s.to_string()))
+        .collect();
+    let query = Arc::new(CompiledQuery { query, capture_names });
+    LOCAL_QUERY_CACHE.with(|cache| {
+        cache.borrow_mut().insert(key.clone(), Arc::clone(&query));
+    });
+    if let Ok(mut cache) = QUERY_CACHE.write() {
+        Ok(cache.entry(key).or_insert_with(|| Arc::clone(&query)).clone())
+    } else {
+        Ok(query)
+    }
 }
 
 #[cfg(test)]
@@ -127,5 +167,18 @@ mod tests {
             assert!(matches.is_empty());
         }
         // Query compilation error is fine for some grammars
+    }
+
+    #[test]
+    fn test_compiled_query_reused() {
+        let langs = crate::available_languages();
+        if langs.is_empty() {
+            return;
+        }
+        let first = &langs[0];
+        let query_src = "(identifier) @id";
+        let q1 = compiled_query(first, query_src).unwrap();
+        let q2 = compiled_query(first, query_src).unwrap();
+        assert!(Arc::ptr_eq(&q1, &q2));
     }
 }
