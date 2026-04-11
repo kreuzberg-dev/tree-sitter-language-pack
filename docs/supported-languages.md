@@ -1,6 +1,6 @@
 # Supported Languages
 
-tree-sitter-language-pack supports **305** languages.
+tree-sitter-language-pack supports **306** languages.
 
 | Language | Extensions | Repository |
 |----------|------------|------------|
@@ -113,6 +113,7 @@ tree-sitter-language-pack supports **305** languages.
 | Gowork | — | [omertuc/tree-sitter-go-work](https://github.com/omertuc/tree-sitter-go-work) |
 | Gpg | — | [tree-sitter-grammars/tree-sitter-gpg-config](https://github.com/tree-sitter-grammars/tree-sitter-gpg-config) |
 | Graphql | `.graphql`, `.gql` | [bkegley/tree-sitter-graphql](https://github.com/bkegley/tree-sitter-graphql) |
+| Gren | `.gren` | [gren-lang/tree-sitter-gren](https://github.com/gren-lang/tree-sitter-gren) |
 | Groovy | `.groovy`, `.gradle` | [Decodetalkers/tree-sitter-groovy](https://github.com/Decodetalkers/tree-sitter-groovy) |
 | Gstlaunch | — | [tree-sitter-grammars/tree-sitter-gstlaunch](https://github.com/tree-sitter-grammars/tree-sitter-gstlaunch) |
 | Hack | `.hack` | [slackhq/tree-sitter-hack](https://github.com/slackhq/tree-sitter-hack) |

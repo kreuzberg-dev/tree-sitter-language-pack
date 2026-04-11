@@ -82,6 +82,7 @@ all = [
     "lang-gomod",
     "lang-gosum",
     "lang-graphql",
+    "lang-gren",
     "lang-groovy",
     "lang-gstlaunch",
     "lang-hack",
@@ -411,6 +412,7 @@ functional = [
     "lang-clojure",
     "lang-janet",
     "lang-agda",
+    "lang-gren",
 ]
 # Curated subset for WASM builds (~30 languages). Compiling all 305 languages
 # to wasm32-unknown-unknown exceeds GitHub Actions runner memory (7GB).
@@ -513,6 +515,7 @@ lang-go = []
 lang-gomod = []
 lang-gosum = []
 lang-graphql = []
+lang-gren = []
 lang-groovy = []
 lang-gstlaunch = []
 lang-hack = []
