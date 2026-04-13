@@ -404,7 +404,7 @@ pub async fn index_workspace(
     let mut all_rels: Vec<RelRow> = Vec::new();
     let mut all_imports: Vec<ImportNode> = Vec::new();
     let mut all_import_rels: Vec<RelRow> = Vec::new();
-    let mut all_symbol_call_rows: Vec<SymbolCallRow> = Vec::new();
+    let mut all_call_refs: Vec<CallRef> = Vec::new();
     let mut inferred_call_rows: Vec<InferredCallRow> = Vec::new();
     let mut python_inferred_call_rows: Vec<PythonInferredCallRow> = Vec::new();
     let mut clone_candidates: Vec<CloneCandidate> = Vec::new();
@@ -473,7 +473,7 @@ pub async fn index_workspace(
                 entry.0 += res.timings.tags_secs;
                 entry.1 += 1;
             }
-            all_symbol_call_rows.extend(res.symbol_calls);
+            all_call_refs.extend(res.call_refs);
             all_file_facts.insert(file_fp.clone(), res.file_facts);
             all_files.push(res.file_node);
             let local_symbols = res.symbols;
@@ -699,6 +699,7 @@ pub async fn index_workspace(
         project_root.as_deref(),
         &manifest_abs,
         &all_file_facts,
+        all_call_refs,
         &launch_requests,
         &import_symbol_requests,
         &reexport_symbol_requests,
@@ -711,6 +712,7 @@ pub async fn index_workspace(
     export_symbol_edges.extend(prep.export_symbol_edges);
     export_alias_edges.extend(prep.export_alias_edges);
     implicit_import_symbol_edges.extend(prep.implicit_import_symbol_edges);
+    let all_symbol_call_rows = prep.symbol_call_rows;
     inferred_call_rows.extend(prep.inferred_call_rows);
     python_inferred_call_rows.extend(prep.python_inferred_call_rows);
     let file_import_edges = prep.file_import_edges;

@@ -11,10 +11,10 @@ use crate::pathing;
 use crate::swift;
 use crate::tags;
 use crate::{
-    CloneCandidate, ExportAliasRequest, FileNode, ImportNode, ImportSymbolRequest, MAX_FILE_BYTES, ManifestEntry,
-    PythonFileContext, ReExportSymbolRequest, RelRow, SwiftFileContext, SymbolCallRow, SymbolNode, WINNOW_LARGE_K,
-    WINNOW_LARGE_W, WINNOW_MEDIUM_K, WINNOW_MEDIUM_W, WINNOW_MIN_FINGERPRINTS, WINNOW_MIN_TOKENS, WINNOW_SMALL_K,
-    WINNOW_SMALL_TOKEN_THRESHOLD, WINNOW_SMALL_W,
+    CallRef, CallRefKind, CloneCandidate, ExportAliasRequest, FileNode, ImportNode, ImportSymbolRequest,
+    MAX_FILE_BYTES, ManifestEntry, PythonFileContext, ReExportSymbolRequest, RelRow, SwiftFileContext, SymbolNode,
+    WINNOW_LARGE_K, WINNOW_LARGE_W, WINNOW_MEDIUM_K, WINNOW_MEDIUM_W, WINNOW_MIN_FINGERPRINTS, WINNOW_MIN_TOKENS,
+    WINNOW_SMALL_K, WINNOW_SMALL_TOKEN_THRESHOLD, WINNOW_SMALL_W,
 };
 
 pub(crate) struct FileResult {
@@ -25,7 +25,7 @@ pub(crate) struct FileResult {
     pub(crate) relations: Vec<RelRow>,
     pub(crate) imports: Vec<ImportNode>,
     pub(crate) import_rels: Vec<RelRow>,
-    pub(crate) symbol_calls: Vec<SymbolCallRow>,
+    pub(crate) call_refs: Vec<CallRef>,
     pub(crate) swift_extensions: Option<HashMap<String, HashSet<String>>>,
     pub(crate) swift_context: Option<SwiftFileContext>,
     pub(crate) python_context: Option<PythonFileContext>,
@@ -605,7 +605,7 @@ fn parse_entry(
         .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
         .unwrap_or(false);
 
-    let symbol_calls: Vec<SymbolCallRow> = call_sites
+    let call_refs: Vec<CallRef> = call_sites
         .clone()
         .into_iter()
         .filter_map(|cs| {
@@ -616,13 +616,27 @@ fn parse_entry(
                 .map(|(_, _, id)| id.clone())
                 .unwrap_or_else(|| file_id.clone());
 
-            if seen_calls.insert((caller_id.clone(), cs.callee.clone())) {
-                Some(SymbolCallRow {
+            let dedupe_key = cs
+                .qualified_callee
+                .clone()
+                .unwrap_or_else(|| cs.callee.clone());
+            if seen_calls.insert((caller_id.clone(), dedupe_key)) {
+                let kind = if cs.qualified_callee.is_some() {
+                    CallRefKind::Scoped
+                } else if cs.receiver.is_some() {
+                    CallRefKind::Member
+                } else {
+                    CallRefKind::Plain
+                };
+                Some(CallRef {
                     caller_id,
                     callee: cs.callee,
-                    project_id: Arc::clone(pid),
+                    language: lang_name.to_string(),
                     caller_filepath: rel_path.clone(),
                     allow_same_file,
+                    kind,
+                    receiver_hint: cs.receiver,
+                    qualified_hint: cs.qualified_callee,
                 })
             } else {
                 None
@@ -793,7 +807,7 @@ fn parse_entry(
         relations,
         imports,
         import_rels,
-        symbol_calls,
+        call_refs,
         swift_extensions,
         swift_context,
         python_context,
@@ -935,7 +949,7 @@ mod tests {
             assert_eq!(actual_defined, expected_defined, "defined symbols mismatch for {name}");
         }
 
-        let actual_calls: HashSet<_> = result.symbol_calls.iter().map(|call| call.callee.clone()).collect();
+        let actual_calls: HashSet<_> = result.call_refs.iter().map(|call| call.callee.clone()).collect();
         let expected_calls: HashSet<_> = expected.called_symbols.iter().cloned().collect();
         if !expected_calls.is_empty() {
             assert_eq!(actual_calls, expected_calls, "called symbols mismatch for {name}");
@@ -994,7 +1008,7 @@ def main():
         assert_eq!(result.file_node.filepath, "pkg/main.py");
         assert!(!result.file_node.is_test);
         assert!(!result.symbols.is_empty());
-        assert!(!result.symbol_calls.is_empty());
+        assert!(!result.call_refs.is_empty());
         assert_eq!(result.import_symbol_requests.len(), 1);
         assert_eq!(result.import_symbol_requests[0].module, ".helpers");
         assert!(result.reexport_symbol_requests.is_empty());

@@ -907,7 +907,9 @@ fn collect_symbol_on_node(
     }
 
     let symbol_kind = match kind {
-        "function_definition" | "function_declaration" | "function_item" => Some(SymbolKind::Function),
+        "function_definition" | "function_declaration" | "function_item" | "method_declaration" => {
+            Some(SymbolKind::Function)
+        }
         "class_definition" | "class_declaration" => {
             if language == "swift" && kind == "class_declaration" {
                 match swift_classlike_kind(node, source) {
@@ -1619,6 +1621,125 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
         }
     }
 
+    fn rust_impl_target_name(node: &tree_sitter::Node, source: &str) -> Option<String> {
+        let header = rust_impl_display_name(node, source)?;
+        let trimmed = header.trim();
+        let after_impl = trimmed.strip_prefix("impl ")?;
+        let target = after_impl
+            .split(" for ")
+            .nth(1)
+            .unwrap_or(after_impl)
+            .trim();
+        if target.is_empty() {
+            None
+        } else {
+            Some(target.to_string())
+        }
+    }
+
+    fn rust_qualified_name_for(node: &tree_sitter::Node, source: &str, name: &str) -> Option<String> {
+        let mut parts: Vec<String> = Vec::new();
+        let mut current = Some(*node);
+        for _ in 0..32 {
+            let Some(item) = current else {
+                break;
+            };
+            match item.kind() {
+                "mod_item" => {
+                    if let Some(module_name) = item
+                        .child_by_field_name("name")
+                        .map(|n| node_text(&n, source).to_string())
+                    {
+                        parts.push(module_name);
+                    }
+                }
+                "trait_item" => {
+                    if let Some(trait_name) = item
+                        .child_by_field_name("name")
+                        .map(|n| node_text(&n, source).to_string())
+                    {
+                        parts.push(trait_name);
+                    }
+                }
+                "impl_item" => {
+                    if let Some(target_name) = rust_impl_target_name(&item, source) {
+                        parts.push(target_name);
+                    }
+                }
+                _ => {}
+            }
+            current = item.parent();
+        }
+
+        if parts.is_empty() {
+            Some(name.to_string())
+        } else {
+            parts.reverse();
+            parts.push(name.to_string());
+            Some(parts.join("::"))
+        }
+    }
+
+    fn go_package_name(node: &tree_sitter::Node, source: &str) -> Option<String> {
+        let mut current = Some(*node);
+        for _ in 0..32 {
+            let Some(item) = current else {
+                break;
+            };
+            if item.kind() == "source_file" {
+                let mut cursor = item.walk();
+                for child in item.children(&mut cursor) {
+                    if child.kind() != "package_clause" {
+                        continue;
+                    }
+                    if let Some(name_node) = child.child_by_field_name("name") {
+                        let name = node_text(&name_node, source).trim().to_string();
+                        if !name.is_empty() {
+                            return Some(name);
+                        }
+                    }
+                    let mut package_cursor = child.walk();
+                    for grandchild in child.children(&mut package_cursor) {
+                        if grandchild.kind() == "package_identifier" || grandchild.kind() == "identifier" {
+                            let name = node_text(&grandchild, source).trim().to_string();
+                            if !name.is_empty() {
+                                return Some(name);
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            current = item.parent();
+        }
+        None
+    }
+
+    fn go_receiver_type_name(node: &tree_sitter::Node, source: &str) -> Option<String> {
+        let receiver = node.child_by_field_name("receiver")?;
+        let text = node_text(&receiver, source);
+        let candidate = text
+            .split(|c: char| !(c.is_alphanumeric() || c == '_'))
+            .filter(|part| !part.is_empty())
+            .last()?;
+        Some(candidate.to_string())
+    }
+
+    fn go_qualified_name_for(
+        node: &tree_sitter::Node,
+        source: &str,
+        name: &str,
+        structure_kind: &StructureKind,
+    ) -> Option<String> {
+        let package_name = go_package_name(node, source)?;
+        if structure_kind == &StructureKind::Method
+            && let Some(receiver_type) = go_receiver_type_name(node, source)
+        {
+            return Some(format!("{package_name}.{receiver_type}.{name}"));
+        }
+        Some(format!("{package_name}.{name}"))
+    }
+
     fn swift_enum_case_name(node: &tree_sitter::Node, source: &str) -> Option<String> {
         if let Some(name_node) = node.child_by_field_name("name") {
             return Some(node_text(&name_node, source).to_string());
@@ -1845,10 +1966,15 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
             node.child_by_field_name("name")
                 .map(|n| node_text(&n, source).to_string())
         };
-        let qualified_name = if language == "swift" {
-            swift_qualified_name(node, source)
-        } else {
-            None
+        let qualified_name = match language {
+            "swift" => swift_qualified_name(node, source),
+            "rust" => name
+                .as_deref()
+                .and_then(|symbol_name| rust_qualified_name_for(node, source, symbol_name)),
+            "go" => name
+                .as_deref()
+                .and_then(|symbol_name| go_qualified_name_for(node, source, symbol_name, &sk)),
+            _ => None,
         };
         let body_span = node.child_by_field_name("body").map(|n| span_from_node(&n));
         let mut children = Vec::new();
@@ -2281,6 +2407,61 @@ mod tests {
         let intel = extract_intelligence(source, "rust", &tree);
         assert!(intel.structure.iter().any(|item| {
             item.kind == StructureKind::Impl && item.name.as_deref() == Some("impl Runner for Service")
+        }));
+    }
+
+    #[test]
+    fn test_extract_rust_function_qualified_name() {
+        let source = r#"
+            mod parser {
+                pub fn get_parser() {}
+            }
+
+            struct Service;
+            impl Service {
+                fn process(&self) {}
+            }
+        "#;
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+        assert!(intel.structure.iter().any(|item| {
+            item.kind == StructureKind::Function
+                && item.name.as_deref() == Some("get_parser")
+                && item.qualified_name.as_deref() == Some("parser::get_parser")
+        }));
+        assert!(intel.structure.iter().any(|item| {
+            item.kind == StructureKind::Function
+                && item.name.as_deref() == Some("process")
+                && item.qualified_name.as_deref() == Some("Service::process")
+        }));
+    }
+
+    #[test]
+    fn test_extract_go_function_qualified_name() {
+        let source = r#"
+            package languagepack
+
+            func GetLanguage() {}
+
+            type Registry struct{}
+
+            func (r *Registry) Process() {}
+        "#;
+        let Some(tree) = parse_or_skip(source, "go") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "go", &tree);
+        assert!(intel.structure.iter().any(|item| {
+            item.kind == StructureKind::Function
+                && item.name.as_deref() == Some("GetLanguage")
+                && item.qualified_name.as_deref() == Some("languagepack.GetLanguage")
+        }));
+        assert!(intel.structure.iter().any(|item| {
+            item.kind == StructureKind::Method
+                && item.name.as_deref() == Some("Process")
+                && item.qualified_name.as_deref() == Some("languagepack.Registry.Process")
         }));
     }
 

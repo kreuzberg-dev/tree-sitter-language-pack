@@ -222,7 +222,7 @@ const RUST_TAGS: &str = r#"
 
 (call_expression
   function: (scoped_identifier
-    name: (identifier) @callee))
+    name: (identifier) @callee) @qualified_callee)
 "#;
 
 /// Python: all defs (visibility is by _ convention). Call expressions.
@@ -519,7 +519,7 @@ const GO_TAGS: &str = r#"
 
 (call_expression
   function: (selector_expression
-    field: (field_identifier) @callee))
+    field: (field_identifier) @callee) @qualified_callee)
 "#;
 
 /// Swift: exported declarations and call expressions.
@@ -979,6 +979,8 @@ pub struct CallSite {
     pub start_byte: usize,
     /// Name of the function/method being called.
     pub callee: String,
+    /// Full callee text when the syntax preserves useful qualification.
+    pub qualified_callee: Option<String>,
     /// Receiver identifier for member calls.
     pub receiver: Option<String>,
 }
@@ -1610,6 +1612,7 @@ fn collect_tag_match(
     let mut has_vis = false;
     let mut def_name: Option<String> = None;
     let mut callee_site: Option<(usize, String)> = None;
+    let mut qualified_callee: Option<String> = None;
     let mut receiver_name: Option<String> = None;
     let mut db_object: Option<String> = None;
     let mut external_callee: Option<String> = None;
@@ -1659,6 +1662,11 @@ fn collect_tag_match(
             "callee" => {
                 if let Some(text) = capture_text(node_info) {
                     callee_site = Some((node_info.start_byte, text.to_string()));
+                }
+            }
+            "qualified_callee" => {
+                if let Some(text) = capture_text(node_info) {
+                    qualified_callee = Some(text.to_string());
                 }
             }
             "recv" => {
@@ -1824,6 +1832,7 @@ fn collect_tag_match(
         call_sites.push(CallSite {
             start_byte,
             callee,
+            qualified_callee,
             receiver: receiver_name,
         });
     }

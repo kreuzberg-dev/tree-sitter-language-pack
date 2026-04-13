@@ -246,6 +246,26 @@ pub(crate) async fn write_calls(graph: &Arc<Graph>, batch: &[SymbolCallRow], run
     run_query_logged(graph, q, "write_calls").await
 }
 
+pub(crate) async fn write_calls_by_id(
+    graph: &Arc<Graph>,
+    batch: &[SymbolCallRow],
+    run_id: &str,
+) -> neo4rs::Result<()> {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MATCH (caller:Node {id: item.caller_id}) \
+         MATCH (callee:Node {id: item.callee_id}) \
+         WHERE (item.allow_same_file = true OR callee.filepath <> item.caller_fp) \
+         MERGE (caller)-[r:CALLS]->(callee) \
+         SET r.last_seen_run = $run_id"
+            .to_string(),
+    )
+    .param("batch", bolt)
+    .param("run_id", run_id.to_string());
+    run_query_logged(graph, q, "write_calls_by_id").await
+}
+
 pub(crate) async fn write_inferred_calls(
     graph: &Arc<Graph>,
     batch: &[InferredCallRow],

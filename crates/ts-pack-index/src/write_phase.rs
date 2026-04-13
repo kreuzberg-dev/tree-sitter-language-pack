@@ -692,13 +692,28 @@ pub(crate) async fn run_write_phases(
             .then_with(|| a.caller_filepath.cmp(&b.caller_filepath))
     });
     let calls_row_count = all_symbol_call_rows.len();
-    ok_chunks(&all_symbol_call_rows, CALL_EDGE_BATCH_SIZE)
-        .try_for_each_concurrent(call_edge_concurrency, |chunk| {
-            let g = Arc::clone(graph);
-            let run_id = run_id.clone();
-            async move { writers::write_calls(&g, chunk, &run_id).await }
-        })
-        .await?;
+    let (resolved_calls, unresolved_calls): (Vec<_>, Vec<_>) =
+        all_symbol_call_rows.into_iter().partition(|row| row.callee_id.is_some());
+    let resolved_call_count = resolved_calls.len();
+    let unresolved_call_count = unresolved_calls.len();
+    if !resolved_calls.is_empty() {
+        ok_chunks(&resolved_calls, CALL_EDGE_BATCH_SIZE)
+            .try_for_each_concurrent(call_edge_concurrency, |chunk| {
+                let g = Arc::clone(graph);
+                let run_id = run_id.clone();
+                async move { writers::write_calls_by_id(&g, chunk, &run_id).await }
+            })
+            .await?;
+    }
+    if !unresolved_calls.is_empty() {
+        ok_chunks(&unresolved_calls, CALL_EDGE_BATCH_SIZE)
+            .try_for_each_concurrent(call_edge_concurrency, |chunk| {
+                let g = Arc::clone(graph);
+                let run_id = run_id.clone();
+                async move { writers::write_calls(&g, chunk, &run_id).await }
+            })
+            .await?;
+    }
 
     let clone_enabled = std::env::var("LM_PROXY_CLONE_ENRICH")
         .ok()
@@ -728,9 +743,11 @@ pub(crate) async fn run_write_phases(
 
     let calls_elapsed = t_calls.elapsed();
     eprintln!(
-        "[ts-pack-index] CALLS writes done in {:.2}s (rows={})",
+        "[ts-pack-index] CALLS writes done in {:.2}s (rows={}, resolved={}, fallback={})",
         calls_elapsed.as_secs_f64(),
         calls_row_count,
+        resolved_call_count,
+        unresolved_call_count,
     );
 
     if !inferred_call_rows.is_empty() || !python_inferred_call_rows.is_empty() {

@@ -37,9 +37,28 @@ pub(crate) struct RelRow {
     pub(crate) child: String,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) enum CallRefKind {
+    Plain,
+    Member,
+    Scoped,
+}
+
+pub(crate) struct CallRef {
+    pub(crate) caller_id: String,
+    pub(crate) callee: String,
+    pub(crate) language: String,
+    pub(crate) caller_filepath: String,
+    pub(crate) allow_same_file: bool,
+    pub(crate) kind: CallRefKind,
+    pub(crate) receiver_hint: Option<String>,
+    pub(crate) qualified_hint: Option<String>,
+}
+
 pub(crate) struct SymbolCallRow {
     pub(crate) caller_id: String,
     pub(crate) callee: String,
+    pub(crate) callee_id: Option<String>,
     pub(crate) project_id: Arc<str>,
     pub(crate) caller_filepath: String,
     pub(crate) allow_same_file: bool,
@@ -360,6 +379,13 @@ impl SymbolCallRow {
             let mut m = serde_json::Map::new();
             m.insert("caller_id".into(), Value::String(self.caller_id.clone()));
             m.insert("callee".into(), Value::String(self.callee.clone()));
+            m.insert(
+                "callee_id".into(),
+                self.callee_id
+                    .as_ref()
+                    .map(|s| Value::String(s.clone()))
+                    .unwrap_or(Value::Null),
+            );
             m.insert("pid".into(), Value::String(self.project_id.to_string()));
             m.insert("caller_fp".into(), Value::String(self.caller_filepath.clone()));
             m.insert("allow_same_file".into(), Value::Bool(self.allow_same_file));
