@@ -104,6 +104,19 @@ pub(crate) struct ExternalApiEdgeRow {
     pub(crate) tgt: String,
 }
 
+pub(crate) struct ExternalSymbolNode {
+    pub(crate) id: String,
+    pub(crate) name: String,
+    pub(crate) qualified_name: String,
+    pub(crate) language: String,
+    pub(crate) project_id: Arc<str>,
+}
+
+pub(crate) struct ExternalSymbolEdgeRow {
+    pub(crate) src: String,
+    pub(crate) tgt: String,
+}
+
 pub(crate) struct FileEdgeRow {
     pub(crate) src_filepath: String,
     pub(crate) tgt_filepath: String,
@@ -350,6 +363,15 @@ pub(crate) struct PythonFileContext {
     pub(crate) symbol_spans: Vec<(usize, usize, String)>,
     pub(crate) call_sites: Vec<tags::CallSite>,
     pub(crate) module_aliases: std::collections::HashMap<String, String>,
+    pub(crate) imported_symbol_modules: std::collections::HashMap<String, String>,
+}
+
+pub(crate) struct GoFileContext {
+    pub(crate) file_id: String,
+    pub(crate) filepath: String,
+    pub(crate) symbol_spans: Vec<(usize, usize, String)>,
+    pub(crate) call_sites: Vec<tags::CallSite>,
+    pub(crate) var_types: std::collections::HashMap<String, String>,
 }
 
 pub(crate) struct CloneCandidate {
@@ -472,6 +494,31 @@ impl ExternalApiNode {
 }
 
 impl ExternalApiEdgeRow {
+    pub(crate) fn to_value(&self) -> Value {
+        Value::Object({
+            let mut m = serde_json::Map::new();
+            m.insert("src".into(), Value::String(self.src.clone()));
+            m.insert("tgt".into(), Value::String(self.tgt.clone()));
+            m
+        })
+    }
+}
+
+impl ExternalSymbolNode {
+    pub(crate) fn to_value(&self) -> Value {
+        Value::Object({
+            let mut m = serde_json::Map::new();
+            m.insert("id".into(), Value::String(self.id.clone()));
+            m.insert("name".into(), Value::String(self.name.clone()));
+            m.insert("qualified_name".into(), Value::String(self.qualified_name.clone()));
+            m.insert("language".into(), Value::String(self.language.clone()));
+            m.insert("pid".into(), Value::String(self.project_id.to_string()));
+            m
+        })
+    }
+}
+
+impl ExternalSymbolEdgeRow {
     pub(crate) fn to_value(&self) -> Value {
         Value::Object({
             let mut m = serde_json::Map::new();

@@ -8,12 +8,12 @@ use tokio::time::{Duration, sleep};
 use crate::{
     ApiRouteCallRow, ApiRouteHandlerRow, CargoCrateFileRow, CargoCrateRow, CargoDependencyEdgeRow,
     CargoWorkspaceCrateRow, CargoWorkspaceRow, CloneCanonRow, CloneGroupRow, CloneMemberRow, DbEdgeRow, DbModelEdgeRow,
-    ExportAliasEdgeRow, ExportSymbolEdgeRow, ExternalApiEdgeRow, ExternalApiNode, FileCloneCanonRow, FileCloneGroupRow,
-    FileCloneMemberRow, FileEdgeRow, FileImportEdgeRow, FileNode, ImplicitImportSymbolEdgeRow, ImportNode,
-    ImportSymbolEdgeRow, InferredCallRow, LaunchEdgeRow, PythonInferredCallRow, RelRow, ResourceBackingRow,
-    ResourceTargetEdgeRow, ResourceUsageRow, RustImplTraitEdgeRow, RustImplTypeEdgeRow, SymbolCallRow, SymbolNode,
-    XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow, XcodeTargetRow,
-    XcodeWorkspaceProjectRow, XcodeWorkspaceRow,
+    ExportAliasEdgeRow, ExportSymbolEdgeRow, ExternalApiEdgeRow, ExternalApiNode, ExternalSymbolEdgeRow,
+    ExternalSymbolNode, FileCloneCanonRow, FileCloneGroupRow, FileCloneMemberRow, FileEdgeRow, FileImportEdgeRow,
+    FileNode, ImplicitImportSymbolEdgeRow, ImportNode, ImportSymbolEdgeRow, InferredCallRow, LaunchEdgeRow,
+    PythonInferredCallRow, RelRow, ResourceBackingRow, ResourceTargetEdgeRow, ResourceUsageRow,
+    RustImplTraitEdgeRow, RustImplTypeEdgeRow, SymbolCallRow, SymbolNode, XcodeSchemeFileRow, XcodeSchemeRow,
+    XcodeSchemeTargetRow, XcodeTargetFileRow, XcodeTargetRow, XcodeWorkspaceProjectRow, XcodeWorkspaceRow,
 };
 
 fn json_to_bolt(v: Value) -> BoltType {
@@ -229,23 +229,6 @@ pub(crate) async fn write_relationships(graph: &Arc<Graph>, batch: &[RelRow], ru
     run_query_logged(graph, q, "write_relationships").await
 }
 
-pub(crate) async fn write_calls(graph: &Arc<Graph>, batch: &[SymbolCallRow], run_id: &str) -> neo4rs::Result<()> {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
-        "UNWIND $batch AS item \
-         MATCH (caller:Node {id: item.caller_id}) \
-         MATCH (callee:Node {project_id: item.pid, name: item.callee}) \
-         WHERE (callee:Function OR callee:Class OR callee:Struct OR callee:Method) \
-           AND (item.allow_same_file = true OR callee.filepath <> item.caller_fp) \
-         MERGE (caller)-[r:CALLS]->(callee) \
-         SET r.last_seen_run = $run_id"
-            .to_string(),
-    )
-    .param("batch", bolt)
-    .param("run_id", run_id.to_string());
-    run_query_logged(graph, q, "write_calls").await
-}
-
 pub(crate) async fn write_calls_by_id(graph: &Arc<Graph>, batch: &[SymbolCallRow], run_id: &str) -> neo4rs::Result<()> {
     let bolt = rows_to_bolt(batch, |r| r.to_value());
     let q = Query::new(
@@ -274,7 +257,11 @@ pub(crate) async fn write_inferred_calls(
          MATCH (callee:Node {project_id: item.pid, name: item.callee}) \
          WHERE (callee:Function OR callee:Class OR callee:Struct OR callee:Method) \
            AND callee.qualified_name IS NOT NULL \
-           AND callee.qualified_name STARTS WITH item.recv + '.' \
+           AND ( \
+             callee.qualified_name STARTS WITH item.recv + '.' \
+             OR callee.qualified_name = item.recv + '.' + item.callee \
+             OR callee.qualified_name ENDS WITH '.' + item.recv + '.' + item.callee \
+           ) \
            AND (item.allow_same_file = true OR callee.filepath <> item.caller_fp) \
          MERGE (caller)-[r:CALLS_INFERRED]->(callee) \
          SET r.last_seen_run = $run_id"
@@ -571,6 +558,46 @@ pub(crate) async fn write_external_api_edges(
     run_query_logged(graph, q, "write_external_api_edges").await
 }
 
+pub(crate) async fn write_external_symbol_nodes(
+    graph: &Arc<Graph>,
+    batch: &[ExternalSymbolNode],
+    run_id: &str,
+) -> neo4rs::Result<()> {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MERGE (e:ExternalSymbol {id: item.id}) \
+         SET e.project_id = item.pid, \
+             e.name = item.name, \
+             e.qualified_name = item.qualified_name, \
+             e.language = item.language, \
+             e.last_seen_run = $run_id"
+            .to_string(),
+    )
+    .param("batch", bolt)
+    .param("run_id", run_id.to_string());
+    run_query_logged(graph, q, "write_external_symbol_nodes").await
+}
+
+pub(crate) async fn write_external_symbol_edges(
+    graph: &Arc<Graph>,
+    batch: &[ExternalSymbolEdgeRow],
+    run_id: &str,
+) -> neo4rs::Result<()> {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MATCH (a:Node {id: item.src}) \
+         MATCH (b:ExternalSymbol {id: item.tgt}) \
+         MERGE (a)-[r:CALLS_EXTERNAL_SYMBOL]->(b) \
+         SET r.last_seen_run = $run_id"
+            .to_string(),
+    )
+    .param("batch", bolt)
+    .param("run_id", run_id.to_string());
+    run_query_logged(graph, q, "write_external_symbol_edges").await
+}
+
 pub(crate) async fn prune_stale_external_api_data(
     graph: &Arc<Graph>,
     project_id: &str,
@@ -589,6 +616,26 @@ pub(crate) async fn prune_stale_external_api_data(
         .param("pid", project_id.to_string())
         .param("run_id", run_id.to_string());
     run_query_logged(graph, delete_nodes, "prune_stale_external_api_nodes").await
+}
+
+pub(crate) async fn prune_stale_external_symbol_data(
+    graph: &Arc<Graph>,
+    project_id: &str,
+    run_id: &str,
+) -> neo4rs::Result<()> {
+    let delete_edges = Query::new(build_project_rel_prune_cypher(
+        ":Node {project_id: $pid}",
+        "CALLS_EXTERNAL_SYMBOL",
+        ":ExternalSymbol {project_id: $pid}",
+    ))
+    .param("pid", project_id.to_string())
+    .param("run_id", run_id.to_string());
+    run_query_logged(graph, delete_edges, "prune_stale_external_symbol_edges").await?;
+
+    let delete_nodes = Query::new(build_project_node_prune_cypher("ExternalSymbol"))
+        .param("pid", project_id.to_string())
+        .param("run_id", run_id.to_string());
+    run_query_logged(graph, delete_nodes, "prune_stale_external_symbol_nodes").await
 }
 
 pub(crate) async fn write_file_import_edges(

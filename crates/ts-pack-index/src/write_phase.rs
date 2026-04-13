@@ -10,12 +10,13 @@ use crate::writers;
 use crate::{
     ApiRouteCallRow, ApiRouteHandlerRow, CALL_EDGE_BATCH_SIZE, CALLS_BATCH_SIZE, CargoCrateFileRow, CargoCrateRow,
     CargoDependencyEdgeRow, CargoWorkspaceCrateRow, CargoWorkspaceRow, CloneCandidate, DbEdgeRow, DbModelEdgeRow,
-    ExportAliasEdgeRow, ExportSymbolEdgeRow, ExternalApiEdgeRow, ExternalApiNode, FileEdgeRow, FileImportEdgeRow,
-    FileNode, IMPORT_BATCH_SIZE, ImplicitImportSymbolEdgeRow, ImportNode, ImportSymbolEdgeRow, InferredCallRow,
-    LaunchEdgeRow, NODE_BATCH_SIZE, NODE_CONCURRENCY, PythonInferredCallRow, REL_BATCH_SIZE, REL_CONCURRENCY, RelRow,
-    ResourceBackingRow, ResourceTargetEdgeRow, ResourceUsageRow, RustImplTraitEdgeRow, RustImplTypeEdgeRow,
-    SymbolCallRow, SymbolNode, XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow,
-    XcodeTargetRow, XcodeWorkspaceProjectRow, XcodeWorkspaceRow, external_api_id, extract_prisma_models,
+    ExportAliasEdgeRow, ExportSymbolEdgeRow, ExternalApiEdgeRow, ExternalApiNode, ExternalSymbolEdgeRow,
+    ExternalSymbolNode, FileEdgeRow, FileImportEdgeRow, FileNode, IMPORT_BATCH_SIZE, ImplicitImportSymbolEdgeRow,
+    ImportNode, ImportSymbolEdgeRow, InferredCallRow, LaunchEdgeRow, NODE_BATCH_SIZE, NODE_CONCURRENCY,
+    PythonInferredCallRow, REL_BATCH_SIZE, REL_CONCURRENCY, RelRow, ResourceBackingRow, ResourceTargetEdgeRow,
+    ResourceUsageRow, RustImplTraitEdgeRow, RustImplTypeEdgeRow, SymbolCallRow, SymbolNode, XcodeSchemeFileRow,
+    XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow, XcodeTargetRow, XcodeWorkspaceProjectRow,
+    XcodeWorkspaceRow, external_api_id, extract_prisma_models,
 };
 
 pub(crate) struct WritePhaseSummary {
@@ -40,6 +41,8 @@ pub(crate) struct WriteInputs {
     pub(crate) db_model_refs_by_file: Vec<(String, String)>,
     pub(crate) external_api_edges: Vec<ExternalApiEdgeRow>,
     pub(crate) external_api_urls: HashSet<String>,
+    pub(crate) external_symbol_nodes: Vec<ExternalSymbolNode>,
+    pub(crate) external_symbol_edges: Vec<ExternalSymbolEdgeRow>,
     pub(crate) file_import_edges: Vec<FileImportEdgeRow>,
     pub(crate) asset_links: Vec<FileEdgeRow>,
     pub(crate) api_edges: Vec<FileEdgeRow>,
@@ -114,6 +117,8 @@ pub(crate) async fn run_write_phases(
         db_model_refs_by_file,
         external_api_edges,
         external_api_urls,
+        external_symbol_nodes,
+        external_symbol_edges,
         file_import_edges,
         asset_links,
         api_edges,
@@ -222,41 +227,6 @@ pub(crate) async fn run_write_phases(
             "[ts-pack-index] CALLS_DB_MODEL writes done in {:.2}s (rows={})",
             t_dbm.elapsed().as_secs_f64(),
             dbm_count,
-        );
-    }
-
-    if !external_api_urls.is_empty() && !external_api_edges.is_empty() {
-        let t_ext = Instant::now();
-        let mut external_nodes = Vec::new();
-        for url in &external_api_urls {
-            external_nodes.push(ExternalApiNode {
-                id: external_api_id(project_id, url),
-                url: url.clone(),
-                project_id: Arc::clone(project_id),
-            });
-        }
-        external_nodes.sort_by(|a, b| a.id.cmp(&b.id));
-        ok_chunks(&external_nodes, NODE_BATCH_SIZE)
-            .try_for_each_concurrent(NODE_CONCURRENCY, |chunk| {
-                let g = Arc::clone(graph);
-                let run_id = run_id.clone();
-                async move { writers::write_external_api_nodes(&g, chunk, &run_id).await }
-            })
-            .await?;
-        let mut external_api_edges = external_api_edges;
-        external_api_edges.sort_by(|a, b| a.src.cmp(&b.src).then_with(|| a.tgt.cmp(&b.tgt)));
-        let ext_count = external_api_edges.len();
-        ok_chunks(&external_api_edges, CALLS_BATCH_SIZE)
-            .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
-                let g = Arc::clone(graph);
-                let run_id = run_id.clone();
-                async move { writers::write_external_api_edges(&g, chunk, &run_id).await }
-            })
-            .await?;
-        eprintln!(
-            "[ts-pack-index] CALLS_API_EXTERNAL writes done in {:.2}s (rows={})",
-            t_ext.elapsed().as_secs_f64(),
-            ext_count,
         );
     }
 
@@ -683,6 +653,70 @@ pub(crate) async fn run_write_phases(
         rel_count,
     );
 
+    if !external_api_urls.is_empty() && !external_api_edges.is_empty() {
+        let t_ext = Instant::now();
+        let mut external_nodes = Vec::new();
+        for url in &external_api_urls {
+            external_nodes.push(ExternalApiNode {
+                id: external_api_id(project_id, url),
+                url: url.clone(),
+                project_id: Arc::clone(project_id),
+            });
+        }
+        external_nodes.sort_by(|a, b| a.id.cmp(&b.id));
+        ok_chunks(&external_nodes, NODE_BATCH_SIZE)
+            .try_for_each_concurrent(NODE_CONCURRENCY, |chunk| {
+                let g = Arc::clone(graph);
+                let run_id = run_id.clone();
+                async move { writers::write_external_api_nodes(&g, chunk, &run_id).await }
+            })
+            .await?;
+        let mut external_api_edges = external_api_edges;
+        external_api_edges.sort_by(|a, b| a.src.cmp(&b.src).then_with(|| a.tgt.cmp(&b.tgt)));
+        let ext_count = external_api_edges.len();
+        ok_chunks(&external_api_edges, CALLS_BATCH_SIZE)
+            .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
+                let g = Arc::clone(graph);
+                let run_id = run_id.clone();
+                async move { writers::write_external_api_edges(&g, chunk, &run_id).await }
+            })
+            .await?;
+        eprintln!(
+            "[ts-pack-index] CALLS_API_EXTERNAL writes done in {:.2}s (rows={})",
+            t_ext.elapsed().as_secs_f64(),
+            ext_count,
+        );
+    }
+
+    if !external_symbol_nodes.is_empty() && !external_symbol_edges.is_empty() {
+        let t_ext = Instant::now();
+        let mut external_symbol_nodes = external_symbol_nodes;
+        external_symbol_nodes.sort_by(|a, b| a.id.cmp(&b.id));
+        ok_chunks(&external_symbol_nodes, NODE_BATCH_SIZE)
+            .try_for_each_concurrent(NODE_CONCURRENCY, |chunk| {
+                let g = Arc::clone(graph);
+                let run_id = run_id.clone();
+                async move { writers::write_external_symbol_nodes(&g, chunk, &run_id).await }
+            })
+            .await?;
+        let mut external_symbol_edges = external_symbol_edges;
+        external_symbol_edges.sort_by(|a, b| a.src.cmp(&b.src).then_with(|| a.tgt.cmp(&b.tgt)));
+        let ext_count = external_symbol_edges.len();
+        ok_chunks(&external_symbol_edges, CALLS_BATCH_SIZE)
+            .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
+                let g = Arc::clone(graph);
+                let run_id = run_id.clone();
+                async move { writers::write_external_symbol_edges(&g, chunk, &run_id).await }
+            })
+            .await?;
+        eprintln!(
+            "[ts-pack-index] CALLS_EXTERNAL_SYMBOL writes done in {:.2}s (rows={})",
+            t_ext.elapsed().as_secs_f64(),
+            ext_count,
+        );
+        writers::prune_stale_external_symbol_data(graph, project_id.as_ref(), &run_id).await?;
+    }
+
     let t_calls = Instant::now();
     let mut all_symbol_call_rows = all_symbol_call_rows;
     all_symbol_call_rows.sort_by(|a, b| {
@@ -692,26 +726,12 @@ pub(crate) async fn run_write_phases(
             .then_with(|| a.caller_filepath.cmp(&b.caller_filepath))
     });
     let calls_row_count = all_symbol_call_rows.len();
-    let (resolved_calls, unresolved_calls): (Vec<_>, Vec<_>) = all_symbol_call_rows
-        .into_iter()
-        .partition(|row| row.callee_id.is_some());
-    let resolved_call_count = resolved_calls.len();
-    let unresolved_call_count = unresolved_calls.len();
-    if !resolved_calls.is_empty() {
-        ok_chunks(&resolved_calls, CALL_EDGE_BATCH_SIZE)
+    if !all_symbol_call_rows.is_empty() {
+        ok_chunks(&all_symbol_call_rows, CALL_EDGE_BATCH_SIZE)
             .try_for_each_concurrent(call_edge_concurrency, |chunk| {
                 let g = Arc::clone(graph);
                 let run_id = run_id.clone();
                 async move { writers::write_calls_by_id(&g, chunk, &run_id).await }
-            })
-            .await?;
-    }
-    if !unresolved_calls.is_empty() {
-        ok_chunks(&unresolved_calls, CALL_EDGE_BATCH_SIZE)
-            .try_for_each_concurrent(call_edge_concurrency, |chunk| {
-                let g = Arc::clone(graph);
-                let run_id = run_id.clone();
-                async move { writers::write_calls(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -744,11 +764,9 @@ pub(crate) async fn run_write_phases(
 
     let calls_elapsed = t_calls.elapsed();
     eprintln!(
-        "[ts-pack-index] CALLS writes done in {:.2}s (rows={}, resolved={}, fallback={})",
+        "[ts-pack-index] CALLS writes done in {:.2}s (rows={}, canonical_only=1)",
         calls_elapsed.as_secs_f64(),
         calls_row_count,
-        resolved_call_count,
-        unresolved_call_count,
     );
 
     if !inferred_call_rows.is_empty() || !python_inferred_call_rows.is_empty() {

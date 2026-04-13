@@ -340,6 +340,50 @@ fn collect_index_semantics(
     }
 }
 
+fn strip_quoted_import_path(raw: &str) -> String {
+    let raw = raw.trim();
+    if raw.len() < 2 {
+        return raw.to_string();
+    }
+    let first = raw.chars().next().unwrap_or('\0');
+    let last = raw.chars().last().unwrap_or('\0');
+    if (first == '"' && last == '"') || (first == '\'' && last == '\'') {
+        return raw[1..raw.len() - 1].to_string();
+    }
+    raw.to_string()
+}
+
+fn parse_go_import_spec(node: &tree_sitter::Node, source: &str) -> Option<ImportInfo> {
+    if node.kind() != "import_spec" {
+        return None;
+    }
+    let text = node_text(node, source);
+    let mut parts = text.split_whitespace();
+    let first = parts.next()?;
+    let second = parts.next();
+    let (alias, source_name) = match second {
+        Some(path) => {
+            let alias = match first.trim() {
+                "." | "_" => None,
+                value if !value.is_empty() => Some(value.to_string()),
+                _ => None,
+            };
+            (alias, strip_quoted_import_path(path))
+        }
+        None => (None, strip_quoted_import_path(first)),
+    };
+    if source_name.is_empty() {
+        return None;
+    }
+    Some(ImportInfo {
+        source: source_name,
+        items: Vec::new(),
+        alias,
+        is_wildcard: false,
+        span: span_from_node(node),
+    })
+}
+
 fn collect_import_on_node(
     node: &tree_sitter::Node,
     source: &str,
@@ -437,6 +481,13 @@ fn collect_import_on_node(
                     span: span_from_node(node),
                 });
             }
+            handled = true;
+        }
+    }
+
+    if language == "go" && kind == "import_spec" && !handled {
+        if let Some(import_info) = parse_go_import_spec(node, source) {
+            imports.push(import_info);
             handled = true;
         }
     }
@@ -1042,6 +1093,13 @@ fn collect_imports(node: &tree_sitter::Node, source: &str, language: &str, impor
                     span: span_from_node(node),
                 });
             }
+            handled = true;
+        }
+    }
+
+    if language == "go" && kind == "import_spec" && !handled {
+        if let Some(import_info) = parse_go_import_spec(node, source) {
+            imports.push(import_info);
             handled = true;
         }
     }
@@ -2458,6 +2516,32 @@ mod tests {
             item.kind == StructureKind::Method
                 && item.name.as_deref() == Some("Process")
                 && item.qualified_name.as_deref() == Some("languagepack.Registry.Process")
+        }));
+    }
+
+    #[test]
+    fn test_extract_go_imports_strip_quotes_and_keep_alias() {
+        let source = r#"
+            package smoke
+
+            import (
+                "os"
+                "path/filepath"
+                j "encoding/json"
+            )
+        "#;
+        let Some(tree) = parse_or_skip(source, "go") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "go", &tree);
+        assert!(intel.imports.iter().any(|imp| imp.source == "os" && imp.alias.is_none()));
+        assert!(
+            intel.imports
+                .iter()
+                .any(|imp| imp.source == "path/filepath" && imp.alias.is_none())
+        );
+        assert!(intel.imports.iter().any(|imp| {
+            imp.source == "encoding/json" && imp.alias.as_deref() == Some("j")
         }));
     }
 

@@ -10,6 +10,7 @@ use crate::swift;
 use crate::{
     ApiRouteCallRow, ApiRouteHandlerRow, CallRef, CargoCrateFileRow, CargoCrateRow, CargoDependencyEdgeRow,
     CargoWorkspaceCrateRow, CargoWorkspaceRow, ExportAliasRequest, FileEdgeRow, FileImportEdgeRow, FileNode,
+    GoFileContext,
     ImplicitImportSymbolEdgeRow, ImportSymbolEdgeRow, ImportSymbolRequest, InferredCallRow, LaunchEdgeRow,
     PythonFileContext, PythonInferredCallRow, ReExportSymbolRequest, ResourceBackingRow, ResourceTargetEdgeRow,
     ResourceUsageRow, RustImplTraitEdgeRow, RustImplTypeEdgeRow, SwiftFileContext, SymbolCallRow, SymbolNode,
@@ -46,6 +47,8 @@ pub(crate) struct PreparationOutputs {
     pub(crate) rust_impl_trait_edges: Vec<RustImplTraitEdgeRow>,
     pub(crate) rust_impl_type_edges: Vec<RustImplTypeEdgeRow>,
     pub(crate) symbol_call_rows: Vec<SymbolCallRow>,
+    pub(crate) external_symbol_nodes: Vec<crate::ExternalSymbolNode>,
+    pub(crate) external_symbol_edges: Vec<crate::ExternalSymbolEdgeRow>,
     pub(crate) inferred_call_rows: Vec<InferredCallRow>,
     pub(crate) python_inferred_call_rows: Vec<PythonInferredCallRow>,
     pub(crate) launch_edges: Vec<LaunchEdgeRow>,
@@ -66,12 +69,17 @@ pub(crate) fn prepare_graph_facts(
     swift_extension_map: &HashMap<String, HashSet<String>>,
     swift_contexts: &[SwiftFileContext],
     python_contexts: &[PythonFileContext],
+    go_contexts: &[GoFileContext],
 ) -> PreparationOutputs {
     let debug_call_resolution = std::env::var("TS_PACK_DEBUG_CALL_RESOLUTION")
         .ok()
         .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
         .unwrap_or(false);
     let mut symbols_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
+    let mut caller_qualified_symbols_by_id: HashMap<String, String> = HashMap::new();
+    let mut go_var_types_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
+    let mut python_module_aliases_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
+    let mut python_imported_symbol_modules_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
     let mut exported_symbols_by_file: HashMap<String, Vec<String>> = HashMap::new();
     let mut exported_symbols_by_prefix: HashMap<String, Vec<String>> = HashMap::new();
     let mut callable_symbols_by_name: HashMap<String, Vec<(String, String)>> = HashMap::new();
@@ -88,6 +96,7 @@ pub(crate) fn prepare_graph_facts(
                     .or_default()
                     .push((sym.id.clone(), sym.filepath.clone()));
                 if let Some(qualified_name) = sym.qualified_name.as_ref() {
+                    caller_qualified_symbols_by_id.insert(sym.id.clone(), qualified_name.clone());
                     qualified_callable_symbols.push((
                         normalize_qualified_hint(qualified_name),
                         sym.id.clone(),
@@ -107,6 +116,11 @@ pub(crate) fn prepare_graph_facts(
                         .push(sym.id.clone());
                 }
             }
+        }
+    }
+    for ctx in go_contexts {
+        if !ctx.var_types.is_empty() {
+            go_var_types_by_file.insert(ctx.filepath.clone(), ctx.var_types.clone());
         }
     }
 
@@ -164,6 +178,14 @@ pub(crate) fn prepare_graph_facts(
             }
         }
     }
+    for ctx in python_contexts {
+        if !ctx.module_aliases.is_empty() {
+            python_module_aliases_by_file.insert(ctx.filepath.clone(), ctx.module_aliases.clone());
+        }
+        if !ctx.imported_symbol_modules.is_empty() {
+            python_imported_symbol_modules_by_file.insert(ctx.filepath.clone(), ctx.imported_symbol_modules.clone());
+        }
+    }
 
     let resolve_import_item_for_file = |src_filepath: &str, item_name: &str| -> Option<String> {
         for req in import_symbol_requests
@@ -205,7 +227,11 @@ pub(crate) fn prepare_graph_facts(
     let resolution_ctx = CallResolutionContext {
         callable_symbols_by_name: &callable_symbols_by_name,
         qualified_callable_symbols: &qualified_callable_symbols,
+        caller_qualified_symbols_by_id: &caller_qualified_symbols_by_id,
         symbols_by_file: &symbols_by_file,
+        go_var_types_by_file: &go_var_types_by_file,
+        python_module_aliases_by_file: &python_module_aliases_by_file,
+        python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
         imported_target_files_by_src: &imported_target_files_by_src,
         import_symbol_requests,
         exported_symbols_by_file: &exported_symbols_by_file,
@@ -215,8 +241,12 @@ pub(crate) fn prepare_graph_facts(
 
     let crate::call_resolution::CallResolutionOutputs {
         symbol_call_rows,
+        external_symbol_nodes,
+        external_symbol_edges,
         resolved_call_rows,
+        unresolved_internal_call_rows,
         resolution_stage_counts,
+        filtered_stage_counts,
         unresolved_name_counts,
         unresolved_bucket_counts,
         unresolved_bucket_samples,
@@ -224,10 +254,8 @@ pub(crate) fn prepare_graph_facts(
         skipped_external_call_rows,
     } = build_symbol_call_rows(call_refs, &resolution_ctx, project_id, debug_call_resolution);
     eprintln!(
-        "[ts-pack-index] CALL resolve prep — resolved={} fallback={} skipped_external={}",
-        resolved_call_rows,
-        symbol_call_rows.len().saturating_sub(resolved_call_rows),
-        skipped_external_call_rows,
+        "[ts-pack-index] CALL resolve prep — resolved={} unresolved_internal={} filtered={}",
+        resolved_call_rows, unresolved_internal_call_rows, skipped_external_call_rows,
     );
     if debug_call_resolution && !resolution_stage_counts.is_empty() {
         let mut stage_rows: Vec<(&'static str, usize)> = resolution_stage_counts.into_iter().collect();
@@ -238,6 +266,16 @@ pub(crate) fn prepare_graph_facts(
             .collect::<Vec<_>>()
             .join(" ");
         eprintln!("[ts-pack-index] CALL resolve stages — {summary}");
+    }
+    if debug_call_resolution && !filtered_stage_counts.is_empty() {
+        let mut stage_rows: Vec<(&'static str, usize)> = filtered_stage_counts.into_iter().collect();
+        stage_rows.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(b.0)));
+        let summary = stage_rows
+            .into_iter()
+            .map(|(stage, count)| format!("{stage}:{count}"))
+            .collect::<Vec<_>>()
+            .join(" ");
+        eprintln!("[ts-pack-index] CALL filtered stages — {summary}");
     }
     if debug_call_resolution && !unresolved_name_counts.is_empty() {
         let mut top_unresolved: Vec<(String, usize)> = unresolved_name_counts.into_iter().collect();
@@ -275,7 +313,11 @@ pub(crate) fn prepare_graph_facts(
     }
     if debug_call_resolution && !unresolved_rust_plain_attribution.is_empty() {
         let mut rows: Vec<((String, String), usize)> = unresolved_rust_plain_attribution.into_iter().collect();
-        rows.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.0.cmp(&b.0.0)).then_with(|| a.0.1.cmp(&b.0.1)));
+        rows.sort_by(|a, b| {
+            b.1.cmp(&a.1)
+                .then_with(|| a.0.0.cmp(&b.0.0))
+                .then_with(|| a.0.1.cmp(&b.0.1))
+        });
         rows.truncate(12);
         let summary = rows
             .into_iter()
@@ -654,6 +696,13 @@ pub(crate) fn prepare_graph_facts(
                 let Some(module_fp) = pathing::resolve_module_path(&ctx.filepath, module, &files_set) else {
                     continue;
                 };
+                let exact_resolves = symbols_by_file
+                    .get(&module_fp)
+                    .and_then(|sym_map| sym_map.get(&call.callee))
+                    .is_some();
+                if exact_resolves {
+                    continue;
+                }
 
                 let caller_id = ctx
                     .symbol_spans
@@ -667,6 +716,46 @@ pub(crate) fn prepare_graph_facts(
                         caller_id,
                         callee: call.callee.clone(),
                         callee_filepath: module_fp,
+                        project_id: Arc::clone(project_id),
+                        caller_filepath: ctx.filepath.clone(),
+                        allow_same_file,
+                    });
+                }
+            }
+        }
+    }
+
+    if !go_contexts.is_empty() {
+        let mut seen: HashSet<(String, String, String)> = HashSet::new();
+        for ctx in go_contexts {
+            for call in &ctx.call_sites {
+                let Some(recv) = &call.receiver else {
+                    continue;
+                };
+                let Some(receiver_type) = ctx.var_types.get(recv) else {
+                    continue;
+                };
+                let normalized_type = receiver_type
+                    .split('.')
+                    .next_back()
+                    .unwrap_or(receiver_type)
+                    .trim_start_matches('*')
+                    .trim();
+                if normalized_type.is_empty() {
+                    continue;
+                }
+                let caller_id = ctx
+                    .symbol_spans
+                    .iter()
+                    .filter(|(sb, eb, _)| *sb <= call.start_byte && call.start_byte < *eb)
+                    .min_by_key(|(sb, eb, _)| eb - sb)
+                    .map(|(_, _, id)| id.clone())
+                    .unwrap_or_else(|| ctx.file_id.clone());
+                if seen.insert((caller_id.clone(), call.callee.clone(), normalized_type.to_string())) {
+                    inferred_call_rows.push(InferredCallRow {
+                        caller_id,
+                        callee: call.callee.clone(),
+                        receiver_type: normalized_type.to_string(),
                         project_id: Arc::clone(project_id),
                         caller_filepath: ctx.filepath.clone(),
                         allow_same_file,
@@ -753,6 +842,8 @@ pub(crate) fn prepare_graph_facts(
         rust_impl_trait_edges,
         rust_impl_type_edges,
         symbol_call_rows,
+        external_symbol_nodes,
+        external_symbol_edges,
         inferred_call_rows,
         python_inferred_call_rows,
         launch_edges,
@@ -896,6 +987,7 @@ mod tests {
             &HashMap::new(),
             &[],
             &[],
+            &[],
         );
 
         assert_eq!(out.import_symbol_edges.len(), 1);
@@ -938,6 +1030,7 @@ mod tests {
             &requests,
             &[],
             &HashMap::new(),
+            &[],
             &[],
             &[],
         );
@@ -992,6 +1085,7 @@ mod tests {
             &HashMap::new(),
             &[],
             &[],
+            &[],
         );
 
         assert_eq!(out.export_symbol_edges.len(), 1);
@@ -1028,6 +1122,7 @@ mod tests {
             &[],
             &alias_requests,
             &HashMap::new(),
+            &[],
             &[],
             &[],
         );
@@ -1078,6 +1173,7 @@ mod tests {
             &HashMap::new(),
             &[],
             &[],
+            &[],
         );
 
         assert_eq!(out.export_alias_edges.len(), 1);
@@ -1115,6 +1211,7 @@ mod tests {
             &[],
             &alias_requests,
             &HashMap::new(),
+            &[],
             &[],
             &[],
         );
@@ -1163,6 +1260,7 @@ mod tests {
             &HashMap::new(),
             &[],
             &[],
+            &[],
         );
 
         assert_eq!(out.export_alias_edges.len(), 2);
@@ -1204,12 +1302,52 @@ mod tests {
             &swift_extension_map,
             &[ctx],
             &[],
+            &[],
         );
 
         assert_eq!(out.inferred_call_rows.len(), 1);
         assert_eq!(out.inferred_call_rows[0].caller_id, "sym:caller");
         assert_eq!(out.inferred_call_rows[0].callee, "run");
         assert_eq!(out.inferred_call_rows[0].receiver_type, "Service");
+    }
+
+    #[test]
+    fn prepares_go_inferred_calls_from_receiver_constructor_types() {
+        let ctx = GoFileContext {
+            file_id: "file:smoke_test.go".to_string(),
+            filepath: "tests/test_apps/go/smoke_test.go".to_string(),
+            symbol_spans: vec![(0, 200, "sym:go_test".to_string())],
+            call_sites: vec![CallSite {
+                start_byte: 25,
+                callee: "Close".to_string(),
+                qualified_callee: Some("registry.Close".to_string()),
+                receiver: Some("registry".to_string()),
+            }],
+            var_types: HashMap::from([("registry".to_string(), "Registry".to_string())]),
+        };
+
+        let out = prepare_graph_facts(
+            &HashMap::new(),
+            &[file_node("file:smoke_test.go", "tests/test_apps/go/smoke_test.go")],
+            &Arc::from("proj"),
+            None,
+            &HashMap::new(),
+            &HashMap::new(),
+            vec![],
+            &[],
+            &[],
+            &[],
+            &[],
+            &HashMap::new(),
+            &[],
+            &[],
+            &[ctx],
+        );
+
+        assert_eq!(out.inferred_call_rows.len(), 1);
+        assert_eq!(out.inferred_call_rows[0].caller_id, "sym:go_test");
+        assert_eq!(out.inferred_call_rows[0].callee, "Close");
+        assert_eq!(out.inferred_call_rows[0].receiver_type, "Registry");
     }
 
     #[test]
@@ -1229,6 +1367,7 @@ mod tests {
                 receiver: Some("helpers".to_string()),
             }],
             module_aliases: HashMap::from([("helpers".to_string(), ".helpers".to_string())]),
+            imported_symbol_modules: HashMap::new(),
         };
 
         let out = with_env_var("TS_PACK_PY_ATTR_CALLS", Some("1"), || {
@@ -1247,6 +1386,7 @@ mod tests {
                 &HashMap::new(),
                 &[],
                 &[ctx],
+                &[],
             )
         });
 
@@ -1254,6 +1394,51 @@ mod tests {
         assert_eq!(out.python_inferred_call_rows[0].caller_id, "sym:main");
         assert_eq!(out.python_inferred_call_rows[0].callee, "run");
         assert_eq!(out.python_inferred_call_rows[0].callee_filepath, "pkg/helpers.py");
+    }
+
+    #[test]
+    fn python_exact_module_alias_calls_do_not_emit_inferred_rows() {
+        let all_files = vec![
+            file_node("file:pkg/main.py", "pkg/main.py"),
+            file_node("file:pkg/helpers.py", "pkg/helpers.py"),
+        ];
+        let mut all_symbols = HashMap::new();
+        all_symbols.insert("Function", vec![symbol_node("sym:run", "run", "pkg/helpers.py", true)]);
+        let ctx = PythonFileContext {
+            file_id: "file:pkg/main.py".to_string(),
+            filepath: "pkg/main.py".to_string(),
+            symbol_spans: vec![(0, 100, "sym:main".to_string())],
+            call_sites: vec![CallSite {
+                start_byte: 5,
+                callee: "run".to_string(),
+                qualified_callee: None,
+                receiver: Some("helpers".to_string()),
+            }],
+            module_aliases: HashMap::from([("helpers".to_string(), ".helpers".to_string())]),
+            imported_symbol_modules: HashMap::new(),
+        };
+
+        let out = with_env_var("TS_PACK_PY_ATTR_CALLS", Some("1"), || {
+            prepare_graph_facts(
+                &all_symbols,
+                &all_files,
+                &Arc::from("proj"),
+                None,
+                &HashMap::new(),
+                &HashMap::new(),
+                vec![],
+                &[],
+                &[],
+                &[],
+                &[],
+                &HashMap::new(),
+                &[],
+                &[ctx],
+                &[],
+            )
+        });
+
+        assert!(out.python_inferred_call_rows.is_empty());
     }
 
     #[test]
@@ -1311,6 +1496,7 @@ mod tests {
                 &HashMap::new(),
                 &[swift_ctx],
                 &[],
+                &[],
             )
         });
 
@@ -1367,6 +1553,7 @@ mod tests {
             &[],
             &[],
             &HashMap::new(),
+            &[],
             &[],
             &[],
         );

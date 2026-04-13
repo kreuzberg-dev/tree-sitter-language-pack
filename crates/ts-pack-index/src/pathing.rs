@@ -7,7 +7,7 @@ use crate::ManifestEntry;
 pub(crate) fn external_api_id(project_id: &str, url: &str) -> String {
     let mut hasher = std::collections::hash_map::DefaultHasher::new();
     url.hash(&mut hasher);
-    format!("{}:external:{:x}", project_id, hasher.finish())
+    format!("{}:external:{:x}", canonical_project_id(project_id), hasher.finish())
 }
 
 pub(crate) fn canonical_project_id(project_id: &str) -> &str {

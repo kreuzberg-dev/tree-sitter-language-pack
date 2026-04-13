@@ -7,12 +7,14 @@ use rayon::prelude::*;
 use tree_sitter_language_pack as ts_pack;
 
 use crate::duplicate;
+use crate::go;
 use crate::pathing;
 use crate::swift;
 use crate::tags;
 use crate::{
     CallRef, CallRefKind, CloneCandidate, ExportAliasRequest, FileNode, ImportNode, ImportSymbolRequest,
-    MAX_FILE_BYTES, ManifestEntry, PythonFileContext, ReExportSymbolRequest, RelRow, SwiftFileContext, SymbolNode,
+    GoFileContext, MAX_FILE_BYTES, ManifestEntry, PythonFileContext, ReExportSymbolRequest, RelRow,
+    SwiftFileContext, SymbolNode,
     WINNOW_LARGE_K, WINNOW_LARGE_W, WINNOW_MEDIUM_K, WINNOW_MEDIUM_W, WINNOW_MIN_FINGERPRINTS, WINNOW_MIN_TOKENS,
     WINNOW_SMALL_K, WINNOW_SMALL_TOKEN_THRESHOLD, WINNOW_SMALL_W,
 };
@@ -29,6 +31,7 @@ pub(crate) struct FileResult {
     pub(crate) swift_extensions: Option<HashMap<String, HashSet<String>>>,
     pub(crate) swift_context: Option<SwiftFileContext>,
     pub(crate) python_context: Option<PythonFileContext>,
+    pub(crate) go_context: Option<GoFileContext>,
     pub(crate) clone_candidates: Vec<CloneCandidate>,
     pub(crate) db_models: Vec<String>,
     pub(crate) external_urls: Vec<String>,
@@ -482,6 +485,7 @@ fn parse_entry(
     let mut swift_extensions: Option<HashMap<String, HashSet<String>>> = None;
     let mut swift_context: Option<SwiftFileContext> = None;
     let mut python_context: Option<PythonFileContext> = None;
+    let mut go_context: Option<GoFileContext> = None;
 
     let mut exported_names: HashSet<String> = result
         .as_ref()
@@ -686,27 +690,55 @@ fn parse_entry(
 
     if lang_name == "python" {
         let mut module_aliases: HashMap<String, String> = HashMap::new();
+        let mut imported_symbol_modules: HashMap<String, String> = HashMap::new();
         if let Some(result) = result.as_ref() {
             for imp in &result.imports {
-                if imp.alias.is_none() || !imp.items.is_empty() {
+                if imp.items.is_empty() {
+                    if imp.alias.is_none() {
+                        continue;
+                    }
+                    let Some(alias) = imp.alias.as_ref() else {
+                        continue;
+                    };
+                    if alias.is_empty() || imp.source.is_empty() {
+                        continue;
+                    }
+                    module_aliases.insert(alias.clone(), imp.source.clone());
                     continue;
                 }
-                let Some(alias) = imp.alias.as_ref() else {
-                    continue;
-                };
-                if alias.is_empty() || imp.source.is_empty() {
+                if imp.source.is_empty() {
                     continue;
                 }
-                module_aliases.insert(alias.clone(), imp.source.clone());
+                for item in &imp.items {
+                    let cleaned = pathing::clean_import_name(item);
+                    if cleaned.is_empty() {
+                        continue;
+                    }
+                    imported_symbol_modules.insert(cleaned, imp.source.clone());
+                }
             }
         }
-        if !call_sites.is_empty() && !module_aliases.is_empty() {
+        if !call_sites.is_empty() && (!module_aliases.is_empty() || !imported_symbol_modules.is_empty()) {
             python_context = Some(PythonFileContext {
                 file_id: file_id.clone(),
                 filepath: rel_path.clone(),
                 symbol_spans: symbol_spans.clone(),
                 call_sites: call_sites.clone(),
                 module_aliases,
+                imported_symbol_modules,
+            });
+        }
+    }
+
+    if lang_name == "go" {
+        let var_types = go::parse_go_var_types(&source);
+        if !var_types.is_empty() && !call_sites.is_empty() {
+            go_context = Some(GoFileContext {
+                file_id: file_id.clone(),
+                filepath: rel_path.clone(),
+                symbol_spans: symbol_spans.clone(),
+                call_sites: call_sites.clone(),
+                var_types,
             });
         }
     }
@@ -808,6 +840,7 @@ fn parse_entry(
         swift_extensions,
         swift_context,
         python_context,
+        go_context,
         clone_candidates,
         db_models: if is_backend { db_models } else { Vec::new() },
         external_urls,

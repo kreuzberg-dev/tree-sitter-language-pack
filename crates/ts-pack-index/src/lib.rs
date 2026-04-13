@@ -1,6 +1,7 @@
 mod asset_phase;
 mod call_resolution;
 mod clone_enrich;
+mod go;
 pub mod duplicate;
 mod model;
 mod parse_phase;
@@ -102,6 +103,14 @@ pub(crate) const WINNOW_LARGE_W: usize = 7;
 
 pub(crate) fn external_api_id(project_id: &str, url: &str) -> String {
     pathing::external_api_id(project_id, url)
+}
+
+pub(crate) fn external_symbol_id(project_id: &str, language: &str, qualified_name: &str) -> String {
+    format!(
+        "{}:external_symbol:{language}:{}",
+        pathing::canonical_project_id(project_id),
+        qualified_name.replace(' ', "")
+    )
 }
 
 fn project_root_from_manifest(manifest: &[ManifestEntry]) -> Option<String> {
@@ -413,11 +422,16 @@ pub async fn index_workspace(
         std::collections::HashMap::new();
     let mut swift_contexts: Vec<SwiftFileContext> = Vec::new();
     let mut python_contexts: Vec<PythonFileContext> = Vec::new();
+    let mut go_contexts: Vec<GoFileContext> = Vec::new();
     let mut db_sources: Vec<String> = Vec::new();
     let mut db_model_refs_by_file: Vec<(String, String)> = Vec::new();
     let mut external_api_edges: Vec<ExternalApiEdgeRow> = Vec::new();
     let mut external_api_urls: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut external_symbol_nodes: Vec<ExternalSymbolNode> = Vec::new();
+    let mut external_symbol_edges: Vec<ExternalSymbolEdgeRow> = Vec::new();
     let mut seen_external_edges: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
+    let mut seen_external_symbol_nodes: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut seen_external_symbol_edges: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
     let mut import_symbol_edges: Vec<ImportSymbolEdgeRow> = Vec::new();
     let mut implicit_import_symbol_edges: Vec<ImplicitImportSymbolEdgeRow> = Vec::new();
     let mut export_symbol_edges: Vec<ExportSymbolEdgeRow> = Vec::new();
@@ -540,6 +554,9 @@ pub async fn index_workspace(
             }
             if let Some(ctx) = res.python_context {
                 python_contexts.push(ctx);
+            }
+            if let Some(ctx) = res.go_context {
+                go_contexts.push(ctx);
             }
             if !res.clone_candidates.is_empty() {
                 clone_candidates.extend(res.clone_candidates);
@@ -708,6 +725,7 @@ pub async fn index_workspace(
         &swift_extension_map,
         &swift_contexts,
         &python_contexts,
+        &go_contexts,
     );
     import_symbol_edges.extend(prep.import_symbol_edges);
     export_symbol_edges.extend(prep.export_symbol_edges);
@@ -716,6 +734,16 @@ pub async fn index_workspace(
     let all_symbol_call_rows = prep.symbol_call_rows;
     inferred_call_rows.extend(prep.inferred_call_rows);
     python_inferred_call_rows.extend(prep.python_inferred_call_rows);
+    for node in prep.external_symbol_nodes {
+        if seen_external_symbol_nodes.insert(node.id.clone()) {
+            external_symbol_nodes.push(node);
+        }
+    }
+    for edge in prep.external_symbol_edges {
+        if seen_external_symbol_edges.insert((edge.src.clone(), edge.tgt.clone())) {
+            external_symbol_edges.push(edge);
+        }
+    }
     let file_import_edges = prep.file_import_edges;
     let launch_edges = prep.launch_edges;
 
@@ -738,6 +766,8 @@ pub async fn index_workspace(
                 db_model_refs_by_file,
                 external_api_edges,
                 external_api_urls,
+                external_symbol_nodes,
+                external_symbol_edges,
                 file_import_edges,
                 asset_links: prep.asset_links,
                 api_edges: prep.api_edges,
