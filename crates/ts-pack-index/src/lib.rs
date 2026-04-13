@@ -56,6 +56,10 @@ pub(crate) const REL_BATCH_SIZE: usize = 1000;
 pub(crate) const IMPORT_BATCH_SIZE: usize = 2000;
 /// Number of CallSiteRow items per CALLS write batch (each may unwind many callees)
 pub(crate) const CALLS_BATCH_SIZE: usize = 200;
+/// Number of direct symbol call rows per serialized CALLS/CALLS_INFERRED batch.
+/// This path is the dominant write bottleneck, so a larger batch reduces round-trip
+/// overhead while still keeping transaction size bounded.
+pub(crate) const CALL_EDGE_BATCH_SIZE: usize = 500;
 
 /// Concurrent writers for node phases.
 /// Neo4j Community Edition serialises above 4 concurrent writers internally;
@@ -362,6 +366,9 @@ pub async fn index_workspace(
     // The CONTAINS index lets Neo4j short-circuit the edge scan in rel MERGE.
     for ddl in &[
         "CREATE CONSTRAINT node_id_unique IF NOT EXISTS FOR (n:Node) REQUIRE n.id IS UNIQUE",
+        "CREATE INDEX node_project_name IF NOT EXISTS FOR (n:Node) ON (n.project_id, n.name)",
+        "CREATE INDEX node_project_name_filepath IF NOT EXISTS FOR (n:Node) ON (n.project_id, n.name, n.filepath)",
+        "CREATE INDEX node_project_qualified_name IF NOT EXISTS FOR (n:Node) ON (n.project_id, n.qualified_name)",
         "CREATE INDEX contains_idx IF NOT EXISTS FOR ()-[r:CONTAINS]-() ON (r.project_id)",
     ] {
         writers::run_query_logged(&graph, Query::new(ddl.to_string()), "schema_ddl").await?;

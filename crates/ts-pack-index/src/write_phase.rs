@@ -8,11 +8,11 @@ use neo4rs::Graph;
 use crate::clone_enrich;
 use crate::writers;
 use crate::{
-    ApiRouteCallRow, ApiRouteHandlerRow, CALLS_BATCH_SIZE, CargoCrateFileRow, CargoCrateRow, CargoDependencyEdgeRow,
-    CargoWorkspaceCrateRow, CargoWorkspaceRow, CloneCandidate, DbEdgeRow, DbModelEdgeRow, ExportAliasEdgeRow,
-    ExportSymbolEdgeRow, ExternalApiEdgeRow, ExternalApiNode, FileEdgeRow, FileImportEdgeRow, FileNode,
-    IMPORT_BATCH_SIZE, ImplicitImportSymbolEdgeRow, ImportNode, ImportSymbolEdgeRow, InferredCallRow, LaunchEdgeRow,
-    NODE_BATCH_SIZE, NODE_CONCURRENCY, PythonInferredCallRow, REL_BATCH_SIZE, REL_CONCURRENCY, RelRow,
+    ApiRouteCallRow, ApiRouteHandlerRow, CALLS_BATCH_SIZE, CALL_EDGE_BATCH_SIZE, CargoCrateFileRow, CargoCrateRow,
+    CargoDependencyEdgeRow, CargoWorkspaceCrateRow, CargoWorkspaceRow, CloneCandidate, DbEdgeRow, DbModelEdgeRow,
+    ExportAliasEdgeRow, ExportSymbolEdgeRow, ExternalApiEdgeRow, ExternalApiNode, FileEdgeRow, FileImportEdgeRow,
+    FileNode, IMPORT_BATCH_SIZE, ImplicitImportSymbolEdgeRow, ImportNode, ImportSymbolEdgeRow, InferredCallRow,
+    LaunchEdgeRow, NODE_BATCH_SIZE, NODE_CONCURRENCY, PythonInferredCallRow, REL_BATCH_SIZE, REL_CONCURRENCY, RelRow,
     ResourceBackingRow, ResourceTargetEdgeRow, ResourceUsageRow, RustImplTraitEdgeRow, RustImplTypeEdgeRow,
     SymbolCallRow, SymbolNode, XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow,
     XcodeTargetRow, XcodeWorkspaceProjectRow, XcodeWorkspaceRow, external_api_id, extract_prisma_models,
@@ -90,6 +90,11 @@ pub(crate) async fn run_write_phases(
     // relationship groups. Serializing these batches avoids transient deadlocks
     // from overlapping MERGE lock acquisition across concurrent transactions.
     let call_edge_concurrency = 1usize;
+    // CONTAINS writes touch shared parent/child node relationship groups. Even
+    // with stable sort order, concurrent MERGE batches can still overlap on the
+    // same node sets and trigger transient deadlocks. This phase is cheap enough
+    // that serial execution is the safer default.
+    let contains_rel_concurrency = 1usize;
     // CALLS_DB_MODEL writes MERGE shared File/Model pairs and can deadlock on
     // larger repos when chunked concurrently. Keep this path serialized too.
     let db_model_edge_concurrency = 1usize;
@@ -665,7 +670,7 @@ pub(crate) async fn run_write_phases(
     let rel_count = all_rels.len();
     let t_rels = Instant::now();
     ok_chunks(&all_rels, REL_BATCH_SIZE)
-        .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
+        .try_for_each_concurrent(contains_rel_concurrency, |chunk| {
             let g = Arc::clone(graph);
             let run_id = run_id.clone();
             async move { writers::write_relationships(&g, chunk, &run_id).await }
@@ -687,7 +692,7 @@ pub(crate) async fn run_write_phases(
             .then_with(|| a.caller_filepath.cmp(&b.caller_filepath))
     });
     let calls_row_count = all_symbol_call_rows.len();
-    ok_chunks(&all_symbol_call_rows, CALLS_BATCH_SIZE)
+    ok_chunks(&all_symbol_call_rows, CALL_EDGE_BATCH_SIZE)
         .try_for_each_concurrent(call_edge_concurrency, |chunk| {
             let g = Arc::clone(graph);
             let run_id = run_id.clone();
@@ -747,7 +752,7 @@ pub(crate) async fn run_write_phases(
         let swift_count = inferred_call_rows.len();
         let py_count = python_inferred_call_rows.len();
         if !inferred_call_rows.is_empty() {
-            ok_chunks(&inferred_call_rows, CALLS_BATCH_SIZE)
+            ok_chunks(&inferred_call_rows, CALL_EDGE_BATCH_SIZE)
                 .try_for_each_concurrent(call_edge_concurrency, |chunk| {
                     let g = Arc::clone(graph);
                     let run_id = run_id.clone();
@@ -756,7 +761,7 @@ pub(crate) async fn run_write_phases(
                 .await?;
         }
         if !python_inferred_call_rows.is_empty() {
-            ok_chunks(&python_inferred_call_rows, CALLS_BATCH_SIZE)
+            ok_chunks(&python_inferred_call_rows, CALL_EDGE_BATCH_SIZE)
                 .try_for_each_concurrent(call_edge_concurrency, |chunk| {
                     let g = Arc::clone(graph);
                     let run_id = run_id.clone();
