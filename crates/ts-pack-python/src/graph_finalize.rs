@@ -5,6 +5,7 @@ use std::fs;
 use std::path::Path;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
+use tokio::time::{Duration, sleep};
 
 use crate::swift_semantic;
 
@@ -16,12 +17,85 @@ fn graph_name(prefix: &str, project_id: &str) -> String {
     format!("{prefix}-{project_id}-{stamp:x}")
 }
 
+fn canonical_project_id(project_id: &str) -> &str {
+    project_id
+        .split_once("::shadow::")
+        .map(|(canonical, _)| canonical)
+        .unwrap_or(project_id)
+}
+
 fn strings_to_bolt(items: &[String]) -> BoltType {
     BoltType::from(items.iter().cloned().map(BoltType::from).collect::<Vec<_>>())
 }
 
+fn write_retry_attempts() -> usize {
+    std::env::var("TS_PACK_NEO4J_WRITE_RETRY_ATTEMPTS")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .filter(|v| *v > 0)
+        .unwrap_or(4)
+}
+
+fn write_retry_base_ms() -> u64 {
+    std::env::var("TS_PACK_NEO4J_WRITE_RETRY_BASE_MS")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+        .filter(|v| *v > 0)
+        .unwrap_or(200)
+}
+
+fn env_usize(name: &str, default: usize) -> usize {
+    std::env::var(name)
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .filter(|v| *v > 0)
+        .unwrap_or(default)
+}
+
+fn env_i64(name: &str, default: i64) -> i64 {
+    std::env::var(name)
+        .ok()
+        .and_then(|v| v.parse::<i64>().ok())
+        .filter(|v| *v > 0)
+        .unwrap_or(default)
+}
+
+fn env_bool(name: &str, default: bool) -> bool {
+    std::env::var(name)
+        .ok()
+        .map(|v| matches!(v.trim().to_ascii_lowercase().as_str(), "1" | "true" | "yes" | "on"))
+        .unwrap_or(default)
+}
+
+fn is_retryable_neo4j_write_error(err: &neo4rs::Error) -> bool {
+    let msg = err.to_string().to_lowercase();
+    msg.contains("deadlock")
+        || msg.contains("deadlockdetected")
+        || msg.contains("transienterror")
+        || msg.contains("lockclient")
+        || msg.contains("cannot acquire")
+        || msg.contains("can't acquire")
+}
+
 async fn run(graph: &Arc<Graph>, q: Query) -> Result<(), Box<dyn std::error::Error>> {
-    graph.run(q).await?;
+    let attempts = write_retry_attempts();
+    let base_ms = write_retry_base_ms();
+    for attempt in 1..=attempts {
+        match graph.run(q.clone()).await {
+            Ok(()) => return Ok(()),
+            Err(err) => {
+                if is_retryable_neo4j_write_error(&err) && attempt < attempts {
+                    let delay_ms = base_ms.saturating_mul(attempt as u64);
+                    eprintln!(
+                        "[ts-pack-python] neo4j finalize retry attempt {attempt}/{attempts} after {delay_ms}ms: {err}"
+                    );
+                    sleep(Duration::from_millis(delay_ms)).await;
+                    continue;
+                }
+                return Err(Box::new(err));
+            }
+        }
+    }
     Ok(())
 }
 
@@ -60,9 +134,23 @@ async fn one_bool(graph: &Arc<Graph>, q: Query, key: &str) -> Result<bool, Box<d
     Ok(false)
 }
 
+async fn estimate_bytes_max(graph: &Arc<Graph>, q: Query) -> Result<Option<i64>, Box<dyn std::error::Error>> {
+    let mut result = graph.execute(q).await?;
+    if let Some(row) = result.next().await? {
+        if let Ok(value) = row.get::<i64>("bytesMax") {
+            return Ok(Some(value));
+        }
+        if let Ok(value) = row.get::<i32>("bytesMax") {
+            return Ok(Some(value as i64));
+        }
+    }
+    Ok(None)
+}
+
 async fn ensure_manifest_file_nodes(
     graph: &Arc<Graph>,
     project_id: &str,
+    run_id: &str,
     manifest_file: &str,
 ) -> Result<i64, Box<dyn std::error::Error>> {
     let manifest_text = match fs::read_to_string(manifest_file) {
@@ -87,6 +175,7 @@ async fn ensure_manifest_file_nodes(
 
     let mut missing_rows = Vec::new();
     let mut manifest_paths = Vec::new();
+    let stable_project_id = canonical_project_id(project_id);
     for entry in &manifest {
         let Some(fp) = entry.get("rel_path").and_then(Value::as_str) else {
             continue;
@@ -103,6 +192,7 @@ async fn ensure_manifest_file_nodes(
             .to_string();
         missing_rows.push(json!({
             "id": format!("{project_id}:file:{filepath}"),
+            "stable_id": format!("{stable_project_id}:file:{filepath}"),
             "filepath": filepath,
             "name": name,
         }));
@@ -118,15 +208,22 @@ async fn ensure_manifest_file_nodes(
                  ON CREATE SET
                     f:Node,
                     f:File,
+                    f.stable_id = row.stable_id,
                     f.project_id = $pid,
                     f.filepath = row.filepath,
                     f.file_path = row.filepath,
                     f.name = row.name,
                     f.indexed_at = timestamp(),
-                    f.parsed = false
-                 SET f:Node, f:File, f.file_path = row.filepath",
+                    f.parsed = false,
+                    f.last_seen_run = $run_id
+                 SET f:Node,
+                     f:File,
+                     f.stable_id = row.stable_id,
+                     f.file_path = row.filepath,
+                     f.last_seen_run = $run_id",
             )
             .param("pid", project_id.to_string())
+            .param("run_id", run_id.to_string())
             .param(
                 "batch",
                 BoltType::from(
@@ -147,9 +244,10 @@ async fn ensure_manifest_file_nodes(
         query(
             "MATCH (f:File {project_id:$pid})
              WHERE f.filepath IN $paths
-             SET f:Node",
+             SET f:Node, f.last_seen_run = $run_id",
         )
         .param("pid", project_id.to_string())
+        .param("run_id", run_id.to_string())
         .param("paths", strings_to_bolt(&manifest_paths)),
     )
     .await?;
@@ -160,6 +258,7 @@ async fn ensure_manifest_file_nodes(
 async fn mark_manifest_parsed(
     graph: &Arc<Graph>,
     project_id: &str,
+    run_id: &str,
     parsed_paths: &[String],
 ) -> Result<i64, Box<dyn std::error::Error>> {
     if parsed_paths.is_empty() {
@@ -170,29 +269,111 @@ async fn mark_manifest_parsed(
         query(
             "MATCH (f:File {project_id:$pid})
              WHERE f.filepath IN $paths AND (f.parsed IS NULL OR f.parsed = false)
-             SET f.parsed = true
+             SET f.parsed = true, f.last_seen_run = $run_id
              RETURN count(f) AS updated",
         )
         .param("pid", project_id.to_string())
+        .param("run_id", run_id.to_string())
         .param("paths", strings_to_bolt(parsed_paths)),
         "updated",
     )
     .await
 }
 
-async fn sync_file_path_alias(graph: &Arc<Graph>, project_id: &str) -> Result<i64, Box<dyn std::error::Error>> {
+async fn sync_file_path_alias(
+    graph: &Arc<Graph>,
+    project_id: &str,
+    run_id: &str,
+) -> Result<i64, Box<dyn std::error::Error>> {
     one_i64(
         graph,
         query(
             "MATCH (f:File {project_id:$pid})
              WHERE f.filepath IS NOT NULL
-             SET f.file_path = f.filepath
+             SET f.file_path = f.filepath, f.last_seen_run = $run_id
              RETURN count(f) AS updated",
         )
-        .param("pid", project_id.to_string()),
+        .param("pid", project_id.to_string())
+        .param("run_id", run_id.to_string()),
         "updated",
     )
     .await
+}
+
+async fn build_file_calls_from_symbol_graph(
+    graph: &Arc<Graph>,
+    project_id: &str,
+    run_id: &str,
+) -> Result<i64, Box<dyn std::error::Error>> {
+    one_i64(
+        graph,
+        query(
+            "MATCH (src:File {project_id:$pid})-[:CONTAINS]->(caller:Node {project_id:$pid})
+             MATCH (caller)-[:CALLS|CALLS_INFERRED]->(callee:Node {project_id:$pid})
+             MATCH (dst:File {project_id:$pid})-[:CONTAINS]->(callee)
+             WHERE src <> dst
+             MERGE (src)-[r:CALLS_FILE]->(dst)
+             SET r.project_id = $pid,
+                 r.last_seen_run = $run_id
+             RETURN count(DISTINCT r) AS updated",
+        )
+        .param("pid", project_id.to_string())
+        .param("run_id", run_id.to_string()),
+        "updated",
+    )
+    .await
+}
+
+async fn build_file_graph_links(
+    graph: &Arc<Graph>,
+    project_id: &str,
+    run_id: &str,
+) -> Result<i64, Box<dyn std::error::Error>> {
+    let mut total = 0i64;
+
+    for rel in [
+        "IMPORTS",
+        "ASSET_LINKS",
+        "CALLS_API",
+        "CALLS_SERVICE",
+        "CALLS_DB",
+        "CALLS_FILE",
+    ] {
+        let cypher = format!(
+            "MATCH (src:File {{project_id:$pid}})-[:{rel}]->(dst:File {{project_id:$pid}})
+             WHERE src <> dst
+             MERGE (src)-[r:FILE_GRAPH_LINK]->(dst)
+             SET r.project_id = $pid,
+                 r.last_seen_run = $run_id
+             RETURN count(DISTINCT r) AS updated"
+        );
+        total += one_i64(
+            graph,
+            query(&cypher)
+                .param("pid", project_id.to_string())
+                .param("run_id", run_id.to_string()),
+            "updated",
+        )
+        .await?;
+    }
+
+    total += one_i64(
+        graph,
+        query(
+            "MATCH (src:File {project_id:$pid})-[:CALLS_API_ROUTE]->(:ApiRoute {project_id:$pid})-[:HANDLED_BY]->(dst:File {project_id:$pid})
+             WHERE src <> dst
+             MERGE (src)-[r:FILE_GRAPH_LINK]->(dst)
+             SET r.project_id = $pid,
+                 r.last_seen_run = $run_id
+             RETURN count(DISTINCT r) AS updated",
+        )
+        .param("pid", project_id.to_string())
+        .param("run_id", run_id.to_string()),
+        "updated",
+    )
+    .await?;
+
+    Ok(total)
 }
 
 async fn count_rel(graph: &Arc<Graph>, project_id: &str, rel: &str) -> Result<i64, Box<dyn std::error::Error>> {
@@ -263,8 +444,7 @@ async fn project_file_graph(
     }
     let exists = one_bool(
         graph,
-        query("CALL gds.graph.exists($name) YIELD exists RETURN exists")
-            .param("name", graph_name.to_string()),
+        query("CALL gds.graph.exists($name) YIELD exists RETURN exists").param("name", graph_name.to_string()),
         "exists",
     )
     .await?;
@@ -313,8 +493,7 @@ async fn run_pagerank(graph: &Arc<Graph>, project_id: &str) -> Result<i64, Box<d
     }
     let exists = one_bool(
         graph,
-        query("CALL gds.graph.exists($name) YIELD exists RETURN exists")
-            .param("name", name.clone()),
+        query("CALL gds.graph.exists($name) YIELD exists RETURN exists").param("name", name.clone()),
         "exists",
     )
     .await?;
@@ -408,6 +587,131 @@ async fn run_file_gds(
     }))
 }
 
+async fn run_betweenness_gds(
+    graph: &Arc<Graph>,
+    project_id: &str,
+    rels: &[String],
+) -> Result<Value, Box<dyn std::error::Error>> {
+    let enabled = env_bool("TS_PACK_GDS_ENABLE_BETWEENNESS", true);
+    if !enabled {
+        return Ok(json!({
+            "status": "skipped",
+            "updated": 0,
+            "reason": "disabled_by_env",
+        }));
+    }
+
+    let file_count = count_file_nodes(graph, project_id).await.unwrap_or(0);
+    let max_file_nodes = env_i64("TS_PACK_GDS_BETWEENNESS_MAX_FILE_NODES", 2500);
+    if file_count > max_file_nodes {
+        return Ok(json!({
+            "status": "skipped",
+            "updated": 0,
+            "file_nodes": file_count,
+            "reason": "file_count_above_threshold",
+            "threshold": max_file_nodes,
+        }));
+    }
+
+    let sample_cap = env_usize("TS_PACK_GDS_BETWEENNESS_SAMPLING_CAP", 256);
+    let sampling_size = usize::min(file_count.max(1) as usize, sample_cap);
+    let max_estimated_bytes = env_i64("TS_PACK_GDS_BETWEENNESS_MAX_ESTIMATED_BYTES", 512 * 1024 * 1024);
+    let concurrency = env_usize("TS_PACK_GDS_BETWEENNESS_CONCURRENCY", 1);
+
+    let name = graph_name("betweenness", project_id);
+    let (projected, rel_counts) = project_file_graph(graph, &name, project_id, rels).await?;
+    let total_rel_count: i64 = rel_counts.iter().sum();
+    if !projected {
+        return Ok(json!({
+            "status": "skipped",
+            "updated": 0,
+            "file_nodes": file_count,
+            "file_rel_total": total_rel_count,
+            "file_rel_counts": rel_count_map(rels, &rel_counts),
+            "reason": if total_rel_count < 2 { "insufficient_file_relationships" } else { "projection_skipped" },
+        }));
+    }
+
+    let estimated_bytes = estimate_bytes_max(
+        graph,
+        query(
+            "CALL gds.betweenness.write.estimate($name, {
+                writeProperty: 'betweenness',
+                samplingSize: $samplingSize,
+                concurrency: $concurrency
+            })
+            YIELD bytesMax
+            RETURN bytesMax",
+        )
+        .param("name", name.clone())
+        .param("samplingSize", sampling_size as i64)
+        .param("concurrency", concurrency as i64),
+    )
+    .await?;
+
+    if let Some(bytes_max) = estimated_bytes {
+        if bytes_max > max_estimated_bytes {
+            drop_graph(graph, &name).await;
+            return Ok(json!({
+                "status": "skipped",
+                "updated": 0,
+                "file_nodes": file_count,
+                "file_rel_total": total_rel_count,
+                "file_rel_counts": rel_count_map(rels, &rel_counts),
+                "reason": "estimate_exceeds_threshold",
+                "estimated_bytes_max": bytes_max,
+                "threshold_bytes_max": max_estimated_bytes,
+                "sampling_size": sampling_size,
+            }));
+        }
+    }
+
+    let write_result = run(
+        graph,
+        query(
+            "CALL gds.betweenness.write($name, {
+                writeProperty: 'betweenness',
+                samplingSize: $samplingSize,
+                concurrency: $concurrency
+            })",
+        )
+        .param("name", name.clone())
+        .param("samplingSize", sampling_size as i64)
+        .param("concurrency", concurrency as i64),
+    )
+    .await;
+    if let Err(err) = write_result {
+        drop_graph(graph, &name).await;
+        return Ok(json!({
+            "status": "failed",
+            "updated": 0,
+            "file_nodes": file_count,
+            "file_rel_total": total_rel_count,
+            "file_rel_counts": rel_count_map(rels, &rel_counts),
+            "sampling_size": sampling_size,
+            "error": err.to_string(),
+        }));
+    }
+
+    let updated = one_i64(
+        graph,
+        query("MATCH (f:File {project_id: $pid}) WHERE f.betweenness IS NOT NULL RETURN count(f) AS updated")
+            .param("pid", project_id.to_string()),
+        "updated",
+    )
+    .await?;
+    drop_graph(graph, &name).await;
+    Ok(json!({
+        "status": "ok",
+        "updated": updated,
+        "file_nodes": file_count,
+        "file_rel_total": total_rel_count,
+        "file_rel_counts": rel_count_map(rels, &rel_counts),
+        "estimated_bytes_max": estimated_bytes,
+        "sampling_size": sampling_size,
+    }))
+}
+
 pub async fn finalize_struct_graph_async(
     project_path: &str,
     project_id: &str,
@@ -417,6 +721,7 @@ pub async fn finalize_struct_graph_async(
     neo4j_user: &str,
     neo4j_pass: &str,
     neo4j_db: &str,
+    run_id: Option<&str>,
 ) -> Result<Value, Box<dyn std::error::Error>> {
     let neo4j_config = ConfigBuilder::default()
         .uri(neo4j_uri)
@@ -427,8 +732,26 @@ pub async fn finalize_struct_graph_async(
         .fetch_size(500)
         .build()?;
     let graph = Arc::new(Graph::connect(neo4j_config).await?);
+    let current_run_id = if let Some(run_id) = run_id {
+        run_id.to_string()
+    } else {
+        let mut result = graph
+            .execute(
+                query("MATCH (p:Project {id:$pid}) RETURN p.struct_index_run_id AS run_id")
+                    .param("pid", project_id.to_string()),
+            )
+            .await?;
+        if let Some(row) = result.next().await? {
+            row.get::<String>("run_id").unwrap_or_default()
+        } else {
+            String::new()
+        }
+    };
+    if current_run_id.is_empty() {
+        return Err(format!("missing struct_index_run_id for project {project_id}").into());
+    }
 
-    let added_manifest = ensure_manifest_file_nodes(&graph, project_id, manifest_file).await?;
+    let added_manifest = ensure_manifest_file_nodes(&graph, project_id, &current_run_id, manifest_file).await?;
     let root = fs::canonicalize(project_path).unwrap_or_else(|_| Path::new(project_path).to_path_buf());
     let parsed_paths = indexed_files
         .iter()
@@ -436,8 +759,8 @@ pub async fn finalize_struct_graph_async(
         .filter_map(|path| path.strip_prefix(&root).ok().map(|p| p.to_path_buf()))
         .map(|path| path.to_string_lossy().replace('\\', "/"))
         .collect::<Vec<_>>();
-    let parsed_marked = mark_manifest_parsed(&graph, project_id, &parsed_paths).await?;
-    let aliased = sync_file_path_alias(&graph, project_id).await?;
+    let parsed_marked = mark_manifest_parsed(&graph, project_id, &current_run_id, &parsed_paths).await?;
+    let aliased = sync_file_path_alias(&graph, project_id, &current_run_id).await?;
     let swift_enrichment = swift_semantic::enrich_swift_graph_async(
         project_path,
         project_id,
@@ -448,14 +771,9 @@ pub async fn finalize_struct_graph_async(
         neo4j_db,
     )
     .await?;
-    let rels = vec![
-        "CALLS".to_string(),
-        "IMPORTS".to_string(),
-        "ASSET_LINKS".to_string(),
-        "CALLS_API".to_string(),
-        "CALLS_SERVICE".to_string(),
-        "CALLS_DB".to_string(),
-    ];
+    let file_call_edges = build_file_calls_from_symbol_graph(&graph, project_id, &current_run_id).await?;
+    let file_graph_links = build_file_graph_links(&graph, project_id, &current_run_id).await?;
+    let rels = vec!["FILE_GRAPH_LINK".to_string()];
     let pagerank = run_pagerank(&graph, project_id).await.unwrap_or(0);
     let louvain = run_file_gds(
         &graph,
@@ -468,17 +786,9 @@ pub async fn finalize_struct_graph_async(
     )
     .await
     .unwrap_or_else(|err| json!({"status": "failed", "updated": 0, "error": err.to_string()}));
-    let betweenness = run_file_gds(
-        &graph,
-        "betweenness",
-        project_id,
-        &rels,
-        "CALL gds.betweenness.write($name, { writeProperty: 'betweenness', samplingSize: null })",
-        "MATCH (f:File {project_id: $pid}) WHERE f.betweenness IS NOT NULL RETURN count(f) AS updated",
-        "updated",
-    )
-    .await
-    .unwrap_or_else(|err| json!({"status": "failed", "updated": 0, "error": err.to_string()}));
+    let betweenness = run_betweenness_gds(&graph, project_id, &rels)
+        .await
+        .unwrap_or_else(|err| json!({"status": "failed", "updated": 0, "error": err.to_string()}));
     let wcc_graph = graph_name("wcc", project_id);
     let isolated = match project_file_graph(&graph, &wcc_graph, project_id, &rels).await {
         Ok((true, rel_counts)) => {
@@ -486,8 +796,7 @@ pub async fn finalize_struct_graph_async(
             let file_count = count_file_nodes(&graph, project_id).await.unwrap_or(0);
             let write_result = run(
                 &graph,
-                query("CALL gds.wcc.write($name, { writeProperty: 'wccComponent' })")
-                    .param("name", wcc_graph.clone()),
+                query("CALL gds.wcc.write($name, { writeProperty: 'wccComponent' })").param("name", wcc_graph.clone()),
             )
             .await;
             if let Err(err) = write_result {
@@ -496,6 +805,8 @@ pub async fn finalize_struct_graph_async(
                     "manifest_added": added_manifest,
                     "parsed_marked": parsed_marked,
                     "file_path_aliased": aliased,
+                    "file_call_edges": file_call_edges,
+                    "file_graph_links": file_graph_links,
                     "swift_enrichment": swift_enrichment,
                     "pagerank": pagerank,
                     "louvain": louvain,
@@ -528,6 +839,8 @@ pub async fn finalize_struct_graph_async(
                     "manifest_added": added_manifest,
                     "parsed_marked": parsed_marked,
                     "file_path_aliased": aliased,
+                    "file_call_edges": file_call_edges,
+                    "file_graph_links": file_graph_links,
                     "swift_enrichment": swift_enrichment,
                     "pagerank": pagerank,
                     "louvain": louvain,
@@ -582,6 +895,8 @@ pub async fn finalize_struct_graph_async(
         "manifest_added": added_manifest,
         "parsed_marked": parsed_marked,
         "file_path_aliased": aliased,
+        "file_call_edges": file_call_edges,
+        "file_graph_links": file_graph_links,
         "swift_enrichment": swift_enrichment,
         "pagerank": pagerank,
         "louvain": louvain,

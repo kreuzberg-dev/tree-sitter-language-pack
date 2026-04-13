@@ -486,6 +486,25 @@ const JS_TS_CONST_TAGS: &str = r#"
       property: (property_identifier) @env_key)))
 "#;
 
+const JS_TS_EXPORT_TAGS: &str = r#"
+(export_statement
+  declaration: (function_declaration
+    name: (identifier) @name)) @exported
+
+(export_statement
+  declaration: (class_declaration
+    name: (identifier) @name)) @exported
+
+(export_statement
+  declaration: (class_declaration
+    name: (type_identifier) @name)) @exported
+
+(export_statement
+  declaration: (lexical_declaration
+    (variable_declarator
+      name: (identifier) @name))) @exported
+"#;
+
 /// Go: all top-level functions (all exported if name starts with uppercase,
 /// but we capture all and let the resolver use naming convention).
 const GO_TAGS: &str = r#"
@@ -1031,8 +1050,14 @@ pub struct BatchTagQueryBundles {
 impl BatchTagQueryBundles {
     pub fn for_lang_and_source(&self, lang: &str, source: &[u8]) -> Option<TagQueryBundle> {
         match lang {
-            "javascript" => self.javascript.as_ref().map(|bundle| filter_js_ts_bundle(bundle, source)),
-            "typescript" | "tsx" => self.typescript.as_ref().map(|bundle| filter_js_ts_bundle(bundle, source)),
+            "javascript" => self
+                .javascript
+                .as_ref()
+                .map(|bundle| filter_js_ts_bundle(bundle, source)),
+            "typescript" | "tsx" => self
+                .typescript
+                .as_ref()
+                .map(|bundle| filter_js_ts_bundle(bundle, source)),
             _ => None,
         }
     }
@@ -1086,9 +1111,7 @@ pub fn run_tags(
             })
             .collect::<Vec<_>>()
             .join(", ");
-        eprintln!(
-            "[ts-pack-index:tag-source] lang={lang_name} file={file_path} mode={source_mode} queries=[{kinds}]"
-        );
+        eprintln!("[ts-pack-index:tag-source] lang={lang_name} file={file_path} mode={source_mode} queries=[{kinds}]");
     }
     let mut saw_match = false;
     let profile_queries = std::env::var("TS_PACK_DEBUG_QUERY_PROFILE")
@@ -1147,15 +1170,12 @@ pub fn run_tags(
                     Ok(matches) => (matches, ts_pack::QueryProfile::default()),
                     Err(_) => continue,
                 },
-                TagQuerySource::Prepared(prepared) => match run_prepared_query_with_optional_ranges(
-                    tree,
-                    prepared,
-                    source,
-                    byte_ranges.as_deref(),
-                ) {
-                    Ok(matches) => (matches, ts_pack::QueryProfile::default()),
-                    Err(_) => continue,
-                },
+                TagQuerySource::Prepared(prepared) => {
+                    match run_prepared_query_with_optional_ranges(tree, prepared, source, byte_ranges.as_deref()) {
+                        Ok(matches) => (matches, ts_pack::QueryProfile::default()),
+                        Err(_) => continue,
+                    }
+                }
             }
         };
         if !matches.is_empty() {
@@ -1193,7 +1213,15 @@ pub fn run_tags(
             let wall_secs = wall_started
                 .map(|started| started.elapsed().as_secs_f64())
                 .unwrap_or(profile.elapsed_secs + process_secs);
-            record_query_profile(lang_name, query_label, file_path, profile, process_secs, wall_secs, source_kind);
+            record_query_profile(
+                lang_name,
+                query_label,
+                file_path,
+                profile,
+                process_secs,
+                wall_secs,
+                source_kind,
+            );
             if profile_query_lines && process_secs >= 0.010 {
                 eprintln!(
                     "[ts-pack-index:query-process] lang={lang_name} label={} file={} matches={} process_ms={:.2}",
@@ -1264,10 +1292,11 @@ fn tags_query(lang: &str) -> Option<&'static str> {
 
 fn valid_tags_query(cache_key: &str, lang: &str, raw_query: &'static str) -> Option<Arc<String>> {
     let started = Instant::now();
+    let cache_id = format!("{lang}:{cache_key}");
     if let Some(query) = VALID_TAGS_QUERY_CACHE
         .read()
         .ok()
-        .and_then(|cache| cache.get(cache_key).cloned())
+        .and_then(|cache| cache.get(&cache_id).cloned())
     {
         if let Ok(mut agg) = VALID_TAGS_QUERY_PROFILE.lock() {
             agg.entry((lang.to_string(), cache_key.to_string()))
@@ -1288,9 +1317,7 @@ fn valid_tags_query(cache_key: &str, lang: &str, raw_query: &'static str) -> Opt
 
     let combined = Arc::new(valid_patterns.join("\n\n"));
     let result = if let Ok(mut cache) = VALID_TAGS_QUERY_CACHE.write() {
-        let entry = cache
-            .entry(cache_key.to_string())
-            .or_insert_with(|| Arc::clone(&combined));
+        let entry = cache.entry(cache_id).or_insert_with(|| Arc::clone(&combined));
         Some(Arc::clone(entry))
     } else {
         Some(combined)
@@ -1319,11 +1346,9 @@ fn query_sources_for(lang: &str, source: &[u8]) -> Option<Vec<(String, TagQueryS
     match lang {
         "javascript" => js_ts_query_sources("javascript", false, source),
         "typescript" | "tsx" => js_ts_query_sources(lang, true, source),
-        _ => {
-            tags_query(lang).and_then(|query| {
-                valid_tags_query(lang, lang, query).map(|q| vec![(lang.to_string(), TagQuerySource::QueryText(q))])
-            })
-        }
+        _ => tags_query(lang).and_then(|query| {
+            valid_tags_query(lang, lang, query).map(|q| vec![(lang.to_string(), TagQuerySource::QueryText(q))])
+        }),
     }
 }
 
@@ -1338,17 +1363,17 @@ fn build_fixed_js_ts_bundle(lang: &str, is_typescript: bool) -> Option<TagQueryB
         call_key.to_string(),
         TagQuerySource::Prepared(prepare_valid_tags_query(lang, call_raw)?),
     )];
-    if let Some(query) = prepare_valid_tags_query(lang, JS_TS_DB_TAGS)
-    {
+    if let Some(query) = prepare_valid_tags_query(lang, JS_TS_DB_TAGS) {
         queries.push(("js-ts:db".to_string(), TagQuerySource::Prepared(query)));
     }
-    if let Some(query) = prepare_valid_tags_query(lang, JS_TS_EXTERNAL_TAGS)
-    {
+    if let Some(query) = prepare_valid_tags_query(lang, JS_TS_EXTERNAL_TAGS) {
         queries.push(("js-ts:external".to_string(), TagQuerySource::Prepared(query)));
     }
-    if let Some(query) = prepare_valid_tags_query(lang, JS_TS_CONST_TAGS)
-    {
+    if let Some(query) = prepare_valid_tags_query(lang, JS_TS_CONST_TAGS) {
         queries.push(("js-ts:const".to_string(), TagQuerySource::Prepared(query)));
+    }
+    if let Some(query) = prepare_valid_tags_query(lang, JS_TS_EXPORT_TAGS) {
+        queries.push(("js-ts:export".to_string(), TagQuerySource::Prepared(query)));
     }
     Some(TagQueryBundle::from_queries(queries))
 }
@@ -1371,6 +1396,7 @@ fn js_ts_query_sources(lang: &str, is_typescript: bool, source: &[u8]) -> Option
         || source_text.contains("db.");
     let wants_external = has_js_ts_external_call_hints(source_text);
     let wants_const = wants_external || source_text.contains("process.env") || source_text.contains("import.meta.env");
+    let wants_export = source_text.contains("export ");
 
     if wants_db {
         if let Some(query) = valid_tags_query("js-ts:db", lang, JS_TS_DB_TAGS) {
@@ -1386,6 +1412,11 @@ fn js_ts_query_sources(lang: &str, is_typescript: bool, source: &[u8]) -> Option
     if wants_const {
         if let Some(query) = valid_tags_query("js-ts:const", lang, JS_TS_CONST_TAGS) {
             queries.push(("js-ts:const".to_string(), TagQuerySource::QueryText(query)));
+        }
+    }
+    if wants_export {
+        if let Some(query) = valid_tags_query("js-ts:export", lang, JS_TS_EXPORT_TAGS) {
+            queries.push(("js-ts:export".to_string(), TagQuerySource::QueryText(query)));
         }
     }
 
@@ -1412,6 +1443,7 @@ fn filter_js_ts_bundle(bundle: &TagQueryBundle, source: &[u8]) -> TagQueryBundle
         || source_text.contains("db.");
     let wants_external = has_js_ts_external_call_hints(source_text);
     let wants_const = wants_external || source_text.contains("process.env") || source_text.contains("import.meta.env");
+    let wants_export = source_text.contains("export ");
 
     let queries = bundle
         .as_slice()
@@ -1420,6 +1452,7 @@ fn filter_js_ts_bundle(bundle: &TagQueryBundle, source: &[u8]) -> TagQueryBundle
             "js-ts:db" => wants_db,
             "js-ts:external" => wants_external,
             "js-ts:const" => wants_const,
+            "js-ts:export" => wants_export,
             _ => true,
         })
         .cloned()
@@ -1501,13 +1534,8 @@ fn run_query_profiled_with_optional_ranges(
     let mut out = Vec::new();
     let mut profile = ts_pack::QueryProfile::default();
     for range in ranges {
-        let (matches, current) = ts_pack::run_query_in_byte_range_profiled(
-            tree,
-            language,
-            query_source,
-            source,
-            range.clone(),
-        )?;
+        let (matches, current) =
+            ts_pack::run_query_in_byte_range_profiled(tree, language, query_source, source, range.clone())?;
         out.extend(matches);
         profile.lookup_secs += current.lookup_secs;
         profile.match_count += current.match_count;
@@ -1574,9 +1602,7 @@ fn collect_tag_match(
     launch_calls: &mut Vec<String>,
     is_external_callee: &dyn Fn(&str) -> bool,
 ) {
-    let is_db_object = |name: &str| {
-        matches!(name, "prisma" | "tx" | "prismaClient" | "db") || name.ends_with("Prisma")
-    };
+    let is_db_object = |name: &str| matches!(name, "prisma" | "tx" | "prismaClient" | "db") || name.ends_with("Prisma");
     let capture_text = |node_info: &ts_pack::NodeInfo| -> Option<&str> {
         std::str::from_utf8(&source[node_info.start_byte..node_info.end_byte]).ok()
     };
@@ -1647,10 +1673,7 @@ fn collect_tag_match(
             }
             "db" => {
                 if source.get(node_info.start_byte).copied() != Some(b'$')
-                    && db_object
-                        .as_deref()
-                        .map(is_db_object)
-                        .unwrap_or(false)
+                    && db_object.as_deref().map(is_db_object).unwrap_or(false)
                     && is_delegate_property_use(source, node_info.end_byte)
                 {
                     if let Some(text) = capture_text(node_info) {
@@ -2149,7 +2172,10 @@ mod tests {
         };
         let tags = run_tags("typescript", &tree, source.as_bytes(), "fixture.ts", None).expect("tags");
 
-        assert!(tags.db_models.is_empty(), "non-prisma member chains should not be tagged as DB models");
+        assert!(
+            tags.db_models.is_empty(),
+            "non-prisma member chains should not be tagged as DB models"
+        );
     }
 }
 #[derive(Debug, Clone, Copy, Default)]

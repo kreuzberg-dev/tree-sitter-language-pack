@@ -17,10 +17,8 @@ static FILE_FACTS_EXTRACTION_CACHE: LazyLock<RwLock<AHashMap<String, Arc<Compile
 static FETCH_METHOD_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"method\s*:\s*["'](?P<method>[A-Za-z]+)["']"#).unwrap());
 static HTTP_MEMBER_WRAPPER_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(
-        r"(?P<client>[A-Za-z_][A-Za-z0-9_]*)\s*\.\s*(?P<method>get|post|put|patch|delete|head|options)\s*\(",
-    )
-    .unwrap()
+    Regex::new(r"(?P<client>[A-Za-z_][A-Za-z0-9_]*)\s*\.\s*(?P<method>get|post|put|patch|delete|head|options)\s*\(")
+        .unwrap()
 });
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -951,13 +949,9 @@ fn normalize_rust_type_name(raw: &str) -> Option<String> {
 }
 
 fn first_capture_text<'a>(m: &'a MatchResult, name: &str) -> Option<&'a str> {
-    m.captures.iter().find_map(|cap| {
-        if cap.name == name {
-            cap.text.as_deref()
-        } else {
-            None
-        }
-    })
+    m.captures
+        .iter()
+        .find_map(|cap| if cap.name == name { cap.text.as_deref() } else { None })
 }
 
 fn pattern_matches<'a>(raw: &'a ExtractionResult, name: &str) -> &'a [MatchResult] {
@@ -1023,8 +1017,13 @@ fn parse_single_js_param(params: &str) -> Option<&str> {
 }
 
 fn infer_js_http_wrapper(body: &str, arg: &str) -> Option<(String, String)> {
-    if !body.contains("fetch(") && !body.contains(".get(") && !body.contains(".post(") && !body.contains(".put(")
-        && !body.contains(".patch(") && !body.contains(".delete(") && !body.contains(".head(")
+    if !body.contains("fetch(")
+        && !body.contains(".get(")
+        && !body.contains(".post(")
+        && !body.contains(".put(")
+        && !body.contains(".patch(")
+        && !body.contains(".delete(")
+        && !body.contains(".head(")
         && !body.contains(".options(")
     {
         return None;
@@ -1047,7 +1046,9 @@ fn infer_js_http_wrapper(body: &str, arg: &str) -> Option<(String, String)> {
         };
         let tail = &body[call.end()..];
         let trimmed = tail.trim_start();
-        if !(trimmed.starts_with(arg) || trimmed.starts_with(&format!("{arg},")) || trimmed.starts_with(&format!("{arg})")))
+        if !(trimmed.starts_with(arg)
+            || trimmed.starts_with(&format!("{arg},"))
+            || trimmed.starts_with(&format!("{arg})")))
         {
             continue;
         }

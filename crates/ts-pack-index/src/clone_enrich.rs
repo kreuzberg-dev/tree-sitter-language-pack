@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use futures::{TryStreamExt, stream};
-use neo4rs::{Graph, Query};
+use neo4rs::Graph;
 
 use crate::writers;
 use crate::{
@@ -42,6 +42,7 @@ fn ok_chunks<'a, T>(
 pub(crate) async fn write_clone_enrichment(
     graph: &Arc<Graph>,
     project_id: &str,
+    run_id: &str,
     clone_candidates: &[CloneCandidate],
     rel_batch_size: usize,
     rel_concurrency: usize,
@@ -298,21 +299,6 @@ pub(crate) async fn write_clone_enrichment(
         });
     }
 
-    writers::run_query_logged(
-        graph,
-        Query::new("MATCH (g:CloneGroup {project_id:$pid}) DETACH DELETE g".to_string())
-            .param("pid", project_id.to_string()),
-        "delete_clone_groups",
-    )
-    .await?;
-    writers::run_query_logged(
-        graph,
-        Query::new("MATCH (g:FileCloneGroup {project_id:$pid}) DETACH DELETE g".to_string())
-            .param("pid", project_id.to_string()),
-        "delete_file_clone_groups",
-    )
-    .await?;
-
     let clone_write_concurrency = 1usize.min(rel_concurrency.max(1));
     clone_group_rows.sort_by(|a, b| a.id.cmp(&b.id));
     clone_member_rows.sort_by(|a, b| a.gid.cmp(&b.gid).then_with(|| a.sid.cmp(&b.sid)));
@@ -326,19 +312,22 @@ pub(crate) async fn write_clone_enrichment(
         ok_chunks(&clone_group_rows, rel_batch_size)
             .try_for_each_concurrent(clone_write_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_clone_groups(&g, chunk).await }
+                let run_id = run_id.to_string();
+                async move { writers::write_clone_groups(&g, chunk, &run_id).await }
             })
             .await?;
         ok_chunks(&clone_member_rows, rel_batch_size)
             .try_for_each_concurrent(clone_write_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_clone_members(&g, chunk).await }
+                let run_id = run_id.to_string();
+                async move { writers::write_clone_members(&g, chunk, &run_id).await }
             })
             .await?;
         ok_chunks(&clone_canon_rows, rel_batch_size)
             .try_for_each_concurrent(clone_write_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_clone_canon(&g, chunk).await }
+                let run_id = run_id.to_string();
+                async move { writers::write_clone_canon(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -346,19 +335,22 @@ pub(crate) async fn write_clone_enrichment(
         ok_chunks(&file_group_rows, rel_batch_size)
             .try_for_each_concurrent(clone_write_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_file_clone_groups(&g, chunk).await }
+                let run_id = run_id.to_string();
+                async move { writers::write_file_clone_groups(&g, chunk, &run_id).await }
             })
             .await?;
         ok_chunks(&file_member_rows, rel_batch_size)
             .try_for_each_concurrent(clone_write_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_file_clone_members(&g, chunk).await }
+                let run_id = run_id.to_string();
+                async move { writers::write_file_clone_members(&g, chunk, &run_id).await }
             })
             .await?;
         ok_chunks(&file_canon_rows, rel_batch_size)
             .try_for_each_concurrent(clone_write_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_file_clone_canon(&g, chunk).await }
+                let run_id = run_id.to_string();
+                async move { writers::write_file_clone_canon(&g, chunk, &run_id).await }
             })
             .await?;
     }

@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use futures::{TryStreamExt, stream};
-use neo4rs::{Graph, Query};
+use neo4rs::Graph;
 
 use crate::clone_enrich;
 use crate::writers;
@@ -26,6 +26,7 @@ pub(crate) struct WritePhaseSummary {
 }
 
 pub(crate) struct WriteInputs {
+    pub(crate) run_id: String,
     pub(crate) all_files: Vec<FileNode>,
     pub(crate) all_symbols: HashMap<&'static str, Vec<SymbolNode>>,
     pub(crate) all_imports: Vec<ImportNode>,
@@ -94,6 +95,7 @@ pub(crate) async fn run_write_phases(
     let db_model_edge_concurrency = 1usize;
 
     let WriteInputs {
+        run_id,
         all_files,
         mut all_symbols,
         all_imports,
@@ -143,13 +145,6 @@ pub(crate) async fn run_write_phases(
         .find(|f| f.filepath == "prisma/schema.prisma")
         .map(|f| f.id.clone());
     if let Some(schema_id) = schema_id {
-        writers::run_query_logged(
-            graph,
-            Query::new("MATCH (:File {project_id: $pid})-[r:CALLS_DB]->() DELETE r".to_string())
-                .param("pid", project_id.to_string()),
-            "delete_calls_db",
-        )
-        .await?;
         let mut seen: HashSet<String> = HashSet::new();
         let mut db_edges = Vec::new();
         for src in &db_sources {
@@ -167,7 +162,8 @@ pub(crate) async fn run_write_phases(
             ok_chunks(&db_edges, CALLS_BATCH_SIZE)
                 .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                     let g = Arc::clone(graph);
-                    async move { writers::write_db_edges(&g, chunk).await }
+                    let run_id = run_id.clone();
+                    async move { writers::write_db_edges(&g, chunk, &run_id).await }
                 })
                 .await?;
             eprintln!(
@@ -206,13 +202,6 @@ pub(crate) async fn run_write_phases(
             project_id: Arc::clone(project_id),
         });
     }
-    writers::run_query_logged(
-        graph,
-        Query::new("MATCH (m:Model {project_id: $pid}) DETACH DELETE m".to_string())
-            .param("pid", project_id.to_string()),
-        "delete_models",
-    )
-    .await?;
     if !db_model_edges.is_empty() {
         db_model_edges.sort_by(|a, b| a.src.cmp(&b.src).then_with(|| a.model.cmp(&b.model)));
         let t_dbm = Instant::now();
@@ -220,7 +209,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&db_model_edges, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(db_model_edge_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_db_model_edges(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_db_model_edges(&g, chunk, &run_id).await }
             })
             .await?;
         eprintln!(
@@ -230,20 +220,6 @@ pub(crate) async fn run_write_phases(
         );
     }
 
-    writers::run_query_logged(
-        graph,
-        Query::new("MATCH (:File {project_id: $pid})-[r:CALLS_API_EXTERNAL]->() DELETE r".to_string())
-            .param("pid", project_id.to_string()),
-        "delete_calls_api_external",
-    )
-    .await?;
-    writers::run_query_logged(
-        graph,
-        Query::new("MATCH (e:ExternalAPI {project_id: $pid}) DETACH DELETE e".to_string())
-            .param("pid", project_id.to_string()),
-        "delete_external_api_nodes",
-    )
-    .await?;
     if !external_api_urls.is_empty() && !external_api_edges.is_empty() {
         let t_ext = Instant::now();
         let mut external_nodes = Vec::new();
@@ -258,7 +234,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&external_nodes, NODE_BATCH_SIZE)
             .try_for_each_concurrent(NODE_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_external_api_nodes(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_external_api_nodes(&g, chunk, &run_id).await }
             })
             .await?;
         let mut external_api_edges = external_api_edges;
@@ -267,7 +244,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&external_api_edges, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_external_api_edges(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_external_api_edges(&g, chunk, &run_id).await }
             })
             .await?;
         eprintln!(
@@ -277,119 +255,6 @@ pub(crate) async fn run_write_phases(
         );
     }
 
-    writers::run_query_logged(
-        graph,
-        Query::new("MATCH (:File {project_id: $pid})-[r:IMPORTS]->() DELETE r".to_string())
-            .param("pid", project_id.to_string()),
-        "delete_imports",
-    )
-    .await?;
-
-    for (label, cypher) in [
-        (
-            "delete_asset_links",
-            "MATCH (:File {project_id: $pid})-[r:ASSET_LINKS]->() DELETE r",
-        ),
-        (
-            "delete_calls_api",
-            "MATCH (:File {project_id: $pid})-[r:CALLS_API]->() DELETE r",
-        ),
-        (
-            "delete_calls_api_route",
-            "MATCH (:File {project_id: $pid})-[r:CALLS_API_ROUTE]->() DELETE r",
-        ),
-        (
-            "delete_api_route_handlers",
-            "MATCH (:ApiRoute {project_id: $pid})-[r:HANDLED_BY]->() DELETE r",
-        ),
-        (
-            "delete_api_routes",
-            "MATCH (r:ApiRoute {project_id: $pid}) DETACH DELETE r",
-        ),
-        (
-            "delete_calls_service",
-            "MATCH (:File {project_id: $pid})-[r:CALLS_SERVICE]->() DELETE r",
-        ),
-        (
-            "delete_resource_links",
-            "MATCH (:File {project_id: $pid})-[r:USES_ASSET|USES_COLOR_ASSET|USES_XIB|USES_STORYBOARD]->() DELETE r",
-        ),
-        (
-            "delete_resource_backing",
-            "MATCH (:Resource {project_id: $pid})-[r:BACKED_BY_FILE]->() DELETE r",
-        ),
-        (
-            "delete_resource_target",
-            "MATCH (:Resource {project_id: $pid})-[r:BUNDLED_IN_TARGET]->() DELETE r",
-        ),
-        (
-            "delete_resources",
-            "MATCH (r:Resource {project_id: $pid}) DETACH DELETE r",
-        ),
-        (
-            "delete_target_files",
-            "MATCH (:XcodeTarget {project_id: $pid})-[r:BUNDLES_FILE]->() DELETE r",
-        ),
-        (
-            "delete_workspace_projects",
-            "MATCH (:XcodeWorkspace {project_id: $pid})-[r:REFERENCES_PROJECT]->() DELETE r",
-        ),
-        (
-            "delete_scheme_targets",
-            "MATCH (:XcodeScheme {project_id: $pid})-[r:BUILDS_TARGET]->() DELETE r",
-        ),
-        (
-            "delete_scheme_files",
-            "MATCH (:XcodeScheme {project_id: $pid})-[r:DEFINED_IN_FILE]->() DELETE r",
-        ),
-        (
-            "delete_targets",
-            "MATCH (t:XcodeTarget {project_id: $pid}) DETACH DELETE t",
-        ),
-        (
-            "delete_schemes",
-            "MATCH (s:XcodeScheme {project_id: $pid}) DETACH DELETE s",
-        ),
-        (
-            "delete_workspaces",
-            "MATCH (w:XcodeWorkspace {project_id: $pid}) DETACH DELETE w",
-        ),
-        (
-            "delete_cargo_workspace_crates",
-            "MATCH (:CargoWorkspace {project_id: $pid})-[r:HAS_PACKAGE]->() DELETE r",
-        ),
-        (
-            "delete_cargo_crate_files",
-            "MATCH (:CargoCrate {project_id: $pid})-[r:DEFINED_IN_FILE]->() DELETE r",
-        ),
-        (
-            "delete_cargo_dependencies",
-            "MATCH (:CargoCrate {project_id: $pid})-[r:DEPENDS_ON_PACKAGE]->() DELETE r",
-        ),
-        (
-            "delete_cargo_workspaces",
-            "MATCH (w:CargoWorkspace {project_id: $pid}) DETACH DELETE w",
-        ),
-        (
-            "delete_cargo_crates",
-            "MATCH (c:CargoCrate {project_id: $pid}) DETACH DELETE c",
-        ),
-        (
-            "delete_rust_impl_trait",
-            "MATCH (:Impl {project_id: $pid})-[r:IMPLEMENTS_TRAIT]->() DELETE r",
-        ),
-        (
-            "delete_rust_impl_type",
-            "MATCH (:Impl {project_id: $pid})-[r:IMPLEMENTS_TYPE]->() DELETE r",
-        ),
-    ] {
-        writers::run_query_logged(
-            graph,
-            Query::new(cypher.to_string()).param("pid", project_id.to_string()),
-            label,
-        )
-        .await?;
-    }
     if !file_import_edges.is_empty() {
         let mut file_import_edges = file_import_edges;
         file_import_edges.sort_by(|a, b| {
@@ -402,7 +267,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&file_import_edges, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_file_import_edges(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_file_import_edges(&g, chunk, &run_id).await }
             })
             .await?;
         eprintln!(
@@ -422,7 +288,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&asset_links, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_file_edges(&g, chunk, "ASSET_LINKS").await }
+                let run_id = run_id.clone();
+                async move { writers::write_file_edges(&g, chunk, "ASSET_LINKS", &run_id).await }
             })
             .await?;
     }
@@ -436,7 +303,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&api_edges, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_file_edges(&g, chunk, "CALLS_API").await }
+                let run_id = run_id.clone();
+                async move { writers::write_file_edges(&g, chunk, "CALLS_API", &run_id).await }
             })
             .await?;
     }
@@ -450,7 +318,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&service_edges, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_file_edges(&g, chunk, "CALLS_SERVICE").await }
+                let run_id = run_id.clone();
+                async move { writers::write_file_edges(&g, chunk, "CALLS_SERVICE", &run_id).await }
             })
             .await?;
     }
@@ -458,7 +327,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&api_route_calls, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_api_route_calls(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_api_route_calls(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -466,7 +336,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&api_route_handlers, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_api_route_handlers(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_api_route_handlers(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -480,7 +351,8 @@ pub(crate) async fn run_write_phases(
                 .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                     let g = Arc::clone(graph);
                     let rel_name = rel_name.clone();
-                    async move { writers::write_resource_usage_edges(&g, chunk, &rel_name).await }
+                    let run_id = run_id.clone();
+                    async move { writers::write_resource_usage_edges(&g, chunk, &rel_name, &run_id).await }
                 })
                 .await?;
         }
@@ -489,7 +361,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&resource_backings, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_resource_backings(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_resource_backings(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -497,7 +370,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&xcode_targets, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_xcode_targets(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_xcode_targets(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -505,7 +379,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&cargo_crates, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_cargo_crates(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_cargo_crates(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -513,7 +388,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&cargo_workspaces, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_cargo_workspaces(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_cargo_workspaces(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -521,7 +397,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&cargo_workspace_crates, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_cargo_workspace_crates(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_cargo_workspace_crates(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -529,7 +406,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&cargo_crate_files, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_cargo_crate_files(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_cargo_crate_files(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -537,7 +415,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&cargo_dependency_edges, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_cargo_dependency_edges(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_cargo_dependency_edges(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -545,7 +424,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&xcode_target_files, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_xcode_target_files(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_xcode_target_files(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -553,7 +433,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&xcode_target_resources, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_xcode_target_resources(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_xcode_target_resources(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -561,7 +442,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&xcode_workspaces, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_xcode_workspaces(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_xcode_workspaces(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -569,7 +451,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&xcode_workspace_projects, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_xcode_workspace_projects(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_xcode_workspace_projects(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -577,7 +460,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&xcode_schemes, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_xcode_schemes(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_xcode_schemes(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -585,7 +469,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&xcode_scheme_targets, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_xcode_scheme_targets(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_xcode_scheme_targets(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -593,39 +478,11 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&xcode_scheme_files, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_xcode_scheme_files(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_xcode_scheme_files(&g, chunk, &run_id).await }
             })
             .await?;
     }
-
-    writers::run_query_logged(
-        graph,
-        Query::new("MATCH (:File {project_id: $pid})-[r:IMPORTS_SYMBOL]->() DELETE r".to_string())
-            .param("pid", project_id.to_string()),
-        "delete_imports_symbol",
-    )
-    .await?;
-    writers::run_query_logged(
-        graph,
-        Query::new("MATCH (:File {project_id: $pid})-[r:IMPLICIT_IMPORTS_SYMBOL]->() DELETE r".to_string())
-            .param("pid", project_id.to_string()),
-        "delete_implicit_imports_symbol",
-    )
-    .await?;
-    writers::run_query_logged(
-        graph,
-        Query::new("MATCH (:File {project_id: $pid})-[r:EXPORTS_SYMBOL]->() DELETE r".to_string())
-            .param("pid", project_id.to_string()),
-        "delete_exports_symbol",
-    )
-    .await?;
-    writers::run_query_logged(
-        graph,
-        Query::new("MATCH (:File {project_id: $pid})-[r:EXPORTS_SYMBOL_AS]->() DELETE r".to_string())
-            .param("pid", project_id.to_string()),
-        "delete_exports_symbol_as",
-    )
-    .await?;
 
     let t_nodes = Instant::now();
     let mut all_files = all_files;
@@ -633,7 +490,8 @@ pub(crate) async fn run_write_phases(
     ok_chunks(&all_files, NODE_BATCH_SIZE)
         .try_for_each_concurrent(NODE_CONCURRENCY, |chunk| {
             let g = Arc::clone(graph);
-            async move { writers::write_file_nodes(&g, chunk).await }
+            let run_id = run_id.clone();
+            async move { writers::write_file_nodes(&g, chunk, &run_id).await }
         })
         .await?;
 
@@ -645,7 +503,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(nodes, NODE_BATCH_SIZE)
             .try_for_each_concurrent(NODE_CONCURRENCY, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_symbol_nodes(&g, chunk, label).await }
+                let run_id = run_id.clone();
+                async move { writers::write_symbol_nodes(&g, chunk, label, &run_id).await }
             })
             .await?;
     }
@@ -667,7 +526,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&import_symbol_edges, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(symbol_edge_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_import_symbol_edges(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_import_symbol_edges(&g, chunk, &run_id).await }
             })
             .await?;
         eprintln!(
@@ -685,7 +545,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&implicit_import_symbol_edges, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(symbol_edge_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_implicit_import_symbol_edges(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_implicit_import_symbol_edges(&g, chunk, &run_id).await }
             })
             .await?;
         eprintln!(
@@ -703,7 +564,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&export_symbol_edges, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(symbol_edge_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_export_symbol_edges(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_export_symbol_edges(&g, chunk, &run_id).await }
             })
             .await?;
         eprintln!(
@@ -725,7 +587,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&export_alias_edges, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(symbol_edge_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_export_alias_edges(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_export_alias_edges(&g, chunk, &run_id).await }
             })
             .await?;
         eprintln!(
@@ -740,7 +603,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&rust_impl_trait_edges, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(symbol_edge_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_rust_impl_trait_edges(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_rust_impl_trait_edges(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -750,7 +614,8 @@ pub(crate) async fn run_write_phases(
         ok_chunks(&rust_impl_type_edges, CALLS_BATCH_SIZE)
             .try_for_each_concurrent(symbol_edge_concurrency, |chunk| {
                 let g = Arc::clone(graph);
-                async move { writers::write_rust_impl_type_edges(&g, chunk).await }
+                let run_id = run_id.clone();
+                async move { writers::write_rust_impl_type_edges(&g, chunk, &run_id).await }
             })
             .await?;
     }
@@ -784,7 +649,8 @@ pub(crate) async fn run_write_phases(
     ok_chunks(&all_imports, IMPORT_BATCH_SIZE)
         .try_for_each_concurrent(NODE_CONCURRENCY, |chunk| {
             let g = Arc::clone(graph);
-            async move { writers::write_import_nodes(&g, chunk).await }
+            let run_id = run_id.clone();
+            async move { writers::write_import_nodes(&g, chunk, &run_id).await }
         })
         .await?;
     let import_elapsed = t_imports.elapsed();
@@ -801,7 +667,8 @@ pub(crate) async fn run_write_phases(
     ok_chunks(&all_rels, REL_BATCH_SIZE)
         .try_for_each_concurrent(REL_CONCURRENCY, |chunk| {
             let g = Arc::clone(graph);
-            async move { writers::write_relationships(&g, chunk).await }
+            let run_id = run_id.clone();
+            async move { writers::write_relationships(&g, chunk, &run_id).await }
         })
         .await?;
     let rel_elapsed = t_rels.elapsed();
@@ -823,7 +690,8 @@ pub(crate) async fn run_write_phases(
     ok_chunks(&all_symbol_call_rows, CALLS_BATCH_SIZE)
         .try_for_each_concurrent(call_edge_concurrency, |chunk| {
             let g = Arc::clone(graph);
-            async move { writers::write_calls(&g, chunk).await }
+            let run_id = run_id.clone();
+            async move { writers::write_calls(&g, chunk, &run_id).await }
         })
         .await?;
 
@@ -844,6 +712,7 @@ pub(crate) async fn run_write_phases(
         clone_enrich::write_clone_enrichment(
             graph,
             project_id.as_ref(),
+            &run_id,
             &clone_candidates,
             REL_BATCH_SIZE,
             REL_CONCURRENCY,
@@ -881,7 +750,8 @@ pub(crate) async fn run_write_phases(
             ok_chunks(&inferred_call_rows, CALLS_BATCH_SIZE)
                 .try_for_each_concurrent(call_edge_concurrency, |chunk| {
                     let g = Arc::clone(graph);
-                    async move { writers::write_inferred_calls(&g, chunk).await }
+                    let run_id = run_id.clone();
+                    async move { writers::write_inferred_calls(&g, chunk, &run_id).await }
                 })
                 .await?;
         }
@@ -889,7 +759,8 @@ pub(crate) async fn run_write_phases(
             ok_chunks(&python_inferred_call_rows, CALLS_BATCH_SIZE)
                 .try_for_each_concurrent(call_edge_concurrency, |chunk| {
                     let g = Arc::clone(graph);
-                    async move { writers::write_python_inferred_calls(&g, chunk).await }
+                    let run_id = run_id.clone();
+                    async move { writers::write_python_inferred_calls(&g, chunk, &run_id).await }
                 })
                 .await?;
         }

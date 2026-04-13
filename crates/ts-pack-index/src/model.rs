@@ -7,6 +7,7 @@ use crate::tags;
 
 pub(crate) struct FileNode {
     pub(crate) id: String,
+    pub(crate) stable_id: String,
     pub(crate) name: String,
     pub(crate) filepath: String,
     pub(crate) project_id: Arc<str>,
@@ -15,6 +16,7 @@ pub(crate) struct FileNode {
 
 pub(crate) struct SymbolNode {
     pub(crate) id: String,
+    pub(crate) stable_id: String,
     pub(crate) name: String,
     pub(crate) kind: String,
     pub(crate) qualified_name: Option<String>,
@@ -342,7 +344,9 @@ pub(crate) struct CloneCandidate {
 
 pub(crate) struct ImportNode {
     pub(crate) id: String,
+    pub(crate) stable_id: String,
     pub(crate) file_id: String,
+    pub(crate) stable_file_id: String,
     pub(crate) name: String,
     pub(crate) source: String,
     pub(crate) is_wildcard: bool,
@@ -883,6 +887,7 @@ impl FileNode {
         Value::Object({
             let mut m = serde_json::Map::new();
             m.insert("id".into(), Value::String(self.id.clone()));
+            m.insert("stable_id".into(), Value::String(self.stable_id.clone()));
             m.insert("name".into(), Value::String(self.name.clone()));
             m.insert("filepath".into(), Value::String(self.filepath.clone()));
             m.insert("project_id".into(), Value::String(self.project_id.to_string()));
@@ -897,6 +902,7 @@ impl SymbolNode {
         Value::Object({
             let mut m = serde_json::Map::new();
             m.insert("id".into(), Value::String(self.id.clone()));
+            m.insert("stable_id".into(), Value::String(self.stable_id.clone()));
             m.insert("name".into(), Value::String(self.name.clone()));
             m.insert("kind".into(), Value::String(self.kind.clone()));
             m.insert(
@@ -950,7 +956,9 @@ impl ImportNode {
         Value::Object({
             let mut m = serde_json::Map::new();
             m.insert("id".into(), Value::String(self.id.clone()));
+            m.insert("stable_id".into(), Value::String(self.stable_id.clone()));
             m.insert("file_id".into(), Value::String(self.file_id.clone()));
+            m.insert("stable_file_id".into(), Value::String(self.stable_file_id.clone()));
             m.insert("name".into(), Value::String(self.name.clone()));
             m.insert("source".into(), Value::String(self.source.clone()));
             m.insert("is_wildcard".into(), Value::Bool(self.is_wildcard));

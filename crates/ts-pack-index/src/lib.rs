@@ -38,6 +38,8 @@ pub struct IndexerConfig {
     pub neo4j_user: String,
     pub neo4j_pass: String,
     pub project_id: String,
+    pub status_project_id: Option<String>,
+    pub run_id: Option<String>,
     pub manifest_file: Option<String>,
 }
 
@@ -132,6 +134,190 @@ pub(crate) fn extract_prisma_models(schema_text: &str) -> Vec<String> {
     models.into_iter().collect()
 }
 
+pub async fn prune_project_shadow_graph(graph: &Arc<Graph>, project_id: &str, run_id: &str) -> neo4rs::Result<()> {
+    writers::prune_stale_db_data(graph, project_id, run_id).await?;
+    writers::prune_stale_external_api_data(graph, project_id, run_id).await?;
+    writers::prune_stale_file_import_edges(graph, project_id, run_id).await?;
+    writers::prune_stale_file_edge_family(graph, project_id, run_id, "ASSET_LINKS", "prune_stale_asset_links").await?;
+    writers::prune_stale_file_edge_family(graph, project_id, run_id, "CALLS_API", "prune_stale_calls_api").await?;
+    writers::prune_stale_file_edge_family(graph, project_id, run_id, "CALLS_SERVICE", "prune_stale_calls_service")
+        .await?;
+    writers::prune_stale_api_route_data(graph, project_id, run_id).await?;
+    writers::prune_stale_cargo_data(graph, project_id, run_id).await?;
+    writers::prune_stale_resource_data(graph, project_id, run_id).await?;
+    writers::prune_stale_xcode_data(graph, project_id, run_id).await?;
+    writers::prune_stale_symbol_edge_data(graph, project_id, run_id).await?;
+    writers::prune_stale_rust_impl_edges(graph, project_id, run_id).await?;
+    writers::prune_stale_core_graph_data(graph, project_id, run_id).await?;
+    writers::prune_stale_clone_data(graph, project_id, run_id).await?;
+    Ok(())
+}
+
+async fn mark_index_run_status(
+    graph: &Arc<Graph>,
+    run_id: &str,
+    project_id: &str,
+    manifest_file: Option<&str>,
+    total_files: usize,
+    status: &str,
+    error: Option<&str>,
+) -> neo4rs::Result<()> {
+    let mut q = Query::new(build_index_run_status_cypher(manifest_file.is_some(), error.is_some()))
+        .param("pid", project_id.to_string())
+        .param("run_id", run_id.to_string())
+        .param("status", status.to_string())
+        .param("file_count", total_files as i64);
+    if let Some(path) = manifest_file {
+        q = q.param("manifest_file", path.to_string());
+    }
+    if let Some(err) = error {
+        let trimmed = err.chars().take(2000).collect::<String>();
+        q = q.param("error", trimmed);
+    }
+    writers::run_query_logged(graph, q, "index_run_status").await
+}
+
+fn build_index_run_status_cypher(has_manifest_file: bool, has_error: bool) -> String {
+    match (has_manifest_file, has_error) {
+        (true, true) => {
+            "MERGE (p:Project {id:$pid}) \
+             SET p.project_id = $pid, \
+                 p.struct_index_status = $status, \
+                 p.struct_index_run_id = $run_id, \
+                 p.struct_index_finished_at = timestamp(), \
+                 p.struct_manifest_file = $manifest_file, \
+                 p.struct_index_error = $error \
+             MERGE (r:IndexRun {id:$run_id}) \
+             SET r.project_id = $pid, \
+                 r.phase = 'struct', \
+                 r.status = $status, \
+                 r.file_count = $file_count, \
+                 r.manifest_file = $manifest_file, \
+                 r.finished_at = timestamp(), \
+                 r.error = $error \
+             FOREACH (_ IN CASE WHEN $status = 'done' THEN [1] ELSE [] END | \
+                 SET p.struct_active_run_id = $run_id, \
+                     p.struct_last_successful_run_id = $run_id, \
+                     p.struct_last_successful_finished_at = timestamp(), \
+                     r.promoted_at = timestamp())"
+        }
+        (true, false) => {
+            "MERGE (p:Project {id:$pid}) \
+             SET p.project_id = $pid, \
+                 p.struct_index_status = $status, \
+                 p.struct_index_run_id = $run_id, \
+                 p.struct_index_finished_at = timestamp(), \
+                 p.struct_manifest_file = $manifest_file \
+             REMOVE p.struct_index_error \
+             MERGE (r:IndexRun {id:$run_id}) \
+             SET r.project_id = $pid, \
+                 r.phase = 'struct', \
+                 r.status = $status, \
+                 r.file_count = $file_count, \
+                 r.manifest_file = $manifest_file, \
+                 r.finished_at = timestamp() \
+             REMOVE r.error \
+             FOREACH (_ IN CASE WHEN $status = 'done' THEN [1] ELSE [] END | \
+                 SET p.struct_active_run_id = $run_id, \
+                     p.struct_last_successful_run_id = $run_id, \
+                     p.struct_last_successful_finished_at = timestamp(), \
+                     r.promoted_at = timestamp())"
+        }
+        (false, true) => {
+            "MERGE (p:Project {id:$pid}) \
+             SET p.project_id = $pid, \
+                 p.struct_index_status = $status, \
+                 p.struct_index_run_id = $run_id, \
+                 p.struct_index_finished_at = timestamp(), \
+                 p.struct_index_error = $error \
+             MERGE (r:IndexRun {id:$run_id}) \
+             SET r.project_id = $pid, \
+                 r.phase = 'struct', \
+                 r.status = $status, \
+                 r.file_count = $file_count, \
+                 r.finished_at = timestamp(), \
+                 r.error = $error \
+             FOREACH (_ IN CASE WHEN $status = 'done' THEN [1] ELSE [] END | \
+                 SET p.struct_active_run_id = $run_id, \
+                     p.struct_last_successful_run_id = $run_id, \
+                     p.struct_last_successful_finished_at = timestamp(), \
+                     r.promoted_at = timestamp())"
+        }
+        (false, false) => {
+            "MERGE (p:Project {id:$pid}) \
+             SET p.project_id = $pid, \
+                 p.struct_index_status = $status, \
+                 p.struct_index_run_id = $run_id, \
+                 p.struct_index_finished_at = timestamp() \
+             REMOVE p.struct_index_error \
+             MERGE (r:IndexRun {id:$run_id}) \
+             SET r.project_id = $pid, \
+                 r.phase = 'struct', \
+                 r.status = $status, \
+                 r.file_count = $file_count, \
+                 r.finished_at = timestamp() \
+             REMOVE r.error \
+             FOREACH (_ IN CASE WHEN $status = 'done' THEN [1] ELSE [] END | \
+                 SET p.struct_active_run_id = $run_id, \
+                     p.struct_last_successful_run_id = $run_id, \
+                     p.struct_last_successful_finished_at = timestamp(), \
+                     r.promoted_at = timestamp())"
+        }
+    }
+    .to_string()
+}
+
+async fn mark_index_run_started(
+    graph: &Arc<Graph>,
+    run_id: &str,
+    project_id: &str,
+    manifest_file: Option<&str>,
+    total_files: usize,
+) -> neo4rs::Result<()> {
+    let mut q = Query::new(build_index_run_started_cypher(manifest_file.is_some()))
+        .param("pid", project_id.to_string())
+        .param("run_id", run_id.to_string())
+        .param("file_count", total_files as i64);
+    if let Some(path) = manifest_file {
+        q = q.param("manifest_file", path.to_string());
+    }
+    writers::run_query_logged(graph, q, "index_run_start").await
+}
+
+fn build_index_run_started_cypher(has_manifest_file: bool) -> String {
+    if has_manifest_file {
+        "MERGE (p:Project {id:$pid}) \
+         SET p.project_id = $pid, \
+             p.struct_index_status = 'in_progress', \
+             p.struct_index_run_id = $run_id, \
+             p.struct_index_started_at = timestamp(), \
+             p.struct_manifest_file = $manifest_file \
+         MERGE (r:IndexRun {id:$run_id}) \
+         SET r.project_id = $pid, \
+             r.phase = 'struct', \
+             r.status = 'in_progress', \
+             r.file_count = $file_count, \
+             r.manifest_file = $manifest_file, \
+             r.started_at = timestamp() \
+         REMOVE r.error"
+            .to_string()
+    } else {
+        "MERGE (p:Project {id:$pid}) \
+         SET p.project_id = $pid, \
+             p.struct_index_status = 'in_progress', \
+             p.struct_index_run_id = $run_id, \
+             p.struct_index_started_at = timestamp() \
+         MERGE (r:IndexRun {id:$run_id}) \
+         SET r.project_id = $pid, \
+             r.phase = 'struct', \
+             r.status = 'in_progress', \
+             r.file_count = $file_count, \
+             r.started_at = timestamp() \
+         REMOVE r.error"
+            .to_string()
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Main entry point
 // ---------------------------------------------------------------------------
@@ -141,7 +327,14 @@ pub async fn index_workspace(
     config: IndexerConfig,
 ) -> Result<Vec<PathBuf>, Box<dyn std::error::Error>> {
     let t0 = Instant::now();
-    let run_id = format!("{}:{}", config.project_id, t0.elapsed().as_nanos());
+    let status_project_id = config
+        .status_project_id
+        .clone()
+        .unwrap_or_else(|| config.project_id.clone());
+    let run_id = config
+        .run_id
+        .clone()
+        .unwrap_or_else(|| format!("{}:{}", status_project_id, t0.elapsed().as_nanos()));
 
     if let Ok(dir) = std::env::var("TS_PACK_CACHE_DIR").or_else(|_| std::env::var("LM_PROXY_TS_PACK_CACHE_DIR")) {
         if !dir.trim().is_empty() {
@@ -189,6 +382,14 @@ pub async fn index_workspace(
     let project_id: Arc<str> = Arc::from(config.project_id.as_str());
 
     eprintln!("[ts-pack-index] Starting — {total_files} files in manifest");
+    mark_index_run_started(
+        &graph,
+        &run_id,
+        status_project_id.as_str(),
+        config.manifest_file.as_deref(),
+        total_files,
+    )
+    .await?;
 
     // --- Global data reservoirs ------------------------------------------
     let mut all_files: Vec<FileNode> = Vec::with_capacity(total_files);
@@ -508,85 +709,134 @@ pub async fn index_workspace(
     let file_import_edges = prep.file_import_edges;
     let launch_edges = prep.launch_edges;
 
-    let write_summary = write_phase::run_write_phases(
-        &graph,
-        &project_id,
-        write_phase::WriteInputs {
-            all_files,
-            all_symbols,
-            all_imports,
-            all_rels,
-            all_import_rels,
-            all_symbol_call_rows,
-            clone_candidates,
-            inferred_call_rows,
-            python_inferred_call_rows,
-            db_sources,
-            db_model_refs_by_file,
-            external_api_edges,
-            external_api_urls,
-            file_import_edges,
-            asset_links: prep.asset_links,
-            api_edges: prep.api_edges,
-            api_route_calls: prep.api_route_calls,
-            api_route_handlers: prep.api_route_handlers,
-            service_edges: prep.service_edges,
-            resource_usages: prep.resource_usages,
-            resource_backings: prep.resource_backings,
-            xcode_targets: prep.xcode_targets,
-            xcode_target_files: prep.xcode_target_files,
-            xcode_target_resources: prep.xcode_target_resources,
-            xcode_workspaces: prep.xcode_workspaces,
-            xcode_workspace_projects: prep.xcode_workspace_projects,
-            xcode_schemes: prep.xcode_schemes,
-            xcode_scheme_targets: prep.xcode_scheme_targets,
-            xcode_scheme_files: prep.xcode_scheme_files,
-            cargo_crates: prep.cargo_crates,
-            cargo_workspaces: prep.cargo_workspaces,
-            cargo_workspace_crates: prep.cargo_workspace_crates,
-            cargo_crate_files: prep.cargo_crate_files,
-            cargo_dependency_edges: prep.cargo_dependency_edges,
-            import_symbol_edges,
-            implicit_import_symbol_edges,
-            rust_impl_trait_edges: prep.rust_impl_trait_edges,
-            rust_impl_type_edges: prep.rust_impl_type_edges,
-            export_symbol_edges,
-            export_alias_edges,
-            launch_edges,
-            manifest_abs,
-        },
-    )
-    .await?;
-
-    // --- Summary ----------------------------------------------------------
-    let total_elapsed = t0.elapsed();
-    eprintln!(
-        "[ts-pack-index] Done — {total_files} files | \
-         parse={:.2}s nodes={:.2}s imports={:.2}s rels={:.2}s calls={:.2}s total={:.2}s",
-        parse_elapsed.as_secs_f64(),
-        write_summary.node_elapsed.as_secs_f64(),
-        write_summary.import_elapsed.as_secs_f64(),
-        write_summary.rel_elapsed.as_secs_f64(),
-        write_summary.calls_elapsed.as_secs_f64(),
-        total_elapsed.as_secs_f64(),
-    );
-
-    writers::run_query_logged(
-        &graph,
-        Query::new(
-            "MERGE (r:IndexRun {id:$id}) \
-             SET r.project_id = $pid, \
-                 r.status = 'done', \
-                 r.finished_at = timestamp()"
-                .to_string(),
+    let result: Result<Vec<PathBuf>, Box<dyn std::error::Error>> = async {
+        let write_summary = write_phase::run_write_phases(
+            &graph,
+            &project_id,
+            write_phase::WriteInputs {
+                run_id: run_id.clone(),
+                all_files,
+                all_symbols,
+                all_imports,
+                all_rels,
+                all_import_rels,
+                all_symbol_call_rows,
+                clone_candidates,
+                inferred_call_rows,
+                python_inferred_call_rows,
+                db_sources,
+                db_model_refs_by_file,
+                external_api_edges,
+                external_api_urls,
+                file_import_edges,
+                asset_links: prep.asset_links,
+                api_edges: prep.api_edges,
+                api_route_calls: prep.api_route_calls,
+                api_route_handlers: prep.api_route_handlers,
+                service_edges: prep.service_edges,
+                resource_usages: prep.resource_usages,
+                resource_backings: prep.resource_backings,
+                xcode_targets: prep.xcode_targets,
+                xcode_target_files: prep.xcode_target_files,
+                xcode_target_resources: prep.xcode_target_resources,
+                xcode_workspaces: prep.xcode_workspaces,
+                xcode_workspace_projects: prep.xcode_workspace_projects,
+                xcode_schemes: prep.xcode_schemes,
+                xcode_scheme_targets: prep.xcode_scheme_targets,
+                xcode_scheme_files: prep.xcode_scheme_files,
+                cargo_crates: prep.cargo_crates,
+                cargo_workspaces: prep.cargo_workspaces,
+                cargo_workspace_crates: prep.cargo_workspace_crates,
+                cargo_crate_files: prep.cargo_crate_files,
+                cargo_dependency_edges: prep.cargo_dependency_edges,
+                import_symbol_edges,
+                implicit_import_symbol_edges,
+                rust_impl_trait_edges: prep.rust_impl_trait_edges,
+                rust_impl_type_edges: prep.rust_impl_type_edges,
+                export_symbol_edges,
+                export_alias_edges,
+                launch_edges,
+                manifest_abs,
+            },
         )
-        .param("id", run_id)
-        .param("pid", config.project_id.to_string()),
-        "index_run_complete",
-    )
-    .await?;
+        .await?;
 
-    let indexed_paths: Vec<PathBuf> = manifest.into_iter().map(|m| PathBuf::from(m.abs_path)).collect();
+        let total_elapsed = t0.elapsed();
+        eprintln!(
+            "[ts-pack-index] Done — {total_files} files | \
+             parse={:.2}s nodes={:.2}s imports={:.2}s rels={:.2}s calls={:.2}s total={:.2}s",
+            parse_elapsed.as_secs_f64(),
+            write_summary.node_elapsed.as_secs_f64(),
+            write_summary.import_elapsed.as_secs_f64(),
+            write_summary.rel_elapsed.as_secs_f64(),
+            write_summary.calls_elapsed.as_secs_f64(),
+            total_elapsed.as_secs_f64(),
+        );
 
-    Ok(indexed_paths)
+        mark_index_run_status(
+            &graph,
+            &run_id,
+            status_project_id.as_str(),
+            config.manifest_file.as_deref(),
+            total_files,
+            "struct_written",
+            None,
+        )
+        .await?;
+
+        let indexed_paths: Vec<PathBuf> = manifest.into_iter().map(|m| PathBuf::from(m.abs_path)).collect();
+        Ok(indexed_paths)
+    }
+    .await;
+
+    if let Err(ref err) = result {
+        let err_text = err.to_string();
+        let _ = mark_index_run_status(
+            &graph,
+            &run_id,
+            status_project_id.as_str(),
+            config.manifest_file.as_deref(),
+            total_files,
+            "failed",
+            Some(&err_text),
+        )
+        .await;
+    }
+
+    result
+}
+
+#[cfg(test)]
+mod run_state_tests {
+    use super::{build_index_run_started_cypher, build_index_run_status_cypher};
+
+    #[test]
+    fn index_run_started_cypher_tracks_manifest_when_present() {
+        let cypher = build_index_run_started_cypher(true);
+        assert!(cypher.contains("p.struct_index_status = 'in_progress'"));
+        assert!(cypher.contains("p.struct_manifest_file = $manifest_file"));
+        assert!(cypher.contains("r.manifest_file = $manifest_file"));
+        assert!(cypher.contains("REMOVE r.error"));
+    }
+
+    #[test]
+    fn failed_status_cypher_persists_error_and_manifest() {
+        let cypher = build_index_run_status_cypher(true, true);
+        assert!(cypher.contains("p.struct_index_status = $status"));
+        assert!(cypher.contains("p.struct_index_error = $error"));
+        assert!(cypher.contains("p.struct_manifest_file = $manifest_file"));
+        assert!(cypher.contains("r.error = $error"));
+    }
+
+    #[test]
+    fn successful_status_cypher_clears_error_without_manifest() {
+        let cypher = build_index_run_status_cypher(false, false);
+        assert!(cypher.contains("p.struct_index_status = $status"));
+        assert!(cypher.contains("REMOVE p.struct_index_error"));
+        assert!(cypher.contains("REMOVE r.error"));
+        assert!(!cypher.contains("manifest_file"));
+        assert!(cypher.contains("p.struct_active_run_id = $run_id"));
+        assert!(cypher.contains("p.struct_last_successful_run_id = $run_id"));
+        assert!(cypher.contains("r.promoted_at = timestamp()"));
+    }
 }

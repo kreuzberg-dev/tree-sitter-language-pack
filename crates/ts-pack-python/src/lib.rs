@@ -155,6 +155,7 @@ fn detect_language_from_path(path: &str) -> Option<String> {
 
 /// Index a workspace (Rust-native indexer). Returns list of indexed file paths.
 #[pyfunction]
+#[pyo3(signature = (path, project_id, neo4j_uri, neo4j_user, neo4j_pass, manifest_file, status_project_id = None, run_id = None))]
 fn index_workspace(
     path: &str,
     project_id: &str,
@@ -162,12 +163,16 @@ fn index_workspace(
     neo4j_user: &str,
     neo4j_pass: &str,
     manifest_file: &str,
+    status_project_id: Option<String>,
+    run_id: Option<String>,
 ) -> PyResult<Vec<String>> {
     let config = ts_pack_index::IndexerConfig {
         neo4j_uri: neo4j_uri.to_string(),
         neo4j_user: neo4j_user.to_string(),
         neo4j_pass: neo4j_pass.to_string(),
         project_id: project_id.to_string(),
+        status_project_id,
+        run_id,
         manifest_file: Some(manifest_file.to_string()),
     };
 
@@ -275,9 +280,7 @@ fn trace_diverse_texts(
     json_value_to_py(py, &value)
 }
 
-fn parse_experiment_config(
-    raw: Option<&str>,
-) -> PyResult<ts_pack_index::duplicate::ExperimentConfig> {
+fn parse_experiment_config(raw: Option<&str>) -> PyResult<ts_pack_index::duplicate::ExperimentConfig> {
     let mut config = ts_pack_index::duplicate::ExperimentConfig::default();
     let Some(raw) = raw else {
         return Ok(config);
@@ -773,7 +776,7 @@ fn enrich_swift_graph(
 
 /// Run the Rust-owned post-index graph finalization pipeline.
 #[pyfunction]
-#[pyo3(signature = (project_path, project_id, manifest_file, indexed_files, neo4j_uri, neo4j_user, neo4j_pass, neo4j_db = "proxy".to_string()))]
+#[pyo3(signature = (project_path, project_id, manifest_file, indexed_files, neo4j_uri, neo4j_user, neo4j_pass, neo4j_db = "proxy".to_string(), run_id = None))]
 fn finalize_struct_graph(
     py: Python<'_>,
     project_path: &str,
@@ -784,6 +787,7 @@ fn finalize_struct_graph(
     neo4j_user: &str,
     neo4j_pass: &str,
     neo4j_db: String,
+    run_id: Option<String>,
 ) -> PyResult<Py<PyAny>> {
     let value = without_gil(|| {
         let rt =
@@ -797,10 +801,46 @@ fn finalize_struct_graph(
             neo4j_user,
             neo4j_pass,
             &neo4j_db,
+            run_id.as_deref(),
         ))
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
     })?;
     json_value_to_py(py, &value)
+}
+
+/// Prune stale structural graph data after a run has finalized successfully but
+/// before it is promoted as the active shadow graph.
+#[pyfunction]
+#[pyo3(signature = (project_id, run_id, neo4j_uri, neo4j_user, neo4j_pass))]
+fn prune_struct_shadow_graph(
+    project_id: &str,
+    run_id: &str,
+    neo4j_uri: &str,
+    neo4j_user: &str,
+    neo4j_pass: &str,
+) -> PyResult<()> {
+    without_gil(|| {
+        let rt =
+            tokio::runtime::Runtime::new().map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+        rt.block_on(async {
+            let config = neo4rs::ConfigBuilder::default()
+                .uri(neo4j_uri)
+                .user(neo4j_user)
+                .password(neo4j_pass)
+                .fetch_size(1000)
+                .max_connections(8)
+                .build()
+                .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+            let graph = std::sync::Arc::new(
+                neo4rs::Graph::connect(config)
+                    .await
+                    .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?,
+            );
+            ts_pack_index::prune_project_shadow_graph(&graph, project_id, run_id)
+                .await
+                .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+        })
+    })
 }
 
 /// Convert a Python dict to a serde_json::Value.
@@ -2288,6 +2328,7 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(extract_swift_semantic_facts, m)?)?;
     m.add_function(wrap_pyfunction!(enrich_swift_graph, m)?)?;
     m.add_function(wrap_pyfunction!(finalize_struct_graph, m)?)?;
+    m.add_function(wrap_pyfunction!(prune_struct_shadow_graph, m)?)?;
     m.add_function(wrap_pyfunction!(init, m)?)?;
     m.add_function(wrap_pyfunction!(configure, m)?)?;
     m.add_function(wrap_pyfunction!(download, m)?)?;

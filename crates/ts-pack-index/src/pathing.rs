@@ -10,6 +10,13 @@ pub(crate) fn external_api_id(project_id: &str, url: &str) -> String {
     format!("{}:external:{:x}", project_id, hasher.finish())
 }
 
+pub(crate) fn canonical_project_id(project_id: &str) -> &str {
+    project_id
+        .split_once("::shadow::")
+        .map(|(canonical, _)| canonical)
+        .unwrap_or(project_id)
+}
+
 pub(crate) fn join_url(base: &str, path: &str) -> Option<String> {
     if base.is_empty() || path.is_empty() {
         return None;

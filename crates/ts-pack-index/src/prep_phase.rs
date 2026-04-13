@@ -661,6 +661,7 @@ mod tests {
     fn file_node(id: &str, filepath: &str) -> FileNode {
         FileNode {
             id: id.to_string(),
+            stable_id: id.to_string(),
             name: filepath.rsplit('/').next().unwrap_or(filepath).to_string(),
             filepath: filepath.to_string(),
             project_id: Arc::from("proj"),
@@ -671,6 +672,7 @@ mod tests {
     fn symbol_node(id: &str, name: &str, filepath: &str, is_exported: bool) -> SymbolNode {
         SymbolNode {
             id: id.to_string(),
+            stable_id: id.to_string(),
             name: name.to_string(),
             kind: "Function".to_string(),
             qualified_name: Some(format!("{name}.qualified")),

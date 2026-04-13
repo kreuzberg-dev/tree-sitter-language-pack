@@ -64,6 +64,7 @@ fn walk_item(
     relations: &mut Vec<RelRow>,
     language: &str,
 ) {
+    let stable_project_id = pathing::canonical_project_id(project_id.as_ref());
     let label: &'static str = match item.kind {
         ts_pack::StructureKind::Class => "Class",
         ts_pack::StructureKind::Function | ts_pack::StructureKind::Method => "Function",
@@ -84,10 +85,19 @@ fn walk_item(
 
     let name = item.name.as_deref().unwrap_or("unnamed");
     let node_id = format!("{}:{}:{}:{}", project_id, label.to_ascii_lowercase(), filepath, name,);
+    let stable_id = format!(
+        "{}:{}:{}:{}",
+        stable_project_id,
+        label.to_ascii_lowercase(),
+        filepath,
+        name,
+    );
 
     let visibility = item.visibility.as_deref().unwrap_or("").trim().to_lowercase();
+    let top_level_parent = parent_id == format!("{}:file:{}", project_id, filepath);
     let name_is_public = match language {
         "go" => name.chars().next().map(|ch| ch.is_uppercase()).unwrap_or(false),
+        "python" => top_level_parent && !name.starts_with('_'),
         _ => false,
     };
     let is_exported = matches!(visibility.as_str(), "public" | "open" | "pub")
@@ -97,6 +107,7 @@ fn walk_item(
 
     symbols.entry(label).or_default().push(SymbolNode {
         id: node_id.clone(),
+        stable_id,
         name: name.to_string(),
         kind: format!("{:?}", item.kind),
         qualified_name: item.qualified_name.clone(),
@@ -155,6 +166,7 @@ fn add_symbol_info(
     symbols: &mut HashMap<&'static str, Vec<SymbolNode>>,
     relations: &mut Vec<RelRow>,
 ) {
+    let stable_project_id = pathing::canonical_project_id(project_id.as_ref());
     let label = label_for_symbol_kind(&sym.kind);
     if label == "Symbol" {
         return;
@@ -163,6 +175,13 @@ fn add_symbol_info(
     let node_id = format!(
         "{}:{}:{}:{}",
         project_id,
+        label.to_ascii_lowercase(),
+        filepath,
+        sym.name,
+    );
+    let stable_id = format!(
+        "{}:{}:{}:{}",
+        stable_project_id,
         label.to_ascii_lowercase(),
         filepath,
         sym.name,
@@ -182,6 +201,7 @@ fn add_symbol_info(
 
     symbols.entry(label).or_default().push(SymbolNode {
         id: node_id.clone(),
+        stable_id,
         name: sym.name.clone(),
         kind: format!("{:?}", sym.kind),
         qualified_name: None,
@@ -442,10 +462,13 @@ fn parse_entry(
         .file_name()
         .map(|n| n.to_string_lossy().into_owned())
         .unwrap_or_default();
+    let canonical_pid = pathing::canonical_project_id(pid.as_ref());
     let file_id = format!("{}:file:{}", pid, rel_path);
+    let stable_file_id = format!("{}:file:{}", canonical_pid, rel_path);
 
     let file_node = FileNode {
         id: file_id.clone(),
+        stable_id: stable_file_id.clone(),
         name: file_name,
         filepath: rel_path.clone(),
         project_id: Arc::clone(pid),
@@ -683,9 +706,12 @@ fn parse_entry(
     if let Some(result) = result.as_ref() {
         for imp in &result.imports {
             let import_id = format!("{}:import:{}:{}", pid, rel_path, imp.source);
+            let stable_import_id = format!("{}:import:{}:{}", canonical_pid, rel_path, imp.source);
             imports.push(ImportNode {
                 id: import_id.clone(),
+                stable_id: stable_import_id,
                 file_id: file_id.clone(),
+                stable_file_id: stable_file_id.clone(),
                 name: imp.source.clone(),
                 source: imp.source.clone(),
                 is_wildcard: imp.is_wildcard,
