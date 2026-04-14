@@ -315,8 +315,8 @@ impl TreeHandle {
 #[pyfunction]
 fn parse_string(language: &str, source: &str) -> PyResult<TreeHandle> {
     let source_bytes = source.as_bytes();
-    let tree = tree_sitter_language_pack::parse_string(language, source_bytes)
-        .map_err(|e| ParseError::new_err(format!("{e}")))?;
+    let tree = without_gil(|| tree_sitter_language_pack::parse_string(language, source_bytes))
+        .map_err(|e| map_core_error(e))?;
     Ok(TreeHandle {
         inner: Mutex::new(tree),
         source: source_bytes.to_vec(),
@@ -522,10 +522,21 @@ fn json_value_to_py(py: Python<'_>, value: &serde_json::Value) -> PyResult<Py<Py
 #[pyfunction]
 fn process(py: Python<'_>, source: &str, config: &ProcessConfig) -> PyResult<Py<PyAny>> {
     let core_config: tree_sitter_language_pack::ProcessConfig = config.into();
-    let result =
-        tree_sitter_language_pack::process(source, &core_config).map_err(|e| ParseError::new_err(format!("{e}")))?;
+    let result = without_gil(|| tree_sitter_language_pack::process(source, &core_config))
+        .map_err(|e| map_core_error(e))?;
     let value = serde_json::to_value(&result).map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))?;
     json_value_to_py(py, &value)
+}
+
+/// Map a core Error to the most specific Python exception type.
+fn map_core_error(e: tree_sitter_language_pack::Error) -> pyo3::PyErr {
+    match e {
+        tree_sitter_language_pack::Error::LanguageNotFound(_) => LanguageNotFoundError::new_err(format!("{e}")),
+        tree_sitter_language_pack::Error::Download(_) | tree_sitter_language_pack::Error::ChecksumMismatch { .. } => {
+            DownloadError::new_err(format!("{e}"))
+        }
+        _ => ParseError::new_err(format!("{e}")),
+    }
 }
 
 // ---------------------------------------------------------------------------

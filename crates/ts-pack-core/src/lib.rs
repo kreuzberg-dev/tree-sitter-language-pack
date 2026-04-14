@@ -238,9 +238,10 @@ pub fn language_count() -> usize {
 /// println!("Structures: {}", result.structure.len());
 /// ```
 pub fn process(source: &str, config: &ProcessConfig) -> Result<ProcessResult, Error> {
-    // Ensure cache is registered before attempting to process
+    // Trigger auto-download for the requested language if not already cached.
+    // get_language() contains the download fallback path; REGISTRY.process() does not.
     #[cfg(feature = "download")]
-    ensure_cache_registered()?;
+    get_language(&config.language)?;
 
     REGISTRY.process(source, config)
 }
