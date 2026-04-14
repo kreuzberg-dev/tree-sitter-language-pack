@@ -298,6 +298,7 @@ ts-pack list | wc -l  # 305
 
 ## Next Steps
 
+- [Download parsers](quickstart.md#step-2-download-parsers) — pre-download grammars for production, CI, or offline use
 - [Quick Start guide](quickstart.md) — parse your first file in 5 minutes
 - [Download model](../concepts/download-model.md) — understand how parser caching works
 - [Languages](../languages.md) — full list of 305 supported languages

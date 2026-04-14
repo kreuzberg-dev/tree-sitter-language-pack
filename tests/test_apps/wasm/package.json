@@ -1,6 +1,6 @@
 {
 	"name": "test-app-wasm",
-	"version": "1.5.0",
+	"version": "1.6.0",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -8,7 +8,7 @@
 		"test:smoke": "vitest run smoke.spec.ts"
 	},
 	"dependencies": {
-		"@kreuzberg/tree-sitter-language-pack-wasm": "1.5.0"
+		"@kreuzberg/tree-sitter-language-pack-wasm": "1.6.0"
 	},
 	"devDependencies": {
 		"vitest": "^3.0.0",

@@ -130,16 +130,23 @@ pub struct ValidationResult {
     pub patterns: AHashMap<String, PatternValidation>,
 }
 
+/// A compiled query with pre-computed capture names.
+struct CompiledPattern {
+    name: String,
+    query: tree_sitter::Query,
+    capture_names: Vec<String>,
+    config: ExtractionPattern,
+}
+
 /// A pre-compiled extraction that can be reused across multiple source inputs.
 ///
-/// Stores compiled `tree_sitter::Query` objects so they don't need to be
-/// recompiled for every call. A new `QueryCursor` is created per extraction
-/// call, making this type `Send + Sync`.
+/// Stores compiled `tree_sitter::Query` objects and their capture names so they
+/// don't need to be recompiled for every call. A `QueryCursor` is reused across
+/// patterns within a single extraction call, making this type `Send + Sync`.
 pub struct CompiledExtraction {
     language: tree_sitter::Language,
     language_name: String,
-    /// Each entry is `(pattern_name, compiled_query, extraction_pattern)`.
-    patterns: Vec<(String, tree_sitter::Query, ExtractionPattern)>,
+    patterns: Vec<CompiledPattern>,
 }
 
 // tree_sitter::Query is Send + Sync, tree_sitter::Language is Send + Sync.
@@ -260,7 +267,13 @@ impl CompiledExtraction {
         for (name, pat) in extraction_patterns {
             let query = tree_sitter::Query::new(&language, &pat.query)
                 .map_err(|e| Error::QueryError(format!("pattern '{name}': {e}")))?;
-            patterns.push((name.clone(), query, pat.clone()));
+            let capture_names = query.capture_names().iter().map(|s| s.to_string()).collect();
+            patterns.push(CompiledPattern {
+                name: name.clone(),
+                query,
+                capture_names,
+                config: pat.clone(),
+            });
         }
 
         Ok(Self {
@@ -272,15 +285,14 @@ impl CompiledExtraction {
 
     /// Extract from source code, parsing it first.
     ///
+    /// Uses the thread-local parser cache to avoid creating a new parser on
+    /// every call.
+    ///
     /// # Errors
     ///
     /// Returns an error if parsing fails.
     pub fn extract(&self, source: &str) -> Result<ExtractionResult, Error> {
-        let mut parser = tree_sitter::Parser::new();
-        parser
-            .set_language(&self.language)
-            .map_err(|e| Error::ParserSetup(format!("{e}")))?;
-        let tree = parser.parse(source.as_bytes(), None).ok_or(Error::ParseFailed)?;
+        let tree = crate::parse::parse_with_language(&self.language_name, &self.language, source.as_bytes())?;
         self.extract_from_tree(&tree, source.as_bytes())
     }
 
@@ -292,19 +304,18 @@ impl CompiledExtraction {
     pub fn extract_from_tree(&self, tree: &tree_sitter::Tree, source: &[u8]) -> Result<ExtractionResult, Error> {
         use tree_sitter::StreamingIterator;
 
-        let mut results = AHashMap::new();
+        let mut results = AHashMap::with_capacity(self.patterns.len());
+        let mut cursor = tree_sitter::QueryCursor::new();
 
-        for (name, query, pat) in &self.patterns {
-            let mut cursor = tree_sitter::QueryCursor::new();
-
-            // Apply byte range restriction if configured.
-            if let Some((start, end)) = pat.byte_range {
+        for cp in &self.patterns {
+            // Reset byte range between patterns to avoid leaking state.
+            if let Some((start, end)) = cp.config.byte_range {
                 cursor.set_byte_range(start..end);
+            } else {
+                cursor.set_byte_range(0..usize::MAX);
             }
 
-            let capture_names: Vec<String> = query.capture_names().iter().map(|s| s.to_string()).collect();
-
-            let mut matches_iter = cursor.matches(query, tree.root_node(), source);
+            let mut matches_iter = cursor.matches(&cp.query, tree.root_node(), source);
             let mut match_results = Vec::new();
             let mut total_count: usize = 0;
 
@@ -312,7 +323,7 @@ impl CompiledExtraction {
                 total_count += 1;
 
                 // If we already hit max_results, keep counting but don't collect.
-                if let Some(max) = pat.max_results
+                if let Some(max) = cp.config.max_results
                     && match_results.len() >= max
                 {
                     continue;
@@ -320,31 +331,32 @@ impl CompiledExtraction {
 
                 let mut captures = Vec::with_capacity(m.captures.len());
                 for cap in m.captures {
-                    let cap_name = capture_names
+                    let cap_name = cp
+                        .capture_names
                         .get(cap.index as usize)
                         .ok_or_else(|| Error::QueryError(format!("invalid capture index {}", cap.index)))?;
                     let ts_node = cap.node;
                     let info = node_info_from_node(ts_node);
                     let capture_start_byte = info.start_byte;
 
-                    let text = match pat.capture_output {
+                    let text = match cp.config.capture_output {
                         CaptureOutput::Text | CaptureOutput::Full => {
                             crate::node::extract_text(source, &info).ok().map(String::from)
                         }
                         CaptureOutput::Node => None,
                     };
 
-                    let node = match pat.capture_output {
+                    let node = match cp.config.capture_output {
                         CaptureOutput::Node | CaptureOutput::Full => Some(info),
                         CaptureOutput::Text => None,
                     };
 
                     // Extract requested child fields from the actual tree_sitter::Node.
-                    let child_field_values = if pat.child_fields.is_empty() {
+                    let child_field_values = if cp.config.child_fields.is_empty() {
                         AHashMap::new()
                     } else {
-                        let mut fields = AHashMap::with_capacity(pat.child_fields.len());
-                        for field_name in &pat.child_fields {
+                        let mut fields = AHashMap::with_capacity(cp.config.child_fields.len());
+                        for field_name in &cp.config.child_fields {
                             let value = ts_node.child_by_field_name(field_name.as_str()).and_then(|child| {
                                 let child_info = node_info_from_node(child);
                                 crate::node::extract_text(source, &child_info).ok().map(String::from)
@@ -373,7 +385,7 @@ impl CompiledExtraction {
             match_results.sort_by_key(|m| m.captures.first().map_or(0, |c| c.start_byte));
 
             results.insert(
-                name.clone(),
+                cp.name.clone(),
                 PatternResult {
                     matches: match_results,
                     total_count,
@@ -745,5 +757,81 @@ mod tests {
         assert_eq!(result.results["fns"].total_count, 1);
         let cap = &result.results["fns"].matches[0].captures[0];
         assert_eq!(cap.text.as_deref(), Some("hello"));
+    }
+
+    #[test]
+    fn test_byte_range_does_not_leak_between_patterns() {
+        if skip_if_no_python() {
+            return;
+        }
+        let source = "def a():\n    pass\ndef b():\n    pass\ndef c():\n    pass\n";
+        let second_fn_start = source.find("def b").unwrap();
+        let second_fn_end = source[second_fn_start..]
+            .find("def c")
+            .map_or(source.len(), |i| second_fn_start + i);
+
+        // Two patterns: first has a byte_range, second does not.
+        // The second pattern should see ALL functions, not just the byte_range.
+        let mut patterns = AHashMap::new();
+        patterns.insert(
+            "restricted".to_string(),
+            ExtractionPattern {
+                query: "(function_definition name: (identifier) @fn_name)".to_string(),
+                capture_output: CaptureOutput::Text,
+                child_fields: Vec::new(),
+                max_results: None,
+                byte_range: Some((second_fn_start, second_fn_end)),
+            },
+        );
+        patterns.insert(
+            "unrestricted".to_string(),
+            ExtractionPattern {
+                query: "(function_definition name: (identifier) @fn_name)".to_string(),
+                capture_output: CaptureOutput::Text,
+                child_fields: Vec::new(),
+                max_results: None,
+                byte_range: None,
+            },
+        );
+
+        let config = python_config(patterns);
+        let compiled = CompiledExtraction::compile(&config).unwrap();
+        let result = compiled.extract(source).unwrap();
+
+        let restricted = &result.results["restricted"];
+        assert_eq!(restricted.matches.len(), 1, "restricted pattern should find 1 function");
+
+        let unrestricted = &result.results["unrestricted"];
+        assert_eq!(
+            unrestricted.matches.len(),
+            3,
+            "unrestricted pattern should find all 3 functions, not be limited by previous byte_range"
+        );
+    }
+
+    #[test]
+    fn test_compiled_extraction_capture_names_precomputed() {
+        if skip_if_no_python() {
+            return;
+        }
+        // Verify capture names are correct when using multiple captures.
+        let mut patterns = AHashMap::new();
+        patterns.insert(
+            "fns".to_string(),
+            ExtractionPattern {
+                query: "(function_definition name: (identifier) @fn_name) @fn_def".to_string(),
+                capture_output: CaptureOutput::Full,
+                child_fields: Vec::new(),
+                max_results: None,
+                byte_range: None,
+            },
+        );
+        let config = python_config(patterns);
+        let result = extract("def hello():\n    pass\n", &config).unwrap();
+        let fns = &result.results["fns"];
+        assert_eq!(fns.matches.len(), 1);
+        let names: Vec<&str> = fns.matches[0].captures.iter().map(|c| c.name.as_str()).collect();
+        assert!(names.contains(&"fn_name"), "should have fn_name capture");
+        assert!(names.contains(&"fn_def"), "should have fn_def capture");
     }
 }

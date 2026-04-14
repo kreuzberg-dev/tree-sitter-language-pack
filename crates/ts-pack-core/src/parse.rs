@@ -1,14 +1,18 @@
-use crate::Error;
 use std::cell::RefCell;
-use std::collections::HashMap;
+
+use ahash::AHashMap;
+
+use crate::Error;
 
 thread_local! {
-    static PARSER_CACHE: RefCell<HashMap<String, tree_sitter::Parser>> = RefCell::new(HashMap::new());
+    static PARSER_CACHE: RefCell<AHashMap<String, tree_sitter::Parser>> = RefCell::new(AHashMap::new());
 }
 
 /// Parse source code with the named language, returning the syntax tree.
 ///
 /// Uses the global registry to look up the language by name.
+/// Caches parsers per-thread so repeated calls for the same language avoid
+/// re-creating the parser.
 ///
 /// # Examples
 ///
@@ -17,20 +21,43 @@ thread_local! {
 /// assert_eq!(tree.root_node().kind(), "module");
 /// ```
 pub fn parse_string(language: &str, source: &[u8]) -> Result<tree_sitter::Tree, Error> {
-    let language_obj = crate::get_language(language)?;
     PARSER_CACHE.with(|cache| {
         let mut cache = cache.borrow_mut();
-        if !cache.contains_key(language) {
-            let mut parser = tree_sitter::Parser::new();
-            parser
-                .set_language(&language_obj)
-                .map_err(|e| Error::ParserSetup(format!("{e}")))?;
-            cache.insert(language.to_string(), parser);
+        if let Some(parser) = cache.get_mut(language) {
+            return parser.parse(source, None).ok_or(Error::ParseFailed);
         }
-        let parser = cache
-            .get_mut(language)
-            .ok_or_else(|| Error::ParserSetup("parser cache lookup failed".to_string()))?;
-        parser.parse(source, None).ok_or(Error::ParseFailed)
+        let language_obj = crate::get_language(language)?;
+        let mut parser = tree_sitter::Parser::new();
+        parser
+            .set_language(&language_obj)
+            .map_err(|e| Error::ParserSetup(format!("{e}")))?;
+        let tree = parser.parse(source, None).ok_or(Error::ParseFailed)?;
+        cache.insert(language.to_string(), parser);
+        Ok(tree)
+    })
+}
+
+/// Parse source code with a pre-loaded `Language`, using the thread-local parser cache.
+///
+/// Avoids a redundant registry lookup when the caller already has the `Language`
+/// (e.g., from `CompiledExtraction` or `LanguageRegistry::get_language`).
+pub(crate) fn parse_with_language(
+    language_name: &str,
+    language: &tree_sitter::Language,
+    source: &[u8],
+) -> Result<tree_sitter::Tree, Error> {
+    PARSER_CACHE.with(|cache| {
+        let mut cache = cache.borrow_mut();
+        if let Some(parser) = cache.get_mut(language_name) {
+            return parser.parse(source, None).ok_or(Error::ParseFailed);
+        }
+        let mut parser = tree_sitter::Parser::new();
+        parser
+            .set_language(language)
+            .map_err(|e| Error::ParserSetup(format!("{e}")))?;
+        let tree = parser.parse(source, None).ok_or(Error::ParseFailed)?;
+        cache.insert(language_name.to_string(), parser);
+        Ok(tree)
     })
 }
 
@@ -190,5 +217,54 @@ mod tests {
         let count = tree_error_count(&tree);
         // Just verify it returns a reasonable number
         assert!(count < 1000);
+    }
+
+    #[test]
+    fn test_parse_with_language_reuses_cache() {
+        if skip_if_no_languages() {
+            return;
+        }
+        let langs = crate::available_languages();
+        let first = &langs[0];
+        let lang = crate::get_language(first).unwrap();
+        let _ = parse_with_language(first, &lang, b"x").unwrap();
+        let after_first = cached_parser_count_for_tests();
+        let _ = parse_with_language(first, &lang, b"y").unwrap();
+        let after_second = cached_parser_count_for_tests();
+        assert_eq!(after_first, after_second, "second call should reuse cached parser");
+    }
+
+    #[test]
+    fn test_parse_with_language_and_parse_string_share_cache() {
+        if skip_if_no_languages() {
+            return;
+        }
+        let langs = crate::available_languages();
+        let first = &langs[0];
+        let lang = crate::get_language(first).unwrap();
+        let _ = parse_string(first, b"x").unwrap();
+        let after_parse_string = cached_parser_count_for_tests();
+        let _ = parse_with_language(first, &lang, b"y").unwrap();
+        let after_parse_with_lang = cached_parser_count_for_tests();
+        assert_eq!(
+            after_parse_string, after_parse_with_lang,
+            "parse_string and parse_with_language should share the same cache"
+        );
+    }
+
+    #[test]
+    fn test_different_languages_get_separate_cache_entries() {
+        let langs = crate::available_languages();
+        if langs.len() < 2 {
+            return;
+        }
+        let before = cached_parser_count_for_tests();
+        let _ = parse_string(&langs[0], b"x").unwrap();
+        let _ = parse_string(&langs[1], b"x").unwrap();
+        let after = cached_parser_count_for_tests();
+        assert!(
+            after >= before + 2,
+            "different languages should create separate cache entries"
+        );
     }
 }

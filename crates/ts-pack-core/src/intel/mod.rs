@@ -63,17 +63,16 @@ pub fn process(
 }
 
 /// Parse source code and return the tree-sitter language and tree.
+///
+/// Uses the thread-local parser cache to avoid creating a new parser on
+/// every call.
 fn parse_source(
     source: &str,
     language: &str,
     registry: &crate::LanguageRegistry,
 ) -> Result<(tree_sitter::Language, tree_sitter::Tree), crate::Error> {
     let lang = registry.get_language(language)?;
-    let mut parser = tree_sitter::Parser::new();
-    parser
-        .set_language(&lang)
-        .map_err(|e| crate::Error::ParserSetup(e.to_string()))?;
-    let tree = parser.parse(source, None).ok_or(crate::Error::ParseFailed)?;
+    let tree = crate::parse::parse_with_language(language, &lang, source.as_bytes())?;
     Ok((lang, tree))
 }
 

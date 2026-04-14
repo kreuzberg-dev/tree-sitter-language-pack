@@ -118,7 +118,7 @@ fn collect_chunk_metadata(
     if depth <= 1
         && node.start_byte() >= chunk_start
         && node.end_byte() <= chunk_end
-        && !collector.node_types.contains(&kind.to_string())
+        && !collector.node_types.iter().any(|t| t == kind)
     {
         collector.node_types.push(kind.to_string());
     }

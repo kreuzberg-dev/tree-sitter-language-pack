@@ -31,54 +31,163 @@ This guide walks from install to parsing code in 5 minutes.
     brew install kreuzberg-dev/tap/ts-pack
     ```
 
-## Step 2 — Get a Parser
+## Step 2 — Download Parsers
 
-Parsers are downloaded automatically on first use. You can also pre-download for offline use.
+Parsers are downloaded automatically on first use — but for production, CI, Docker, or offline environments you should **pre-download** them.
+
+### Download specific languages
+
+=== "CLI"
+
+    ```bash
+    ts-pack download python javascript rust go
+    ```
 
 === "Python"
 
     ```python
-    from tree_sitter_language_pack import get_parser, download
+    from tree_sitter_language_pack import download
 
-    # Auto-downloads on first call
-    parser = get_parser("python")
-
-    # Or pre-download explicitly
-    download(["python", "javascript", "rust"])
+    download(["python", "javascript", "rust", "go"])
     ```
 
 === "Node.js"
 
     ```typescript
-    import { parseString, download } from "@kreuzberg/tree-sitter-language-pack";
+    import { download } from "@kreuzberg/tree-sitter-language-pack";
 
-    // Auto-downloads on first call
-    const tree = parseString("python", "print('hello')");
-
-    // Or pre-download explicitly
-    download(["python", "javascript", "rust"]);
+    download(["python", "javascript", "rust", "go"]);
     ```
 
 === "Rust"
 
     ```rust
-    use ts_pack_core::{get_parser, download};
+    use tree_sitter_language_pack::download;
 
-    // Auto-downloads on first call
-    let mut parser = get_parser("python")?;
-
-    // Or pre-download explicitly
-    download(&["python", "javascript", "rust"])?;
+    download(&["python", "javascript", "rust", "go"])?;
     ```
+
+### Download all 305 languages
 
 === "CLI"
 
     ```bash
-    # Download for offline use
-    ts-pack download python javascript rust
-
-    # Or skip — parsing auto-downloads
+    ts-pack download --all
     ```
+
+=== "Python"
+
+    ```python
+    from tree_sitter_language_pack import download_all
+
+    download_all()
+    ```
+
+=== "Node.js"
+
+    ```typescript
+    import { downloadAll } from "@kreuzberg/tree-sitter-language-pack";
+
+    downloadAll();
+    ```
+
+=== "Rust"
+
+    ```rust
+    use tree_sitter_language_pack::download_all;
+
+    download_all()?;
+    ```
+
+### Download by language group
+
+Groups bundle related languages together: `web`, `systems`, `scripting`, `data`, `jvm`, `functional`.
+
+=== "CLI"
+
+    ```bash
+    # Download all web languages (HTML, CSS, JS, TS, Vue, Svelte, ...)
+    ts-pack download --groups web,data
+
+    # See what's cached
+    ts-pack list --downloaded
+    ```
+
+=== "Python"
+
+    ```python
+    from tree_sitter_language_pack import init
+
+    init({"groups": ["web", "data"]})
+    ```
+
+=== "Node.js"
+
+    ```typescript
+    import { init } from "@kreuzberg/tree-sitter-language-pack";
+
+    init({ groups: ["web", "data"] });
+    ```
+
+=== "Rust"
+
+    ```rust
+    use tree_sitter_language_pack::{PackConfig, init};
+
+    let config = PackConfig {
+        groups: Some(vec!["web".into(), "data".into()]),
+        ..Default::default()
+    };
+    init(&config)?;
+    ```
+
+### Docker and CI
+
+Pre-download parsers during your Docker build or CI setup to avoid runtime network calls:
+
+```dockerfile title="Dockerfile"
+FROM python:3.12-slim
+RUN pip install tree-sitter-language-pack
+# Pre-download at build time — no network needed at runtime
+RUN python -c "from tree_sitter_language_pack import download_all; download_all()"
+```
+
+```yaml title="GitHub Actions"
+- name: Install and pre-download parsers
+  run: |
+    pip install tree-sitter-language-pack
+    python -c "from tree_sitter_language_pack import download; download(['python', 'javascript', 'rust'])"
+```
+
+### Configuration file
+
+Create a `language-pack.toml` to declare which languages your project needs:
+
+```toml title="language-pack.toml"
+languages = ["python", "javascript", "rust", "go"]
+# groups = ["web", "systems"]
+# cache_dir = "/tmp/parsers"
+```
+
+Then download everything declared in the config:
+
+=== "CLI"
+
+    ```bash
+    # Reads language-pack.toml automatically
+    ts-pack download
+    ```
+
+=== "Python"
+
+    ```python
+    from tree_sitter_language_pack import init
+    # Reads language-pack.toml from current directory
+    init()
+    ```
+
+!!! tip "Cache location"
+    Parsers are cached in `~/.cache/tree-sitter-language-pack/` (Linux/macOS) or `%LOCALAPPDATA%\tree-sitter-language-pack\` (Windows). Override with `TSLP_CACHE_DIR` environment variable, the `cache_dir` field in `language-pack.toml`, or the programmatic API. See [Download Model](../concepts/download-model.md) for full details.
 
 ## Step 3 — Parse Code
 

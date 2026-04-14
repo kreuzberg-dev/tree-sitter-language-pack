@@ -98,9 +98,14 @@ fn compiled_query(language: &str, query_source: &str) -> Result<Arc<CompiledQuer
     if let Some(query) = LOCAL_QUERY_CACHE.with(|cache| cache.borrow().get(&key).cloned()) {
         return Ok(query);
     }
-    if let Some(query) = QUERY_CACHE.read().ok().and_then(|cache| cache.get(&key).cloned()) {
+    if let Some(query) = QUERY_CACHE
+        .read()
+        .map_err(|e| Error::LockPoisoned(e.to_string()))?
+        .get(&key)
+        .cloned()
+    {
         LOCAL_QUERY_CACHE.with(|cache| {
-            cache.borrow_mut().insert(key.clone(), Arc::clone(&query));
+            cache.borrow_mut().insert(key, Arc::clone(&query));
         });
         return Ok(query);
     }
@@ -112,15 +117,12 @@ fn compiled_query(language: &str, query_source: &str) -> Result<Arc<CompiledQuer
         .iter()
         .map(|s| Cow::Owned(s.to_string()))
         .collect();
-    let query = Arc::new(CompiledQuery { query, capture_names });
+    let compiled = Arc::new(CompiledQuery { query, capture_names });
     LOCAL_QUERY_CACHE.with(|cache| {
-        cache.borrow_mut().insert(key.clone(), Arc::clone(&query));
+        cache.borrow_mut().insert(key.clone(), Arc::clone(&compiled));
     });
-    if let Ok(mut cache) = QUERY_CACHE.write() {
-        Ok(cache.entry(key).or_insert_with(|| Arc::clone(&query)).clone())
-    } else {
-        Ok(query)
-    }
+    let mut global = QUERY_CACHE.write().map_err(|e| Error::LockPoisoned(e.to_string()))?;
+    Ok(global.entry(key).or_insert_with(|| Arc::clone(&compiled)).clone())
 }
 
 #[cfg(test)]
@@ -180,5 +182,80 @@ mod tests {
         let q1 = compiled_query(first, query_src).unwrap();
         let q2 = compiled_query(first, query_src).unwrap();
         assert!(Arc::ptr_eq(&q1, &q2));
+    }
+
+    #[test]
+    fn test_different_languages_same_query_separate_cache() {
+        let langs = crate::available_languages();
+        if langs.len() < 2 {
+            return;
+        }
+        let query_src = "(identifier) @id";
+        let q1 = compiled_query(&langs[0], query_src);
+        let q2 = compiled_query(&langs[1], query_src);
+        // Both might fail if grammar doesn't have identifiers, but if both succeed
+        // they should be different Arc pointers.
+        if let (Ok(q1), Ok(q2)) = (q1, q2) {
+            assert!(
+                !Arc::ptr_eq(&q1, &q2),
+                "different languages should produce different cached queries"
+            );
+        }
+    }
+
+    #[test]
+    fn test_compiled_query_error_recovery() {
+        let langs = crate::available_languages();
+        if langs.is_empty() {
+            return;
+        }
+        let first = &langs[0];
+        // Invalid query should fail
+        let bad = compiled_query(first, "((((invalid syntax");
+        assert!(bad.is_err());
+        // Valid query should still work after a failed compilation
+        let good = compiled_query(first, "(identifier) @id");
+        // May fail for some grammars without identifiers, but should not panic
+        let _ = good;
+    }
+
+    #[test]
+    fn test_compiled_query_capture_names_preserved() {
+        let langs = crate::available_languages();
+        if langs.is_empty() {
+            return;
+        }
+        let first = &langs[0];
+        let q = compiled_query(first, "(identifier) @name");
+        if let Ok(q) = q {
+            assert!(!q.capture_names.is_empty(), "capture_names should not be empty");
+            assert_eq!(q.capture_names[0], "name");
+        }
+    }
+
+    #[test]
+    fn test_compiled_query_shared_across_threads() {
+        let langs = crate::available_languages();
+        if langs.is_empty() {
+            return;
+        }
+        let lang = langs[0].clone();
+        let query_src = "(identifier) @id";
+        // Prime the global cache from this thread
+        let q_main = compiled_query(&lang, query_src);
+        if q_main.is_err() {
+            return; // Grammar doesn't support this query
+        }
+        let q_main = q_main.unwrap();
+
+        let lang_clone = lang.clone();
+        let handle = std::thread::spawn(move || compiled_query(&lang_clone, query_src));
+        let q_thread = handle.join().expect("thread should not panic");
+        if let Ok(q_thread) = q_thread {
+            assert!(
+                Arc::ptr_eq(&q_main, &q_thread),
+                "same query from different threads should share the same Arc via global cache"
+            );
+        }
     }
 }

@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-04-14
+
+### Added
+
+- Thread-local parser cache in `parse_string()` — avoids re-creating parsers on repeated calls for the same language
+- Two-level compiled query cache (thread-local + global) in `run_query()` — avoids recompiling tree-sitter queries
+- `parse_with_language()` internal API for callers that already have a `Language` object
+- Pre-computed capture names in `CompiledExtraction` — avoids rebuilding on every extraction call
+- Go `type_spec` declarations extracted as symbols with correct `SymbolKind` (struct, interface, type)
+- Dedicated "Download Parsers" section in quickstart docs covering CLI, programmatic APIs, groups, Docker/CI, and config files
+- Tests for parser cache reuse, query cache sharing across threads, cursor byte-range isolation, and capture name correctness
+
+### Fixed
+
+- `compiled_query()` now propagates `Error::LockPoisoned` instead of silently ignoring poisoned RwLock
+- `QueryCursor` byte-range no longer leaks between patterns when reusing the cursor in `extract_from_tree()`
+- Replaced `std::collections::HashMap` with `ahash::AHashMap` in parser cache for consistency
+- Redundant `get_language()` call removed from `parse_string()` hot path — only called on cache miss
+
+### Changed
+
+- `CompiledExtraction::extract()` and `intel::parse_source()` now use the thread-local parser cache
+- `QueryCursor` reused across patterns within a single `extract_from_tree()` call
+- Unnecessary `String` allocation removed from `node_types.contains()` check in chunking
+
 ## [1.5.0] - 2026-04-08
 
 ### Added
