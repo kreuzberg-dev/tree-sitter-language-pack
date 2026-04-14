@@ -10,6 +10,7 @@ pub(crate) struct CallResolutionContext<'a> {
     pub(crate) symbols_by_file: &'a HashMap<String, HashMap<String, String>>,
     pub(crate) go_import_aliases_by_file: &'a HashMap<String, HashMap<String, String>>,
     pub(crate) go_var_types_by_file: &'a HashMap<String, HashMap<String, String>>,
+    pub(crate) rust_var_types_by_file: &'a HashMap<String, HashMap<String, String>>,
     pub(crate) python_module_aliases_by_file: &'a HashMap<String, HashMap<String, String>>,
     pub(crate) python_imported_symbol_modules_by_file: &'a HashMap<String, HashMap<String, String>>,
     pub(crate) imported_target_files_by_src: &'a HashMap<String, HashSet<String>>,
@@ -358,6 +359,44 @@ fn resolve_by_go_receiver_type(ctx: &CallResolutionContext<'_>, call_ref: &CallR
         .iter()
         .filter(|(qualified_name, _, filepath)| {
             (qualified_name == &exact || qualified_name.ends_with(&suffix))
+                && (call_ref.allow_same_file || filepath != &call_ref.caller_filepath)
+        })
+        .map(|(_, id, _)| id.clone());
+    let first = matches.next();
+    let second = matches.next();
+    if second.is_none() { first } else { None }
+}
+
+fn resolve_by_rust_receiver_type(ctx: &CallResolutionContext<'_>, call_ref: &CallRef) -> Option<String> {
+    if call_ref.language != "rust" || !matches!(call_ref.kind, CallRefKind::Member | CallRefKind::Scoped) {
+        return None;
+    }
+    let receiver = call_ref.receiver_hint.as_deref()?;
+    let receiver_type = ctx
+        .rust_var_types_by_file
+        .get(&call_ref.caller_filepath)
+        .and_then(|m| m.get(receiver))?;
+    let normalized_type = receiver_type
+        .rsplit("::")
+        .next()
+        .unwrap_or(receiver_type)
+        .trim_start_matches('*')
+        .trim();
+    if normalized_type.is_empty() {
+        return None;
+    }
+    let rust_exact = format!("{normalized_type}::{}", call_ref.callee);
+    let dot_exact = format!("{normalized_type}.{}", call_ref.callee);
+    let rust_suffix = format!("::{normalized_type}::{}", call_ref.callee);
+    let dot_suffix = format!(".{normalized_type}.{}", call_ref.callee);
+    let mut matches = ctx
+        .qualified_callable_symbols
+        .iter()
+        .filter(|(qualified_name, _, filepath)| {
+            (qualified_name == &rust_exact
+                || qualified_name == &dot_exact
+                || qualified_name.ends_with(&rust_suffix)
+                || qualified_name.ends_with(&dot_suffix))
                 && (call_ref.allow_same_file || filepath != &call_ref.caller_filepath)
         })
         .map(|(_, id, _)| id.clone());
@@ -887,6 +926,7 @@ pub(crate) fn resolve_call_ref(ctx: &CallResolutionContext<'_>, call_ref: &CallR
         CallRefKind::Scoped => &[
             ("go_import_receiver", resolve_by_go_import_receiver),
             ("go_receiver_type", resolve_by_go_receiver_type),
+            ("rust_receiver_type", resolve_by_rust_receiver_type),
             ("self_qualified", resolve_by_self_qualified),
             ("qualified", resolve_by_qualified_hint),
             ("receiver_qualified", resolve_by_receiver_qualified),
@@ -897,6 +937,7 @@ pub(crate) fn resolve_call_ref(ctx: &CallResolutionContext<'_>, call_ref: &CallR
         ],
         CallRefKind::Member => &[
             ("python_module_receiver", resolve_by_python_module_receiver),
+            ("rust_receiver_type", resolve_by_rust_receiver_type),
             ("receiver_qualified", resolve_by_receiver_qualified),
             ("import_symbol", resolve_by_import_symbol_request),
             ("imported_target", resolve_by_imported_target_unique),
@@ -1221,6 +1262,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1234,6 +1276,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1270,6 +1313,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1283,6 +1327,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1329,6 +1374,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1342,6 +1388,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1384,6 +1431,7 @@ mod tests {
         )]);
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::from([(
             "pkg/main.py".to_string(),
@@ -1400,6 +1448,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1438,6 +1487,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1452,6 +1502,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1491,6 +1542,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1504,6 +1556,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1539,6 +1592,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1552,6 +1606,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1603,6 +1658,7 @@ mod tests {
             )]),
         )]);
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1620,6 +1676,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1668,6 +1725,7 @@ mod tests {
             "tests/test_apps/go/smoke_test.go".to_string(),
             HashMap::from([("registry".to_string(), "Registry".to_string())]),
         )]);
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1681,6 +1739,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1712,11 +1771,75 @@ mod tests {
     }
 
     #[test]
+    fn rust_receiver_type_calls_resolve_exactly() {
+        let callable_symbols_by_name = HashMap::from([(
+            "process".to_string(),
+            vec![("sym:process".to_string(), "crates/ts-pack-core/src/registry.rs".to_string())],
+        )]);
+        let qualified_callable_symbols = vec![(
+            "LanguageRegistry::process".to_string(),
+            "sym:process".to_string(),
+            "crates/ts-pack-core/src/registry.rs".to_string(),
+        )];
+        let caller_qualified_symbols_by_id = HashMap::new();
+        let symbols_by_file = HashMap::new();
+        let go_import_aliases_by_file = HashMap::new();
+        let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::from([(
+            "crates/ts-pack-core/src/lib.rs".to_string(),
+            HashMap::from([("REGISTRY".to_string(), "LanguageRegistry".to_string())]),
+        )]);
+        let python_module_aliases_by_file = HashMap::new();
+        let python_imported_symbol_modules_by_file = HashMap::new();
+        let imported_target_files_by_src = HashMap::new();
+        let exported_symbols_by_file = HashMap::new();
+        let files_set = HashSet::new();
+        let rust_local_module_roots_by_src_root = HashMap::new();
+        let ctx = CallResolutionContext {
+            callable_symbols_by_name: &callable_symbols_by_name,
+            qualified_callable_symbols: &qualified_callable_symbols,
+            caller_qualified_symbols_by_id: &caller_qualified_symbols_by_id,
+            symbols_by_file: &symbols_by_file,
+            go_import_aliases_by_file: &go_import_aliases_by_file,
+            go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
+            python_module_aliases_by_file: &python_module_aliases_by_file,
+            python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
+            imported_target_files_by_src: &imported_target_files_by_src,
+            import_symbol_requests: &[],
+            exported_symbols_by_file: &exported_symbols_by_file,
+            files_set: &files_set,
+            rust_local_module_roots_by_src_root: &rust_local_module_roots_by_src_root,
+        };
+
+        match resolve_call_ref(
+            &ctx,
+            &CallRef {
+                caller_id: "sym:wrapper".into(),
+                callee: "process".into(),
+                language: "rust".into(),
+                caller_filepath: "crates/ts-pack-core/src/lib.rs".into(),
+                allow_same_file: false,
+                kind: CallRefKind::Member,
+                receiver_hint: Some("REGISTRY".into()),
+                qualified_hint: Some("REGISTRY.process".into()),
+            },
+        ) {
+            CallResolution::ResolvedInternal(id, stage) => {
+                assert_eq!(id, "sym:process");
+                assert_eq!(stage, "rust_receiver_type");
+            }
+            _ => panic!("expected rust receiver-type resolution"),
+        }
+    }
+
+    #[test]
     fn python_builtin_calls_are_filtered() {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1730,6 +1853,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1763,6 +1887,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1776,6 +1901,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1809,6 +1935,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::from([(
             "pkg/helpers.py".to_string(),
             HashMap::from([("hashlib".to_string(), "hashlib".to_string())]),
@@ -1825,6 +1952,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1861,6 +1989,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1874,6 +2003,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1910,6 +2040,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1923,6 +2054,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -1959,6 +2091,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -1972,6 +2105,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -2008,6 +2142,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -2021,6 +2156,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -2057,6 +2193,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -2070,6 +2207,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -2112,6 +2250,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -2125,6 +2264,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -2161,6 +2301,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -2174,6 +2315,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -2210,6 +2352,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -2223,6 +2366,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -2259,6 +2403,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -2272,6 +2417,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -2308,6 +2454,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -2321,6 +2468,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -2357,6 +2505,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -2370,6 +2519,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -2406,6 +2556,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -2419,6 +2570,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -2455,6 +2607,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -2468,6 +2621,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -2504,6 +2658,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -2517,6 +2672,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -3711,6 +3867,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -3724,6 +3881,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -3757,6 +3915,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -3770,6 +3929,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -3803,6 +3963,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -3816,6 +3977,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -3849,6 +4011,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -3862,6 +4025,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -3896,6 +4060,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -3909,6 +4074,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -3943,6 +4109,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -3956,6 +4123,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -3990,6 +4158,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -4003,6 +4172,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -4037,6 +4207,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -4050,6 +4221,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -4084,6 +4256,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -4097,6 +4270,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,
@@ -4131,6 +4305,7 @@ mod tests {
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
         let python_module_aliases_by_file = HashMap::new();
         let python_imported_symbol_modules_by_file = HashMap::new();
         let imported_target_files_by_src = HashMap::new();
@@ -4144,6 +4319,7 @@ mod tests {
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
             go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
             python_module_aliases_by_file: &python_module_aliases_by_file,
             python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
             imported_target_files_by_src: &imported_target_files_by_src,

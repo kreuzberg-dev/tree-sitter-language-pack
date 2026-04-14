@@ -9,11 +9,13 @@ use tree_sitter_language_pack as ts_pack;
 use crate::duplicate;
 use crate::go;
 use crate::pathing;
+use crate::rust;
 use crate::swift;
 use crate::tags;
 use crate::{
     CallRef, CallRefKind, CloneCandidate, ExportAliasRequest, FileNode, GoFileContext, ImportNode, ImportSymbolRequest,
-    MAX_FILE_BYTES, ManifestEntry, PythonFileContext, ReExportSymbolRequest, RelRow, SwiftFileContext, SymbolNode,
+    MAX_FILE_BYTES, ManifestEntry, PythonFileContext, ReExportSymbolRequest, RelRow, RustFileContext, SwiftFileContext,
+    SymbolNode,
     WINNOW_LARGE_K, WINNOW_LARGE_W, WINNOW_MEDIUM_K, WINNOW_MEDIUM_W, WINNOW_MIN_FINGERPRINTS, WINNOW_MIN_TOKENS,
     WINNOW_SMALL_K, WINNOW_SMALL_TOKEN_THRESHOLD, WINNOW_SMALL_W,
 };
@@ -30,6 +32,7 @@ pub(crate) struct FileResult {
     pub(crate) swift_extensions: Option<HashMap<String, HashSet<String>>>,
     pub(crate) swift_context: Option<SwiftFileContext>,
     pub(crate) python_context: Option<PythonFileContext>,
+    pub(crate) rust_context: Option<RustFileContext>,
     pub(crate) go_context: Option<GoFileContext>,
     pub(crate) clone_candidates: Vec<CloneCandidate>,
     pub(crate) db_models: Vec<String>,
@@ -484,6 +487,7 @@ fn parse_entry(
     let mut swift_extensions: Option<HashMap<String, HashSet<String>>> = None;
     let mut swift_context: Option<SwiftFileContext> = None;
     let mut python_context: Option<PythonFileContext> = None;
+    let mut rust_context: Option<RustFileContext> = None;
     let mut go_context: Option<GoFileContext> = None;
 
     let mut exported_names: HashSet<String> = result
@@ -729,6 +733,16 @@ fn parse_entry(
         }
     }
 
+    if lang_name == "rust" {
+        let var_types = rust::parse_rust_var_types(&source);
+        if !var_types.is_empty() {
+            rust_context = Some(RustFileContext {
+                filepath: rel_path.clone(),
+                var_types,
+            });
+        }
+    }
+
     if lang_name == "go" {
         let (var_types, method_return_assignments, function_return_assignments) = go::parse_go_var_types(&source);
         let method_return_types = go::parse_go_method_return_types(&source);
@@ -861,6 +875,7 @@ fn parse_entry(
         swift_extensions,
         swift_context,
         python_context,
+        rust_context,
         go_context,
         clone_candidates,
         db_models: if is_backend { db_models } else { Vec::new() },

@@ -12,7 +12,8 @@ use crate::{
     CargoWorkspaceCrateRow, CargoWorkspaceRow, ExportAliasRequest, FileEdgeRow, FileImportEdgeRow, FileNode,
     GoFileContext, ImplicitImportSymbolEdgeRow, ImportSymbolEdgeRow, ImportSymbolRequest, InferredCallRow,
     LaunchEdgeRow, PythonFileContext, PythonInferredCallRow, ReExportSymbolRequest, ResourceBackingRow,
-    ResourceTargetEdgeRow, ResourceUsageRow, RustImplTraitEdgeRow, RustImplTypeEdgeRow, SwiftFileContext,
+    ResourceTargetEdgeRow, ResourceUsageRow, RustFileContext, RustImplTraitEdgeRow, RustImplTypeEdgeRow,
+    SwiftFileContext,
     SymbolCallRow, SymbolNode, XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow,
     XcodeTargetRow, XcodeWorkspaceProjectRow, XcodeWorkspaceRow,
 };
@@ -68,6 +69,7 @@ pub(crate) fn prepare_graph_facts(
     swift_extension_map: &HashMap<String, HashSet<String>>,
     swift_contexts: &[SwiftFileContext],
     python_contexts: &[PythonFileContext],
+    rust_contexts: &[RustFileContext],
     go_contexts: &[GoFileContext],
 ) -> PreparationOutputs {
     let debug_call_resolution = std::env::var("TS_PACK_DEBUG_CALL_RESOLUTION")
@@ -78,6 +80,7 @@ pub(crate) fn prepare_graph_facts(
     let mut caller_qualified_symbols_by_id: HashMap<String, String> = HashMap::new();
     let mut go_import_aliases_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
     let mut go_var_types_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
+    let mut rust_var_types_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
     let mut go_method_return_types: HashMap<String, String> = HashMap::new();
     let mut go_function_return_types: HashMap<String, Vec<(String, String)>> = HashMap::new();
     let mut python_module_aliases_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
@@ -275,6 +278,11 @@ pub(crate) fn prepare_graph_facts(
             python_imported_symbol_modules_by_file.insert(ctx.filepath.clone(), ctx.imported_symbol_modules.clone());
         }
     }
+    for ctx in rust_contexts {
+        if !ctx.var_types.is_empty() {
+            rust_var_types_by_file.insert(ctx.filepath.clone(), ctx.var_types.clone());
+        }
+    }
 
     let resolve_import_item_for_file = |src_filepath: &str, item_name: &str| -> Option<String> {
         for req in import_symbol_requests
@@ -320,6 +328,7 @@ pub(crate) fn prepare_graph_facts(
         symbols_by_file: &symbols_by_file,
         go_import_aliases_by_file: &go_import_aliases_by_file,
         go_var_types_by_file: &go_var_types_by_file,
+        rust_var_types_by_file: &rust_var_types_by_file,
         python_module_aliases_by_file: &python_module_aliases_by_file,
         python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
         imported_target_files_by_src: &imported_target_files_by_src,
@@ -1086,6 +1095,7 @@ mod tests {
             &[],
             &[],
             &[],
+            &[],
         );
 
         assert_eq!(out.import_symbol_edges.len(), 1);
@@ -1128,6 +1138,7 @@ mod tests {
             &requests,
             &[],
             &HashMap::new(),
+            &[],
             &[],
             &[],
             &[],
@@ -1184,6 +1195,7 @@ mod tests {
             &[],
             &[],
             &[],
+            &[],
         );
 
         assert_eq!(out.export_symbol_edges.len(), 1);
@@ -1220,6 +1232,7 @@ mod tests {
             &[],
             &alias_requests,
             &HashMap::new(),
+            &[],
             &[],
             &[],
             &[],
@@ -1272,6 +1285,7 @@ mod tests {
             &[],
             &[],
             &[],
+            &[],
         );
 
         assert_eq!(out.export_alias_edges.len(), 1);
@@ -1309,6 +1323,7 @@ mod tests {
             &[],
             &alias_requests,
             &HashMap::new(),
+            &[],
             &[],
             &[],
             &[],
@@ -1359,6 +1374,7 @@ mod tests {
             &[],
             &[],
             &[],
+            &[],
         );
 
         assert_eq!(out.export_alias_edges.len(), 2);
@@ -1399,6 +1415,7 @@ mod tests {
             &[],
             &swift_extension_map,
             &[ctx],
+            &[],
             &[],
             &[],
         );
@@ -1442,6 +1459,7 @@ mod tests {
             &[],
             &[],
             &HashMap::new(),
+            &[],
             &[],
             &[],
             &[ctx],
@@ -1507,6 +1525,7 @@ mod tests {
             &HashMap::new(),
             &[],
             &[],
+            &[],
             &[provider_ctx, caller_ctx],
         );
 
@@ -1569,6 +1588,7 @@ mod tests {
             &HashMap::new(),
             &[],
             &[],
+            &[],
             &[helper_ctx, caller_ctx],
         );
         assert_eq!(out.inferred_call_rows.len(), 1);
@@ -1612,6 +1632,7 @@ mod tests {
                 &HashMap::new(),
                 &[],
                 &[ctx],
+                &[],
                 &[],
             )
         });
@@ -1660,6 +1681,7 @@ mod tests {
                 &HashMap::new(),
                 &[],
                 &[ctx],
+                &[],
                 &[],
             )
         });
@@ -1723,6 +1745,7 @@ mod tests {
                 &[swift_ctx],
                 &[],
                 &[],
+                &[],
             )
         });
 
@@ -1779,6 +1802,7 @@ mod tests {
             &[],
             &[],
             &HashMap::new(),
+            &[],
             &[],
             &[],
             &[],

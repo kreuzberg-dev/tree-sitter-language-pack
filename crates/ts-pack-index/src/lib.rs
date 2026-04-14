@@ -7,6 +7,7 @@ mod model;
 mod parse_phase;
 mod pathing;
 mod prep_phase;
+mod rust;
 mod swift;
 mod tags;
 mod write_phase;
@@ -422,6 +423,7 @@ pub async fn index_workspace(
         std::collections::HashMap::new();
     let mut swift_contexts: Vec<SwiftFileContext> = Vec::new();
     let mut python_contexts: Vec<PythonFileContext> = Vec::new();
+    let mut rust_contexts: Vec<RustFileContext> = Vec::new();
     let mut go_contexts: Vec<GoFileContext> = Vec::new();
     let mut db_sources: Vec<String> = Vec::new();
     let mut db_model_refs_by_file: Vec<(String, String)> = Vec::new();
@@ -554,6 +556,9 @@ pub async fn index_workspace(
             }
             if let Some(ctx) = res.python_context {
                 python_contexts.push(ctx);
+            }
+            if let Some(ctx) = res.rust_context {
+                rust_contexts.push(ctx);
             }
             if let Some(ctx) = res.go_context {
                 go_contexts.push(ctx);
@@ -725,6 +730,7 @@ pub async fn index_workspace(
         &swift_extension_map,
         &swift_contexts,
         &python_contexts,
+        &rust_contexts,
         &go_contexts,
     );
     import_symbol_edges.extend(prep.import_symbol_edges);

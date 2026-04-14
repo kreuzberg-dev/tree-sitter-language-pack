@@ -366,6 +366,11 @@ pub(crate) struct PythonFileContext {
     pub(crate) imported_symbol_modules: std::collections::HashMap<String, String>,
 }
 
+pub(crate) struct RustFileContext {
+    pub(crate) filepath: String,
+    pub(crate) var_types: std::collections::HashMap<String, String>,
+}
+
 pub(crate) struct GoFileContext {
     pub(crate) file_id: String,
     pub(crate) filepath: String,

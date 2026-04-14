@@ -219,7 +219,7 @@ const RUST_TAGS: &str = r#"
 (call_expression
   function: (field_expression
     value: (identifier) @recv
-    field: (identifier) @callee))
+    field: (field_identifier) @callee))
 
 (call_expression
   function: (scoped_identifier
@@ -2086,6 +2086,26 @@ mod tests {
             tags.call_sites
                 .iter()
                 .any(|c| c.callee == "start" && c.receiver.as_deref() == Some("self"))
+        );
+    }
+
+    #[test]
+    fn extracts_rust_static_receiver_calls() {
+        let source = r#"
+        static REGISTRY: LazyLock<LanguageRegistry> = LazyLock::new(LanguageRegistry::new);
+
+        pub fn process(source: &str, config: &ProcessConfig) -> Result<ProcessResult, Error> {
+            REGISTRY.process(source, config)
+        }
+        "#;
+        let Some(tree) = maybe_parse("rust", source) else {
+            return;
+        };
+        let tags = run_tags("rust", &tree, source.as_bytes(), "fixture.rs", None).expect("tags");
+
+        assert!(
+            tags.call_sites.iter().any(|c| c.callee == "process" && c.receiver.as_deref() == Some("REGISTRY")),
+            "expected REGISTRY.process call site"
         );
     }
 
