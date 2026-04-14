@@ -488,11 +488,12 @@
 		"rev": "f780ca55e65e7d7360d0229331763e16c452fc98"
 	},
 	"gap": {
-		"extensions": ["g", "gi", "gd"],
+		"extensions": ["g", "gi"],
 		"repo": "https://github.com/gap-system/tree-sitter-gap",
 		"rev": "ed2480d42281586932920527823b307bc45052b8"
 	},
 	"gdscript": {
+		"ambiguous": { "gd": ["gap"] },
 		"branch": "master",
 		"extensions": ["gd"],
 		"repo": "https://github.com/PrestonKnopp/tree-sitter-gdscript",
@@ -659,7 +660,7 @@
 		"rev": "bab9111922d53d43668fabb61869bec51bbcb915"
 	},
 	"hocon": {
-		"extensions": ["conf"],
+		"extensions": ["hocon"],
 		"repo": "https://github.com/antosha417/tree-sitter-hocon",
 		"rev": "c390f10519ae69fdb03b3e5764f5592fb6924bcc"
 	},
@@ -930,7 +931,8 @@
 		"rev": "1c166a97a3481f385136394b950d9556d28af7b8"
 	},
 	"nginx": {
-		"extensions": ["conf"],
+		"ambiguous": { "conf": ["hocon"] },
+		"extensions": ["conf", "nginx"],
 		"repo": "https://github.com/opa-oz/tree-sitter-nginx",
 		"rev": "47ade644d754cce57974aac44d2c9450e823d4f4"
 	},
@@ -1394,6 +1396,7 @@
 		"rev": "64f26c3a6e9e6cf4f77165c8283e35a26b7825a7"
 	},
 	"systemverilog": {
+		"ambiguous": { "sv": ["verilog"], "svh": ["verilog"] },
 		"extensions": ["sv", "svh"],
 		"repo": "https://github.com/gmlarumbe/tree-sitter-systemverilog",
 		"rev": "293928578cb27fbd0005fcc5f09c09a1e8628c89"
@@ -1548,7 +1551,7 @@
 		"rev": "cfca210ce8fdcb5245bd9cd5c47ce0a21a8488d5"
 	},
 	"verilog": {
-		"extensions": ["sv", "svh", "verilog"],
+		"extensions": ["verilog"],
 		"repo": "https://github.com/tree-sitter/tree-sitter-verilog",
 		"rev": "227d277b6a1a5e2bf818d6206935722a7503de08"
 	},
