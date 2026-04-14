@@ -35,6 +35,18 @@ fn node_text<'a>(node: &tree_sitter::Node, source: &'a str) -> &'a str {
     &source[node.start_byte()..node.end_byte()]
 }
 
+fn go_type_spec_symbol_kind(node: &tree_sitter::Node) -> SymbolKind {
+    let ty_kind = node
+        .child_by_field_name("type")
+        .map(|n| n.kind().to_string())
+        .unwrap_or_default();
+    match ty_kind.as_str() {
+        "struct_type" => SymbolKind::Type,
+        "interface_type" => SymbolKind::Interface,
+        _ => SymbolKind::Type,
+    }
+}
+
 pub(crate) fn compute_metrics(source: &str, root: &tree_sitter::Node) -> FileMetrics {
     let mut total_lines = 0usize;
     let mut blank_lines = 0;
@@ -295,6 +307,7 @@ fn collect_symbols(node: &tree_sitter::Node, source: &str, symbols: &mut Vec<Sym
         "function_definition" | "function_declaration" | "function_item" => Some(SymbolKind::Function),
         "class_definition" | "class_declaration" => Some(SymbolKind::Class),
         "type_alias_declaration" | "type_item" => Some(SymbolKind::Type),
+        "type_spec" => Some(go_type_spec_symbol_kind(node)),
         "interface_declaration" => Some(SymbolKind::Interface),
         "enum_item" | "enum_declaration" => Some(SymbolKind::Enum),
         "const_item" | "const_declaration" => Some(SymbolKind::Constant),
@@ -503,6 +516,34 @@ mod tests {
         let names: Vec<_> = func_symbols.iter().map(|s| s.name.as_str()).collect();
         assert!(names.contains(&"alpha"));
         assert!(names.contains(&"beta"));
+    }
+
+    #[test]
+    fn test_extract_go_type_declarations_as_symbols() {
+        let source = "type User struct{}\ntype Service interface{}\ntype ID string\n";
+        let Some(tree) = parse_or_skip(source, "go") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "go", &tree);
+
+        assert!(
+            intel
+                .symbols
+                .iter()
+                .any(|s| { s.kind == SymbolKind::Type && s.name == "User" })
+        );
+        assert!(
+            intel
+                .symbols
+                .iter()
+                .any(|s| { s.kind == SymbolKind::Interface && s.name == "Service" })
+        );
+        assert!(
+            intel
+                .symbols
+                .iter()
+                .any(|s| { s.kind == SymbolKind::Type && s.name == "ID" })
+        );
     }
 
     // -- Diagnostics tests --
