@@ -721,10 +721,12 @@ fn main() {
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
     let crate_local = manifest_dir.join("language_definitions.json");
     let workspace_path = project_root.join("sources/language_definitions.json");
-    let definitions_path = if crate_local.exists() {
-        crate_local
-    } else {
+    // Prefer workspace source (always up-to-date during development).
+    // Fall back to crate-local copy (present in crates.io packages).
+    let definitions_path = if workspace_path.exists() {
         workspace_path
+    } else {
+        crate_local
     };
 
     let definitions: BTreeMap<String, LanguageDefinition> = if definitions_path.exists() {
