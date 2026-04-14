@@ -297,6 +297,11 @@ fn parse_experiment_config(raw: Option<&str>) -> PyResult<ts_pack_index::duplica
     config.boilerplate_variant_suppression = get_bool("boilerplate_variant_suppression").unwrap_or(false);
     config.canonical_docs_mirror_suppression = get_bool("canonical_docs_mirror_suppression").unwrap_or(false);
     config.helper_clone_suppression = get_bool("helper_clone_suppression").unwrap_or(false);
+    config.query_class_override = obj
+        .get("query_class_override")
+        .and_then(|v| v.as_str())
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
     config.threshold_struct = get_f64("threshold_struct");
     config.threshold_lexical = get_f64("threshold_lexical");
     config.threshold_role = get_f64("threshold_role");

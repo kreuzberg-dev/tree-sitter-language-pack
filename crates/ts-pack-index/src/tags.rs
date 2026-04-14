@@ -2104,7 +2104,9 @@ mod tests {
         let tags = run_tags("rust", &tree, source.as_bytes(), "fixture.rs", None).expect("tags");
 
         assert!(
-            tags.call_sites.iter().any(|c| c.callee == "process" && c.receiver.as_deref() == Some("REGISTRY")),
+            tags.call_sites
+                .iter()
+                .any(|c| c.callee == "process" && c.receiver.as_deref() == Some("REGISTRY")),
             "expected REGISTRY.process call site"
         );
     }

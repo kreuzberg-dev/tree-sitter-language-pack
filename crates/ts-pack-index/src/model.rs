@@ -364,6 +364,14 @@ pub(crate) struct PythonFileContext {
     pub(crate) call_sites: Vec<tags::CallSite>,
     pub(crate) module_aliases: std::collections::HashMap<String, String>,
     pub(crate) imported_symbol_modules: std::collections::HashMap<String, String>,
+    pub(crate) var_types: std::collections::HashMap<String, String>,
+    pub(crate) function_return_assignments: Vec<PythonFunctionReturnAssignment>,
+    pub(crate) function_return_types: std::collections::HashMap<String, String>,
+}
+
+pub(crate) struct PythonFunctionReturnAssignment {
+    pub(crate) var_name: String,
+    pub(crate) function_name: String,
 }
 
 pub(crate) struct RustFileContext {

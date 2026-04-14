@@ -7,6 +7,7 @@ mod model;
 mod parse_phase;
 mod pathing;
 mod prep_phase;
+mod python;
 mod rust;
 mod swift;
 mod tags;

@@ -13,9 +13,8 @@ use crate::{
     GoFileContext, ImplicitImportSymbolEdgeRow, ImportSymbolEdgeRow, ImportSymbolRequest, InferredCallRow,
     LaunchEdgeRow, PythonFileContext, PythonInferredCallRow, ReExportSymbolRequest, ResourceBackingRow,
     ResourceTargetEdgeRow, ResourceUsageRow, RustFileContext, RustImplTraitEdgeRow, RustImplTypeEdgeRow,
-    SwiftFileContext,
-    SymbolCallRow, SymbolNode, XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow,
-    XcodeTargetRow, XcodeWorkspaceProjectRow, XcodeWorkspaceRow,
+    SwiftFileContext, SymbolCallRow, SymbolNode, XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow,
+    XcodeTargetFileRow, XcodeTargetRow, XcodeWorkspaceProjectRow, XcodeWorkspaceRow,
 };
 
 pub(crate) struct PreparationOutputs {
@@ -81,8 +80,10 @@ pub(crate) fn prepare_graph_facts(
     let mut go_import_aliases_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
     let mut go_var_types_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
     let mut rust_var_types_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
+    let mut python_var_types_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
     let mut go_method_return_types: HashMap<String, String> = HashMap::new();
     let mut go_function_return_types: HashMap<String, Vec<(String, String)>> = HashMap::new();
+    let mut python_function_return_types_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
     let mut python_module_aliases_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
     let mut python_imported_symbol_modules_by_file: HashMap<String, HashMap<String, String>> = HashMap::new();
     let mut exported_symbols_by_file: HashMap<String, Vec<String>> = HashMap::new();
@@ -271,11 +272,46 @@ pub(crate) fn prepare_graph_facts(
         }
     }
     for ctx in python_contexts {
+        if !ctx.var_types.is_empty() {
+            python_var_types_by_file.insert(ctx.filepath.clone(), ctx.var_types.clone());
+        }
+        if !ctx.function_return_types.is_empty() {
+            python_function_return_types_by_file.insert(ctx.filepath.clone(), ctx.function_return_types.clone());
+        }
         if !ctx.module_aliases.is_empty() {
             python_module_aliases_by_file.insert(ctx.filepath.clone(), ctx.module_aliases.clone());
         }
         if !ctx.imported_symbol_modules.is_empty() {
             python_imported_symbol_modules_by_file.insert(ctx.filepath.clone(), ctx.imported_symbol_modules.clone());
+        }
+    }
+    for ctx in python_contexts {
+        if ctx.function_return_assignments.is_empty() {
+            continue;
+        }
+        let file_var_types = python_var_types_by_file.entry(ctx.filepath.clone()).or_default();
+        let file_return_types = python_function_return_types_by_file.get(&ctx.filepath);
+        for assignment in &ctx.function_return_assignments {
+            if file_var_types.contains_key(&assignment.var_name) {
+                continue;
+            }
+            if let Some(return_type) = file_return_types.and_then(|m| m.get(&assignment.function_name)) {
+                file_var_types.insert(assignment.var_name.clone(), return_type.clone());
+                continue;
+            }
+            let Some(module) = ctx.imported_symbol_modules.get(&assignment.function_name) else {
+                continue;
+            };
+            let Some(target_fp) = pathing::resolve_module_path(&ctx.filepath, module, &files_set) else {
+                continue;
+            };
+            let Some(return_type) = python_function_return_types_by_file
+                .get(&target_fp)
+                .and_then(|m| m.get(&assignment.function_name))
+            else {
+                continue;
+            };
+            file_var_types.insert(assignment.var_name.clone(), return_type.clone());
         }
     }
     for ctx in rust_contexts {
@@ -329,6 +365,7 @@ pub(crate) fn prepare_graph_facts(
         go_import_aliases_by_file: &go_import_aliases_by_file,
         go_var_types_by_file: &go_var_types_by_file,
         rust_var_types_by_file: &rust_var_types_by_file,
+        python_var_types_by_file: &python_var_types_by_file,
         python_module_aliases_by_file: &python_module_aliases_by_file,
         python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
         imported_target_files_by_src: &imported_target_files_by_src,
@@ -1614,6 +1651,9 @@ mod tests {
             }],
             module_aliases: HashMap::from([("helpers".to_string(), ".helpers".to_string())]),
             imported_symbol_modules: HashMap::new(),
+            var_types: HashMap::new(),
+            function_return_assignments: vec![],
+            function_return_types: HashMap::new(),
         };
 
         let out = with_env_var("TS_PACK_PY_ATTR_CALLS", Some("1"), || {
@@ -1663,6 +1703,9 @@ mod tests {
             }],
             module_aliases: HashMap::from([("helpers".to_string(), ".helpers".to_string())]),
             imported_symbol_modules: HashMap::new(),
+            var_types: HashMap::new(),
+            function_return_assignments: vec![],
+            function_return_types: HashMap::new(),
         };
 
         let out = with_env_var("TS_PACK_PY_ATTR_CALLS", Some("1"), || {
@@ -1686,6 +1729,98 @@ mod tests {
             )
         });
 
+        assert!(out.python_inferred_call_rows.is_empty());
+    }
+
+    #[test]
+    fn python_imported_factory_receiver_calls_resolve_exactly() {
+        let mut all_symbols = HashMap::new();
+        all_symbols.insert(
+            "Function",
+            vec![SymbolNode {
+                id: "sym:parse".to_string(),
+                stable_id: "sym:parse".to_string(),
+                name: "parse".to_string(),
+                kind: "Method".to_string(),
+                qualified_name: Some("Parser.parse".to_string()),
+                filepath: "pkg/helpers.py".to_string(),
+                project_id: Arc::from("proj"),
+                start_line: 1,
+                end_line: 2,
+                start_byte: 0,
+                end_byte: 10,
+                signature: None,
+                visibility: None,
+                is_exported: true,
+                doc_comment: None,
+            }],
+        );
+        let all_files = vec![
+            file_node("file:pkg/main.py", "pkg/main.py"),
+            file_node("file:pkg/helpers.py", "pkg/helpers.py"),
+        ];
+        let helper_ctx = PythonFileContext {
+            file_id: "file:pkg/helpers.py".to_string(),
+            filepath: "pkg/helpers.py".to_string(),
+            symbol_spans: vec![],
+            call_sites: vec![],
+            module_aliases: HashMap::new(),
+            imported_symbol_modules: HashMap::new(),
+            var_types: HashMap::new(),
+            function_return_assignments: vec![],
+            function_return_types: HashMap::from([("make_parser".to_string(), "Parser".to_string())]),
+        };
+        let caller_ctx = PythonFileContext {
+            file_id: "file:pkg/main.py".to_string(),
+            filepath: "pkg/main.py".to_string(),
+            symbol_spans: vec![(0, 100, "sym:main".to_string())],
+            call_sites: vec![CallSite {
+                start_byte: 20,
+                callee: "parse".to_string(),
+                qualified_callee: Some("parser.parse".to_string()),
+                receiver: Some("parser".to_string()),
+            }],
+            module_aliases: HashMap::new(),
+            imported_symbol_modules: HashMap::from([("make_parser".to_string(), ".helpers".to_string())]),
+            var_types: HashMap::new(),
+            function_return_assignments: vec![crate::PythonFunctionReturnAssignment {
+                var_name: "parser".to_string(),
+                function_name: "make_parser".to_string(),
+            }],
+            function_return_types: HashMap::new(),
+        };
+
+        let out = prepare_graph_facts(
+            &all_symbols,
+            &all_files,
+            &Arc::from("proj"),
+            None,
+            &HashMap::new(),
+            &HashMap::new(),
+            vec![CallRef {
+                caller_id: "sym:main".to_string(),
+                callee: "parse".to_string(),
+                language: "python".to_string(),
+                caller_filepath: "pkg/main.py".to_string(),
+                allow_same_file: false,
+                kind: crate::CallRefKind::Scoped,
+                receiver_hint: Some("parser".to_string()),
+                qualified_hint: Some("parser.parse".to_string()),
+            }],
+            &[],
+            &[],
+            &[],
+            &[],
+            &HashMap::new(),
+            &[],
+            &[helper_ctx, caller_ctx],
+            &[],
+            &[],
+        );
+
+        assert_eq!(out.symbol_call_rows.len(), 1);
+        assert_eq!(out.symbol_call_rows[0].caller_id, "sym:main");
+        assert_eq!(out.symbol_call_rows[0].callee_id.as_deref(), Some("sym:parse"));
         assert!(out.python_inferred_call_rows.is_empty());
     }
 

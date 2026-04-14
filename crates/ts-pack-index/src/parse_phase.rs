@@ -9,15 +9,15 @@ use tree_sitter_language_pack as ts_pack;
 use crate::duplicate;
 use crate::go;
 use crate::pathing;
+use crate::python;
 use crate::rust;
 use crate::swift;
 use crate::tags;
 use crate::{
     CallRef, CallRefKind, CloneCandidate, ExportAliasRequest, FileNode, GoFileContext, ImportNode, ImportSymbolRequest,
     MAX_FILE_BYTES, ManifestEntry, PythonFileContext, ReExportSymbolRequest, RelRow, RustFileContext, SwiftFileContext,
-    SymbolNode,
-    WINNOW_LARGE_K, WINNOW_LARGE_W, WINNOW_MEDIUM_K, WINNOW_MEDIUM_W, WINNOW_MIN_FINGERPRINTS, WINNOW_MIN_TOKENS,
-    WINNOW_SMALL_K, WINNOW_SMALL_TOKEN_THRESHOLD, WINNOW_SMALL_W,
+    SymbolNode, WINNOW_LARGE_K, WINNOW_LARGE_W, WINNOW_MEDIUM_K, WINNOW_MEDIUM_W, WINNOW_MIN_FINGERPRINTS,
+    WINNOW_MIN_TOKENS, WINNOW_SMALL_K, WINNOW_SMALL_TOKEN_THRESHOLD, WINNOW_SMALL_W,
 };
 
 pub(crate) struct FileResult {
@@ -694,6 +694,7 @@ fn parse_entry(
     if lang_name == "python" {
         let mut module_aliases: HashMap<String, String> = HashMap::new();
         let mut imported_symbol_modules: HashMap<String, String> = HashMap::new();
+        let (var_types, function_return_assignments, function_return_types) = python::parse_python_var_types(&source);
         if let Some(result) = result.as_ref() {
             for imp in &result.imports {
                 if imp.items.is_empty() {
@@ -721,7 +722,13 @@ fn parse_entry(
                 }
             }
         }
-        if !call_sites.is_empty() && (!module_aliases.is_empty() || !imported_symbol_modules.is_empty()) {
+        if !call_sites.is_empty()
+            || !module_aliases.is_empty()
+            || !imported_symbol_modules.is_empty()
+            || !var_types.is_empty()
+            || !function_return_assignments.is_empty()
+            || !function_return_types.is_empty()
+        {
             python_context = Some(PythonFileContext {
                 file_id: file_id.clone(),
                 filepath: rel_path.clone(),
@@ -729,6 +736,9 @@ fn parse_entry(
                 call_sites: call_sites.clone(),
                 module_aliases,
                 imported_symbol_modules,
+                var_types,
+                function_return_assignments,
+                function_return_types,
             });
         }
     }

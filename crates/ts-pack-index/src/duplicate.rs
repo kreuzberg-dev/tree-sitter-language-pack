@@ -90,6 +90,7 @@ pub struct ExperimentConfig {
     pub boilerplate_variant_suppression: bool,
     pub canonical_docs_mirror_suppression: bool,
     pub helper_clone_suppression: bool,
+    pub query_class_override: Option<String>,
     pub threshold_struct: Option<f64>,
     pub threshold_lexical: Option<f64>,
     pub threshold_role: Option<f64>,
@@ -605,7 +606,13 @@ fn summarize_candidate_relations(idx: usize, pairs: &[DuplicatePairSummary]) -> 
     relations
 }
 
-fn query_class(query: &str, mode: &str) -> String {
+fn query_class(query: &str, mode: &str, experiments: &ExperimentConfig) -> String {
+    if let Some(override_value) = experiments.query_class_override.as_ref() {
+        let trimmed = override_value.trim();
+        if !trimmed.is_empty() {
+            return trimmed.to_string();
+        }
+    }
     let lower = query.to_lowercase();
     if mode == "docs" {
         if lower.contains("version")
@@ -807,7 +814,7 @@ pub fn rerank_diverse_trace_for_search_with_experiments(
             candidates: Vec::new(),
             telemetry: DuplicateTelemetry {
                 mode: analysis.mode,
-                query_class: query_class(query.unwrap_or(""), retrieval_mode),
+                query_class: query_class(query.unwrap_or(""), retrieval_mode, experiments),
                 exact_suppressions: analysis.suppressed_indices.len(),
                 experimental_suppressions: 0,
                 relation_counts: BTreeMap::new(),
@@ -899,7 +906,7 @@ pub fn rerank_diverse_trace_for_search_with_experiments(
             candidates: Vec::new(),
             telemetry: DuplicateTelemetry {
                 mode: analysis.mode,
-                query_class: query_class(query.unwrap_or(""), retrieval_mode),
+                query_class: query_class(query.unwrap_or(""), retrieval_mode, experiments),
                 exact_suppressions: analysis.suppressed_indices.len(),
                 experimental_suppressions: 0,
                 relation_counts: BTreeMap::new(),
@@ -1241,7 +1248,7 @@ pub fn rerank_diverse_trace_for_search_with_experiments(
     }
     let telemetry = DuplicateTelemetry {
         mode: analysis.mode,
-        query_class: query_class(query.unwrap_or(""), retrieval_mode),
+        query_class: query_class(query.unwrap_or(""), retrieval_mode, experiments),
         exact_suppressions: analysis.suppressed_indices.len(),
         experimental_suppressions: experimental_suppressed.len(),
         relation_counts,
@@ -2206,6 +2213,27 @@ mod tests {
                 .iter()
                 .any(|candidate| candidate.decision_reason == "exact_duplicate_suppressed")
         );
+    }
+
+    #[test]
+    fn query_class_override_beats_hybrid_fallback() {
+        let rows = vec![
+            "parser = get_parser(\"python\"); tree = parser.parse(b\"x\")".to_string(),
+            "pub fn parse_string(language: &str, source: &[u8]) {}".to_string(),
+        ];
+        let relevance = vec![0.8, 0.9];
+        let trace = rerank_diverse_trace_for_search_with_experiments(
+            &rows,
+            &relevance,
+            Some("where is parser.parse used in tree-sitter-language-pack"),
+            Some("code"),
+            &[],
+            &ExperimentConfig {
+                query_class_override: Some("usage_lookup".to_string()),
+                ..ExperimentConfig::default()
+            },
+        );
+        assert_eq!(trace.telemetry.query_class, "usage_lookup");
     }
 
     #[test]
