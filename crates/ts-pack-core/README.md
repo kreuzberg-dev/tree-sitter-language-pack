@@ -114,7 +114,7 @@ Enable curated language sets instead of individual languages:
 
 ```toml
 [dependencies]
-ts-pack-core = { version = "1.5.0", default-features = false, features = ["web"] }
+ts-pack-core = { version = "1.6.0", default-features = false, features = ["web"] }
 ```
 
 Available groups: `all` (default), `web`, `systems`, `scripting`, `data`, `jvm`, `functional`.

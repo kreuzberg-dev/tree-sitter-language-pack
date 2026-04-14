@@ -177,11 +177,20 @@ mod tests {
         if langs.is_empty() {
             return;
         }
-        let first = &langs[0];
-        let query_src = "(identifier) @id";
-        let q1 = compiled_query(first, query_src).unwrap();
-        let q2 = compiled_query(first, query_src).unwrap();
-        assert!(Arc::ptr_eq(&q1, &q2));
+        // Try each language until we find one where the query compiles.
+        for lang in &langs {
+            let query_src = "(identifier) @reuse_check";
+            let q1 = match compiled_query(lang, query_src) {
+                Ok(q) => q,
+                Err(_) => continue,
+            };
+            let q2 = compiled_query(lang, query_src).unwrap();
+            assert!(
+                Arc::ptr_eq(&q1, &q2),
+                "repeated compiled_query for '{lang}' should return same Arc"
+            );
+            return;
+        }
     }
 
     #[test]
