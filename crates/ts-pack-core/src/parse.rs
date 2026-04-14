@@ -1,4 +1,10 @@
 use crate::Error;
+use std::cell::RefCell;
+use std::collections::HashMap;
+
+thread_local! {
+    static PARSER_CACHE: RefCell<HashMap<String, tree_sitter::Parser>> = RefCell::new(HashMap::new());
+}
 
 /// Parse source code with the named language, returning the syntax tree.
 ///
@@ -11,8 +17,26 @@ use crate::Error;
 /// assert_eq!(tree.root_node().kind(), "module");
 /// ```
 pub fn parse_string(language: &str, source: &[u8]) -> Result<tree_sitter::Tree, Error> {
-    let mut parser = crate::get_parser(language)?;
-    parser.parse(source, None).ok_or(Error::ParseFailed)
+    let language_obj = crate::get_language(language)?;
+    PARSER_CACHE.with(|cache| {
+        let mut cache = cache.borrow_mut();
+        if !cache.contains_key(language) {
+            let mut parser = tree_sitter::Parser::new();
+            parser
+                .set_language(&language_obj)
+                .map_err(|e| Error::ParserSetup(format!("{e}")))?;
+            cache.insert(language.to_string(), parser);
+        }
+        let parser = cache
+            .get_mut(language)
+            .ok_or_else(|| Error::ParserSetup("parser cache lookup failed".to_string()))?;
+        parser.parse(source, None).ok_or(Error::ParseFailed)
+    })
+}
+
+#[cfg(test)]
+pub(crate) fn cached_parser_count_for_tests() -> usize {
+    PARSER_CACHE.with(|cache| cache.borrow().len())
 }
 
 /// Check whether any node in the tree matches the given type name.
@@ -97,6 +121,22 @@ mod tests {
         let first = &langs[0];
         let tree = parse_string(first, b"x");
         assert!(tree.is_ok(), "parse_string should succeed for '{first}'");
+    }
+
+    #[test]
+    fn test_parse_string_reuses_thread_local_parser_cache() {
+        if skip_if_no_languages() {
+            return;
+        }
+        let langs = crate::available_languages();
+        let first = &langs[0];
+        let before = cached_parser_count_for_tests();
+        let _ = parse_string(first, b"x").unwrap();
+        let after_first = cached_parser_count_for_tests();
+        let _ = parse_string(first, b"y").unwrap();
+        let after_second = cached_parser_count_for_tests();
+        assert!(after_first >= before);
+        assert_eq!(after_second, after_first);
     }
 
     #[test]
