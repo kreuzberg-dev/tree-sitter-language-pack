@@ -40,16 +40,33 @@ brew install kreuzberg-dev/tap/ts-pack
 
 {% include 'partials/features.md.jinja' %}
 
-### Feature Groups
+### Downloading Parsers
 
-Enable curated language sets instead of individual languages:
+Parsers are downloaded automatically on first use. For production, CI, or Docker, pre-download them:
 
-```toml
-[dependencies]
-ts-pack-core = { version = "{{ project.version }}", default-features = false, features = ["web"] }
+```rust
+// Download specific languages
+ts_pack_core::download(&["python", "javascript", "rust"])?;
+
+// Download all 305 languages
+ts_pack_core::download_all()?;
 ```
 
-Available groups: `all` (default), `web`, `systems`, `scripting`, `data`, `jvm`, `functional`.
+Or use the CLI:
+
+```sh
+ts-pack download python javascript rust
+ts-pack download --all
+ts-pack download --groups web,systems
+```
+
+### Static Compilation
+
+To statically compile parsers into your binary (instead of downloading at runtime), set the `TSLP_LANGUAGES` environment variable at build time:
+
+```sh
+TSLP_LANGUAGES=python,rust,javascript cargo build
+```
 
 {% endif %}
 ## API Reference

@@ -106,18 +106,35 @@ println!("Chunks: {}", result.chunks.len());
 | **Selective Installation** | Download only the languages you need; unused parsers never downloaded |
 | **Polyglot Bindings** | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++ |
 | **Automatic Caching** | Downloaded parsers cached in platform-specific directories for offline use |
-| **Feature Groups** | Curated language sets: `web`, `systems`, `scripting`, `data`, `jvm`, `functional` |
+| **CLI Tool** | `ts-pack download` to pre-download parsers for offline/CI/Docker use |
 
-### Feature Groups
+### Downloading Parsers
 
-Enable curated language sets instead of individual languages:
+Parsers are downloaded automatically on first use. For production, CI, or Docker, pre-download them:
 
-```toml
-[dependencies]
-ts-pack-core = { version = "1.6.0", default-features = false, features = ["web"] }
+```rust
+// Download specific languages
+ts_pack_core::download(&["python", "javascript", "rust"])?;
+
+// Download all 305 languages
+ts_pack_core::download_all()?;
 ```
 
-Available groups: `all` (default), `web`, `systems`, `scripting`, `data`, `jvm`, `functional`.
+Or use the CLI:
+
+```sh
+ts-pack download python javascript rust
+ts-pack download --all
+ts-pack download --groups web,systems
+```
+
+### Static Compilation
+
+To statically compile parsers into your binary (instead of downloading at runtime), set the `TSLP_LANGUAGES` environment variable at build time:
+
+```sh
+TSLP_LANGUAGES=python,rust,javascript cargo build
+```
 
 ## API Reference
 

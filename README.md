@@ -228,7 +228,7 @@ The `process()` function returns structured analysis including functions, classe
 | **Selective Installation** | Download only the languages you need; unused parsers never downloaded |
 | **Polyglot Bindings** | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++ |
 | **Automatic Caching** | Downloaded parsers cached in platform-specific directories for offline use |
-| **Feature Groups** | Curated language sets: `web`, `systems`, `scripting`, `data`, `jvm`, `functional` |
+| **CLI Tool** | `ts-pack download` to pre-download parsers for offline/CI/Docker use |
 
 ## Supported Languages
 
