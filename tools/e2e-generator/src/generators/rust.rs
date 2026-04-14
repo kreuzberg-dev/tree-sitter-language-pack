@@ -55,7 +55,7 @@ doctest = false
 [workspace]
 
 [workspace.dependencies]
-tree-sitter-language-pack = { path = "../../crates/ts-pack-core", features = ["serde", "all"] }
+tree-sitter-language-pack = { path = "../../crates/ts-pack-core", features = ["serde"] }
 tree-sitter = "0.26"
 
 [dependencies]
