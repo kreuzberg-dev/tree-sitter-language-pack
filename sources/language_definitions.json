@@ -600,6 +600,11 @@
 		"repo": "https://github.com/bkegley/tree-sitter-graphql",
 		"rev": "5e66e961eee421786bdda8495ed1db045e06b5fe"
 	},
+	"gren": {
+		"extensions": ["gren"],
+		"repo": "https://github.com/gren-lang/tree-sitter-gren",
+		"rev": "cecd8ce9b18f1803d37682f33b6224978fd04d31"
+	},
 	"groovy": {
 		"branch": "gh-pages",
 		"extensions": ["groovy", "gradle"],
