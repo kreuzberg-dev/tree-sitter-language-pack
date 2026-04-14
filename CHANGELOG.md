@@ -32,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `QueryCursor` reused across patterns within a single `extract_from_tree()` call
 - Unnecessary `String` allocation removed from `node_types.contains()` check in chunking
 
+### Removed
+
+- All 305 `lang-*` Cargo features and group features (`all`, `web`, `systems`, `scripting`, `data`, `jvm`, `functional`, `wasm`) — language selection is now via `TSLP_LANGUAGES` env var at build time; the `download` feature (default) fetches parsers at runtime
+
 ## [1.5.0] - 2026-04-08
 
 ### Added

@@ -18,7 +18,6 @@ js-sys = { workspace = true }
 serde_json = { workspace = true }
 tree-sitter = { workspace = true }
 tree-sitter-language-pack = { path = "../ts-pack-core", default-features = false, features = [
-    "wasm",
     "serde",
 ] }
 wasm-bindgen = { workspace = true }

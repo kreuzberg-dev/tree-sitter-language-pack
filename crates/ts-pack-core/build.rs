@@ -56,10 +56,11 @@ fn find_project_root() -> PathBuf {
 }
 
 fn selected_languages(definitions: &BTreeMap<String, LanguageDefinition>) -> Vec<String> {
-    // Check TSLP_LANGUAGES env var first
+    // Use TSLP_LANGUAGES env var to select a subset of languages to compile
+    // statically. If not set, no languages are compiled statically — they are
+    // downloaded at runtime via the `download` feature instead.
     if let Ok(langs) = env::var("TSLP_LANGUAGES") {
         let selected: Vec<String> = langs.split(',').map(|s| s.trim().to_string()).collect();
-        // Validate language names
         for name in &selected {
             if !name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
                 panic!(
@@ -77,20 +78,7 @@ fn selected_languages(definitions: &BTreeMap<String, LanguageDefinition>) -> Vec
         return selected;
     }
 
-    // Check Cargo features: lang-* features
-    let mut selected = Vec::new();
-    for name in definitions.keys() {
-        let feature_env = format!("CARGO_FEATURE_LANG_{}", name.to_uppercase().replace('-', "_"));
-        if env::var(&feature_env).is_ok() {
-            selected.push(name.clone());
-        }
-    }
-
-    if selected.is_empty() {
-        return Vec::new();
-    }
-
-    selected
+    Vec::new()
 }
 
 /// Get the target OS, using CARGO_CFG_TARGET_OS for cross-compilation correctness.
