@@ -814,7 +814,7 @@ fn finalize_struct_graph(
 }
 
 #[pyfunction]
-#[pyo3(signature = (project_id, neo4j_uri, neo4j_user, neo4j_pass, neo4j_db = "proxy".to_string(), symbol_filter = None, file_filter = None))]
+#[pyo3(signature = (project_id, neo4j_uri, neo4j_user, neo4j_pass, neo4j_db = "proxy".to_string(), symbol_filter = None, file_filter = None, project_path = None))]
 fn trace_graph_provenance(
     py: Python<'_>,
     project_id: &str,
@@ -824,6 +824,7 @@ fn trace_graph_provenance(
     neo4j_db: String,
     symbol_filter: Option<String>,
     file_filter: Option<String>,
+    project_path: Option<String>,
 ) -> PyResult<Py<PyAny>> {
     let value = without_gil(|| {
         let rt =
@@ -834,6 +835,7 @@ fn trace_graph_provenance(
             neo4j_pass,
             &neo4j_db,
             project_id,
+            project_path.as_deref(),
             symbol_filter.as_deref(),
             file_filter.as_deref(),
         ))

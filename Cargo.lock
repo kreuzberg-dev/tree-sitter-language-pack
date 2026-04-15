@@ -2933,6 +2933,7 @@ dependencies = [
  "serde_json",
  "tokio",
  "tree-sitter-language-pack",
+ "walkdir",
 ]
 
 [[package]]

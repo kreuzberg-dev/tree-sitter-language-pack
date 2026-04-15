@@ -1,5 +1,6 @@
 use neo4rs::{Graph, query};
 use serde_json::{Value, json};
+use std::path::Path;
 use std::sync::Arc;
 use ts_pack_index::{graph_schema, provenance};
 
@@ -73,6 +74,7 @@ pub async fn collect_provenance_report_async(
     neo4j_pass: &str,
     neo4j_db: &str,
     project_id: &str,
+    project_path: Option<&str>,
     symbol_filter: Option<&str>,
     file_filter: Option<&str>,
 ) -> Result<Value, Box<dyn std::error::Error>> {
@@ -87,8 +89,12 @@ pub async fn collect_provenance_report_async(
     let graph = Arc::new(Graph::connect(config).await?);
     let symbol_filter = normalize_filter(symbol_filter);
     let file_filter = normalize_filter(file_filter);
+    let parse_call_ref_samples = project_path
+        .map(Path::new)
+        .map(|path| provenance::collect_parse_provenance_samples(path, symbol_filter.as_deref(), file_filter.as_deref()))
+        .unwrap_or_default();
 
-    let mut calls_file_samples = Vec::new();
+    let mut resolved_internal_samples = Vec::new();
     let calls_file_cypher = format!(
         "MATCH (src:{file_label} {{project_id:$pid}})-[:{contains_rel}]->(caller:Node {{project_id:$pid}})
          MATCH (caller)-[call:{calls_rel}|{calls_inferred_rel}]->(callee:Node {{project_id:$pid}})
@@ -113,12 +119,50 @@ pub async fn collect_provenance_report_async(
         {
             continue;
         }
-        calls_file_samples.push(json!({
+        resolved_internal_samples.push(json!({
             "src": src,
             "dst": dst,
             "caller": row.get::<String>("caller").unwrap_or_default(),
             "callee": callee,
             "via": row.get::<String>("via").unwrap_or_default(),
+        }));
+    }
+
+    let mut external_symbol_samples = Vec::new();
+    let external_symbol_cypher = format!(
+        "MATCH (src:{file_label} {{project_id:$pid}})-[:{contains_rel}]->(caller:Node {{project_id:$pid}})
+         MATCH (caller)-[:{calls_external_rel}]->(ext:{external_symbol_label} {{project_id:$pid}})
+         RETURN src.filepath AS src,
+                caller.name AS caller,
+                ext.name AS callee,
+                ext.qualified_name AS qualified_name,
+                ext.language AS language
+         LIMIT 100",
+        file_label = graph_schema::NODE_LABEL_FILE,
+        contains_rel = graph_schema::REL_CONTAINS,
+        calls_external_rel = graph_schema::REL_CALLS_EXTERNAL_SYMBOL,
+        external_symbol_label = graph_schema::NODE_LABEL_EXTERNAL_SYMBOL,
+    );
+    let mut external_rows = graph
+        .execute(query(&external_symbol_cypher).param("pid", project_id.to_string()))
+        .await?;
+    while let Some(row) = external_rows.next().await? {
+        let src: String = row.get("src").unwrap_or_default();
+        let callee: String = row.get("callee").unwrap_or_default();
+        let qualified_name: String = row.get("qualified_name").unwrap_or_default();
+        if !explicit_call_matches(&src, &callee, symbol_filter.as_deref(), file_filter.as_deref())
+            && !symbol_filter
+                .as_deref()
+                .is_some_and(|needle| contains_normalized(&qualified_name, needle))
+        {
+            continue;
+        }
+        external_symbol_samples.push(json!({
+            "src": src,
+            "caller": row.get::<String>("caller").unwrap_or_default(),
+            "callee": callee,
+            "qualified_name": qualified_name,
+            "language": row.get::<String>("language").unwrap_or_default(),
         }));
     }
 
@@ -174,10 +218,19 @@ pub async fn collect_provenance_report_async(
 
     Ok(json!({
         "project_id": project_id,
+        "project_path": project_path.unwrap_or_default(),
         "symbol_filter": symbol_filter,
         "file_filter": file_filter,
+        "parse": {
+            "call_ref_samples": parse_call_ref_samples,
+        },
+        "resolve": {
+            "resolved_internal_samples": resolved_internal_samples.clone(),
+            "external_symbol_samples": external_symbol_samples,
+            "note": "Unresolved and filtered decisions remain available through index-time provenance logging.",
+        },
         "finalize": {
-            "calls_file_samples": calls_file_samples,
+            "calls_file_samples": resolved_internal_samples,
             "file_graph_link_samples": file_graph_link_samples,
         }
     }))
