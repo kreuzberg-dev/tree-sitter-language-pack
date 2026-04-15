@@ -246,6 +246,77 @@ fn add_symbol_info(
     });
 }
 
+fn add_synthetic_swift_main_symbol(
+    symbols: &mut HashMap<&'static str, Vec<SymbolNode>>,
+    relations: &mut Vec<RelRow>,
+    file_id: &str,
+    filepath: &str,
+    project_id: Arc<str>,
+    source: &str,
+    call_sites: &[tags::CallSite],
+) {
+    if !filepath.ends_with("/main.swift") && filepath != "main.swift" {
+        return;
+    }
+
+    let existing_main = symbols
+        .get("Function")
+        .map(|items| items.iter().any(|item| item.name == "main"))
+        .unwrap_or(false);
+    if existing_main {
+        return;
+    }
+
+    let existing_spans: Vec<(usize, usize)> = symbols
+        .values()
+        .flat_map(|items| items.iter())
+        .map(|item| (item.start_byte, item.end_byte))
+        .collect();
+
+    let mut uncovered_call_start: Option<usize> = None;
+    for call in call_sites {
+        let covered = existing_spans
+            .iter()
+            .any(|(sb, eb)| *sb <= call.start_byte && call.start_byte < *eb);
+        if !covered {
+            uncovered_call_start = Some(call.start_byte);
+            break;
+        }
+    }
+
+    let Some(start_byte) = uncovered_call_start else {
+        return;
+    };
+
+    let stable_project_id = pathing::canonical_project_id(project_id.as_ref());
+    let node_id = format!("{project_id}:function:{filepath}:main");
+    let stable_id = format!("{stable_project_id}:function:{filepath}:main");
+    let start_line = source[..start_byte].bytes().filter(|b| *b == b'\n').count() as u32 + 1;
+    let end_line = source.lines().count().max(start_line as usize) as u32;
+
+    symbols.entry("Function").or_default().push(SymbolNode {
+        id: node_id.clone(),
+        stable_id,
+        name: "main".to_string(),
+        kind: "Function".to_string(),
+        qualified_name: Some("main".to_string()),
+        filepath: filepath.to_string(),
+        project_id,
+        start_line,
+        end_line,
+        start_byte,
+        end_byte: source.len(),
+        signature: Some("synthetic swift entrypoint".to_string()),
+        visibility: None,
+        is_exported: false,
+        doc_comment: None,
+    });
+    relations.push(RelRow {
+        parent: file_id.to_string(),
+        child: node_id,
+    });
+}
+
 fn is_test_like_path(path: &str) -> bool {
     let normalized = path.replace('\\', "/").to_lowercase();
     let basename = normalized.rsplit('/').next().unwrap_or(normalized.as_str());
@@ -857,6 +928,18 @@ fn parse_entry(
                 &mut relations,
             );
         }
+    }
+
+    if lang_name == "swift" {
+        add_synthetic_swift_main_symbol(
+            &mut symbols,
+            &mut relations,
+            &file_id,
+            rel_path,
+            Arc::clone(pid),
+            &source,
+            &call_sites,
+        );
     }
 
     let symbol_spans: Vec<(usize, usize, String)> = symbols
@@ -1500,6 +1583,47 @@ export * as routes from "./routes";
     #[test]
     fn golden_ra_storage_sample_swift() {
         run_golden_fixture("raStorage", "sample", "swift", "test_parse/data/sample.swift");
+    }
+
+    #[test]
+    fn synthesizes_swift_main_symbol_for_top_level_entry_calls() {
+        let root = unique_temp_dir("swift-main-entry");
+        fs::create_dir_all(root.join("Examples/App")).unwrap();
+        let file_abs = root.join("Examples/App/main.swift");
+        fs::write(
+            &file_abs,
+            r#"
+import Foundation
+
+let graph = DynamicGraph()
+graph.trackGrad(tensor)
+"#,
+        )
+        .unwrap();
+
+        let manifest = vec![ManifestEntry {
+            abs_path: file_abs.to_string_lossy().to_string(),
+            rel_path: "Examples/App/main.swift".to_string(),
+            ext: "swift".to_string(),
+            size: fs::metadata(&file_abs).unwrap().len(),
+        }];
+
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        assert_eq!(results.len(), 1);
+        let result = &results[0];
+        let funcs = result.symbols.get("Function").expect("functions");
+        let main = funcs.iter().find(|sym| sym.name == "main").expect("synthetic main");
+        assert_eq!(main.filepath, "Examples/App/main.swift");
+        assert!(main.start_line >= 3);
+        assert!(
+            result
+                .call_refs
+                .iter()
+                .any(|call| { call.caller_id == main.id && call.callee == "DynamicGraph" }),
+            "expected top-level constructor call to belong to synthetic main symbol"
+        );
+
+        let _ = fs::remove_dir_all(root);
     }
 
     #[test]
