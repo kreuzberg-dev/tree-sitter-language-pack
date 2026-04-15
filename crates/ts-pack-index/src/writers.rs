@@ -97,6 +97,58 @@ fn build_file_to_file_edge_write_cypher(rel_name: &str) -> String {
     )
 }
 
+fn query_with_run_id(cypher: String, run_id: &str) -> Query {
+    Query::new(cypher).param("run_id", run_id.to_string())
+}
+
+fn batch_query_with_run_id(batch: BoltType, cypher: String, run_id: &str) -> Query {
+    query_with_run_id(cypher, run_id).param("batch", batch)
+}
+
+async fn run_batch_query_logged<T, F>(
+    graph: &Arc<Graph>,
+    batch: &[T],
+    run_id: &str,
+    label: &str,
+    cypher: String,
+    row_to_value: F,
+) -> neo4rs::Result<()>
+where
+    F: Fn(&T) -> Value,
+{
+    let bolt = rows_to_bolt(batch, row_to_value);
+    let q = batch_query_with_run_id(bolt, cypher, run_id);
+    run_query_logged(graph, q, label).await
+}
+
+async fn prune_project_rel_family(
+    graph: &Arc<Graph>,
+    project_id: &str,
+    run_id: &str,
+    left_pattern: &str,
+    rel_type: &str,
+    right_pattern: &str,
+    label: &str,
+) -> neo4rs::Result<()> {
+    let q = query_with_run_id(
+        build_project_rel_prune_cypher(left_pattern, rel_type, right_pattern),
+        run_id,
+    )
+    .param("pid", project_id.to_string());
+    run_query_logged(graph, q, label).await
+}
+
+async fn prune_project_node_family(
+    graph: &Arc<Graph>,
+    project_id: &str,
+    run_id: &str,
+    node_label: &str,
+    label: &str,
+) -> neo4rs::Result<()> {
+    let q = query_with_run_id(build_project_node_prune_cypher(node_label), run_id).param("pid", project_id.to_string());
+    run_query_logged(graph, q, label).await
+}
+
 pub(crate) async fn run_query_logged(graph: &Arc<Graph>, q: Query, label: &str) -> neo4rs::Result<()> {
     let attempts = write_retry_attempts();
     let base_ms = write_retry_base_ms();
@@ -303,14 +355,16 @@ pub(crate) async fn prune_stale_core_graph_data(
         ("CALLS", "prune_stale_calls"),
         ("CALLS_INFERRED", "prune_stale_calls_inferred"),
     ] {
-        let q = Query::new(build_project_rel_prune_cypher(
+        prune_project_rel_family(
+            graph,
+            project_id,
+            run_id,
             ":Node {project_id: $pid}",
             label,
             ":Node {project_id: $pid}",
-        ))
-        .param("pid", project_id.to_string())
-        .param("run_id", run_id.to_string());
-        run_query_logged(graph, q, query_label).await?;
+            query_label,
+        )
+        .await?;
     }
 
     for (label, query_label) in [
@@ -318,10 +372,7 @@ pub(crate) async fn prune_stale_core_graph_data(
         ("File", "prune_stale_file_nodes"),
         ("Node", "prune_stale_generic_nodes"),
     ] {
-        let q = Query::new(build_project_node_prune_cypher(label))
-            .param("pid", project_id.to_string())
-            .param("run_id", run_id.to_string());
-        run_query_logged(graph, q, query_label).await?;
+        prune_project_node_family(graph, project_id, run_id, label, query_label).await?;
     }
     Ok(())
 }
@@ -531,10 +582,7 @@ pub(crate) async fn prune_stale_clone_data(graph: &Arc<Graph>, project_id: &str,
         ("CloneGroup", "prune_stale_clone_groups"),
         ("FileCloneGroup", "prune_stale_file_clone_groups"),
     ] {
-        let q = Query::new(build_project_node_prune_cypher(label))
-            .param("pid", project_id.to_string())
-            .param("run_id", run_id.to_string());
-        run_query_logged(graph, q, query_label).await?;
+        prune_project_node_family(graph, project_id, run_id, label, query_label).await?;
     }
     Ok(())
 }
@@ -603,19 +651,25 @@ pub(crate) async fn prune_stale_external_api_data(
     project_id: &str,
     run_id: &str,
 ) -> neo4rs::Result<()> {
-    let delete_edges = Query::new(build_project_rel_prune_cypher(
+    prune_project_rel_family(
+        graph,
+        project_id,
+        run_id,
         ":File {project_id: $pid}",
         "CALLS_API_EXTERNAL",
         ":ExternalAPI {project_id: $pid}",
-    ))
-    .param("pid", project_id.to_string())
-    .param("run_id", run_id.to_string());
-    run_query_logged(graph, delete_edges, "prune_stale_external_api_edges").await?;
+        "prune_stale_external_api_edges",
+    )
+    .await?;
 
-    let delete_nodes = Query::new(build_project_node_prune_cypher("ExternalAPI"))
-        .param("pid", project_id.to_string())
-        .param("run_id", run_id.to_string());
-    run_query_logged(graph, delete_nodes, "prune_stale_external_api_nodes").await
+    prune_project_node_family(
+        graph,
+        project_id,
+        run_id,
+        "ExternalAPI",
+        "prune_stale_external_api_nodes",
+    )
+    .await
 }
 
 pub(crate) async fn prune_stale_external_symbol_data(
@@ -623,19 +677,25 @@ pub(crate) async fn prune_stale_external_symbol_data(
     project_id: &str,
     run_id: &str,
 ) -> neo4rs::Result<()> {
-    let delete_edges = Query::new(build_project_rel_prune_cypher(
+    prune_project_rel_family(
+        graph,
+        project_id,
+        run_id,
         ":Node {project_id: $pid}",
         "CALLS_EXTERNAL_SYMBOL",
         ":ExternalSymbol {project_id: $pid}",
-    ))
-    .param("pid", project_id.to_string())
-    .param("run_id", run_id.to_string());
-    run_query_logged(graph, delete_edges, "prune_stale_external_symbol_edges").await?;
+        "prune_stale_external_symbol_edges",
+    )
+    .await?;
 
-    let delete_nodes = Query::new(build_project_node_prune_cypher("ExternalSymbol"))
-        .param("pid", project_id.to_string())
-        .param("run_id", run_id.to_string());
-    run_query_logged(graph, delete_nodes, "prune_stale_external_symbol_nodes").await
+    prune_project_node_family(
+        graph,
+        project_id,
+        run_id,
+        "ExternalSymbol",
+        "prune_stale_external_symbol_nodes",
+    )
+    .await
 }
 
 pub(crate) async fn write_file_import_edges(
@@ -643,8 +703,11 @@ pub(crate) async fn write_file_import_edges(
     batch: &[FileImportEdgeRow],
     run_id: &str,
 ) -> neo4rs::Result<()> {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(
+    run_batch_query_logged(
+        graph,
+        batch,
+        run_id,
+        "write_file_import_edges",
         "UNWIND $batch AS item \
          MATCH (a:File {project_id: item.pid, filepath: item.src}) \
          MATCH (b:File {project_id: item.pid, filepath: item.tgt}) \
@@ -652,10 +715,9 @@ pub(crate) async fn write_file_import_edges(
          SET r.project_id = item.pid, \
              r.last_seen_run = $run_id"
             .to_string(),
+        |r| r.to_value(),
     )
-    .param("batch", bolt)
-    .param("run_id", run_id.to_string());
-    run_query_logged(graph, q, "write_file_import_edges").await
+    .await
 }
 
 pub(crate) async fn prune_stale_file_import_edges(
@@ -663,14 +725,16 @@ pub(crate) async fn prune_stale_file_import_edges(
     project_id: &str,
     run_id: &str,
 ) -> neo4rs::Result<()> {
-    let q = Query::new(build_project_rel_prune_cypher(
+    prune_project_rel_family(
+        graph,
+        project_id,
+        run_id,
         ":File {project_id: $pid}",
         "IMPORTS",
         ":File {project_id: $pid}",
-    ))
-    .param("pid", project_id.to_string())
-    .param("run_id", run_id.to_string());
-    run_query_logged(graph, q, "prune_stale_file_import_edges").await
+        "prune_stale_file_import_edges",
+    )
+    .await
 }
 
 pub(crate) async fn write_file_edges(
@@ -679,11 +743,15 @@ pub(crate) async fn write_file_edges(
     rel_name: &str,
     run_id: &str,
 ) -> neo4rs::Result<()> {
-    let bolt = rows_to_bolt(batch, |r| r.to_value());
-    let q = Query::new(build_file_to_file_edge_write_cypher(rel_name))
-        .param("batch", bolt)
-        .param("run_id", run_id.to_string());
-    run_query_logged(graph, q, &format!("write_{rel_name}")).await
+    run_batch_query_logged(
+        graph,
+        batch,
+        run_id,
+        &format!("write_{rel_name}"),
+        build_file_to_file_edge_write_cypher(rel_name),
+        |r| r.to_value(),
+    )
+    .await
 }
 
 pub(crate) async fn prune_stale_file_edge_family(
@@ -693,14 +761,16 @@ pub(crate) async fn prune_stale_file_edge_family(
     rel_type: &str,
     label: &str,
 ) -> neo4rs::Result<()> {
-    let q = Query::new(build_project_rel_prune_cypher(
+    prune_project_rel_family(
+        graph,
+        project_id,
+        run_id,
         ":File {project_id: $pid}",
         rel_type,
         ":File {project_id: $pid}",
-    ))
-    .param("pid", project_id.to_string())
-    .param("run_id", run_id.to_string());
-    run_query_logged(graph, q, label).await
+        label,
+    )
+    .await
 }
 
 pub(crate) async fn write_api_route_calls(
