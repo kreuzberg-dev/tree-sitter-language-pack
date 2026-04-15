@@ -52,6 +52,24 @@ pub(crate) struct ParseTimings {
     pub(crate) tags_secs: f64,
 }
 
+struct ParsedSource {
+    lang_name: &'static str,
+    source: String,
+    parsed_tree: Option<ts_pack::Tree>,
+    file_facts: ts_pack::FileFacts,
+    process_result: Option<ts_pack::ProcessResult>,
+    timings: ParseTimings,
+}
+
+struct TagExtraction {
+    exported_names: HashSet<String>,
+    call_sites: Vec<tags::CallSite>,
+    db_models: Vec<String>,
+    external_urls: Vec<String>,
+    launch_calls: Vec<String>,
+    tags_secs: f64,
+}
+
 fn is_apple_fact_file(path: &str) -> bool {
     let normalized = path.replace('\\', "/");
     normalized.ends_with(".xcodeproj/project.pbxproj")
@@ -363,40 +381,39 @@ fn build_clone_candidates(symbols: &HashMap<&'static str, Vec<SymbolNode>>, sour
     local_clone_candidates
 }
 
-fn parse_entry(
-    entry: &ManifestEntry,
-    pid: &Arc<str>,
-    tag_query_bundles: Option<&tags::BatchTagQueryBundles>,
-) -> Option<FileResult> {
-    let rel_basename = entry.rel_path.rsplit('/').next().unwrap_or(entry.rel_path.as_str());
-    if matches!(rel_basename, ".gitignore" | ".indexignore" | ".env" | ".env.example") {
-        return None;
+fn detect_entry_language(entry: &ManifestEntry) -> Option<&'static str> {
+    if is_apple_fact_file(&entry.rel_path) {
+        return Some("text");
     }
-
-    let lang_name = if is_apple_fact_file(&entry.rel_path) {
-        "text"
-    } else if entry.ext == "svg" {
-        "xml"
-    } else {
-        match ts_pack::detect_language_from_extension(&entry.ext) {
-            Some(lang) => lang,
-            None => {
-                eprintln!(
-                    "[ts-pack-index] detect_language_from_extension failed: {}",
-                    entry.rel_path
-                );
-                return None;
-            }
+    if entry.ext == "svg" {
+        return Some("xml");
+    }
+    match ts_pack::detect_language_from_extension(&entry.ext) {
+        Some(lang) => Some(lang),
+        None => {
+            eprintln!(
+                "[ts-pack-index] detect_language_from_extension failed: {}",
+                entry.rel_path
+            );
+            None
         }
-    };
-    if lang_name != "text" && !ts_pack::has_language(lang_name) {
-        if let Err(err) = ts_pack::download(&[lang_name]) {
+    }
+}
+
+fn ensure_language_available(lang_name: &str) -> bool {
+    if lang_name == "text" || ts_pack::has_language(lang_name) {
+        return true;
+    }
+    match ts_pack::download(&[lang_name]) {
+        Ok(_) => true,
+        Err(err) => {
             eprintln!("[ts-pack-index] download failed: {lang} ({err})", lang = lang_name);
-            return None;
+            false
         }
     }
+}
 
-    let rel_path = &entry.rel_path;
+fn read_entry_source(entry: &ManifestEntry) -> Option<String> {
     let source = match std::fs::read_to_string(&entry.abs_path) {
         Ok(source) => source,
         Err(err) => {
@@ -412,7 +429,10 @@ fn parse_entry(
         );
         return None;
     }
+    Some(source)
+}
 
+fn parse_source_tree(rel_path: &str, lang_name: &str, source: &str) -> Option<(Option<ts_pack::Tree>, f64)> {
     let t_parse_tree = Instant::now();
     let parsed_tree = if lang_name == "text" {
         None
@@ -420,38 +440,338 @@ fn parse_entry(
         match ts_pack::parse_string(lang_name, source.as_bytes()) {
             Ok(tree) => Some(tree),
             Err(err) => {
-                eprintln!("[ts-pack-index] parse failed: {} ({})", entry.rel_path, err);
+                eprintln!("[ts-pack-index] parse failed: {} ({})", rel_path, err);
                 return None;
             }
         }
     };
-    let parse_tree_secs = t_parse_tree.elapsed().as_secs_f64();
+    Some((parsed_tree, t_parse_tree.elapsed().as_secs_f64()))
+}
 
+fn extract_entry_file_facts(
+    parsed_tree: Option<&ts_pack::Tree>,
+    source: &str,
+    lang_name: &str,
+    rel_path: &str,
+) -> (ts_pack::FileFacts, f64) {
     let t_file_facts = Instant::now();
-    let file_facts = match parsed_tree.as_ref() {
+    let file_facts = match parsed_tree {
         Some(tree) => {
-            ts_pack::extract_file_facts_from_tree(tree, &source, lang_name, Some(rel_path)).unwrap_or_default()
+            ts_pack::extract_file_facts_from_tree(tree, source, lang_name, Some(rel_path)).unwrap_or_default()
         }
-        None => ts_pack::extract_file_facts(&source, lang_name, Some(rel_path)).unwrap_or_default(),
+        None => ts_pack::extract_file_facts(source, lang_name, Some(rel_path)).unwrap_or_default(),
     };
-    let file_facts_secs = t_file_facts.elapsed().as_secs_f64();
+    (file_facts, t_file_facts.elapsed().as_secs_f64())
+}
 
+fn process_entry_source(
+    rel_path: &str,
+    lang_name: &str,
+    source: &str,
+    parsed_tree: Option<&ts_pack::Tree>,
+) -> Option<(Option<ts_pack::ProcessResult>, f64)> {
     let t_process = Instant::now();
-    let result = match parsed_tree.as_ref() {
+    let result = match parsed_tree {
         None => None,
         Some(tree) => {
             let mut proc_config = ts_pack::ProcessConfig::new(lang_name);
             proc_config.symbols = true;
-            match ts_pack::process_with_tree(&source, &proc_config, tree) {
+            match ts_pack::process_with_tree(source, &proc_config, tree) {
                 Ok(result) => Some(result),
                 Err(err) => {
-                    eprintln!("[ts-pack-index] process failed: {} ({})", entry.rel_path, err);
+                    eprintln!("[ts-pack-index] process failed: {} ({})", rel_path, err);
                     return None;
                 }
             }
         }
     };
-    let process_secs = t_process.elapsed().as_secs_f64();
+    Some((result, t_process.elapsed().as_secs_f64()))
+}
+
+fn parse_entry_source(entry: &ManifestEntry) -> Option<ParsedSource> {
+    let lang_name = detect_entry_language(entry)?;
+    if !ensure_language_available(lang_name) {
+        return None;
+    }
+    let source = read_entry_source(entry)?;
+    let (parsed_tree, parse_tree_secs) = parse_source_tree(&entry.rel_path, lang_name, &source)?;
+    let (file_facts, file_facts_secs) =
+        extract_entry_file_facts(parsed_tree.as_ref(), &source, lang_name, &entry.rel_path);
+    let (process_result, process_secs) =
+        process_entry_source(&entry.rel_path, lang_name, &source, parsed_tree.as_ref())?;
+    Some(ParsedSource {
+        lang_name,
+        source,
+        parsed_tree,
+        file_facts,
+        process_result,
+        timings: ParseTimings {
+            parse_tree_secs,
+            file_facts_secs,
+            process_secs,
+            tags_secs: 0.0,
+        },
+    })
+}
+
+fn extract_tag_data(
+    rel_path: &str,
+    lang_name: &str,
+    source: &str,
+    parsed_tree: Option<&ts_pack::Tree>,
+    process_result: Option<&ts_pack::ProcessResult>,
+    file_facts: &ts_pack::FileFacts,
+    tag_query_bundles: Option<&tags::BatchTagQueryBundles>,
+) -> TagExtraction {
+    let mut exported_names: HashSet<String> = process_result
+        .map(|r| {
+            r.exports
+                .iter()
+                .filter_map(|e| normalized_export_name(&e.name))
+                .collect()
+        })
+        .unwrap_or_default();
+    let t_tags = Instant::now();
+    let tag_bundle = tag_query_bundles.and_then(|bundles| bundles.for_lang_and_source(lang_name, source.as_bytes()));
+    let tags_result =
+        parsed_tree.and_then(|tree| tags::run_tags(lang_name, tree, source.as_bytes(), rel_path, tag_bundle.as_ref()));
+    let tags_secs = t_tags.elapsed().as_secs_f64();
+
+    let (tag_exported, call_sites, mut db_models, external_calls, const_strings, launch_calls) = match tags_result {
+        Some(tr) => (
+            tr.exported_names,
+            tr.call_sites,
+            tr.db_models,
+            tr.external_calls,
+            tr.const_strings,
+            tr.launch_calls,
+        ),
+        None => (
+            HashSet::new(),
+            Vec::new(),
+            HashSet::new(),
+            Vec::new(),
+            HashMap::new(),
+            Vec::new(),
+        ),
+    };
+    exported_names.extend(tag_exported);
+    for item in &file_facts.db_models {
+        db_models.insert(item.model.clone());
+    }
+
+    let mut external_urls = Vec::new();
+    for call in external_calls {
+        let url = match call.arg {
+            tags::ExternalCallArg::Literal(value) => Some(value),
+            tags::ExternalCallArg::Identifier(name) => const_strings.get(&name).cloned(),
+            tags::ExternalCallArg::ConcatIdentLiteral { ident, literal } => {
+                const_strings.get(&ident).map(|base| format!("{base}{literal}"))
+            }
+            tags::ExternalCallArg::ConcatLiteralIdent { literal, ident } => {
+                const_strings.get(&ident).map(|base| format!("{literal}{base}"))
+            }
+            tags::ExternalCallArg::UrlLiteral { path, base } => pathing::join_url(&base, &path),
+            tags::ExternalCallArg::UrlWithBaseIdent { path, base_ident } => const_strings
+                .get(&base_ident)
+                .and_then(|base| pathing::join_url(base, &path)),
+        };
+        if let Some(url) = url {
+            if url.starts_with("http://") || url.starts_with("https://") || url.starts_with("env://") {
+                external_urls.push(url);
+            }
+        }
+    }
+
+    TagExtraction {
+        exported_names,
+        call_sites,
+        db_models: db_models.into_iter().collect(),
+        external_urls,
+        launch_calls,
+        tags_secs,
+    }
+}
+
+fn build_language_contexts(
+    lang_name: &str,
+    source: &str,
+    file_id: &str,
+    rel_path: &str,
+    symbol_spans: &[(usize, usize, String)],
+    call_sites: &[tags::CallSite],
+    process_result: Option<&ts_pack::ProcessResult>,
+) -> (
+    Option<HashMap<String, HashSet<String>>>,
+    Option<SwiftFileContext>,
+    Option<PythonFileContext>,
+    Option<RustFileContext>,
+    Option<GoFileContext>,
+) {
+    let mut swift_extensions: Option<HashMap<String, HashSet<String>>> = None;
+    let mut swift_context: Option<SwiftFileContext> = None;
+    let mut python_context: Option<PythonFileContext> = None;
+    let mut rust_context: Option<RustFileContext> = None;
+    let mut go_context: Option<GoFileContext> = None;
+
+    if lang_name == "swift" {
+        let mut ext_map: HashMap<String, HashSet<String>> = HashMap::new();
+        if let Some(result) = process_result {
+            swift::collect_swift_extensions(&result.structure, &mut ext_map);
+        }
+        if !ext_map.is_empty() {
+            swift_extensions = Some(ext_map);
+        }
+
+        let mut ext_spans = Vec::new();
+        if let Some(result) = process_result {
+            swift::collect_swift_extension_spans(&result.structure, &mut ext_spans);
+        }
+
+        let mut type_spans = Vec::new();
+        if let Some(result) = process_result {
+            swift::collect_swift_type_spans(&result.structure, &mut type_spans);
+        }
+
+        let var_types = swift::parse_swift_var_types(source);
+        if !var_types.is_empty() || !call_sites.is_empty() {
+            swift_context = Some(SwiftFileContext {
+                file_id: file_id.to_string(),
+                filepath: rel_path.to_string(),
+                symbol_spans: symbol_spans.to_vec(),
+                extension_spans: ext_spans,
+                type_spans,
+                call_sites: call_sites.to_vec(),
+                var_types,
+            });
+        }
+    }
+
+    if lang_name == "python" {
+        let mut module_aliases: HashMap<String, String> = HashMap::new();
+        let mut imported_symbol_modules: HashMap<String, String> = HashMap::new();
+        let (var_types, function_return_assignments, function_return_types) = python::parse_python_var_types(source);
+        if let Some(result) = process_result {
+            for imp in &result.imports {
+                if imp.items.is_empty() {
+                    if imp.alias.is_none() {
+                        continue;
+                    }
+                    let Some(alias) = imp.alias.as_ref() else {
+                        continue;
+                    };
+                    if alias.is_empty() || imp.source.is_empty() {
+                        continue;
+                    }
+                    module_aliases.insert(alias.clone(), imp.source.clone());
+                    continue;
+                }
+                if imp.source.is_empty() {
+                    continue;
+                }
+                for item in &imp.items {
+                    let cleaned = pathing::clean_import_name(item);
+                    if cleaned.is_empty() {
+                        continue;
+                    }
+                    imported_symbol_modules.insert(cleaned, imp.source.clone());
+                }
+            }
+        }
+        if !call_sites.is_empty()
+            || !module_aliases.is_empty()
+            || !imported_symbol_modules.is_empty()
+            || !var_types.is_empty()
+            || !function_return_assignments.is_empty()
+            || !function_return_types.is_empty()
+        {
+            python_context = Some(PythonFileContext {
+                file_id: file_id.to_string(),
+                filepath: rel_path.to_string(),
+                symbol_spans: symbol_spans.to_vec(),
+                call_sites: call_sites.to_vec(),
+                module_aliases,
+                imported_symbol_modules,
+                var_types,
+                function_return_assignments,
+                function_return_types,
+            });
+        }
+    }
+
+    if lang_name == "rust" {
+        let var_types = rust::parse_rust_var_types(source);
+        if !var_types.is_empty() {
+            rust_context = Some(RustFileContext {
+                filepath: rel_path.to_string(),
+                var_types,
+            });
+        }
+    }
+
+    if lang_name == "go" {
+        let (var_types, method_return_assignments, function_return_assignments) = go::parse_go_var_types(source);
+        let method_return_types = go::parse_go_method_return_types(source);
+        let function_return_types = go::parse_go_function_return_types(source);
+        let mut import_aliases: HashMap<String, String> = HashMap::new();
+        if let Some(result) = process_result {
+            for imp in &result.imports {
+                if let Some(alias) = imp.alias.as_ref().filter(|alias| !alias.is_empty()) {
+                    import_aliases.insert(alias.clone(), imp.source.clone());
+                }
+            }
+        }
+        if !var_types.is_empty()
+            || !method_return_assignments.is_empty()
+            || !method_return_types.is_empty()
+            || !function_return_assignments.is_empty()
+            || !function_return_types.is_empty()
+            || !import_aliases.is_empty()
+            || !call_sites.is_empty()
+        {
+            go_context = Some(GoFileContext {
+                file_id: file_id.to_string(),
+                filepath: rel_path.to_string(),
+                symbol_spans: symbol_spans.to_vec(),
+                call_sites: call_sites.to_vec(),
+                import_aliases,
+                var_types,
+                method_return_assignments,
+                method_return_types,
+                function_return_assignments,
+                function_return_types,
+            });
+        }
+    }
+
+    (
+        swift_extensions,
+        swift_context,
+        python_context,
+        rust_context,
+        go_context,
+    )
+}
+
+fn parse_entry(
+    entry: &ManifestEntry,
+    pid: &Arc<str>,
+    tag_query_bundles: Option<&tags::BatchTagQueryBundles>,
+) -> Option<FileResult> {
+    let rel_basename = entry.rel_path.rsplit('/').next().unwrap_or(entry.rel_path.as_str());
+    if matches!(rel_basename, ".gitignore" | ".indexignore" | ".env" | ".env.example") {
+        return None;
+    }
+
+    let rel_path = &entry.rel_path;
+    let ParsedSource {
+        lang_name,
+        source,
+        parsed_tree,
+        file_facts,
+        process_result: result,
+        mut timings,
+    } = parse_entry_source(entry)?;
 
     if entry.rel_path.contains("duplication_demo") {
         eprintln!(
@@ -484,75 +804,23 @@ fn parse_entry(
     let mut relations = Vec::new();
     let mut imports = Vec::new();
     let mut import_rels = Vec::new();
-    let mut swift_extensions: Option<HashMap<String, HashSet<String>>> = None;
-    let mut swift_context: Option<SwiftFileContext> = None;
-    let mut python_context: Option<PythonFileContext> = None;
-    let mut rust_context: Option<RustFileContext> = None;
-    let mut go_context: Option<GoFileContext> = None;
-
-    let mut exported_names: HashSet<String> = result
-        .as_ref()
-        .map(|r| {
-            r.exports
-                .iter()
-                .filter_map(|e| normalized_export_name(&e.name))
-                .collect()
-        })
-        .unwrap_or_default();
-    let t_tags = Instant::now();
-    let tag_bundle = tag_query_bundles.and_then(|bundles| bundles.for_lang_and_source(lang_name, source.as_bytes()));
-    let tags_result = parsed_tree
-        .as_ref()
-        .and_then(|tree| tags::run_tags(lang_name, tree, source.as_bytes(), rel_path, tag_bundle.as_ref()));
-    let tags_secs = t_tags.elapsed().as_secs_f64();
-
-    let (tag_exported, raw_call_sites, tag_db_models, external_calls, const_strings, launch_calls) = match tags_result {
-        Some(tr) => (
-            tr.exported_names,
-            tr.call_sites,
-            tr.db_models,
-            tr.external_calls,
-            tr.const_strings,
-            tr.launch_calls,
-        ),
-        None => (
-            HashSet::new(),
-            Vec::new(),
-            HashSet::new(),
-            Vec::new(),
-            HashMap::new(),
-            Vec::new(),
-        ),
-    };
-    exported_names.extend(tag_exported);
-    let call_sites = raw_call_sites;
-    let mut db_models: HashSet<String> = tag_db_models;
-    for item in &file_facts.db_models {
-        db_models.insert(item.model.clone());
-    }
-    let db_models = db_models.into_iter().collect::<Vec<_>>();
-    let mut external_urls = Vec::new();
-    for call in external_calls {
-        let url = match call.arg {
-            tags::ExternalCallArg::Literal(value) => Some(value),
-            tags::ExternalCallArg::Identifier(name) => const_strings.get(&name).cloned(),
-            tags::ExternalCallArg::ConcatIdentLiteral { ident, literal } => {
-                const_strings.get(&ident).map(|base| format!("{base}{literal}"))
-            }
-            tags::ExternalCallArg::ConcatLiteralIdent { literal, ident } => {
-                const_strings.get(&ident).map(|base| format!("{literal}{base}"))
-            }
-            tags::ExternalCallArg::UrlLiteral { path, base } => pathing::join_url(&base, &path),
-            tags::ExternalCallArg::UrlWithBaseIdent { path, base_ident } => const_strings
-                .get(&base_ident)
-                .and_then(|base| pathing::join_url(base, &path)),
-        };
-        if let Some(url) = url {
-            if url.starts_with("http://") || url.starts_with("https://") || url.starts_with("env://") {
-                external_urls.push(url);
-            }
-        }
-    }
+    let TagExtraction {
+        exported_names,
+        call_sites,
+        db_models,
+        external_urls,
+        launch_calls,
+        tags_secs,
+    } = extract_tag_data(
+        rel_path,
+        lang_name,
+        &source,
+        parsed_tree.as_ref(),
+        result.as_ref(),
+        &file_facts,
+        tag_query_bundles,
+    );
+    timings.tags_secs = tags_secs;
 
     let is_backend = rel_path.starts_with("src/api/")
         || rel_path.starts_with("src/services/")
@@ -648,145 +916,15 @@ fn parse_entry(
         })
         .collect();
 
-    if lang_name == "swift" {
-        let mut ext_map: HashMap<String, HashSet<String>> = HashMap::new();
-        if let Some(result) = result.as_ref() {
-            swift::collect_swift_extensions(&result.structure, &mut ext_map);
-        }
-        if !ext_map.is_empty() {
-            swift_extensions = Some(ext_map);
-        }
-
-        let mut ext_spans = Vec::new();
-        if let Some(result) = result.as_ref() {
-            swift::collect_swift_extension_spans(&result.structure, &mut ext_spans);
-        }
-
-        let mut type_spans = Vec::new();
-        if let Some(result) = result.as_ref() {
-            swift::collect_swift_type_spans(&result.structure, &mut type_spans);
-        }
-
-        let var_types = swift::parse_swift_var_types(&source);
-        if !var_types.is_empty() {
-            swift_context = Some(SwiftFileContext {
-                file_id: file_id.clone(),
-                filepath: rel_path.clone(),
-                symbol_spans: symbol_spans.clone(),
-                extension_spans: ext_spans.clone(),
-                type_spans: type_spans.clone(),
-                call_sites: call_sites.clone(),
-                var_types,
-            });
-        } else if !call_sites.is_empty() {
-            swift_context = Some(SwiftFileContext {
-                file_id: file_id.clone(),
-                filepath: rel_path.clone(),
-                symbol_spans: symbol_spans.clone(),
-                extension_spans: ext_spans.clone(),
-                type_spans: type_spans.clone(),
-                call_sites: call_sites.clone(),
-                var_types: HashMap::new(),
-            });
-        }
-    }
-
-    if lang_name == "python" {
-        let mut module_aliases: HashMap<String, String> = HashMap::new();
-        let mut imported_symbol_modules: HashMap<String, String> = HashMap::new();
-        let (var_types, function_return_assignments, function_return_types) = python::parse_python_var_types(&source);
-        if let Some(result) = result.as_ref() {
-            for imp in &result.imports {
-                if imp.items.is_empty() {
-                    if imp.alias.is_none() {
-                        continue;
-                    }
-                    let Some(alias) = imp.alias.as_ref() else {
-                        continue;
-                    };
-                    if alias.is_empty() || imp.source.is_empty() {
-                        continue;
-                    }
-                    module_aliases.insert(alias.clone(), imp.source.clone());
-                    continue;
-                }
-                if imp.source.is_empty() {
-                    continue;
-                }
-                for item in &imp.items {
-                    let cleaned = pathing::clean_import_name(item);
-                    if cleaned.is_empty() {
-                        continue;
-                    }
-                    imported_symbol_modules.insert(cleaned, imp.source.clone());
-                }
-            }
-        }
-        if !call_sites.is_empty()
-            || !module_aliases.is_empty()
-            || !imported_symbol_modules.is_empty()
-            || !var_types.is_empty()
-            || !function_return_assignments.is_empty()
-            || !function_return_types.is_empty()
-        {
-            python_context = Some(PythonFileContext {
-                file_id: file_id.clone(),
-                filepath: rel_path.clone(),
-                symbol_spans: symbol_spans.clone(),
-                call_sites: call_sites.clone(),
-                module_aliases,
-                imported_symbol_modules,
-                var_types,
-                function_return_assignments,
-                function_return_types,
-            });
-        }
-    }
-
-    if lang_name == "rust" {
-        let var_types = rust::parse_rust_var_types(&source);
-        if !var_types.is_empty() {
-            rust_context = Some(RustFileContext {
-                filepath: rel_path.clone(),
-                var_types,
-            });
-        }
-    }
-
-    if lang_name == "go" {
-        let (var_types, method_return_assignments, function_return_assignments) = go::parse_go_var_types(&source);
-        let method_return_types = go::parse_go_method_return_types(&source);
-        let function_return_types = go::parse_go_function_return_types(&source);
-        let mut import_aliases: HashMap<String, String> = HashMap::new();
-        if let Some(result) = result.as_ref() {
-            for imp in &result.imports {
-                if let Some(alias) = imp.alias.as_ref().filter(|alias| !alias.is_empty()) {
-                    import_aliases.insert(alias.clone(), imp.source.clone());
-                }
-            }
-        }
-        if !var_types.is_empty()
-            || !method_return_assignments.is_empty()
-            || !method_return_types.is_empty()
-            || !function_return_assignments.is_empty()
-            || !function_return_types.is_empty()
-            || !import_aliases.is_empty()
-            || !call_sites.is_empty()
-        {
-            go_context = Some(GoFileContext {
-                file_id: file_id.clone(),
-                filepath: rel_path.clone(),
-                symbol_spans: symbol_spans.clone(),
-                call_sites: call_sites.clone(),
-                import_aliases,
-                var_types,
-                method_return_assignments,
-                method_return_types,
-                function_return_assignments,
-                function_return_types,
-            });
-        }
-    }
+    let (swift_extensions, swift_context, python_context, rust_context, go_context) = build_language_contexts(
+        lang_name,
+        &source,
+        &file_id,
+        rel_path,
+        &symbol_spans,
+        &call_sites,
+        result.as_ref(),
+    );
 
     let mut import_symbol_requests = Vec::new();
     let mut reexport_groups: HashMap<(String, bool), Vec<String>> = HashMap::new();
@@ -894,12 +1032,7 @@ fn parse_entry(
         reexport_symbol_requests,
         export_alias_requests,
         launch_calls,
-        timings: ParseTimings {
-            parse_tree_secs,
-            file_facts_secs,
-            process_secs,
-            tags_secs,
-        },
+        timings,
     })
 }
 
