@@ -397,6 +397,7 @@ pub async fn finalize_struct_graph_async(
         neo4j_user,
         neo4j_pass,
         neo4j_db,
+        &current_run_id,
     )
     .await?;
     let file_call_edges = file_graph::build_file_calls_from_symbol_graph(&graph, project_id, &current_run_id).await?;

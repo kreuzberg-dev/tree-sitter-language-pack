@@ -751,7 +751,7 @@ fn extract_swift_semantic_facts(py: Python<'_>, project_path: &str) -> PyResult<
 
 /// Extract and persist Swift semantic graph enrichment using SourceKitten/Xcode context.
 #[pyfunction]
-#[pyo3(signature = (project_path, project_id, indexed_files, neo4j_uri, neo4j_user, neo4j_pass, neo4j_db = "proxy".to_string()))]
+#[pyo3(signature = (project_path, project_id, indexed_files, neo4j_uri, neo4j_user, neo4j_pass, neo4j_db = "proxy".to_string(), run_id = "".to_string()))]
 fn enrich_swift_graph(
     py: Python<'_>,
     project_path: &str,
@@ -761,6 +761,7 @@ fn enrich_swift_graph(
     neo4j_user: &str,
     neo4j_pass: &str,
     neo4j_db: String,
+    run_id: String,
 ) -> PyResult<Py<PyAny>> {
     let value = without_gil(|| {
         let rt =
@@ -773,6 +774,7 @@ fn enrich_swift_graph(
             neo4j_user,
             neo4j_pass,
             &neo4j_db,
+            &run_id,
         ))
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
     })?;

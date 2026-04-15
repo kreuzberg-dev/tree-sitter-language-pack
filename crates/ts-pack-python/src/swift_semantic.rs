@@ -11,8 +11,11 @@ struct SwiftSymbolRecord {
     name: String,
     base_name: String,
     kind: String,
+    qualified_name: Option<String>,
     start_line: usize,
     end_line: usize,
+    start_byte: usize,
+    end_byte: usize,
     usr: Option<String>,
     doc_comment: Option<String>,
     inherited_types: Vec<String>,
@@ -66,6 +69,14 @@ fn clean_name(value: &str) -> String {
 
 fn base_name(name: &str) -> String {
     clean_name(name).split('(').next().unwrap_or("").trim().to_string()
+}
+
+fn canonical_project_id(project_id: &str) -> String {
+    project_id
+        .split_once("::shadow::")
+        .map(|(canonical, _)| canonical)
+        .unwrap_or(project_id)
+        .to_string()
 }
 
 fn extract_preceding_doc_comment(lines: &[&str], start_line: usize) -> Option<String> {
@@ -243,8 +254,15 @@ fn structure_records_from_value(data: &Value, raw: &[u8], lines: &[&str], out: &
                 name: name.clone(),
                 base_name: base_name(&name),
                 kind,
+                qualified_name: item
+                    .get("key.name")
+                    .and_then(Value::as_str)
+                    .map(clean_name)
+                    .filter(|value| !value.is_empty()),
                 start_line,
                 end_line,
+                start_byte: offset,
+                end_byte: offset.saturating_add(length),
                 usr: {
                     let usr = clean_name(item.get("key.usr").and_then(Value::as_str).unwrap_or(""));
                     if usr.is_empty() { None } else { Some(usr) }
@@ -283,6 +301,45 @@ fn extract_swift_structure_records(sourcekitten: &str, file_path: &Path) -> Vec<
     let mut records = Vec::new();
     structure_records_from_value(&data, &raw, &lines, &mut records);
     records
+}
+
+fn swift_symbol_label_and_kind(sourcekitten_kind: &str) -> Option<(&'static str, &'static str)> {
+    if sourcekitten_kind.contains(".struct") {
+        Some(("struct", "Struct"))
+    } else if sourcekitten_kind.contains(".class") {
+        Some(("class", "Class"))
+    } else if sourcekitten_kind.contains(".enum") && !sourcekitten_kind.contains(".enumelement") {
+        Some(("enum", "Enum"))
+    } else if sourcekitten_kind.contains(".protocol") {
+        Some(("protocol", "Protocol"))
+    } else if sourcekitten_kind.contains(".extension") {
+        Some(("extension", "Extension"))
+    } else if sourcekitten_kind.contains(".typealias") {
+        Some(("typealias", "TypeAlias"))
+    } else if sourcekitten_kind.contains(".function.method") {
+        Some(("method", "Method"))
+    } else if sourcekitten_kind.contains(".function.") || sourcekitten_kind.ends_with(".function") {
+        Some(("function", "Function"))
+    } else {
+        None
+    }
+}
+
+fn swift_primary_owner(records: &[SwiftSymbolRecord]) -> Option<&SwiftSymbolRecord> {
+    records
+        .iter()
+        .filter(|record| {
+            matches!(
+                swift_symbol_label_and_kind(&record.kind),
+                Some((_, "Struct" | "Class" | "Enum" | "Protocol"))
+            )
+        })
+        .max_by_key(|record| {
+            (
+                record.end_line.saturating_sub(record.start_line),
+                usize::MAX - record.start_line,
+            )
+        })
 }
 
 fn clean_path_list(value: &Value) -> Vec<String> {
@@ -479,8 +536,11 @@ fn semantic_index_records(
                         name: name.clone(),
                         base_name: base_name(&name),
                         kind: clean_name(map.get("key.kind").and_then(Value::as_str).unwrap_or("")),
+                        qualified_name: Some(name),
                         start_line: 0,
                         end_line: 0,
+                        start_byte: 0,
+                        end_byte: 0,
                         usr: Some(usr),
                         doc_comment: None,
                         inherited_types: Vec::new(),
@@ -563,8 +623,11 @@ pub fn extract_swift_semantic_facts_value(project_path: &str) -> Value {
                             "name": record.name,
                             "base_name": record.base_name,
                             "kind": record.kind,
+                            "qualified_name": record.qualified_name,
                             "start_line": record.start_line,
                             "end_line": record.end_line,
+                            "start_byte": record.start_byte,
+                            "end_byte": record.end_byte,
                             "usr": semantic_usr_by_base_name.get(&record.base_name).cloned().or(record.usr),
                             "doc_comment": record.doc_comment,
                             "inherited_types": record.inherited_types,
@@ -678,6 +741,98 @@ async fn write_swift_enrichment(
     Ok(())
 }
 
+async fn write_missing_swift_symbols(
+    graph: &Arc<Graph>,
+    project_id: &str,
+    rows: &[Value],
+) -> Result<(), Box<dyn std::error::Error>> {
+    if rows.is_empty() {
+        return Ok(());
+    }
+    graph
+        .run(
+            query(
+                "UNWIND $rows AS row
+             MATCH (f:File {project_id:$pid, filepath:row.filepath})
+             MERGE (s:Node {id: row.sid})
+             ON CREATE SET s:Node,
+                           s.stable_id = row.stable_id,
+                           s.name = row.name,
+                           s.kind = row.node_kind,
+                           s.qualified_name = row.qualified_name,
+                           s.project_id = $pid,
+                           s.filepath = row.filepath,
+                           s.start_line = row.start_line,
+                           s.end_line = row.end_line,
+                           s.start_byte = row.start_byte,
+                           s.end_byte = row.end_byte,
+                           s.visibility = row.visibility,
+                           s.is_exported = row.is_exported,
+                           s.doc_comment = row.doc_comment,
+                           s.last_seen_run = row.run_id
+             ON MATCH SET  s.stable_id = row.stable_id,
+                           s.qualified_name = row.qualified_name,
+                           s.start_line = row.start_line,
+                           s.end_line = row.end_line,
+                           s.start_byte = row.start_byte,
+                           s.end_byte = row.end_byte,
+                           s.visibility = row.visibility,
+                           s.is_exported = row.is_exported,
+                           s.doc_comment = CASE
+                               WHEN (s.doc_comment IS NULL OR trim(s.doc_comment) = '')
+                                    AND row.doc_comment IS NOT NULL
+                                    AND trim(row.doc_comment) <> ''
+                               THEN row.doc_comment
+                               ELSE s.doc_comment
+                           END,
+                           s.last_seen_run = row.run_id
+             FOREACH (_ IN CASE WHEN row.label = 'class' THEN [1] ELSE [] END | SET s:Class)
+             FOREACH (_ IN CASE WHEN row.label = 'struct' THEN [1] ELSE [] END | SET s:Struct)
+             FOREACH (_ IN CASE WHEN row.label = 'enum' THEN [1] ELSE [] END | SET s:Enum)
+             FOREACH (_ IN CASE WHEN row.label = 'protocol' THEN [1] ELSE [] END | SET s:Protocol)
+             FOREACH (_ IN CASE WHEN row.label = 'extension' THEN [1] ELSE [] END | SET s:Extension)
+             FOREACH (_ IN CASE WHEN row.label = 'typealias' THEN [1] ELSE [] END | SET s:TypeAlias)
+             FOREACH (_ IN CASE WHEN row.label = 'function' THEN [1] ELSE [] END | SET s:Function)
+             FOREACH (_ IN CASE WHEN row.label = 'method' THEN [1] ELSE [] END | SET s:Method)
+             MERGE (f)-[:CONTAINS]->(s)",
+            )
+            .param("pid", project_id.to_string())
+            .param(
+                "rows",
+                neo4rs::BoltType::from(rows.iter().cloned().map(json_to_bolt).collect::<Vec<_>>()),
+            ),
+        )
+        .await?;
+    Ok(())
+}
+
+async fn promote_swift_file_call_edges(
+    graph: &Arc<Graph>,
+    project_id: &str,
+    rows: &[Value],
+) -> Result<(), Box<dyn std::error::Error>> {
+    if rows.is_empty() {
+        return Ok(());
+    }
+    graph
+        .run(
+            query(
+                "UNWIND $rows AS row
+             MATCH (:File {project_id:$pid, filepath:row.filepath})-[r:CALLS|CALLS_INFERRED]->(callee:Node {project_id:$pid})
+             MATCH (caller:Node {project_id:$pid, id:row.caller_sid})
+             WHERE caller.filepath = row.filepath
+             MERGE (caller)-[:CALLS_INFERRED]->(callee)",
+            )
+            .param("pid", project_id.to_string())
+            .param(
+                "rows",
+                neo4rs::BoltType::from(rows.iter().cloned().map(json_to_bolt).collect::<Vec<_>>()),
+            ),
+        )
+        .await?;
+    Ok(())
+}
+
 pub async fn enrich_swift_graph_async(
     project_path: &str,
     project_id: &str,
@@ -686,14 +841,15 @@ pub async fn enrich_swift_graph_async(
     neo4j_user: &str,
     neo4j_pass: &str,
     neo4j_db: &str,
+    run_id: &str,
 ) -> Result<Value, Box<dyn std::error::Error>> {
-    let enabled = matches!(
+    let enabled = !matches!(
         std::env::var("LM_PROXY_SWIFT_SOURCEKITTEN")
-            .unwrap_or_default()
+            .unwrap_or_else(|_| "1".to_string())
             .trim()
             .to_ascii_lowercase()
             .as_str(),
-        "1" | "true" | "yes" | "on"
+        "0" | "false" | "no" | "off"
     );
     if !enabled {
         return Ok(json!({"enabled": false, "files": 0, "symbols": 0}));
@@ -734,22 +890,35 @@ pub async fn enrich_swift_graph_async(
         .build()?;
     let graph = Arc::new(Graph::connect(neo4j_config).await?);
     let graph_symbols = load_swift_symbols(&graph, project_id, &filepaths).await?;
+    let active_run_id = run_id.trim();
+    if active_run_id.is_empty() {
+        return Err(format!("missing active struct run id for swift enrichment: {project_id}").into());
+    }
 
     let mut updates = Vec::new();
+    let mut missing_symbols = Vec::new();
+    let mut promoted_callers = Vec::new();
     let mut files_with_matches = 0usize;
+    let canonical_pid = canonical_project_id(project_id);
     for rel_path in &filepaths {
         let Some(records) = semantic_records.get(rel_path).and_then(Value::as_array) else {
             continue;
         };
-        let symbols = graph_symbols.get(rel_path).cloned().unwrap_or_default();
-        let mut matched_here = 0usize;
-        for record in records {
-            let item = SwiftSymbolRecord {
+        let semantic_items = records
+            .iter()
+            .map(|record| SwiftSymbolRecord {
                 name: clean_name(record.get("name").and_then(Value::as_str).unwrap_or("")),
                 base_name: clean_name(record.get("base_name").and_then(Value::as_str).unwrap_or("")),
                 kind: clean_name(record.get("kind").and_then(Value::as_str).unwrap_or("")),
+                qualified_name: record
+                    .get("qualified_name")
+                    .and_then(Value::as_str)
+                    .map(clean_name)
+                    .filter(|value| !value.is_empty()),
                 start_line: record.get("start_line").and_then(Value::as_u64).unwrap_or(0) as usize,
                 end_line: record.get("end_line").and_then(Value::as_u64).unwrap_or(0) as usize,
+                start_byte: record.get("start_byte").and_then(Value::as_u64).unwrap_or(0) as usize,
+                end_byte: record.get("end_byte").and_then(Value::as_u64).unwrap_or(0) as usize,
                 usr: record.get("usr").and_then(Value::as_str).map(str::to_string),
                 doc_comment: record.get("doc_comment").and_then(Value::as_str).map(str::to_string),
                 inherited_types: record
@@ -763,8 +932,33 @@ pub async fn enrich_swift_graph_async(
                             .collect::<Vec<_>>()
                     })
                     .unwrap_or_default(),
-            };
+            })
+            .collect::<Vec<_>>();
+        let symbols = graph_symbols.get(rel_path).cloned().unwrap_or_default();
+        let mut matched_here = 0usize;
+        for item in &semantic_items {
             let Some(matched_symbol) = match_symbol_record(&item, &symbols) else {
+                if let Some((label, node_kind)) = swift_symbol_label_and_kind(&item.kind) {
+                    let sid = format!("{project_id}:{}:{}:{}", label, rel_path, item.base_name);
+                    let stable_id = format!("{canonical_pid}:{}:{}:{}", label, rel_path, item.base_name);
+                    missing_symbols.push(json!({
+                        "sid": sid,
+                        "stable_id": stable_id,
+                        "filepath": rel_path,
+                        "label": label,
+                        "node_kind": node_kind,
+                        "name": item.base_name,
+                        "qualified_name": item.qualified_name.clone().unwrap_or_else(|| item.base_name.clone()),
+                        "start_line": item.start_line,
+                        "end_line": item.end_line,
+                        "start_byte": item.start_byte,
+                        "end_byte": item.end_byte,
+                        "visibility": if matches!(node_kind, "Struct" | "Class" | "Enum" | "Protocol") { "internal" } else { "" },
+                        "is_exported": false,
+                        "doc_comment": item.doc_comment,
+                        "run_id": active_run_id,
+                    }));
+                }
                 continue;
             };
             matched_here += 1;
@@ -779,13 +973,25 @@ pub async fn enrich_swift_graph_async(
         if matched_here > 0 {
             files_with_matches += 1;
         }
+        if let Some(owner) = swift_primary_owner(&semantic_items)
+            && let Some((label, _)) = swift_symbol_label_and_kind(&owner.kind)
+        {
+            promoted_callers.push(json!({
+                "filepath": rel_path,
+                "caller_sid": format!("{project_id}:{}:{}:{}", label, rel_path, owner.base_name),
+            }));
+        }
     }
 
+    write_missing_swift_symbols(&graph, project_id, &missing_symbols).await?;
     write_swift_enrichment(&graph, project_id, &updates).await?;
+    promote_swift_file_call_edges(&graph, project_id, &promoted_callers).await?;
     Ok(json!({
         "enabled": true,
         "available": true,
         "files": files_with_matches,
         "symbols": updates.len(),
+        "created_symbols": missing_symbols.len(),
+        "promoted_callers": promoted_callers.len(),
     }))
 }
