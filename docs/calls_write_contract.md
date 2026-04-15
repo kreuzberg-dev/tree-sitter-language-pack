@@ -69,3 +69,35 @@ Examples:
 - explicit external-call graph families for known external package/module calls
 
 Avoid adding generic fallback name matching back into the canonical write path.
+
+## Debugging Provenance
+
+When a call edge or file-graph link looks wrong, debug it through the staged pipeline instead of inspecting Neo4j writes in isolation.
+
+Use these optional env vars to emit targeted provenance lines:
+
+- `TS_PACK_DEBUG_PROVENANCE_SYMBOL`
+  - substring match for the callee / qualified target under investigation
+- `TS_PACK_DEBUG_PROVENANCE_FILE`
+  - substring match for the caller or file path under investigation
+
+Matched lines emit as `[ts-pack-provenance] ...` across these stages:
+
+- `stage=parse`
+  - raw `CallRef` extracted from syntax/tag data
+- `stage=resolve`
+  - resolution outcome such as `resolved_internal`, `filtered`, or `unresolved`
+- `stage=finalize`
+  - derived `CALLS_FILE` and `FILE_GRAPH_LINK` samples during file-graph materialization
+
+This is intentionally ad hoc debugging state. Do not add these env vars to `.env` by default.
+
+## Producer Boundary
+
+`tree-sitter-language-pack` is the producer-side source of truth for:
+
+- graph label / relationship contract
+- canonical `:CALLS` write semantics
+- semantic chunk metadata contract used by retrieval
+
+Consumers such as `rest_proxy` should validate and consume those contracts, not recreate or silently backfill them.
