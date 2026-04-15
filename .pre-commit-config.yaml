@@ -92,7 +92,7 @@ repos:
       - id: cargo-machete
 
   - repo: https://github.com/EmbarkStudios/cargo-deny
-    rev: 0.19.1
+    rev: 0.19.2
     hooks:
       - id: cargo-deny
         args: ["check"]
@@ -124,13 +124,13 @@ repos:
 
   # AI Rules
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v3.11.3
+    rev: v3.11.5
     hooks:
       - id: ai-rulez-generate
 
   # JavaScript/TypeScript/JSON: biome (formatting + linting)
   - repo: https://github.com/biomejs/pre-commit
-    rev: v2.4.11
+    rev: v2.4.12
     hooks:
       - id: biome-format
       - id: biome-lint
