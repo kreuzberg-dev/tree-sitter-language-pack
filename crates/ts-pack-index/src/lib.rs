@@ -3,6 +3,7 @@ mod call_resolution;
 mod clone_enrich;
 pub mod duplicate;
 mod go;
+mod graph_schema;
 mod model;
 mod parse_phase;
 mod pathing;
@@ -154,10 +155,30 @@ pub async fn prune_project_shadow_graph(graph: &Arc<Graph>, project_id: &str, ru
     writers::prune_stale_db_data(graph, project_id, run_id).await?;
     writers::prune_stale_external_api_data(graph, project_id, run_id).await?;
     writers::prune_stale_file_import_edges(graph, project_id, run_id).await?;
-    writers::prune_stale_file_edge_family(graph, project_id, run_id, "ASSET_LINKS", "prune_stale_asset_links").await?;
-    writers::prune_stale_file_edge_family(graph, project_id, run_id, "CALLS_API", "prune_stale_calls_api").await?;
-    writers::prune_stale_file_edge_family(graph, project_id, run_id, "CALLS_SERVICE", "prune_stale_calls_service")
-        .await?;
+    writers::prune_stale_file_edge_family(
+        graph,
+        project_id,
+        run_id,
+        graph_schema::REL_ASSET_LINKS,
+        "prune_stale_asset_links",
+    )
+    .await?;
+    writers::prune_stale_file_edge_family(
+        graph,
+        project_id,
+        run_id,
+        graph_schema::REL_CALLS_API,
+        "prune_stale_calls_api",
+    )
+    .await?;
+    writers::prune_stale_file_edge_family(
+        graph,
+        project_id,
+        run_id,
+        graph_schema::REL_CALLS_SERVICE,
+        "prune_stale_calls_service",
+    )
+    .await?;
     writers::prune_stale_api_route_data(graph, project_id, run_id).await?;
     writers::prune_stale_cargo_data(graph, project_id, run_id).await?;
     writers::prune_stale_resource_data(graph, project_id, run_id).await?;

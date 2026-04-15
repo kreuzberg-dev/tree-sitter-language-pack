@@ -5,6 +5,7 @@ from typing import Any, TypeAlias
 from xml.etree import ElementTree
 
 from tree_sitter_language_pack import _native as _native
+from ._semantic_contract import REQUIRED_SEMANTIC_CHUNK_FIELDS
 
 DownloadError = _native.DownloadError
 LanguageNotFoundError = _native.LanguageNotFoundError
