@@ -2088,17 +2088,40 @@ fn rust_impl_display_name(node: &tree_sitter::Node, source: &str) -> Option<Stri
 
 fn swift_classlike_kind(node: &tree_sitter::Node, source: &str) -> Option<StructureKind> {
     let text = node_text(node, source);
-    if text.contains("extension ") || text.starts_with("extension ") || text.starts_with("public extension") {
-        return Some(StructureKind::Extension);
-    }
-    if text.contains(" enum ") || text.starts_with("enum ") || text.starts_with("public enum") {
-        return Some(StructureKind::Enum);
-    }
-    if text.contains(" struct ") || text.starts_with("struct ") || text.starts_with("public struct") {
-        return Some(StructureKind::Struct);
-    }
-    if text.contains(" class ") || text.starts_with("class ") || text.starts_with("public class") {
-        return Some(StructureKind::Class);
+    let is_modifier = |token: &str| {
+        matches!(
+            token,
+            "public"
+                | "open"
+                | "internal"
+                | "fileprivate"
+                | "private"
+                | "final"
+                | "indirect"
+                | "prefix"
+                | "postfix"
+                | "infix"
+                | "mutating"
+                | "nonmutating"
+                | "convenience"
+                | "required"
+                | "override"
+                | "static"
+        )
+    };
+
+    for raw_token in text.split_whitespace() {
+        let token = raw_token.trim_matches(|ch: char| matches!(ch, '{' | '(' | '['));
+        if token.is_empty() || token.starts_with('@') || is_modifier(token) {
+            continue;
+        }
+        return match token {
+            "extension" => Some(StructureKind::Extension),
+            "enum" => Some(StructureKind::Enum),
+            "struct" => Some(StructureKind::Struct),
+            "class" => Some(StructureKind::Class),
+            _ => None,
+        };
     }
     None
 }
@@ -2622,6 +2645,21 @@ mod tests {
             .find(|item| item.name.as_deref() == Some("Greeter"))
             .expect("expected Greeter");
         assert_eq!(item.visibility.as_deref(), Some("public"));
+    }
+
+    #[test]
+    fn test_extract_swift_struct_with_attribute() {
+        let source = "@main\nstruct DrawThingsCLI: ParsableCommand {}\n";
+        let Some(tree) = parse_or_skip(source, "swift") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "swift", &tree);
+        let item = intel
+            .structure
+            .iter()
+            .find(|item| item.name.as_deref() == Some("DrawThingsCLI"))
+            .expect("expected DrawThingsCLI");
+        assert_eq!(item.kind, StructureKind::Struct);
     }
 
     // -- Import extraction tests --

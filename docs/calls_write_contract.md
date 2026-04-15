@@ -101,3 +101,17 @@ This is intentionally ad hoc debugging state. Do not add these env vars to `.env
 - semantic chunk metadata contract used by retrieval
 
 Consumers such as `rest_proxy` should validate and consume those contracts, not recreate or silently backfill them.
+
+## Reindexing Note
+
+When producer-side semantic metadata changes without changing the underlying chunk text, incremental semantic indexing may skip the old rows because chunk identity is still stable.
+
+That means metadata-only changes such as:
+
+- new `declared_symbols`
+- corrected `chunk_role`
+- better `contains_definition`
+
+do not reliably propagate to existing repos through an incremental run alone.
+
+After semantic contract changes of that kind, run a full `rebuild` for affected repos so the updated producer metadata fully replaces old rows.

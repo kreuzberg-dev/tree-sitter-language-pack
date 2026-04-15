@@ -67,6 +67,42 @@ _DECLARATION_PATTERNS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"^\s*class\s+([A-Za-z_][A-Za-z0-9_]*)\b"), "type"),
     (
         re.compile(
+            r"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public|open|internal|fileprivate|private|final)?\s*class\s+([A-Za-z_][A-Za-z0-9_]*)\b"
+        ),
+        "type",
+    ),
+    (
+        re.compile(
+            r"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public|open|internal|fileprivate|private|final)?\s*struct\s+([A-Za-z_][A-Za-z0-9_]*)\b"
+        ),
+        "type",
+    ),
+    (
+        re.compile(
+            r"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public|open|internal|fileprivate|private|final|indirect)?\s*enum\s+([A-Za-z_][A-Za-z0-9_]*)\b"
+        ),
+        "type",
+    ),
+    (
+        re.compile(
+            r"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public|open|internal|fileprivate|private)?\s*protocol\s+([A-Za-z_][A-Za-z0-9_]*)\b"
+        ),
+        "type",
+    ),
+    (
+        re.compile(
+            r"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public|open|internal|fileprivate|private)?\s*extension\s+([A-Za-z_][A-Za-z0-9_<>.]*)\b"
+        ),
+        "type",
+    ),
+    (
+        re.compile(
+            r"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public|open|internal|fileprivate|private)?\s*typealias\s+([A-Za-z_][A-Za-z0-9_]*)\b"
+        ),
+        "type",
+    ),
+    (
+        re.compile(
             r"^\s*export\s+(?:default\s+)?(?:async\s+)?function\s+([A-Za-z_][A-Za-z0-9_]*)\s*\("
         ),
         "function",
@@ -702,6 +738,15 @@ def build_swift_chunks(
         if node.type in container_types:
             name = _name_of(node)
             next_context = context_path + ([name] if name else [])
+            text = src_b[node.start_byte : node.end_byte].decode("utf-8", errors="replace")
+            _emit_text(
+                text,
+                node.start_byte,
+                name,
+                node.start_point[0] + 1,
+                node.end_point[0] + 1,
+                next_context,
+            )
             for child in node.children:
                 _walk(child, next_context)
             return
