@@ -48,6 +48,107 @@ pub(crate) struct CallResolutionOutputs {
     pub(crate) skipped_external_call_rows: usize,
 }
 
+type ResolverFn = fn(&CallResolutionContext<'_>, &CallRef) -> Option<String>;
+
+struct ResolutionTelemetry {
+    resolved_call_rows: usize,
+    unresolved_internal_call_rows: usize,
+    resolution_stage_counts: HashMap<&'static str, usize>,
+    filtered_stage_counts: HashMap<&'static str, usize>,
+    unresolved_name_counts: HashMap<String, usize>,
+    unresolved_bucket_counts: HashMap<String, usize>,
+    unresolved_bucket_samples: HashMap<String, Vec<String>>,
+    unresolved_rust_plain_attribution: HashMap<(String, String), usize>,
+    skipped_external_call_rows: usize,
+}
+
+impl ResolutionTelemetry {
+    fn new() -> Self {
+        Self {
+            resolved_call_rows: 0,
+            unresolved_internal_call_rows: 0,
+            resolution_stage_counts: HashMap::new(),
+            filtered_stage_counts: HashMap::new(),
+            unresolved_name_counts: HashMap::new(),
+            unresolved_bucket_counts: HashMap::new(),
+            unresolved_bucket_samples: HashMap::new(),
+            unresolved_rust_plain_attribution: HashMap::new(),
+            skipped_external_call_rows: 0,
+        }
+    }
+
+    fn record_resolved(&mut self, stage: &'static str) {
+        self.resolved_call_rows += 1;
+        *self.resolution_stage_counts.entry(stage).or_insert(0) += 1;
+    }
+
+    fn record_filtered(&mut self, reason: &'static str) {
+        self.skipped_external_call_rows += 1;
+        *self.filtered_stage_counts.entry(reason).or_insert(0) += 1;
+    }
+
+    fn record_unresolved(&mut self, call_ref: &CallRef, reason: &'static str, debug_call_resolution: bool) {
+        self.unresolved_internal_call_rows += 1;
+        if !debug_call_resolution {
+            return;
+        }
+        *self.unresolved_name_counts.entry(call_ref.callee.clone()).or_insert(0) += 1;
+        let kind = match call_ref.kind {
+            CallRefKind::Plain => "plain",
+            CallRefKind::Member => "member",
+            CallRefKind::Scoped => "scoped",
+        };
+        let bucket = format!(
+            "{}:{}:{}",
+            call_ref.language,
+            kind,
+            if call_ref.receiver_hint.is_some() {
+                "recv"
+            } else {
+                "norecv"
+            }
+        );
+        *self.unresolved_bucket_counts.entry(bucket.clone()).or_insert(0) += 1;
+        if bucket == "rust:plain:norecv" {
+            *self
+                .unresolved_rust_plain_attribution
+                .entry((call_ref.callee.clone(), call_ref.caller_filepath.clone()))
+                .or_insert(0) += 1;
+        }
+        let samples = self.unresolved_bucket_samples.entry(bucket).or_default();
+        if samples.len() < 5 {
+            let qualified = call_ref.qualified_hint.as_deref().unwrap_or("-");
+            let receiver = call_ref.receiver_hint.as_deref().unwrap_or("-");
+            samples.push(format!(
+                "{} @ {} (qualified={}, recv={}, reason={})",
+                call_ref.callee, call_ref.caller_filepath, qualified, receiver, reason
+            ));
+        }
+    }
+
+    fn into_outputs(
+        self,
+        symbol_call_rows: Vec<SymbolCallRow>,
+        external_symbol_nodes: Vec<ExternalSymbolNode>,
+        external_symbol_edges: Vec<ExternalSymbolEdgeRow>,
+    ) -> CallResolutionOutputs {
+        CallResolutionOutputs {
+            symbol_call_rows,
+            external_symbol_nodes,
+            external_symbol_edges,
+            resolved_call_rows: self.resolved_call_rows,
+            unresolved_internal_call_rows: self.unresolved_internal_call_rows,
+            resolution_stage_counts: self.resolution_stage_counts,
+            filtered_stage_counts: self.filtered_stage_counts,
+            unresolved_name_counts: self.unresolved_name_counts,
+            unresolved_bucket_counts: self.unresolved_bucket_counts,
+            unresolved_bucket_samples: self.unresolved_bucket_samples,
+            unresolved_rust_plain_attribution: self.unresolved_rust_plain_attribution,
+            skipped_external_call_rows: self.skipped_external_call_rows,
+        }
+    }
+}
+
 fn strip_generic_segments(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
     let mut depth = 0usize;
@@ -940,8 +1041,8 @@ fn resolve_external_python_module_receiver(
     })
 }
 
-pub(crate) fn resolve_call_ref(ctx: &CallResolutionContext<'_>, call_ref: &CallRef) -> CallResolution {
-    let stages: &[(&str, fn(&CallResolutionContext<'_>, &CallRef) -> Option<String>)] = match call_ref.kind {
+fn resolution_stages(call_ref: &CallRef) -> &'static [(&'static str, ResolverFn)] {
+    match call_ref.kind {
         CallRefKind::Scoped if call_ref.language == "python" => &[
             ("python_module_receiver", resolve_by_python_module_receiver),
             ("python_receiver_type", resolve_by_python_receiver_type),
@@ -982,51 +1083,48 @@ pub(crate) fn resolve_call_ref(ctx: &CallResolutionContext<'_>, call_ref: &CallR
             ("imported_target", resolve_by_imported_target_unique),
             ("local_directory", resolve_by_local_directory_unique),
         ],
-    };
-
-    for (stage, resolver) in stages {
-        if let Some(id) = resolver(ctx, call_ref) {
-            return CallResolution::ResolvedInternal(id, stage);
-        }
     }
+}
+
+fn resolve_call_ref_filters(ctx: &CallResolutionContext<'_>, call_ref: &CallRef) -> Option<CallResolution> {
     if is_rust_constructor_noise(call_ref) {
-        return CallResolution::Filtered("constructor_noise", None);
+        return Some(CallResolution::Filtered("constructor_noise", None));
     }
     if is_python_builtin_noise(call_ref) {
-        return CallResolution::Filtered("python_builtin", None);
+        return Some(CallResolution::Filtered("python_builtin", None));
     }
     if is_python_semantic_payload_support_plain_noise(call_ref) {
-        return CallResolution::Filtered("python_payload_support_plain", None);
+        return Some(CallResolution::Filtered("python_payload_support_plain", None));
     }
     if is_python_init_wrapper_plain_noise(call_ref) {
-        return CallResolution::Filtered("python_init_wrapper_plain", None);
+        return Some(CallResolution::Filtered("python_init_wrapper_plain", None));
     }
     if is_python_container_method_noise(ctx, call_ref) {
-        return CallResolution::Filtered("python_container_method", None);
+        return Some(CallResolution::Filtered("python_container_method", None));
     }
     if is_python_semantic_payload_support_member_noise(call_ref) {
-        return CallResolution::Filtered("python_payload_support_member", None);
+        return Some(CallResolution::Filtered("python_payload_support_member", None));
     }
     if is_python_init_wrapper_member_noise(call_ref) {
-        return CallResolution::Filtered("python_init_wrapper_member", None);
+        return Some(CallResolution::Filtered("python_init_wrapper_member", None));
     }
     if is_python_script_support_member_noise(call_ref) {
-        return CallResolution::Filtered("python_script_support_member", None);
+        return Some(CallResolution::Filtered("python_script_support_member", None));
     }
     if is_python_regex_method_noise(call_ref) {
-        return CallResolution::Filtered("python_regex_method", None);
+        return Some(CallResolution::Filtered("python_regex_method", None));
     }
     if is_filtered_same_file_policy(ctx, call_ref) {
-        return CallResolution::Filtered("policy_same_file", None);
+        return Some(CallResolution::Filtered("policy_same_file", None));
     }
     if is_go_test_receiver_noise(call_ref) {
-        return CallResolution::Filtered("go_test_receiver", None);
+        return Some(CallResolution::Filtered("go_test_receiver", None));
     }
     if is_python_test_receiver_noise(call_ref) {
-        return CallResolution::Filtered("python_test_receiver", None);
+        return Some(CallResolution::Filtered("python_test_receiver", None));
     }
     if is_clearly_external_rust_scoped_call(ctx, call_ref) {
-        return CallResolution::Filtered(
+        return Some(CallResolution::Filtered(
             "external_rust_scoped",
             call_ref
                 .qualified_hint
@@ -1036,10 +1134,10 @@ pub(crate) fn resolve_call_ref(ctx: &CallResolutionContext<'_>, call_ref: &CallR
                     qualified_name: qualified_name.clone(),
                     language: call_ref.language.clone(),
                 }),
-        );
+        ));
     }
     if is_clearly_external_go_scoped_call(ctx, call_ref) {
-        return CallResolution::Filtered(
+        return Some(CallResolution::Filtered(
             "external_go_scoped",
             call_ref
                 .qualified_hint
@@ -1049,16 +1147,37 @@ pub(crate) fn resolve_call_ref(ctx: &CallResolutionContext<'_>, call_ref: &CallR
                     qualified_name: qualified_name.clone(),
                     language: call_ref.language.clone(),
                 }),
-        );
+        ));
     }
     if let Some(external_symbol) = resolve_external_python_module_receiver(ctx, call_ref) {
-        return CallResolution::Filtered("external_python_module", Some(external_symbol));
+        return Some(CallResolution::Filtered(
+            "external_python_module",
+            Some(external_symbol),
+        ));
     }
     if let Some(external_symbol) = resolve_python_init_external_receiver(call_ref) {
-        return CallResolution::Filtered("external_python_module", Some(external_symbol));
+        return Some(CallResolution::Filtered(
+            "external_python_module",
+            Some(external_symbol),
+        ));
     }
     if let Some(external_symbol) = resolve_explicit_python_external_receiver(call_ref) {
-        return CallResolution::Filtered("external_python_module", Some(external_symbol));
+        return Some(CallResolution::Filtered(
+            "external_python_module",
+            Some(external_symbol),
+        ));
+    }
+    None
+}
+
+pub(crate) fn resolve_call_ref(ctx: &CallResolutionContext<'_>, call_ref: &CallRef) -> CallResolution {
+    for (stage, resolver) in resolution_stages(call_ref) {
+        if let Some(id) = resolver(ctx, call_ref) {
+            return CallResolution::ResolvedInternal(id, stage);
+        }
+    }
+    if let Some(filtered) = resolve_call_ref_filters(ctx, call_ref) {
+        return filtered;
     }
     if std::env::var("TS_PACK_DEBUG_PYTHON_SCOPED_TRACE")
         .ok()
@@ -1179,21 +1298,12 @@ pub(crate) fn build_symbol_call_rows(
     let mut symbol_call_rows = Vec::with_capacity(call_refs.len());
     let mut external_symbol_nodes = Vec::new();
     let mut external_symbol_edges = Vec::new();
-    let mut resolved_call_rows = 0usize;
-    let mut unresolved_internal_call_rows = 0usize;
-    let mut resolution_stage_counts: HashMap<&'static str, usize> = HashMap::new();
-    let mut filtered_stage_counts: HashMap<&'static str, usize> = HashMap::new();
-    let mut unresolved_name_counts: HashMap<String, usize> = HashMap::new();
-    let mut unresolved_bucket_counts: HashMap<String, usize> = HashMap::new();
-    let mut unresolved_bucket_samples: HashMap<String, Vec<String>> = HashMap::new();
-    let mut unresolved_rust_plain_attribution: HashMap<(String, String), usize> = HashMap::new();
-    let mut skipped_external_call_rows = 0usize;
+    let mut telemetry = ResolutionTelemetry::new();
 
     for call_ref in call_refs {
         match resolve_call_ref(resolution_ctx, &call_ref) {
             CallResolution::ResolvedInternal(id, stage) => {
-                resolved_call_rows += 1;
-                *resolution_stage_counts.entry(stage).or_insert(0) += 1;
+                telemetry.record_resolved(stage);
                 symbol_call_rows.push(SymbolCallRow {
                     caller_id: call_ref.caller_id,
                     callee: call_ref.callee,
@@ -1204,8 +1314,7 @@ pub(crate) fn build_symbol_call_rows(
                 });
             }
             CallResolution::Filtered(reason, external_symbol) => {
-                skipped_external_call_rows += 1;
-                *filtered_stage_counts.entry(reason).or_insert(0) += 1;
+                telemetry.record_filtered(reason);
                 if let Some(external_symbol) = external_symbol {
                     let external_id = crate::external_symbol_id(
                         project_id.as_ref(),
@@ -1226,58 +1335,12 @@ pub(crate) fn build_symbol_call_rows(
                 }
             }
             CallResolution::Unresolved(reason) => {
-                unresolved_internal_call_rows += 1;
-                if debug_call_resolution {
-                    *unresolved_name_counts.entry(call_ref.callee.clone()).or_insert(0) += 1;
-                    let kind = match call_ref.kind {
-                        CallRefKind::Plain => "plain",
-                        CallRefKind::Member => "member",
-                        CallRefKind::Scoped => "scoped",
-                    };
-                    let bucket = format!(
-                        "{}:{}:{}",
-                        call_ref.language,
-                        kind,
-                        if call_ref.receiver_hint.is_some() {
-                            "recv"
-                        } else {
-                            "norecv"
-                        }
-                    );
-                    *unresolved_bucket_counts.entry(bucket.clone()).or_insert(0) += 1;
-                    if bucket == "rust:plain:norecv" {
-                        *unresolved_rust_plain_attribution
-                            .entry((call_ref.callee.clone(), call_ref.caller_filepath.clone()))
-                            .or_insert(0) += 1;
-                    }
-                    let samples = unresolved_bucket_samples.entry(bucket).or_default();
-                    if samples.len() < 5 {
-                        let qualified = call_ref.qualified_hint.as_deref().unwrap_or("-");
-                        let receiver = call_ref.receiver_hint.as_deref().unwrap_or("-");
-                        samples.push(format!(
-                            "{} @ {} (qualified={}, recv={}, reason={})",
-                            call_ref.callee, call_ref.caller_filepath, qualified, receiver, reason
-                        ));
-                    }
-                }
+                telemetry.record_unresolved(&call_ref, reason, debug_call_resolution);
             }
         }
     }
 
-    CallResolutionOutputs {
-        symbol_call_rows,
-        external_symbol_nodes,
-        external_symbol_edges,
-        resolved_call_rows,
-        unresolved_internal_call_rows,
-        resolution_stage_counts,
-        filtered_stage_counts,
-        unresolved_name_counts,
-        unresolved_bucket_counts,
-        unresolved_bucket_samples,
-        unresolved_rust_plain_attribution,
-        skipped_external_call_rows,
-    }
+    telemetry.into_outputs(symbol_call_rows, external_symbol_nodes, external_symbol_edges)
 }
 
 #[cfg(test)]
