@@ -266,6 +266,12 @@ mod tests {
     }
 
     #[test]
+    fn test_objcpp_extension_maps_to_objc() {
+        assert_eq!(detect_language_from_extension("mm"), Some("objc"));
+        assert_eq!(detect_language_from_path("src/Bridge.mm"), Some("objc"));
+    }
+
+    #[test]
     fn test_ambiguity_unambiguous() {
         // .py is not ambiguous
         assert!(extension_ambiguity("py").is_none());

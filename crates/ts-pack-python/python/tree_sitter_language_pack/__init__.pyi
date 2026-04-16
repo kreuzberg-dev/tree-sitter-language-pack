@@ -434,7 +434,9 @@ __all__ = [
     "clean_cache",
     "configure",
     "build_codebase_embedding_rows",
+    "build_indexing_chunks",
     "build_line_window_chunks",
+    "should_use_line_window_fallback",
     "build_swift_chunks",
     "build_semantic_sync_plan",
     "detect_language",
@@ -507,6 +509,19 @@ def build_swift_chunks(
     chunk_lines: int = 60,
     overlap_lines: int = 10,
 ) -> list[dict[str, Any]]: ...
+def should_use_line_window_fallback(file_path: str) -> bool: ...
+def build_indexing_chunks(
+    source: str,
+    file_path: str,
+    project_id: str,
+    *,
+    language: str | None = None,
+    chunk_id_version: str = "v6",
+    chunk_max_size: int = 4000,
+    chunk_overlap: int = 200,
+    chunk_lines: int = 60,
+    overlap_lines: int = 10,
+) -> dict[str, Any]: ...
 def build_semantic_sync_plan(
     all_chunks: list[list[dict[str, Any]]],
     existing_ids: set[str] | None = None,

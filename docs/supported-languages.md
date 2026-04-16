@@ -182,7 +182,7 @@ tree-sitter-language-pack supports **305** languages.
 | Norg Meta | — | [nvim-neorg/tree-sitter-norg-meta](https://github.com/nvim-neorg/tree-sitter-norg-meta) |
 | Nqc | `.nqc` | [tree-sitter-grammars/tree-sitter-nqc](https://github.com/tree-sitter-grammars/tree-sitter-nqc) |
 | Nushell | `.nu` | [nushell/tree-sitter-nu](https://github.com/nushell/tree-sitter-nu) |
-| Objc | `.m` | [tree-sitter-grammars/tree-sitter-objc](https://github.com/tree-sitter-grammars/tree-sitter-objc) |
+| Objc | `.m`, `.mm` | [tree-sitter-grammars/tree-sitter-objc](https://github.com/tree-sitter-grammars/tree-sitter-objc) |
 | OCaml | `.ml` | [tree-sitter/tree-sitter-ocaml](https://github.com/tree-sitter/tree-sitter-ocaml) |
 | OCaml Interface | `.mli` | [tree-sitter/tree-sitter-ocaml](https://github.com/tree-sitter/tree-sitter-ocaml) |
 | Ocamllex | `.mll` | [atom-ocaml/tree-sitter-ocamllex](https://github.com/atom-ocaml/tree-sitter-ocamllex) |

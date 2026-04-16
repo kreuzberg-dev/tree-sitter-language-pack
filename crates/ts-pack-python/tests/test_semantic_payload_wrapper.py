@@ -1,4 +1,5 @@
 import unittest
+import asyncio
 
 import tree_sitter_language_pack as ts
 
@@ -102,6 +103,155 @@ struct SidebarView: View {
         self.assertTrue(definition["metadata"]["contains_definition"])
         self.assertEqual(definition["metadata"]["chunk_role"], "definition")
         self.assertEqual(definition["metadata"]["context_path"], ["SidebarView"])
+
+    def test_build_swift_chunks_split_oversized_single_line_members(self):
+        if not ts.has_language("swift"):
+            self.skipTest("swift parser unavailable in test environment")
+
+        huge_literal = "a" * 47000
+        chunks = ts.build_swift_chunks(
+            f"""
+struct StringNormalizationCases {{
+    static let cases = ["{huge_literal}"]
+}}
+""",
+            "validation-test/stdlib/StringNormalization.swift",
+            "proj",
+            chunk_max_size=4000,
+            chunk_lines=60,
+            overlap_lines=10,
+        )
+
+        self.assertTrue(chunks)
+        max_body_bytes = max(
+            len("\n".join(chunk["text"].splitlines()[1:]).encode("utf-8"))
+            for chunk in chunks
+        )
+        self.assertLessEqual(max_body_bytes, 4000)
+        self.assertTrue(
+            any(
+                "StringNormalizationCases" in (chunk.get("metadata", {}).get("declared_symbols") or [])
+                for chunk in chunks
+            )
+        )
+
+    def test_build_indexing_chunks_falls_back_for_pathological_swift_nesting(self):
+        huge_parens = "(_:" * 3000 + "0" + ")" * 3000
+        payload = ts.build_indexing_chunks(
+            f"let x =\n{huge_parens}\n",
+            "test/Parse/structure_overflow_paren_exprs.swift",
+            "proj",
+            language="swift",
+            chunk_max_size=4000,
+            chunk_overlap=200,
+            chunk_lines=60,
+            overlap_lines=10,
+        )
+
+        chunks = payload.get("chunks") or []
+        self.assertTrue(chunks)
+        self.assertEqual(payload.get("language"), "swift")
+        self.assertTrue(all("metadata" in chunk for chunk in chunks))
+
+    def test_build_indexing_chunks_falls_back_for_objcpp_and_keeps_objc_symbols(self):
+        source = """
+#import <Foundation/Foundation.h>
+
+@interface Counter : NSObject
+- (int)add:(int)a to:(int)b;
+@end
+
+@implementation Counter
+- (int)add:(int)a to:(int)b {
+    std::vector<int> values = {a, b};
+    return values[0] + values[1];
+}
+@end
+"""
+        payload = ts.build_indexing_chunks(
+            source,
+            "src/Bridge.mm",
+            "proj",
+            language="objc",
+            chunk_max_size=4000,
+            chunk_overlap=200,
+            chunk_lines=60,
+            overlap_lines=10,
+        )
+
+        chunks = payload.get("chunks") or []
+        self.assertTrue(chunks)
+        all_declared = {
+            symbol
+            for chunk in chunks
+            for symbol in ((chunk.get("metadata") or {}).get("declared_symbols") or [])
+        }
+        self.assertIn("Counter", all_declared)
+
+    def test_execute_semantic_index_driver_commits_before_rounds(self):
+        class _Conn:
+            def __init__(self):
+                self.commits = 0
+
+            async def execute(self, *_args, **_kwargs):
+                class _Cursor:
+                    async def fetchall(self):
+                        return []
+
+                    def __aiter__(self):
+                        async def _iter():
+                            if False:
+                                yield None
+                        return _iter()
+
+                return _Cursor()
+
+            def cursor(self):
+                class _PruneCursor:
+                    rowcount = 0
+
+                    async def __aenter__(self):
+                        return self
+
+                    async def __aexit__(self, exc_type, exc, tb):
+                        return False
+
+                    async def execute(self, *_args, **_kwargs):
+                        return None
+
+                return _PruneCursor()
+
+            async def commit(self):
+                self.commits += 1
+
+        conn = _Conn()
+        observed = {"commit_seen": False}
+
+        async def _embed(batch):
+            return batch
+
+        async def _write(batch):
+            observed["commit_seen"] = conn.commits > 0
+            return len(batch)
+
+        async def _run():
+            return await ts.execute_semantic_index_driver(
+                conn,
+                "proj",
+                ["src/sample.py"],
+                [[{"ref_id": "chunk-1", "text": "hello", "metadata": {"file": "src/sample.py"}}]],
+                rebuild=False,
+                batch_size=1,
+                concurrency=1,
+                embed_batch_fn=_embed,
+                write_batch_fn=_write,
+            )
+
+        result = asyncio.run(_run())
+
+        self.assertEqual(conn.commits, 1)
+        self.assertTrue(observed["commit_seen"])
+        self.assertEqual(result["written"], 1)
 
 
 if __name__ == "__main__":

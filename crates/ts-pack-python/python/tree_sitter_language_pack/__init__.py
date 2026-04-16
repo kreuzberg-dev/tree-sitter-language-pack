@@ -297,22 +297,25 @@ def extract_file_facts(source: bytes | str, language: str, file_path: str | None
 from ._semantic_payload import (
     CODEBASE_EMBEDDINGS_UPSERT_SQL,
     build_codebase_embedding_rows,
+    build_indexing_chunks as _python_build_indexing_chunks,
     build_line_window_chunks as _python_build_line_window_chunks,
     build_semantic_payload as _python_build_semantic_payload,
     build_semantic_sync_plan,
+    should_use_line_window_fallback as _python_should_use_line_window_fallback,
     build_swift_chunks as _python_build_swift_chunks,
     execute_codebase_embedding_upsert as _python_execute_codebase_embedding_upsert,
     execute_semantic_index_driver as _python_execute_semantic_index_driver,
 )
 
+build_indexing_chunks = _python_build_indexing_chunks
 build_line_window_chunks = _python_build_line_window_chunks
+should_use_line_window_fallback = _python_should_use_line_window_fallback
 build_swift_chunks = _python_build_swift_chunks
 build_semantic_payload = _python_build_semantic_payload
-execute_semantic_index_driver = getattr(
-    _native,
-    "execute_semantic_index_driver",
-    _python_execute_semantic_index_driver,
-)
+# Keep the semantic index driver in Python. It orchestrates long-running
+# embedding/write rounds across external services and connection pools, so the
+# Python implementation is the source of truth for transaction boundaries.
+execute_semantic_index_driver = _python_execute_semantic_index_driver
 execute_codebase_embedding_upsert = getattr(
     _native,
     "execute_codebase_embedding_upsert",
@@ -366,9 +369,11 @@ __all__ = [
     "configure",
     "CODEBASE_EMBEDDINGS_UPSERT_SQL",
     "build_codebase_embedding_rows",
+    "build_indexing_chunks",
     "build_line_window_chunks",
     "build_semantic_payload",
     "build_semantic_sync_plan",
+    "should_use_line_window_fallback",
     "build_swift_chunks",
     "detect_language",
     "detect_language_from_content",

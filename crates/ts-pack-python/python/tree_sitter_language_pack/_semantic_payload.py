@@ -57,6 +57,8 @@ _EXTRACTIONS_BY_LANG = {
 _DECLARATION_ANCHOR_RADIUS = 20
 _MAX_DECLARATION_ANCHORS = 6
 _DECLARATION_PATTERNS: list[tuple[re.Pattern[str], str]] = [
+    (re.compile(r"^\s*@interface\s+([A-Za-z_][A-Za-z0-9_]*)\b"), "type"),
+    (re.compile(r"^\s*@implementation\s+([A-Za-z_][A-Za-z0-9_]*)\b"), "type"),
     (re.compile(r"^\s*pub\s+fn\s+([A-Za-z_][A-Za-z0-9_]*)\s*\("), "function"),
     (re.compile(r"^\s*fn\s+([A-Za-z_][A-Za-z0-9_]*)\s*\("), "function"),
     (re.compile(r"^\s*struct\s+([A-Za-z_][A-Za-z0-9_]*)\b"), "type"),
@@ -152,6 +154,35 @@ _SUPPORT_PATH_SEGMENTS = {
     "/dist/",
     "/release/",
 }
+_FALLBACK_EXTS = {
+    "yaml",
+    "yml",
+    "toml",
+    "json",
+    "pbxproj",
+    "xcscheme",
+    "xcworkspacedata",
+    "plist",
+    "md",
+    "txt",
+    "sh",
+    "bash",
+    "zsh",
+    "fish",
+    "sql",
+    "graphql",
+    "tf",
+    "hcl",
+    "r",
+    "jl",
+}
+_FALLBACK_FILENAMES = {
+    ".env",
+    ".env.example",
+    ".gitignore",
+    ".indexignore",
+}
+_SWIFT_SAFE_PAREN_NESTING_LIMIT = 2048
 
 
 def _chunk_id(project_id: str, file_path: str, start_byte: int, text: str, version: str) -> str:
@@ -176,6 +207,60 @@ def _chunk_content_body(text: str) -> str:
     if lines and lines[0].startswith("// File: "):
         return "\n".join(lines[1:])
     return text
+
+
+def _utf8_byte_len(text: str) -> int:
+    return len(text.encode("utf-8"))
+
+
+def _max_delimiter_nesting(source: str, opener: str, closer: str) -> int:
+    depth = 0
+    max_depth = 0
+    for ch in source:
+        if ch == opener:
+            depth += 1
+            if depth > max_depth:
+                max_depth = depth
+        elif ch == closer and depth:
+            depth -= 1
+    return max_depth
+
+
+def _swift_requires_line_fallback(source: str) -> bool:
+    return _max_delimiter_nesting(source, "(", ")") > _SWIFT_SAFE_PAREN_NESTING_LIMIT
+
+
+def _split_text_at_utf8_boundaries(text: str, max_chunk_size: int) -> list[tuple[int, str]]:
+    if max_chunk_size <= 0:
+        return [(0, text)] if text else []
+    encoded = text.encode("utf-8")
+    if len(encoded) <= max_chunk_size:
+        return [(0, text)]
+
+    parts: list[tuple[int, str]] = []
+    start = 0
+    while start < len(encoded):
+        end = min(start + max_chunk_size, len(encoded))
+        while end > start:
+            try:
+                piece = encoded[start:end].decode("utf-8")
+                break
+            except UnicodeDecodeError:
+                end -= 1
+        if end <= start:
+            end = min(start + 1, len(encoded))
+            while end < len(encoded):
+                try:
+                    piece = encoded[start:end].decode("utf-8")
+                    break
+                except UnicodeDecodeError:
+                    end += 1
+            else:
+                piece = encoded[start:].decode("utf-8", errors="ignore")
+                end = len(encoded)
+        parts.append((start, piece))
+        start = end
+    return parts
 
 
 def _extract_chunk_member_usages(text: str) -> list[str]:
@@ -545,6 +630,16 @@ def _normalize_ts_pack_result(source: str, lang: str | None, result: dict | None
     return normalized
 
 
+def should_use_line_window_fallback(file_path: str) -> bool:
+    basename = (file_path or "").replace("\\", "/").rsplit("/", 1)[-1]
+    if basename in _FALLBACK_FILENAMES:
+        return True
+    if "." not in basename:
+        return False
+    ext = basename.rsplit(".", 1)[-1].lower()
+    return ext in _FALLBACK_EXTS
+
+
 def _build_process_config(language: str, *, chunk_max_size: int, chunk_overlap: int):
     kwargs = {
         "structure": True,
@@ -584,23 +679,29 @@ def build_line_window_chunks(
     lines = source.splitlines()
     i = 0
     metadata_base = dict(file_meta or {})
+    max_chunk_size = 4000
     while i < len(lines):
         block = lines[i : i + chunk_lines]
         if not block:
             break
-        text = file_header + "\n".join(block)
-        chunks.append(
-            {
-                "ref_id": _chunk_id_with_header(project_id, file_path, i, text, chunk_id_version),
-                "text": text,
-                "metadata": {
-                    "file": file_path,
-                    "project_id": project_id,
-                    "language": language,
-                    **metadata_base,
-                },
-            }
-        )
+        block_text = "\n".join(block)
+        for offset, piece in _split_text_at_utf8_boundaries(block_text, max_chunk_size):
+            body = piece.rstrip("\n")
+            if not body.strip():
+                continue
+            text = file_header + body
+            chunks.append(
+                {
+                    "ref_id": _chunk_id_with_header(project_id, file_path, i + offset, text, chunk_id_version),
+                    "text": text,
+                    "metadata": {
+                        "file": file_path,
+                        "project_id": project_id,
+                        "language": language,
+                        **metadata_base,
+                    },
+                }
+            )
         i += chunk_lines - overlap_lines
     return _finalize_semantic_chunks(
         source,
@@ -698,27 +799,84 @@ def build_swift_chunks(
         end_line: int,
         context_path: list[str],
     ) -> None:
-        text = text.strip()
-        if not text:
+        if not text or not text.strip():
             return
-        if len(text.encode("utf-8")) <= chunk_max_size:
-            _append_chunk(text, start_byte, name, start_line, end_line, context_path)
+        if _utf8_byte_len(text) <= chunk_max_size:
+            _append_chunk(text.rstrip("\n"), start_byte, name, start_line, end_line, context_path)
             return
 
-        lines = text.splitlines()
-        i = 0
-        while i < len(lines):
-            block = "\n".join(lines[i : i + chunk_lines]).strip()
-            if block:
+        raw_lines = text.splitlines(keepends=True)
+        current_parts: list[str] = []
+        current_bytes = 0
+        current_start_byte = start_byte
+        current_start_line = start_line
+        current_end_line = start_line - 1
+        rel_byte = 0
+
+        def _flush_current() -> None:
+            nonlocal current_parts, current_bytes, current_start_byte, current_start_line, current_end_line
+            if not current_parts:
+                return
+            body = "".join(current_parts).rstrip("\n")
+            if body.strip():
                 _append_chunk(
-                    block,
-                    start_byte + i,
+                    body,
+                    current_start_byte,
                     name,
-                    start_line + i,
-                    start_line + min(i + chunk_lines, len(lines)) - 1,
+                    current_start_line,
+                    max(current_start_line, current_end_line),
                     context_path,
                 )
-            i += chunk_lines - overlap_lines
+            current_parts = []
+            current_bytes = 0
+            current_end_line = current_start_line - 1
+
+        for line_index, raw_line in enumerate(raw_lines):
+            line_start_byte = start_byte + rel_byte
+            line_start_line = start_line + line_index
+            line_bytes = _utf8_byte_len(raw_line)
+
+            if line_bytes > chunk_max_size:
+                _flush_current()
+                for piece_offset, piece in _split_text_at_utf8_boundaries(raw_line, chunk_max_size):
+                    body = piece.rstrip("\n")
+                    if not body.strip():
+                        continue
+                    _append_chunk(
+                        body,
+                        line_start_byte + piece_offset,
+                        name,
+                        line_start_line,
+                        line_start_line,
+                        context_path,
+                    )
+                rel_byte += line_bytes
+                current_start_byte = start_byte + rel_byte
+                current_start_line = line_start_line + 1
+                continue
+
+            if current_parts and (
+                len(current_parts) >= chunk_lines or current_bytes + line_bytes > chunk_max_size
+            ):
+                _flush_current()
+                current_start_byte = line_start_byte
+                current_start_line = line_start_line
+
+            if not current_parts:
+                current_start_byte = line_start_byte
+                current_start_line = line_start_line
+
+            current_parts.append(raw_line)
+            current_bytes += line_bytes
+            current_end_line = line_start_line
+            rel_byte += line_bytes
+
+            if len(current_parts) >= chunk_lines:
+                _flush_current()
+                current_start_byte = start_byte + rel_byte
+                current_start_line = line_start_line + 1
+
+        _flush_current()
 
     def _walk(node, context_path: list[str]) -> None:
         if node.type in member_types:
@@ -763,6 +921,97 @@ def build_swift_chunks(
         chunks,
         chunk_id_version=chunk_id_version,
     )
+
+
+def build_indexing_chunks(
+    source: str,
+    file_path: str,
+    project_id: str,
+    *,
+    language: str | None = None,
+    chunk_id_version: str = "v6",
+    chunk_max_size: int = 4000,
+    chunk_overlap: int = 200,
+    chunk_lines: int = 60,
+    overlap_lines: int = 10,
+) -> dict[str, Any]:
+    file_meta: dict[str, Any] = {}
+    chunks: list[dict[str, Any]] = []
+
+    if language == "swift":
+        if _swift_requires_line_fallback(source):
+            return {
+                "language": language,
+                "file_meta": file_meta,
+                "chunks": build_line_window_chunks(
+                    source,
+                    file_path,
+                    project_id,
+                    language=language,
+                    file_meta=file_meta,
+                    chunk_id_version=chunk_id_version,
+                    chunk_lines=chunk_lines,
+                    overlap_lines=overlap_lines,
+                ),
+            }
+        try:
+            payload = build_semantic_payload(
+                source,
+                "swift",
+                file_path,
+                project_id,
+                chunk_id_version=chunk_id_version,
+                chunk_max_size=chunk_max_size,
+                chunk_overlap=chunk_overlap,
+            )
+            file_meta = payload.get("file_meta") or {}
+        except Exception:
+            file_meta = {}
+
+        chunks = build_swift_chunks(
+            source,
+            file_path,
+            project_id,
+            file_meta=file_meta,
+            chunk_id_version=chunk_id_version,
+            chunk_max_size=chunk_max_size,
+            chunk_lines=chunk_lines,
+            overlap_lines=overlap_lines,
+        )
+        if chunks:
+            return {"language": language, "file_meta": file_meta, "chunks": chunks}
+
+    elif language:
+        payload = build_semantic_payload(
+            source,
+            language,
+            file_path,
+            project_id,
+            chunk_id_version=chunk_id_version,
+            chunk_max_size=chunk_max_size,
+            chunk_overlap=chunk_overlap,
+        )
+        file_meta = payload.get("file_meta") or {}
+        chunks = payload.get("chunks") or []
+        if language == "objc" and (file_meta.get("file_diagnostics") or {}).get("count", 0) > 0:
+            chunks = []
+        if chunks:
+            return {"language": language, "file_meta": file_meta, "chunks": chunks}
+
+    if language is None and not should_use_line_window_fallback(file_path):
+        return {"language": language, "file_meta": file_meta, "chunks": []}
+
+    chunks = build_line_window_chunks(
+        source,
+        file_path,
+        project_id,
+        language=language,
+        file_meta=file_meta,
+        chunk_id_version=chunk_id_version,
+        chunk_lines=chunk_lines,
+        overlap_lines=overlap_lines,
+    )
+    return {"language": language, "file_meta": file_meta, "chunks": chunks}
 
 
 def build_semantic_sync_plan(
@@ -1078,6 +1327,15 @@ async def execute_semantic_index_rounds(
     return {"written": total_written, "rounds": rounds}
 
 
+async def _maybe_commit_connection(conn: Any) -> None:
+    commit = getattr(conn, "commit", None)
+    if commit is None:
+        return
+    result = commit()
+    if hasattr(result, "__await__"):
+        await result
+
+
 async def execute_semantic_index_driver(
     conn: Any,
     project_id: str,
@@ -1164,6 +1422,13 @@ async def execute_semantic_index_driver(
             all_chunks,
             rebuild=rebuild,
         )
+
+    # End the preparation transaction before the long-running embedding loop.
+    # The round writes use the caller's write_batch_fn, typically on separate
+    # pool connections, so keeping the prepare connection open here invites
+    # idle-in-transaction timeouts on large indexes.
+    await _maybe_commit_connection(conn)
+
     round_result = await execute_semantic_index_rounds(
         sync_plan.get("new_chunks") or [],
         batch_size=batch_size,
