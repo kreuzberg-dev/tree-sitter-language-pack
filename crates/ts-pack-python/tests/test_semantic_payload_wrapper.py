@@ -188,6 +188,22 @@ struct StringNormalizationCases {{
         }
         self.assertIn("Counter", all_declared)
 
+    def test_build_indexing_chunks_strips_nul_bytes_from_chunk_text(self):
+        payload = ts.build_indexing_chunks(
+            "let weird = \"a\\x00b\\x00c\"\n",
+            "test/Parse/strange-characters.swift",
+            "proj",
+            language="swift",
+            chunk_max_size=4000,
+            chunk_overlap=200,
+            chunk_lines=60,
+            overlap_lines=10,
+        )
+
+        chunks = payload.get("chunks") or []
+        self.assertTrue(chunks)
+        self.assertTrue(all("\x00" not in chunk["text"] for chunk in chunks))
+
     def test_execute_semantic_index_driver_commits_before_rounds(self):
         class _Conn:
             def __init__(self):

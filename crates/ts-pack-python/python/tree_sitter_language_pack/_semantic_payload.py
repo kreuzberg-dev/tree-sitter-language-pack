@@ -640,6 +640,24 @@ def should_use_line_window_fallback(file_path: str) -> bool:
     return ext in _FALLBACK_EXTS
 
 
+def _strip_nul_bytes(text: str) -> str:
+    return text.replace("\x00", "")
+
+
+def _sanitize_chunk_payload(value: Any) -> Any:
+    if isinstance(value, str):
+        return _strip_nul_bytes(value)
+    if isinstance(value, list):
+        return [_sanitize_chunk_payload(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _sanitize_chunk_payload(item) for key, item in value.items()}
+    return value
+
+
+def _sanitize_chunk_list(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [_sanitize_chunk_payload(chunk) for chunk in chunks]
+
+
 def _build_process_config(language: str, *, chunk_max_size: int, chunk_overlap: int):
     kwargs = {
         "structure": True,
@@ -674,6 +692,7 @@ def build_line_window_chunks(
     chunk_lines: int = 60,
     overlap_lines: int = 10,
 ) -> list[dict[str, Any]]:
+    source = _strip_nul_bytes(source)
     file_header = f"// File: {file_path}\n"
     chunks: list[dict[str, Any]] = []
     lines = source.splitlines()
@@ -703,13 +722,15 @@ def build_line_window_chunks(
                 }
             )
         i += chunk_lines - overlap_lines
-    return _finalize_semantic_chunks(
-        source,
-        file_path,
-        project_id,
-        metadata_base,
-        chunks,
-        chunk_id_version=chunk_id_version,
+    return _sanitize_chunk_list(
+        _finalize_semantic_chunks(
+            source,
+            file_path,
+            project_id,
+            metadata_base,
+            chunks,
+            chunk_id_version=chunk_id_version,
+        )
     )
 
 
@@ -724,6 +745,7 @@ def build_swift_chunks(
     chunk_lines: int = 60,
     overlap_lines: int = 10,
 ) -> list[dict[str, Any]]:
+    source = _strip_nul_bytes(source)
     from . import get_parser
 
     member_types = {
@@ -913,13 +935,15 @@ def build_swift_chunks(
             _walk(child, context_path)
 
     _walk(tree.root_node, [])
-    return _finalize_semantic_chunks(
-        source,
-        file_path,
-        project_id,
-        metadata_base,
-        chunks,
-        chunk_id_version=chunk_id_version,
+    return _sanitize_chunk_list(
+        _finalize_semantic_chunks(
+            source,
+            file_path,
+            project_id,
+            metadata_base,
+            chunks,
+            chunk_id_version=chunk_id_version,
+        )
     )
 
 
@@ -935,6 +959,7 @@ def build_indexing_chunks(
     chunk_lines: int = 60,
     overlap_lines: int = 10,
 ) -> dict[str, Any]:
+    source = _strip_nul_bytes(source)
     file_meta: dict[str, Any] = {}
     chunks: list[dict[str, Any]] = []
 
@@ -992,7 +1017,7 @@ def build_indexing_chunks(
             chunk_overlap=chunk_overlap,
         )
         file_meta = payload.get("file_meta") or {}
-        chunks = payload.get("chunks") or []
+        chunks = _sanitize_chunk_list(payload.get("chunks") or [])
         if language == "objc" and (file_meta.get("file_diagnostics") or {}).get("count", 0) > 0:
             chunks = []
         if chunks:
@@ -1454,6 +1479,7 @@ def build_semantic_payload(
     chunk_max_size: int = 4000,
     chunk_overlap: int = 200,
 ) -> dict[str, Any]:
+    source = _strip_nul_bytes(source)
     config = _build_process_config(language, chunk_max_size=chunk_max_size, chunk_overlap=chunk_overlap)
     result = _normalize_ts_pack_result(source, language, process(source, config))
     file_facts = extract_file_facts(source, language, file_path)
@@ -1497,12 +1523,14 @@ def build_semantic_payload(
                 },
             }
         )
-    chunks = _finalize_semantic_chunks(
-        source,
-        file_path,
-        project_id,
-        file_meta,
-        chunks,
-        chunk_id_version=chunk_id_version,
+    chunks = _sanitize_chunk_list(
+        _finalize_semantic_chunks(
+            source,
+            file_path,
+            project_id,
+            file_meta,
+            chunks,
+            chunk_id_version=chunk_id_version,
+        )
     )
     return {"result": result, "file_meta": file_meta, "chunks": chunks}
