@@ -78,6 +78,10 @@ fn is_apple_fact_file(path: &str) -> bool {
         || normalized.ends_with(".xcscheme")
 }
 
+fn swift_extension_qualified_name(name: &str, filepath: &str, start_line: usize) -> String {
+    format!("extension {name}@{filepath}:{}", start_line + 1)
+}
+
 fn walk_item(
     item: &ts_pack::StructureItem,
     parent_id: &str,
@@ -129,12 +133,20 @@ fn walk_item(
         || exported_names.contains(name)
         || name_is_public;
 
+    let qualified_name = if language == "swift" && matches!(item.kind, ts_pack::StructureKind::Extension) {
+        item.name
+            .as_deref()
+            .map(|name| swift_extension_qualified_name(name, filepath, item.span.start_line))
+    } else {
+        item.qualified_name.clone()
+    };
+
     symbols.entry(label).or_default().push(SymbolNode {
         id: node_id.clone(),
         stable_id,
         name: name.to_string(),
         kind: format!("{:?}", item.kind),
-        qualified_name: item.qualified_name.clone(),
+        qualified_name,
         filepath: filepath.to_string(),
         project_id: Arc::clone(&project_id),
         start_line: (item.span.start_line + 1) as u32,
@@ -223,12 +235,18 @@ fn add_symbol_info(
         return;
     }
 
+    let qualified_name = if label == "Extension" {
+        Some(swift_extension_qualified_name(&sym.name, filepath, sym.span.start_line))
+    } else {
+        None
+    };
+
     symbols.entry(label).or_default().push(SymbolNode {
         id: node_id.clone(),
         stable_id,
         name: sym.name.clone(),
         kind: format!("{:?}", sym.kind),
-        qualified_name: None,
+        qualified_name,
         filepath: filepath.to_string(),
         project_id: Arc::clone(&project_id),
         start_line: (sym.span.start_line + 1) as u32,
@@ -1621,6 +1639,57 @@ graph.trackGrad(tensor)
                 .iter()
                 .any(|call| { call.caller_id == main.id && call.callee == "DynamicGraph" }),
             "expected top-level constructor call to belong to synthetic main symbol"
+        );
+
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn swift_extensions_get_distinct_qualified_names() {
+        let root = unique_temp_dir("swift-extension-identity");
+        fs::create_dir_all(root.join("Sources/App")).unwrap();
+        let file_abs = root.join("Sources/App/EventLoop.swift");
+        fs::write(
+            &file_abs,
+            r#"
+public protocol EventLoop {
+    func makePromise()
+}
+
+extension EventLoop {
+    public func makePromise() {}
+}
+"#,
+        )
+        .unwrap();
+
+        let manifest = vec![ManifestEntry {
+            abs_path: file_abs.to_string_lossy().to_string(),
+            rel_path: "Sources/App/EventLoop.swift".to_string(),
+            ext: "swift".to_string(),
+            size: fs::metadata(&file_abs).unwrap().len(),
+        }];
+
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        assert_eq!(results.len(), 1);
+        let result = &results[0];
+        let protocols = result.symbols.get("Protocol").expect("protocols");
+        let extensions = result.symbols.get("Extension").expect("extensions");
+        let protocol = protocols.iter().find(|sym| sym.name == "EventLoop").expect("protocol");
+        let extension = extensions
+            .iter()
+            .find(|sym| sym.name == "EventLoop")
+            .expect("extension");
+
+        assert_eq!(protocol.qualified_name.as_deref(), Some("EventLoop"));
+        assert_ne!(extension.qualified_name.as_deref(), Some("EventLoop"));
+        assert!(
+            extension
+                .qualified_name
+                .as_deref()
+                .unwrap_or_default()
+                .starts_with("extension EventLoop@Sources/App/EventLoop.swift:"),
+            "extension qualified name should be declaration-distinct"
         );
 
         let _ = fs::remove_dir_all(root);

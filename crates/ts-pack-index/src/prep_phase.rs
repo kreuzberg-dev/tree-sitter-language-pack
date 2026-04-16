@@ -57,6 +57,7 @@ struct PreparationIndexes {
     symbols_by_file: HashMap<String, HashMap<String, String>>,
     caller_qualified_symbols_by_id: HashMap<String, String>,
     go_import_aliases_by_file: HashMap<String, HashMap<String, String>>,
+    swift_var_types_by_file: HashMap<String, HashMap<String, String>>,
     go_var_types_by_file: HashMap<String, HashMap<String, String>>,
     rust_var_types_by_file: HashMap<String, HashMap<String, String>>,
     python_var_types_by_file: HashMap<String, HashMap<String, String>>,
@@ -81,6 +82,7 @@ struct FileResolutionIndexes {
 
 fn build_preparation_indexes(
     all_symbols: &HashMap<&'static str, Vec<SymbolNode>>,
+    swift_contexts: &[SwiftFileContext],
     go_contexts: &[GoFileContext],
     python_contexts: &[PythonFileContext],
     rust_contexts: &[RustFileContext],
@@ -89,6 +91,7 @@ fn build_preparation_indexes(
         symbols_by_file: HashMap::new(),
         caller_qualified_symbols_by_id: HashMap::new(),
         go_import_aliases_by_file: HashMap::new(),
+        swift_var_types_by_file: HashMap::new(),
         go_var_types_by_file: HashMap::new(),
         rust_var_types_by_file: HashMap::new(),
         python_var_types_by_file: HashMap::new(),
@@ -102,6 +105,14 @@ fn build_preparation_indexes(
         callable_symbols_by_name: HashMap::new(),
         qualified_callable_symbols: Vec::new(),
     };
+
+    for ctx in swift_contexts {
+        if !ctx.var_types.is_empty() {
+            indexes
+                .swift_var_types_by_file
+                .insert(ctx.filepath.clone(), ctx.var_types.clone());
+        }
+    }
 
     for syms in all_symbols.values() {
         for sym in syms {
@@ -513,7 +524,7 @@ pub(crate) fn prepare_graph_facts(
         .ok()
         .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
         .unwrap_or(false);
-    let indexes = build_preparation_indexes(all_symbols, go_contexts, python_contexts, rust_contexts);
+    let indexes = build_preparation_indexes(all_symbols, swift_contexts, go_contexts, python_contexts, rust_contexts);
     let file_indexes = build_file_resolution_indexes(all_files, import_symbol_requests, reexport_symbol_requests);
 
     let resolve_import_item_for_file = |src_filepath: &str, item_name: &str| -> Option<String> {
@@ -559,6 +570,7 @@ pub(crate) fn prepare_graph_facts(
         caller_qualified_symbols_by_id: &indexes.caller_qualified_symbols_by_id,
         symbols_by_file: &indexes.symbols_by_file,
         go_import_aliases_by_file: &indexes.go_import_aliases_by_file,
+        swift_var_types_by_file: &indexes.swift_var_types_by_file,
         go_var_types_by_file: &indexes.go_var_types_by_file,
         rust_var_types_by_file: &indexes.rust_var_types_by_file,
         python_var_types_by_file: &indexes.python_var_types_by_file,

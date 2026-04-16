@@ -2,6 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use crate::pathing;
 use crate::provenance;
+use crate::swift;
 use crate::{CallRef, CallRefKind, ExternalSymbolEdgeRow, ExternalSymbolNode, ImportSymbolRequest, SymbolCallRow};
 
 #[path = "call_resolution_policy.rs"]
@@ -13,6 +14,7 @@ pub(crate) struct CallResolutionContext<'a> {
     pub(crate) caller_qualified_symbols_by_id: &'a HashMap<String, String>,
     pub(crate) symbols_by_file: &'a HashMap<String, HashMap<String, String>>,
     pub(crate) go_import_aliases_by_file: &'a HashMap<String, HashMap<String, String>>,
+    pub(crate) swift_var_types_by_file: &'a HashMap<String, HashMap<String, String>>,
     pub(crate) go_var_types_by_file: &'a HashMap<String, HashMap<String, String>>,
     pub(crate) rust_var_types_by_file: &'a HashMap<String, HashMap<String, String>>,
     pub(crate) python_var_types_by_file: &'a HashMap<String, HashMap<String, String>>,
@@ -499,6 +501,39 @@ fn resolve_by_go_receiver_type(ctx: &CallResolutionContext<'_>, call_ref: &CallR
     if second.is_none() { first } else { None }
 }
 
+fn resolve_by_swift_receiver_type(ctx: &CallResolutionContext<'_>, call_ref: &CallRef) -> Option<String> {
+    if call_ref.language != "swift" || !matches!(call_ref.kind, CallRefKind::Member | CallRefKind::Scoped) {
+        return None;
+    }
+    let receiver = call_ref.receiver_hint.as_deref()?;
+    let receiver_type = ctx
+        .swift_var_types_by_file
+        .get(&call_ref.caller_filepath)
+        .and_then(|m| m.get(receiver))?;
+    let normalized_type = swift::normalize_swift_type(receiver_type)?;
+    let simple_type = normalized_type
+        .rsplit('.')
+        .next()
+        .unwrap_or(normalized_type.as_str())
+        .trim();
+    if simple_type.is_empty() {
+        return None;
+    }
+    let exact = format!("{simple_type}.{}", call_ref.callee);
+    let suffix = format!(".{simple_type}.{}", call_ref.callee);
+    let mut matches = ctx
+        .qualified_callable_symbols
+        .iter()
+        .filter(|(qualified_name, _, filepath)| {
+            (qualified_name == &exact || qualified_name.ends_with(&suffix))
+                && (call_ref.allow_same_file || filepath != &call_ref.caller_filepath)
+        })
+        .map(|(_, id, _)| id.clone());
+    let first = matches.next();
+    let second = matches.next();
+    if second.is_none() { first } else { None }
+}
+
 fn resolve_by_rust_receiver_type(ctx: &CallResolutionContext<'_>, call_ref: &CallRef) -> Option<String> {
     if call_ref.language != "rust" || !matches!(call_ref.kind, CallRefKind::Member | CallRefKind::Scoped) {
         return None;
@@ -638,6 +673,7 @@ fn resolution_stages(call_ref: &CallRef) -> &'static [(&'static str, ResolverFn)
         ],
         CallRefKind::Scoped => &[
             ("go_import_receiver", resolve_by_go_import_receiver),
+            ("swift_receiver_type", resolve_by_swift_receiver_type),
             ("go_receiver_type", resolve_by_go_receiver_type),
             ("rust_receiver_type", resolve_by_rust_receiver_type),
             ("self_qualified", resolve_by_self_qualified),
@@ -651,6 +687,7 @@ fn resolution_stages(call_ref: &CallRef) -> &'static [(&'static str, ResolverFn)
         CallRefKind::Member => &[
             ("python_module_receiver", resolve_by_python_module_receiver),
             ("python_receiver_type", resolve_by_python_receiver_type),
+            ("swift_receiver_type", resolve_by_swift_receiver_type),
             ("rust_receiver_type", resolve_by_rust_receiver_type),
             ("receiver_qualified", resolve_by_receiver_qualified),
             ("import_symbol", resolve_by_import_symbol_request),
@@ -828,6 +865,7 @@ mod tests {
         caller_qualified_symbols_by_id: HashMap<String, String>,
         symbols_by_file: HashMap<String, HashMap<String, String>>,
         go_import_aliases_by_file: HashMap<String, HashMap<String, String>>,
+        swift_var_types_by_file: HashMap<String, HashMap<String, String>>,
         go_var_types_by_file: HashMap<String, HashMap<String, String>>,
         rust_var_types_by_file: HashMap<String, HashMap<String, String>>,
         python_var_types_by_file: HashMap<String, HashMap<String, String>>,
@@ -848,6 +886,7 @@ mod tests {
                 caller_qualified_symbols_by_id: &self.caller_qualified_symbols_by_id,
                 symbols_by_file: &self.symbols_by_file,
                 go_import_aliases_by_file: &self.go_import_aliases_by_file,
+                swift_var_types_by_file: &self.swift_var_types_by_file,
                 go_var_types_by_file: &self.go_var_types_by_file,
                 rust_var_types_by_file: &self.rust_var_types_by_file,
                 python_var_types_by_file: &self.python_var_types_by_file,
@@ -923,6 +962,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -938,6 +978,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -986,6 +1027,7 @@ mod tests {
             HashMap::from([("caller".to_string(), "validators::JavaValidator::validate".to_string())]);
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1001,6 +1043,7 @@ mod tests {
             caller_qualified_symbols_by_id: &caller_qualified_symbols_by_id,
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1045,6 +1088,7 @@ mod tests {
             HashMap::from([("run".to_string(), "sym:run".to_string())]),
         )]);
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1063,6 +1107,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1097,12 +1142,83 @@ mod tests {
     }
 
     #[test]
+    fn swift_receiver_type_calls_resolve_exactly() {
+        let callable_symbols_by_name = HashMap::from([(
+            "makePromise".to_string(),
+            vec![(
+                "sym:makePromise".to_string(),
+                "Sources/NIOCore/EventLoop.swift".to_string(),
+            )],
+        )]);
+        let qualified_callable_symbols = vec![(
+            "EventLoop.makePromise".to_string(),
+            "sym:makePromise".to_string(),
+            "Sources/NIOCore/EventLoop.swift".to_string(),
+        )];
+        let caller_qualified_symbols_by_id = HashMap::new();
+        let symbols_by_file = HashMap::new();
+        let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::from([(
+            "Benchmarks/Benchmarks/NIOCoreBenchmarks/Benchmarks.swift".to_string(),
+            HashMap::from([("el".to_string(), "any EventLoop".to_string())]),
+        )]);
+        let go_var_types_by_file = HashMap::new();
+        let rust_var_types_by_file = HashMap::new();
+        let python_var_types_by_file = HashMap::new();
+        let python_module_aliases_by_file = HashMap::new();
+        let python_imported_symbol_modules_by_file = HashMap::new();
+        let imported_target_files_by_src = HashMap::new();
+        let exported_symbols_by_file = HashMap::new();
+        let files_set = HashSet::new();
+        let rust_local_module_roots_by_src_root = HashMap::new();
+        let ctx = CallResolutionContext {
+            callable_symbols_by_name: &callable_symbols_by_name,
+            qualified_callable_symbols: &qualified_callable_symbols,
+            caller_qualified_symbols_by_id: &caller_qualified_symbols_by_id,
+            symbols_by_file: &symbols_by_file,
+            go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
+            go_var_types_by_file: &go_var_types_by_file,
+            rust_var_types_by_file: &rust_var_types_by_file,
+            python_var_types_by_file: &python_var_types_by_file,
+            python_module_aliases_by_file: &python_module_aliases_by_file,
+            python_imported_symbol_modules_by_file: &python_imported_symbol_modules_by_file,
+            imported_target_files_by_src: &imported_target_files_by_src,
+            import_symbol_requests: &[],
+            exported_symbols_by_file: &exported_symbols_by_file,
+            files_set: &files_set,
+            rust_local_module_roots_by_src_root: &rust_local_module_roots_by_src_root,
+        };
+
+        match resolve_call_ref(
+            &ctx,
+            &CallRef {
+                caller_id: "caller".into(),
+                callee: "makePromise".into(),
+                language: "swift".into(),
+                caller_filepath: "Benchmarks/Benchmarks/NIOCoreBenchmarks/Benchmarks.swift".into(),
+                allow_same_file: false,
+                kind: CallRefKind::Member,
+                receiver_hint: Some("el".into()),
+                qualified_hint: Some("el.makePromise".into()),
+            },
+        ) {
+            CallResolution::ResolvedInternal(id, stage) => {
+                assert_eq!(id, "sym:makePromise");
+                assert_eq!(stage, "swift_receiver_type");
+            }
+            _ => panic!("expected swift receiver-type resolution"),
+        }
+    }
+
+    #[test]
     fn rust_build_script_stdlib_scoped_calls_are_filtered_as_external() {
         let callable_symbols_by_name = HashMap::new();
         let qualified_callable_symbols = vec![];
         let caller_qualified_symbols_by_id = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1119,6 +1235,7 @@ mod tests {
             caller_qualified_symbols_by_id: &caller_qualified_symbols_by_id,
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1160,6 +1277,7 @@ mod tests {
         let caller_qualified_symbols_by_id = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1175,6 +1293,7 @@ mod tests {
             caller_qualified_symbols_by_id: &caller_qualified_symbols_by_id,
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1212,6 +1331,7 @@ mod tests {
         let caller_qualified_symbols_by_id = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1227,6 +1347,7 @@ mod tests {
             caller_qualified_symbols_by_id: &caller_qualified_symbols_by_id,
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1280,6 +1401,7 @@ mod tests {
                 "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go".to_string(),
             )]),
         )]);
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1299,6 +1421,7 @@ mod tests {
             caller_qualified_symbols_by_id: &caller_qualified_symbols_by_id,
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1346,6 +1469,7 @@ mod tests {
         let caller_qualified_symbols_by_id = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::from([(
             "tests/test_apps/go/smoke_test.go".to_string(),
             HashMap::from([("registry".to_string(), "Registry".to_string())]),
@@ -1364,6 +1488,7 @@ mod tests {
             caller_qualified_symbols_by_id: &caller_qualified_symbols_by_id,
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1414,6 +1539,7 @@ mod tests {
         let caller_qualified_symbols_by_id = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::from([(
             "crates/ts-pack-core/src/lib.rs".to_string(),
@@ -1432,6 +1558,7 @@ mod tests {
             caller_qualified_symbols_by_id: &caller_qualified_symbols_by_id,
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1470,6 +1597,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1485,6 +1613,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1520,6 +1649,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1535,6 +1665,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1570,6 +1701,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1588,6 +1720,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1626,6 +1759,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1641,6 +1775,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1679,6 +1814,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1694,6 +1830,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1732,6 +1869,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1747,6 +1885,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1785,6 +1924,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1800,6 +1940,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1838,6 +1979,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1853,6 +1995,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1897,6 +2040,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1912,6 +2056,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -1950,6 +2095,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -1965,6 +2111,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2003,6 +2150,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2018,6 +2166,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2056,6 +2205,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2071,6 +2221,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2109,6 +2260,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2124,6 +2276,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2162,6 +2315,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2177,6 +2331,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2215,6 +2370,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2230,6 +2386,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2268,6 +2425,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2283,6 +2441,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2454,6 +2613,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2469,6 +2629,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2504,6 +2665,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2519,6 +2681,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2554,6 +2717,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2569,6 +2733,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2604,6 +2769,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2619,6 +2785,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2654,6 +2821,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2669,6 +2837,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2704,6 +2873,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2719,6 +2889,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,
@@ -2754,6 +2925,7 @@ mod tests {
         let callable_symbols_by_name = HashMap::new();
         let symbols_by_file = HashMap::new();
         let go_import_aliases_by_file = HashMap::new();
+        let swift_var_types_by_file = HashMap::new();
         let go_var_types_by_file = HashMap::new();
         let rust_var_types_by_file = HashMap::new();
         let python_var_types_by_file = HashMap::new();
@@ -2769,6 +2941,7 @@ mod tests {
             caller_qualified_symbols_by_id: &HashMap::new(),
             symbols_by_file: &symbols_by_file,
             go_import_aliases_by_file: &go_import_aliases_by_file,
+            swift_var_types_by_file: &swift_var_types_by_file,
             go_var_types_by_file: &go_var_types_by_file,
             rust_var_types_by_file: &rust_var_types_by_file,
             python_var_types_by_file: &python_var_types_by_file,

@@ -3,7 +3,13 @@ use std::collections::{HashMap, HashSet};
 use tree_sitter_language_pack as ts_pack;
 
 pub(crate) fn normalize_swift_type(raw: &str) -> Option<String> {
-    let mut s = raw.trim().trim_end_matches('?').trim_end_matches('!').to_string();
+    let mut s = raw.trim().to_string();
+    for prefix in ["any ", "some ", "isolated ", "borrowing ", "consuming ", "sending "] {
+        if let Some(rest) = s.strip_prefix(prefix) {
+            s = rest.trim().to_string();
+        }
+    }
+    s = s.trim_end_matches('?').trim_end_matches('!').trim().to_string();
     if let Some(idx) = s.find('<') {
         s.truncate(idx);
     }
@@ -126,15 +132,12 @@ pub(crate) fn parse_swift_var_types(source: &str) -> HashMap<String, String> {
 
         if let Some(idx) = rest.find(':') {
             let type_part = rest[idx + 1..].trim();
-            let mut ty = String::new();
-            for ch in type_part.chars() {
-                if ch.is_alphanumeric() || ch == '_' || ch == '.' || ch == '<' || ch == '>' || ch == '?' || ch == '!' {
-                    ty.push(ch);
-                } else {
-                    break;
-                }
-            }
-            if let Some(tn) = normalize_swift_type(&ty) {
+            let type_segment = type_part
+                .split(|ch: char| matches!(ch, '=' | ',' | ')' | '{'))
+                .next()
+                .unwrap_or(type_part)
+                .trim();
+            if let Some(tn) = normalize_swift_type(type_segment) {
                 map.insert(name, tn);
             }
             continue;
@@ -241,5 +244,17 @@ mod tests {
         assert_eq!(vars.get("task"), Some(&"ServiceTask".to_string()));
         assert_eq!(vars.get("nested"), Some(&"ApiClient".to_string()));
         assert_eq!(vars.get("response"), Some(&"ServiceTask".to_string()));
+    }
+
+    #[test]
+    fn parses_swift_existentials_and_opaque_annotations() {
+        let source = r#"
+        let loop: any EventLoop = EmbeddedEventLoop()
+        let channel: some Channel = makeChannel()
+        "#;
+
+        let vars = parse_swift_var_types(source);
+        assert_eq!(vars.get("loop"), Some(&"EventLoop".to_string()));
+        assert_eq!(vars.get("channel"), Some(&"Channel".to_string()));
     }
 }

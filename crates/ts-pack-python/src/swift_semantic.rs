@@ -12,6 +12,7 @@ struct SwiftSymbolRecord {
     base_name: String,
     kind: String,
     qualified_name: Option<String>,
+    extended_type: Option<String>,
     start_line: usize,
     end_line: usize,
     start_byte: usize,
@@ -25,6 +26,7 @@ struct SwiftSymbolRecord {
 struct GraphSymbolRow {
     sid: String,
     name: String,
+    kind: String,
     start_line: usize,
     end_line: usize,
 }
@@ -69,6 +71,10 @@ fn clean_name(value: &str) -> String {
 
 fn base_name(name: &str) -> String {
     clean_name(name).split('(').next().unwrap_or("").trim().to_string()
+}
+
+fn swift_extension_qualified_name(type_name: &str, filepath: &str, start_line: usize) -> String {
+    format!("extension {type_name}@{filepath}:{start_line}")
 }
 
 fn canonical_project_id(project_id: &str) -> String {
@@ -197,7 +203,8 @@ pub(crate) fn json_to_bolt(v: Value) -> neo4rs::BoltType {
 fn match_symbol_record(record: &SwiftSymbolRecord, symbols: &[GraphSymbolRow]) -> Option<GraphSymbolRow> {
     let record_name = clean_name(&record.name);
     let record_base = clean_name(&record.base_name);
-    let mut candidates: Vec<(usize, usize, usize, usize, GraphSymbolRow)> = Vec::new();
+    let expected_kind = swift_symbol_label_and_kind(&record.kind).map(|(_, kind)| kind);
+    let mut candidates: Vec<(usize, usize, usize, usize, usize, GraphSymbolRow)> = Vec::new();
     for sym in symbols {
         let sym_name = clean_name(&sym.name);
         let sym_base = base_name(&sym_name);
@@ -208,6 +215,7 @@ fn match_symbol_record(record: &SwiftSymbolRecord, symbols: &[GraphSymbolRow]) -
             - std::cmp::max(record.start_line, sym.start_line) as isize;
         let distance = record.start_line.abs_diff(sym.start_line) + record.end_line.abs_diff(sym.end_line);
         candidates.push((
+            if expected_kind == Some(sym.kind.as_str()) { 0 } else { 1 },
             if record_name == sym_name { 0 } else { 1 },
             if overlap >= 0 { 0 } else { 1 },
             distance,
@@ -220,11 +228,18 @@ fn match_symbol_record(record: &SwiftSymbolRecord, symbols: &[GraphSymbolRow]) -
             .then(a.1.cmp(&b.1))
             .then(a.2.cmp(&b.2))
             .then(a.3.cmp(&b.3))
+            .then(a.4.cmp(&b.4))
     });
-    candidates.into_iter().next().map(|entry| entry.4)
+    candidates.into_iter().next().map(|entry| entry.5)
 }
 
-fn structure_records_from_value(data: &Value, raw: &[u8], lines: &[&str], out: &mut Vec<SwiftSymbolRecord>) {
+fn structure_records_from_value(
+    data: &Value,
+    raw: &[u8],
+    lines: &[&str],
+    rel_path: &str,
+    out: &mut Vec<SwiftSymbolRecord>,
+) {
     let items = data
         .get("key.substructure")
         .and_then(Value::as_array)
@@ -248,17 +263,28 @@ fn structure_records_from_value(data: &Value, raw: &[u8], lines: &[&str], out: &
             .collect::<HashSet<_>>()
             .into_iter()
             .collect::<Vec<_>>();
+        let extended_type = if kind.contains(".extension") {
+            let ty = clean_inherited_type_name(&name);
+            if ty.is_empty() { None } else { Some(ty) }
+        } else {
+            None
+        };
         if kind.starts_with("source.lang.swift.decl") && !name.is_empty() {
             let doc_comment = clean_name(item.get("key.doc.comment").and_then(Value::as_str).unwrap_or(""));
+            let qualified_name = if let Some(type_name) = extended_type.as_deref() {
+                Some(swift_extension_qualified_name(type_name, rel_path, start_line))
+            } else {
+                item.get("key.name")
+                    .and_then(Value::as_str)
+                    .map(clean_name)
+                    .filter(|value| !value.is_empty())
+            };
             out.push(SwiftSymbolRecord {
                 name: name.clone(),
                 base_name: base_name(&name),
                 kind,
-                qualified_name: item
-                    .get("key.name")
-                    .and_then(Value::as_str)
-                    .map(clean_name)
-                    .filter(|value| !value.is_empty()),
+                qualified_name,
+                extended_type,
                 start_line,
                 end_line,
                 start_byte: offset,
@@ -275,7 +301,7 @@ fn structure_records_from_value(data: &Value, raw: &[u8], lines: &[&str], out: &
                 inherited_types,
             });
         }
-        structure_records_from_value(&item, raw, lines, out);
+        structure_records_from_value(&item, raw, lines, rel_path, out);
     }
 }
 
@@ -299,7 +325,8 @@ fn extract_swift_structure_records(sourcekitten: &str, file_path: &Path) -> Vec<
     let text = String::from_utf8_lossy(&raw);
     let lines = text.lines().collect::<Vec<_>>();
     let mut records = Vec::new();
-    structure_records_from_value(&data, &raw, &lines, &mut records);
+    let rel_path = file_path.to_string_lossy().replace('\\', "/");
+    structure_records_from_value(&data, &raw, &lines, &rel_path, &mut records);
     records
 }
 
@@ -537,6 +564,7 @@ fn semantic_index_records(
                         base_name: base_name(&name),
                         kind: clean_name(map.get("key.kind").and_then(Value::as_str).unwrap_or("")),
                         qualified_name: Some(name),
+                        extended_type: None,
                         start_line: 0,
                         end_line: 0,
                         start_byte: 0,
@@ -573,6 +601,7 @@ fn merged_swift_structure_records(
                 "base_name": record.base_name,
                 "kind": record.kind,
                 "qualified_name": record.qualified_name,
+                "extended_type": record.extended_type,
                 "start_line": record.start_line,
                 "end_line": record.end_line,
                 "start_byte": record.start_byte,
@@ -640,11 +669,8 @@ pub fn extract_swift_semantic_facts_value(project_path: &str) -> Value {
                             semantic_usr_by_base_name.entry(record.base_name).or_insert(usr);
                         }
                     }
-                    let merged = merged_swift_structure_records(
-                        &rel_path,
-                        structure_records,
-                        &semantic_usr_by_base_name,
-                    );
+                    let merged =
+                        merged_swift_structure_records(&rel_path, structure_records, &semantic_usr_by_base_name);
                     if !merged.is_empty() {
                         out.insert(rel_path, Value::Array(merged));
                     }
@@ -663,11 +689,7 @@ pub fn extract_swift_semantic_facts_value(project_path: &str) -> Value {
                 Err(_) => continue,
             };
             let structure_records = extract_swift_structure_records(&sourcekitten, abs_path);
-            let merged = merged_swift_structure_records(
-                &rel_path,
-                structure_records,
-                &semantic_usr_by_base_name,
-            );
+            let merged = merged_swift_structure_records(&rel_path, structure_records, &semantic_usr_by_base_name);
             if !merged.is_empty() {
                 out.insert(rel_path, Value::Array(merged));
             }
@@ -690,6 +712,7 @@ async fn load_swift_symbols(
                  RETURN f.filepath AS filepath,
                         s.id AS sid,
                         s.name AS name,
+                        head([label IN labels(s) WHERE label <> 'Node']) AS kind,
                         s.start_line AS start_line,
                         s.end_line AS end_line
                  ORDER BY filepath, start_line, end_line, name",
@@ -713,11 +736,13 @@ async fn load_swift_symbols(
         let filepath: String = row.get("filepath").unwrap_or_default();
         let sid: String = row.get("sid").unwrap_or_default();
         let name: String = row.get("name").unwrap_or_default();
+        let kind: String = row.get("kind").unwrap_or_default();
         let start_line: i64 = row.get("start_line").unwrap_or(0);
         let end_line: i64 = row.get("end_line").unwrap_or(0);
         rows_by_file.entry(filepath).or_default().push(GraphSymbolRow {
             sid,
             name,
+            kind,
             start_line: start_line.max(0) as usize,
             end_line: end_line.max(0) as usize,
         });
@@ -741,18 +766,28 @@ async fn write_swift_enrichment(
              MATCH (s:Node {project_id:$pid, id:row.sid})
              CALL {
                  WITH s
-                 OPTIONAL MATCH (s)-[old_rel:SWIFT_INHERITS_TYPE]->(:SwiftTypeRef)
+                 OPTIONAL MATCH (s)-[old_rel:SWIFT_INHERITS_TYPE]->(:SwiftTypeRef {project_id:$pid})
                  DELETE old_rel
                  RETURN count(*) AS cleared_swift_rel_count
              }
              CALL {
                  WITH s
-                 OPTIONAL MATCH (s)-[old_rel:IMPLEMENTS_TYPE]->(t:Node {project_id:$pid})
+                 OPTIONAL MATCH (s)-[old_rel:IMPLEMENTS_TYPE|SWIFT_EXTENDS_TYPE]->(t:Node {project_id:$pid})
                  DELETE old_rel
                  RETURN count(*) AS cleared_impl_rel_count
              }
              SET s.swift_sourcekitten = true,
                  s.swift_sourcekitten_kind = row.kind,
+                 s.swift_extended_type = CASE
+                     WHEN row.extended_type IS NOT NULL AND trim(row.extended_type) <> ''
+                     THEN row.extended_type
+                     ELSE s.swift_extended_type
+                 END,
+                 s.qualified_name = CASE
+                     WHEN row.qualified_name IS NOT NULL AND trim(row.qualified_name) <> ''
+                     THEN row.qualified_name
+                     ELSE s.qualified_name
+                 END,
                  s.swift_usr = CASE
                      WHEN row.usr IS NOT NULL AND trim(row.usr) <> '' THEN row.usr
                      ELSE s.swift_usr
@@ -787,6 +822,16 @@ async fn write_swift_enrichment(
                  MERGE (s)-[implements_rel:IMPLEMENTS_TYPE]->(t)
                  SET implements_rel.last_seen_run = $run_id
                  RETURN count(*) AS implementation_rel_count
+             }
+             CALL {
+                 WITH s, row
+                 WITH s, row WHERE row.extended_type IS NOT NULL AND trim(row.extended_type) <> ''
+                 MATCH (t:Node {project_id:$pid, name:row.extended_type})
+                 WHERE (t:Struct OR t:Class OR t:Enum OR t:Protocol OR t:Interface OR t:Trait OR t:TypeAlias)
+                   AND elementId(t) <> elementId(s)
+                 MERGE (s)-[extends_rel:SWIFT_EXTENDS_TYPE]->(t)
+                 SET extends_rel.last_seen_run = $run_id
+                 RETURN count(*) AS extension_rel_count
              }
              RETURN count(s) AS updated",
             )
@@ -975,6 +1020,11 @@ pub async fn enrich_swift_graph_async(
                     .and_then(Value::as_str)
                     .map(clean_name)
                     .filter(|value| !value.is_empty()),
+                extended_type: record
+                    .get("extended_type")
+                    .and_then(Value::as_str)
+                    .map(clean_name)
+                    .filter(|value| !value.is_empty()),
                 start_line: record.get("start_line").and_then(Value::as_u64).unwrap_or(0) as usize,
                 end_line: record.get("end_line").and_then(Value::as_u64).unwrap_or(0) as usize,
                 start_byte: record.get("start_byte").and_then(Value::as_u64).unwrap_or(0) as usize,
@@ -1021,6 +1071,8 @@ pub async fn enrich_swift_graph_async(
                     updates.push(json!({
                         "sid": sid,
                         "kind": item.kind,
+                        "qualified_name": item.qualified_name,
+                        "extended_type": item.extended_type,
                         "usr": item.usr,
                         "doc_comment": item.doc_comment,
                         "inherited_types": item.inherited_types,
@@ -1032,6 +1084,8 @@ pub async fn enrich_swift_graph_async(
             updates.push(json!({
                 "sid": matched_symbol.sid,
                 "kind": item.kind,
+                "qualified_name": item.qualified_name,
+                "extended_type": item.extended_type,
                 "usr": item.usr,
                 "doc_comment": item.doc_comment,
                 "inherited_types": item.inherited_types,
