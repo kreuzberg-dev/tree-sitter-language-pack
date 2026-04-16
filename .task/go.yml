@@ -11,14 +11,14 @@ tasks:
   build:
     desc: Build Go bindings (requires FFI built first)
     deps: [build:ffi]
-    dir: packages/go/v1
+    dir: packages/go
     cmds:
       - go build -tags tspack_dev ./...
 
   test:
     desc: Run Go unit tests
     deps: [build:ffi]
-    dir: packages/go/v1
+    dir: packages/go
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
@@ -27,26 +27,26 @@ tasks:
   lint:
     desc: Lint and vet Go code (requires FFI built first)
     deps: [build:ffi]
-    dir: packages/go/v1
+    dir: packages/go
     cmds:
       - go vet -tags tspack_dev ./...
 
   lint:check:
     desc: Check Go linting without modifications (CI)
     deps: [build:ffi]
-    dir: packages/go/v1
+    dir: packages/go
     cmds:
       - go vet -tags tspack_dev ./...
 
   format:
     desc: Format Go code
-    dir: packages/go/v1
+    dir: packages/go
     cmds:
       - gofmt -w .
 
   format:check:
     desc: Check Go formatting
-    dir: packages/go/v1
+    dir: packages/go
     cmds:
       - test -z "$(gofmt -l .)"
 
@@ -67,7 +67,7 @@ tasks:
 
   update:
     desc: Update Go dependencies and linters
-    dir: packages/go/v1
+    dir: packages/go
     cmds:
       - echo "Updating Go dependencies and linters..."
       - go get -u ./...
@@ -77,7 +77,7 @@ tasks:
 
   clean:
     desc: Clean Go build cache
-    dir: packages/go/v1
+    dir: packages/go
     cmds:
       - go clean -cache
 

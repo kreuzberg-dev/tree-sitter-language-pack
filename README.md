@@ -13,7 +13,7 @@
     <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack-wasm?label=WASM&color=007ec6" alt="Wasm">
   </a>  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
-  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1">
+  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go">
     <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6" alt="Go">
   </a>  <a href="https://www.nuget.org/packages/TreeSitterLanguagePack">
     <img src="https://img.shields.io/nuget/v/TreeSitterLanguagePack?label=C%23&color=007ec6" alt="Csharp">
@@ -118,10 +118,10 @@ See [Node.js README](crates/ts-pack-node/README.md) for full documentation.
 ### Go
 
 ```sh
-go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1
+go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
 ```
 
-See [Go README](packages/go/v1/README.md) for full documentation.
+See [Go README](packages/go/README.md) for full documentation.
 
 ### Java
 
@@ -239,7 +239,7 @@ This pack includes 305+ languages. See the [full language list](docs/supported-l
 - [Rust](crates/ts-pack-core/README.md) -- Rust core library providing access to 305 tree-sitter parsers with on-demand download and caching support.
 - [Python](crates/ts-pack-python/README.md) -- Python bindings for tree-sitter-language-pack, providing access to 305 pre-compiled tree-sitter parsers with on-demand downloads.
 - [Node.js](crates/ts-pack-node/README.md) -- Node.js NAPI bindings for tree-sitter-language-pack with on-demand parser downloads.
-- [Go](packages/go/v1/README.md) -- Go bindings for tree-sitter-language-pack with on-demand parser caching.
+- [Go](packages/go/README.md) -- Go bindings for tree-sitter-language-pack with on-demand parser caching.
 - [Java](crates/ts-pack-java/README.md) -- Java bindings for tree-sitter-language-pack with on-demand parser downloads (JDK 22+).
 - [Elixir](crates/ts-pack-elixir/README.md) -- Elixir bindings for tree-sitter-language-pack with on-demand parser downloads.
 - [Ruby](crates/ts-pack-ruby/README.md) -- Ruby bindings for tree-sitter-language-pack with on-demand parser downloads.

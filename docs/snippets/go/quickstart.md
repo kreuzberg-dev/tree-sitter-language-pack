@@ -4,7 +4,7 @@ package main
 import (
     "fmt"
     "log"
-    tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
+    tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
 func main() {

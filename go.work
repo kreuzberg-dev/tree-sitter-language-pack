@@ -2,6 +2,6 @@ go 1.26
 
 use (
 	./e2e/go
-	./packages/go/v1
+	./packages/go
 	./tests/test_apps/go
 )

@@ -36,8 +36,8 @@ packages/csharp/**/obj/
 packages/csharp/**/runtimes/
 
 # Go vendored FFI artifacts
-packages/go/v1/include/
-packages/go/v1/lib/
+packages/go/include/
+packages/go/lib/
 
 # Elixir build artifacts
 crates/ts-pack-elixir/deps/

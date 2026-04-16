@@ -11,7 +11,7 @@ on:
       - 'Cargo.lock'
       - 'crates/ts-pack-core/**'
       - 'crates/ts-pack-ffi/**'
-      - 'packages/go/v1/**'
+      - 'packages/go/**'
       - 'e2e/go/**'
       - 'fixtures/**'
       - 'tools/e2e-generator/**'
@@ -28,7 +28,7 @@ on:
       - 'Cargo.lock'
       - 'crates/ts-pack-core/**'
       - 'crates/ts-pack-ffi/**'
-      - 'packages/go/v1/**'
+      - 'packages/go/**'
       - 'e2e/go/**'
       - 'fixtures/**'
       - 'tools/e2e-generator/**'
@@ -174,15 +174,22 @@ jobs:
           cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
           mkdir -p crates/ts-pack-ffi/include
           cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
-          # Place in path CGO expects (relative to packages/go/v1/)
+          # Place in path CGO expects (relative to packages/go/)
           mkdir -p crates/ts-pack-ffi/target/release
           cp target/release/libts_pack_ffi.* crates/ts-pack-ffi/target/release/ 2>/dev/null || true
+
+      - name: Verify go.mod placement and module path
+        run: |
+          test -f packages/go/go.mod || (echo "ERROR: go.mod missing at packages/go/go.mod" && exit 1)
+          grep -q 'module github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go$' packages/go/go.mod \
+            || (echo "ERROR: module path in go.mod is wrong" && exit 1)
+          test ! -d packages/go/v1 || (echo "ERROR: stale v1/ directory still exists" && exit 1)
 
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
           go-version: "1.26"
-          cache-dependency-path: packages/go/v1/go.sum
+          cache-dependency-path: packages/go/go.sum
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1
@@ -228,7 +235,7 @@ jobs:
           cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
           mkdir -p crates/ts-pack-ffi/include
           cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
-          # Place in path CGO expects (relative to packages/go/v1/)
+          # Place in path CGO expects (relative to packages/go/)
           mkdir -p crates/ts-pack-ffi/target/release
           cp target/release/libts_pack_ffi.* crates/ts-pack-ffi/target/release/ 2>/dev/null || true
 
@@ -243,7 +250,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version: "1.26"
-          cache-dependency-path: packages/go/v1/go.sum
+          cache-dependency-path: packages/go/go.sum
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1
