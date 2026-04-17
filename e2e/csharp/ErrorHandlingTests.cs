@@ -28,6 +28,18 @@ public class ErrorHandlingTests
     }
 
     [Fact]
+    public void ErrorHandlingHaskellUnterminatedBlockComment()
+    {
+        // Regression: unterminated nested Haskell block comment must not crash the process. On gcc/aarch64 at -O2 with a pre-0.26.4 vendored array.h and without -fno-strict-aliasing, this input triggers heap corruption (malloc: mismatching next->prev_size) via a strict-aliasing miscompilation in the scanner's array_push hot loop.
+        if (!TsPackClient.HasLanguage("haskell"))
+        {
+            return; // Language 'haskell' not available
+        }
+        var langPtr = TsPackClient.GetLanguage("haskell");
+        Assert.True(langPtr != IntPtr.Zero, "Language pointer should not be null");
+    }
+
+    [Fact]
     public void ErrorHandlingInvalidSyntax()
     {
         // Parsing invalid syntax should produce a tree with error nodes.

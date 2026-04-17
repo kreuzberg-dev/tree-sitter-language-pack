@@ -25,6 +25,16 @@ def test_error_handling_empty_source():
     root = tree.root_node
 
 
+@pytest.mark.skipif(not has_language("haskell"), reason="Language 'haskell' not available")
+def test_error_handling_haskell_unterminated_block_comment():
+    """Regression: unterminated nested Haskell block comment must not crash the process. On gcc/aarch64 at -O2 with a pre-0.26.4 vendored array.h and without -fno-strict-aliasing, this input triggers heap corruption (malloc: mismatching next->prev_size) via a strict-aliasing miscompilation in the scanner's array_push hot loop."""
+    parser = get_parser("haskell")
+    tree = parser.parse(b"{-aaaaaaaaaaaaaa aaaa}\n    {-aaa (aaaaaaaaaa [aaaaaaaaaaaaa aaa")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert tree_has_error_nodes(root), "Tree should contain error nodes"
+
+
 @pytest.mark.skipif(not has_language("javascript"), reason="Language 'javascript' not available")
 def test_error_handling_invalid_syntax():
     """Parsing invalid syntax should produce a tree with error nodes."""
