@@ -2624,12 +2624,9 @@ jobs:
 
       - name: Create Go module tag
         if: ${{ needs.prepare.outputs.release_go == 'true' && needs.prepare.outputs.dry_run != 'true' }}
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          GO_TAG="packages/go/v${VERSION}"
-          echo "Creating Go module tag: $GO_TAG"
-          git tag "$GO_TAG" || echo "Tag already exists"
-          git push origin "$GO_TAG" 2>/dev/null || echo "Tag already pushed"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/publish/go/tag-and-push-go-module.sh "${{ needs.prepare.outputs.tag }}"
 
       - name: Publish release from draft state
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
