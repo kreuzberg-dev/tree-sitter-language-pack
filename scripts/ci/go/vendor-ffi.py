@@ -39,7 +39,7 @@ def lib_filename() -> str:
 
 def vendor(repo_root: Path) -> None:
     """Copy FFI header and static library into Go package."""
-    go_dir = repo_root / "packages" / "go" / "v1"
+    go_dir = repo_root / "packages" / "go"
     ffi_include = repo_root / "crates" / "ts-pack-ffi" / "include"
     ffi_lib = repo_root / "target" / "release" / lib_filename()
 
@@ -76,7 +76,7 @@ def vendor(repo_root: Path) -> None:
 
 def clean(repo_root: Path) -> None:
     """Remove vendored FFI artifacts from Go package."""
-    go_dir = repo_root / "packages" / "go" / "v1"
+    go_dir = repo_root / "packages" / "go"
 
     for subdir in ("include", "lib"):
         path = go_dir / subdir

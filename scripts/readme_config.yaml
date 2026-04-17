@@ -27,7 +27,7 @@ badges:
     link: "https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack"
   go:
     url: "https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6"
-    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1"
+    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go"
   csharp:
     url: "https://img.shields.io/nuget/v/TreeSitterLanguagePack?label=C%23&color=007ec6"
     link: "https://www.nuget.org/packages/TreeSitterLanguagePack"
@@ -177,17 +177,17 @@ languages:
   go:
     name: "Go"
     template: language_package.md.jinja
-    output_path: packages/go/v1/README.md
-    package_name: "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
+    output_path: packages/go/README.md
+    package_name: "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
     package_manager: [go]
     description: "Go bindings for tree-sitter-language-pack with on-demand parser caching."
-    install_command: "go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
+    install_command: "go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
     quick_start: |
       package main
 
       import (
           "fmt"
-          tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
+          tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
       )
 
       func main() {

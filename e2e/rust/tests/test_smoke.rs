@@ -4388,7 +4388,7 @@ fn smoke_rtf() {
     }
     // Smoke test: load rtf and parse a simple snippet
     let mut parser = tree_sitter_language_pack::get_parser("rtf").expect("Failed to get parser for 'rtf'");
-    let tree = parser.parse("x", None);
+    let tree = parser.parse("{\\rtf1 hello}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();

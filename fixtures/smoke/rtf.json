@@ -7,6 +7,6 @@
 	"description": "Smoke test: load rtf and parse a simple snippet",
 	"id": "smoke_rtf",
 	"language": "rtf",
-	"source_code": "x",
+	"source_code": "{\\rtf1 hello}",
 	"tags": ["smoke"]
 }

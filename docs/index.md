@@ -150,7 +150,7 @@ description: "Comprehensive tree-sitter grammar compilation with bindings for Py
 === "Go"
 
     ```bash
-    go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1
+    go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
     ```
 
 === "Java"
@@ -182,7 +182,7 @@ description: "Comprehensive tree-sitter grammar compilation with bindings for Py
 | :fontawesome-brands-python: Python | [`tree-sitter-language-pack`](https://pypi.org/project/tree-sitter-language-pack/) | 3.10+ |
 | :fontawesome-brands-js: Node.js | [`@kreuzberg/tree-sitter-language-pack`](https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack) | 18+ |
 | :fontawesome-brands-rust: Rust | [`ts-pack-core`](https://crates.io/crates/tree-sitter-language-pack) | 1.75+ |
-| :fontawesome-brands-golang: Go | [`packages/go/v1`](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1) | 1.26+ |
+| :fontawesome-brands-golang: Go | [`packages/go`](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go) | 1.26+ |
 | :fontawesome-brands-java: Java | [`dev.kreuzberg:tree-sitter-language-pack`](https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack) | 25+ |
 | :material-language-csharp: C# / .NET | [`TreeSitterLanguagePack`](https://www.nuget.org/packages/TreeSitterLanguagePack) | .NET 10+ |
 | :material-language-ruby: Ruby | [`tree_sitter_language_pack`](https://rubygems.org/gems/tree_sitter_language_pack) | 3.4+ |

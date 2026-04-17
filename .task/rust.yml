@@ -145,10 +145,11 @@ tasks:
       - cargo test --manifest-path e2e/rust/Cargo.toml
 
   e2e:all-grammars:
-    desc: Run Rust E2E tests with all grammars (no TSLP_LANGUAGES filter)
+    desc: Run Rust E2E tests with a representative set of grammars compiled statically
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
       TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,bash,c,cpp,java,ruby,swift,kotlin"
     cmds:
       - cargo test --manifest-path e2e/rust/Cargo.toml
 

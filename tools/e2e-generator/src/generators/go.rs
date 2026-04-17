@@ -45,7 +45,7 @@ go 1.26
 
 require github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go v0.0.0
 
-replace github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go => ../../packages/go/v1
+replace github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go => ../../packages/go
 "#;
     std::fs::write(dir.join("go.mod"), content).map_err(|e| format!("Failed to write go.mod: {e}"))
 }

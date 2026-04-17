@@ -93,11 +93,11 @@ fn main() {
 Requires Go 1.26+.
 
 ```bash
-go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1
+go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
 ```
 
 ```go
-import tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
+import tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 
 func main() {
     fmt.Println(tslp.LanguageCount()) // 305

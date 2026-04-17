@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Go: move package root from `packages/go/v1/` to `packages/go/` so the Go module proxy can resolve `go.mod` at the correct path — `go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go` now works (#97)
+- Go: fix CGO `SRCDIR`-relative include/lib paths (one fewer `../` after directory restructure)
+
 ## [1.6.0] - 2026-04-14
 
 ### Added

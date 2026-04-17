@@ -29,7 +29,7 @@ Part of the kreuzberg.dev ecosystem:
 - Python: https://pypi.org/project/tree-sitter-language-pack/
 - Node.js: https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack
 - Rust: https://crates.io/crates/tree-sitter-language-pack
-- Go: https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1
+- Go: https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go
 - Java: https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack
 - C# / .NET: https://www.nuget.org/packages/TreeSitterLanguagePack
 - Ruby: https://rubygems.org/gems/tree_sitter_language_pack
