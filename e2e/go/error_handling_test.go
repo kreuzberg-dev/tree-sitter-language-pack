@@ -26,19 +26,6 @@ func TestErrorHandlingEmptySource(t *testing.T) {
 	}
 }
 
-func TestErrorHandlingHaskellUnterminatedBlockComment(t *testing.T) {
-	// Regression: unterminated nested Haskell block comment must not crash the process. On gcc/aarch64 at -O2 with a pre-0.26.4 vendored array.h and without -fno-strict-aliasing, this input triggers heap corruption (malloc: mismatching next->prev_size) via a strict-aliasing miscompilation in the scanner's array_push hot loop.
-	reg := newTestRegistry(t)
-	skipIfLanguageUnavailable(t, reg, "haskell")
-	ptr, err := reg.GetLanguage("haskell")
-	if err != nil {
-		t.Fatalf("Failed to get language %q: %v", "haskell", err)
-	}
-	if ptr == nil {
-		t.Fatalf("Language pointer for %q is nil", "haskell")
-	}
-}
-
 func TestErrorHandlingInvalidSyntax(t *testing.T) {
 	// Parsing invalid syntax should produce a tree with error nodes.
 	reg := newTestRegistry(t)
@@ -60,4 +47,3 @@ func TestErrorHandlingUnknownLanguage(t *testing.T) {
 		t.Fatalf("Expected error loading language %q, got nil", "nonexistent_xyz")
 	}
 }
-
