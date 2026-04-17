@@ -255,7 +255,7 @@
 		"extensions": ["cs"],
 		"generate": true,
 		"repo": "https://github.com/tree-sitter/tree-sitter-c-sharp",
-		"rev": "5eb7f1fff6699695174af4fb62dbaf5fd544601d"
+		"rev": "cac6d5fb595f5811a076336682d5d595ac1c9e85"
 	},
 	"css": {
 		"branch": "master",
@@ -283,7 +283,7 @@
 	"cue": {
 		"extensions": ["cue"],
 		"repo": "https://github.com/eonpatapon/tree-sitter-cue",
-		"rev": "a9e713c2fa2da69de03ceb799807043420ca7c4b"
+		"rev": "dd7b90e0770ff18070c515937ba3c3d6d93db00e"
 	},
 	"cylc": {
 		"extensions": ["cylc"],
@@ -413,7 +413,7 @@
 	"enforce": {
 		"extensions": ["enforce"],
 		"repo": "https://github.com/simonvic/tree-sitter-enforce",
-		"rev": "eb2796871d966264cdb041b797416ef1757c8b4f"
+		"rev": "cb42835385ac6d4fc64fd7b3f962591b928ccc7d"
 	},
 	"erlang": {
 		"extensions": ["erl", "hrl"],
@@ -450,7 +450,7 @@
 		"branch": "master",
 		"extensions": ["fish"],
 		"repo": "https://github.com/ram02z/tree-sitter-fish",
-		"rev": "fa2143f5d66a9eb6c007ba9173525ea7aaafe788"
+		"rev": "f435b0bd772578c70e5d158b85267bb886316f88"
 	},
 	"foam": {
 		"extensions": [],
@@ -466,21 +466,21 @@
 		"branch": "master",
 		"extensions": ["f90", "f95", "f03", "f08", "f"],
 		"repo": "https://github.com/stadelmanma/tree-sitter-fortran",
-		"rev": "a8638eb185ecf87374599d985f52ce9d0c634425"
+		"rev": "2597b9a3f551b7c1e4668ca14bbe1502cb8414dc"
 	},
 	"fsharp": {
 		"branch": "main",
 		"directory": "fsharp",
 		"extensions": ["fs", "fsx"],
 		"repo": "https://github.com/ionide/tree-sitter-fsharp",
-		"rev": "594c500ecace8618db32dd1144307897277db067"
+		"rev": "5247c1197cb290fcaea0e0a793d32829c1396831"
 	},
 	"fsharp_signature": {
 		"branch": "main",
 		"directory": "fsharp_signature",
 		"extensions": ["fsi"],
 		"repo": "https://github.com/ionide/tree-sitter-fsharp",
-		"rev": "594c500ecace8618db32dd1144307897277db067"
+		"rev": "5247c1197cb290fcaea0e0a793d32829c1396831"
 	},
 	"func": {
 		"extensions": ["fc"],
@@ -490,10 +490,12 @@
 	"gap": {
 		"extensions": ["g", "gi"],
 		"repo": "https://github.com/gap-system/tree-sitter-gap",
-		"rev": "ed2480d42281586932920527823b307bc45052b8"
+		"rev": "3fa54a9bce964731f8a3e0fb80d55805dd4ec8f0"
 	},
 	"gdscript": {
-		"ambiguous": { "gd": ["gap"] },
+		"ambiguous": {
+			"gd": ["gap"]
+		},
 		"branch": "master",
 		"extensions": ["gd"],
 		"repo": "https://github.com/PrestonKnopp/tree-sitter-gdscript",
@@ -788,7 +790,7 @@
 	"kcl": {
 		"extensions": ["k"],
 		"repo": "https://github.com/kcl-lang/tree-sitter-kcl",
-		"rev": "b0b2eb38009e04035a6e266c7e11e541f3caab7c"
+		"rev": "746a127fb1cbef3891016618d671a1383440cb47"
 	},
 	"kconfig": {
 		"extensions": [],
@@ -931,7 +933,9 @@
 		"rev": "1c166a97a3481f385136394b950d9556d28af7b8"
 	},
 	"nginx": {
-		"ambiguous": { "conf": ["hocon"] },
+		"ambiguous": {
+			"conf": ["hocon"]
+		},
 		"extensions": ["conf", "nginx"],
 		"repo": "https://github.com/opa-oz/tree-sitter-nginx",
 		"rev": "47ade644d754cce57974aac44d2c9450e823d4f4"
@@ -1038,7 +1042,7 @@
 		"branch": "release",
 		"extensions": ["pl", "pm"],
 		"repo": "https://github.com/tree-sitter-perl/tree-sitter-perl",
-		"rev": "67887d64e479493888dba5a4daae4be5a84e8218"
+		"rev": "4d64ea48056f24a79a1be29925fe8462a80a7cd1"
 	},
 	"pgn": {
 		"branch": "master",
@@ -1196,7 +1200,7 @@
 	"razor": {
 		"extensions": ["razor", "cshtml"],
 		"repo": "https://github.com/tris203/tree-sitter-razor",
-		"rev": "fe46ce5ea7d844e53d59bc96f2175d33691c61c5"
+		"rev": "1e8ec29b7179329ce7cffcfae2c5347e8a00f7cf"
 	},
 	"rbs": {
 		"extensions": ["rbs"],
@@ -1277,7 +1281,7 @@
 		"branch": "master",
 		"extensions": ["scala"],
 		"repo": "https://github.com/tree-sitter/tree-sitter-scala",
-		"rev": "d71328b913037efe2e695e9aeb5065839dce335f"
+		"rev": "a06047ee441bd02ca6ebcc0f913737b7c6e178e1"
 	},
 	"scheme": {
 		"extensions": ["scm"],
@@ -1393,10 +1397,13 @@
 		"extensions": ["swift"],
 		"generate": true,
 		"repo": "https://github.com/alex-pinkus/tree-sitter-swift",
-		"rev": "64f26c3a6e9e6cf4f77165c8283e35a26b7825a7"
+		"rev": "e2b381615811f0dc5b6fb3fbc1a1b5046c1348b3"
 	},
 	"systemverilog": {
-		"ambiguous": { "sv": ["verilog"], "svh": ["verilog"] },
+		"ambiguous": {
+			"sv": ["verilog"],
+			"svh": ["verilog"]
+		},
 		"extensions": ["sv", "svh"],
 		"repo": "https://github.com/gmlarumbe/tree-sitter-systemverilog",
 		"rev": "293928578cb27fbd0005fcc5f09c09a1e8628c89"

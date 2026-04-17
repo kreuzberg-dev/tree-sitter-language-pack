@@ -49,7 +49,7 @@ repos:
 
   # Python: ruff (linting + formatting) + mypy (type checking)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.10
+    rev: v0.15.11
     hooks:
       - id: ruff
         args: ["--fix", "--unsafe-fixes"]
@@ -87,12 +87,12 @@ repos:
           ]
 
   - repo: https://github.com/bnjbvr/cargo-machete
-    rev: v0.9.1
+    rev: v0.9.2
     hooks:
       - id: cargo-machete
 
   - repo: https://github.com/EmbarkStudios/cargo-deny
-    rev: 0.19.2
+    rev: 0.19.4
     hooks:
       - id: cargo-deny
         args: ["check"]
@@ -124,7 +124,7 @@ repos:
 
   # AI Rules
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v3.11.5
+    rev: v3.12.0
     hooks:
       - id: ai-rulez-generate
 
