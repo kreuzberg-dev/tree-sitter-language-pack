@@ -59,7 +59,11 @@ fn selected_languages(definitions: &BTreeMap<String, LanguageDefinition>) -> Vec
     // Use TSLP_LANGUAGES env var to select a subset of languages to compile
     // statically. If not set, no languages are compiled statically — they are
     // downloaded at runtime via the `download` feature instead.
+    // Special value "all" compiles every language in language_definitions.json.
     if let Ok(langs) = env::var("TSLP_LANGUAGES") {
+        if langs.trim() == "all" {
+            return definitions.keys().cloned().collect();
+        }
         let selected: Vec<String> = langs.split(',').map(|s| s.trim().to_string()).collect();
         for name in &selected {
             if !name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
