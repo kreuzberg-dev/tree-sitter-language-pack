@@ -7,10 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-04-17
+
 ### Fixed
 
 - Go: move package root from `packages/go/v1/` to `packages/go/` so the Go module proxy can resolve `go.mod` at the correct path — `go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go` now works (#97)
 - Go: fix CGO `SRCDIR`-relative include/lib paths (one fewer `../` after directory restructure)
+- Remove `features = ["all"]` from e2e Rust test `Cargo.toml` — use `download` feature for runtime parser fetching
+- Remove 305 `lang-*` features to unblock crates.io publish (300 feature limit)
+- Regenerate READMEs for v1.6.0, fix Windows query cache test flake
+- Bump `rustls-webpki` to patch RUSTSEC-2026-0098 and RUSTSEC-2026-0099 (#99)
+- Fix MIME type inference in core build by embedding `language_definitions.json` in crate
+
+### Changed
+
+- Update dependencies across Python, Node.js, PHP, and Rust lockfiles
+- Replace feature group docs with `download`/`TSLP_LANGUAGES` documentation in READMEs
 
 ## [1.6.0] - 2026-04-14
 
