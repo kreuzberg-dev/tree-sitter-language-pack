@@ -170,6 +170,7 @@ fn compile_parser_dynamic(name: &str, c_symbol: Option<&str>, parser_dir: &Path,
         // GCC/Clang flags
         cmd.arg("-std=c11");
         cmd.arg("-O2");
+        cmd.arg("-fno-strict-aliasing");
         cmd.arg("-fPIC");
         for inc in &includes {
             cmd.arg(format!("-I{}", inc.display()));
@@ -187,6 +188,7 @@ fn compile_parser_dynamic(name: &str, c_symbol: Option<&str>, parser_dir: &Path,
             cpp_cmd.arg("-c");
             cpp_cmd.arg("-fPIC");
             cpp_cmd.arg("-O2");
+            cpp_cmd.arg("-fno-strict-aliasing");
             for inc in &includes {
                 cpp_cmd.arg(format!("-I{}", inc.display()));
             }
@@ -327,6 +329,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
         .file(&parser_c)
         .define("TREE_SITTER_HIDE_SYMBOLS", None)
         .flag_if_supported("-fvisibility=hidden")
+        .flag_if_supported("-fno-strict-aliasing")
         .warnings(false);
     build.std("c11");
     apply_wasm32_sysroot(&mut build);
@@ -355,6 +358,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
             .define("serialize", &*format!("tree_sitter_{name}_ext_serialize"))
             .define("scan_comment", &*format!("tree_sitter_{name}_ext_scan_comment"))
             .flag_if_supported("-fvisibility=hidden")
+            .flag_if_supported("-fno-strict-aliasing")
             .warnings(false);
         scanner_build.std("c11");
         apply_wasm32_sysroot(&mut scanner_build);
@@ -380,6 +384,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
             .define("deserialize", &*format!("tree_sitter_{name}_ext_deserialize"))
             .define("serialize", &*format!("tree_sitter_{name}_ext_serialize"))
             .flag_if_supported("-fvisibility=hidden")
+            .flag_if_supported("-fno-strict-aliasing")
             .warnings(false)
             .cpp(true);
         apply_wasm32_sysroot(&mut cpp_build);
