@@ -712,6 +712,10 @@ fn main() {
     // Prefer workspace source (always up-to-date during development).
     // Fall back to crate-local copy (present in crates.io packages).
     let definitions_path = if workspace_path.exists() {
+        // Keep the crate-local copy in sync so `cargo publish` includes it.
+        if crate_local.parent().is_some_and(|p| p.exists()) {
+            let _ = fs::copy(&workspace_path, &crate_local);
+        }
         workspace_path
     } else {
         crate_local

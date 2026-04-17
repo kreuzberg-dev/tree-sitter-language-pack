@@ -12,19 +12,13 @@ presets:
 builtins:
   - rust
   - python
-  - pyo3
   - typescript
-  - napi-rs
   - go
   - java
   - ruby
-  - magnus
   - php
-  - ext-php-rs
   - csharp
   - elixir
-  - rustler
-  - wasm
   - security
   - git-workflow
   - code-quality
@@ -38,6 +32,11 @@ includes:
   - name: kreuzberg-core
     source: https://github.com/kreuzberg-dev/ai-rulez.git
     path: modules/core
+    local_override: ../ai-rulez
+    merge_strategy: local-override
+  - name: kreuzberg-languages
+    source: https://github.com/kreuzberg-dev/ai-rulez.git
+    path: modules/languages
     local_override: ../ai-rulez
     merge_strategy: local-override
   - name: kreuzberg-cicd
