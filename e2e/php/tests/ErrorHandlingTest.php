@@ -29,6 +29,18 @@ class ErrorHandlingTest extends TestCase
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
+    public function test_error_handling_haskell_unterminated_block_comment(): void
+    {
+        // Regression: unterminated nested Haskell block comment must not crash the process. On gcc/aarch64 at -O2 with a pre-0.26.4 vendored array.h and without -fno-strict-aliasing, this input triggers heap corruption (malloc: mismatching next->prev_size) via a strict-aliasing miscompilation in the scanner's array_push hot loop.
+        if (!\ts_pack_has_language('haskell')) {
+            $this->markTestSkipped('Language \'haskell\' not available');
+        }
+        $langPtr = \ts_pack_get_language('haskell');
+        $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
+        $sexp = \ts_pack_parse_string('haskell', "{-aaaaaaaaaaaaaa aaaa}\n    {-aaa (aaaaaaaaaa [aaaaaaaaaaaaa aaa");
+        $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
+    }
+
     public function test_error_handling_invalid_syntax(): void
     {
         // Parsing invalid syntax should produce a tree with error nodes.

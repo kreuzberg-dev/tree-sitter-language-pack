@@ -22,6 +22,21 @@ fn error_handling_empty_source() {
 }
 
 #[test]
+fn error_handling_haskell_unterminated_block_comment() {
+    if !tree_sitter_language_pack::has_language("haskell") {
+        eprintln!("Skipping: language 'haskell' not available");
+        return;
+    }
+    // Regression: unterminated nested Haskell block comment must not crash the process. On gcc/aarch64 at -O2 with a pre-0.26.4 vendored array.h and without -fno-strict-aliasing, this input triggers heap corruption (malloc: mismatching next->prev_size) via a strict-aliasing miscompilation in the scanner's array_push hot loop.
+    let mut parser = tree_sitter_language_pack::get_parser("haskell").expect("Failed to get parser for 'haskell'");
+    let tree = parser.parse("{-aaaaaaaaaaaaaa aaaa}\n    {-aaa (aaaaaaaaaa [aaaaaaaaaaaaa aaa", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(e2e_tests::tree_has_error_nodes(root), "Tree should contain error nodes");
+}
+
+#[test]
 fn error_handling_invalid_syntax() {
     if !tree_sitter_language_pack::has_language("javascript") {
         eprintln!("Skipping: language 'javascript' not available");
