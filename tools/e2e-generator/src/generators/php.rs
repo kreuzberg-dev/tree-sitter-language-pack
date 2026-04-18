@@ -42,7 +42,7 @@ fn write_composer_json(dir: &Path) -> Result<(), String> {
         "php": ">=8.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "^11.0"
+        "phpunit/phpunit": "^13.0"
     },
     "autoload-dev": {
         "psr-4": {

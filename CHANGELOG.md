@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-04-18
+
+### Fixed
+
+- Compile bundled grammars with `-fno-strict-aliasing` to prevent undefined behavior (#100)
+
+### Changed
+
+- Update dependencies across lockfiles
+- Regenerate READMEs for 1.6.1 version bump (#101)
+
 ## [1.6.1] - 2026-04-17
 
 ### Fixed

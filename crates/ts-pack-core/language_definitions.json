@@ -418,7 +418,7 @@
 	"erlang": {
 		"extensions": ["erl", "hrl"],
 		"repo": "https://github.com/WhatsApp/tree-sitter-erlang",
-		"rev": "1d78195c4fbb1fc027eb3e4220427f1eb8bfc89e"
+		"rev": "520202ffbedfdb68048073af6040d102c9290dce"
 	},
 	"facility": {
 		"extensions": ["fsd"],
@@ -790,7 +790,7 @@
 	"kcl": {
 		"extensions": ["k"],
 		"repo": "https://github.com/kcl-lang/tree-sitter-kcl",
-		"rev": "746a127fb1cbef3891016618d671a1383440cb47"
+		"rev": "026f40fb0a59a35da75b9c8801d52f6c14feda24"
 	},
 	"kconfig": {
 		"extensions": [],
@@ -995,14 +995,14 @@
 		"directory": "grammars/ocaml",
 		"extensions": ["ml"],
 		"repo": "https://github.com/tree-sitter/tree-sitter-ocaml",
-		"rev": "be8d9493f39f2425d625aabb7259452085be91df"
+		"rev": "35c9d3ef57b7f8bfeda21b3b9b866f8669d0bc85"
 	},
 	"ocaml_interface": {
 		"branch": "master",
 		"directory": "grammars/interface",
 		"extensions": ["mli"],
 		"repo": "https://github.com/tree-sitter/tree-sitter-ocaml",
-		"rev": "be8d9493f39f2425d625aabb7259452085be91df"
+		"rev": "35c9d3ef57b7f8bfeda21b3b9b866f8669d0bc85"
 	},
 	"ocamllex": {
 		"extensions": ["mll"],
