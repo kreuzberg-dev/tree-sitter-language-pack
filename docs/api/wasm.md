@@ -281,14 +281,14 @@ The config is a plain JS object (not a JSON string). It is converted internally 
 
 - `source` (string): Source code
 - `config` (object): Configuration object. Must contain at least `language`. Optional fields:
-    - `structure` (bool, default true): Extract structural items
-    - `imports` (bool, default true): Extract import statements
-    - `exports` (bool, default true): Extract export statements
-    - `comments` (bool, default false): Extract comments
-    - `docstrings` (bool, default false): Extract docstrings
-    - `symbols` (bool, default false): Extract symbol definitions
-    - `diagnostics` (bool, default false): Include parse diagnostics
-    - `chunk_max_size` (number or null, default null): Maximum chunk size in bytes
+  - `structure` (bool, default true): Extract structural items
+  - `imports` (bool, default true): Extract import statements
+  - `exports` (bool, default true): Extract export statements
+  - `comments` (bool, default false): Extract comments
+  - `docstrings` (bool, default false): Extract docstrings
+  - `symbols` (bool, default false): Extract symbol definitions
+  - `diagnostics` (bool, default false): Include parse diagnostics
+  - `chunk_max_size` (number or null, default null): Maximum chunk size in bytes
 
 **Returns:** object - Parsed result as a native JS object
 
@@ -321,20 +321,20 @@ The config is a plain JS object (not a JSON string). It is converted internally 
 
 - `source` (string): Source code to extract from
 - `config` (object): Configuration object. Fields:
-    - `language` (string, required): Language name
-    - `patterns` (object, required): Named patterns to run. Each key maps to an object with:
-        - `query` (string, required): Tree-sitter query in S-expression syntax
-        - `capture_output` (string, default `"Full"`): What to capture -- `"Text"`, `"Node"`, or `"Full"`
-        - `child_fields` (string[], default `[]`): Field names to extract from child nodes
-        - `max_results` (number | null, default null): Maximum number of matches to return
-        - `byte_range` ([number, number] | null, default null): Restrict matches to a byte range
+  - `language` (string, required): Language name
+  - `patterns` (object, required): Named patterns to run. Each key maps to an object with:
+    - `query` (string, required): tree-sitter query in S-expression syntax
+    - `capture_output` (string, default `"Full"`): What to capture -- `"Text"`, `"Node"`, or `"Full"`
+    - `child_fields` (string[], default `[]`): Field names to extract from child nodes
+    - `max_results` (number | null, default null): Maximum number of matches to return
+    - `byte_range` ([number, number] | null, default null): Restrict matches to a byte range
 
 **Returns:** object - Extraction results. The top-level object contains:
 
 - `language` (string): The language used
 - `results` (object): Keyed by pattern name, each value contains:
-    - `matches` (array): Each match has `pattern_index` (number) and `captures` (array). Each capture has `name` (string), `text` (string | null), `node` (object | null), `child_fields` (object), and `start_byte` (number).
-    - `total_count` (number): Total matches before `max_results` truncation
+  - `matches` (array): Each match has `pattern_index` (number) and `captures` (array). Each capture has `name` (string), `text` (string | null), `node` (object | null), `child_fields` (object), and `start_byte` (number).
+  - `total_count` (number): Total matches before `max_results` truncation
 
 **Throws:** Error on invalid config, unknown language, or extraction failure.
 
@@ -375,11 +375,11 @@ The config is a plain JS object with the same shape as the config for `extract`.
 
 - `valid` (boolean): Whether all patterns are valid
 - `patterns` (object): Per-pattern validation, each with:
-    - `valid` (boolean): Whether this pattern compiled successfully
-    - `capture_names` (string[]): Capture names defined in the query
-    - `pattern_count` (number): Number of patterns in the query
-    - `warnings` (string[]): Non-fatal warnings
-    - `errors` (string[]): Fatal errors (e.g., query syntax errors)
+  - `valid` (boolean): Whether this pattern compiled successfully
+  - `capture_names` (string[]): Capture names defined in the query
+  - `pattern_count` (number): Number of patterns in the query
+  - `warnings` (string[]): Non-fatal warnings
+  - `errors` (string[]): Fatal errors (e.g., query syntax errors)
 
 **Throws:** Error on invalid config or unknown language.
 

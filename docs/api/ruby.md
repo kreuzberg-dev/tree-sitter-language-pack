@@ -57,9 +57,9 @@ Initialize the language pack with optional pre-downloads.
 **Parameters:**
 
 - `config_json` (String): JSON string with optional fields:
-    - `cache_dir` (string): Custom cache directory
-    - `languages` (array): Language names to download
-    - `groups` (array): Language groups to download
+  - `cache_dir` (string): Custom cache directory
+  - `languages` (array): Language names to download
+  - `groups` (array): Language groups to download
 
 **Returns:** nil
 
@@ -80,7 +80,7 @@ Apply configuration without downloading. Use to set a custom cache directory bef
 **Parameters:**
 
 - `config_json` (String): JSON string with optional fields:
-    - `cache_dir` (string): Custom cache directory
+  - `cache_dir` (string): Custom cache directory
 
 **Returns:** nil
 
@@ -469,14 +469,14 @@ Process source code and extract metadata as a JSON string.
 
 - `source` (String): Source code
 - `config_json` (String): JSON string with processing configuration. Must contain at least `"language"`. Optional fields:
-    - `structure` (bool, default true): Extract structural items
-    - `imports` (bool, default true): Extract import statements
-    - `exports` (bool, default true): Extract export statements
-    - `comments` (bool, default false): Extract comments
-    - `docstrings` (bool, default false): Extract docstrings
-    - `symbols` (bool, default false): Extract symbol definitions
-    - `diagnostics` (bool, default false): Include parse diagnostics
-    - `chunk_max_size` (int or null, default null): Maximum chunk size in bytes
+  - `structure` (bool, default true): Extract structural items
+  - `imports` (bool, default true): Extract import statements
+  - `exports` (bool, default true): Extract export statements
+  - `comments` (bool, default false): Extract comments
+  - `docstrings` (bool, default false): Extract docstrings
+  - `symbols` (bool, default false): Extract symbol definitions
+  - `diagnostics` (bool, default false): Include parse diagnostics
+  - `chunk_max_size` (int or null, default null): Maximum chunk size in bytes
 
 **Returns:** String - JSON string with extraction results
 
@@ -506,20 +506,20 @@ Run tree-sitter queries against source code and return structured extraction res
 
 - `source` (String): Source code to extract from
 - `config_json` (String): JSON string with extraction configuration. Fields:
-    - `language` (string, required): Language name
-    - `patterns` (object, required): Named patterns to run. Each key maps to an object with:
-        - `query` (string, required): Tree-sitter query in S-expression syntax
-        - `capture_output` (string, default `"Full"`): What to capture -- `"Text"`, `"Node"`, or `"Full"`
-        - `child_fields` (array of string, default `[]`): Field names to extract from child nodes
-        - `max_results` (int or null, default null): Maximum number of matches to return
-        - `byte_range` (array of two ints or null, default null): Restrict matches to a byte range `[start, end]`
+  - `language` (string, required): Language name
+  - `patterns` (object, required): Named patterns to run. Each key maps to an object with:
+    - `query` (string, required): tree-sitter query in S-expression syntax
+    - `capture_output` (string, default `"Full"`): What to capture -- `"Text"`, `"Node"`, or `"Full"`
+    - `child_fields` (array of string, default `[]`): Field names to extract from child nodes
+    - `max_results` (int or null, default null): Maximum number of matches to return
+    - `byte_range` (array of two ints or null, default null): Restrict matches to a byte range `[start, end]`
 
 **Returns:** String - JSON string with extraction results. The top-level object contains:
 
 - `language` (string): The language used
 - `results` (object): Keyed by pattern name, each value contains:
-    - `matches` (array): Each match has `pattern_index` (int) and `captures` (array). Each capture has `name` (string), `text` (string or null), `node` (object or null), `child_fields` (object), and `start_byte` (int).
-    - `total_count` (int): Total matches before `max_results` truncation
+  - `matches` (array): Each match has `pattern_index` (int) and `captures` (array). Each capture has `name` (string), `text` (string or null), `node` (object or null), `child_fields` (object), and `start_byte` (int).
+  - `total_count` (int): Total matches before `max_results` truncation
 
 **Raises:** `RuntimeError` on invalid config JSON, unknown language, or extraction failure.
 
@@ -561,11 +561,11 @@ Validate extraction patterns without running them against source code. Useful fo
 
 - `valid` (bool): Whether all patterns are valid
 - `patterns` (object): Per-pattern validation, each with:
-    - `valid` (bool): Whether this pattern compiled successfully
-    - `capture_names` (array of string): Capture names defined in the query
-    - `pattern_count` (int): Number of patterns in the query
-    - `warnings` (array of string): Non-fatal warnings
-    - `errors` (array of string): Fatal errors (e.g., query syntax errors)
+  - `valid` (bool): Whether this pattern compiled successfully
+  - `capture_names` (array of string): Capture names defined in the query
+  - `pattern_count` (int): Number of patterns in the query
+  - `warnings` (array of string): Non-fatal warnings
+  - `errors` (array of string): Fatal errors (e.g., query syntax errors)
 
 **Raises:** `RuntimeError` on invalid config JSON or unknown language.
 

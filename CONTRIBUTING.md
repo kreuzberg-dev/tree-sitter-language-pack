@@ -5,11 +5,11 @@ Thank you for your interest in contributing to tree-sitter-language-pack! This g
 ## Table of Contents
 
 - [Development Setup](#development-setup)
-    - [Task Installation](#task-installation)
-    - [Quick Start](#quick-start)
+  - [Task Installation](#task-installation)
+  - [Quick Start](#quick-start)
 - [Development Workflow](#development-workflow)
-    - [Common Commands](#common-commands)
-    - [Language-Specific Tasks](#language-specific-tasks)
+  - [Common Commands](#common-commands)
+  - [Language-Specific Tasks](#language-specific-tasks)
 - [Parser Caching](#parser-caching)
 - [Adding Languages](#adding-languages)
 - [E2E Tests](#e2e-tests)
@@ -254,11 +254,11 @@ Before proposing a new grammar, verify its license by checking the `LICENSE` fil
 
     Fields:
 
-    - `repo` (required): Repository URL
-    - `rev` (required): Specific commit hash for reproducible builds
-    - `branch` (optional): Branch name if not "main"
-    - `directory` (optional): Path to src folder if not in root
-    - `generate` (optional): Run tree-sitter generate command
+   - `repo` (required): Repository URL
+   - `rev` (required): Specific commit hash for reproducible builds
+   - `branch` (optional): Branch name if not "main"
+   - `directory` (optional): Path to src folder if not in root
+   - `generate` (optional): Run tree-sitter generate command
 
 1. **Add a Cargo feature** for the language in `crates/ts-pack-core/Cargo.toml`
 

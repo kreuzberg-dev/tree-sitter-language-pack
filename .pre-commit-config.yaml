@@ -115,12 +115,23 @@ repos:
     hooks:
       - id: actionlint
 
-  # Markdown
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.48.0
+  # Markdown: linting
+  - repo: https://github.com/rvben/rumdl-pre-commit
+    rev: "v0.1.73"
     hooks:
-      - id: markdownlint-fix
+      - id: rumdl-fmt
         exclude: "^.ai-rulez/"
+
+  # Markdown prose linting: textlint
+  - repo: local
+    hooks:
+      - id: textlint
+        name: textlint (docs prose)
+        entry: npx textlint
+        language: node
+        files: ^docs/.*\.md$
+        exclude: ^docs/(CHANGELOG|snippets/)
+        pass_filenames: true
 
   # AI Rules
   - repo: https://github.com/Goldziher/ai-rulez
@@ -247,11 +258,9 @@ repos:
         pass_filenames: false
         require_serial: true
 
-  # Spelling
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.2
+  # Spelling: fast Rust-based spell checker
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.45.1
     hooks:
-      - id: codespell
-        exclude: ^tests|^parsers|^vendors|^target|^e2e|^\.ai-rulez|pnpm-lock\.yaml|docs/css/|sources
-        additional_dependencies:
-          - tomli
+      - id: typos
+        args: [--force-exclude]

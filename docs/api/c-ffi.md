@@ -429,11 +429,11 @@ Run extraction queries against source code using tree-sitter query patterns.
 
 - `language` (string, required): the language name.
 - `patterns` (object, required): a map of pattern names to pattern definitions. Each pattern definition contains:
-    - `query` (string): a tree-sitter query string.
-    - `capture_output` (object): output format configuration.
-    - `child_fields` (array): child field names to extract.
-    - `max_results` (number or null): optional limit on matches.
-    - `byte_range` (array or null): optional `[start, end]` byte range to restrict matching.
+  - `query` (string): a tree-sitter query string.
+  - `capture_output` (object): output format configuration.
+  - `child_fields` (array): child field names to extract.
+  - `max_results` (number or null): optional limit on matches.
+  - `byte_range` (array or null): optional `[start, end]` byte range to restrict matching.
 
 **Returns:** `char*` -- newly-allocated JSON string containing the extraction results, or null on error. Check `ts_pack_last_error()` on null. Free with `ts_pack_free_string`.
 

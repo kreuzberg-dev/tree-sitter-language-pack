@@ -513,7 +513,7 @@ Execute a tree-sitter query pattern against a parsed tree. Returns all matches w
 
 - `tree` (&Tree): Parsed syntax tree
 - `language` (&str): Language name (used to compile the query)
-- `query_source` (&str): Tree-sitter query pattern string
+- `query_source` (&str): tree-sitter query pattern string
 - `source` (&[u8]): Original source code bytes
 
 **Returns:** Result<Vec<QueryMatch>, Error>

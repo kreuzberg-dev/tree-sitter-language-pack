@@ -511,14 +511,14 @@ Run user-defined tree-sitter queries against source code and return structured r
 
 - `source` (str): Source code string to parse and query
 - `config` (dict): Extraction configuration with the following keys:
-    - `language` (str): Language name (e.g., `"python"`)
-    - `patterns` (dict): Mapping of pattern names to pattern config dicts
+  - `language` (str): Language name (e.g., `"python"`)
+  - `patterns` (dict): Mapping of pattern names to pattern config dicts
 
 **Pattern config fields:**
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `query` | `str` | (required) | Tree-sitter S-expression query string |
+| `query` | `str` | (required) | tree-sitter S-expression query string |
 | `capture_output` | `str` | `"Full"` | `"Text"` (text only), `"Node"` (node info only), or `"Full"` (both) |
 | `child_fields` | `list[str]` | `[]` | Child field names to extract from captured nodes |
 | `max_results` | `int \| None` | `None` | Maximum matches to return (None for unlimited) |
@@ -528,8 +528,8 @@ Run user-defined tree-sitter queries against source code and return structured r
 
 - `language` (str): The language used
 - `results` (dict): Mapping of pattern names to result dicts, each containing:
-    - `matches` (list[dict]): List of match dicts, each with `pattern_index` (int) and `captures` (list of capture dicts)
-    - `total_count` (int): Total matches found (before `max_results` truncation)
+  - `matches` (list[dict]): List of match dicts, each with `pattern_index` (int) and `captures` (list of capture dicts)
+  - `total_count` (int): Total matches found (before `max_results` truncation)
 
 Each capture dict contains: `name` (str), `node` (dict or None), `text` (str or None), `child_fields` (dict), `start_byte` (int).
 
@@ -572,11 +572,11 @@ Validate an extraction config without executing it. Checks that the language exi
 
 - `valid` (bool): Whether all patterns are valid
 - `patterns` (dict): Mapping of pattern names to validation dicts, each with:
-    - `valid` (bool): Whether this pattern compiled
-    - `capture_names` (list[str]): Capture names defined in the query
-    - `pattern_count` (int): Number of patterns in the query
-    - `warnings` (list[str]): Non-fatal warnings
-    - `errors` (list[str]): Fatal errors (e.g., syntax errors)
+  - `valid` (bool): Whether this pattern compiled
+  - `capture_names` (list[str]): Capture names defined in the query
+  - `pattern_count` (int): Number of patterns in the query
+  - `warnings` (list[str]): Non-fatal warnings
+  - `errors` (list[str]): Fatal errors (e.g., syntax errors)
 
 **Raises:**
 
@@ -607,9 +607,9 @@ Initialize the language pack with configuration. Applies cache directory setting
 **Parameters:**
 
 - `config` (dict): Dictionary with optional keys:
-    - `cache_dir` (str | None): Custom cache directory path
-    - `languages` (list[str] | None): Languages to download
-    - `groups` (list[str] | None): Language groups to download
+  - `cache_dir` (str | None): Custom cache directory path
+  - `languages` (list[str] | None): Languages to download
+  - `groups` (list[str] | None): Language groups to download
 
 **Raises:**
 

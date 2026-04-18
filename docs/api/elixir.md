@@ -54,9 +54,9 @@ Initialize the language pack with optional pre-downloads.
 **Parameters:**
 
 - `config_json` (String): JSON string with optional fields:
-    - `cache_dir` (string): Custom cache directory path
-    - `languages` (list): Language names to download
-    - `groups` (list): Language groups to download
+  - `cache_dir` (string): Custom cache directory path
+  - `languages` (list): Language names to download
+  - `groups` (list): Language groups to download
 
 **Returns:** `:ok`
 
@@ -79,7 +79,7 @@ Apply configuration without downloading. Use to set a custom cache directory bef
 **Parameters:**
 
 - `config_json` (String): JSON string with optional fields:
-    - `cache_dir` (string): Custom cache directory path
+  - `cache_dir` (string): Custom cache directory path
 
 **Returns:** `:ok`
 
@@ -499,14 +499,14 @@ Process source code and extract metadata as an Elixir map. The result is convert
 
 - `source` (String): Source code
 - `config_json` (String): JSON string with processing configuration. Must contain at least `"language"`. Optional fields:
-    - `structure` (bool, default true): Extract structural items
-    - `imports` (bool, default true): Extract import statements
-    - `exports` (bool, default true): Extract export statements
-    - `comments` (bool, default false): Extract comments
-    - `docstrings` (bool, default false): Extract docstrings
-    - `symbols` (bool, default false): Extract symbol definitions
-    - `diagnostics` (bool, default false): Include parse diagnostics
-    - `chunk_max_size` (int or null, default null): Maximum chunk size in bytes
+  - `structure` (bool, default true): Extract structural items
+  - `imports` (bool, default true): Extract import statements
+  - `exports` (bool, default true): Extract export statements
+  - `comments` (bool, default false): Extract comments
+  - `docstrings` (bool, default false): Extract docstrings
+  - `symbols` (bool, default false): Extract symbol definitions
+  - `diagnostics` (bool, default false): Include parse diagnostics
+  - `chunk_max_size` (int or null, default null): Maximum chunk size in bytes
 
 **Returns:** map with string keys
 
@@ -533,20 +533,20 @@ Run tree-sitter queries against source code and return structured extraction res
 
 - `source` (String): Source code to extract from
 - `config_json` (String): JSON string with extraction configuration. Fields:
-    - `language` (string, required): Language name
-    - `patterns` (object, required): Named patterns to run. Each key maps to an object with:
-        - `query` (string, required): Tree-sitter query in S-expression syntax
-        - `capture_output` (string, default `"Full"`): What to capture -- `"Text"`, `"Node"`, or `"Full"`
-        - `child_fields` (list of string, default `[]`): Field names to extract from child nodes
-        - `max_results` (int or nil, default nil): Maximum number of matches to return
-        - `byte_range` (list of two ints or nil, default nil): Restrict matches to a byte range `[start, end]`
+  - `language` (string, required): Language name
+  - `patterns` (object, required): Named patterns to run. Each key maps to an object with:
+    - `query` (string, required): tree-sitter query in S-expression syntax
+    - `capture_output` (string, default `"Full"`): What to capture -- `"Text"`, `"Node"`, or `"Full"`
+    - `child_fields` (list of string, default `[]`): Field names to extract from child nodes
+    - `max_results` (int or nil, default nil): Maximum number of matches to return
+    - `byte_range` (list of two ints or nil, default nil): Restrict matches to a byte range `[start, end]`
 
 **Returns:** map with string keys. The top-level map contains:
 
 - `"language"` (string): The language used
 - `"results"` (map): Keyed by pattern name, each value contains:
-    - `"matches"` (list): Each match has `"pattern_index"` (integer) and `"captures"` (list). Each capture has `"name"` (string), `"text"` (string or nil), `"node"` (map or nil), `"child_fields"` (map), and `"start_byte"` (integer).
-    - `"total_count"` (integer): Total matches before `max_results` truncation
+  - `"matches"` (list): Each match has `"pattern_index"` (integer) and `"captures"` (list). Each capture has `"name"` (string), `"text"` (string or nil), `"node"` (map or nil), `"child_fields"` (map), and `"start_byte"` (integer).
+  - `"total_count"` (integer): Total matches before `max_results` truncation
 
 **Raises:** Erlang error on invalid config JSON, unknown language, or extraction failure.
 
@@ -586,11 +586,11 @@ Validate extraction patterns without running them against source code. Useful fo
 
 - `"valid"` (boolean): Whether all patterns are valid
 - `"patterns"` (map): Per-pattern validation, each with:
-    - `"valid"` (boolean): Whether this pattern compiled successfully
-    - `"capture_names"` (list of string): Capture names defined in the query
-    - `"pattern_count"` (integer): Number of patterns in the query
-    - `"warnings"` (list of string): Non-fatal warnings
-    - `"errors"` (list of string): Fatal errors (e.g., query syntax errors)
+  - `"valid"` (boolean): Whether this pattern compiled successfully
+  - `"capture_names"` (list of string): Capture names defined in the query
+  - `"pattern_count"` (integer): Number of patterns in the query
+  - `"warnings"` (list of string): Non-fatal warnings
+  - `"errors"` (list of string): Fatal errors (e.g., query syntax errors)
 
 **Raises:** Erlang error on invalid config JSON or unknown language.
 

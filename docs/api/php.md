@@ -235,20 +235,20 @@ The wrapper class calls `ts_pack_extract` internally and JSON-decodes the result
 
 - `$source` (string): Source code to extract from
 - `$configJson` (string): JSON string with extraction configuration. Fields:
-    - `language` (string, required): Language name
-    - `patterns` (object, required): Named patterns to run. Each key maps to an object with:
-        - `query` (string, required): Tree-sitter query in S-expression syntax
-        - `capture_output` (string, default `"Full"`): What to capture -- `"Text"`, `"Node"`, or `"Full"`
-        - `child_fields` (string[], default `[]`): Field names to extract from child nodes
-        - `max_results` (int|null, default null): Maximum number of matches to return
-        - `byte_range` ([int, int]|null, default null): Restrict matches to a byte range
+  - `language` (string, required): Language name
+  - `patterns` (object, required): Named patterns to run. Each key maps to an object with:
+    - `query` (string, required): tree-sitter query in S-expression syntax
+    - `capture_output` (string, default `"Full"`): What to capture -- `"Text"`, `"Node"`, or `"Full"`
+    - `child_fields` (string[], default `[]`): Field names to extract from child nodes
+    - `max_results` (int|null, default null): Maximum number of matches to return
+    - `byte_range` ([int, int]|null, default null): Restrict matches to a byte range
 
 **Returns:** array - Associative array with extraction results. The top-level array contains:
 
 - `language` (string): The language used
 - `results` (array): Keyed by pattern name, each value contains:
-    - `matches` (array): Each match has `pattern_index` (int) and `captures` (array). Each capture has `name` (string), `text` (string|null), `node` (array|null), `child_fields` (array), and `start_byte` (int).
-    - `total_count` (int): Total matches before `max_results` truncation
+  - `matches` (array): Each match has `pattern_index` (int) and `captures` (array). Each capture has `name` (string), `text` (string|null), `node` (array|null), `child_fields` (array), and `start_byte` (int).
+  - `total_count` (int): Total matches before `max_results` truncation
 
 **Throws:** `\RuntimeException` on invalid config JSON, unknown language, or extraction failure.
 
@@ -286,11 +286,11 @@ Validate extraction patterns without running them against source code. Useful fo
 
 - `valid` (bool): Whether all patterns are valid
 - `patterns` (array): Per-pattern validation, each with:
-    - `valid` (bool): Whether this pattern compiled successfully
-    - `capture_names` (string[]): Capture names defined in the query
-    - `pattern_count` (int): Number of patterns in the query
-    - `warnings` (string[]): Non-fatal warnings
-    - `errors` (string[]): Fatal errors (e.g., query syntax errors)
+  - `valid` (bool): Whether this pattern compiled successfully
+  - `capture_names` (string[]): Capture names defined in the query
+  - `pattern_count` (int): Number of patterns in the query
+  - `warnings` (string[]): Non-fatal warnings
+  - `errors` (string[]): Fatal errors (e.g., query syntax errors)
 
 **Throws:** `\RuntimeException` on invalid config JSON or unknown language.
 

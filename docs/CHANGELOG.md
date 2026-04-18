@@ -104,14 +104,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Download/configure API across all bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP, WASM, C FFI)
-    - `init(config)` — configure + pre-download languages
-    - `download(languages)` — download specific parsers
-    - `download_all()` — download all 170+ parsers
-    - `configure(config)` — set cache directory
-    - `manifest_languages()` — list all available from remote manifest
-    - `downloaded_languages()` — list locally cached parsers
-    - `clean_cache()` — remove cached parsers
-    - `cache_dir()` — get effective cache directory
+  - `init(config)` — configure + pre-download languages
+  - `download(languages)` — download specific parsers
+  - `download_all()` — download all 170+ parsers
+  - `configure(config)` — set cache directory
+  - `manifest_languages()` — list all available from remote manifest
+  - `downloaded_languages()` — list locally cached parsers
+  - `clean_cache()` — remove cached parsers
+  - `cache_dir()` — get effective cache directory
 - Auto-download in `get_language()` — parsers download on first use
 - `PackConfig` struct with TOML file loading and directory discovery
 - CLI redesign: `download`, `clean`, `list`, `parse`, `process`, `cache-dir`, `init`, `completions`

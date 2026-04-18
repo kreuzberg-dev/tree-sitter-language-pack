@@ -69,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - 57 new permissively-licensed grammars — 305 languages total
-    - abl, c3, cel, cfml, chuck, cst, dhall, elvish, gap, gdshader, glimmer, gnuplot, gotmpl, gowork, gpg, hjson, hocon, hoon, htmldjango, jai, javadoc, json5, kcl, mlir, nasm, norg_meta, ocamllex, openscad, phpdoc, poe_filter, prql, rasi, razor, rbs, roc, rtf, slang, smalltalk, sml, snakemake, souffle, sourcepawn, sql_bigquery, stan, superhtml, sway, systemverilog, tact, tera, typespec, typoscript, vhs, vrl, wgsl_bevy, x86asm, ziggy, ziggy_schema
+  - abl, c3, cel, cfml, chuck, cst, dhall, elvish, gap, gdshader, glimmer, gnuplot, gotmpl, gowork, gpg, hjson, hocon, hoon, htmldjango, jai, javadoc, json5, kcl, mlir, nasm, norg_meta, ocamllex, openscad, phpdoc, poe_filter, prql, rasi, razor, rbs, roc, rtf, slang, smalltalk, sml, snakemake, souffle, sourcepawn, sql_bigquery, stan, superhtml, sway, systemverilog, tact, tera, typespec, typoscript, vhs, vrl, wgsl_bevy, x86asm, ziggy, ziggy_schema
 - CI license validation job in `ci-validate.yaml` — blocks PRs that introduce non-permissive (GPL/AGPL/LGPL/MPL) grammars
 
 ### Fixed
@@ -145,11 +145,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Extraction query API: run user-defined tree-sitter queries and get structured results
-    - `extract_patterns()` / `extract()` across Python, Node.js, Rust, Ruby, Elixir, PHP, WASM, C FFI
-    - `validate_extraction()` for config validation without execution
-    - `CompiledExtraction` for pre-compiled query reuse (Rust)
-    - `ProcessConfig.extractions` for combining custom queries with standard analysis
-    - Types: ExtractionConfig, ExtractionPattern, CaptureOutput, CaptureResult, MatchResult, PatternResult, ExtractionResult
+  - `extract_patterns()` / `extract()` across Python, Node.js, Rust, Ruby, Elixir, PHP, WASM, C FFI
+  - `validate_extraction()` for config validation without execution
+  - `CompiledExtraction` for pre-compiled query reuse (Rust)
+  - `ProcessConfig.extractions` for combining custom queries with standard analysis
+  - Types: ExtractionConfig, ExtractionPattern, CaptureOutput, CaptureResult, MatchResult, PatternResult, ExtractionResult
 - Criterion benchmarks: 9 groups, 23 benchmarks across Python, TypeScript, Rust, Go
 - Extraction queries guide and documentation across all API references
 
@@ -197,7 +197,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - 49 new permissively-licensed grammars — 248 languages total
-    - angular, bass, blade, brightscript, circom, cooklang, corn, crystal, cue, cylc, desktop, djot, earthfile, ebnf, editorconfig, eds, eex, elsa, enforce, facility, faust, fidl, foam, forth, git_config, git_rebase, godot_resource, http, hurl, just, ledger, less, liquid, mojo, move, nickel, nginx, norg, nushell, promql, pug, ql, robot, teal, templ, tmux, todotxt, turtle, vimdoc, wolfram
+  - angular, bass, blade, brightscript, circom, cooklang, corn, crystal, cue, cylc, desktop, djot, earthfile, ebnf, editorconfig, eds, eex, elsa, enforce, facility, faust, fidl, foam, forth, git_config, git_rebase, godot_resource, http, hurl, just, ledger, less, liquid, mojo, move, nickel, nginx, norg, nushell, promql, pug, ql, robot, teal, templ, tmux, todotxt, turtle, vimdoc, wolfram
 - Grammar updater automation (`scripts/check_grammar_updates.py`) with weekly CI workflow
 - Generated supported languages table (`docs/supported-languages.md`) integrated into docs CI
 - Node.js NAPI exports: `detectLanguageFromExtension`, `detectLanguageFromPath`, `getHighlightsQuery`, `extensionAmbiguity`
@@ -459,14 +459,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Download/configure API across all bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP, WASM, C FFI)
-    - `init(config)` — configure + pre-download languages
-    - `download(languages)` — download specific parsers
-    - `download_all()` — download all 170+ parsers
-    - `configure(config)` — set cache directory
-    - `manifest_languages()` — list all available from remote manifest
-    - `downloaded_languages()` — list locally cached parsers
-    - `clean_cache()` — remove cached parsers
-    - `cache_dir()` — get effective cache directory
+  - `init(config)` — configure + pre-download languages
+  - `download(languages)` — download specific parsers
+  - `download_all()` — download all 170+ parsers
+  - `configure(config)` — set cache directory
+  - `manifest_languages()` — list all available from remote manifest
+  - `downloaded_languages()` — list locally cached parsers
+  - `clean_cache()` — remove cached parsers
+  - `cache_dir()` — get effective cache directory
 - Auto-download in `get_language()` — parsers download on first use
 - `PackConfig` struct with TOML file loading and directory discovery
 - CLI redesign: `download`, `clean`, `list`, `parse`, `process`, `cache-dir`, `init`, `completions`
