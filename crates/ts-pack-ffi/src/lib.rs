@@ -97,6 +97,10 @@ pub unsafe extern "C" fn ts_pack_registry_new() -> *mut TsPackRegistry {
     ffi_guard!(ptr::null_mut(), {
         clear_last_error();
         let inner = LanguageRegistry::new();
+        #[cfg(feature = "download")]
+        if let Ok(cache_dir) = tree_sitter_language_pack::cache_dir() {
+            inner.add_extra_libs_dir(cache_dir);
+        }
         let names: Vec<CString> = inner
             .available_languages()
             .into_iter()

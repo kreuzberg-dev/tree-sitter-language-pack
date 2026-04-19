@@ -72,22 +72,22 @@ import (
 )
 
 func main() {
+    if err := tspack.Init(`{"languages":["go"]}`); err != nil {
+        panic(err)
+    }
+
     reg, _ := tspack.NewRegistry()
     defer reg.Close()
-
-    // Optional: Pre-download specific languages for offline use
-    reg.Init([]string{"python", "go", "rust"})
 
     langs := reg.AvailableLanguages()
     fmt.Println(langs)
 
-    // Auto-downloads language if not cached
     config := tspack.ProcessConfig{Language: "go"}
-    result, _ := reg.Process(source, config)
+    result, _ := reg.Process("package main\nfunc main() {}\n", config)
     fmt.Printf("Functions: %d\n", len(result.Structure))
 
-    // Pre-download languages for offline use
-    reg.Download([]string{"python", "javascript"})
+    downloaded, _ := tspack.Download([]string{"python", "javascript"})
+    fmt.Printf("Downloaded: %d\n", downloaded)
 }
 ```
 
@@ -113,8 +113,8 @@ func main() {
 
 ### Download API
 
-- `Registry.Init(languages)` -- pre-download specific languages for offline use
-- `Registry.Download(languages)` -- download parsers on demand
+- `Init(configJSON)` -- configure the cache and optionally pre-download languages
+- `Download(languages)` -- download parsers on demand
 
 ### Intelligence
 
