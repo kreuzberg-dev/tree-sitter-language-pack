@@ -14,11 +14,8 @@ builtins:
   - python
   - typescript
   - go
-  - java
-  - ruby
   - php
   - csharp
-  - elixir
   - security
   - git-workflow
   - code-quality
@@ -27,27 +24,22 @@ builtins:
   - default-commands
 
 # Include shared ai-rulez configuration from git repository
-# local_override: when set and path exists, uses local copy instead of git (for development)
 includes:
   - name: kreuzberg-core
     source: https://github.com/kreuzberg-dev/ai-rulez.git
     path: modules/core
-    local_override: ../ai-rulez
     merge_strategy: local-override
   - name: kreuzberg-languages
     source: https://github.com/kreuzberg-dev/ai-rulez.git
     path: modules/languages
-    local_override: ../ai-rulez
     merge_strategy: local-override
   - name: kreuzberg-cicd
     source: https://github.com/kreuzberg-dev/ai-rulez.git
     path: modules/cicd
-    local_override: ../ai-rulez
     merge_strategy: local-override
   - name: kreuzberg-e2e-generator
     source: https://github.com/kreuzberg-dev/ai-rulez.git
     path: modules/e2e-generator
-    local_override: ../ai-rulez
     merge_strategy: local-override
 
 profiles:
@@ -58,6 +50,3 @@ default: full
 
 header:
   style: minimal
-
-compression:
-  level: moderate
