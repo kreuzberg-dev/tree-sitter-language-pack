@@ -187,25 +187,35 @@ languages:
 
       import (
           "fmt"
+          "log"
           tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
       )
 
       func main() {
           if err := tspack.Init(`{"languages":["go"]}`); err != nil {
-              panic(err)
+              log.Fatal(err)
           }
 
-          reg, _ := tspack.NewRegistry()
+          reg, err := tspack.NewRegistry()
+          if err != nil {
+              log.Fatal(err)
+          }
           defer reg.Close()
 
           langs := reg.AvailableLanguages()
           fmt.Println(langs)
 
           config := tspack.ProcessConfig{Language: "go"}
-          result, _ := reg.Process("package main\nfunc main() {}\n", config)
+          result, err := reg.Process("package main\nfunc main() {}\n", config)
+          if err != nil {
+              log.Fatal(err)
+          }
           fmt.Printf("Functions: %d\n", len(result.Structure))
 
-          downloaded, _ := tspack.Download([]string{"python", "javascript"})
+          downloaded, err := tspack.Download([]string{"python", "javascript"})
+          if err != nil {
+              log.Fatal(err)
+          }
           fmt.Printf("Downloaded: %d\n", downloaded)
       }
 
