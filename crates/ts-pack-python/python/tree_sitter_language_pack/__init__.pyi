@@ -522,6 +522,18 @@ def build_indexing_chunks(
     chunk_lines: int = 60,
     overlap_lines: int = 10,
 ) -> dict[str, Any]: ...
+def process_semantic_manifest_entries(
+    manifest_entries: list[dict[str, Any]],
+    project_id: str,
+    *,
+    max_file_bytes: int = 1_000_000,
+    chunk_id_version: str = "v6",
+    chunk_max_size: int = 4000,
+    chunk_overlap: int = 200,
+    chunk_lines: int = 60,
+    overlap_lines: int = 10,
+    skip_diagnostic_files: bool = False,
+) -> list[dict[str, Any]]: ...
 def build_semantic_sync_plan(
     all_chunks: list[list[dict[str, Any]]],
     existing_ids: set[str] | None = None,
@@ -553,6 +565,22 @@ async def execute_semantic_index_driver(
     concurrency: int,
     embed_batch_fn: Any,
     write_batch_fn: Any,
+    progress_fn: Any | None = None,
+) -> dict[str, Any]: ...
+
+async def execute_semantic_index_driver_native(
+    project_id: str,
+    manifest_paths: list[str],
+    all_chunks: list[list[dict[str, Any]]],
+    pg_dsn: str,
+    lmstudio_base_url: str,
+    lmstudio_embed_model: str,
+    *,
+    rebuild: bool = False,
+    batch_size: int = 128,
+    concurrency: int = 4,
+    write_batch_size: int = 1024,
+    timeout_s: float = 120.0,
     progress_fn: Any | None = None,
 ) -> dict[str, Any]: ...
 def extract(source: str, config: dict[str, object]) -> dict[str, Any]: ...

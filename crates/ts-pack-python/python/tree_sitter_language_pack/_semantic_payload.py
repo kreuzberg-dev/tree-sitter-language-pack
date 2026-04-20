@@ -1179,13 +1179,28 @@ async def execute_codebase_embedding_upsert(
 async def execute_semantic_sync(
     conn: Any,
     project_id: str,
+    manifest_paths: list[str],
     all_chunks: list[list[dict[str, Any]]],
+    *,
+    existing_ids_override: set[str] | None = None,
 ) -> dict[str, Any]:
-    cur = await conn.execute(
-        "SELECT chunk_id FROM codebase_embeddings WHERE project_id = %s",
-        [project_id],
-    )
-    existing_ids = {row[0] for row in await cur.fetchall()}
+    if existing_ids_override is None:
+        manifest_path_set = [path for path in manifest_paths if path]
+        if manifest_path_set:
+            cur = await conn.execute(
+                """
+                SELECT chunk_id
+                FROM codebase_embeddings
+                WHERE project_id = %s
+                  AND file_path = ANY(%s)
+                """,
+                (project_id, manifest_path_set),
+            )
+        else:
+            cur = await conn.execute("SELECT chunk_id FROM codebase_embeddings WHERE 1=0", ())
+        existing_ids = {row[0] for row in await cur.fetchall()}
+    else:
+        existing_ids = set(existing_ids_override)
     sync_plan = build_semantic_sync_plan(all_chunks, existing_ids)
 
     pruned_total = 0
@@ -1230,22 +1245,31 @@ async def execute_semantic_index_prepare(
             (project_id,),
         )
         wiped = True
+    else:
+        manifest_path_set = [path for path in manifest_paths if path]
+        if manifest_path_set:
+            delete_cur = await conn.execute(
+                """
+                DELETE FROM codebase_embeddings
+                WHERE project_id = %s
+                  AND NOT (file_path = ANY(%s))
+                """,
+                (project_id, manifest_path_set),
+            )
+        else:
+            delete_cur = await conn.execute(
+                "DELETE FROM codebase_embeddings WHERE project_id = %s",
+                (project_id,),
+            )
+        orphan_pruned = getattr(delete_cur, "rowcount", 0) or 0
 
-    rows_cursor = await conn.execute(
-        "SELECT DISTINCT file_path FROM codebase_embeddings WHERE project_id = %s",
-        (project_id,),
+    sync_plan = await execute_semantic_sync(
+        conn,
+        project_id,
+        manifest_paths,
+        all_chunks,
+        existing_ids_override=set() if rebuild else None,
     )
-    db_paths = {row[0] async for row in rows_cursor}
-    manifest_path_set = {path for path in manifest_paths if path}
-    orphans = db_paths - manifest_path_set
-    for path in orphans:
-        await conn.execute(
-            "DELETE FROM codebase_embeddings WHERE project_id = %s AND file_path = %s",
-            (project_id, path),
-        )
-        orphan_pruned += 1
-
-    sync_plan = await execute_semantic_sync(conn, project_id, all_chunks)
     sync_plan["wiped"] = wiped
     sync_plan["orphan_pruned"] = orphan_pruned
     return sync_plan
@@ -1261,6 +1285,8 @@ async def execute_semantic_index_rounds(
     progress_fn: Any | None = None,
     round_plan: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
+    import time
+
     total_new = len(new_chunks)
     total_written = 0
 
@@ -1294,6 +1320,7 @@ async def execute_semantic_index_rounds(
 
     rounds = len(round_plan)
     for round_info in round_plan:
+        round_started = time.perf_counter()
         round_idx = int(round_info.get("round_index") or 0)
         n_rounds = int(round_info.get("rounds") or rounds or 1)
         sub_batches = list(round_info.get("sub_batches") or [])
@@ -1313,9 +1340,19 @@ async def execute_semantic_index_rounds(
                 }
             )
 
+        embed_started = time.perf_counter()
         embedded_batches = await __import__("asyncio").gather(
             *[embed_batch_fn(batch) for batch in sub_batches]
         )
+        embed_seconds = time.perf_counter() - embed_started
+
+        write_groups: list[list[dict[str, Any]]] = []
+        combined_group: list[dict[str, Any]] = []
+        for embedded in embedded_batches:
+            if embedded:
+                combined_group.extend(embedded)
+        if combined_group:
+            write_groups.append(combined_group)
 
         if progress_fn is not None:
             await progress_fn(
@@ -1323,16 +1360,18 @@ async def execute_semantic_index_rounds(
                     "round_index": round_idx,
                     "rounds": n_rounds,
                     "group_size": group_size,
-                    "batch_count": batch_count,
+                    "batch_count": len(write_groups),
                     "written_so_far": total_written,
                     "total_new": total_new,
                     "phase": "write_start",
                 }
             )
 
+        write_started = time.perf_counter()
         write_counts = await __import__("asyncio").gather(
-            *[write_batch_fn(batch) for batch in embedded_batches]
+            *[write_batch_fn(batch) for batch in write_groups]
         )
+        write_seconds = time.perf_counter() - write_started
         total_written += sum(int(count or 0) for count in write_counts)
 
         if progress_fn is not None:
@@ -1346,6 +1385,9 @@ async def execute_semantic_index_rounds(
                     "total_new": total_new,
                     "phase": "round_done",
                     "round_written": sum(int(count or 0) for count in write_counts),
+                    "embed_seconds": embed_seconds,
+                    "write_seconds": write_seconds,
+                    "round_seconds": time.perf_counter() - round_started,
                 }
             )
 
@@ -1374,22 +1416,32 @@ async def execute_semantic_index_driver(
     write_batch_fn: Any,
     progress_fn: Any | None = None,
 ) -> dict[str, Any]:
+    import time as _time
+
+    prepare_started = _time.perf_counter()
     driver_plan_builder = getattr(_native, "build_semantic_index_driver_plan", None)
 
     existing_ids: set[str] = set()
     db_paths: set[str] = set()
     if driver_plan_builder is not None:
-        cur = await conn.execute(
-            "SELECT chunk_id FROM codebase_embeddings WHERE project_id = %s",
-            [project_id],
-        )
-        existing_ids = {row[0] for row in await cur.fetchall()}
-
-        rows_cursor = await conn.execute(
-            "SELECT DISTINCT file_path FROM codebase_embeddings WHERE project_id = %s",
-            (project_id,),
-        )
-        db_paths = {row[0] async for row in rows_cursor}
+        manifest_path_set = [path for path in manifest_paths if path]
+        if rebuild:
+            existing_ids = set()
+        else:
+            if manifest_path_set:
+                cur = await conn.execute(
+                    """
+                    SELECT chunk_id
+                    FROM codebase_embeddings
+                    WHERE project_id = %s
+                      AND file_path = ANY(%s)
+                    """,
+                    (project_id, manifest_path_set),
+                )
+            else:
+                cur = await conn.execute("SELECT chunk_id FROM codebase_embeddings WHERE 1=0", ())
+            existing_ids = {row[0] for row in await cur.fetchall()}
+        db_paths = set(manifest_path_set)
 
         sync_plan = dict(
             driver_plan_builder(
@@ -1408,13 +1460,23 @@ async def execute_semantic_index_driver(
                 "DELETE FROM codebase_embeddings WHERE project_id = %s",
                 (project_id,),
             )
-        orphan_pruned = 0
-        for path in sync_plan.get("orphan_paths") or []:
-            await conn.execute(
-                "DELETE FROM codebase_embeddings WHERE project_id = %s AND file_path = %s",
-                (project_id, path),
-            )
-            orphan_pruned += 1
+            orphan_pruned = 0
+        else:
+            if manifest_path_set:
+                delete_cur = await conn.execute(
+                    """
+                    DELETE FROM codebase_embeddings
+                    WHERE project_id = %s
+                      AND NOT (file_path = ANY(%s))
+                    """,
+                    (project_id, manifest_path_set),
+                )
+            else:
+                delete_cur = await conn.execute(
+                    "DELETE FROM codebase_embeddings WHERE project_id = %s",
+                    (project_id,),
+                )
+            orphan_pruned = getattr(delete_cur, "rowcount", 0) or 0
 
         pruned_total = 0
         prune_targets = sync_plan.get("prune_targets") or []
@@ -1453,6 +1515,18 @@ async def execute_semantic_index_driver(
     # pool connections, so keeping the prepare connection open here invites
     # idle-in-transaction timeouts on large indexes.
     await _maybe_commit_connection(conn)
+
+    if progress_fn is not None:
+        await progress_fn(
+            {
+                "phase": "prepare_done",
+                "prepare_seconds": _time.perf_counter() - prepare_started,
+                "existing_count": len(sync_plan.get("existing_ids") or set()),
+                "orphan_pruned": int(sync_plan.get("orphan_pruned") or 0),
+                "pruned_total": int(sync_plan.get("pruned_total") or 0),
+                "total_new": len(sync_plan.get("new_chunks") or []),
+            }
+        )
 
     round_result = await execute_semantic_index_rounds(
         sync_plan.get("new_chunks") or [],

@@ -13,11 +13,16 @@ crate-type = ["cdylib"]
 
 [dependencies]
 futures = "0.3"
+futures-util = "0.3"
 neo4rs = "0.7.3"
 pyo3 = { workspace = true }
 pyo3-async-runtimes = { version = "0.28", features = ["tokio-runtime"] }
+rayon = { workspace = true }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+regex = "1"
 serde_json = { workspace = true }
 sha2 = { workspace = true }
+tokio-postgres = "0.7"
 tree-sitter = { workspace = true }
 tree-sitter-language-pack = { path = "../ts-pack-core", features = ["serde", "download"] }
 ts-pack-index = { path = "../ts-pack-index" }

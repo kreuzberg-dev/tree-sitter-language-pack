@@ -2,6 +2,7 @@ import unittest
 import asyncio
 
 import tree_sitter_language_pack as ts
+from tree_sitter_language_pack import _semantic_payload as semantic_payload
 
 
 class SemanticPayloadWrapperTests(unittest.TestCase):
@@ -268,6 +269,212 @@ struct StringNormalizationCases {{
         self.assertEqual(conn.commits, 1)
         self.assertTrue(observed["commit_seen"])
         self.assertEqual(result["written"], 1)
+
+    def test_execute_semantic_index_rounds_coalesces_writes_per_round(self):
+        embedded_calls = []
+        written_batches = []
+
+        async def _embed(batch):
+            embedded_calls.append(len(batch))
+            return [
+                {
+                    "ref_id": item["ref_id"],
+                    "text": item["text"],
+                    "vector": [0.1, 0.2],
+                    "metadata": item["metadata"],
+                }
+                for item in batch
+            ]
+
+        async def _write(batch):
+            written_batches.append(len(batch))
+            return len(batch)
+
+        new_chunks = [
+            {"ref_id": f"chunk-{i}", "text": f"text {i}", "metadata": {"file": f"src/{i}.py"}}
+            for i in range(4)
+        ]
+
+        result = asyncio.run(
+            semantic_payload.execute_semantic_index_rounds(
+                new_chunks,
+                batch_size=2,
+                concurrency=2,
+                embed_batch_fn=_embed,
+                write_batch_fn=_write,
+            )
+        )
+
+        self.assertEqual(result["written"], 4)
+        self.assertEqual(embedded_calls, [2, 2])
+        self.assertEqual(written_batches, [4])
+
+    def test_execute_semantic_index_prepare_scopes_queries_to_manifest(self):
+        class _CursorResult:
+            def __init__(self, rows=None, rowcount=0):
+                self._rows = rows or []
+                self.rowcount = rowcount
+
+            async def fetchall(self):
+                return self._rows
+
+        class _Conn:
+            def __init__(self):
+                self.calls = []
+
+            async def execute(self, query, params):
+                self.calls.append((" ".join(str(query).split()), params))
+                if "SELECT chunk_id" in query:
+                    return _CursorResult(rows=[("chunk-1",)])
+                return _CursorResult(rowcount=3)
+
+            def cursor(self):
+                class _PruneCursor:
+                    rowcount = 0
+
+                    async def __aenter__(self):
+                        return self
+
+                    async def __aexit__(self, exc_type, exc, tb):
+                        return False
+
+                    async def execute(self, *_args, **_kwargs):
+                        return None
+
+                return _PruneCursor()
+
+        conn = _Conn()
+        result = asyncio.run(
+            semantic_payload.execute_semantic_index_prepare(
+                conn,
+                "proj",
+                ["src/a.py", "src/b.py"],
+                [[{"ref_id": "chunk-2", "text": "hello", "metadata": {"file": "src/a.py"}}]],
+                rebuild=False,
+            )
+        )
+
+        self.assertEqual(result["orphan_pruned"], 3)
+        self.assertEqual(result["existing_ids"], {"chunk-1"})
+        select_calls = [call for call in conn.calls if "SELECT chunk_id" in call[0]]
+        self.assertEqual(len(select_calls), 1)
+        self.assertIn("file_path = ANY(%s)", select_calls[0][0])
+        self.assertEqual(select_calls[0][1], ("proj", ["src/a.py", "src/b.py"]))
+        delete_calls = [call for call in conn.calls if "DELETE FROM codebase_embeddings" in call[0]]
+        self.assertEqual(len(delete_calls), 1)
+        self.assertIn("NOT (file_path = ANY(%s))", delete_calls[0][0])
+
+    def test_execute_semantic_index_prepare_rebuild_ignores_existing_ids(self):
+        class _CursorResult:
+            def __init__(self, rows=None, rowcount=0):
+                self._rows = rows or []
+                self.rowcount = rowcount
+
+            async def fetchall(self):
+                return self._rows
+
+        class _Conn:
+            def __init__(self):
+                self.calls = []
+
+            async def execute(self, query, params):
+                self.calls.append((" ".join(str(query).split()), params))
+                if "SELECT chunk_id" in query:
+                    return _CursorResult(rows=[("chunk-1",)])
+                if "DELETE FROM codebase_embeddings" in query:
+                    return _CursorResult(rowcount=5)
+                return _CursorResult()
+
+            def cursor(self):
+                class _PruneCursor:
+                    rowcount = 0
+
+                    async def __aenter__(self):
+                        return self
+
+                    async def __aexit__(self, exc_type, exc, tb):
+                        return False
+
+                    async def execute(self, *_args, **_kwargs):
+                        return None
+
+                return _PruneCursor()
+
+        conn = _Conn()
+        result = asyncio.run(
+            semantic_payload.execute_semantic_index_prepare(
+                conn,
+                "proj",
+                ["src/a.py"],
+                [[{"ref_id": "chunk-1", "text": "hello", "metadata": {"file": "src/a.py"}}]],
+                rebuild=True,
+            )
+        )
+
+        self.assertEqual(result["existing_ids"], set())
+        self.assertEqual(len(result["new_chunks"]), 1)
+        select_calls = [call for call in conn.calls if "SELECT chunk_id" in call[0]]
+        self.assertEqual(select_calls, [])
+        delete_calls = [call for call in conn.calls if "DELETE FROM codebase_embeddings" in call[0]]
+        self.assertEqual(len(delete_calls), 1)
+
+    def test_execute_semantic_index_driver_emits_prepare_done_progress(self):
+        class _Cursor:
+            async def fetchall(self):
+                return []
+
+        class _Conn:
+            async def execute(self, *_args, **_kwargs):
+                return _Cursor()
+
+            def cursor(self):
+                class _PruneCursor:
+                    rowcount = 0
+
+                    async def __aenter__(self):
+                        return self
+
+                    async def __aexit__(self, exc_type, exc, tb):
+                        return False
+
+                    async def execute(self, *_args, **_kwargs):
+                        return None
+
+                return _PruneCursor()
+
+            async def commit(self):
+                return None
+
+        events = []
+
+        async def _progress(event):
+            events.append(event)
+
+        async def _embed(batch):
+            return batch
+
+        async def _write(batch):
+            return len(batch)
+
+        result = asyncio.run(
+            semantic_payload.execute_semantic_index_driver(
+                _Conn(),
+                "proj",
+                ["src/sample.py"],
+                [[{"ref_id": "chunk-1", "text": "hello", "metadata": {"file": "src/sample.py"}}]],
+                rebuild=False,
+                batch_size=1,
+                concurrency=1,
+                embed_batch_fn=_embed,
+                write_batch_fn=_write,
+                progress_fn=_progress,
+            )
+        )
+
+        self.assertEqual(result["written"], 1)
+        prepare_events = [event for event in events if event.get("phase") == "prepare_done"]
+        self.assertEqual(len(prepare_events), 1)
+        self.assertIn("prepare_seconds", prepare_events[0])
 
 
 if __name__ == "__main__":

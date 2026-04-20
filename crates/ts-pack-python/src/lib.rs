@@ -1,10 +1,16 @@
 use futures::future::try_join_all;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList, PySet, PyTuple};
+use regex::Regex;
+use reqwest::Client as HttpClient;
 use sha2::{Digest, Sha256};
 use std::collections::HashSet;
+use std::error::Error as StdError;
 use std::path::Path;
-use std::sync::Mutex;
+use std::sync::{Mutex, OnceLock};
+use tokio_postgres::binary_copy::BinaryCopyInWriter;
+use tokio_postgres::NoTls;
+use tokio_postgres::types::Type;
 
 mod graph_finalize;
 mod swift_semantic;
@@ -143,6 +149,373 @@ fn detect_language_from_content(content: &str) -> Option<String> {
 #[pyfunction]
 fn detect_language_from_extension(ext: &str) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_extension(ext).map(String::from)
+}
+
+const SWIFT_SAFE_PAREN_NESTING_LIMIT: usize = 2048;
+const FALLBACK_EXTS: &[&str] = &[
+    "yaml",
+    "yml",
+    "toml",
+    "json",
+    "pbxproj",
+    "xcscheme",
+    "xcworkspacedata",
+    "plist",
+    "md",
+    "txt",
+    "sh",
+    "bash",
+    "zsh",
+    "fish",
+    "sql",
+    "graphql",
+    "tf",
+    "hcl",
+    "r",
+    "jl",
+];
+const FALLBACK_FILENAMES: &[&str] = &[".env", ".env.example", ".gitignore", ".indexignore"];
+const SUPPORT_PATH_SEGMENTS: &[&str] = &[
+    "/scripts/",
+    "/tools/",
+    "/vendor/",
+    "/vendors/",
+    "/generated/",
+    "/node_modules/",
+    "/dist/",
+    "/release/",
+];
+
+fn should_use_line_window_fallback_path(file_path: &str) -> bool {
+    let normalized = file_path.replace('\\', "/");
+    let basename = normalized.rsplit('/').next().unwrap_or("");
+    if FALLBACK_FILENAMES.contains(&basename) {
+        return true;
+    }
+    let Some((_, ext)) = basename.rsplit_once('.') else {
+        return false;
+    };
+    FALLBACK_EXTS.contains(&ext.to_ascii_lowercase().as_str())
+}
+
+fn max_delimiter_nesting(text: &str, opener: char, closer: char) -> usize {
+    let mut depth = 0usize;
+    let mut max_depth = 0usize;
+    for ch in text.chars() {
+        if ch == opener {
+            depth += 1;
+            if depth > max_depth {
+                max_depth = depth;
+            }
+        } else if ch == closer && depth > 0 {
+            depth -= 1;
+        }
+    }
+    max_depth
+}
+
+fn swift_requires_line_fallback(source: &str) -> bool {
+    max_delimiter_nesting(source, '(', ')') > SWIFT_SAFE_PAREN_NESTING_LIMIT
+}
+
+fn chunk_content_body(text: &str) -> &str {
+    if let Some(rest) = text.strip_prefix("// File: ") {
+        if let Some((_, body)) = rest.split_once('\n') {
+            return body;
+        }
+    }
+    text
+}
+
+fn member_usage_regex() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        Regex::new(r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\.\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(")
+            .expect("member usage regex")
+    })
+}
+
+fn call_like_regex() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| Regex::new(r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(").expect("call-like regex"))
+}
+
+fn declaration_regexes() -> &'static Vec<Regex> {
+    static RES: OnceLock<Vec<Regex>> = OnceLock::new();
+    RES.get_or_init(|| {
+        vec![
+            Regex::new(r"^\s*(?:async\s+)?def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(").unwrap(),
+            Regex::new(r"^\s*class\s+([A-Za-z_][A-Za-z0-9_]*)\b").unwrap(),
+            Regex::new(r"^\s*function\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(").unwrap(),
+            Regex::new(r"^\s*(?:export\s+(?:default\s+)?)?(?:async\s+)?function\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(").unwrap(),
+            Regex::new(r"^\s*struct\s+([A-Za-z_][A-Za-z0-9_]*)\b").unwrap(),
+            Regex::new(r"^\s*enum\s+([A-Za-z_][A-Za-z0-9_]*)\b").unwrap(),
+            Regex::new(r"^\s*trait\s+([A-Za-z_][A-Za-z0-9_]*)\b").unwrap(),
+            Regex::new(r"^\s*mod\s+([A-Za-z_][A-Za-z0-9_]*)\b").unwrap(),
+            Regex::new(r"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public|open|internal|fileprivate|private|final)?\s*class\s+([A-Za-z_][A-Za-z0-9_]*)\b").unwrap(),
+            Regex::new(r"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public|open|internal|fileprivate|private|final)?\s*struct\s+([A-Za-z_][A-Za-z0-9_]*)\b").unwrap(),
+            Regex::new(r"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public|open|internal|fileprivate|private|final|indirect)?\s*enum\s+([A-Za-z_][A-Za-z0-9_]*)\b").unwrap(),
+            Regex::new(r"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public|open|internal|fileprivate|private)?\s*protocol\s+([A-Za-z_][A-Za-z0-9_]*)\b").unwrap(),
+            Regex::new(r"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public|open|internal|fileprivate|private)?\s*extension\s+([A-Za-z_][A-Za-z0-9_<>.]*)\b").unwrap(),
+            Regex::new(r"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public|open|internal|fileprivate|private)?\s*typealias\s+([A-Za-z_][A-Za-z0-9_]*)\b").unwrap(),
+        ]
+    })
+}
+
+fn declaration_node_types() -> &'static HashSet<&'static str> {
+    static SET: OnceLock<HashSet<&'static str>> = OnceLock::new();
+    SET.get_or_init(|| {
+        HashSet::from([
+            "function_definition",
+            "function_declaration",
+            "function_item",
+            "method_definition",
+            "method_declaration",
+            "class_definition",
+            "class_declaration",
+            "struct_declaration",
+            "enum_declaration",
+            "protocol_declaration",
+            "extension_declaration",
+            "typealias_declaration",
+            "interface_declaration",
+            "impl_item",
+        ])
+    })
+}
+
+fn callsite_node_types() -> &'static HashSet<&'static str> {
+    static SET: OnceLock<HashSet<&'static str>> = OnceLock::new();
+    SET.get_or_init(|| {
+        HashSet::from([
+            "call_expression",
+            "call",
+            "method_invocation",
+            "function_call_expression",
+        ])
+    })
+}
+
+fn extract_chunk_member_usages(text: &str) -> Vec<String> {
+    let body = chunk_content_body(text);
+    let mut seen = HashSet::new();
+    let mut values = Vec::new();
+    for caps in member_usage_regex().captures_iter(body) {
+        let expr = format!("{}.{}", &caps[1], &caps[2]).to_lowercase();
+        if seen.insert(expr.clone()) {
+            values.push(expr);
+            if values.len() >= 24 {
+                break;
+            }
+        }
+    }
+    values
+}
+
+fn extract_chunk_call_like_symbols(text: &str, member_usages: &[String]) -> Vec<String> {
+    let body = chunk_content_body(text);
+    let mut seen: HashSet<String> = member_usages.iter().map(|v| v.to_lowercase()).collect();
+    let mut values = member_usages.to_vec();
+    for caps in call_like_regex().captures_iter(body) {
+        let value = caps[1].to_lowercase();
+        if seen.insert(value.clone()) {
+            values.push(value);
+            if values.len() >= 32 {
+                break;
+            }
+        }
+    }
+    values
+}
+
+fn extract_chunk_declared_symbols(text: &str) -> Vec<String> {
+    let body = chunk_content_body(text);
+    let mut seen = HashSet::new();
+    let mut values = Vec::new();
+    for line in body.lines() {
+        for re in declaration_regexes().iter() {
+            if let Some(caps) = re.captures(line) {
+                if let Some(m) = caps.get(1) {
+                    let symbol = m.as_str().trim().to_string();
+                    if !symbol.is_empty() && seen.insert(symbol.to_lowercase()) {
+                        values.push(symbol);
+                    }
+                }
+                break;
+            }
+        }
+        if values.len() >= 16 {
+            break;
+        }
+    }
+    values
+}
+
+fn chunk_contains_entrypoint(file_path: &str, declared_symbols: &[String]) -> bool {
+    if file_path.is_empty() || declared_symbols.is_empty() {
+        return false;
+    }
+    let norm = file_path.replace('\\', "/").to_lowercase();
+    let lowered: HashSet<String> = declared_symbols.iter().map(|s| s.trim().to_lowercase()).collect();
+    if !lowered.contains("main") {
+        return false;
+    }
+    norm.ends_with("/src/main.rs")
+        || norm.ends_with("/src/main.py")
+        || norm.ends_with("/src/main.ts")
+        || norm.ends_with("/src/main.tsx")
+        || norm.ends_with("/src/main.js")
+        || norm.ends_with("/src/main.jsx")
+        || (norm.ends_with("/main.go") && (norm.contains("/cmd/") || norm.starts_with("cmd/")))
+}
+
+fn infer_chunk_role(file_path: &str, metadata: &serde_json::Map<String, serde_json::Value>) -> String {
+    let norm = file_path.replace('\\', "/").to_lowercase();
+    if norm.contains("/tests/") || norm.starts_with("tests/") || norm.contains("/test/") || norm.starts_with("test/") {
+        return "test_usage".to_string();
+    }
+    if norm.contains("/examples/") || norm.starts_with("examples/") {
+        return "example_usage".to_string();
+    }
+    if norm.contains("/docs/") || norm.starts_with("docs/") {
+        return "documentation".to_string();
+    }
+    if SUPPORT_PATH_SEGMENTS.iter().any(|segment| norm.contains(segment)) || norm.starts_with("scripts/") || norm.starts_with("tools/") {
+        return "script_support".to_string();
+    }
+    if metadata
+        .get("contains_definition")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+        || metadata
+            .get("declared_symbols")
+            .and_then(|v| v.as_array())
+            .map(|arr| !arr.is_empty())
+            .unwrap_or(false)
+    {
+        return "definition".to_string();
+    }
+    let lowered_node_types: HashSet<String> = metadata
+        .get("node_types")
+        .and_then(|v| v.as_array())
+        .into_iter()
+        .flatten()
+        .filter_map(|v| v.as_str())
+        .map(|v| v.trim().to_lowercase())
+        .collect();
+    if lowered_node_types.iter().any(|t| declaration_node_types().contains(t.as_str())) {
+        return "definition".to_string();
+    }
+    if lowered_node_types.iter().any(|t| callsite_node_types().contains(t.as_str())) {
+        return "usage".to_string();
+    }
+    "context".to_string()
+}
+
+fn enrich_semantic_chunk_contract_py(py: Python<'_>, chunks: &Bound<'_, PyAny>, file_path: &str) -> PyResult<()> {
+    let list = chunks.cast::<PyList>()?;
+    for chunk_any in list.iter() {
+        let chunk_dict = chunk_any.cast::<PyDict>()?;
+        let text = chunk_dict
+            .get_item("text")?
+            .and_then(|v| v.extract::<String>().ok())
+            .unwrap_or_default();
+
+        let metadata_dict = if let Ok(Some(meta)) = chunk_dict.get_item("metadata") {
+            if let Ok(meta_dict) = meta.cast::<PyDict>() {
+                meta_dict.clone()
+            } else {
+                let d = PyDict::new(py);
+                chunk_dict.set_item("metadata", &d)?;
+                d
+            }
+        } else {
+            let d = PyDict::new(py);
+            chunk_dict.set_item("metadata", &d)?;
+            d
+        };
+
+        let mut metadata_json = py_dict_to_json_value(&metadata_dict)?
+            .as_object()
+            .cloned()
+            .unwrap_or_default();
+
+        let member_usages_missing = !metadata_json.get("member_usages").is_some_and(|v| v.is_array());
+        let member_usages = if member_usages_missing {
+            let values = extract_chunk_member_usages(&text);
+            metadata_json.insert(
+                "member_usages".into(),
+                serde_json::Value::Array(values.iter().cloned().map(serde_json::Value::String).collect()),
+            );
+            values
+        } else {
+            metadata_json
+                .get("member_usages")
+                .and_then(|v| v.as_array())
+                .map(|arr| arr.iter().filter_map(|v| v.as_str().map(str::to_string)).collect())
+                .unwrap_or_default()
+        };
+
+        if !metadata_json.get("call_like_symbols").is_some_and(|v| v.is_array()) {
+            let values = extract_chunk_call_like_symbols(&text, &member_usages);
+            metadata_json.insert(
+                "call_like_symbols".into(),
+                serde_json::Value::Array(values.into_iter().map(serde_json::Value::String).collect()),
+            );
+        }
+
+        let declared_symbols = if !metadata_json.get("declared_symbols").is_some_and(|v| v.is_array()) {
+            let values = extract_chunk_declared_symbols(&text);
+            metadata_json.insert(
+                "declared_symbols".into(),
+                serde_json::Value::Array(values.iter().cloned().map(serde_json::Value::String).collect()),
+            );
+            values
+        } else {
+            metadata_json
+                .get("declared_symbols")
+                .and_then(|v| v.as_array())
+                .map(|arr| arr.iter().filter_map(|v| v.as_str().map(str::to_string)).collect())
+                .unwrap_or_default()
+        };
+
+        if !metadata_json.contains_key("contains_definition") {
+            let lowered_node_types: HashSet<String> = metadata_json
+                .get("node_types")
+                .and_then(|v| v.as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|v| v.as_str())
+                .map(|v| v.trim().to_lowercase())
+                .collect();
+            let contains_definition = !declared_symbols.is_empty()
+                || lowered_node_types
+                    .iter()
+                    .any(|t| declaration_node_types().contains(t.as_str()));
+            metadata_json.insert("contains_definition".into(), serde_json::Value::Bool(contains_definition));
+        }
+
+        if !metadata_json.contains_key("contains_entrypoint") {
+            metadata_json.insert(
+                "contains_entrypoint".into(),
+                serde_json::Value::Bool(chunk_contains_entrypoint(file_path, &declared_symbols)),
+            );
+        }
+
+        let chunk_role_missing = metadata_json
+            .get("chunk_role")
+            .and_then(|v| v.as_str())
+            .map(|v| v.trim().is_empty())
+            .unwrap_or(true);
+        if chunk_role_missing {
+            let role = infer_chunk_role(file_path, &metadata_json);
+            metadata_json.insert("chunk_role".into(), serde_json::Value::String(role));
+        }
+
+        let metadata_py = json_value_to_py(py, &serde_json::Value::Object(metadata_json))?;
+        chunk_dict.set_item("metadata", metadata_py)?;
+    }
+    Ok(())
 }
 
 /// Detect language name from a file path based on its extension.
@@ -1830,6 +2203,281 @@ fn build_swift_chunks(
     Ok(chunks.into_any().unbind())
 }
 
+#[pyfunction(
+    signature = (
+        manifest_entries,
+        project_id,
+        max_file_bytes = 1_000_000,
+        chunk_id_version = "v6".to_string(),
+        chunk_max_size = 4000,
+        chunk_overlap = 200,
+        chunk_lines = 60,
+        overlap_lines = 10,
+        skip_diagnostic_files = false,
+    )
+)]
+fn process_semantic_manifest_entries(
+    py: Python<'_>,
+    manifest_entries: Vec<Py<PyAny>>,
+    project_id: String,
+    max_file_bytes: usize,
+    chunk_id_version: String,
+    chunk_max_size: usize,
+    chunk_overlap: usize,
+    chunk_lines: usize,
+    overlap_lines: usize,
+    skip_diagnostic_files: bool,
+) -> PyResult<Py<PyAny>> {
+    let results = PyList::empty(py);
+
+    for entry in manifest_entries {
+        let entry_any = entry.bind(py);
+        let entry_dict = entry_any.cast::<PyDict>()?;
+        let abs_path = entry_dict
+            .get_item("abs_path")?
+            .and_then(|value| value.extract::<String>().ok())
+            .unwrap_or_default();
+        let rel_path = entry_dict
+            .get_item("rel_path")?
+            .and_then(|value| value.extract::<String>().ok())
+            .unwrap_or_else(|| abs_path.clone());
+
+        let result_dict = PyDict::new(py);
+        let empty_chunks = PyList::empty(py).into_any().unbind();
+
+        let fallback_allowed = should_use_line_window_fallback_path(&rel_path);
+        let ext = Path::new(&abs_path)
+            .extension()
+            .and_then(|value| value.to_str())
+            .unwrap_or("")
+            .to_ascii_lowercase();
+
+        let mut parser_missing = false;
+        let mut language = if fallback_allowed {
+            None
+        } else if ext == "svg" {
+            Some("xml".to_string())
+        } else {
+            detect_language_from_extension(&ext).or_else(|| detect_language(&abs_path))
+        };
+
+        if let Some(lang) = language.as_ref() {
+            if !has_language(lang) {
+                parser_missing = true;
+                language = None;
+            }
+        }
+
+        if language.is_none() && !fallback_allowed {
+            result_dict.set_item("chunks", empty_chunks.clone_ref(py))?;
+            result_dict.set_item("reason", if parser_missing { "missing_parser" } else { "unknown_language" })?;
+            results.append(result_dict)?;
+            continue;
+        }
+
+        let source_bytes = match std::fs::read(&abs_path) {
+            Ok(value) => value,
+            Err(_) => {
+                result_dict.set_item("chunks", empty_chunks.clone_ref(py))?;
+                result_dict.set_item("reason", "read_error")?;
+                results.append(result_dict)?;
+                continue;
+            }
+        };
+        if source_bytes.len() > max_file_bytes {
+            result_dict.set_item("chunks", empty_chunks.clone_ref(py))?;
+            result_dict.set_item("reason", "too_large")?;
+            results.append(result_dict)?;
+            continue;
+        }
+
+        let source = String::from_utf8_lossy(&source_bytes).replace('\0', "");
+        if source.trim().is_empty() {
+            result_dict.set_item("chunks", empty_chunks.clone_ref(py))?;
+            result_dict.set_item("reason", "empty")?;
+            results.append(result_dict)?;
+            continue;
+        }
+
+        let mut forced_reason: Option<&'static str> = None;
+        let maybe_chunks: PyResult<Py<PyAny>> = (|| {
+            let mut file_meta_json = serde_json::Value::Object(serde_json::Map::new());
+
+            if language.as_deref() == Some("swift") && swift_requires_line_fallback(&source) {
+                return build_line_window_chunks(
+                    py,
+                    &source,
+                    &rel_path,
+                    &project_id,
+                    language.clone(),
+                    None,
+                    &chunk_id_version,
+                    chunk_lines,
+                    overlap_lines,
+                );
+            }
+
+            if let Some(lang) = language.as_ref() {
+                if lang == "swift" {
+                    if let Ok(payload_obj) = build_semantic_payload(
+                        py,
+                        &source,
+                        lang.clone(),
+                        rel_path.clone(),
+                        project_id.clone(),
+                        chunk_id_version.clone(),
+                        chunk_max_size,
+                        chunk_overlap,
+                    ) {
+                        if let Ok(payload_dict) = payload_obj.bind(py).cast::<PyDict>() {
+                            if let Ok(Some(file_meta_obj)) = payload_dict.get_item("file_meta") {
+                                if let Ok(file_meta_dict) = file_meta_obj.cast::<PyDict>() {
+                                    file_meta_json = py_dict_to_json_value(file_meta_dict)?;
+                                }
+                            }
+                        }
+                    }
+
+                    if skip_diagnostic_files {
+                        let diag_count = file_meta_json
+                            .as_object()
+                            .and_then(|obj| obj.get("file_diagnostics"))
+                            .and_then(|v| v.as_object())
+                            .and_then(|obj| obj.get("count"))
+                            .and_then(value_as_i64)
+                            .unwrap_or(0);
+                        if diag_count > 0 {
+                            forced_reason = Some("diagnostics");
+                            return Ok(empty_chunks.clone_ref(py));
+                        }
+                    }
+
+                    let file_meta_py = json_value_to_py(py, &file_meta_json)?;
+                    let chunks = build_swift_chunks(
+                        py,
+                        &source,
+                        &rel_path,
+                        &project_id,
+                        Some(file_meta_py.clone_ref(py)),
+                        &chunk_id_version,
+                        chunk_max_size,
+                        chunk_lines,
+                        overlap_lines,
+                    )?;
+                    if let Ok(list) = chunks.bind(py).cast::<PyList>() {
+                        if !list.is_empty() {
+                            return Ok(chunks);
+                        }
+                    }
+                    return build_line_window_chunks(
+                        py,
+                        &source,
+                        &rel_path,
+                        &project_id,
+                        Some(lang.clone()),
+                        Some(file_meta_py),
+                        &chunk_id_version,
+                        chunk_lines,
+                        overlap_lines,
+                    );
+                }
+
+                let payload_obj = match build_semantic_payload(
+                    py,
+                    &source,
+                    lang.clone(),
+                    rel_path.clone(),
+                    project_id.clone(),
+                    chunk_id_version.clone(),
+                    chunk_max_size,
+                    chunk_overlap,
+                ) {
+                    Ok(payload_obj) => {
+                        if let Ok(payload_dict) = payload_obj.bind(py).cast::<PyDict>() {
+                            if let Ok(Some(file_meta_obj)) = payload_dict.get_item("file_meta") {
+                                if let Ok(file_meta_dict) = file_meta_obj.cast::<PyDict>() {
+                                    file_meta_json = py_dict_to_json_value(file_meta_dict)?;
+                                }
+                            }
+                        }
+                        Some(payload_obj)
+                    }
+                    Err(_) => None,
+                };
+
+                if skip_diagnostic_files {
+                    let diag_count = file_meta_json
+                        .as_object()
+                        .and_then(|obj| obj.get("file_diagnostics"))
+                        .and_then(|v| v.as_object())
+                        .and_then(|obj| obj.get("count"))
+                        .and_then(value_as_i64)
+                        .unwrap_or(0);
+                    if diag_count > 0 {
+                        forced_reason = Some("diagnostics");
+                        return Ok(empty_chunks.clone_ref(py));
+                    }
+                }
+
+                if let Some(payload_obj) = payload_obj {
+                    if let Ok(payload_dict) = payload_obj.bind(py).cast::<PyDict>()
+                        && let Ok(Some(chunks_obj)) = payload_dict.get_item("chunks")
+                    {
+                        if let Ok(list) = chunks_obj.cast::<PyList>() {
+                            if !list.is_empty() {
+                                return Ok(chunks_obj.unbind());
+                            }
+                        }
+                    }
+                }
+                let file_meta_py = json_value_to_py(py, &file_meta_json)?;
+                return build_line_window_chunks(
+                    py,
+                    &source,
+                    &rel_path,
+                    &project_id,
+                    Some(lang.clone()),
+                    Some(file_meta_py),
+                    &chunk_id_version,
+                    chunk_lines,
+                    overlap_lines,
+                );
+            }
+
+            build_line_window_chunks(
+                py,
+                &source,
+                &rel_path,
+                &project_id,
+                None,
+                None,
+                &chunk_id_version,
+                chunk_lines,
+                overlap_lines,
+            )
+        })();
+
+        match maybe_chunks {
+            Ok(chunks) => {
+                enrich_semantic_chunk_contract_py(py, chunks.bind(py), &rel_path)?;
+                result_dict.set_item("chunks", chunks)?;
+                if let Some(reason) = forced_reason {
+                    result_dict.set_item("reason", reason)?;
+                } else {
+                    result_dict.set_item("reason", py.None())?;
+                }
+            }
+            Err(_) => {
+                result_dict.set_item("chunks", empty_chunks.clone_ref(py))?;
+                result_dict.set_item("reason", py.None())?;
+            }
+        }
+        results.append(result_dict)?;
+    }
+
+    Ok(results.into_any().unbind())
+}
+
 #[pyfunction]
 fn build_semantic_index_round_plan(
     py: Python<'_>,
@@ -1880,7 +2528,11 @@ fn build_semantic_index_driver_plan(
     batch_size: usize,
     concurrency: usize,
 ) -> PyResult<Py<PyAny>> {
-    let existing: HashSet<String> = existing_ids.unwrap_or_default().into_iter().collect();
+    let existing: HashSet<String> = if rebuild {
+        HashSet::new()
+    } else {
+        existing_ids.unwrap_or_default().into_iter().collect()
+    };
     let manifest_path_set: HashSet<String> = manifest_paths.unwrap_or_default().into_iter().collect();
     let db_path_set: HashSet<String> = db_paths.unwrap_or_default().into_iter().collect();
     let orphan_paths: Vec<String> = db_path_set.difference(&manifest_path_set).cloned().collect();
@@ -1981,6 +2633,444 @@ fn clone_py(obj: &Py<PyAny>) -> Py<PyAny> {
     Python::attach(|py| obj.clone_ref(py))
 }
 
+#[derive(Clone, Debug)]
+struct NativeSemanticChunk {
+    ref_id: String,
+    text: String,
+    file_path: String,
+    chunk_index: i32,
+    metadata_json: String,
+}
+
+#[derive(Clone, Debug)]
+struct NativeEmbeddedChunk {
+    ref_id: String,
+    text: String,
+    file_path: String,
+    chunk_index: i32,
+    metadata_json: String,
+    vector: Vec<f64>,
+}
+
+#[derive(Default, Clone, Debug)]
+struct NativeSemanticIngestStats {
+    embed_calls: usize,
+    embed_chunks: usize,
+    embed_seconds: f64,
+    write_calls: usize,
+    write_chunks: usize,
+    write_seconds: f64,
+}
+
+fn extract_native_semantic_chunks(
+    py: Python<'_>,
+    all_chunks: Vec<Vec<Py<PyAny>>>,
+) -> PyResult<Vec<Vec<NativeSemanticChunk>>> {
+    let json_mod = py.import("json")?;
+    let dumps = json_mod.getattr("dumps")?;
+    let mut out: Vec<Vec<NativeSemanticChunk>> = Vec::with_capacity(all_chunks.len());
+
+    for file_chunks in all_chunks {
+        let mut native_file_chunks: Vec<NativeSemanticChunk> = Vec::with_capacity(file_chunks.len());
+        for chunk in file_chunks {
+            let chunk_dict = chunk.bind(py).cast::<PyDict>()?;
+
+            let Some(ref_id_any) = chunk_dict.get_item("ref_id")? else {
+                continue;
+            };
+            let ref_id = ref_id_any.extract::<String>()?;
+
+            let Some(text_any) = chunk_dict.get_item("text")? else {
+                continue;
+            };
+            let text = text_any.extract::<String>()?;
+
+            let metadata_json = if let Some(meta_any) = chunk_dict.get_item("metadata")? {
+                dumps.call1((meta_any,))?.extract::<String>()?
+            } else {
+                "{}".to_string()
+            };
+
+            let (file_path, chunk_index) = if let Some(meta_any) = chunk_dict.get_item("metadata")? {
+                if let Ok(meta_dict) = meta_any.cast::<PyDict>() {
+                    let file_path = meta_dict
+                        .get_item("file")?
+                        .and_then(|value| value.extract::<String>().ok())
+                        .unwrap_or_default();
+                    let chunk_index = meta_dict
+                        .get_item("chunk_index")?
+                        .and_then(|value| value.extract::<i32>().ok())
+                        .or_else(|| {
+                            meta_dict
+                                .get_item("start_line")
+                                .ok()
+                                .flatten()
+                                .and_then(|value| value.extract::<i32>().ok())
+                        })
+                        .unwrap_or(0);
+                    (file_path, chunk_index)
+                } else {
+                    (String::new(), 0)
+                }
+            } else {
+                (String::new(), 0)
+            };
+
+            native_file_chunks.push(NativeSemanticChunk {
+                ref_id,
+                text,
+                file_path,
+                chunk_index,
+                metadata_json,
+            });
+        }
+        out.push(native_file_chunks);
+    }
+
+    Ok(out)
+}
+
+const NATIVE_CODEBASE_EMBEDDINGS_STAGE_SQL: &str = "\
+CREATE TEMP TABLE IF NOT EXISTS codebase_embeddings_stage (\
+    chunk_id TEXT,\
+    project_id TEXT,\
+    file_path TEXT,\
+    ref_type TEXT,\
+    chunk_index INTEGER,\
+    content TEXT,\
+    embedding_text TEXT,\
+    metadata_text TEXT,\
+    created_at_epoch DOUBLE PRECISION\
+)";
+
+const NATIVE_CODEBASE_EMBEDDINGS_STAGE_TRUNCATE_SQL: &str = "TRUNCATE codebase_embeddings_stage";
+
+const NATIVE_CODEBASE_EMBEDDINGS_STAGE_COPY_SQL: &str = "\
+COPY codebase_embeddings_stage \
+  (chunk_id, project_id, file_path, ref_type, chunk_index,\
+   content, embedding_text, metadata_text, created_at_epoch)\
+FROM STDIN BINARY";
+
+const NATIVE_CODEBASE_EMBEDDINGS_STAGE_INSERT_SQL: &str = "\
+INSERT INTO codebase_embeddings\
+  (chunk_id, project_id, file_path, ref_type, chunk_index,\
+   content, embedding, metadata, created_at)\
+SELECT\
+  chunk_id,\
+  project_id,\
+  file_path,\
+  ref_type,\
+  chunk_index,\
+  content,\
+  embedding_text::vector,\
+  metadata_text::jsonb,\
+  to_timestamp(created_at_epoch)\
+FROM codebase_embeddings_stage\
+ON CONFLICT (chunk_id) DO NOTHING";
+
+fn vector_to_pg_text(vector: &[f64]) -> String {
+    let mut out = String::from("[");
+    for (idx, value) in vector.iter().enumerate() {
+        if idx > 0 {
+            out.push(',');
+        }
+        out.push_str(&value.to_string());
+    }
+    out.push(']');
+    out
+}
+
+fn format_error_chain(err: &(dyn StdError + 'static)) -> String {
+    let mut parts = vec![err.to_string()];
+    let mut current = err.source();
+    while let Some(source) = current {
+        parts.push(source.to_string());
+        current = source.source();
+    }
+    parts.join(": ")
+}
+
+async fn emit_progress(progress_fn: &Option<Py<PyAny>>, payload: serde_json::Value) -> PyResult<()> {
+    let Some(progress_fn) = progress_fn else {
+        return Ok(());
+    };
+    let event = Python::attach(|py| json_value_to_py(py, &payload))?;
+    let _ = await_py_callable1(progress_fn, event).await?;
+    Ok(())
+}
+
+async fn fetch_existing_ids_native(
+    client: &tokio_postgres::Client,
+    project_id: &str,
+    manifest_paths: &[String],
+) -> Result<HashSet<String>, tokio_postgres::Error> {
+    if manifest_paths.is_empty() {
+        return Ok(HashSet::new());
+    }
+    let rows = client
+        .query(
+            "SELECT chunk_id FROM codebase_embeddings WHERE project_id = $1 AND file_path = ANY($2)",
+            &[&project_id, &manifest_paths],
+        )
+        .await?;
+    Ok(rows
+        .into_iter()
+        .filter_map(|row| row.try_get::<_, String>(0).ok())
+        .collect())
+}
+
+async fn delete_orphan_paths_native(
+    client: &tokio_postgres::Client,
+    project_id: &str,
+    manifest_paths: &[String],
+) -> Result<i64, tokio_postgres::Error> {
+    let affected = if manifest_paths.is_empty() {
+        client
+            .execute(
+                "DELETE FROM codebase_embeddings WHERE project_id = $1",
+                &[&project_id],
+            )
+            .await?
+    } else {
+        client
+            .execute(
+                "DELETE FROM codebase_embeddings WHERE project_id = $1 AND NOT (file_path = ANY($2))",
+                &[&project_id, &manifest_paths],
+            )
+            .await?
+    };
+    Ok(affected as i64)
+}
+
+async fn prune_file_chunks_native(
+    client: &tokio_postgres::Client,
+    project_id: &str,
+    file_path: &str,
+    chunk_ids: &[String],
+) -> Result<i64, tokio_postgres::Error> {
+    if file_path.is_empty() || chunk_ids.is_empty() {
+        return Ok(0);
+    }
+    let affected = client
+        .execute(
+            "DELETE FROM codebase_embeddings WHERE project_id = $1 AND file_path = $2 AND NOT (chunk_id = ANY($3))",
+            &[&project_id, &file_path, &chunk_ids],
+        )
+        .await?;
+    Ok(affected as i64)
+}
+
+async fn embed_lmstudio_batch_native(
+    client: &HttpClient,
+    base_url: &str,
+    model: &str,
+    batch: &[NativeSemanticChunk],
+) -> PyResult<Vec<NativeEmbeddedChunk>> {
+    let url = format!("{}/v1/embeddings", base_url.trim_end_matches('/'));
+    let inputs: Vec<String> = batch.iter().map(|item| item.text.clone()).collect();
+    let response = client
+        .post(url)
+        .json(&serde_json::json!({
+            "model": model,
+            "input": inputs,
+        }))
+        .send()
+        .await
+        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("LM Studio request failed: {e}")))?;
+
+    let status = response.status();
+    if !status.is_success() {
+        let body = response.text().await.unwrap_or_default();
+        return Err(pyo3::exceptions::PyRuntimeError::new_err(format!(
+            "LM Studio embeddings request failed: {} {}",
+            status,
+            body
+        )));
+    }
+
+    let mut payload: serde_json::Value = response
+        .json()
+        .await
+        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("LM Studio response decode failed: {e}")))?;
+    let items = payload
+        .get_mut("data")
+        .and_then(|value| value.as_array_mut())
+        .ok_or_else(|| pyo3::exceptions::PyRuntimeError::new_err("LM Studio embeddings response missing data array"))?;
+
+    items.sort_by_key(|item| item.get("index").and_then(|v| v.as_u64()).unwrap_or(0));
+
+    if items.len() != batch.len() {
+        return Err(pyo3::exceptions::PyRuntimeError::new_err(format!(
+            "LM Studio embeddings response size mismatch: expected {} got {}",
+            batch.len(),
+            items.len()
+        )));
+    }
+
+    let mut out = Vec::with_capacity(batch.len());
+    for (chunk, item) in batch.iter().zip(items.iter()) {
+        let vector = item
+            .get("embedding")
+            .and_then(|value| value.as_array())
+            .ok_or_else(|| pyo3::exceptions::PyRuntimeError::new_err("LM Studio embeddings response missing embedding vector"))?
+            .iter()
+            .map(|value| value.as_f64().unwrap_or(0.0))
+            .collect::<Vec<f64>>();
+        out.push(NativeEmbeddedChunk {
+            ref_id: chunk.ref_id.clone(),
+            text: chunk.text.clone(),
+            file_path: chunk.file_path.clone(),
+            chunk_index: chunk.chunk_index,
+            metadata_json: chunk.metadata_json.clone(),
+            vector,
+        });
+    }
+    Ok(out)
+}
+
+async fn insert_embedding_rows_native_insert(
+    client: &tokio_postgres::Client,
+    project_id: &str,
+    rows: &[NativeEmbeddedChunk],
+) -> PyResult<i64> {
+    if rows.is_empty() {
+        return Ok(0);
+    }
+
+    let created_at = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("clock error: {e}")))?
+        .as_secs_f64();
+
+    let mut query = String::from(
+        "INSERT INTO codebase_embeddings \
+         (chunk_id, project_id, file_path, ref_type, chunk_index, content, embedding, metadata, created_at) VALUES ",
+    );
+    let mut params: Vec<&(dyn tokio_postgres::types::ToSql + Sync)> = Vec::with_capacity(rows.len() * 9);
+    let vector_texts: Vec<String> = rows.iter().map(|row| vector_to_pg_text(&row.vector)).collect();
+    let ref_types: Vec<String> = rows.iter().map(|_| "code".to_string()).collect();
+
+    for (idx, row) in rows.iter().enumerate() {
+        if idx > 0 {
+            query.push_str(", ");
+        }
+        let base = idx * 9;
+        query.push_str(&format!(
+            "(${}, ${}, ${}, ${}, ${}, ${}, (${})::text::vector, (${})::text::jsonb, to_timestamp(${}))",
+            base + 1,
+            base + 2,
+            base + 3,
+            base + 4,
+            base + 5,
+            base + 6,
+            base + 7,
+            base + 8,
+            base + 9
+        ));
+        params.push(&row.ref_id);
+        params.push(&project_id);
+        params.push(&row.file_path);
+        params.push(&ref_types[idx]);
+        params.push(&row.chunk_index);
+        params.push(&row.text);
+        params.push(&vector_texts[idx]);
+        params.push(&row.metadata_json);
+        params.push(&created_at);
+    }
+    query.push_str(" ON CONFLICT (chunk_id) DO NOTHING");
+
+    let written = client
+        .execute(query.as_str(), &params)
+        .await
+        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("native postgres upsert failed: {}", format_error_chain(&e))))?;
+    Ok(written as i64)
+}
+
+async fn insert_embedding_rows_native(
+    client: &tokio_postgres::Client,
+    pg_dsn: &str,
+    project_id: &str,
+    rows: &[NativeEmbeddedChunk],
+) -> PyResult<i64> {
+    if rows.is_empty() {
+        return Ok(0);
+    }
+
+    let created_at = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("clock error: {e}")))?
+        .as_secs_f64();
+    let vector_texts: Vec<String> = rows.iter().map(|row| vector_to_pg_text(&row.vector)).collect();
+    let ref_types: Vec<String> = rows.iter().map(|_| "code".to_string()).collect();
+
+    let copy_result: Result<i64, tokio_postgres::Error> = async {
+        client.batch_execute(NATIVE_CODEBASE_EMBEDDINGS_STAGE_SQL).await?;
+        client.batch_execute(NATIVE_CODEBASE_EMBEDDINGS_STAGE_TRUNCATE_SQL).await?;
+        let sink = client.copy_in(NATIVE_CODEBASE_EMBEDDINGS_STAGE_COPY_SQL).await?;
+        let mut writer = std::pin::pin!(BinaryCopyInWriter::new(
+            sink,
+            &[
+                Type::TEXT,
+                Type::TEXT,
+                Type::TEXT,
+                Type::TEXT,
+                Type::INT4,
+                Type::TEXT,
+                Type::TEXT,
+                Type::TEXT,
+                Type::FLOAT8,
+            ],
+        ));
+        for (idx, row) in rows.iter().enumerate() {
+            writer
+                .as_mut()
+                .write(&[
+                    &row.ref_id,
+                    &project_id,
+                    &row.file_path,
+                    &ref_types[idx],
+                    &row.chunk_index,
+                    &row.text,
+                    &vector_texts[idx],
+                    &row.metadata_json,
+                    &created_at,
+                ])
+                .await?;
+        }
+        writer.as_mut().finish().await?;
+        let written = client.execute(NATIVE_CODEBASE_EMBEDDINGS_STAGE_INSERT_SQL, &[]).await?;
+        Ok(written as i64)
+    }
+    .await;
+
+    match copy_result {
+        Ok(written) => Ok(written),
+        Err(copy_err) => {
+            let (fallback_client, fallback_connection) = tokio_postgres::connect(pg_dsn, NoTls)
+                .await
+                .map_err(|fallback_connect_err| {
+                    pyo3::exceptions::PyRuntimeError::new_err(format!(
+                        "native stage copy failed: {}; fallback reconnect failed: {}",
+                        format_error_chain(&copy_err),
+                        format_error_chain(&fallback_connect_err)
+                    ))
+                })?;
+            tokio::spawn(async move {
+                let _ = fallback_connection.await;
+            });
+            insert_embedding_rows_native_insert(&fallback_client, project_id, rows)
+                .await
+                .map_err(|fallback_err| {
+                    pyo3::exceptions::PyRuntimeError::new_err(format!(
+                        "native stage copy failed: {}; fallback upsert also failed: {}",
+                        format_error_chain(&copy_err),
+                        fallback_err
+                    ))
+                })
+        }
+    }
+}
+
 async fn await_py_method1(obj: &Py<PyAny>, method: &str, args: Py<PyTuple>) -> PyResult<Py<PyAny>> {
     let awaitable = Python::attach(|py| -> PyResult<Py<PyAny>> {
         let result = obj.bind(py).call_method1(method, args.into_bound(py))?;
@@ -2057,26 +3147,30 @@ fn execute_semantic_index_driver(
     let progress_fn_obj = progress_fn.map(|p| p.clone_ref(py));
 
     Ok(pyo3_async_runtimes::tokio::future_into_py(py, async move {
-        let existing_args = Python::attach(|py| -> PyResult<Py<PyTuple>> {
-            Ok(PyTuple::new(
-                py,
-                [
-                    "SELECT chunk_id FROM codebase_embeddings WHERE project_id = %s"
-                        .into_pyobject(py)?
-                        .into_any(),
-                    vec![project_id.clone()].into_pyobject(py)?.into_any(),
-                ],
-            )?
-            .unbind())
-        })?;
-        let existing_rows = await_py_method1(&conn_obj, "execute", existing_args).await?;
-        let existing_fetch = await_py_method1(
-            &existing_rows,
-            "fetchall",
-            Python::attach(|py| -> PyResult<Py<PyTuple>> { Ok(PyTuple::empty(py).unbind()) })?,
-        )
-        .await?;
-        let existing_ids = Python::attach(|py| extract_first_col_strings(&existing_fetch.bind(py)))?;
+        let existing_ids = if rebuild {
+            Vec::new()
+        } else {
+            let existing_args = Python::attach(|py| -> PyResult<Py<PyTuple>> {
+                Ok(PyTuple::new(
+                    py,
+                    [
+                        "SELECT chunk_id FROM codebase_embeddings WHERE project_id = %s"
+                            .into_pyobject(py)?
+                            .into_any(),
+                        vec![project_id.clone()].into_pyobject(py)?.into_any(),
+                    ],
+                )?
+                .unbind())
+            })?;
+            let existing_rows = await_py_method1(&conn_obj, "execute", existing_args).await?;
+            let existing_fetch = await_py_method1(
+                &existing_rows,
+                "fetchall",
+                Python::attach(|py| -> PyResult<Py<PyTuple>> { Ok(PyTuple::empty(py).unbind()) })?,
+            )
+            .await?;
+            Python::attach(|py| extract_first_col_strings(&existing_fetch.bind(py)))?
+        };
 
         let db_paths_args = Python::attach(|py| -> PyResult<Py<PyTuple>> {
             Ok(PyTuple::new(
@@ -2327,6 +3421,224 @@ fn execute_semantic_index_driver(
     .unbind())
 }
 
+#[pyfunction(signature = (
+    project_id,
+    manifest_paths,
+    all_chunks,
+    pg_dsn,
+    lmstudio_base_url,
+    lmstudio_embed_model,
+    rebuild = false,
+    batch_size = 128,
+    concurrency = 4,
+    write_batch_size = 1024,
+    timeout_s = 120.0,
+    progress_fn = None
+))]
+fn execute_semantic_index_driver_native(
+    py: Python<'_>,
+    project_id: String,
+    manifest_paths: Vec<String>,
+    all_chunks: Vec<Vec<Py<PyAny>>>,
+    pg_dsn: String,
+    lmstudio_base_url: String,
+    lmstudio_embed_model: String,
+    rebuild: bool,
+    batch_size: usize,
+    concurrency: usize,
+    write_batch_size: usize,
+    timeout_s: f64,
+    progress_fn: Option<Py<PyAny>>,
+) -> PyResult<Py<PyAny>> {
+    let native_chunks = extract_native_semantic_chunks(py, all_chunks)?;
+    let progress_fn_obj = progress_fn.map(|p| p.clone_ref(py));
+
+    Ok(pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        let safe_batch_size = batch_size.max(1);
+        let safe_concurrency = concurrency.max(1);
+        let safe_write_batch_size = write_batch_size.max(1);
+        let prepare_started = std::time::Instant::now();
+
+        let (client, connection) = tokio_postgres::connect(&pg_dsn, NoTls)
+            .await
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("native postgres connect failed: {e}")))?;
+        tokio::spawn(async move {
+            let _ = connection.await;
+        });
+
+        let manifest_path_set: Vec<String> = manifest_paths.into_iter().filter(|path| !path.is_empty()).collect();
+        let existing_ids = if rebuild {
+            HashSet::new()
+        } else {
+            fetch_existing_ids_native(&client, &project_id, &manifest_path_set)
+                .await
+                .map_err(|e| {
+                    pyo3::exceptions::PyRuntimeError::new_err(format!("native existing-id fetch failed: {e}"))
+                })?
+        };
+
+        let orphan_pruned = if rebuild {
+            client
+                .execute("DELETE FROM codebase_embeddings WHERE project_id = $1", &[&project_id])
+                .await
+                .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("native rebuild wipe failed: {e}")))?
+                as i64
+        } else {
+            delete_orphan_paths_native(&client, &project_id, &manifest_path_set)
+                .await
+                .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("native orphan prune failed: {e}")))?
+        };
+
+        let mut new_chunks: Vec<NativeSemanticChunk> = Vec::new();
+        let mut skipped_chunks: usize = 0;
+        let mut pruned_total: i64 = 0;
+        let mut total_chunks: usize = 0;
+
+        for file_chunks in &native_chunks {
+            if file_chunks.is_empty() {
+                continue;
+            }
+            total_chunks += file_chunks.len();
+            let mut file_ids: Vec<String> = Vec::with_capacity(file_chunks.len());
+            let file_path = file_chunks[0].file_path.clone();
+            for chunk in file_chunks {
+                file_ids.push(chunk.ref_id.clone());
+                if existing_ids.contains(&chunk.ref_id) {
+                    skipped_chunks += 1;
+                } else {
+                    new_chunks.push(chunk.clone());
+                }
+            }
+            pruned_total += prune_file_chunks_native(&client, &project_id, &file_path, &file_ids)
+                .await
+                .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("native chunk prune failed: {e}")))?;
+        }
+
+        emit_progress(
+            &progress_fn_obj,
+            serde_json::json!({
+                "phase": "prepare_done",
+                "prepare_seconds": prepare_started.elapsed().as_secs_f64(),
+                "existing_count": existing_ids.len(),
+                "orphan_pruned": orphan_pruned,
+                "pruned_total": pruned_total,
+                "total_new": new_chunks.len(),
+            }),
+        )
+        .await?;
+
+        let http_client = HttpClient::builder()
+            .timeout(std::time::Duration::from_secs_f64(timeout_s.max(1.0)))
+            .build()
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("native LM Studio client init failed: {e}")))?;
+
+        let mut ingest_stats = NativeSemanticIngestStats::default();
+        let mut written: usize = 0;
+        let mut written_ref_ids: Vec<String> = Vec::new();
+        let window = safe_batch_size.saturating_mul(safe_concurrency).max(1);
+        let total_new = new_chunks.len();
+        let rounds = if total_new == 0 { 0 } else { total_new.div_ceil(window) };
+
+        for round_idx in 0..rounds {
+            let round_started = std::time::Instant::now();
+            let start = round_idx * window;
+            let end = std::cmp::min(start + window, total_new);
+            let group = &new_chunks[start..end];
+            let sub_batches: Vec<Vec<NativeSemanticChunk>> = group
+                .chunks(safe_batch_size)
+                .map(|batch| batch.to_vec())
+                .collect();
+
+            emit_progress(
+                &progress_fn_obj,
+                serde_json::json!({
+                    "phase": "embed_start",
+                    "round_index": round_idx,
+                    "rounds": rounds,
+                    "group_size": group.len(),
+                    "batch_count": sub_batches.len(),
+                    "written_so_far": written,
+                    "total_new": total_new,
+                }),
+            )
+            .await?;
+
+            let embed_started = std::time::Instant::now();
+            let embedded_batches = try_join_all(sub_batches.iter().map(|batch| {
+                embed_lmstudio_batch_native(&http_client, &lmstudio_base_url, &lmstudio_embed_model, batch)
+            }))
+            .await?;
+            let embed_seconds = embed_started.elapsed().as_secs_f64();
+            ingest_stats.embed_calls += sub_batches.len();
+            ingest_stats.embed_chunks += group.len();
+            ingest_stats.embed_seconds += embed_seconds;
+
+            let mut combined_group: Vec<NativeEmbeddedChunk> = Vec::new();
+            for batch in embedded_batches {
+                combined_group.extend(batch);
+            }
+
+            let write_started = std::time::Instant::now();
+            let mut round_written = 0usize;
+            for write_group in combined_group.chunks(safe_write_batch_size) {
+                if write_group.is_empty() {
+                    continue;
+                }
+                let count = insert_embedding_rows_native(&client, &pg_dsn, &project_id, write_group).await?;
+                ingest_stats.write_calls += 1;
+                ingest_stats.write_chunks += write_group.len();
+                round_written += count as usize;
+                written += count as usize;
+                written_ref_ids.extend(write_group.iter().map(|row| row.ref_id.clone()));
+            }
+            let write_seconds = write_started.elapsed().as_secs_f64();
+            ingest_stats.write_seconds += write_seconds;
+
+            emit_progress(
+                &progress_fn_obj,
+                serde_json::json!({
+                    "phase": "round_done",
+                    "round_index": round_idx,
+                    "rounds": rounds,
+                    "group_size": group.len(),
+                    "batch_count": sub_batches.len(),
+                    "written_so_far": written,
+                    "total_new": total_new,
+                    "round_written": round_written,
+                    "embed_seconds": embed_seconds,
+                    "write_seconds": write_seconds,
+                    "round_seconds": round_started.elapsed().as_secs_f64(),
+                }),
+            )
+            .await?;
+        }
+
+        Python::attach(|py| {
+            let result = PyDict::new(py);
+            result.set_item("new_chunk_count", total_new)?;
+            result.set_item("skipped_chunks", skipped_chunks)?;
+            result.set_item("total_chunks", total_chunks)?;
+            result.set_item("existing_count", existing_ids.len())?;
+            result.set_item("pruned_total", pruned_total)?;
+            result.set_item("orphan_pruned", orphan_pruned)?;
+            result.set_item("wiped", rebuild)?;
+            result.set_item("written", written)?;
+            result.set_item("rounds", rounds)?;
+            result.set_item("written_ref_ids", written_ref_ids)?;
+            let stats = PyDict::new(py);
+            stats.set_item("embed_calls", ingest_stats.embed_calls)?;
+            stats.set_item("embed_chunks", ingest_stats.embed_chunks)?;
+            stats.set_item("embed_seconds", ingest_stats.embed_seconds)?;
+            stats.set_item("write_calls", ingest_stats.write_calls)?;
+            stats.set_item("write_chunks", ingest_stats.write_chunks)?;
+            stats.set_item("write_seconds", ingest_stats.write_seconds)?;
+            result.set_item("ingest_stats", stats)?;
+            Ok(result.into_any().unbind())
+        })
+    })?
+    .unbind())
+}
+
 // ---------------------------------------------------------------------------
 // Module registration
 // ---------------------------------------------------------------------------
@@ -2379,11 +3691,13 @@ fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(build_line_window_chunks, m)?)?;
     m.add_function(wrap_pyfunction!(build_swift_chunks, m)?)?;
     m.add_function(wrap_pyfunction!(build_semantic_payload, m)?)?;
+    m.add_function(wrap_pyfunction!(process_semantic_manifest_entries, m)?)?;
     m.add_function(wrap_pyfunction!(build_semantic_sync_plan, m)?)?;
     m.add_function(wrap_pyfunction!(build_codebase_embedding_rows, m)?)?;
     m.add_function(wrap_pyfunction!(build_semantic_index_round_plan, m)?)?;
     m.add_function(wrap_pyfunction!(build_semantic_index_driver_plan, m)?)?;
     m.add_function(wrap_pyfunction!(execute_codebase_embedding_upsert, m)?)?;
     m.add_function(wrap_pyfunction!(execute_semantic_index_driver, m)?)?;
+    m.add_function(wrap_pyfunction!(execute_semantic_index_driver_native, m)?)?;
     Ok(())
 }

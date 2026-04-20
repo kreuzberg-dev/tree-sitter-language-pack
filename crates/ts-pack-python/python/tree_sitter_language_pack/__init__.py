@@ -96,6 +96,8 @@ trace_diverse_texts = getattr(
         "experiments": {},
     },
 )
+execute_semantic_index_driver_native = getattr(_native, "execute_semantic_index_driver_native", None)
+process_semantic_manifest_entries = getattr(_native, "process_semantic_manifest_entries", None)
 
 
 def _safe_list(value: Any) -> list[Any]:
@@ -384,6 +386,7 @@ __all__ = [
     "downloaded_languages",
     "execute_codebase_embedding_upsert",
     "execute_semantic_index_driver",
+    "execute_semantic_index_driver_native",
     "extract",
     "extract_file_facts",
     "extract_swift_semantic_facts",
