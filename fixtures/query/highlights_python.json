@@ -1,0 +1,15 @@
+{
+	"id": "highlights_query_python",
+	"description": "get_highlights_query returns non-empty string for python",
+	"category": "query",
+	"tags": ["query", "highlights"],
+	"call": "highlights",
+	"input": {
+		"language": "python"
+	},
+	"assertions": [
+		{
+			"type": "not_empty"
+		}
+	]
+}

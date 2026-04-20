@@ -1,0 +1,24 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=68", "wheel"]
+
+[project]
+name = "tree-sitter-language-pack-e2e-tests"
+version = "0.0.0"
+description = "End-to-end tests"
+requires-python = ">=3.10"
+dependencies = ["tree-sitter-language-pack", "pytest>=7.4", "pytest-asyncio>=0.23", "pytest-timeout>=2.1"]
+
+[tool.uv.sources]
+tree-sitter-language-pack = { path = "../../packages/python", editable = true }
+
+[tool.setuptools]
+packages = []
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
+addopts = "-v --strict-markers --tb=short"
+timeout = 300

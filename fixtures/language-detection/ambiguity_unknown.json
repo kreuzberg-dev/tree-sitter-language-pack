@@ -1,0 +1,15 @@
+{
+	"id": "ambiguity_unknown_extension",
+	"description": "Unknown extension returns empty (no ambiguity data)",
+	"category": "language-detection",
+	"tags": ["language-detection", "ambiguity"],
+	"call": "ambiguity",
+	"input": {
+		"extension": "zzzzz_nonexistent"
+	},
+	"assertions": [
+		{
+			"type": "is_empty"
+		}
+	]
+}

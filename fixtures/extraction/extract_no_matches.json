@@ -1,0 +1,29 @@
+{
+	"id": "extract_patterns_no_matches",
+	"description": "Extraction query that matches nothing returns empty results",
+	"category": "extraction",
+	"tags": ["extraction", "patterns"],
+	"call": "extract",
+	"input": {
+		"source_code": "x = 1\ny = 2\n",
+		"config": {
+			"language": "python",
+			"patterns": {
+				"classes": {
+					"query": "(class_definition name: (identifier) @name)",
+					"capture_output": "Full"
+				}
+			}
+		}
+	},
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "count_equals",
+			"field": "results.classes.matches",
+			"value": 0
+		}
+	]
+}

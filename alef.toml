@@ -313,6 +313,39 @@ module = "tree_sitter_language_pack"
 result_var = "result"
 args = [{ name = "language", field = "language", type = "string" }]
 
+[e2e.calls.injections]
+function = "get_injections_query"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [{ name = "language", field = "language", type = "string" }]
+
+[e2e.calls.locals]
+function = "get_locals_query"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [{ name = "language", field = "language", type = "string" }]
+
+[e2e.calls.language_count]
+function = "language_count"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = []
+
+[e2e.calls.extract]
+function = "extract_patterns"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [
+    { name = "source", field = "source_code", type = "string" },
+    { name = "config", field = "config", type = "json_object" },
+]
+
+[e2e.calls.validate]
+function = "validate_extraction"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [{ name = "config", field = "config", type = "json_object" }]
+
 [e2e.packages.rust]
 path = "../../crates/ts-pack-core"
 
