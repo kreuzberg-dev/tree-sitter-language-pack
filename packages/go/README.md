@@ -68,26 +68,36 @@ package main
 
 import (
     "fmt"
+    "log"
     tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
 func main() {
-    reg, _ := tspack.NewRegistry()
-    defer reg.Close()
+    if err := tspack.Init(`{"languages":["go"]}`); err != nil {
+        log.Fatal(err)
+    }
 
-    // Optional: Pre-download specific languages for offline use
-    reg.Init([]string{"python", "go", "rust"})
+    reg, err := tspack.NewRegistry()
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer reg.Close()
 
     langs := reg.AvailableLanguages()
     fmt.Println(langs)
 
-    // Auto-downloads language if not cached
     config := tspack.ProcessConfig{Language: "go"}
-    result, _ := reg.Process(source, config)
+    result, err := reg.Process("package main\nfunc main() {}\n", config)
+    if err != nil {
+        log.Fatal(err)
+    }
     fmt.Printf("Functions: %d\n", len(result.Structure))
 
-    // Pre-download languages for offline use
-    reg.Download([]string{"python", "javascript"})
+    downloaded, err := tspack.Download([]string{"python", "javascript"})
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("Downloaded: %d\n", downloaded)
 }
 ```
 
@@ -113,8 +123,8 @@ func main() {
 
 ### Download API
 
-- `Registry.Init(languages)` -- pre-download specific languages for offline use
-- `Registry.Download(languages)` -- download parsers on demand
+- `Init(configJSON)` -- configure the cache and optionally pre-download languages
+- `Download(languages)` -- download parsers on demand
 
 ### Intelligence
 

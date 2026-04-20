@@ -5,6 +5,8 @@ tasks:
     desc: Build FFI static library for Go
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LINK_MODE: '{{default "static" .TSLP_LINK_MODE}}'
+      TSLP_LANGUAGES: '{{default "python,rust,javascript,typescript,go,html,css,json" .TSLP_LANGUAGES}}'
     cmds:
       - cargo build -p ts-pack-ffi --release
 
