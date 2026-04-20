@@ -9,56 +9,56 @@ class TreeInspectionTest {
     @Test
     void testTreeErrorCountBroken() throws Exception {
         // Parse broken Python code and verify error count >= 1
-        var result = TreeSitterLanguagePack.process("def (broken syntax @@@ !!!");
+        var result = TreeSitterLanguagePack.process("def (broken syntax @@@ !!!", null);
         // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testTreeErrorCountValid() throws Exception {
         // Parse valid Python code and verify zero error count
-        var result = TreeSitterLanguagePack.process("x = 1\ny = 2\n");
+        var result = TreeSitterLanguagePack.process("x = 1\ny = 2\n", null);
         // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testTreeFindNodesTwoFunctions() throws Exception {
         // Parse Python with 2 functions and verify find_nodes_by_type count
-        var result = TreeSitterLanguagePack.process("def foo():\n    pass\n\ndef bar():\n    pass\n");
+        var result = TreeSitterLanguagePack.process("def foo():\n    pass\n\ndef bar():\n    pass\n", null);
         // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testTreeHasErrorNodesBrokenSyntax() throws Exception {
         // tree_has_error_nodes returns true for syntactically broken code
-        var result = TreeSitterLanguagePack.process("def broken(\n    x = \n");
+        var result = TreeSitterLanguagePack.process("def broken(\n    x = \n", null);
         // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testTreeHasErrorNodesValidCode() throws Exception {
         // tree_has_error_nodes returns false for valid Python code
-        var result = TreeSitterLanguagePack.process("def greet(name):\n    return f'Hello {name}'\n");
+        var result = TreeSitterLanguagePack.process("def greet(name):\n    return f'Hello {name}'\n", null);
         // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testTreeNamedChildrenClassAndFunction() throws Exception {
         // Parse Python with class and function, verify named children count
-        var result = TreeSitterLanguagePack.process("class Foo:\n    pass\n\ndef bar():\n    pass\n");
+        var result = TreeSitterLanguagePack.process("class Foo:\n    pass\n\ndef bar():\n    pass\n", null);
         // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testTreeRootNodeInfoPython() throws Exception {
         // Parse Python source and verify root node info
-        var result = TreeSitterLanguagePack.process("def hello():\n    pass\n");
+        var result = TreeSitterLanguagePack.process("def hello():\n    pass\n", null);
         // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testTreeToSexpPython() throws Exception {
         // Parse Python and verify tree_to_sexp returns valid S-expression containing module
-        var result = TreeSitterLanguagePack.process("x = 1\n");
+        var result = TreeSitterLanguagePack.process("x = 1\n", null);
         // TODO: unsupported assertion type: method_result
     }
 

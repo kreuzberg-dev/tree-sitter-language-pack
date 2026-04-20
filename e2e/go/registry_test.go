@@ -11,7 +11,7 @@ import (
 
 func Test_RegistryHasLanguageFalse(t *testing.T) {
 	// has_language('nonexistent') should return false
-	result, err := tspack.Process("")
+	result, err := tspack.Process("", nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -20,7 +20,7 @@ func Test_RegistryHasLanguageFalse(t *testing.T) {
 
 func Test_RegistryHasLanguageTrue(t *testing.T) {
 	// has_language('python') should return true
-	result, err := tspack.Process("")
+	result, err := tspack.Process("", nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -29,7 +29,7 @@ func Test_RegistryHasLanguageTrue(t *testing.T) {
 
 func Test_RegistryLanguageCount(t *testing.T) {
 	// language_count returns a value greater than 300
-	result, err := tspack.Process("")
+	result, err := tspack.Process("", nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -40,7 +40,7 @@ func Test_RegistryLanguageCount(t *testing.T) {
 
 func Test_RegistryListLanguages(t *testing.T) {
 	// available_languages should return a non-empty list
-	result, err := tspack.Process("")
+	result, err := tspack.Process("", nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}

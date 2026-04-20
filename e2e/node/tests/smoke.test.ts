@@ -4,1532 +4,1532 @@ import { process } from '@kreuzberg/tree-sitter-language-pack';
 
 describe('smoke', () => {
   it('smoke_abl: Smoke test: load abl and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_actionscript: Smoke test: load actionscript and parse a simple snippet', () => {
-    const result = process("var x:int = 1;");
+    const result = process("var x:int = 1;", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ada: Smoke test: load ada and parse a simple snippet', () => {
-    const result = process("procedure Main is begin null; end Main;");
+    const result = process("procedure Main is begin null; end Main;", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_agda: Smoke test: load agda and parse a simple snippet', () => {
-    const result = process("module Main where");
+    const result = process("module Main where", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_al: Smoke test: load al and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_angular: Smoke test: load angular and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_apex: Smoke test: load apex and parse a simple snippet', () => {
-    const result = process("public class Main {}");
+    const result = process("public class Main {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_arduino: Smoke test: load arduino and parse a simple snippet', () => {
-    const result = process("void setup() {}");
+    const result = process("void setup() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_asciidoc: Smoke test: load asciidoc and parse a simple snippet', () => {
-    const result = process("= Title\n\nParagraph.");
+    const result = process("= Title\n\nParagraph.", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_asm: Smoke test: load asm and parse a simple snippet', () => {
-    const result = process("mov eax, 1");
+    const result = process("mov eax, 1", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_astro: Smoke test: load astro and parse a simple snippet', () => {
-    const result = process("---\n---\n<p>hello</p>");
+    const result = process("---\n---\n<p>hello</p>", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_awk: Smoke test: load awk and parse a simple snippet', () => {
-    const result = process("BEGIN { print \"hello\" }");
+    const result = process("BEGIN { print \"hello\" }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_bash: Smoke test: load bash and parse a simple snippet', () => {
-    const result = process("echo hello");
+    const result = process("echo hello", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_bass: Smoke test: load bass and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_batch: Smoke test: load batch and parse a simple snippet', () => {
-    const result = process("@echo off\necho hello");
+    const result = process("@echo off\necho hello", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_beancount: Smoke test: load beancount and parse a simple snippet', () => {
-    const result = process("2024-01-01 open Assets:Bank USD");
+    const result = process("2024-01-01 open Assets:Bank USD", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_bibtex: Smoke test: load bibtex and parse a simple snippet', () => {
-    const result = process("@article{key, title={A}}");
+    const result = process("@article{key, title={A}}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_bicep: Smoke test: load bicep and parse a simple snippet', () => {
-    const result = process("param name string");
+    const result = process("param name string", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_bitbake: Smoke test: load bitbake and parse a simple snippet', () => {
-    const result = process("DESCRIPTION = \"hello\"");
+    const result = process("DESCRIPTION = \"hello\"", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_blade: Smoke test: load blade and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_brightscript: Smoke test: load brightscript and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_bsl: Smoke test: load bsl and parse a simple snippet', () => {
-    const result = process("Procedure Main() EndProcedure");
+    const result = process("Procedure Main() EndProcedure", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_c: Smoke test: load c and parse a simple snippet', () => {
-    const result = process("int main() { return 0; }");
+    const result = process("int main() { return 0; }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_c3: Smoke test: load c3 and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_caddy: Smoke test: load caddy and parse a simple snippet', () => {
-    const result = process(":8080 {\n\trespond \"Hello\"\n}");
+    const result = process(":8080 {\n\trespond \"Hello\"\n}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cairo: Smoke test: load cairo and parse a simple snippet', () => {
-    const result = process("fn main() {}");
+    const result = process("fn main() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_capnp: Smoke test: load capnp and parse a simple snippet', () => {
-    const result = process("@0xabcdef1234567890;");
+    const result = process("@0xabcdef1234567890;", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cedar: Smoke test: load cedar and parse a simple snippet', () => {
-    const result = process("permit(principal, action, resource);");
+    const result = process("permit(principal, action, resource);", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cedarschema: Smoke test: load cedarschema and parse a simple snippet', () => {
-    const result = process("entity User;");
+    const result = process("entity User;", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cel: Smoke test: load cel and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cfml: Smoke test: load cfml and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_chatito: Smoke test: load chatito and parse a simple snippet', () => {
-    const result = process("%[greeting]\n    hello");
+    const result = process("%[greeting]\n    hello", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_chuck: Smoke test: load chuck and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_circom: Smoke test: load circom and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_clarity: Smoke test: load clarity and parse a simple snippet', () => {
-    const result = process("(define-public (hello) (ok true))");
+    const result = process("(define-public (hello) (ok true))", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_clojure: Smoke test: load clojure and parse a simple snippet', () => {
-    const result = process("(def x 1)");
+    const result = process("(def x 1)", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cmake: Smoke test: load cmake and parse a simple snippet', () => {
-    const result = process("cmake_minimum_required(VERSION 3.0)");
+    const result = process("cmake_minimum_required(VERSION 3.0)", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cobol: Smoke test: load cobol and parse a simple snippet', () => {
-    const result = process("       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.");
+    const result = process("       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_comment: Smoke test: load comment and parse a simple snippet', () => {
-    const result = process("TODO: fix this");
+    const result = process("TODO: fix this", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_commonlisp: Smoke test: load commonlisp and parse a simple snippet', () => {
-    const result = process("(defun hello () (print \"hello\"))");
+    const result = process("(defun hello () (print \"hello\"))", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cooklang: Smoke test: load cooklang and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_corn: Smoke test: load corn and parse a simple snippet', () => {
-    const result = process("{ key = \"value\" }");
+    const result = process("{ key = \"value\" }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cpon: Smoke test: load cpon and parse a simple snippet', () => {
-    const result = process("{\"key\": 1}");
+    const result = process("{\"key\": 1}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cpp: Smoke test: load cpp and parse a simple snippet', () => {
-    const result = process("int main() { return 0; }");
+    const result = process("int main() { return 0; }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_crystal: Smoke test: load crystal and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_csharp: Smoke test: load csharp and parse a simple snippet', () => {
-    const result = process("class Main {}");
+    const result = process("class Main {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_css: Smoke test: load css and parse a simple snippet', () => {
-    const result = process("body { color: red; }");
+    const result = process("body { color: red; }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cst: Smoke test: load cst and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_csv: Smoke test: load csv and parse a simple snippet', () => {
-    const result = process("a,b,c\n1,2,3");
+    const result = process("a,b,c\n1,2,3", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cuda: Smoke test: load cuda and parse a simple snippet', () => {
-    const result = process("__global__ void kernel() {}");
+    const result = process("__global__ void kernel() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cue: Smoke test: load cue and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_cylc: Smoke test: load cylc and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_d: Smoke test: load d and parse a simple snippet', () => {
-    const result = process("void main() {}");
+    const result = process("void main() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_dart: Smoke test: load dart and parse a simple snippet', () => {
-    const result = process("void main() {}");
+    const result = process("void main() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_desktop: Smoke test: load desktop and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_devicetree: Smoke test: load devicetree and parse a simple snippet', () => {
-    const result = process("/dts-v1/;\n/ { };");
+    const result = process("/dts-v1/;\n/ { };", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_dhall: Smoke test: load dhall and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_diff: Smoke test: load diff and parse a simple snippet', () => {
-    const result = process("--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new");
+    const result = process("--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_djot: Smoke test: load djot and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_dockerfile: Smoke test: load dockerfile and parse a simple snippet', () => {
-    const result = process("FROM alpine");
+    const result = process("FROM alpine", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_dot: Smoke test: load dot and parse a simple snippet', () => {
-    const result = process("digraph G { A -> B; }");
+    const result = process("digraph G { A -> B; }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_doxygen: Smoke test: load doxygen and parse a simple snippet', () => {
-    const result = process("/** @brief A function */");
+    const result = process("/** @brief A function */", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_dtd: Smoke test: load dtd and parse a simple snippet', () => {
-    const result = process("<!ELEMENT note (body)>");
+    const result = process("<!ELEMENT note (body)>", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_earthfile: Smoke test: load earthfile and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ebnf: Smoke test: load ebnf and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_editorconfig: Smoke test: load editorconfig and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_eds: Smoke test: load eds and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_eex: Smoke test: load eex and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_elisp: Smoke test: load elisp and parse a simple snippet', () => {
-    const result = process("(defun hello () (message \"hello\"))");
+    const result = process("(defun hello () (message \"hello\"))", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_elixir: Smoke test: load elixir and parse a simple snippet', () => {
-    const result = process("IO.puts(\"hello\")");
+    const result = process("IO.puts(\"hello\")", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_elm: Smoke test: load elm and parse a simple snippet', () => {
-    const result = process("module Main exposing (..)");
+    const result = process("module Main exposing (..)", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_elsa: Smoke test: load elsa and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_elvish: Smoke test: load elvish and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_embeddedtemplate: Smoke test: load embeddedtemplate and parse a simple snippet', () => {
-    const result = process("<%= value %>");
+    const result = process("<%= value %>", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_enforce: Smoke test: load enforce and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_erlang: Smoke test: load erlang and parse a simple snippet', () => {
-    const result = process("main() -> ok.");
+    const result = process("main() -> ok.", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_facility: Smoke test: load facility and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_faust: Smoke test: load faust and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_fennel: Smoke test: load fennel and parse a simple snippet', () => {
-    const result = process("(fn hello [] (print :hello))");
+    const result = process("(fn hello [] (print :hello))", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_fidl: Smoke test: load fidl and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_firrtl: Smoke test: load firrtl and parse a simple snippet', () => {
-    const result = process("circuit Main :");
+    const result = process("circuit Main :", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_fish: Smoke test: load fish and parse a simple snippet', () => {
-    const result = process("echo hello");
+    const result = process("echo hello", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_foam: Smoke test: load foam and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_forth: Smoke test: load forth and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_fortran: Smoke test: load fortran and parse a simple snippet', () => {
-    const result = process("program main\nend program main");
+    const result = process("program main\nend program main", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_fsharp: Smoke test: load fsharp and parse a simple snippet', () => {
-    const result = process("let x = 1");
+    const result = process("let x = 1", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_fsharp_signature: Smoke test: load fsharp_signature and parse a simple snippet', () => {
-    const result = process("val x: int");
+    const result = process("val x: int", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_func: Smoke test: load func and parse a simple snippet', () => {
-    const result = process("() recv_internal() {}");
+    const result = process("() recv_internal() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gap: Smoke test: load gap and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gdscript: Smoke test: load gdscript and parse a simple snippet', () => {
-    const result = process("extends Node\nfunc _ready():\n\tpass");
+    const result = process("extends Node\nfunc _ready():\n\tpass", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gdshader: Smoke test: load gdshader and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_git_config: Smoke test: load git_config and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_git_rebase: Smoke test: load git_rebase and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gitattributes: Smoke test: load gitattributes and parse a simple snippet', () => {
-    const result = process("*.txt text");
+    const result = process("*.txt text", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gitcommit: Smoke test: load gitcommit and parse a simple snippet', () => {
-    const result = process("feat: add feature\n\nBody text");
+    const result = process("feat: add feature\n\nBody text", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gitignore: Smoke test: load gitignore and parse a simple snippet', () => {
-    const result = process("*.o\n*.log");
+    const result = process("*.o\n*.log", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gleam: Smoke test: load gleam and parse a simple snippet', () => {
-    const result = process("pub fn main() { }");
+    const result = process("pub fn main() { }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_glimmer: Smoke test: load glimmer and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_glsl: Smoke test: load glsl and parse a simple snippet', () => {
-    const result = process("void main() { gl_Position = vec4(0.0); }");
+    const result = process("void main() { gl_Position = vec4(0.0); }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gn: Smoke test: load gn and parse a simple snippet', () => {
-    const result = process("group(\"hello\") {}");
+    const result = process("group(\"hello\") {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gnuplot: Smoke test: load gnuplot and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_go: Smoke test: load go and parse a simple snippet', () => {
-    const result = process("package main");
+    const result = process("package main", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_godot_resource: Smoke test: load godot_resource and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gomod: Smoke test: load gomod and parse a simple snippet', () => {
-    const result = process("module example.com/hello\n\ngo 1.21");
+    const result = process("module example.com/hello\n\ngo 1.21", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gosum: Smoke test: load gosum and parse a simple snippet', () => {
-    const result = process("example.com/pkg v1.0.0 h1:abc=");
+    const result = process("example.com/pkg v1.0.0 h1:abc=", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gotmpl: Smoke test: load gotmpl and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gowork: Smoke test: load gowork and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gpg: Smoke test: load gpg and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_graphql: Smoke test: load graphql and parse a simple snippet', () => {
-    const result = process("type Query { hello: String }");
+    const result = process("type Query { hello: String }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gren: Smoke test: load gren and parse a simple snippet', () => {
-    const result = process("module Main exposing (..)");
+    const result = process("module Main exposing (..)", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_groovy: Smoke test: load groovy and parse a simple snippet', () => {
-    const result = process("def x = 1");
+    const result = process("def x = 1", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_gstlaunch: Smoke test: load gstlaunch and parse a simple snippet', () => {
-    const result = process("fakesrc ! fakesink");
+    const result = process("fakesrc ! fakesink", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_hack: Smoke test: load hack and parse a simple snippet', () => {
-    const result = process("<?hh\nfunction main(): void {}");
+    const result = process("<?hh\nfunction main(): void {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_hare: Smoke test: load hare and parse a simple snippet', () => {
-    const result = process("export fn main() void = void;");
+    const result = process("export fn main() void = void;", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_haskell: Smoke test: load haskell and parse a simple snippet', () => {
-    const result = process("main = putStrLn \"hello\"");
+    const result = process("main = putStrLn \"hello\"", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_haxe: Smoke test: load haxe and parse a simple snippet', () => {
-    const result = process("class Main { static function main() {} }");
+    const result = process("class Main { static function main() {} }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_hcl: Smoke test: load hcl and parse a simple snippet', () => {
-    const result = process("variable \"name\" { type = string }");
+    const result = process("variable \"name\" { type = string }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_heex: Smoke test: load heex and parse a simple snippet', () => {
-    const result = process("<%= @greeting %>");
+    const result = process("<%= @greeting %>", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_hjson: Smoke test: load hjson and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_hlsl: Smoke test: load hlsl and parse a simple snippet', () => {
-    const result = process("float4 main() : SV_Target { return 0; }");
+    const result = process("float4 main() : SV_Target { return 0; }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_hocon: Smoke test: load hocon and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_hoon: Smoke test: load hoon and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_html: Smoke test: load html and parse a simple snippet', () => {
-    const result = process("<p>hello</p>");
+    const result = process("<p>hello</p>", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_htmldjango: Smoke test: load htmldjango and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_http: Smoke test: load http and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_hurl: Smoke test: load hurl and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_hyprlang: Smoke test: load hyprlang and parse a simple snippet', () => {
-    const result = process("general { border_size = 1 }");
+    const result = process("general { border_size = 1 }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_idris: Smoke test: load idris and parse a simple snippet', () => {
-    const result = process("module Main");
+    const result = process("module Main", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ini: Smoke test: load ini and parse a simple snippet', () => {
-    const result = process("[section]\nkey = value");
+    const result = process("[section]\nkey = value", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ispc: Smoke test: load ispc and parse a simple snippet', () => {
-    const result = process("export void main() {}");
+    const result = process("export void main() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_jai: Smoke test: load jai and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_janet: Smoke test: load janet and parse a simple snippet', () => {
-    const result = process("(print \"hello\")");
+    const result = process("(print \"hello\")", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_java: Smoke test: load java and parse a simple snippet', () => {
-    const result = process("class Main {}");
+    const result = process("class Main {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_javadoc: Smoke test: load javadoc and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_javascript: Smoke test: load javascript and parse a simple snippet', () => {
-    const result = process("console.log('hello');");
+    const result = process("console.log('hello');", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_jinja2: Smoke test: load jinja2 and parse a simple snippet', () => {
-    const result = process("{{ variable }}");
+    const result = process("{{ variable }}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_jq: Smoke test: load jq and parse a simple snippet', () => {
-    const result = process(".[] | select(.key)");
+    const result = process(".[] | select(.key)", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_jsdoc: Smoke test: load jsdoc and parse a simple snippet', () => {
-    const result = process("/** @param {string} name */");
+    const result = process("/** @param {string} name */", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_json: Smoke test: load json and parse a simple snippet', () => {
-    const result = process("{\"key\": \"value\"}");
+    const result = process("{\"key\": \"value\"}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_json5: Smoke test: load json5 and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_jsonnet: Smoke test: load jsonnet and parse a simple snippet', () => {
-    const result = process("{ key: 'value' }");
+    const result = process("{ key: 'value' }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_julia: Smoke test: load julia and parse a simple snippet', () => {
-    const result = process("function main() end");
+    const result = process("function main() end", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_just: Smoke test: load just and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_kcl: Smoke test: load kcl and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_kconfig: Smoke test: load kconfig and parse a simple snippet', () => {
-    const result = process("config FOO\n\tbool \"Enable foo\"");
+    const result = process("config FOO\n\tbool \"Enable foo\"", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_kdl: Smoke test: load kdl and parse a simple snippet', () => {
-    const result = process("node \"value\"");
+    const result = process("node \"value\"", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_kotlin: Smoke test: load kotlin and parse a simple snippet', () => {
-    const result = process("fun main() {}");
+    const result = process("fun main() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_latex: Smoke test: load latex and parse a simple snippet', () => {
-    const result = process("\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}");
+    const result = process("\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_lean: Smoke test: load lean and parse a simple snippet', () => {
-    const result = process("def main : IO Unit := pure ()");
+    const result = process("def main : IO Unit := pure ()", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ledger: Smoke test: load ledger and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_less: Smoke test: load less and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_linkerscript: Smoke test: load linkerscript and parse a simple snippet', () => {
-    const result = process("SECTIONS { .text : { *(.text) } }");
+    const result = process("SECTIONS { .text : { *(.text) } }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_liquid: Smoke test: load liquid and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_llvm: Smoke test: load llvm and parse a simple snippet', () => {
-    const result = process("define i32 @main() { ret i32 0 }");
+    const result = process("define i32 @main() { ret i32 0 }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_lua: Smoke test: load lua and parse a simple snippet', () => {
-    const result = process("print('hello')");
+    const result = process("print('hello')", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_luadoc: Smoke test: load luadoc and parse a simple snippet', () => {
-    const result = process("---@param name string");
+    const result = process("---@param name string", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_luap: Smoke test: load luap and parse a simple snippet', () => {
-    const result = process("[a-z]+");
+    const result = process("[a-z]+", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_luau: Smoke test: load luau and parse a simple snippet', () => {
-    const result = process("local x: number = 1");
+    const result = process("local x: number = 1", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_magik: Smoke test: load magik and parse a simple snippet', () => {
-    const result = process("_method object.hello\n_endmethod");
+    const result = process("_method object.hello\n_endmethod", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_make: Smoke test: load make and parse a simple snippet', () => {
-    const result = process("all:\n\techo hello");
+    const result = process("all:\n\techo hello", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_markdown: Smoke test: load markdown and parse a simple snippet', () => {
-    const result = process("# Hello\n\nWorld");
+    const result = process("# Hello\n\nWorld", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_markdown_inline: Smoke test: load markdown_inline and parse a simple snippet', () => {
-    const result = process("**bold** and *italic*");
+    const result = process("**bold** and *italic*", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_matlab: Smoke test: load matlab and parse a simple snippet', () => {
-    const result = process("function y = hello(x)\ny = x;\nend");
+    const result = process("function y = hello(x)\ny = x;\nend", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_mermaid: Smoke test: load mermaid and parse a simple snippet', () => {
-    const result = process("graph TD\nA --> B");
+    const result = process("graph TD\nA --> B", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_meson: Smoke test: load meson and parse a simple snippet', () => {
-    const result = process("project('hello', 'c')");
+    const result = process("project('hello', 'c')", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_mlir: Smoke test: load mlir and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_mojo: Smoke test: load mojo and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_move: Smoke test: load move and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_nasm: Smoke test: load nasm and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_netlinx: Smoke test: load netlinx and parse a simple snippet', () => {
-    const result = process("PROGRAM_NAME='hello'");
+    const result = process("PROGRAM_NAME='hello'", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_nginx: Smoke test: load nginx and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_nickel: Smoke test: load nickel and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_nim: Smoke test: load nim and parse a simple snippet', () => {
-    const result = process("echo \"hello\"");
+    const result = process("echo \"hello\"", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ninja: Smoke test: load ninja and parse a simple snippet', () => {
-    const result = process("rule cc\n  command = cc \$in -o \$out");
+    const result = process("rule cc\n  command = cc \$in -o \$out", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_nix: Smoke test: load nix and parse a simple snippet', () => {
-    const result = process("{ pkgs ? import <nixpkgs> {} }: pkgs.hello");
+    const result = process("{ pkgs ? import <nixpkgs> {} }: pkgs.hello", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_norg: Smoke test: load norg and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_norg_meta: Smoke test: load norg_meta and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_nqc: Smoke test: load nqc and parse a simple snippet', () => {
-    const result = process("task main() {}");
+    const result = process("task main() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_nushell: Smoke test: load nushell and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_objc: Smoke test: load objc and parse a simple snippet', () => {
-    const result = process("@interface Main @end");
+    const result = process("@interface Main @end", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ocaml: Smoke test: load ocaml and parse a simple snippet', () => {
-    const result = process("let () = print_endline \"hello\"");
+    const result = process("let () = print_endline \"hello\"", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ocaml_interface: Smoke test: load ocaml_interface and parse a simple snippet', () => {
-    const result = process("val x : int");
+    const result = process("val x : int", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ocamllex: Smoke test: load ocamllex and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_odin: Smoke test: load odin and parse a simple snippet', () => {
-    const result = process("package main");
+    const result = process("package main", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_openscad: Smoke test: load openscad and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_org: Smoke test: load org and parse a simple snippet', () => {
-    const result = process("* Hello\nWorld");
+    const result = process("* Hello\nWorld", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_pascal: Smoke test: load pascal and parse a simple snippet', () => {
-    const result = process("program Hello; begin end.");
+    const result = process("program Hello; begin end.", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_pem: Smoke test: load pem and parse a simple snippet', () => {
-    const result = process("-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----");
+    const result = process("-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_perl: Smoke test: load perl and parse a simple snippet', () => {
-    const result = process("print 'hello';");
+    const result = process("print 'hello';", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_pgn: Smoke test: load pgn and parse a simple snippet', () => {
-    const result = process("1. e4 e5 *");
+    const result = process("1. e4 e5 *", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_php: Smoke test: load php and parse a simple snippet', () => {
-    const result = process("<?php echo 'hello'; ?>");
+    const result = process("<?php echo 'hello'; ?>", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_phpdoc: Smoke test: load phpdoc and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_pkl: Smoke test: load pkl and parse a simple snippet', () => {
-    const result = process("name = \"hello\"");
+    const result = process("name = \"hello\"", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_po: Smoke test: load po and parse a simple snippet', () => {
-    const result = process("msgid \"hello\"\nmsgstr \"world\"");
+    const result = process("msgid \"hello\"\nmsgstr \"world\"", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_poe_filter: Smoke test: load poe_filter and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_pony: Smoke test: load pony and parse a simple snippet', () => {
-    const result = process("actor Main\n  new create(env: Env) => None");
+    const result = process("actor Main\n  new create(env: Env) => None", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_postscript: Smoke test: load postscript and parse a simple snippet', () => {
-    const result = process("/hello { (Hello) show } def");
+    const result = process("/hello { (Hello) show } def", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_powershell: Smoke test: load powershell and parse a simple snippet', () => {
-    const result = process("Write-Host 'hello'");
+    const result = process("Write-Host 'hello'", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_printf: Smoke test: load printf and parse a simple snippet', () => {
-    const result = process("%d %s");
+    const result = process("%d %s", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_prisma: Smoke test: load prisma and parse a simple snippet', () => {
-    const result = process("model User { id Int @id }");
+    const result = process("model User { id Int @id }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_prolog: Smoke test: load prolog and parse a simple snippet', () => {
-    const result = process("hello :- write('hello'), nl.");
+    const result = process("hello :- write('hello'), nl.", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_promql: Smoke test: load promql and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_properties: Smoke test: load properties and parse a simple snippet', () => {
-    const result = process("key=value");
+    const result = process("key=value", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_proto: Smoke test: load proto and parse a simple snippet', () => {
-    const result = process("syntax = \"proto3\";");
+    const result = process("syntax = \"proto3\";", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_prql: Smoke test: load prql and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_psv: Smoke test: load psv and parse a simple snippet', () => {
-    const result = process("a|b|c\n1|2|3");
+    const result = process("a|b|c\n1|2|3", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_pug: Smoke test: load pug and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_puppet: Smoke test: load puppet and parse a simple snippet', () => {
-    const result = process("notify { 'hello': }");
+    const result = process("notify { 'hello': }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_purescript: Smoke test: load purescript and parse a simple snippet', () => {
-    const result = process("module Main where");
+    const result = process("module Main where", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_pymanifest: Smoke test: load pymanifest and parse a simple snippet', () => {
-    const result = process("include *.txt");
+    const result = process("include *.txt", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_python: Smoke test: load python and parse a simple snippet', () => {
-    const result = process("print('hello')");
+    const result = process("print('hello')", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ql: Smoke test: load ql and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_qmldir: Smoke test: load qmldir and parse a simple snippet', () => {
-    const result = process("module Example");
+    const result = process("module Example", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_qmljs: Smoke test: load qmljs and parse a simple snippet', () => {
-    const result = process("import QtQuick 2.0\nItem {}");
+    const result = process("import QtQuick 2.0\nItem {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_query: Smoke test: load query and parse a simple snippet', () => {
-    const result = process("(identifier) @name");
+    const result = process("(identifier) @name", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_r: Smoke test: load r and parse a simple snippet', () => {
-    const result = process("print('hello')");
+    const result = process("print('hello')", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_racket: Smoke test: load racket and parse a simple snippet', () => {
-    const result = process("#lang racket\n(define x 1)");
+    const result = process("#lang racket\n(define x 1)", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_rasi: Smoke test: load rasi and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_razor: Smoke test: load razor and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_rbs: Smoke test: load rbs and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_re2c: Smoke test: load re2c and parse a simple snippet', () => {
-    const result = process("/*!re2c\n  [a-z]+ { return; }\n*/");
+    const result = process("/*!re2c\n  [a-z]+ { return; }\n*/", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_readline: Smoke test: load readline and parse a simple snippet', () => {
-    const result = process("set editing-mode vi");
+    const result = process("set editing-mode vi", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_regex: Smoke test: load regex and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_rego: Smoke test: load rego and parse a simple snippet', () => {
-    const result = process("package main\ndefault allow = false");
+    const result = process("package main\ndefault allow = false", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_requirements: Smoke test: load requirements and parse a simple snippet', () => {
-    const result = process("flask>=2.0");
+    const result = process("flask>=2.0", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_rescript: Smoke test: load rescript and parse a simple snippet', () => {
-    const result = process("let x = 1");
+    const result = process("let x = 1", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_robot: Smoke test: load robot and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_roc: Smoke test: load roc and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ron: Smoke test: load ron and parse a simple snippet', () => {
-    const result = process("(key: \"value\")");
+    const result = process("(key: \"value\")", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_rst: Smoke test: load rst and parse a simple snippet', () => {
-    const result = process("Hello\n=====\n\nWorld");
+    const result = process("Hello\n=====\n\nWorld", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_rtf: Smoke test: load rtf and parse a simple snippet', () => {
-    const result = process("{\\rtf1 hello}");
+    const result = process("{\\rtf1 hello}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ruby: Smoke test: load ruby and parse a simple snippet', () => {
-    const result = process("puts 'hello'");
+    const result = process("puts 'hello'", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_rust: Smoke test: load rust and parse a simple snippet', () => {
-    const result = process("fn main() {}");
+    const result = process("fn main() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_scala: Smoke test: load scala and parse a simple snippet', () => {
-    const result = process("object Main");
+    const result = process("object Main", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_scheme: Smoke test: load scheme and parse a simple snippet', () => {
-    const result = process("(define x 1)");
+    const result = process("(define x 1)", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_scss: Smoke test: load scss and parse a simple snippet', () => {
-    const result = process("\$color: red;\nbody { color: \$color; }");
+    const result = process("\$color: red;\nbody { color: \$color; }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_slang: Smoke test: load slang and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_smali: Smoke test: load smali and parse a simple snippet', () => {
-    const result = process(".class public LMain;\n.super Ljava/lang/Object;");
+    const result = process(".class public LMain;\n.super Ljava/lang/Object;", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_smalltalk: Smoke test: load smalltalk and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_smithy: Smoke test: load smithy and parse a simple snippet', () => {
-    const result = process("namespace example\nstring MyString");
+    const result = process("namespace example\nstring MyString", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_sml: Smoke test: load sml and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_snakemake: Smoke test: load snakemake and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_solidity: Smoke test: load solidity and parse a simple snippet', () => {
-    const result = process("pragma solidity ^0.8.0;\ncontract Main {}");
+    const result = process("pragma solidity ^0.8.0;\ncontract Main {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_souffle: Smoke test: load souffle and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_sourcepawn: Smoke test: load sourcepawn and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_sparql: Smoke test: load sparql and parse a simple snippet', () => {
-    const result = process("SELECT ?s WHERE { ?s ?p ?o }");
+    const result = process("SELECT ?s WHERE { ?s ?p ?o }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_sql: Smoke test: load sql and parse a simple snippet', () => {
-    const result = process("SELECT 1;");
+    const result = process("SELECT 1;", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_sql_bigquery: Smoke test: load sql_bigquery and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_squirrel: Smoke test: load squirrel and parse a simple snippet', () => {
-    const result = process("function main() {}");
+    const result = process("function main() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ssh_config: Smoke test: load ssh_config and parse a simple snippet', () => {
-    const result = process("Host example\n  HostName example.com");
+    const result = process("Host example\n  HostName example.com", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_stan: Smoke test: load stan and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_starlark: Smoke test: load starlark and parse a simple snippet', () => {
-    const result = process("def hello(): pass");
+    const result = process("def hello(): pass", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_superhtml: Smoke test: load superhtml and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_svelte: Smoke test: load svelte and parse a simple snippet', () => {
-    const result = process("<script>let x = 1;</script>");
+    const result = process("<script>let x = 1;</script>", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_sway: Smoke test: load sway and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_swift: Smoke test: load swift and parse a simple snippet', () => {
-    const result = process("print(\"hello\")");
+    const result = process("print(\"hello\")", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_systemverilog: Smoke test: load systemverilog and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_tablegen: Smoke test: load tablegen and parse a simple snippet', () => {
-    const result = process("def Hello : Base {}");
+    const result = process("def Hello : Base {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_tact: Smoke test: load tact and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_tcl: Smoke test: load tcl and parse a simple snippet', () => {
-    const result = process("puts hello");
+    const result = process("puts hello", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_teal: Smoke test: load teal and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_templ: Smoke test: load templ and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_tera: Smoke test: load tera and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_terraform: Smoke test: load terraform and parse a simple snippet', () => {
-    const result = process("resource \"null_resource\" \"main\" {}");
+    const result = process("resource \"null_resource\" \"main\" {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_test: Smoke test: load test and parse a simple snippet', () => {
-    const result = process("===========\nTest\n===========\n---\n(node)");
+    const result = process("===========\nTest\n===========\n---\n(node)", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_textproto: Smoke test: load textproto and parse a simple snippet', () => {
-    const result = process("key: \"value\"");
+    const result = process("key: \"value\"", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_thrift: Smoke test: load thrift and parse a simple snippet', () => {
-    const result = process("service HelloService {}");
+    const result = process("service HelloService {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_tlaplus: Smoke test: load tlaplus and parse a simple snippet', () => {
-    const result = process("---- MODULE Main ----\n====");
+    const result = process("---- MODULE Main ----\n====", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_tmux: Smoke test: load tmux and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_todotxt: Smoke test: load todotxt and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_toml: Smoke test: load toml and parse a simple snippet', () => {
-    const result = process("key = \"value\"");
+    const result = process("key = \"value\"", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_tsv: Smoke test: load tsv and parse a simple snippet', () => {
-    const result = process("a\tb\tc\n1\t2\t3");
+    const result = process("a\tb\tc\n1\t2\t3", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_tsx: Smoke test: load tsx and parse a simple snippet', () => {
-    const result = process("const App = () => <div />;");
+    const result = process("const App = () => <div />;", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_turtle: Smoke test: load turtle and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_twig: Smoke test: load twig and parse a simple snippet', () => {
-    const result = process("{{ variable }}");
+    const result = process("{{ variable }}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_typescript: Smoke test: load typescript and parse a simple snippet', () => {
-    const result = process("const x: number = 42;");
+    const result = process("const x: number = 42;", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_typespec: Smoke test: load typespec and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_typoscript: Smoke test: load typoscript and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_typst: Smoke test: load typst and parse a simple snippet', () => {
-    const result = process("#let x = 1");
+    const result = process("#let x = 1", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_udev: Smoke test: load udev and parse a simple snippet', () => {
-    const result = process("ACTION==\"add\", KERNEL==\"sd*\"");
+    const result = process("ACTION==\"add\", KERNEL==\"sd*\"", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ungrammar: Smoke test: load ungrammar and parse a simple snippet', () => {
-    const result = process("Root = Item*\nItem = 'token'");
+    const result = process("Root = Item*\nItem = 'token'", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_uxntal: Smoke test: load uxntal and parse a simple snippet', () => {
-    const result = process("|0100 LIT 01");
+    const result = process("|0100 LIT 01", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_v: Smoke test: load v and parse a simple snippet', () => {
-    const result = process("fn main() {}");
+    const result = process("fn main() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_vb: Smoke test: load vb and parse a simple snippet', () => {
-    const result = process("Module Main\nEnd Module");
+    const result = process("Module Main\nEnd Module", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_verilog: Smoke test: load verilog and parse a simple snippet', () => {
-    const result = process("module main; endmodule");
+    const result = process("module main; endmodule", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_vhdl: Smoke test: load vhdl and parse a simple snippet', () => {
-    const result = process("entity main is end main;");
+    const result = process("entity main is end main;", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_vhs: Smoke test: load vhs and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_vim: Smoke test: load vim and parse a simple snippet', () => {
-    const result = process("echo 'hello'");
+    const result = process("echo 'hello'", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_vimdoc: Smoke test: load vimdoc and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_vrl: Smoke test: load vrl and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_vue: Smoke test: load vue and parse a simple snippet', () => {
-    const result = process("<template><div>hello</div></template>");
+    const result = process("<template><div>hello</div></template>", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_wast: Smoke test: load wast and parse a simple snippet', () => {
-    const result = process("(module)");
+    const result = process("(module)", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_wat: Smoke test: load wat and parse a simple snippet', () => {
-    const result = process("(module)");
+    const result = process("(module)", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_wgsl: Smoke test: load wgsl and parse a simple snippet', () => {
-    const result = process("@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }");
+    const result = process("@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_wgsl_bevy: Smoke test: load wgsl_bevy and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_wit: Smoke test: load wit and parse a simple snippet', () => {
-    const result = process("package example:pkg;");
+    const result = process("package example:pkg;", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_wolfram: Smoke test: load wolfram and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_x86asm: Smoke test: load x86asm and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_xcompose: Smoke test: load xcompose and parse a simple snippet', () => {
-    const result = process("<Multi_key> <a> : \"a\"");
+    const result = process("<Multi_key> <a> : \"a\"", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_xml: Smoke test: load xml and parse a simple snippet', () => {
-    const result = process("<?xml version=\"1.0\"?>\n<root>hello</root>");
+    const result = process("<?xml version=\"1.0\"?>\n<root>hello</root>", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_yaml: Smoke test: load yaml and parse a simple snippet', () => {
-    const result = process("key: value");
+    const result = process("key: value", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_yuck: Smoke test: load yuck and parse a simple snippet', () => {
-    const result = process("(defwidget main [] (label :text \"hi\"))");
+    const result = process("(defwidget main [] (label :text \"hi\"))", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_zig: Smoke test: load zig and parse a simple snippet', () => {
-    const result = process("pub fn main() void {}");
+    const result = process("pub fn main() void {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ziggy: Smoke test: load ziggy and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_ziggy_schema: Smoke test: load ziggy_schema and parse a simple snippet', () => {
-    const result = process("x");
+    const result = process("x", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('smoke_zsh: Smoke test: load zsh and parse a simple snippet', () => {
-    const result = process("echo hello");
+    const result = process("echo hello", null);
     // TODO: unsupported assertion type: method_result
   });
 });

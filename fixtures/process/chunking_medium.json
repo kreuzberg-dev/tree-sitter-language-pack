@@ -2,13 +2,18 @@
 	"id": "python_chunking_medium",
 	"description": "Intel: Python code with medium chunk size",
 	"category": "process",
-	"tags": ["intel", "chunking"],
+	"tags": [
+		"intel",
+		"chunking"
+	],
 	"skip": {
 		"reason": "Requires python language"
 	},
 	"input": {
-		"language": "python",
-		"source_code": "def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n"
+		"source_code": "def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n",
+		"config": {
+			"language": "python"
+		}
 	},
 	"assertions": [
 		{

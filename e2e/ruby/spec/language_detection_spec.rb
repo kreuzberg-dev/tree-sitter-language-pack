@@ -6,117 +6,117 @@ require 'json'
 
 RSpec.describe 'language-detection' do
   it 'ambiguity_h_extension: The .h extension is ambiguous (could be C, C++, or Objective-C)' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).not_to be_empty
   end
 
   it 'ambiguity_py_extension: The .py extension is NOT ambiguous (only maps to python)' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result.nil? || result.empty?).to be(true)
   end
 
   it 'ambiguity_unknown_extension: Unknown extension returns empty (no ambiguity data)' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result.nil? || result.empty?).to be(true)
   end
 
   it 'detect_content_bash_shebang: detect_language_from_content recognizes #!/bin/bash shebang' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('bash')
   end
 
   it 'detect_content_no_shebang: detect_language_from_content returns None when no shebang present' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result.nil? || result.empty?).to be(true)
   end
 
   it 'detect_content_python_shebang: detect_language_from_content recognizes #!/usr/bin/env python3 shebang' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('python')
   end
 
   it 'detect_ext_cpp: detect_language_from_extension recognizes .cpp as cpp' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('cpp')
   end
 
   it 'detect_ext_go: detect_language_from_extension recognizes .go as go' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('go')
   end
 
   it 'detect_ext_java: detect_language_from_extension recognizes .java as java' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('java')
   end
 
   it 'detect_ext_javascript: detect_language_from_extension recognizes .js as javascript' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('javascript')
   end
 
   it 'detect_ext_php: detect_language_from_extension recognizes .php as php' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('php')
   end
 
   it 'detect_ext_python: detect_language_from_extension recognizes .py as python' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('python')
   end
 
   it 'detect_ext_ruby: detect_language_from_extension recognizes .rb as ruby' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('ruby')
   end
 
   it 'detect_ext_rust: detect_language_from_extension recognizes .rs as rust' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('rust')
   end
 
   it 'detect_ext_typescript: detect_language_from_extension recognizes .ts as typescript' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('typescript')
   end
 
   it 'detect_ext_unknown: detect_language_from_extension returns None for unknown extension .xyz' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result.nil? || result.empty?).to be(true)
   end
 
   it 'detect_path_dotfile: detect_language_from_path returns None for dotfile .gitignore (no standard extension)' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result.nil? || result.empty?).to be(true)
   end
 
   it 'detect_path_go_nested: detect_language_from_path extracts extension from nested path lib/server.go' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('go')
   end
 
   it 'detect_path_java_root: detect_language_from_path recognizes Main.java in root directory' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('java')
   end
 
   it 'detect_path_js_root: detect_language_from_path recognizes app.js in root directory' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('javascript')
   end
 
   it 'detect_path_nested: detect_language_from_path extracts extension from nested path src/main.py' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('python')
   end
 
   it 'detect_path_no_extension: detect_language_from_path returns None for extensionless file Makefile' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result.nil? || result.empty?).to be(true)
   end
 
   it 'detect_path_rust_src: detect_language_from_path extracts extension from nested path src/main.rs' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to eq('rust')
   end
 end

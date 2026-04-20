@@ -6,42 +6,42 @@ require 'json'
 
 RSpec.describe 'tree-inspection' do
   it 'tree_error_count_broken: Parse broken Python code and verify error count >= 1' do
-    result = TreeSitterLanguagePack.process('def (broken syntax @@@ !!!')
+    result = TreeSitterLanguagePack.process('def (broken syntax @@@ !!!', nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'tree_error_count_valid: Parse valid Python code and verify zero error count' do
-    result = TreeSitterLanguagePack.process("x = 1\ny = 2\n")
+    result = TreeSitterLanguagePack.process("x = 1\ny = 2\n", nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'tree_find_nodes_two_functions: Parse Python with 2 functions and verify find_nodes_by_type count' do
-    result = TreeSitterLanguagePack.process("def foo():\n    pass\n\ndef bar():\n    pass\n")
+    result = TreeSitterLanguagePack.process("def foo():\n    pass\n\ndef bar():\n    pass\n", nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'tree_has_error_nodes_broken_syntax: tree_has_error_nodes returns true for syntactically broken code' do
-    result = TreeSitterLanguagePack.process("def broken(\n    x = \n")
+    result = TreeSitterLanguagePack.process("def broken(\n    x = \n", nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'tree_has_error_nodes_valid_code: tree_has_error_nodes returns false for valid Python code' do
-    result = TreeSitterLanguagePack.process("def greet(name):\n    return f'Hello {name}'\n")
+    result = TreeSitterLanguagePack.process("def greet(name):\n    return f'Hello {name}'\n", nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'tree_named_children_class_and_function: Parse Python with class and function, verify named children count' do
-    result = TreeSitterLanguagePack.process("class Foo:\n    pass\n\ndef bar():\n    pass\n")
+    result = TreeSitterLanguagePack.process("class Foo:\n    pass\n\ndef bar():\n    pass\n", nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'tree_root_node_info_python: Parse Python source and verify root node info' do
-    result = TreeSitterLanguagePack.process("def hello():\n    pass\n")
+    result = TreeSitterLanguagePack.process("def hello():\n    pass\n", nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'tree_to_sexp_python: Parse Python and verify tree_to_sexp returns valid S-expression containing module' do
-    result = TreeSitterLanguagePack.process("x = 1\n")
+    result = TreeSitterLanguagePack.process("x = 1\n", nil)
     # TODO: unsupported assertion type: method_result
   end
 end

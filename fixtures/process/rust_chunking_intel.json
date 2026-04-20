@@ -2,13 +2,18 @@
 	"id": "rust_chunking_process",
 	"description": "Intel: chunk multi-function Rust source into pieces",
 	"category": "process",
-	"tags": ["intel", "chunking"],
+	"tags": [
+		"intel",
+		"chunking"
+	],
 	"skip": {
 		"reason": "Requires rust language"
 	},
 	"input": {
-		"language": "rust",
-		"source_code": "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n"
+		"source_code": "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n",
+		"config": {
+			"language": "rust"
+		}
 	},
 	"assertions": [
 		{

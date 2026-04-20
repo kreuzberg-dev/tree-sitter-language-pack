@@ -14,2142 +14,2142 @@ final class SmokeTest extends TestCase
     /** Smoke test: load abl and parse a simple snippet */
     public function test_smoke_abl(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load actionscript and parse a simple snippet */
     public function test_smoke_actionscript(): void
     {
-        $result = TreeSitterLanguagePack::process("var x:int = 1;");
+        $result = TreeSitterLanguagePack::process("var x:int = 1;", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ada and parse a simple snippet */
     public function test_smoke_ada(): void
     {
-        $result = TreeSitterLanguagePack::process("procedure Main is begin null; end Main;");
+        $result = TreeSitterLanguagePack::process("procedure Main is begin null; end Main;", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load agda and parse a simple snippet */
     public function test_smoke_agda(): void
     {
-        $result = TreeSitterLanguagePack::process("module Main where");
+        $result = TreeSitterLanguagePack::process("module Main where", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load al and parse a simple snippet */
     public function test_smoke_al(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load angular and parse a simple snippet */
     public function test_smoke_angular(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load apex and parse a simple snippet */
     public function test_smoke_apex(): void
     {
-        $result = TreeSitterLanguagePack::process("public class Main {}");
+        $result = TreeSitterLanguagePack::process("public class Main {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load arduino and parse a simple snippet */
     public function test_smoke_arduino(): void
     {
-        $result = TreeSitterLanguagePack::process("void setup() {}");
+        $result = TreeSitterLanguagePack::process("void setup() {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load asciidoc and parse a simple snippet */
     public function test_smoke_asciidoc(): void
     {
-        $result = TreeSitterLanguagePack::process("= Title\n\nParagraph.");
+        $result = TreeSitterLanguagePack::process("= Title\n\nParagraph.", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load asm and parse a simple snippet */
     public function test_smoke_asm(): void
     {
-        $result = TreeSitterLanguagePack::process("mov eax, 1");
+        $result = TreeSitterLanguagePack::process("mov eax, 1", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load astro and parse a simple snippet */
     public function test_smoke_astro(): void
     {
-        $result = TreeSitterLanguagePack::process("---\n---\n<p>hello</p>");
+        $result = TreeSitterLanguagePack::process("---\n---\n<p>hello</p>", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load awk and parse a simple snippet */
     public function test_smoke_awk(): void
     {
-        $result = TreeSitterLanguagePack::process("BEGIN { print \"hello\" }");
+        $result = TreeSitterLanguagePack::process("BEGIN { print \"hello\" }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load bash and parse a simple snippet */
     public function test_smoke_bash(): void
     {
-        $result = TreeSitterLanguagePack::process("echo hello");
+        $result = TreeSitterLanguagePack::process("echo hello", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load bass and parse a simple snippet */
     public function test_smoke_bass(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load batch and parse a simple snippet */
     public function test_smoke_batch(): void
     {
-        $result = TreeSitterLanguagePack::process("@echo off\necho hello");
+        $result = TreeSitterLanguagePack::process("@echo off\necho hello", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load beancount and parse a simple snippet */
     public function test_smoke_beancount(): void
     {
-        $result = TreeSitterLanguagePack::process("2024-01-01 open Assets:Bank USD");
+        $result = TreeSitterLanguagePack::process("2024-01-01 open Assets:Bank USD", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load bibtex and parse a simple snippet */
     public function test_smoke_bibtex(): void
     {
-        $result = TreeSitterLanguagePack::process("@article{key, title={A}}");
+        $result = TreeSitterLanguagePack::process("@article{key, title={A}}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load bicep and parse a simple snippet */
     public function test_smoke_bicep(): void
     {
-        $result = TreeSitterLanguagePack::process("param name string");
+        $result = TreeSitterLanguagePack::process("param name string", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load bitbake and parse a simple snippet */
     public function test_smoke_bitbake(): void
     {
-        $result = TreeSitterLanguagePack::process("DESCRIPTION = \"hello\"");
+        $result = TreeSitterLanguagePack::process("DESCRIPTION = \"hello\"", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load blade and parse a simple snippet */
     public function test_smoke_blade(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load brightscript and parse a simple snippet */
     public function test_smoke_brightscript(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load bsl and parse a simple snippet */
     public function test_smoke_bsl(): void
     {
-        $result = TreeSitterLanguagePack::process("Procedure Main() EndProcedure");
+        $result = TreeSitterLanguagePack::process("Procedure Main() EndProcedure", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load c and parse a simple snippet */
     public function test_smoke_c(): void
     {
-        $result = TreeSitterLanguagePack::process("int main() { return 0; }");
+        $result = TreeSitterLanguagePack::process("int main() { return 0; }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load c3 and parse a simple snippet */
     public function test_smoke_c3(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load caddy and parse a simple snippet */
     public function test_smoke_caddy(): void
     {
-        $result = TreeSitterLanguagePack::process(":8080 {\n\trespond \"Hello\"\n}");
+        $result = TreeSitterLanguagePack::process(":8080 {\n\trespond \"Hello\"\n}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cairo and parse a simple snippet */
     public function test_smoke_cairo(): void
     {
-        $result = TreeSitterLanguagePack::process("fn main() {}");
+        $result = TreeSitterLanguagePack::process("fn main() {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load capnp and parse a simple snippet */
     public function test_smoke_capnp(): void
     {
-        $result = TreeSitterLanguagePack::process("@0xabcdef1234567890;");
+        $result = TreeSitterLanguagePack::process("@0xabcdef1234567890;", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cedar and parse a simple snippet */
     public function test_smoke_cedar(): void
     {
-        $result = TreeSitterLanguagePack::process("permit(principal, action, resource);");
+        $result = TreeSitterLanguagePack::process("permit(principal, action, resource);", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cedarschema and parse a simple snippet */
     public function test_smoke_cedarschema(): void
     {
-        $result = TreeSitterLanguagePack::process("entity User;");
+        $result = TreeSitterLanguagePack::process("entity User;", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cel and parse a simple snippet */
     public function test_smoke_cel(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cfml and parse a simple snippet */
     public function test_smoke_cfml(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load chatito and parse a simple snippet */
     public function test_smoke_chatito(): void
     {
-        $result = TreeSitterLanguagePack::process("%[greeting]\n    hello");
+        $result = TreeSitterLanguagePack::process("%[greeting]\n    hello", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load chuck and parse a simple snippet */
     public function test_smoke_chuck(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load circom and parse a simple snippet */
     public function test_smoke_circom(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load clarity and parse a simple snippet */
     public function test_smoke_clarity(): void
     {
-        $result = TreeSitterLanguagePack::process("(define-public (hello) (ok true))");
+        $result = TreeSitterLanguagePack::process("(define-public (hello) (ok true))", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load clojure and parse a simple snippet */
     public function test_smoke_clojure(): void
     {
-        $result = TreeSitterLanguagePack::process("(def x 1)");
+        $result = TreeSitterLanguagePack::process("(def x 1)", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cmake and parse a simple snippet */
     public function test_smoke_cmake(): void
     {
-        $result = TreeSitterLanguagePack::process("cmake_minimum_required(VERSION 3.0)");
+        $result = TreeSitterLanguagePack::process("cmake_minimum_required(VERSION 3.0)", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cobol and parse a simple snippet */
     public function test_smoke_cobol(): void
     {
-        $result = TreeSitterLanguagePack::process("       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.");
+        $result = TreeSitterLanguagePack::process("       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load comment and parse a simple snippet */
     public function test_smoke_comment(): void
     {
-        $result = TreeSitterLanguagePack::process("TODO: fix this");
+        $result = TreeSitterLanguagePack::process("TODO: fix this", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load commonlisp and parse a simple snippet */
     public function test_smoke_commonlisp(): void
     {
-        $result = TreeSitterLanguagePack::process("(defun hello () (print \"hello\"))");
+        $result = TreeSitterLanguagePack::process("(defun hello () (print \"hello\"))", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cooklang and parse a simple snippet */
     public function test_smoke_cooklang(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load corn and parse a simple snippet */
     public function test_smoke_corn(): void
     {
-        $result = TreeSitterLanguagePack::process("{ key = \"value\" }");
+        $result = TreeSitterLanguagePack::process("{ key = \"value\" }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cpon and parse a simple snippet */
     public function test_smoke_cpon(): void
     {
-        $result = TreeSitterLanguagePack::process("{\"key\": 1}");
+        $result = TreeSitterLanguagePack::process("{\"key\": 1}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cpp and parse a simple snippet */
     public function test_smoke_cpp(): void
     {
-        $result = TreeSitterLanguagePack::process("int main() { return 0; }");
+        $result = TreeSitterLanguagePack::process("int main() { return 0; }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load crystal and parse a simple snippet */
     public function test_smoke_crystal(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load csharp and parse a simple snippet */
     public function test_smoke_csharp(): void
     {
-        $result = TreeSitterLanguagePack::process("class Main {}");
+        $result = TreeSitterLanguagePack::process("class Main {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load css and parse a simple snippet */
     public function test_smoke_css(): void
     {
-        $result = TreeSitterLanguagePack::process("body { color: red; }");
+        $result = TreeSitterLanguagePack::process("body { color: red; }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cst and parse a simple snippet */
     public function test_smoke_cst(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load csv and parse a simple snippet */
     public function test_smoke_csv(): void
     {
-        $result = TreeSitterLanguagePack::process("a,b,c\n1,2,3");
+        $result = TreeSitterLanguagePack::process("a,b,c\n1,2,3", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cuda and parse a simple snippet */
     public function test_smoke_cuda(): void
     {
-        $result = TreeSitterLanguagePack::process("__global__ void kernel() {}");
+        $result = TreeSitterLanguagePack::process("__global__ void kernel() {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cue and parse a simple snippet */
     public function test_smoke_cue(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load cylc and parse a simple snippet */
     public function test_smoke_cylc(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load d and parse a simple snippet */
     public function test_smoke_d(): void
     {
-        $result = TreeSitterLanguagePack::process("void main() {}");
+        $result = TreeSitterLanguagePack::process("void main() {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load dart and parse a simple snippet */
     public function test_smoke_dart(): void
     {
-        $result = TreeSitterLanguagePack::process("void main() {}");
+        $result = TreeSitterLanguagePack::process("void main() {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load desktop and parse a simple snippet */
     public function test_smoke_desktop(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load devicetree and parse a simple snippet */
     public function test_smoke_devicetree(): void
     {
-        $result = TreeSitterLanguagePack::process("/dts-v1/;\n/ { };");
+        $result = TreeSitterLanguagePack::process("/dts-v1/;\n/ { };", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load dhall and parse a simple snippet */
     public function test_smoke_dhall(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load diff and parse a simple snippet */
     public function test_smoke_diff(): void
     {
-        $result = TreeSitterLanguagePack::process("--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new");
+        $result = TreeSitterLanguagePack::process("--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load djot and parse a simple snippet */
     public function test_smoke_djot(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load dockerfile and parse a simple snippet */
     public function test_smoke_dockerfile(): void
     {
-        $result = TreeSitterLanguagePack::process("FROM alpine");
+        $result = TreeSitterLanguagePack::process("FROM alpine", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load dot and parse a simple snippet */
     public function test_smoke_dot(): void
     {
-        $result = TreeSitterLanguagePack::process("digraph G { A -> B; }");
+        $result = TreeSitterLanguagePack::process("digraph G { A -> B; }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load doxygen and parse a simple snippet */
     public function test_smoke_doxygen(): void
     {
-        $result = TreeSitterLanguagePack::process("/** @brief A function */");
+        $result = TreeSitterLanguagePack::process("/** @brief A function */", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load dtd and parse a simple snippet */
     public function test_smoke_dtd(): void
     {
-        $result = TreeSitterLanguagePack::process("<!ELEMENT note (body)>");
+        $result = TreeSitterLanguagePack::process("<!ELEMENT note (body)>", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load earthfile and parse a simple snippet */
     public function test_smoke_earthfile(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ebnf and parse a simple snippet */
     public function test_smoke_ebnf(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load editorconfig and parse a simple snippet */
     public function test_smoke_editorconfig(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load eds and parse a simple snippet */
     public function test_smoke_eds(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load eex and parse a simple snippet */
     public function test_smoke_eex(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load elisp and parse a simple snippet */
     public function test_smoke_elisp(): void
     {
-        $result = TreeSitterLanguagePack::process("(defun hello () (message \"hello\"))");
+        $result = TreeSitterLanguagePack::process("(defun hello () (message \"hello\"))", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load elixir and parse a simple snippet */
     public function test_smoke_elixir(): void
     {
-        $result = TreeSitterLanguagePack::process("IO.puts(\"hello\")");
+        $result = TreeSitterLanguagePack::process("IO.puts(\"hello\")", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load elm and parse a simple snippet */
     public function test_smoke_elm(): void
     {
-        $result = TreeSitterLanguagePack::process("module Main exposing (..)");
+        $result = TreeSitterLanguagePack::process("module Main exposing (..)", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load elsa and parse a simple snippet */
     public function test_smoke_elsa(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load elvish and parse a simple snippet */
     public function test_smoke_elvish(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load embeddedtemplate and parse a simple snippet */
     public function test_smoke_embeddedtemplate(): void
     {
-        $result = TreeSitterLanguagePack::process("<%= value %>");
+        $result = TreeSitterLanguagePack::process("<%= value %>", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load enforce and parse a simple snippet */
     public function test_smoke_enforce(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load erlang and parse a simple snippet */
     public function test_smoke_erlang(): void
     {
-        $result = TreeSitterLanguagePack::process("main() -> ok.");
+        $result = TreeSitterLanguagePack::process("main() -> ok.", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load facility and parse a simple snippet */
     public function test_smoke_facility(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load faust and parse a simple snippet */
     public function test_smoke_faust(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load fennel and parse a simple snippet */
     public function test_smoke_fennel(): void
     {
-        $result = TreeSitterLanguagePack::process("(fn hello [] (print :hello))");
+        $result = TreeSitterLanguagePack::process("(fn hello [] (print :hello))", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load fidl and parse a simple snippet */
     public function test_smoke_fidl(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load firrtl and parse a simple snippet */
     public function test_smoke_firrtl(): void
     {
-        $result = TreeSitterLanguagePack::process("circuit Main :");
+        $result = TreeSitterLanguagePack::process("circuit Main :", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load fish and parse a simple snippet */
     public function test_smoke_fish(): void
     {
-        $result = TreeSitterLanguagePack::process("echo hello");
+        $result = TreeSitterLanguagePack::process("echo hello", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load foam and parse a simple snippet */
     public function test_smoke_foam(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load forth and parse a simple snippet */
     public function test_smoke_forth(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load fortran and parse a simple snippet */
     public function test_smoke_fortran(): void
     {
-        $result = TreeSitterLanguagePack::process("program main\nend program main");
+        $result = TreeSitterLanguagePack::process("program main\nend program main", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load fsharp and parse a simple snippet */
     public function test_smoke_fsharp(): void
     {
-        $result = TreeSitterLanguagePack::process("let x = 1");
+        $result = TreeSitterLanguagePack::process("let x = 1", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load fsharp_signature and parse a simple snippet */
     public function test_smoke_fsharp_signature(): void
     {
-        $result = TreeSitterLanguagePack::process("val x: int");
+        $result = TreeSitterLanguagePack::process("val x: int", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load func and parse a simple snippet */
     public function test_smoke_func(): void
     {
-        $result = TreeSitterLanguagePack::process("() recv_internal() {}");
+        $result = TreeSitterLanguagePack::process("() recv_internal() {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gap and parse a simple snippet */
     public function test_smoke_gap(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gdscript and parse a simple snippet */
     public function test_smoke_gdscript(): void
     {
-        $result = TreeSitterLanguagePack::process("extends Node\nfunc _ready():\n\tpass");
+        $result = TreeSitterLanguagePack::process("extends Node\nfunc _ready():\n\tpass", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gdshader and parse a simple snippet */
     public function test_smoke_gdshader(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load git_config and parse a simple snippet */
     public function test_smoke_git_config(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load git_rebase and parse a simple snippet */
     public function test_smoke_git_rebase(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gitattributes and parse a simple snippet */
     public function test_smoke_gitattributes(): void
     {
-        $result = TreeSitterLanguagePack::process("*.txt text");
+        $result = TreeSitterLanguagePack::process("*.txt text", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gitcommit and parse a simple snippet */
     public function test_smoke_gitcommit(): void
     {
-        $result = TreeSitterLanguagePack::process("feat: add feature\n\nBody text");
+        $result = TreeSitterLanguagePack::process("feat: add feature\n\nBody text", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gitignore and parse a simple snippet */
     public function test_smoke_gitignore(): void
     {
-        $result = TreeSitterLanguagePack::process("*.o\n*.log");
+        $result = TreeSitterLanguagePack::process("*.o\n*.log", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gleam and parse a simple snippet */
     public function test_smoke_gleam(): void
     {
-        $result = TreeSitterLanguagePack::process("pub fn main() { }");
+        $result = TreeSitterLanguagePack::process("pub fn main() { }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load glimmer and parse a simple snippet */
     public function test_smoke_glimmer(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load glsl and parse a simple snippet */
     public function test_smoke_glsl(): void
     {
-        $result = TreeSitterLanguagePack::process("void main() { gl_Position = vec4(0.0); }");
+        $result = TreeSitterLanguagePack::process("void main() { gl_Position = vec4(0.0); }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gn and parse a simple snippet */
     public function test_smoke_gn(): void
     {
-        $result = TreeSitterLanguagePack::process("group(\"hello\") {}");
+        $result = TreeSitterLanguagePack::process("group(\"hello\") {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gnuplot and parse a simple snippet */
     public function test_smoke_gnuplot(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load go and parse a simple snippet */
     public function test_smoke_go(): void
     {
-        $result = TreeSitterLanguagePack::process("package main");
+        $result = TreeSitterLanguagePack::process("package main", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load godot_resource and parse a simple snippet */
     public function test_smoke_godot_resource(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gomod and parse a simple snippet */
     public function test_smoke_gomod(): void
     {
-        $result = TreeSitterLanguagePack::process("module example.com/hello\n\ngo 1.21");
+        $result = TreeSitterLanguagePack::process("module example.com/hello\n\ngo 1.21", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gosum and parse a simple snippet */
     public function test_smoke_gosum(): void
     {
-        $result = TreeSitterLanguagePack::process("example.com/pkg v1.0.0 h1:abc=");
+        $result = TreeSitterLanguagePack::process("example.com/pkg v1.0.0 h1:abc=", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gotmpl and parse a simple snippet */
     public function test_smoke_gotmpl(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gowork and parse a simple snippet */
     public function test_smoke_gowork(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gpg and parse a simple snippet */
     public function test_smoke_gpg(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load graphql and parse a simple snippet */
     public function test_smoke_graphql(): void
     {
-        $result = TreeSitterLanguagePack::process("type Query { hello: String }");
+        $result = TreeSitterLanguagePack::process("type Query { hello: String }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gren and parse a simple snippet */
     public function test_smoke_gren(): void
     {
-        $result = TreeSitterLanguagePack::process("module Main exposing (..)");
+        $result = TreeSitterLanguagePack::process("module Main exposing (..)", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load groovy and parse a simple snippet */
     public function test_smoke_groovy(): void
     {
-        $result = TreeSitterLanguagePack::process("def x = 1");
+        $result = TreeSitterLanguagePack::process("def x = 1", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load gstlaunch and parse a simple snippet */
     public function test_smoke_gstlaunch(): void
     {
-        $result = TreeSitterLanguagePack::process("fakesrc ! fakesink");
+        $result = TreeSitterLanguagePack::process("fakesrc ! fakesink", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load hack and parse a simple snippet */
     public function test_smoke_hack(): void
     {
-        $result = TreeSitterLanguagePack::process("<?hh\nfunction main(): void {}");
+        $result = TreeSitterLanguagePack::process("<?hh\nfunction main(): void {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load hare and parse a simple snippet */
     public function test_smoke_hare(): void
     {
-        $result = TreeSitterLanguagePack::process("export fn main() void = void;");
+        $result = TreeSitterLanguagePack::process("export fn main() void = void;", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load haskell and parse a simple snippet */
     public function test_smoke_haskell(): void
     {
-        $result = TreeSitterLanguagePack::process("main = putStrLn \"hello\"");
+        $result = TreeSitterLanguagePack::process("main = putStrLn \"hello\"", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load haxe and parse a simple snippet */
     public function test_smoke_haxe(): void
     {
-        $result = TreeSitterLanguagePack::process("class Main { static function main() {} }");
+        $result = TreeSitterLanguagePack::process("class Main { static function main() {} }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load hcl and parse a simple snippet */
     public function test_smoke_hcl(): void
     {
-        $result = TreeSitterLanguagePack::process("variable \"name\" { type = string }");
+        $result = TreeSitterLanguagePack::process("variable \"name\" { type = string }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load heex and parse a simple snippet */
     public function test_smoke_heex(): void
     {
-        $result = TreeSitterLanguagePack::process("<%= @greeting %>");
+        $result = TreeSitterLanguagePack::process("<%= @greeting %>", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load hjson and parse a simple snippet */
     public function test_smoke_hjson(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load hlsl and parse a simple snippet */
     public function test_smoke_hlsl(): void
     {
-        $result = TreeSitterLanguagePack::process("float4 main() : SV_Target { return 0; }");
+        $result = TreeSitterLanguagePack::process("float4 main() : SV_Target { return 0; }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load hocon and parse a simple snippet */
     public function test_smoke_hocon(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load hoon and parse a simple snippet */
     public function test_smoke_hoon(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load html and parse a simple snippet */
     public function test_smoke_html(): void
     {
-        $result = TreeSitterLanguagePack::process("<p>hello</p>");
+        $result = TreeSitterLanguagePack::process("<p>hello</p>", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load htmldjango and parse a simple snippet */
     public function test_smoke_htmldjango(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load http and parse a simple snippet */
     public function test_smoke_http(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load hurl and parse a simple snippet */
     public function test_smoke_hurl(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load hyprlang and parse a simple snippet */
     public function test_smoke_hyprlang(): void
     {
-        $result = TreeSitterLanguagePack::process("general { border_size = 1 }");
+        $result = TreeSitterLanguagePack::process("general { border_size = 1 }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load idris and parse a simple snippet */
     public function test_smoke_idris(): void
     {
-        $result = TreeSitterLanguagePack::process("module Main");
+        $result = TreeSitterLanguagePack::process("module Main", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ini and parse a simple snippet */
     public function test_smoke_ini(): void
     {
-        $result = TreeSitterLanguagePack::process("[section]\nkey = value");
+        $result = TreeSitterLanguagePack::process("[section]\nkey = value", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ispc and parse a simple snippet */
     public function test_smoke_ispc(): void
     {
-        $result = TreeSitterLanguagePack::process("export void main() {}");
+        $result = TreeSitterLanguagePack::process("export void main() {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load jai and parse a simple snippet */
     public function test_smoke_jai(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load janet and parse a simple snippet */
     public function test_smoke_janet(): void
     {
-        $result = TreeSitterLanguagePack::process("(print \"hello\")");
+        $result = TreeSitterLanguagePack::process("(print \"hello\")", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load java and parse a simple snippet */
     public function test_smoke_java(): void
     {
-        $result = TreeSitterLanguagePack::process("class Main {}");
+        $result = TreeSitterLanguagePack::process("class Main {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load javadoc and parse a simple snippet */
     public function test_smoke_javadoc(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load javascript and parse a simple snippet */
     public function test_smoke_javascript(): void
     {
-        $result = TreeSitterLanguagePack::process("console.log('hello');");
+        $result = TreeSitterLanguagePack::process("console.log('hello');", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load jinja2 and parse a simple snippet */
     public function test_smoke_jinja2(): void
     {
-        $result = TreeSitterLanguagePack::process("{{ variable }}");
+        $result = TreeSitterLanguagePack::process("{{ variable }}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load jq and parse a simple snippet */
     public function test_smoke_jq(): void
     {
-        $result = TreeSitterLanguagePack::process(".[] | select(.key)");
+        $result = TreeSitterLanguagePack::process(".[] | select(.key)", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load jsdoc and parse a simple snippet */
     public function test_smoke_jsdoc(): void
     {
-        $result = TreeSitterLanguagePack::process("/** @param {string} name */");
+        $result = TreeSitterLanguagePack::process("/** @param {string} name */", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load json and parse a simple snippet */
     public function test_smoke_json(): void
     {
-        $result = TreeSitterLanguagePack::process("{\"key\": \"value\"}");
+        $result = TreeSitterLanguagePack::process("{\"key\": \"value\"}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load json5 and parse a simple snippet */
     public function test_smoke_json5(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load jsonnet and parse a simple snippet */
     public function test_smoke_jsonnet(): void
     {
-        $result = TreeSitterLanguagePack::process("{ key: 'value' }");
+        $result = TreeSitterLanguagePack::process("{ key: 'value' }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load julia and parse a simple snippet */
     public function test_smoke_julia(): void
     {
-        $result = TreeSitterLanguagePack::process("function main() end");
+        $result = TreeSitterLanguagePack::process("function main() end", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load just and parse a simple snippet */
     public function test_smoke_just(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load kcl and parse a simple snippet */
     public function test_smoke_kcl(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load kconfig and parse a simple snippet */
     public function test_smoke_kconfig(): void
     {
-        $result = TreeSitterLanguagePack::process("config FOO\n\tbool \"Enable foo\"");
+        $result = TreeSitterLanguagePack::process("config FOO\n\tbool \"Enable foo\"", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load kdl and parse a simple snippet */
     public function test_smoke_kdl(): void
     {
-        $result = TreeSitterLanguagePack::process("node \"value\"");
+        $result = TreeSitterLanguagePack::process("node \"value\"", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load kotlin and parse a simple snippet */
     public function test_smoke_kotlin(): void
     {
-        $result = TreeSitterLanguagePack::process("fun main() {}");
+        $result = TreeSitterLanguagePack::process("fun main() {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load latex and parse a simple snippet */
     public function test_smoke_latex(): void
     {
-        $result = TreeSitterLanguagePack::process("\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}");
+        $result = TreeSitterLanguagePack::process("\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load lean and parse a simple snippet */
     public function test_smoke_lean(): void
     {
-        $result = TreeSitterLanguagePack::process("def main : IO Unit := pure ()");
+        $result = TreeSitterLanguagePack::process("def main : IO Unit := pure ()", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ledger and parse a simple snippet */
     public function test_smoke_ledger(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load less and parse a simple snippet */
     public function test_smoke_less(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load linkerscript and parse a simple snippet */
     public function test_smoke_linkerscript(): void
     {
-        $result = TreeSitterLanguagePack::process("SECTIONS { .text : { *(.text) } }");
+        $result = TreeSitterLanguagePack::process("SECTIONS { .text : { *(.text) } }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load liquid and parse a simple snippet */
     public function test_smoke_liquid(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load llvm and parse a simple snippet */
     public function test_smoke_llvm(): void
     {
-        $result = TreeSitterLanguagePack::process("define i32 @main() { ret i32 0 }");
+        $result = TreeSitterLanguagePack::process("define i32 @main() { ret i32 0 }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load lua and parse a simple snippet */
     public function test_smoke_lua(): void
     {
-        $result = TreeSitterLanguagePack::process("print('hello')");
+        $result = TreeSitterLanguagePack::process("print('hello')", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load luadoc and parse a simple snippet */
     public function test_smoke_luadoc(): void
     {
-        $result = TreeSitterLanguagePack::process("---@param name string");
+        $result = TreeSitterLanguagePack::process("---@param name string", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load luap and parse a simple snippet */
     public function test_smoke_luap(): void
     {
-        $result = TreeSitterLanguagePack::process("[a-z]+");
+        $result = TreeSitterLanguagePack::process("[a-z]+", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load luau and parse a simple snippet */
     public function test_smoke_luau(): void
     {
-        $result = TreeSitterLanguagePack::process("local x: number = 1");
+        $result = TreeSitterLanguagePack::process("local x: number = 1", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load magik and parse a simple snippet */
     public function test_smoke_magik(): void
     {
-        $result = TreeSitterLanguagePack::process("_method object.hello\n_endmethod");
+        $result = TreeSitterLanguagePack::process("_method object.hello\n_endmethod", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load make and parse a simple snippet */
     public function test_smoke_make(): void
     {
-        $result = TreeSitterLanguagePack::process("all:\n\techo hello");
+        $result = TreeSitterLanguagePack::process("all:\n\techo hello", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load markdown and parse a simple snippet */
     public function test_smoke_markdown(): void
     {
-        $result = TreeSitterLanguagePack::process("# Hello\n\nWorld");
+        $result = TreeSitterLanguagePack::process("# Hello\n\nWorld", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load markdown_inline and parse a simple snippet */
     public function test_smoke_markdown_inline(): void
     {
-        $result = TreeSitterLanguagePack::process("**bold** and *italic*");
+        $result = TreeSitterLanguagePack::process("**bold** and *italic*", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load matlab and parse a simple snippet */
     public function test_smoke_matlab(): void
     {
-        $result = TreeSitterLanguagePack::process("function y = hello(x)\ny = x;\nend");
+        $result = TreeSitterLanguagePack::process("function y = hello(x)\ny = x;\nend", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load mermaid and parse a simple snippet */
     public function test_smoke_mermaid(): void
     {
-        $result = TreeSitterLanguagePack::process("graph TD\nA --> B");
+        $result = TreeSitterLanguagePack::process("graph TD\nA --> B", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load meson and parse a simple snippet */
     public function test_smoke_meson(): void
     {
-        $result = TreeSitterLanguagePack::process("project('hello', 'c')");
+        $result = TreeSitterLanguagePack::process("project('hello', 'c')", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load mlir and parse a simple snippet */
     public function test_smoke_mlir(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load mojo and parse a simple snippet */
     public function test_smoke_mojo(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load move and parse a simple snippet */
     public function test_smoke_move(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load nasm and parse a simple snippet */
     public function test_smoke_nasm(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load netlinx and parse a simple snippet */
     public function test_smoke_netlinx(): void
     {
-        $result = TreeSitterLanguagePack::process("PROGRAM_NAME='hello'");
+        $result = TreeSitterLanguagePack::process("PROGRAM_NAME='hello'", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load nginx and parse a simple snippet */
     public function test_smoke_nginx(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load nickel and parse a simple snippet */
     public function test_smoke_nickel(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load nim and parse a simple snippet */
     public function test_smoke_nim(): void
     {
-        $result = TreeSitterLanguagePack::process("echo \"hello\"");
+        $result = TreeSitterLanguagePack::process("echo \"hello\"", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ninja and parse a simple snippet */
     public function test_smoke_ninja(): void
     {
-        $result = TreeSitterLanguagePack::process("rule cc\n  command = cc \$in -o \$out");
+        $result = TreeSitterLanguagePack::process("rule cc\n  command = cc \$in -o \$out", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load nix and parse a simple snippet */
     public function test_smoke_nix(): void
     {
-        $result = TreeSitterLanguagePack::process("{ pkgs ? import <nixpkgs> {} }: pkgs.hello");
+        $result = TreeSitterLanguagePack::process("{ pkgs ? import <nixpkgs> {} }: pkgs.hello", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load norg and parse a simple snippet */
     public function test_smoke_norg(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load norg_meta and parse a simple snippet */
     public function test_smoke_norg_meta(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load nqc and parse a simple snippet */
     public function test_smoke_nqc(): void
     {
-        $result = TreeSitterLanguagePack::process("task main() {}");
+        $result = TreeSitterLanguagePack::process("task main() {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load nushell and parse a simple snippet */
     public function test_smoke_nushell(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load objc and parse a simple snippet */
     public function test_smoke_objc(): void
     {
-        $result = TreeSitterLanguagePack::process("@interface Main @end");
+        $result = TreeSitterLanguagePack::process("@interface Main @end", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ocaml and parse a simple snippet */
     public function test_smoke_ocaml(): void
     {
-        $result = TreeSitterLanguagePack::process("let () = print_endline \"hello\"");
+        $result = TreeSitterLanguagePack::process("let () = print_endline \"hello\"", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ocaml_interface and parse a simple snippet */
     public function test_smoke_ocaml_interface(): void
     {
-        $result = TreeSitterLanguagePack::process("val x : int");
+        $result = TreeSitterLanguagePack::process("val x : int", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ocamllex and parse a simple snippet */
     public function test_smoke_ocamllex(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load odin and parse a simple snippet */
     public function test_smoke_odin(): void
     {
-        $result = TreeSitterLanguagePack::process("package main");
+        $result = TreeSitterLanguagePack::process("package main", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load openscad and parse a simple snippet */
     public function test_smoke_openscad(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load org and parse a simple snippet */
     public function test_smoke_org(): void
     {
-        $result = TreeSitterLanguagePack::process("* Hello\nWorld");
+        $result = TreeSitterLanguagePack::process("* Hello\nWorld", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load pascal and parse a simple snippet */
     public function test_smoke_pascal(): void
     {
-        $result = TreeSitterLanguagePack::process("program Hello; begin end.");
+        $result = TreeSitterLanguagePack::process("program Hello; begin end.", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load pem and parse a simple snippet */
     public function test_smoke_pem(): void
     {
-        $result = TreeSitterLanguagePack::process("-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----");
+        $result = TreeSitterLanguagePack::process("-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load perl and parse a simple snippet */
     public function test_smoke_perl(): void
     {
-        $result = TreeSitterLanguagePack::process("print 'hello';");
+        $result = TreeSitterLanguagePack::process("print 'hello';", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load pgn and parse a simple snippet */
     public function test_smoke_pgn(): void
     {
-        $result = TreeSitterLanguagePack::process("1. e4 e5 *");
+        $result = TreeSitterLanguagePack::process("1. e4 e5 *", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load php and parse a simple snippet */
     public function test_smoke_php(): void
     {
-        $result = TreeSitterLanguagePack::process("<?php echo 'hello'; ?>");
+        $result = TreeSitterLanguagePack::process("<?php echo 'hello'; ?>", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load phpdoc and parse a simple snippet */
     public function test_smoke_phpdoc(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load pkl and parse a simple snippet */
     public function test_smoke_pkl(): void
     {
-        $result = TreeSitterLanguagePack::process("name = \"hello\"");
+        $result = TreeSitterLanguagePack::process("name = \"hello\"", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load po and parse a simple snippet */
     public function test_smoke_po(): void
     {
-        $result = TreeSitterLanguagePack::process("msgid \"hello\"\nmsgstr \"world\"");
+        $result = TreeSitterLanguagePack::process("msgid \"hello\"\nmsgstr \"world\"", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load poe_filter and parse a simple snippet */
     public function test_smoke_poe_filter(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load pony and parse a simple snippet */
     public function test_smoke_pony(): void
     {
-        $result = TreeSitterLanguagePack::process("actor Main\n  new create(env: Env) => None");
+        $result = TreeSitterLanguagePack::process("actor Main\n  new create(env: Env) => None", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load postscript and parse a simple snippet */
     public function test_smoke_postscript(): void
     {
-        $result = TreeSitterLanguagePack::process("/hello { (Hello) show } def");
+        $result = TreeSitterLanguagePack::process("/hello { (Hello) show } def", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load powershell and parse a simple snippet */
     public function test_smoke_powershell(): void
     {
-        $result = TreeSitterLanguagePack::process("Write-Host 'hello'");
+        $result = TreeSitterLanguagePack::process("Write-Host 'hello'", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load printf and parse a simple snippet */
     public function test_smoke_printf(): void
     {
-        $result = TreeSitterLanguagePack::process("%d %s");
+        $result = TreeSitterLanguagePack::process("%d %s", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load prisma and parse a simple snippet */
     public function test_smoke_prisma(): void
     {
-        $result = TreeSitterLanguagePack::process("model User { id Int @id }");
+        $result = TreeSitterLanguagePack::process("model User { id Int @id }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load prolog and parse a simple snippet */
     public function test_smoke_prolog(): void
     {
-        $result = TreeSitterLanguagePack::process("hello :- write('hello'), nl.");
+        $result = TreeSitterLanguagePack::process("hello :- write('hello'), nl.", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load promql and parse a simple snippet */
     public function test_smoke_promql(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load properties and parse a simple snippet */
     public function test_smoke_properties(): void
     {
-        $result = TreeSitterLanguagePack::process("key=value");
+        $result = TreeSitterLanguagePack::process("key=value", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load proto and parse a simple snippet */
     public function test_smoke_proto(): void
     {
-        $result = TreeSitterLanguagePack::process("syntax = \"proto3\";");
+        $result = TreeSitterLanguagePack::process("syntax = \"proto3\";", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load prql and parse a simple snippet */
     public function test_smoke_prql(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load psv and parse a simple snippet */
     public function test_smoke_psv(): void
     {
-        $result = TreeSitterLanguagePack::process("a|b|c\n1|2|3");
+        $result = TreeSitterLanguagePack::process("a|b|c\n1|2|3", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load pug and parse a simple snippet */
     public function test_smoke_pug(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load puppet and parse a simple snippet */
     public function test_smoke_puppet(): void
     {
-        $result = TreeSitterLanguagePack::process("notify { 'hello': }");
+        $result = TreeSitterLanguagePack::process("notify { 'hello': }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load purescript and parse a simple snippet */
     public function test_smoke_purescript(): void
     {
-        $result = TreeSitterLanguagePack::process("module Main where");
+        $result = TreeSitterLanguagePack::process("module Main where", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load pymanifest and parse a simple snippet */
     public function test_smoke_pymanifest(): void
     {
-        $result = TreeSitterLanguagePack::process("include *.txt");
+        $result = TreeSitterLanguagePack::process("include *.txt", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load python and parse a simple snippet */
     public function test_smoke_python(): void
     {
-        $result = TreeSitterLanguagePack::process("print('hello')");
+        $result = TreeSitterLanguagePack::process("print('hello')", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ql and parse a simple snippet */
     public function test_smoke_ql(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load qmldir and parse a simple snippet */
     public function test_smoke_qmldir(): void
     {
-        $result = TreeSitterLanguagePack::process("module Example");
+        $result = TreeSitterLanguagePack::process("module Example", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load qmljs and parse a simple snippet */
     public function test_smoke_qmljs(): void
     {
-        $result = TreeSitterLanguagePack::process("import QtQuick 2.0\nItem {}");
+        $result = TreeSitterLanguagePack::process("import QtQuick 2.0\nItem {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load query and parse a simple snippet */
     public function test_smoke_query(): void
     {
-        $result = TreeSitterLanguagePack::process("(identifier) @name");
+        $result = TreeSitterLanguagePack::process("(identifier) @name", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load r and parse a simple snippet */
     public function test_smoke_r(): void
     {
-        $result = TreeSitterLanguagePack::process("print('hello')");
+        $result = TreeSitterLanguagePack::process("print('hello')", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load racket and parse a simple snippet */
     public function test_smoke_racket(): void
     {
-        $result = TreeSitterLanguagePack::process("#lang racket\n(define x 1)");
+        $result = TreeSitterLanguagePack::process("#lang racket\n(define x 1)", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load rasi and parse a simple snippet */
     public function test_smoke_rasi(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load razor and parse a simple snippet */
     public function test_smoke_razor(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load rbs and parse a simple snippet */
     public function test_smoke_rbs(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load re2c and parse a simple snippet */
     public function test_smoke_re2c(): void
     {
-        $result = TreeSitterLanguagePack::process("/*!re2c\n  [a-z]+ { return; }\n*/");
+        $result = TreeSitterLanguagePack::process("/*!re2c\n  [a-z]+ { return; }\n*/", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load readline and parse a simple snippet */
     public function test_smoke_readline(): void
     {
-        $result = TreeSitterLanguagePack::process("set editing-mode vi");
+        $result = TreeSitterLanguagePack::process("set editing-mode vi", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load regex and parse a simple snippet */
     public function test_smoke_regex(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load rego and parse a simple snippet */
     public function test_smoke_rego(): void
     {
-        $result = TreeSitterLanguagePack::process("package main\ndefault allow = false");
+        $result = TreeSitterLanguagePack::process("package main\ndefault allow = false", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load requirements and parse a simple snippet */
     public function test_smoke_requirements(): void
     {
-        $result = TreeSitterLanguagePack::process("flask>=2.0");
+        $result = TreeSitterLanguagePack::process("flask>=2.0", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load rescript and parse a simple snippet */
     public function test_smoke_rescript(): void
     {
-        $result = TreeSitterLanguagePack::process("let x = 1");
+        $result = TreeSitterLanguagePack::process("let x = 1", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load robot and parse a simple snippet */
     public function test_smoke_robot(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load roc and parse a simple snippet */
     public function test_smoke_roc(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ron and parse a simple snippet */
     public function test_smoke_ron(): void
     {
-        $result = TreeSitterLanguagePack::process("(key: \"value\")");
+        $result = TreeSitterLanguagePack::process("(key: \"value\")", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load rst and parse a simple snippet */
     public function test_smoke_rst(): void
     {
-        $result = TreeSitterLanguagePack::process("Hello\n=====\n\nWorld");
+        $result = TreeSitterLanguagePack::process("Hello\n=====\n\nWorld", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load rtf and parse a simple snippet */
     public function test_smoke_rtf(): void
     {
-        $result = TreeSitterLanguagePack::process("{\\rtf1 hello}");
+        $result = TreeSitterLanguagePack::process("{\\rtf1 hello}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ruby and parse a simple snippet */
     public function test_smoke_ruby(): void
     {
-        $result = TreeSitterLanguagePack::process("puts 'hello'");
+        $result = TreeSitterLanguagePack::process("puts 'hello'", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load rust and parse a simple snippet */
     public function test_smoke_rust(): void
     {
-        $result = TreeSitterLanguagePack::process("fn main() {}");
+        $result = TreeSitterLanguagePack::process("fn main() {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load scala and parse a simple snippet */
     public function test_smoke_scala(): void
     {
-        $result = TreeSitterLanguagePack::process("object Main");
+        $result = TreeSitterLanguagePack::process("object Main", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load scheme and parse a simple snippet */
     public function test_smoke_scheme(): void
     {
-        $result = TreeSitterLanguagePack::process("(define x 1)");
+        $result = TreeSitterLanguagePack::process("(define x 1)", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load scss and parse a simple snippet */
     public function test_smoke_scss(): void
     {
-        $result = TreeSitterLanguagePack::process("\$color: red;\nbody { color: \$color; }");
+        $result = TreeSitterLanguagePack::process("\$color: red;\nbody { color: \$color; }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load slang and parse a simple snippet */
     public function test_smoke_slang(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load smali and parse a simple snippet */
     public function test_smoke_smali(): void
     {
-        $result = TreeSitterLanguagePack::process(".class public LMain;\n.super Ljava/lang/Object;");
+        $result = TreeSitterLanguagePack::process(".class public LMain;\n.super Ljava/lang/Object;", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load smalltalk and parse a simple snippet */
     public function test_smoke_smalltalk(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load smithy and parse a simple snippet */
     public function test_smoke_smithy(): void
     {
-        $result = TreeSitterLanguagePack::process("namespace example\nstring MyString");
+        $result = TreeSitterLanguagePack::process("namespace example\nstring MyString", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load sml and parse a simple snippet */
     public function test_smoke_sml(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load snakemake and parse a simple snippet */
     public function test_smoke_snakemake(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load solidity and parse a simple snippet */
     public function test_smoke_solidity(): void
     {
-        $result = TreeSitterLanguagePack::process("pragma solidity ^0.8.0;\ncontract Main {}");
+        $result = TreeSitterLanguagePack::process("pragma solidity ^0.8.0;\ncontract Main {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load souffle and parse a simple snippet */
     public function test_smoke_souffle(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load sourcepawn and parse a simple snippet */
     public function test_smoke_sourcepawn(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load sparql and parse a simple snippet */
     public function test_smoke_sparql(): void
     {
-        $result = TreeSitterLanguagePack::process("SELECT ?s WHERE { ?s ?p ?o }");
+        $result = TreeSitterLanguagePack::process("SELECT ?s WHERE { ?s ?p ?o }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load sql and parse a simple snippet */
     public function test_smoke_sql(): void
     {
-        $result = TreeSitterLanguagePack::process("SELECT 1;");
+        $result = TreeSitterLanguagePack::process("SELECT 1;", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load sql_bigquery and parse a simple snippet */
     public function test_smoke_sql_bigquery(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load squirrel and parse a simple snippet */
     public function test_smoke_squirrel(): void
     {
-        $result = TreeSitterLanguagePack::process("function main() {}");
+        $result = TreeSitterLanguagePack::process("function main() {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ssh_config and parse a simple snippet */
     public function test_smoke_ssh_config(): void
     {
-        $result = TreeSitterLanguagePack::process("Host example\n  HostName example.com");
+        $result = TreeSitterLanguagePack::process("Host example\n  HostName example.com", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load stan and parse a simple snippet */
     public function test_smoke_stan(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load starlark and parse a simple snippet */
     public function test_smoke_starlark(): void
     {
-        $result = TreeSitterLanguagePack::process("def hello(): pass");
+        $result = TreeSitterLanguagePack::process("def hello(): pass", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load superhtml and parse a simple snippet */
     public function test_smoke_superhtml(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load svelte and parse a simple snippet */
     public function test_smoke_svelte(): void
     {
-        $result = TreeSitterLanguagePack::process("<script>let x = 1;</script>");
+        $result = TreeSitterLanguagePack::process("<script>let x = 1;</script>", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load sway and parse a simple snippet */
     public function test_smoke_sway(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load swift and parse a simple snippet */
     public function test_smoke_swift(): void
     {
-        $result = TreeSitterLanguagePack::process("print(\"hello\")");
+        $result = TreeSitterLanguagePack::process("print(\"hello\")", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load systemverilog and parse a simple snippet */
     public function test_smoke_systemverilog(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load tablegen and parse a simple snippet */
     public function test_smoke_tablegen(): void
     {
-        $result = TreeSitterLanguagePack::process("def Hello : Base {}");
+        $result = TreeSitterLanguagePack::process("def Hello : Base {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load tact and parse a simple snippet */
     public function test_smoke_tact(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load tcl and parse a simple snippet */
     public function test_smoke_tcl(): void
     {
-        $result = TreeSitterLanguagePack::process("puts hello");
+        $result = TreeSitterLanguagePack::process("puts hello", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load teal and parse a simple snippet */
     public function test_smoke_teal(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load templ and parse a simple snippet */
     public function test_smoke_templ(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load tera and parse a simple snippet */
     public function test_smoke_tera(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load terraform and parse a simple snippet */
     public function test_smoke_terraform(): void
     {
-        $result = TreeSitterLanguagePack::process("resource \"null_resource\" \"main\" {}");
+        $result = TreeSitterLanguagePack::process("resource \"null_resource\" \"main\" {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load test and parse a simple snippet */
     public function test_smoke_test(): void
     {
-        $result = TreeSitterLanguagePack::process("===========\nTest\n===========\n---\n(node)");
+        $result = TreeSitterLanguagePack::process("===========\nTest\n===========\n---\n(node)", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load textproto and parse a simple snippet */
     public function test_smoke_textproto(): void
     {
-        $result = TreeSitterLanguagePack::process("key: \"value\"");
+        $result = TreeSitterLanguagePack::process("key: \"value\"", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load thrift and parse a simple snippet */
     public function test_smoke_thrift(): void
     {
-        $result = TreeSitterLanguagePack::process("service HelloService {}");
+        $result = TreeSitterLanguagePack::process("service HelloService {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load tlaplus and parse a simple snippet */
     public function test_smoke_tlaplus(): void
     {
-        $result = TreeSitterLanguagePack::process("---- MODULE Main ----\n====");
+        $result = TreeSitterLanguagePack::process("---- MODULE Main ----\n====", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load tmux and parse a simple snippet */
     public function test_smoke_tmux(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load todotxt and parse a simple snippet */
     public function test_smoke_todotxt(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load toml and parse a simple snippet */
     public function test_smoke_toml(): void
     {
-        $result = TreeSitterLanguagePack::process("key = \"value\"");
+        $result = TreeSitterLanguagePack::process("key = \"value\"", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load tsv and parse a simple snippet */
     public function test_smoke_tsv(): void
     {
-        $result = TreeSitterLanguagePack::process("a\tb\tc\n1\t2\t3");
+        $result = TreeSitterLanguagePack::process("a\tb\tc\n1\t2\t3", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load tsx and parse a simple snippet */
     public function test_smoke_tsx(): void
     {
-        $result = TreeSitterLanguagePack::process("const App = () => <div />;");
+        $result = TreeSitterLanguagePack::process("const App = () => <div />;", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load turtle and parse a simple snippet */
     public function test_smoke_turtle(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load twig and parse a simple snippet */
     public function test_smoke_twig(): void
     {
-        $result = TreeSitterLanguagePack::process("{{ variable }}");
+        $result = TreeSitterLanguagePack::process("{{ variable }}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load typescript and parse a simple snippet */
     public function test_smoke_typescript(): void
     {
-        $result = TreeSitterLanguagePack::process("const x: number = 42;");
+        $result = TreeSitterLanguagePack::process("const x: number = 42;", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load typespec and parse a simple snippet */
     public function test_smoke_typespec(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load typoscript and parse a simple snippet */
     public function test_smoke_typoscript(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load typst and parse a simple snippet */
     public function test_smoke_typst(): void
     {
-        $result = TreeSitterLanguagePack::process("#let x = 1");
+        $result = TreeSitterLanguagePack::process("#let x = 1", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load udev and parse a simple snippet */
     public function test_smoke_udev(): void
     {
-        $result = TreeSitterLanguagePack::process("ACTION==\"add\", KERNEL==\"sd*\"");
+        $result = TreeSitterLanguagePack::process("ACTION==\"add\", KERNEL==\"sd*\"", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ungrammar and parse a simple snippet */
     public function test_smoke_ungrammar(): void
     {
-        $result = TreeSitterLanguagePack::process("Root = Item*\nItem = 'token'");
+        $result = TreeSitterLanguagePack::process("Root = Item*\nItem = 'token'", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load uxntal and parse a simple snippet */
     public function test_smoke_uxntal(): void
     {
-        $result = TreeSitterLanguagePack::process("|0100 LIT 01");
+        $result = TreeSitterLanguagePack::process("|0100 LIT 01", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load v and parse a simple snippet */
     public function test_smoke_v(): void
     {
-        $result = TreeSitterLanguagePack::process("fn main() {}");
+        $result = TreeSitterLanguagePack::process("fn main() {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load vb and parse a simple snippet */
     public function test_smoke_vb(): void
     {
-        $result = TreeSitterLanguagePack::process("Module Main\nEnd Module");
+        $result = TreeSitterLanguagePack::process("Module Main\nEnd Module", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load verilog and parse a simple snippet */
     public function test_smoke_verilog(): void
     {
-        $result = TreeSitterLanguagePack::process("module main; endmodule");
+        $result = TreeSitterLanguagePack::process("module main; endmodule", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load vhdl and parse a simple snippet */
     public function test_smoke_vhdl(): void
     {
-        $result = TreeSitterLanguagePack::process("entity main is end main;");
+        $result = TreeSitterLanguagePack::process("entity main is end main;", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load vhs and parse a simple snippet */
     public function test_smoke_vhs(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load vim and parse a simple snippet */
     public function test_smoke_vim(): void
     {
-        $result = TreeSitterLanguagePack::process("echo 'hello'");
+        $result = TreeSitterLanguagePack::process("echo 'hello'", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load vimdoc and parse a simple snippet */
     public function test_smoke_vimdoc(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load vrl and parse a simple snippet */
     public function test_smoke_vrl(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load vue and parse a simple snippet */
     public function test_smoke_vue(): void
     {
-        $result = TreeSitterLanguagePack::process("<template><div>hello</div></template>");
+        $result = TreeSitterLanguagePack::process("<template><div>hello</div></template>", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load wast and parse a simple snippet */
     public function test_smoke_wast(): void
     {
-        $result = TreeSitterLanguagePack::process("(module)");
+        $result = TreeSitterLanguagePack::process("(module)", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load wat and parse a simple snippet */
     public function test_smoke_wat(): void
     {
-        $result = TreeSitterLanguagePack::process("(module)");
+        $result = TreeSitterLanguagePack::process("(module)", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load wgsl and parse a simple snippet */
     public function test_smoke_wgsl(): void
     {
-        $result = TreeSitterLanguagePack::process("@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }");
+        $result = TreeSitterLanguagePack::process("@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load wgsl_bevy and parse a simple snippet */
     public function test_smoke_wgsl_bevy(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load wit and parse a simple snippet */
     public function test_smoke_wit(): void
     {
-        $result = TreeSitterLanguagePack::process("package example:pkg;");
+        $result = TreeSitterLanguagePack::process("package example:pkg;", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load wolfram and parse a simple snippet */
     public function test_smoke_wolfram(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load x86asm and parse a simple snippet */
     public function test_smoke_x86asm(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load xcompose and parse a simple snippet */
     public function test_smoke_xcompose(): void
     {
-        $result = TreeSitterLanguagePack::process("<Multi_key> <a> : \"a\"");
+        $result = TreeSitterLanguagePack::process("<Multi_key> <a> : \"a\"", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load xml and parse a simple snippet */
     public function test_smoke_xml(): void
     {
-        $result = TreeSitterLanguagePack::process("<?xml version=\"1.0\"?>\n<root>hello</root>");
+        $result = TreeSitterLanguagePack::process("<?xml version=\"1.0\"?>\n<root>hello</root>", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load yaml and parse a simple snippet */
     public function test_smoke_yaml(): void
     {
-        $result = TreeSitterLanguagePack::process("key: value");
+        $result = TreeSitterLanguagePack::process("key: value", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load yuck and parse a simple snippet */
     public function test_smoke_yuck(): void
     {
-        $result = TreeSitterLanguagePack::process("(defwidget main [] (label :text \"hi\"))");
+        $result = TreeSitterLanguagePack::process("(defwidget main [] (label :text \"hi\"))", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load zig and parse a simple snippet */
     public function test_smoke_zig(): void
     {
-        $result = TreeSitterLanguagePack::process("pub fn main() void {}");
+        $result = TreeSitterLanguagePack::process("pub fn main() void {}", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ziggy and parse a simple snippet */
     public function test_smoke_ziggy(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load ziggy_schema and parse a simple snippet */
     public function test_smoke_ziggy_schema(): void
     {
-        $result = TreeSitterLanguagePack::process("x");
+        $result = TreeSitterLanguagePack::process("x", null);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Smoke test: load zsh and parse a simple snippet */
     public function test_smoke_zsh(): void
     {
-        $result = TreeSitterLanguagePack::process("echo hello");
+        $result = TreeSitterLanguagePack::process("echo hello", null);
         // TODO: unsupported assertion type: method_result
     }
 }

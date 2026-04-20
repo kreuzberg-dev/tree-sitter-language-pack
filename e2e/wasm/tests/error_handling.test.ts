@@ -4,19 +4,19 @@ import { process } from 'tree_sitter_language_pack';
 
 describe('error-handling', () => {
   it('error_empty_language_name: Parsing with empty language name should error', () => {
-    expect(() => process("hello")).toThrow();
+    expect(() => process("hello", null)).toThrow();
   });
 
   it('error_handling_empty_source: Parsing an empty string should still produce a tree.', () => {
-    const result = process("");
+    const result = process("", null);
   });
 
   it('error_handling_invalid_syntax: Parsing invalid syntax should produce a tree with error nodes.', () => {
-    const result = process("function function function @@@ %%%");
+    const result = process("function function function @@@ %%%", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('error_handling_unknown_language: Loading a nonexistent language should produce an error.', () => {
-    expect(() => process("")).toThrow();
+    expect(() => process("", null)).toThrow();
   });
 });

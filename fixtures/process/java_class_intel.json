@@ -2,13 +2,17 @@
 	"id": "java_class_process",
 	"description": "Intel: Java class with methods and imports",
 	"category": "process",
-	"tags": ["intel"],
+	"tags": [
+		"intel"
+	],
 	"skip": {
 		"reason": "Requires java language"
 	},
 	"input": {
-		"language": "java",
-		"source_code": "import java.util.List;\n\npublic class Greeter {\n    public String greet(String name) {\n        return \"Hello \" + name;\n    }\n}\n"
+		"source_code": "import java.util.List;\n\npublic class Greeter {\n    public String greet(String name) {\n        return \"Hello \" + name;\n    }\n}\n",
+		"config": {
+			"language": "java"
+		}
 	},
 	"assertions": [
 		{

@@ -2,13 +2,18 @@
 	"id": "python_multi_import_process_detail",
 	"description": "Intel: detect multiple Python imports",
 	"category": "process",
-	"tags": ["metadata", "imports"],
+	"tags": [
+		"metadata",
+		"imports"
+	],
 	"skip": {
 		"reason": "Requires python language"
 	},
 	"input": {
-		"language": "python",
-		"source_code": "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
+		"source_code": "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+		"config": {
+			"language": "python"
+		}
 	},
 	"assertions": [
 		{

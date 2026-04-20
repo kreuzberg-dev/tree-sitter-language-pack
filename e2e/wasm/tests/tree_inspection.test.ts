@@ -4,42 +4,42 @@ import { process } from 'tree_sitter_language_pack';
 
 describe('tree-inspection', () => {
   it('tree_error_count_broken: Parse broken Python code and verify error count >= 1', () => {
-    const result = process("def (broken syntax @@@ !!!");
+    const result = process("def (broken syntax @@@ !!!", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('tree_error_count_valid: Parse valid Python code and verify zero error count', () => {
-    const result = process("x = 1\ny = 2\n");
+    const result = process("x = 1\ny = 2\n", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('tree_find_nodes_two_functions: Parse Python with 2 functions and verify find_nodes_by_type count', () => {
-    const result = process("def foo():\n    pass\n\ndef bar():\n    pass\n");
+    const result = process("def foo():\n    pass\n\ndef bar():\n    pass\n", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('tree_has_error_nodes_broken_syntax: tree_has_error_nodes returns true for syntactically broken code', () => {
-    const result = process("def broken(\n    x = \n");
+    const result = process("def broken(\n    x = \n", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('tree_has_error_nodes_valid_code: tree_has_error_nodes returns false for valid Python code', () => {
-    const result = process("def greet(name):\n    return f'Hello {name}'\n");
+    const result = process("def greet(name):\n    return f'Hello {name}'\n", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('tree_named_children_class_and_function: Parse Python with class and function, verify named children count', () => {
-    const result = process("class Foo:\n    pass\n\ndef bar():\n    pass\n");
+    const result = process("class Foo:\n    pass\n\ndef bar():\n    pass\n", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('tree_root_node_info_python: Parse Python source and verify root node info', () => {
-    const result = process("def hello():\n    pass\n");
+    const result = process("def hello():\n    pass\n", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('tree_to_sexp_python: Parse Python and verify tree_to_sexp returns valid S-expression containing module', () => {
-    const result = process("x = 1\n");
+    const result = process("x = 1\n", null);
     // TODO: unsupported assertion type: method_result
   });
 });

@@ -4,38 +4,38 @@ import { process } from '@kreuzberg/tree-sitter-language-pack';
 
 describe('parsing', () => {
   it('parsing_go_function: Parse a Go function declaration and assert node type', () => {
-    const result = process("package main\nfunc main() {}");
+    const result = process("package main\nfunc main() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('parsing_html_element: Parse an HTML element and assert node type', () => {
-    const result = process("<div>hello</div>");
+    const result = process("<div>hello</div>", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('parsing_javascript_class: Parse a JavaScript class declaration.', () => {
-    const result = process("class Foo { bar() {} }");
+    const result = process("class Foo { bar() {} }", null);
     expect(result.rootChildCount).toBeGreaterThanOrEqual(1);
     // TODO: unsupported assertion type: method_result
   });
 
   it('parsing_javascript_variable: Parse a JavaScript variable declaration and assert node type', () => {
-    const result = process("const x = 1;");
+    const result = process("const x = 1;", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('parsing_python_function: Parse a Python function definition and assert node type', () => {
-    const result = process("def hello(): pass");
+    const result = process("def hello(): pass", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('parsing_rust_function: Parse a Rust function definition and assert node type', () => {
-    const result = process("fn main() {}");
+    const result = process("fn main() {}", null);
     // TODO: unsupported assertion type: method_result
   });
 
   it('parsing_rust_struct: Parse a Rust struct definition.', () => {
-    const result = process("struct Point { x: f64, y: f64 }");
+    const result = process("struct Point { x: f64, y: f64 }", null);
     expect(result.rootChildCount).toBeGreaterThanOrEqual(1);
   });
 });

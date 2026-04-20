@@ -5,21 +5,21 @@ defmodule E2e.ParsingTest do
 
   describe "parsing_go_function" do
     test "Parse a Go function declaration and assert node type" do
-      {:ok, result} = TreeSitterLanguagePack.process("package main\nfunc main() {}")
+      {:ok, result} = TreeSitterLanguagePack.process("package main\nfunc main() {}", nil)
       # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "parsing_html_element" do
     test "Parse an HTML element and assert node type" do
-      {:ok, result} = TreeSitterLanguagePack.process("<div>hello</div>")
+      {:ok, result} = TreeSitterLanguagePack.process("<div>hello</div>", nil)
       # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "parsing_javascript_class" do
     test "Parse a JavaScript class declaration." do
-      {:ok, result} = TreeSitterLanguagePack.process("class Foo { bar() {} }")
+      {:ok, result} = TreeSitterLanguagePack.process("class Foo { bar() {} }", nil)
       assert result.root_child_count >= 1
       # TODO: unsupported assertion type: method_result
     end
@@ -27,28 +27,28 @@ defmodule E2e.ParsingTest do
 
   describe "parsing_javascript_variable" do
     test "Parse a JavaScript variable declaration and assert node type" do
-      {:ok, result} = TreeSitterLanguagePack.process("const x = 1;")
+      {:ok, result} = TreeSitterLanguagePack.process("const x = 1;", nil)
       # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "parsing_python_function" do
     test "Parse a Python function definition and assert node type" do
-      {:ok, result} = TreeSitterLanguagePack.process("def hello(): pass")
+      {:ok, result} = TreeSitterLanguagePack.process("def hello(): pass", nil)
       # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "parsing_rust_function" do
     test "Parse a Rust function definition and assert node type" do
-      {:ok, result} = TreeSitterLanguagePack.process("fn main() {}")
+      {:ok, result} = TreeSitterLanguagePack.process("fn main() {}", nil)
       # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "parsing_rust_struct" do
     test "Parse a Rust struct definition." do
-      {:ok, result} = TreeSitterLanguagePack.process("struct Point { x: f64, y: f64 }")
+      {:ok, result} = TreeSitterLanguagePack.process("struct Point { x: f64, y: f64 }", nil)
       assert result.root_child_count >= 1
     end
   end

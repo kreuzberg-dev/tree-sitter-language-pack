@@ -14,7 +14,7 @@ import (
 
 func Test_ProcessJavascriptExportsDetail(t *testing.T) {
 	// JavaScript with exports, verify export count
-	result, err := tspack.Process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n")
+	result, err := tspack.Process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", `{"language":"javascript"}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -31,7 +31,7 @@ func Test_ProcessPythonComments(t *testing.T) {
 def hello():
     # inline comment
     pass
-`)
+`, `{"language":"python"}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -49,7 +49,7 @@ from pathlib import Path
 
 def main():
     pass
-`)
+`, `{"language":"python"}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -73,7 +73,7 @@ def hello():
 
 def world():
     print('world')
-`)
+`, `{"language":"python"}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -103,7 +103,7 @@ impl MyConfig {
         Self { name: String::new(), value: 0 }
     }
 }
-`)
+`, `{"language":"rust"}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}

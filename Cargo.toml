@@ -3,6 +3,7 @@ members = ["crates/*", "tools/snippet-runner"]
 exclude = [
     "crates/ts-pack-elixir",
     "crates/ts-pack-java",
+    "crates/ts-pack-node",
     "crates/ts-pack-ruby",
     "tests/test_apps/rust",
 ]

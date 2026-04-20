@@ -2,7 +2,7 @@
 	"abl": {
 		"extensions": ["p", "cls", "w"],
 		"repo": "https://github.com/usagi-coffee/tree-sitter-abl",
-		"rev": "b854b8d69500142afc79888b03e8de2bb03ec1c6"
+		"rev": "d92c556a9429fc52f5cea47347fd1985a8502687"
 	},
 	"actionscript": {
 		"extensions": ["as"],
@@ -133,7 +133,7 @@
 	"c3": {
 		"extensions": ["c3", "c3i", "c3t"],
 		"repo": "https://github.com/c3lang/tree-sitter-c3",
-		"rev": "8c172f52b965e78d36828f5b8e92091b4bc6d9e3"
+		"rev": "06ad624ceb8bbed01ad65dfbd51626938a1ea3f2"
 	},
 	"caddy": {
 		"extensions": ["caddyfile"],
@@ -995,14 +995,14 @@
 		"directory": "grammars/ocaml",
 		"extensions": ["ml"],
 		"repo": "https://github.com/tree-sitter/tree-sitter-ocaml",
-		"rev": "35c9d3ef57b7f8bfeda21b3b9b866f8669d0bc85"
+		"rev": "ec8dcc936f90007b86cb1a1683d09c0bf6d8183b"
 	},
 	"ocaml_interface": {
 		"branch": "master",
 		"directory": "grammars/interface",
 		"extensions": ["mli"],
 		"repo": "https://github.com/tree-sitter/tree-sitter-ocaml",
-		"rev": "35c9d3ef57b7f8bfeda21b3b9b866f8669d0bc85"
+		"rev": "ec8dcc936f90007b86cb1a1683d09c0bf6d8183b"
 	},
 	"ocamllex": {
 		"extensions": ["mll"],
@@ -1200,7 +1200,7 @@
 	"razor": {
 		"extensions": ["razor", "cshtml"],
 		"repo": "https://github.com/tris203/tree-sitter-razor",
-		"rev": "1e8ec29b7179329ce7cffcfae2c5347e8a00f7cf"
+		"rev": "a57265cc454a060292f869d6b30c10f797adb971"
 	},
 	"rbs": {
 		"extensions": ["rbs"],
@@ -1281,7 +1281,7 @@
 		"branch": "master",
 		"extensions": ["scala"],
 		"repo": "https://github.com/tree-sitter/tree-sitter-scala",
-		"rev": "a06047ee441bd02ca6ebcc0f913737b7c6e178e1"
+		"rev": "38950b525c9dfc44c8b60d44bdd6e54217286ca8"
 	},
 	"scheme": {
 		"extensions": ["scm"],

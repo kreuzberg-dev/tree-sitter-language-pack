@@ -14,7 +14,7 @@ final class ProcessTest extends TestCase
     /** JavaScript with exports, verify export count */
     public function test_process_javascript_exports_detail(): void
     {
-        $result = TreeSitterLanguagePack::process("export function greet(name) {\n  return `Hello \${name}`;\n}\n\nexport const VERSION = '1.0';\n");
+        $result = TreeSitterLanguagePack::process("export function greet(name) {\n  return `Hello \${name}`;\n}\n\nexport const VERSION = '1.0';\n", ["language" => "javascript"]);
         $this->assertEquals("javascript", $result->language);
         $this->assertGreaterThanOrEqual(1, count($result->exports));
     }
@@ -22,7 +22,7 @@ final class ProcessTest extends TestCase
     /** Python with comments, verify comment count */
     public function test_process_python_comments(): void
     {
-        $result = TreeSitterLanguagePack::process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n");
+        $result = TreeSitterLanguagePack::process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", ["language" => "python"]);
         $this->assertEquals("python", $result->language);
         $this->assertGreaterThanOrEqual(1, count($result->comments));
     }
@@ -30,7 +30,7 @@ final class ProcessTest extends TestCase
     /** Python with multiple imports, verify imports contain specific source */
     public function test_process_python_imports_detail(): void
     {
-        $result = TreeSitterLanguagePack::process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n");
+        $result = TreeSitterLanguagePack::process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", ["language" => "python"]);
         $this->assertEquals("python", $result->language);
         $this->assertGreaterThanOrEqual(2, count($result->imports));
         $this->assertStringContainsString("os", $result->import_sources);
@@ -39,7 +39,7 @@ final class ProcessTest extends TestCase
     /** Python code with metrics assertions */
     public function test_process_python_metrics_detail(): void
     {
-        $result = TreeSitterLanguagePack::process("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n");
+        $result = TreeSitterLanguagePack::process("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", ["language" => "python"]);
         $this->assertEquals("python", $result->language);
         $this->assertGreaterThanOrEqual(4, $result->metrics->code_lines);
         $this->assertGreaterThanOrEqual(1, $result->metrics->comment_lines);
@@ -49,7 +49,7 @@ final class ProcessTest extends TestCase
     /** Rust struct with name, verify structure name contains value */
     public function test_process_rust_structure_name(): void
     {
-        $result = TreeSitterLanguagePack::process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n");
+        $result = TreeSitterLanguagePack::process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", ["language" => "rust"]);
         $this->assertEquals("rust", $result->language);
         $this->assertGreaterThanOrEqual(1, count($result->structure));
         $this->assertStringContainsString("MyConfig", $result->structure_names);

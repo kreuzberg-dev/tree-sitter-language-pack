@@ -2,13 +2,17 @@
 	"id": "c_function_process",
 	"description": "Intel: C function with include",
 	"category": "process",
-	"tags": ["intel"],
+	"tags": [
+		"intel"
+	],
 	"skip": {
 		"reason": "Requires c language"
 	},
 	"input": {
-		"language": "c",
-		"source_code": "#include <stdio.h>\n\nint main() {\n    printf(\"hello\");\n    return 0;\n}\n"
+		"source_code": "#include <stdio.h>\n\nint main() {\n    printf(\"hello\");\n    return 0;\n}\n",
+		"config": {
+			"language": "c"
+		}
 	},
 	"assertions": [
 		{

@@ -11,7 +11,7 @@ import (
 
 func Test_ErrorEmptyLanguageName(t *testing.T) {
 	// Parsing with empty language name should error
-	_, err := tspack.Process(`hello`)
+	_, err := tspack.Process(`hello`, nil)
 	if err == nil {
 		t.Errorf("expected an error, but call succeeded")
 	}
@@ -19,7 +19,7 @@ func Test_ErrorEmptyLanguageName(t *testing.T) {
 
 func Test_ErrorHandlingEmptySource(t *testing.T) {
 	// Parsing an empty string should still produce a tree.
-	_, err := tspack.Process(``)
+	_, err := tspack.Process(``, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -27,7 +27,7 @@ func Test_ErrorHandlingEmptySource(t *testing.T) {
 
 func Test_ErrorHandlingInvalidSyntax(t *testing.T) {
 	// Parsing invalid syntax should produce a tree with error nodes.
-	result, err := tspack.Process(`function function function @@@ %%%`)
+	result, err := tspack.Process(`function function function @@@ %%%`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -36,7 +36,7 @@ func Test_ErrorHandlingInvalidSyntax(t *testing.T) {
 
 func Test_ErrorHandlingUnknownLanguage(t *testing.T) {
 	// Loading a nonexistent language should produce an error.
-	_, err := tspack.Process(``)
+	_, err := tspack.Process(``, nil)
 	if err == nil {
 		t.Errorf("expected an error, but call succeeded")
 	}

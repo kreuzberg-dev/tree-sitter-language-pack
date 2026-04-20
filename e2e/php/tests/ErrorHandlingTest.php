@@ -15,20 +15,20 @@ final class ErrorHandlingTest extends TestCase
     public function test_error_empty_language_name(): void
     {
         $this->expectException(\Exception::class);
-        TreeSitterLanguagePack::process("hello");
+        TreeSitterLanguagePack::process("hello", null);
     }
 
     /** Parsing an empty string should still produce a tree. */
     public function test_error_handling_empty_source(): void
     {
         $this->expectNotToPerformAssertions();
-        $result = TreeSitterLanguagePack::process("");
+        $result = TreeSitterLanguagePack::process("", null);
     }
 
     /** Parsing invalid syntax should produce a tree with error nodes. */
     public function test_error_handling_invalid_syntax(): void
     {
-        $result = TreeSitterLanguagePack::process("function function function @@@ %%%");
+        $result = TreeSitterLanguagePack::process("function function function @@@ %%%", null);
         // TODO: unsupported assertion type: method_result
     }
 
@@ -36,6 +36,6 @@ final class ErrorHandlingTest extends TestCase
     public function test_error_handling_unknown_language(): void
     {
         $this->expectException(\Exception::class);
-        TreeSitterLanguagePack::process("");
+        TreeSitterLanguagePack::process("", null);
     }
 }

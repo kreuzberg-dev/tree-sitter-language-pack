@@ -9,26 +9,26 @@ class ErrorHandlingTest {
     @Test
     void testErrorEmptyLanguageName() throws Exception {
         // Parsing with empty language name should error
-        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("hello"));
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("hello", null));
     }
 
     @Test
     void testErrorHandlingEmptySource() throws Exception {
         // Parsing an empty string should still produce a tree.
-        var result = TreeSitterLanguagePack.process("");
+        var result = TreeSitterLanguagePack.process("", null);
     }
 
     @Test
     void testErrorHandlingInvalidSyntax() throws Exception {
         // Parsing invalid syntax should produce a tree with error nodes.
-        var result = TreeSitterLanguagePack.process("function function function @@@ %%%");
+        var result = TreeSitterLanguagePack.process("function function function @@@ %%%", null);
         // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testErrorHandlingUnknownLanguage() throws Exception {
         // Loading a nonexistent language should produce an error.
-        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process(""));
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("", null));
     }
 
 }

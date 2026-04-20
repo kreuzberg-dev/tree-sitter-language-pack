@@ -2,13 +2,19 @@
 	"id": "python_error_diagnostics",
 	"description": "Intel: Python code with syntax errors should report diagnostics",
 	"category": "process",
-	"tags": ["intel", "error", "diagnostics"],
+	"tags": [
+		"intel",
+		"error",
+		"diagnostics"
+	],
 	"skip": {
 		"reason": "Requires python language"
 	},
 	"input": {
-		"language": "python",
-		"source_code": "def broken(\n    pass\n"
+		"source_code": "def broken(\n    pass\n",
+		"config": {
+			"language": "python"
+		}
 	},
 	"assertions": [
 		{

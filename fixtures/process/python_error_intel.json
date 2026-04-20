@@ -2,13 +2,19 @@
 	"id": "python_malformed_code_process",
 	"description": "Intel: detect diagnostics in malformed Python code",
 	"category": "process",
-	"tags": ["intel", "error", "diagnostics"],
+	"tags": [
+		"intel",
+		"error",
+		"diagnostics"
+	],
 	"skip": {
 		"reason": "Requires python language"
 	},
 	"input": {
-		"language": "python",
-		"source_code": "def broken(\n    return\nclass"
+		"source_code": "def broken(\n    return\nclass",
+		"config": {
+			"language": "python"
+		}
 	},
 	"assertions": [
 		{

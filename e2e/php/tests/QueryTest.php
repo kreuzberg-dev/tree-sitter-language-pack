@@ -14,35 +14,35 @@ final class QueryTest extends TestCase
     /** get_highlights_query returns non-empty string for python */
     public function test_highlights_query_python(): void
     {
-        $result = TreeSitterLanguagePack::process("");
+        $result = TreeSitterLanguagePack::process("", null);
         $this->assertNotEmpty($result);
     }
 
     /** get_highlights_query returns None for unknown language */
     public function test_highlights_query_unknown_language(): void
     {
-        $result = TreeSitterLanguagePack::process("");
+        $result = TreeSitterLanguagePack::process("", null);
         $this->assertEmpty($result);
     }
 
     /** get_injections_query returns non-empty for javascript (has embedded languages) */
     public function test_injections_query_javascript(): void
     {
-        $result = TreeSitterLanguagePack::process("");
+        $result = TreeSitterLanguagePack::process("", null);
         $this->assertNotEmpty($result);
     }
 
     /** get_locals_query returns non-empty for python */
     public function test_locals_query_python(): void
     {
-        $result = TreeSitterLanguagePack::process("");
+        $result = TreeSitterLanguagePack::process("", null);
         $this->assertNotEmpty($result);
     }
 
     /** Parse Python and run a query to find function definitions */
     public function test_run_query_python_functions(): void
     {
-        $result = TreeSitterLanguagePack::process("def hello():\n    pass\n\ndef world():\n    return 42\n");
+        $result = TreeSitterLanguagePack::process("def hello():\n    pass\n\ndef world():\n    return 42\n", null);
         // TODO: unsupported assertion type: method_result
     }
 }

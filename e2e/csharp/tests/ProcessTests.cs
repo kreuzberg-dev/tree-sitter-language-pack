@@ -16,7 +16,7 @@ public class ProcessTests
     public void Test_ProcessJavascriptExportsDetail()
     {
         // JavaScript with exports, verify export count
-        var result = TreeSitterLanguagePackLib.Process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", null);
+        var result = TreeSitterLanguagePackLib.Process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", "{\"language\":\"javascript\"}");
         Assert.Equal("javascript", result.Language.Trim());
         Assert.True(result.Exports.Count >= 1, "expected at least 1 elements");
     }
@@ -25,7 +25,7 @@ public class ProcessTests
     public void Test_ProcessPythonComments()
     {
         // Python with comments, verify comment count
-        var result = TreeSitterLanguagePackLib.Process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", null);
+        var result = TreeSitterLanguagePackLib.Process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", "{\"language\":\"python\"}");
         Assert.Equal("python", result.Language.Trim());
         Assert.True(result.Comments.Count >= 1, "expected at least 1 elements");
     }
@@ -34,7 +34,7 @@ public class ProcessTests
     public void Test_ProcessPythonImportsDetail()
     {
         // Python with multiple imports, verify imports contain specific source
-        var result = TreeSitterLanguagePackLib.Process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", null);
+        var result = TreeSitterLanguagePackLib.Process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", "{\"language\":\"python\"}");
         Assert.Equal("python", result.Language.Trim());
         Assert.True(result.Imports.Count >= 2, "expected at least 2 elements");
         Assert.Contains("os", result.ImportSources.ToString().ToLower());
@@ -44,7 +44,7 @@ public class ProcessTests
     public void Test_ProcessPythonMetricsDetail()
     {
         // Python code with metrics assertions
-        var result = TreeSitterLanguagePackLib.Process("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", null);
+        var result = TreeSitterLanguagePackLib.Process("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", "{\"language\":\"python\"}");
         Assert.Equal("python", result.Language.Trim());
         Assert.True(result.Metrics.CodeLines >= 4, "expected >= 4");
         Assert.True(result.Metrics.CommentLines >= 1, "expected >= 1");
@@ -55,7 +55,7 @@ public class ProcessTests
     public void Test_ProcessRustStructureName()
     {
         // Rust struct with name, verify structure name contains value
-        var result = TreeSitterLanguagePackLib.Process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", null);
+        var result = TreeSitterLanguagePackLib.Process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", "{\"language\":\"rust\"}");
         Assert.Equal("rust", result.Language.Trim());
         Assert.True(result.Structure.Count >= 1, "expected at least 1 elements");
         Assert.Contains("myconfig", result.StructureNames.ToString().ToLower());

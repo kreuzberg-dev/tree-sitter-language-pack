@@ -2,10 +2,15 @@
 	"id": "process_python_comments",
 	"description": "Python with comments, verify comment count",
 	"category": "process",
-	"tags": ["metadata"],
+	"tags": [
+		"metadata"
+	],
 	"input": {
-		"language": "python",
-		"source_code": "# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n"
+		"source_code": "# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n",
+		"config": {
+			"language": "python",
+			"comments": true
+		}
 	},
 	"assertions": [
 		{

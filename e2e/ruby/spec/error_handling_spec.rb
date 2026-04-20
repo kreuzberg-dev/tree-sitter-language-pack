@@ -6,20 +6,20 @@ require 'json'
 
 RSpec.describe 'error-handling' do
   it 'error_empty_language_name: Parsing with empty language name should error' do
-    expect { TreeSitterLanguagePack.process('hello') }.to raise_error
+    expect { TreeSitterLanguagePack.process('hello', nil) }.to raise_error
   end
 
   it 'error_handling_empty_source: Parsing an empty string should still produce a tree.' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).not_to be_nil
   end
 
   it 'error_handling_invalid_syntax: Parsing invalid syntax should produce a tree with error nodes.' do
-    result = TreeSitterLanguagePack.process('function function function @@@ %%%')
+    result = TreeSitterLanguagePack.process('function function function @@@ %%%', nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'error_handling_unknown_language: Loading a nonexistent language should produce an error.' do
-    expect { TreeSitterLanguagePack.process('') }.to raise_error
+    expect { TreeSitterLanguagePack.process('', nil) }.to raise_error
   end
 end

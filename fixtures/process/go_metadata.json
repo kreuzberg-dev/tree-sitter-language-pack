@@ -2,13 +2,17 @@
 	"id": "go_function_process_detail",
 	"description": "Intel: extract structure from Go function definition",
 	"category": "process",
-	"tags": ["metadata"],
+	"tags": [
+		"metadata"
+	],
 	"skip": {
 		"reason": "Requires go language"
 	},
 	"input": {
-		"language": "go",
-		"source_code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n"
+		"source_code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n",
+		"config": {
+			"language": "go"
+		}
 	},
 	"assertions": [
 		{

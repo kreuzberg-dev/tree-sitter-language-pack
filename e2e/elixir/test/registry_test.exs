@@ -5,28 +5,28 @@ defmodule E2e.RegistryTest do
 
   describe "registry_has_language_false" do
     test "has_language('nonexistent') should return false" do
-      {:ok, result} = TreeSitterLanguagePack.process("")
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
       # TODO: unsupported assertion type: is_false
     end
   end
 
   describe "registry_has_language_true" do
     test "has_language('python') should return true" do
-      {:ok, result} = TreeSitterLanguagePack.process("")
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
       assert result == true
     end
   end
 
   describe "registry_language_count" do
     test "language_count returns a value greater than 300" do
-      {:ok, result} = TreeSitterLanguagePack.process("")
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
       assert result >= 300
     end
   end
 
   describe "registry_list_languages" do
     test "available_languages should return a non-empty list" do
-      {:ok, result} = TreeSitterLanguagePack.process("")
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
       assert result != ""
     end
   end

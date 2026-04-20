@@ -6,27 +6,27 @@ require 'json'
 
 RSpec.describe 'query' do
   it 'highlights_query_python: get_highlights_query returns non-empty string for python' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).not_to be_empty
   end
 
   it 'highlights_query_unknown_language: get_highlights_query returns None for unknown language' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result.nil? || result.empty?).to be(true)
   end
 
   it 'injections_query_javascript: get_injections_query returns non-empty for javascript (has embedded languages)' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).not_to be_empty
   end
 
   it 'locals_query_python: get_locals_query returns non-empty for python' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).not_to be_empty
   end
 
   it 'run_query_python_functions: Parse Python and run a query to find function definitions' do
-    result = TreeSitterLanguagePack.process("def hello():\n    pass\n\ndef world():\n    return 42\n")
+    result = TreeSitterLanguagePack.process("def hello():\n    pass\n\ndef world():\n    return 42\n", nil)
     # TODO: unsupported assertion type: method_result
   end
 end

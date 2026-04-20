@@ -11,7 +11,7 @@ import (
 
 func Test_TreeErrorCountBroken(t *testing.T) {
 	// Parse broken Python code and verify error count >= 1
-	result, err := tspack.Process(`def (broken syntax @@@ !!!`)
+	result, err := tspack.Process(`def (broken syntax @@@ !!!`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -22,7 +22,7 @@ func Test_TreeErrorCountValid(t *testing.T) {
 	// Parse valid Python code and verify zero error count
 	result, err := tspack.Process(`x = 1
 y = 2
-`)
+`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -36,7 +36,7 @@ func Test_TreeFindNodesTwoFunctions(t *testing.T) {
 
 def bar():
     pass
-`)
+`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -47,7 +47,7 @@ func Test_TreeHasErrorNodesBrokenSyntax(t *testing.T) {
 	// tree_has_error_nodes returns true for syntactically broken code
 	result, err := tspack.Process(`def broken(
     x = 
-`)
+`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -58,7 +58,7 @@ func Test_TreeHasErrorNodesValidCode(t *testing.T) {
 	// tree_has_error_nodes returns false for valid Python code
 	result, err := tspack.Process(`def greet(name):
     return f'Hello {name}'
-`)
+`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -72,7 +72,7 @@ func Test_TreeNamedChildrenClassAndFunction(t *testing.T) {
 
 def bar():
     pass
-`)
+`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -83,7 +83,7 @@ func Test_TreeRootNodeInfoPython(t *testing.T) {
 	// Parse Python source and verify root node info
 	result, err := tspack.Process(`def hello():
     pass
-`)
+`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -93,7 +93,7 @@ func Test_TreeRootNodeInfoPython(t *testing.T) {
 func Test_TreeToSexpPython(t *testing.T) {
 	// Parse Python and verify tree_to_sexp returns valid S-expression containing module
 	result, err := tspack.Process(`x = 1
-`)
+`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}

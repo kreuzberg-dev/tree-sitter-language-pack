@@ -6,22 +6,22 @@ require 'json'
 
 RSpec.describe 'registry' do
   it 'registry_has_language_false: has_language(\'nonexistent\') should return false' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     # TODO: unsupported assertion type: is_false
   end
 
   it 'registry_has_language_true: has_language(\'python\') should return true' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to be true
   end
 
   it 'registry_language_count: language_count returns a value greater than 300' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).to be >= 300
   end
 
   it 'registry_list_languages: available_languages should return a non-empty list' do
-    result = TreeSitterLanguagePack.process('')
+    result = TreeSitterLanguagePack.process('', nil)
     expect(result).not_to be_empty
   end
 end

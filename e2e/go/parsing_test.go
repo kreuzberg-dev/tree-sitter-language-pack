@@ -12,7 +12,7 @@ import (
 func Test_ParsingGoFunction(t *testing.T) {
 	// Parse a Go function declaration and assert node type
 	result, err := tspack.Process(`package main
-func main() {}`)
+func main() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -21,7 +21,7 @@ func main() {}`)
 
 func Test_ParsingHtmlElement(t *testing.T) {
 	// Parse an HTML element and assert node type
-	result, err := tspack.Process(`<div>hello</div>`)
+	result, err := tspack.Process(`<div>hello</div>`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -30,7 +30,7 @@ func Test_ParsingHtmlElement(t *testing.T) {
 
 func Test_ParsingJavascriptClass(t *testing.T) {
 	// Parse a JavaScript class declaration.
-	result, err := tspack.Process(`class Foo { bar() {} }`)
+	result, err := tspack.Process(`class Foo { bar() {} }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -42,7 +42,7 @@ func Test_ParsingJavascriptClass(t *testing.T) {
 
 func Test_ParsingJavascriptVariable(t *testing.T) {
 	// Parse a JavaScript variable declaration and assert node type
-	result, err := tspack.Process(`const x = 1;`)
+	result, err := tspack.Process(`const x = 1;`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -51,7 +51,7 @@ func Test_ParsingJavascriptVariable(t *testing.T) {
 
 func Test_ParsingPythonFunction(t *testing.T) {
 	// Parse a Python function definition and assert node type
-	result, err := tspack.Process(`def hello(): pass`)
+	result, err := tspack.Process(`def hello(): pass`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -60,7 +60,7 @@ func Test_ParsingPythonFunction(t *testing.T) {
 
 func Test_ParsingRustFunction(t *testing.T) {
 	// Parse a Rust function definition and assert node type
-	result, err := tspack.Process(`fn main() {}`)
+	result, err := tspack.Process(`fn main() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -69,7 +69,7 @@ func Test_ParsingRustFunction(t *testing.T) {
 
 func Test_ParsingRustStruct(t *testing.T) {
 	// Parse a Rust struct definition.
-	result, err := tspack.Process(`struct Point { x: f64, y: f64 }`)
+	result, err := tspack.Process(`struct Point { x: f64, y: f64 }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}

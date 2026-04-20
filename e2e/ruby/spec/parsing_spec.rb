@@ -6,38 +6,38 @@ require 'json'
 
 RSpec.describe 'parsing' do
   it 'parsing_go_function: Parse a Go function declaration and assert node type' do
-    result = TreeSitterLanguagePack.process("package main\nfunc main() {}")
+    result = TreeSitterLanguagePack.process("package main\nfunc main() {}", nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'parsing_html_element: Parse an HTML element and assert node type' do
-    result = TreeSitterLanguagePack.process('<div>hello</div>')
+    result = TreeSitterLanguagePack.process('<div>hello</div>', nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'parsing_javascript_class: Parse a JavaScript class declaration.' do
-    result = TreeSitterLanguagePack.process('class Foo { bar() {} }')
+    result = TreeSitterLanguagePack.process('class Foo { bar() {} }', nil)
     expect(result.root_child_count).to be >= 1
     # TODO: unsupported assertion type: method_result
   end
 
   it 'parsing_javascript_variable: Parse a JavaScript variable declaration and assert node type' do
-    result = TreeSitterLanguagePack.process('const x = 1;')
+    result = TreeSitterLanguagePack.process('const x = 1;', nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'parsing_python_function: Parse a Python function definition and assert node type' do
-    result = TreeSitterLanguagePack.process('def hello(): pass')
+    result = TreeSitterLanguagePack.process('def hello(): pass', nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'parsing_rust_function: Parse a Rust function definition and assert node type' do
-    result = TreeSitterLanguagePack.process('fn main() {}')
+    result = TreeSitterLanguagePack.process('fn main() {}', nil)
     # TODO: unsupported assertion type: method_result
   end
 
   it 'parsing_rust_struct: Parse a Rust struct definition.' do
-    result = TreeSitterLanguagePack.process('struct Point { x: f64, y: f64 }')
+    result = TreeSitterLanguagePack.process('struct Point { x: f64, y: f64 }', nil)
     expect(result.root_child_count).to be >= 1
   end
 end

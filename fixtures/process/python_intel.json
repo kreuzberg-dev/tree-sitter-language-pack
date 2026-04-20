@@ -2,13 +2,17 @@
 	"id": "python_function_process",
 	"description": "Intel: extract structure from Python function definition",
 	"category": "process",
-	"tags": ["intel"],
+	"tags": [
+		"intel"
+	],
 	"skip": {
 		"reason": "Requires python language"
 	},
 	"input": {
-		"language": "python",
-		"source_code": "def greet(name):\n    return f'Hello, {name}!'\n"
+		"source_code": "def greet(name):\n    return f'Hello, {name}!'\n",
+		"config": {
+			"language": "python"
+		}
 	},
 	"assertions": [
 		{

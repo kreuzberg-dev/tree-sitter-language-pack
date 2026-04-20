@@ -6,26 +6,26 @@ require 'json'
 
 RSpec.describe 'process' do
   it 'process_javascript_exports_detail: JavaScript with exports, verify export count' do
-    result = TreeSitterLanguagePack.process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n")
+    result = TreeSitterLanguagePack.process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", { 'language' => 'javascript' })
     expect(result.language).to eq('javascript')
     expect(result.exports.length).to be >= 1
   end
 
   it 'process_python_comments: Python with comments, verify comment count' do
-    result = TreeSitterLanguagePack.process("\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n")
+    result = TreeSitterLanguagePack.process("\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n", { 'language' => 'python' })
     expect(result.language).to eq('python')
     expect(result.comments.length).to be >= 1
   end
 
   it 'process_python_imports_detail: Python with multiple imports, verify imports contain specific source' do
-    result = TreeSitterLanguagePack.process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n")
+    result = TreeSitterLanguagePack.process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", { 'language' => 'python' })
     expect(result.language).to eq('python')
     expect(result.imports.length).to be >= 2
     expect(result.import_sources.to_s).to include('os')
   end
 
   it 'process_python_metrics_detail: Python code with metrics assertions' do
-    result = TreeSitterLanguagePack.process("\# module docstring\nimport os\n\ndef hello():\n    \# greeting\n    print('hello')\n\ndef world():\n    print('world')\n")
+    result = TreeSitterLanguagePack.process("\# module docstring\nimport os\n\ndef hello():\n    \# greeting\n    print('hello')\n\ndef world():\n    print('world')\n", { 'language' => 'python' })
     expect(result.language).to eq('python')
     expect(result.metrics.code_lines).to be >= 4
     expect(result.metrics.comment_lines).to be >= 1
@@ -33,7 +33,7 @@ RSpec.describe 'process' do
   end
 
   it 'process_rust_structure_name: Rust struct with name, verify structure name contains value' do
-    result = TreeSitterLanguagePack.process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n")
+    result = TreeSitterLanguagePack.process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", { 'language' => 'rust' })
     expect(result.language).to eq('rust')
     expect(result.structure.length).to be >= 1
     expect(result.structure_names.to_s).to include('MyConfig')

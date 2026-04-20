@@ -9,28 +9,28 @@ class RegistryTest {
     @Test
     void testRegistryHasLanguageFalse() throws Exception {
         // has_language('nonexistent') should return false
-        var result = TreeSitterLanguagePack.process("");
+        var result = TreeSitterLanguagePack.process("", null);
         // TODO: unsupported assertion type: is_false
     }
 
     @Test
     void testRegistryHasLanguageTrue() throws Exception {
         // has_language('python') should return true
-        var result = TreeSitterLanguagePack.process("");
+        var result = TreeSitterLanguagePack.process("", null);
         assertTrue(result, "expected true");
     }
 
     @Test
     void testRegistryLanguageCount() throws Exception {
         // language_count returns a value greater than 300
-        var result = TreeSitterLanguagePack.process("");
+        var result = TreeSitterLanguagePack.process("", null);
         assertTrue(result >= 300, "expected >= 300");
     }
 
     @Test
     void testRegistryListLanguages() throws Exception {
         // available_languages should return a non-empty list
-        var result = TreeSitterLanguagePack.process("");
+        var result = TreeSitterLanguagePack.process("", null);
         assertFalse(result.isEmpty(), "expected non-empty value");
     }
 

@@ -5,7 +5,7 @@ defmodule E2e.ProcessTest do
 
   describe "process_javascript_exports_detail" do
     test "JavaScript with exports, verify export count" do
-      {:ok, result} = TreeSitterLanguagePack.process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n")
+      {:ok, result} = TreeSitterLanguagePack.process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", %{"language" => "javascript"})
       assert String.trim(result.language) == "javascript"
       assert length(result.exports) >= 1
     end
@@ -13,7 +13,7 @@ defmodule E2e.ProcessTest do
 
   describe "process_python_comments" do
     test "Python with comments, verify comment count" do
-      {:ok, result} = TreeSitterLanguagePack.process("\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n")
+      {:ok, result} = TreeSitterLanguagePack.process("\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n", %{"language" => "python"})
       assert String.trim(result.language) == "python"
       assert length(result.comments) >= 1
     end
@@ -21,7 +21,7 @@ defmodule E2e.ProcessTest do
 
   describe "process_python_imports_detail" do
     test "Python with multiple imports, verify imports contain specific source" do
-      {:ok, result} = TreeSitterLanguagePack.process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n")
+      {:ok, result} = TreeSitterLanguagePack.process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", %{"language" => "python"})
       assert String.trim(result.language) == "python"
       assert length(result.imports) >= 2
       assert String.contains?(to_string(result.import_sources), "os")
@@ -30,7 +30,7 @@ defmodule E2e.ProcessTest do
 
   describe "process_python_metrics_detail" do
     test "Python code with metrics assertions" do
-      {:ok, result} = TreeSitterLanguagePack.process("\# module docstring\nimport os\n\ndef hello():\n    \# greeting\n    print('hello')\n\ndef world():\n    print('world')\n")
+      {:ok, result} = TreeSitterLanguagePack.process("\# module docstring\nimport os\n\ndef hello():\n    \# greeting\n    print('hello')\n\ndef world():\n    print('world')\n", %{"language" => "python"})
       assert String.trim(result.language) == "python"
       assert result.metrics.code_lines >= 4
       assert result.metrics.comment_lines >= 1
@@ -40,7 +40,7 @@ defmodule E2e.ProcessTest do
 
   describe "process_rust_structure_name" do
     test "Rust struct with name, verify structure name contains value" do
-      {:ok, result} = TreeSitterLanguagePack.process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n")
+      {:ok, result} = TreeSitterLanguagePack.process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", %{"language" => "rust"})
       assert String.trim(result.language) == "rust"
       assert length(result.structure) >= 1
       assert String.contains?(to_string(result.structure_names), "MyConfig")

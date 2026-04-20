@@ -11,7 +11,7 @@ import (
 
 func Test_HighlightsQueryPython(t *testing.T) {
 	// get_highlights_query returns non-empty string for python
-	result, err := tspack.Process("")
+	result, err := tspack.Process("", nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -22,7 +22,7 @@ func Test_HighlightsQueryPython(t *testing.T) {
 
 func Test_HighlightsQueryUnknownLanguage(t *testing.T) {
 	// get_highlights_query returns None for unknown language
-	result, err := tspack.Process("")
+	result, err := tspack.Process("", nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -33,7 +33,7 @@ func Test_HighlightsQueryUnknownLanguage(t *testing.T) {
 
 func Test_InjectionsQueryJavascript(t *testing.T) {
 	// get_injections_query returns non-empty for javascript (has embedded languages)
-	result, err := tspack.Process("")
+	result, err := tspack.Process("", nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -44,7 +44,7 @@ func Test_InjectionsQueryJavascript(t *testing.T) {
 
 func Test_LocalsQueryPython(t *testing.T) {
 	// get_locals_query returns non-empty for python
-	result, err := tspack.Process("")
+	result, err := tspack.Process("", nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -60,7 +60,7 @@ func Test_RunQueryPythonFunctions(t *testing.T) {
 
 def world():
     return 42
-`)
+`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}

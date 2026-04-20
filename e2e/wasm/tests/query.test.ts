@@ -4,27 +4,27 @@ import { process } from 'tree_sitter_language_pack';
 
 describe('query', () => {
   it('highlights_query_python: get_highlights_query returns non-empty string for python', () => {
-    const result = process('');
+    const result = process('', null);
     expect(result.length).toBeGreaterThan(0);
   });
 
   it('highlights_query_unknown_language: get_highlights_query returns None for unknown language', () => {
-    const result = process('');
+    const result = process('', null);
     expect(result.trim()).toHaveLength(0);
   });
 
   it('injections_query_javascript: get_injections_query returns non-empty for javascript (has embedded languages)', () => {
-    const result = process('');
+    const result = process('', null);
     expect(result.length).toBeGreaterThan(0);
   });
 
   it('locals_query_python: get_locals_query returns non-empty for python', () => {
-    const result = process('');
+    const result = process('', null);
     expect(result.length).toBeGreaterThan(0);
   });
 
   it('run_query_python_functions: Parse Python and run a query to find function definitions', () => {
-    const result = process("def hello():\n    pass\n\ndef world():\n    return 42\n");
+    const result = process("def hello():\n    pass\n\ndef world():\n    return 42\n", null);
     // TODO: unsupported assertion type: method_result
   });
 });

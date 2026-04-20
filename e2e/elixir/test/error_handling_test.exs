@@ -5,26 +5,26 @@ defmodule E2e.ErrorHandlingTest do
 
   describe "error_empty_language_name" do
     test "Parsing with empty language name should error" do
-      assert {:error, _} = TreeSitterLanguagePack.process("hello")
+      assert {:error, _} = TreeSitterLanguagePack.process("hello", nil)
     end
   end
 
   describe "error_handling_empty_source" do
     test "Parsing an empty string should still produce a tree." do
-      {:ok, result} = TreeSitterLanguagePack.process("")
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
     end
   end
 
   describe "error_handling_invalid_syntax" do
     test "Parsing invalid syntax should produce a tree with error nodes." do
-      {:ok, result} = TreeSitterLanguagePack.process("function function function @@@ %%%")
+      {:ok, result} = TreeSitterLanguagePack.process("function function function @@@ %%%", nil)
       # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "error_handling_unknown_language" do
     test "Loading a nonexistent language should produce an error." do
-      assert {:error, _} = TreeSitterLanguagePack.process("")
+      assert {:error, _} = TreeSitterLanguagePack.process("", nil)
     end
   end
 end

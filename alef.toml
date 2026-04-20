@@ -6,7 +6,7 @@ core_import = "tree_sitter_language_pack"
 sources = ["crates/ts-pack-core/src/lib.rs"]
 version_from = "Cargo.toml"
 workspace_root = "."
-features = ["download", "serde", "config"]
+features = ["serde", "config"]
 
 [include]
 types = [
@@ -242,7 +242,7 @@ module = "tree_sitter_language_pack"
 result_var = "result"
 args = [
     { name = "source", field = "source_code", type = "string" },
-    { name = "config", field = "config", type = "json_object", optional = true },
+    { name = "config", field = "config", type = "json_object" },
 ]
 
 [e2e.call.overrides.rust]

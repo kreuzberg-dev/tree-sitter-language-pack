@@ -8,7 +8,8 @@ from tree_sitter_language_pack import process
 def test_c_function_process() -> None:
     """Intel: C function with include."""
     source = '#include <stdio.h>\n\nint main() {\n    printf("hello");\n    return 0;\n}\n'
-    result = process(source=source)
+    config = {"language": "c"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "c"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Function" in result.structure_kinds  # noqa: S101
@@ -19,7 +20,8 @@ def test_c_function_process() -> None:
 def test_config_all_python() -> None:
     """Intel: process with all features enabled."""
     source = "# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Function" in result.structure_kinds  # noqa: S101
@@ -31,7 +33,8 @@ def test_config_all_python() -> None:
 def test_config_minimal_python() -> None:
     """Intel: process with minimal config - only metrics."""
     source = "def hello():\n    pass\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert result.metrics.total_lines >= 2  # noqa: S101
 
@@ -39,7 +42,8 @@ def test_config_minimal_python() -> None:
 def test_go_function_process() -> None:
     """Intel: extract structure from Go function definition."""
     source = 'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n'
-    result = process(source=source)
+    config = {"language": "go"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "go"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Function" in result.structure_kinds  # noqa: S101
@@ -51,7 +55,8 @@ def test_go_function_process() -> None:
 def test_go_function_process_detail() -> None:
     """Intel: extract structure from Go function definition."""
     source = 'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n'
-    result = process(source=source)
+    config = {"language": "go"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "go"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Function" in result.structure_kinds  # noqa: S101
@@ -63,7 +68,8 @@ def test_go_function_process_detail() -> None:
 def test_java_class_process() -> None:
     """Intel: Java class with methods and imports."""
     source = 'import java.util.List;\n\npublic class Greeter {\n    public String greet(String name) {\n        return "Hello " + name;\n    }\n}\n'
-    result = process(source=source)
+    config = {"language": "java"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "java"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Class" in result.structure_kinds  # noqa: S101
@@ -75,7 +81,8 @@ def test_java_class_process() -> None:
 def test_javascript_multi_import_process() -> None:
     """Intel: detect multiple imports and function in JavaScript."""
     source = "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n"
-    result = process(source=source)
+    config = {"language": "javascript"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "javascript"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Function" in result.structure_kinds  # noqa: S101
@@ -87,7 +94,8 @@ def test_javascript_multi_import_process() -> None:
 def test_javascript_multi_import_process_detail() -> None:
     """Intel: detect multiple imports and function in JavaScript."""
     source = "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n"
-    result = process(source=source)
+    config = {"language": "javascript"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "javascript"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Function" in result.structure_kinds  # noqa: S101
@@ -98,21 +106,24 @@ def test_javascript_multi_import_process_detail() -> None:
 def test_process_javascript_exports_detail() -> None:
     """JavaScript with exports, verify export count."""
     source = "export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n"
-    result = process(source=source)
+    config = {"language": "javascript"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "javascript"  # noqa: S101
     assert len(result.exports) >= 1  # noqa: S101
 
 def test_process_python_comments() -> None:
     """Python with comments, verify comment count."""
     source = "# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.comments) >= 1  # noqa: S101
 
 def test_process_python_imports_detail() -> None:
     """Python with multiple imports, verify imports contain specific source."""
     source = "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.imports) >= 2  # noqa: S101
     assert "os" in result.import_sources  # noqa: S101
@@ -120,7 +131,8 @@ def test_process_python_imports_detail() -> None:
 def test_process_python_metrics_detail() -> None:
     """Python code with metrics assertions."""
     source = "# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert result.metrics.code_lines >= 4  # noqa: S101
     assert result.metrics.comment_lines >= 1  # noqa: S101
@@ -129,7 +141,8 @@ def test_process_python_metrics_detail() -> None:
 def test_process_rust_structure_name() -> None:
     """Rust struct with name, verify structure name contains value."""
     source = "pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n"
-    result = process(source=source)
+    config = {"language": "rust"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "rust"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "MyConfig" in result.structure_names  # noqa: S101
@@ -138,7 +151,8 @@ def test_process_rust_structure_name() -> None:
 def test_python_chunking_medium() -> None:
     """Intel: Python code with medium chunk size."""
     source = "def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 3  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
@@ -149,7 +163,8 @@ def test_python_chunking_medium() -> None:
 def test_python_chunking_process_detail() -> None:
     """Intel: chunk multi-function Python source into multiple pieces."""
     source = "def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert result.metrics.total_lines >= 8  # noqa: S101
     assert len(result.chunks) >= 2  # noqa: S101
@@ -159,7 +174,8 @@ def test_python_chunking_process_detail() -> None:
 def test_python_class_with_methods_process() -> None:
     """Intel: extract nested structure from Python class with methods."""
     source = "class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Class" in result.structure_kinds  # noqa: S101
@@ -170,7 +186,8 @@ def test_python_class_with_methods_process() -> None:
 def test_python_class_with_methods_process_detail() -> None:
     """Intel: extract nested structure from Python class with methods."""
     source = "class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Class" in result.structure_kinds  # noqa: S101
@@ -181,7 +198,8 @@ def test_python_class_with_methods_process_detail() -> None:
 def test_python_error_diagnostics() -> None:
     """Intel: Python code with syntax errors should report diagnostics."""
     source = "def broken(\n    pass\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert result.metrics.error_count == 1  # noqa: S101
     assert result.diagnostics  # noqa: S101
@@ -190,7 +208,8 @@ def test_python_error_diagnostics() -> None:
 def test_python_function_process() -> None:
     """Intel: extract structure from Python function definition."""
     source = "def greet(name):\n    return f'Hello, {name}!'\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Function" in result.structure_kinds  # noqa: S101
@@ -201,7 +220,8 @@ def test_python_function_process() -> None:
 def test_python_function_process_detail() -> None:
     """Intel: extract structure from Python function definition."""
     source = "def greet(name):\n    return f'Hello, {name}!'\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Function" in result.structure_kinds  # noqa: S101
@@ -212,7 +232,8 @@ def test_python_function_process_detail() -> None:
 def test_python_malformed_code_process() -> None:
     """Intel: detect diagnostics in malformed Python code."""
     source = "def broken(\n    return\nclass"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert result.diagnostics  # noqa: S101
 
@@ -220,7 +241,8 @@ def test_python_malformed_code_process() -> None:
 def test_python_malformed_code_process_detail() -> None:
     """Intel: detect diagnostics in malformed Python code."""
     source = "def broken(\n    return\nclass"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert result.diagnostics  # noqa: S101
 
@@ -228,7 +250,8 @@ def test_python_malformed_code_process_detail() -> None:
 def test_python_multi_import_process() -> None:
     """Intel: detect multiple Python imports."""
     source = "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert len(result.imports) >= 3  # noqa: S101
@@ -239,7 +262,8 @@ def test_python_multi_import_process() -> None:
 def test_python_multi_import_process_detail() -> None:
     """Intel: detect multiple Python imports."""
     source = "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
-    result = process(source=source)
+    config = {"language": "python"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert len(result.imports) >= 3  # noqa: S101
@@ -250,7 +274,8 @@ def test_python_multi_import_process_detail() -> None:
 def test_ruby_class_process() -> None:
     """Intel: Ruby class with method."""
     source = "require 'json'\n\nclass Greeter\n  def greet(name)\n    \"Hello #{name}\"\n  end\nend\n"
-    result = process(source=source)
+    config = {"language": "ruby"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "ruby"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Class" in result.structure_kinds  # noqa: S101
@@ -261,7 +286,8 @@ def test_ruby_class_process() -> None:
 def test_rust_chunking_process() -> None:
     """Intel: chunk multi-function Rust source into pieces."""
     source = "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n"
-    result = process(source=source)
+    config = {"language": "rust"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "rust"  # noqa: S101
     assert result.metrics.total_lines >= 7  # noqa: S101
     assert len(result.chunks) >= 2  # noqa: S101
@@ -271,7 +297,8 @@ def test_rust_chunking_process() -> None:
 def test_rust_chunking_process_detail() -> None:
     """Intel: chunk multi-function Rust source into pieces."""
     source = "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n"
-    result = process(source=source)
+    config = {"language": "rust"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "rust"  # noqa: S101
     assert result.metrics.total_lines >= 7  # noqa: S101
     assert len(result.chunks) >= 2  # noqa: S101
@@ -281,7 +308,8 @@ def test_rust_chunking_process_detail() -> None:
 def test_rust_function_process() -> None:
     """Intel: extract structure from Rust function definition."""
     source = "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n"
-    result = process(source=source)
+    config = {"language": "rust"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "rust"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Function" in result.structure_kinds  # noqa: S101
@@ -292,7 +320,8 @@ def test_rust_function_process() -> None:
 def test_rust_function_process_detail() -> None:
     """Intel: extract structure from Rust function definition."""
     source = "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n"
-    result = process(source=source)
+    config = {"language": "rust"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "rust"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Function" in result.structure_kinds  # noqa: S101
@@ -303,7 +332,8 @@ def test_rust_function_process_detail() -> None:
 def test_typescript_function_process() -> None:
     """Intel: extract structure from TypeScript function."""
     source = "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n"
-    result = process(source=source)
+    config = {"language": "typescript"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "typescript"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Function" in result.structure_kinds  # noqa: S101
@@ -315,7 +345,8 @@ def test_typescript_function_process() -> None:
 def test_typescript_function_process_detail() -> None:
     """Intel: extract structure from TypeScript function."""
     source = "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n"
-    result = process(source=source)
+    config = {"language": "typescript"}
+    result = process(source=source, config=config)
     assert result.language.strip() == "typescript"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
     assert "Function" in result.structure_kinds  # noqa: S101

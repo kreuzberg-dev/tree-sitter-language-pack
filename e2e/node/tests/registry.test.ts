@@ -4,22 +4,22 @@ import { process } from '@kreuzberg/tree-sitter-language-pack';
 
 describe('registry', () => {
   it('registry_has_language_false: has_language(\'nonexistent\') should return false', () => {
-    const result = process("");
+    const result = process("", null);
     // TODO: unsupported assertion type: is_false
   });
 
   it('registry_has_language_true: has_language(\'python\') should return true', () => {
-    const result = process("");
+    const result = process("", null);
     expect(result).toBe(true);
   });
 
   it('registry_language_count: language_count returns a value greater than 300', () => {
-    const result = process("");
+    const result = process("", null);
     expect(result).toBeGreaterThanOrEqual(300);
   });
 
   it('registry_list_languages: available_languages should return a non-empty list', () => {
-    const result = process("");
+    const result = process("", null);
     expect(result.length).toBeGreaterThan(0);
   });
 });

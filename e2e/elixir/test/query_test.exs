@@ -5,35 +5,35 @@ defmodule E2e.QueryTest do
 
   describe "highlights_query_python" do
     test "get_highlights_query returns non-empty string for python" do
-      {:ok, result} = TreeSitterLanguagePack.process("")
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
       assert result != ""
     end
   end
 
   describe "highlights_query_unknown_language" do
     test "get_highlights_query returns None for unknown language" do
-      {:ok, result} = TreeSitterLanguagePack.process("")
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
       assert is_nil(result) or String.trim(result) == ""
     end
   end
 
   describe "injections_query_javascript" do
     test "get_injections_query returns non-empty for javascript (has embedded languages)" do
-      {:ok, result} = TreeSitterLanguagePack.process("")
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
       assert result != ""
     end
   end
 
   describe "locals_query_python" do
     test "get_locals_query returns non-empty for python" do
-      {:ok, result} = TreeSitterLanguagePack.process("")
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
       assert result != ""
     end
   end
 
   describe "run_query_python_functions" do
     test "Parse Python and run a query to find function definitions" do
-      {:ok, result} = TreeSitterLanguagePack.process("def hello():\n    pass\n\ndef world():\n    return 42\n")
+      {:ok, result} = TreeSitterLanguagePack.process("def hello():\n    pass\n\ndef world():\n    return 42\n", nil)
       # TODO: unsupported assertion type: method_result
     end
   end

@@ -11,7 +11,7 @@ import (
 
 func Test_SmokeAbl(t *testing.T) {
 	// Smoke test: load abl and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -20,7 +20,7 @@ func Test_SmokeAbl(t *testing.T) {
 
 func Test_SmokeActionscript(t *testing.T) {
 	// Smoke test: load actionscript and parse a simple snippet
-	result, err := tspack.Process(`var x:int = 1;`)
+	result, err := tspack.Process(`var x:int = 1;`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -29,7 +29,7 @@ func Test_SmokeActionscript(t *testing.T) {
 
 func Test_SmokeAda(t *testing.T) {
 	// Smoke test: load ada and parse a simple snippet
-	result, err := tspack.Process(`procedure Main is begin null; end Main;`)
+	result, err := tspack.Process(`procedure Main is begin null; end Main;`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -38,7 +38,7 @@ func Test_SmokeAda(t *testing.T) {
 
 func Test_SmokeAgda(t *testing.T) {
 	// Smoke test: load agda and parse a simple snippet
-	result, err := tspack.Process(`module Main where`)
+	result, err := tspack.Process(`module Main where`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -47,7 +47,7 @@ func Test_SmokeAgda(t *testing.T) {
 
 func Test_SmokeAl(t *testing.T) {
 	// Smoke test: load al and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -56,7 +56,7 @@ func Test_SmokeAl(t *testing.T) {
 
 func Test_SmokeAngular(t *testing.T) {
 	// Smoke test: load angular and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -65,7 +65,7 @@ func Test_SmokeAngular(t *testing.T) {
 
 func Test_SmokeApex(t *testing.T) {
 	// Smoke test: load apex and parse a simple snippet
-	result, err := tspack.Process(`public class Main {}`)
+	result, err := tspack.Process(`public class Main {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -74,7 +74,7 @@ func Test_SmokeApex(t *testing.T) {
 
 func Test_SmokeArduino(t *testing.T) {
 	// Smoke test: load arduino and parse a simple snippet
-	result, err := tspack.Process(`void setup() {}`)
+	result, err := tspack.Process(`void setup() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -85,7 +85,7 @@ func Test_SmokeAsciidoc(t *testing.T) {
 	// Smoke test: load asciidoc and parse a simple snippet
 	result, err := tspack.Process(`= Title
 
-Paragraph.`)
+Paragraph.`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -94,7 +94,7 @@ Paragraph.`)
 
 func Test_SmokeAsm(t *testing.T) {
 	// Smoke test: load asm and parse a simple snippet
-	result, err := tspack.Process(`mov eax, 1`)
+	result, err := tspack.Process(`mov eax, 1`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -105,7 +105,7 @@ func Test_SmokeAstro(t *testing.T) {
 	// Smoke test: load astro and parse a simple snippet
 	result, err := tspack.Process(`---
 ---
-<p>hello</p>`)
+<p>hello</p>`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -114,7 +114,7 @@ func Test_SmokeAstro(t *testing.T) {
 
 func Test_SmokeAwk(t *testing.T) {
 	// Smoke test: load awk and parse a simple snippet
-	result, err := tspack.Process(`BEGIN { print "hello" }`)
+	result, err := tspack.Process(`BEGIN { print "hello" }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -123,7 +123,7 @@ func Test_SmokeAwk(t *testing.T) {
 
 func Test_SmokeBash(t *testing.T) {
 	// Smoke test: load bash and parse a simple snippet
-	result, err := tspack.Process(`echo hello`)
+	result, err := tspack.Process(`echo hello`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -132,7 +132,7 @@ func Test_SmokeBash(t *testing.T) {
 
 func Test_SmokeBass(t *testing.T) {
 	// Smoke test: load bass and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -142,7 +142,7 @@ func Test_SmokeBass(t *testing.T) {
 func Test_SmokeBatch(t *testing.T) {
 	// Smoke test: load batch and parse a simple snippet
 	result, err := tspack.Process(`@echo off
-echo hello`)
+echo hello`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -151,7 +151,7 @@ echo hello`)
 
 func Test_SmokeBeancount(t *testing.T) {
 	// Smoke test: load beancount and parse a simple snippet
-	result, err := tspack.Process(`2024-01-01 open Assets:Bank USD`)
+	result, err := tspack.Process(`2024-01-01 open Assets:Bank USD`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -160,7 +160,7 @@ func Test_SmokeBeancount(t *testing.T) {
 
 func Test_SmokeBibtex(t *testing.T) {
 	// Smoke test: load bibtex and parse a simple snippet
-	result, err := tspack.Process(`@article{key, title={A}}`)
+	result, err := tspack.Process(`@article{key, title={A}}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -169,7 +169,7 @@ func Test_SmokeBibtex(t *testing.T) {
 
 func Test_SmokeBicep(t *testing.T) {
 	// Smoke test: load bicep and parse a simple snippet
-	result, err := tspack.Process(`param name string`)
+	result, err := tspack.Process(`param name string`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -178,7 +178,7 @@ func Test_SmokeBicep(t *testing.T) {
 
 func Test_SmokeBitbake(t *testing.T) {
 	// Smoke test: load bitbake and parse a simple snippet
-	result, err := tspack.Process(`DESCRIPTION = "hello"`)
+	result, err := tspack.Process(`DESCRIPTION = "hello"`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -187,7 +187,7 @@ func Test_SmokeBitbake(t *testing.T) {
 
 func Test_SmokeBlade(t *testing.T) {
 	// Smoke test: load blade and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -196,7 +196,7 @@ func Test_SmokeBlade(t *testing.T) {
 
 func Test_SmokeBrightscript(t *testing.T) {
 	// Smoke test: load brightscript and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -205,7 +205,7 @@ func Test_SmokeBrightscript(t *testing.T) {
 
 func Test_SmokeBsl(t *testing.T) {
 	// Smoke test: load bsl and parse a simple snippet
-	result, err := tspack.Process(`Procedure Main() EndProcedure`)
+	result, err := tspack.Process(`Procedure Main() EndProcedure`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -214,7 +214,7 @@ func Test_SmokeBsl(t *testing.T) {
 
 func Test_SmokeC(t *testing.T) {
 	// Smoke test: load c and parse a simple snippet
-	result, err := tspack.Process(`int main() { return 0; }`)
+	result, err := tspack.Process(`int main() { return 0; }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -223,7 +223,7 @@ func Test_SmokeC(t *testing.T) {
 
 func Test_SmokeC3(t *testing.T) {
 	// Smoke test: load c3 and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -234,7 +234,7 @@ func Test_SmokeCaddy(t *testing.T) {
 	// Smoke test: load caddy and parse a simple snippet
 	result, err := tspack.Process(`:8080 {
 	respond "Hello"
-}`)
+}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -243,7 +243,7 @@ func Test_SmokeCaddy(t *testing.T) {
 
 func Test_SmokeCairo(t *testing.T) {
 	// Smoke test: load cairo and parse a simple snippet
-	result, err := tspack.Process(`fn main() {}`)
+	result, err := tspack.Process(`fn main() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -252,7 +252,7 @@ func Test_SmokeCairo(t *testing.T) {
 
 func Test_SmokeCapnp(t *testing.T) {
 	// Smoke test: load capnp and parse a simple snippet
-	result, err := tspack.Process(`@0xabcdef1234567890;`)
+	result, err := tspack.Process(`@0xabcdef1234567890;`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -261,7 +261,7 @@ func Test_SmokeCapnp(t *testing.T) {
 
 func Test_SmokeCedar(t *testing.T) {
 	// Smoke test: load cedar and parse a simple snippet
-	result, err := tspack.Process(`permit(principal, action, resource);`)
+	result, err := tspack.Process(`permit(principal, action, resource);`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -270,7 +270,7 @@ func Test_SmokeCedar(t *testing.T) {
 
 func Test_SmokeCedarschema(t *testing.T) {
 	// Smoke test: load cedarschema and parse a simple snippet
-	result, err := tspack.Process(`entity User;`)
+	result, err := tspack.Process(`entity User;`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -279,7 +279,7 @@ func Test_SmokeCedarschema(t *testing.T) {
 
 func Test_SmokeCel(t *testing.T) {
 	// Smoke test: load cel and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -288,7 +288,7 @@ func Test_SmokeCel(t *testing.T) {
 
 func Test_SmokeCfml(t *testing.T) {
 	// Smoke test: load cfml and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -298,7 +298,7 @@ func Test_SmokeCfml(t *testing.T) {
 func Test_SmokeChatito(t *testing.T) {
 	// Smoke test: load chatito and parse a simple snippet
 	result, err := tspack.Process(`%[greeting]
-    hello`)
+    hello`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -307,7 +307,7 @@ func Test_SmokeChatito(t *testing.T) {
 
 func Test_SmokeChuck(t *testing.T) {
 	// Smoke test: load chuck and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -316,7 +316,7 @@ func Test_SmokeChuck(t *testing.T) {
 
 func Test_SmokeCircom(t *testing.T) {
 	// Smoke test: load circom and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -325,7 +325,7 @@ func Test_SmokeCircom(t *testing.T) {
 
 func Test_SmokeClarity(t *testing.T) {
 	// Smoke test: load clarity and parse a simple snippet
-	result, err := tspack.Process(`(define-public (hello) (ok true))`)
+	result, err := tspack.Process(`(define-public (hello) (ok true))`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -334,7 +334,7 @@ func Test_SmokeClarity(t *testing.T) {
 
 func Test_SmokeClojure(t *testing.T) {
 	// Smoke test: load clojure and parse a simple snippet
-	result, err := tspack.Process(`(def x 1)`)
+	result, err := tspack.Process(`(def x 1)`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -343,7 +343,7 @@ func Test_SmokeClojure(t *testing.T) {
 
 func Test_SmokeCmake(t *testing.T) {
 	// Smoke test: load cmake and parse a simple snippet
-	result, err := tspack.Process(`cmake_minimum_required(VERSION 3.0)`)
+	result, err := tspack.Process(`cmake_minimum_required(VERSION 3.0)`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -353,7 +353,7 @@ func Test_SmokeCmake(t *testing.T) {
 func Test_SmokeCobol(t *testing.T) {
 	// Smoke test: load cobol and parse a simple snippet
 	result, err := tspack.Process(`       IDENTIFICATION DIVISION.
-       PROGRAM-ID. HELLO.`)
+       PROGRAM-ID. HELLO.`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -362,7 +362,7 @@ func Test_SmokeCobol(t *testing.T) {
 
 func Test_SmokeComment(t *testing.T) {
 	// Smoke test: load comment and parse a simple snippet
-	result, err := tspack.Process(`TODO: fix this`)
+	result, err := tspack.Process(`TODO: fix this`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -371,7 +371,7 @@ func Test_SmokeComment(t *testing.T) {
 
 func Test_SmokeCommonlisp(t *testing.T) {
 	// Smoke test: load commonlisp and parse a simple snippet
-	result, err := tspack.Process(`(defun hello () (print "hello"))`)
+	result, err := tspack.Process(`(defun hello () (print "hello"))`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -380,7 +380,7 @@ func Test_SmokeCommonlisp(t *testing.T) {
 
 func Test_SmokeCooklang(t *testing.T) {
 	// Smoke test: load cooklang and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -389,7 +389,7 @@ func Test_SmokeCooklang(t *testing.T) {
 
 func Test_SmokeCorn(t *testing.T) {
 	// Smoke test: load corn and parse a simple snippet
-	result, err := tspack.Process(`{ key = "value" }`)
+	result, err := tspack.Process(`{ key = "value" }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -398,7 +398,7 @@ func Test_SmokeCorn(t *testing.T) {
 
 func Test_SmokeCpon(t *testing.T) {
 	// Smoke test: load cpon and parse a simple snippet
-	result, err := tspack.Process(`{"key": 1}`)
+	result, err := tspack.Process(`{"key": 1}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -407,7 +407,7 @@ func Test_SmokeCpon(t *testing.T) {
 
 func Test_SmokeCpp(t *testing.T) {
 	// Smoke test: load cpp and parse a simple snippet
-	result, err := tspack.Process(`int main() { return 0; }`)
+	result, err := tspack.Process(`int main() { return 0; }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -416,7 +416,7 @@ func Test_SmokeCpp(t *testing.T) {
 
 func Test_SmokeCrystal(t *testing.T) {
 	// Smoke test: load crystal and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -425,7 +425,7 @@ func Test_SmokeCrystal(t *testing.T) {
 
 func Test_SmokeCsharp(t *testing.T) {
 	// Smoke test: load csharp and parse a simple snippet
-	result, err := tspack.Process(`class Main {}`)
+	result, err := tspack.Process(`class Main {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -434,7 +434,7 @@ func Test_SmokeCsharp(t *testing.T) {
 
 func Test_SmokeCss(t *testing.T) {
 	// Smoke test: load css and parse a simple snippet
-	result, err := tspack.Process(`body { color: red; }`)
+	result, err := tspack.Process(`body { color: red; }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -443,7 +443,7 @@ func Test_SmokeCss(t *testing.T) {
 
 func Test_SmokeCst(t *testing.T) {
 	// Smoke test: load cst and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -453,7 +453,7 @@ func Test_SmokeCst(t *testing.T) {
 func Test_SmokeCsv(t *testing.T) {
 	// Smoke test: load csv and parse a simple snippet
 	result, err := tspack.Process(`a,b,c
-1,2,3`)
+1,2,3`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -462,7 +462,7 @@ func Test_SmokeCsv(t *testing.T) {
 
 func Test_SmokeCuda(t *testing.T) {
 	// Smoke test: load cuda and parse a simple snippet
-	result, err := tspack.Process(`__global__ void kernel() {}`)
+	result, err := tspack.Process(`__global__ void kernel() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -471,7 +471,7 @@ func Test_SmokeCuda(t *testing.T) {
 
 func Test_SmokeCue(t *testing.T) {
 	// Smoke test: load cue and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -480,7 +480,7 @@ func Test_SmokeCue(t *testing.T) {
 
 func Test_SmokeCylc(t *testing.T) {
 	// Smoke test: load cylc and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -489,7 +489,7 @@ func Test_SmokeCylc(t *testing.T) {
 
 func Test_SmokeD(t *testing.T) {
 	// Smoke test: load d and parse a simple snippet
-	result, err := tspack.Process(`void main() {}`)
+	result, err := tspack.Process(`void main() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -498,7 +498,7 @@ func Test_SmokeD(t *testing.T) {
 
 func Test_SmokeDart(t *testing.T) {
 	// Smoke test: load dart and parse a simple snippet
-	result, err := tspack.Process(`void main() {}`)
+	result, err := tspack.Process(`void main() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -507,7 +507,7 @@ func Test_SmokeDart(t *testing.T) {
 
 func Test_SmokeDesktop(t *testing.T) {
 	// Smoke test: load desktop and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -517,7 +517,7 @@ func Test_SmokeDesktop(t *testing.T) {
 func Test_SmokeDevicetree(t *testing.T) {
 	// Smoke test: load devicetree and parse a simple snippet
 	result, err := tspack.Process(`/dts-v1/;
-/ { };`)
+/ { };`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -526,7 +526,7 @@ func Test_SmokeDevicetree(t *testing.T) {
 
 func Test_SmokeDhall(t *testing.T) {
 	// Smoke test: load dhall and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -539,7 +539,7 @@ func Test_SmokeDiff(t *testing.T) {
 +++ b/file
 @@ -1 +1 @@
 -old
-+new`)
++new`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -548,7 +548,7 @@ func Test_SmokeDiff(t *testing.T) {
 
 func Test_SmokeDjot(t *testing.T) {
 	// Smoke test: load djot and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -557,7 +557,7 @@ func Test_SmokeDjot(t *testing.T) {
 
 func Test_SmokeDockerfile(t *testing.T) {
 	// Smoke test: load dockerfile and parse a simple snippet
-	result, err := tspack.Process(`FROM alpine`)
+	result, err := tspack.Process(`FROM alpine`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -566,7 +566,7 @@ func Test_SmokeDockerfile(t *testing.T) {
 
 func Test_SmokeDot(t *testing.T) {
 	// Smoke test: load dot and parse a simple snippet
-	result, err := tspack.Process(`digraph G { A -> B; }`)
+	result, err := tspack.Process(`digraph G { A -> B; }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -575,7 +575,7 @@ func Test_SmokeDot(t *testing.T) {
 
 func Test_SmokeDoxygen(t *testing.T) {
 	// Smoke test: load doxygen and parse a simple snippet
-	result, err := tspack.Process(`/** @brief A function */`)
+	result, err := tspack.Process(`/** @brief A function */`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -584,7 +584,7 @@ func Test_SmokeDoxygen(t *testing.T) {
 
 func Test_SmokeDtd(t *testing.T) {
 	// Smoke test: load dtd and parse a simple snippet
-	result, err := tspack.Process(`<!ELEMENT note (body)>`)
+	result, err := tspack.Process(`<!ELEMENT note (body)>`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -593,7 +593,7 @@ func Test_SmokeDtd(t *testing.T) {
 
 func Test_SmokeEarthfile(t *testing.T) {
 	// Smoke test: load earthfile and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -602,7 +602,7 @@ func Test_SmokeEarthfile(t *testing.T) {
 
 func Test_SmokeEbnf(t *testing.T) {
 	// Smoke test: load ebnf and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -611,7 +611,7 @@ func Test_SmokeEbnf(t *testing.T) {
 
 func Test_SmokeEditorconfig(t *testing.T) {
 	// Smoke test: load editorconfig and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -620,7 +620,7 @@ func Test_SmokeEditorconfig(t *testing.T) {
 
 func Test_SmokeEds(t *testing.T) {
 	// Smoke test: load eds and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -629,7 +629,7 @@ func Test_SmokeEds(t *testing.T) {
 
 func Test_SmokeEex(t *testing.T) {
 	// Smoke test: load eex and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -638,7 +638,7 @@ func Test_SmokeEex(t *testing.T) {
 
 func Test_SmokeElisp(t *testing.T) {
 	// Smoke test: load elisp and parse a simple snippet
-	result, err := tspack.Process(`(defun hello () (message "hello"))`)
+	result, err := tspack.Process(`(defun hello () (message "hello"))`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -647,7 +647,7 @@ func Test_SmokeElisp(t *testing.T) {
 
 func Test_SmokeElixir(t *testing.T) {
 	// Smoke test: load elixir and parse a simple snippet
-	result, err := tspack.Process(`IO.puts("hello")`)
+	result, err := tspack.Process(`IO.puts("hello")`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -656,7 +656,7 @@ func Test_SmokeElixir(t *testing.T) {
 
 func Test_SmokeElm(t *testing.T) {
 	// Smoke test: load elm and parse a simple snippet
-	result, err := tspack.Process(`module Main exposing (..)`)
+	result, err := tspack.Process(`module Main exposing (..)`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -665,7 +665,7 @@ func Test_SmokeElm(t *testing.T) {
 
 func Test_SmokeElsa(t *testing.T) {
 	// Smoke test: load elsa and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -674,7 +674,7 @@ func Test_SmokeElsa(t *testing.T) {
 
 func Test_SmokeElvish(t *testing.T) {
 	// Smoke test: load elvish and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -683,7 +683,7 @@ func Test_SmokeElvish(t *testing.T) {
 
 func Test_SmokeEmbeddedtemplate(t *testing.T) {
 	// Smoke test: load embeddedtemplate and parse a simple snippet
-	result, err := tspack.Process(`<%= value %>`)
+	result, err := tspack.Process(`<%= value %>`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -692,7 +692,7 @@ func Test_SmokeEmbeddedtemplate(t *testing.T) {
 
 func Test_SmokeEnforce(t *testing.T) {
 	// Smoke test: load enforce and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -701,7 +701,7 @@ func Test_SmokeEnforce(t *testing.T) {
 
 func Test_SmokeErlang(t *testing.T) {
 	// Smoke test: load erlang and parse a simple snippet
-	result, err := tspack.Process(`main() -> ok.`)
+	result, err := tspack.Process(`main() -> ok.`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -710,7 +710,7 @@ func Test_SmokeErlang(t *testing.T) {
 
 func Test_SmokeFacility(t *testing.T) {
 	// Smoke test: load facility and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -719,7 +719,7 @@ func Test_SmokeFacility(t *testing.T) {
 
 func Test_SmokeFaust(t *testing.T) {
 	// Smoke test: load faust and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -728,7 +728,7 @@ func Test_SmokeFaust(t *testing.T) {
 
 func Test_SmokeFennel(t *testing.T) {
 	// Smoke test: load fennel and parse a simple snippet
-	result, err := tspack.Process(`(fn hello [] (print :hello))`)
+	result, err := tspack.Process(`(fn hello [] (print :hello))`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -737,7 +737,7 @@ func Test_SmokeFennel(t *testing.T) {
 
 func Test_SmokeFidl(t *testing.T) {
 	// Smoke test: load fidl and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -746,7 +746,7 @@ func Test_SmokeFidl(t *testing.T) {
 
 func Test_SmokeFirrtl(t *testing.T) {
 	// Smoke test: load firrtl and parse a simple snippet
-	result, err := tspack.Process(`circuit Main :`)
+	result, err := tspack.Process(`circuit Main :`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -755,7 +755,7 @@ func Test_SmokeFirrtl(t *testing.T) {
 
 func Test_SmokeFish(t *testing.T) {
 	// Smoke test: load fish and parse a simple snippet
-	result, err := tspack.Process(`echo hello`)
+	result, err := tspack.Process(`echo hello`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -764,7 +764,7 @@ func Test_SmokeFish(t *testing.T) {
 
 func Test_SmokeFoam(t *testing.T) {
 	// Smoke test: load foam and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -773,7 +773,7 @@ func Test_SmokeFoam(t *testing.T) {
 
 func Test_SmokeForth(t *testing.T) {
 	// Smoke test: load forth and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -783,7 +783,7 @@ func Test_SmokeForth(t *testing.T) {
 func Test_SmokeFortran(t *testing.T) {
 	// Smoke test: load fortran and parse a simple snippet
 	result, err := tspack.Process(`program main
-end program main`)
+end program main`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -792,7 +792,7 @@ end program main`)
 
 func Test_SmokeFsharp(t *testing.T) {
 	// Smoke test: load fsharp and parse a simple snippet
-	result, err := tspack.Process(`let x = 1`)
+	result, err := tspack.Process(`let x = 1`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -801,7 +801,7 @@ func Test_SmokeFsharp(t *testing.T) {
 
 func Test_SmokeFsharpSignature(t *testing.T) {
 	// Smoke test: load fsharp_signature and parse a simple snippet
-	result, err := tspack.Process(`val x: int`)
+	result, err := tspack.Process(`val x: int`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -810,7 +810,7 @@ func Test_SmokeFsharpSignature(t *testing.T) {
 
 func Test_SmokeFunc(t *testing.T) {
 	// Smoke test: load func and parse a simple snippet
-	result, err := tspack.Process(`() recv_internal() {}`)
+	result, err := tspack.Process(`() recv_internal() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -819,7 +819,7 @@ func Test_SmokeFunc(t *testing.T) {
 
 func Test_SmokeGap(t *testing.T) {
 	// Smoke test: load gap and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -830,7 +830,7 @@ func Test_SmokeGdscript(t *testing.T) {
 	// Smoke test: load gdscript and parse a simple snippet
 	result, err := tspack.Process(`extends Node
 func _ready():
-	pass`)
+	pass`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -839,7 +839,7 @@ func _ready():
 
 func Test_SmokeGdshader(t *testing.T) {
 	// Smoke test: load gdshader and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -848,7 +848,7 @@ func Test_SmokeGdshader(t *testing.T) {
 
 func Test_SmokeGitConfig(t *testing.T) {
 	// Smoke test: load git_config and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -857,7 +857,7 @@ func Test_SmokeGitConfig(t *testing.T) {
 
 func Test_SmokeGitRebase(t *testing.T) {
 	// Smoke test: load git_rebase and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -866,7 +866,7 @@ func Test_SmokeGitRebase(t *testing.T) {
 
 func Test_SmokeGitattributes(t *testing.T) {
 	// Smoke test: load gitattributes and parse a simple snippet
-	result, err := tspack.Process(`*.txt text`)
+	result, err := tspack.Process(`*.txt text`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -877,7 +877,7 @@ func Test_SmokeGitcommit(t *testing.T) {
 	// Smoke test: load gitcommit and parse a simple snippet
 	result, err := tspack.Process(`feat: add feature
 
-Body text`)
+Body text`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -887,7 +887,7 @@ Body text`)
 func Test_SmokeGitignore(t *testing.T) {
 	// Smoke test: load gitignore and parse a simple snippet
 	result, err := tspack.Process(`*.o
-*.log`)
+*.log`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -896,7 +896,7 @@ func Test_SmokeGitignore(t *testing.T) {
 
 func Test_SmokeGleam(t *testing.T) {
 	// Smoke test: load gleam and parse a simple snippet
-	result, err := tspack.Process(`pub fn main() { }`)
+	result, err := tspack.Process(`pub fn main() { }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -905,7 +905,7 @@ func Test_SmokeGleam(t *testing.T) {
 
 func Test_SmokeGlimmer(t *testing.T) {
 	// Smoke test: load glimmer and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -914,7 +914,7 @@ func Test_SmokeGlimmer(t *testing.T) {
 
 func Test_SmokeGlsl(t *testing.T) {
 	// Smoke test: load glsl and parse a simple snippet
-	result, err := tspack.Process(`void main() { gl_Position = vec4(0.0); }`)
+	result, err := tspack.Process(`void main() { gl_Position = vec4(0.0); }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -923,7 +923,7 @@ func Test_SmokeGlsl(t *testing.T) {
 
 func Test_SmokeGn(t *testing.T) {
 	// Smoke test: load gn and parse a simple snippet
-	result, err := tspack.Process(`group("hello") {}`)
+	result, err := tspack.Process(`group("hello") {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -932,7 +932,7 @@ func Test_SmokeGn(t *testing.T) {
 
 func Test_SmokeGnuplot(t *testing.T) {
 	// Smoke test: load gnuplot and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -941,7 +941,7 @@ func Test_SmokeGnuplot(t *testing.T) {
 
 func Test_SmokeGo(t *testing.T) {
 	// Smoke test: load go and parse a simple snippet
-	result, err := tspack.Process(`package main`)
+	result, err := tspack.Process(`package main`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -950,7 +950,7 @@ func Test_SmokeGo(t *testing.T) {
 
 func Test_SmokeGodotResource(t *testing.T) {
 	// Smoke test: load godot_resource and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -961,7 +961,7 @@ func Test_SmokeGomod(t *testing.T) {
 	// Smoke test: load gomod and parse a simple snippet
 	result, err := tspack.Process(`module example.com/hello
 
-go 1.21`)
+go 1.21`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -970,7 +970,7 @@ go 1.21`)
 
 func Test_SmokeGosum(t *testing.T) {
 	// Smoke test: load gosum and parse a simple snippet
-	result, err := tspack.Process(`example.com/pkg v1.0.0 h1:abc=`)
+	result, err := tspack.Process(`example.com/pkg v1.0.0 h1:abc=`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -979,7 +979,7 @@ func Test_SmokeGosum(t *testing.T) {
 
 func Test_SmokeGotmpl(t *testing.T) {
 	// Smoke test: load gotmpl and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -988,7 +988,7 @@ func Test_SmokeGotmpl(t *testing.T) {
 
 func Test_SmokeGowork(t *testing.T) {
 	// Smoke test: load gowork and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -997,7 +997,7 @@ func Test_SmokeGowork(t *testing.T) {
 
 func Test_SmokeGpg(t *testing.T) {
 	// Smoke test: load gpg and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1006,7 +1006,7 @@ func Test_SmokeGpg(t *testing.T) {
 
 func Test_SmokeGraphql(t *testing.T) {
 	// Smoke test: load graphql and parse a simple snippet
-	result, err := tspack.Process(`type Query { hello: String }`)
+	result, err := tspack.Process(`type Query { hello: String }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1015,7 +1015,7 @@ func Test_SmokeGraphql(t *testing.T) {
 
 func Test_SmokeGren(t *testing.T) {
 	// Smoke test: load gren and parse a simple snippet
-	result, err := tspack.Process(`module Main exposing (..)`)
+	result, err := tspack.Process(`module Main exposing (..)`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1024,7 +1024,7 @@ func Test_SmokeGren(t *testing.T) {
 
 func Test_SmokeGroovy(t *testing.T) {
 	// Smoke test: load groovy and parse a simple snippet
-	result, err := tspack.Process(`def x = 1`)
+	result, err := tspack.Process(`def x = 1`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1033,7 +1033,7 @@ func Test_SmokeGroovy(t *testing.T) {
 
 func Test_SmokeGstlaunch(t *testing.T) {
 	// Smoke test: load gstlaunch and parse a simple snippet
-	result, err := tspack.Process(`fakesrc ! fakesink`)
+	result, err := tspack.Process(`fakesrc ! fakesink`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1043,7 +1043,7 @@ func Test_SmokeGstlaunch(t *testing.T) {
 func Test_SmokeHack(t *testing.T) {
 	// Smoke test: load hack and parse a simple snippet
 	result, err := tspack.Process(`<?hh
-function main(): void {}`)
+function main(): void {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1052,7 +1052,7 @@ function main(): void {}`)
 
 func Test_SmokeHare(t *testing.T) {
 	// Smoke test: load hare and parse a simple snippet
-	result, err := tspack.Process(`export fn main() void = void;`)
+	result, err := tspack.Process(`export fn main() void = void;`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1061,7 +1061,7 @@ func Test_SmokeHare(t *testing.T) {
 
 func Test_SmokeHaskell(t *testing.T) {
 	// Smoke test: load haskell and parse a simple snippet
-	result, err := tspack.Process(`main = putStrLn "hello"`)
+	result, err := tspack.Process(`main = putStrLn "hello"`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1070,7 +1070,7 @@ func Test_SmokeHaskell(t *testing.T) {
 
 func Test_SmokeHaxe(t *testing.T) {
 	// Smoke test: load haxe and parse a simple snippet
-	result, err := tspack.Process(`class Main { static function main() {} }`)
+	result, err := tspack.Process(`class Main { static function main() {} }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1079,7 +1079,7 @@ func Test_SmokeHaxe(t *testing.T) {
 
 func Test_SmokeHcl(t *testing.T) {
 	// Smoke test: load hcl and parse a simple snippet
-	result, err := tspack.Process(`variable "name" { type = string }`)
+	result, err := tspack.Process(`variable "name" { type = string }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1088,7 +1088,7 @@ func Test_SmokeHcl(t *testing.T) {
 
 func Test_SmokeHeex(t *testing.T) {
 	// Smoke test: load heex and parse a simple snippet
-	result, err := tspack.Process(`<%= @greeting %>`)
+	result, err := tspack.Process(`<%= @greeting %>`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1097,7 +1097,7 @@ func Test_SmokeHeex(t *testing.T) {
 
 func Test_SmokeHjson(t *testing.T) {
 	// Smoke test: load hjson and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1106,7 +1106,7 @@ func Test_SmokeHjson(t *testing.T) {
 
 func Test_SmokeHlsl(t *testing.T) {
 	// Smoke test: load hlsl and parse a simple snippet
-	result, err := tspack.Process(`float4 main() : SV_Target { return 0; }`)
+	result, err := tspack.Process(`float4 main() : SV_Target { return 0; }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1115,7 +1115,7 @@ func Test_SmokeHlsl(t *testing.T) {
 
 func Test_SmokeHocon(t *testing.T) {
 	// Smoke test: load hocon and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1124,7 +1124,7 @@ func Test_SmokeHocon(t *testing.T) {
 
 func Test_SmokeHoon(t *testing.T) {
 	// Smoke test: load hoon and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1133,7 +1133,7 @@ func Test_SmokeHoon(t *testing.T) {
 
 func Test_SmokeHtml(t *testing.T) {
 	// Smoke test: load html and parse a simple snippet
-	result, err := tspack.Process(`<p>hello</p>`)
+	result, err := tspack.Process(`<p>hello</p>`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1142,7 +1142,7 @@ func Test_SmokeHtml(t *testing.T) {
 
 func Test_SmokeHtmldjango(t *testing.T) {
 	// Smoke test: load htmldjango and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1151,7 +1151,7 @@ func Test_SmokeHtmldjango(t *testing.T) {
 
 func Test_SmokeHttp(t *testing.T) {
 	// Smoke test: load http and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1160,7 +1160,7 @@ func Test_SmokeHttp(t *testing.T) {
 
 func Test_SmokeHurl(t *testing.T) {
 	// Smoke test: load hurl and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1169,7 +1169,7 @@ func Test_SmokeHurl(t *testing.T) {
 
 func Test_SmokeHyprlang(t *testing.T) {
 	// Smoke test: load hyprlang and parse a simple snippet
-	result, err := tspack.Process(`general { border_size = 1 }`)
+	result, err := tspack.Process(`general { border_size = 1 }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1178,7 +1178,7 @@ func Test_SmokeHyprlang(t *testing.T) {
 
 func Test_SmokeIdris(t *testing.T) {
 	// Smoke test: load idris and parse a simple snippet
-	result, err := tspack.Process(`module Main`)
+	result, err := tspack.Process(`module Main`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1188,7 +1188,7 @@ func Test_SmokeIdris(t *testing.T) {
 func Test_SmokeIni(t *testing.T) {
 	// Smoke test: load ini and parse a simple snippet
 	result, err := tspack.Process(`[section]
-key = value`)
+key = value`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1197,7 +1197,7 @@ key = value`)
 
 func Test_SmokeIspc(t *testing.T) {
 	// Smoke test: load ispc and parse a simple snippet
-	result, err := tspack.Process(`export void main() {}`)
+	result, err := tspack.Process(`export void main() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1206,7 +1206,7 @@ func Test_SmokeIspc(t *testing.T) {
 
 func Test_SmokeJai(t *testing.T) {
 	// Smoke test: load jai and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1215,7 +1215,7 @@ func Test_SmokeJai(t *testing.T) {
 
 func Test_SmokeJanet(t *testing.T) {
 	// Smoke test: load janet and parse a simple snippet
-	result, err := tspack.Process(`(print "hello")`)
+	result, err := tspack.Process(`(print "hello")`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1224,7 +1224,7 @@ func Test_SmokeJanet(t *testing.T) {
 
 func Test_SmokeJava(t *testing.T) {
 	// Smoke test: load java and parse a simple snippet
-	result, err := tspack.Process(`class Main {}`)
+	result, err := tspack.Process(`class Main {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1233,7 +1233,7 @@ func Test_SmokeJava(t *testing.T) {
 
 func Test_SmokeJavadoc(t *testing.T) {
 	// Smoke test: load javadoc and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1242,7 +1242,7 @@ func Test_SmokeJavadoc(t *testing.T) {
 
 func Test_SmokeJavascript(t *testing.T) {
 	// Smoke test: load javascript and parse a simple snippet
-	result, err := tspack.Process(`console.log('hello');`)
+	result, err := tspack.Process(`console.log('hello');`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1251,7 +1251,7 @@ func Test_SmokeJavascript(t *testing.T) {
 
 func Test_SmokeJinja2(t *testing.T) {
 	// Smoke test: load jinja2 and parse a simple snippet
-	result, err := tspack.Process(`{{ variable }}`)
+	result, err := tspack.Process(`{{ variable }}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1260,7 +1260,7 @@ func Test_SmokeJinja2(t *testing.T) {
 
 func Test_SmokeJq(t *testing.T) {
 	// Smoke test: load jq and parse a simple snippet
-	result, err := tspack.Process(`.[] | select(.key)`)
+	result, err := tspack.Process(`.[] | select(.key)`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1269,7 +1269,7 @@ func Test_SmokeJq(t *testing.T) {
 
 func Test_SmokeJsdoc(t *testing.T) {
 	// Smoke test: load jsdoc and parse a simple snippet
-	result, err := tspack.Process(`/** @param {string} name */`)
+	result, err := tspack.Process(`/** @param {string} name */`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1278,7 +1278,7 @@ func Test_SmokeJsdoc(t *testing.T) {
 
 func Test_SmokeJson(t *testing.T) {
 	// Smoke test: load json and parse a simple snippet
-	result, err := tspack.Process(`{"key": "value"}`)
+	result, err := tspack.Process(`{"key": "value"}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1287,7 +1287,7 @@ func Test_SmokeJson(t *testing.T) {
 
 func Test_SmokeJson5(t *testing.T) {
 	// Smoke test: load json5 and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1296,7 +1296,7 @@ func Test_SmokeJson5(t *testing.T) {
 
 func Test_SmokeJsonnet(t *testing.T) {
 	// Smoke test: load jsonnet and parse a simple snippet
-	result, err := tspack.Process(`{ key: 'value' }`)
+	result, err := tspack.Process(`{ key: 'value' }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1305,7 +1305,7 @@ func Test_SmokeJsonnet(t *testing.T) {
 
 func Test_SmokeJulia(t *testing.T) {
 	// Smoke test: load julia and parse a simple snippet
-	result, err := tspack.Process(`function main() end`)
+	result, err := tspack.Process(`function main() end`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1314,7 +1314,7 @@ func Test_SmokeJulia(t *testing.T) {
 
 func Test_SmokeJust(t *testing.T) {
 	// Smoke test: load just and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1323,7 +1323,7 @@ func Test_SmokeJust(t *testing.T) {
 
 func Test_SmokeKcl(t *testing.T) {
 	// Smoke test: load kcl and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1333,7 +1333,7 @@ func Test_SmokeKcl(t *testing.T) {
 func Test_SmokeKconfig(t *testing.T) {
 	// Smoke test: load kconfig and parse a simple snippet
 	result, err := tspack.Process(`config FOO
-	bool "Enable foo"`)
+	bool "Enable foo"`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1342,7 +1342,7 @@ func Test_SmokeKconfig(t *testing.T) {
 
 func Test_SmokeKdl(t *testing.T) {
 	// Smoke test: load kdl and parse a simple snippet
-	result, err := tspack.Process(`node "value"`)
+	result, err := tspack.Process(`node "value"`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1351,7 +1351,7 @@ func Test_SmokeKdl(t *testing.T) {
 
 func Test_SmokeKotlin(t *testing.T) {
 	// Smoke test: load kotlin and parse a simple snippet
-	result, err := tspack.Process(`fun main() {}`)
+	result, err := tspack.Process(`fun main() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1363,7 +1363,7 @@ func Test_SmokeLatex(t *testing.T) {
 	result, err := tspack.Process(`\documentclass{article}
 \begin{document}
 Hello
-\end{document}`)
+\end{document}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1372,7 +1372,7 @@ Hello
 
 func Test_SmokeLean(t *testing.T) {
 	// Smoke test: load lean and parse a simple snippet
-	result, err := tspack.Process(`def main : IO Unit := pure ()`)
+	result, err := tspack.Process(`def main : IO Unit := pure ()`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1381,7 +1381,7 @@ func Test_SmokeLean(t *testing.T) {
 
 func Test_SmokeLedger(t *testing.T) {
 	// Smoke test: load ledger and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1390,7 +1390,7 @@ func Test_SmokeLedger(t *testing.T) {
 
 func Test_SmokeLess(t *testing.T) {
 	// Smoke test: load less and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1399,7 +1399,7 @@ func Test_SmokeLess(t *testing.T) {
 
 func Test_SmokeLinkerscript(t *testing.T) {
 	// Smoke test: load linkerscript and parse a simple snippet
-	result, err := tspack.Process(`SECTIONS { .text : { *(.text) } }`)
+	result, err := tspack.Process(`SECTIONS { .text : { *(.text) } }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1408,7 +1408,7 @@ func Test_SmokeLinkerscript(t *testing.T) {
 
 func Test_SmokeLiquid(t *testing.T) {
 	// Smoke test: load liquid and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1417,7 +1417,7 @@ func Test_SmokeLiquid(t *testing.T) {
 
 func Test_SmokeLlvm(t *testing.T) {
 	// Smoke test: load llvm and parse a simple snippet
-	result, err := tspack.Process(`define i32 @main() { ret i32 0 }`)
+	result, err := tspack.Process(`define i32 @main() { ret i32 0 }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1426,7 +1426,7 @@ func Test_SmokeLlvm(t *testing.T) {
 
 func Test_SmokeLua(t *testing.T) {
 	// Smoke test: load lua and parse a simple snippet
-	result, err := tspack.Process(`print('hello')`)
+	result, err := tspack.Process(`print('hello')`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1435,7 +1435,7 @@ func Test_SmokeLua(t *testing.T) {
 
 func Test_SmokeLuadoc(t *testing.T) {
 	// Smoke test: load luadoc and parse a simple snippet
-	result, err := tspack.Process(`---@param name string`)
+	result, err := tspack.Process(`---@param name string`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1444,7 +1444,7 @@ func Test_SmokeLuadoc(t *testing.T) {
 
 func Test_SmokeLuap(t *testing.T) {
 	// Smoke test: load luap and parse a simple snippet
-	result, err := tspack.Process(`[a-z]+`)
+	result, err := tspack.Process(`[a-z]+`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1453,7 +1453,7 @@ func Test_SmokeLuap(t *testing.T) {
 
 func Test_SmokeLuau(t *testing.T) {
 	// Smoke test: load luau and parse a simple snippet
-	result, err := tspack.Process(`local x: number = 1`)
+	result, err := tspack.Process(`local x: number = 1`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1463,7 +1463,7 @@ func Test_SmokeLuau(t *testing.T) {
 func Test_SmokeMagik(t *testing.T) {
 	// Smoke test: load magik and parse a simple snippet
 	result, err := tspack.Process(`_method object.hello
-_endmethod`)
+_endmethod`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1473,7 +1473,7 @@ _endmethod`)
 func Test_SmokeMake(t *testing.T) {
 	// Smoke test: load make and parse a simple snippet
 	result, err := tspack.Process(`all:
-	echo hello`)
+	echo hello`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1484,7 +1484,7 @@ func Test_SmokeMarkdown(t *testing.T) {
 	// Smoke test: load markdown and parse a simple snippet
 	result, err := tspack.Process(`# Hello
 
-World`)
+World`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1493,7 +1493,7 @@ World`)
 
 func Test_SmokeMarkdownInline(t *testing.T) {
 	// Smoke test: load markdown_inline and parse a simple snippet
-	result, err := tspack.Process(`**bold** and *italic*`)
+	result, err := tspack.Process(`**bold** and *italic*`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1504,7 +1504,7 @@ func Test_SmokeMatlab(t *testing.T) {
 	// Smoke test: load matlab and parse a simple snippet
 	result, err := tspack.Process(`function y = hello(x)
 y = x;
-end`)
+end`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1514,7 +1514,7 @@ end`)
 func Test_SmokeMermaid(t *testing.T) {
 	// Smoke test: load mermaid and parse a simple snippet
 	result, err := tspack.Process(`graph TD
-A --> B`)
+A --> B`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1523,7 +1523,7 @@ A --> B`)
 
 func Test_SmokeMeson(t *testing.T) {
 	// Smoke test: load meson and parse a simple snippet
-	result, err := tspack.Process(`project('hello', 'c')`)
+	result, err := tspack.Process(`project('hello', 'c')`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1532,7 +1532,7 @@ func Test_SmokeMeson(t *testing.T) {
 
 func Test_SmokeMlir(t *testing.T) {
 	// Smoke test: load mlir and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1541,7 +1541,7 @@ func Test_SmokeMlir(t *testing.T) {
 
 func Test_SmokeMojo(t *testing.T) {
 	// Smoke test: load mojo and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1550,7 +1550,7 @@ func Test_SmokeMojo(t *testing.T) {
 
 func Test_SmokeMove(t *testing.T) {
 	// Smoke test: load move and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1559,7 +1559,7 @@ func Test_SmokeMove(t *testing.T) {
 
 func Test_SmokeNasm(t *testing.T) {
 	// Smoke test: load nasm and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1568,7 +1568,7 @@ func Test_SmokeNasm(t *testing.T) {
 
 func Test_SmokeNetlinx(t *testing.T) {
 	// Smoke test: load netlinx and parse a simple snippet
-	result, err := tspack.Process(`PROGRAM_NAME='hello'`)
+	result, err := tspack.Process(`PROGRAM_NAME='hello'`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1577,7 +1577,7 @@ func Test_SmokeNetlinx(t *testing.T) {
 
 func Test_SmokeNginx(t *testing.T) {
 	// Smoke test: load nginx and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1586,7 +1586,7 @@ func Test_SmokeNginx(t *testing.T) {
 
 func Test_SmokeNickel(t *testing.T) {
 	// Smoke test: load nickel and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1595,7 +1595,7 @@ func Test_SmokeNickel(t *testing.T) {
 
 func Test_SmokeNim(t *testing.T) {
 	// Smoke test: load nim and parse a simple snippet
-	result, err := tspack.Process(`echo "hello"`)
+	result, err := tspack.Process(`echo "hello"`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1605,7 +1605,7 @@ func Test_SmokeNim(t *testing.T) {
 func Test_SmokeNinja(t *testing.T) {
 	// Smoke test: load ninja and parse a simple snippet
 	result, err := tspack.Process(`rule cc
-  command = cc $in -o $out`)
+  command = cc $in -o $out`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1614,7 +1614,7 @@ func Test_SmokeNinja(t *testing.T) {
 
 func Test_SmokeNix(t *testing.T) {
 	// Smoke test: load nix and parse a simple snippet
-	result, err := tspack.Process(`{ pkgs ? import <nixpkgs> {} }: pkgs.hello`)
+	result, err := tspack.Process(`{ pkgs ? import <nixpkgs> {} }: pkgs.hello`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1623,7 +1623,7 @@ func Test_SmokeNix(t *testing.T) {
 
 func Test_SmokeNorg(t *testing.T) {
 	// Smoke test: load norg and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1632,7 +1632,7 @@ func Test_SmokeNorg(t *testing.T) {
 
 func Test_SmokeNorgMeta(t *testing.T) {
 	// Smoke test: load norg_meta and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1641,7 +1641,7 @@ func Test_SmokeNorgMeta(t *testing.T) {
 
 func Test_SmokeNqc(t *testing.T) {
 	// Smoke test: load nqc and parse a simple snippet
-	result, err := tspack.Process(`task main() {}`)
+	result, err := tspack.Process(`task main() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1650,7 +1650,7 @@ func Test_SmokeNqc(t *testing.T) {
 
 func Test_SmokeNushell(t *testing.T) {
 	// Smoke test: load nushell and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1659,7 +1659,7 @@ func Test_SmokeNushell(t *testing.T) {
 
 func Test_SmokeObjc(t *testing.T) {
 	// Smoke test: load objc and parse a simple snippet
-	result, err := tspack.Process(`@interface Main @end`)
+	result, err := tspack.Process(`@interface Main @end`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1668,7 +1668,7 @@ func Test_SmokeObjc(t *testing.T) {
 
 func Test_SmokeOcaml(t *testing.T) {
 	// Smoke test: load ocaml and parse a simple snippet
-	result, err := tspack.Process(`let () = print_endline "hello"`)
+	result, err := tspack.Process(`let () = print_endline "hello"`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1677,7 +1677,7 @@ func Test_SmokeOcaml(t *testing.T) {
 
 func Test_SmokeOcamlInterface(t *testing.T) {
 	// Smoke test: load ocaml_interface and parse a simple snippet
-	result, err := tspack.Process(`val x : int`)
+	result, err := tspack.Process(`val x : int`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1686,7 +1686,7 @@ func Test_SmokeOcamlInterface(t *testing.T) {
 
 func Test_SmokeOcamllex(t *testing.T) {
 	// Smoke test: load ocamllex and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1695,7 +1695,7 @@ func Test_SmokeOcamllex(t *testing.T) {
 
 func Test_SmokeOdin(t *testing.T) {
 	// Smoke test: load odin and parse a simple snippet
-	result, err := tspack.Process(`package main`)
+	result, err := tspack.Process(`package main`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1704,7 +1704,7 @@ func Test_SmokeOdin(t *testing.T) {
 
 func Test_SmokeOpenscad(t *testing.T) {
 	// Smoke test: load openscad and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1714,7 +1714,7 @@ func Test_SmokeOpenscad(t *testing.T) {
 func Test_SmokeOrg(t *testing.T) {
 	// Smoke test: load org and parse a simple snippet
 	result, err := tspack.Process(`* Hello
-World`)
+World`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1723,7 +1723,7 @@ World`)
 
 func Test_SmokePascal(t *testing.T) {
 	// Smoke test: load pascal and parse a simple snippet
-	result, err := tspack.Process(`program Hello; begin end.`)
+	result, err := tspack.Process(`program Hello; begin end.`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1734,7 +1734,7 @@ func Test_SmokePem(t *testing.T) {
 	// Smoke test: load pem and parse a simple snippet
 	result, err := tspack.Process(`-----BEGIN CERTIFICATE-----
 data
------END CERTIFICATE-----`)
+-----END CERTIFICATE-----`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1743,7 +1743,7 @@ data
 
 func Test_SmokePerl(t *testing.T) {
 	// Smoke test: load perl and parse a simple snippet
-	result, err := tspack.Process(`print 'hello';`)
+	result, err := tspack.Process(`print 'hello';`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1752,7 +1752,7 @@ func Test_SmokePerl(t *testing.T) {
 
 func Test_SmokePgn(t *testing.T) {
 	// Smoke test: load pgn and parse a simple snippet
-	result, err := tspack.Process(`1. e4 e5 *`)
+	result, err := tspack.Process(`1. e4 e5 *`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1761,7 +1761,7 @@ func Test_SmokePgn(t *testing.T) {
 
 func Test_SmokePhp(t *testing.T) {
 	// Smoke test: load php and parse a simple snippet
-	result, err := tspack.Process(`<?php echo 'hello'; ?>`)
+	result, err := tspack.Process(`<?php echo 'hello'; ?>`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1770,7 +1770,7 @@ func Test_SmokePhp(t *testing.T) {
 
 func Test_SmokePhpdoc(t *testing.T) {
 	// Smoke test: load phpdoc and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1779,7 +1779,7 @@ func Test_SmokePhpdoc(t *testing.T) {
 
 func Test_SmokePkl(t *testing.T) {
 	// Smoke test: load pkl and parse a simple snippet
-	result, err := tspack.Process(`name = "hello"`)
+	result, err := tspack.Process(`name = "hello"`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1789,7 +1789,7 @@ func Test_SmokePkl(t *testing.T) {
 func Test_SmokePo(t *testing.T) {
 	// Smoke test: load po and parse a simple snippet
 	result, err := tspack.Process(`msgid "hello"
-msgstr "world"`)
+msgstr "world"`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1798,7 +1798,7 @@ msgstr "world"`)
 
 func Test_SmokePoeFilter(t *testing.T) {
 	// Smoke test: load poe_filter and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1808,7 +1808,7 @@ func Test_SmokePoeFilter(t *testing.T) {
 func Test_SmokePony(t *testing.T) {
 	// Smoke test: load pony and parse a simple snippet
 	result, err := tspack.Process(`actor Main
-  new create(env: Env) => None`)
+  new create(env: Env) => None`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1817,7 +1817,7 @@ func Test_SmokePony(t *testing.T) {
 
 func Test_SmokePostscript(t *testing.T) {
 	// Smoke test: load postscript and parse a simple snippet
-	result, err := tspack.Process(`/hello { (Hello) show } def`)
+	result, err := tspack.Process(`/hello { (Hello) show } def`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1826,7 +1826,7 @@ func Test_SmokePostscript(t *testing.T) {
 
 func Test_SmokePowershell(t *testing.T) {
 	// Smoke test: load powershell and parse a simple snippet
-	result, err := tspack.Process(`Write-Host 'hello'`)
+	result, err := tspack.Process(`Write-Host 'hello'`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1835,7 +1835,7 @@ func Test_SmokePowershell(t *testing.T) {
 
 func Test_SmokePrintf(t *testing.T) {
 	// Smoke test: load printf and parse a simple snippet
-	result, err := tspack.Process(`%d %s`)
+	result, err := tspack.Process(`%d %s`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1844,7 +1844,7 @@ func Test_SmokePrintf(t *testing.T) {
 
 func Test_SmokePrisma(t *testing.T) {
 	// Smoke test: load prisma and parse a simple snippet
-	result, err := tspack.Process(`model User { id Int @id }`)
+	result, err := tspack.Process(`model User { id Int @id }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1853,7 +1853,7 @@ func Test_SmokePrisma(t *testing.T) {
 
 func Test_SmokeProlog(t *testing.T) {
 	// Smoke test: load prolog and parse a simple snippet
-	result, err := tspack.Process(`hello :- write('hello'), nl.`)
+	result, err := tspack.Process(`hello :- write('hello'), nl.`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1862,7 +1862,7 @@ func Test_SmokeProlog(t *testing.T) {
 
 func Test_SmokePromql(t *testing.T) {
 	// Smoke test: load promql and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1871,7 +1871,7 @@ func Test_SmokePromql(t *testing.T) {
 
 func Test_SmokeProperties(t *testing.T) {
 	// Smoke test: load properties and parse a simple snippet
-	result, err := tspack.Process(`key=value`)
+	result, err := tspack.Process(`key=value`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1880,7 +1880,7 @@ func Test_SmokeProperties(t *testing.T) {
 
 func Test_SmokeProto(t *testing.T) {
 	// Smoke test: load proto and parse a simple snippet
-	result, err := tspack.Process(`syntax = "proto3";`)
+	result, err := tspack.Process(`syntax = "proto3";`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1889,7 +1889,7 @@ func Test_SmokeProto(t *testing.T) {
 
 func Test_SmokePrql(t *testing.T) {
 	// Smoke test: load prql and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1899,7 +1899,7 @@ func Test_SmokePrql(t *testing.T) {
 func Test_SmokePsv(t *testing.T) {
 	// Smoke test: load psv and parse a simple snippet
 	result, err := tspack.Process(`a|b|c
-1|2|3`)
+1|2|3`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1908,7 +1908,7 @@ func Test_SmokePsv(t *testing.T) {
 
 func Test_SmokePug(t *testing.T) {
 	// Smoke test: load pug and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1917,7 +1917,7 @@ func Test_SmokePug(t *testing.T) {
 
 func Test_SmokePuppet(t *testing.T) {
 	// Smoke test: load puppet and parse a simple snippet
-	result, err := tspack.Process(`notify { 'hello': }`)
+	result, err := tspack.Process(`notify { 'hello': }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1926,7 +1926,7 @@ func Test_SmokePuppet(t *testing.T) {
 
 func Test_SmokePurescript(t *testing.T) {
 	// Smoke test: load purescript and parse a simple snippet
-	result, err := tspack.Process(`module Main where`)
+	result, err := tspack.Process(`module Main where`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1935,7 +1935,7 @@ func Test_SmokePurescript(t *testing.T) {
 
 func Test_SmokePymanifest(t *testing.T) {
 	// Smoke test: load pymanifest and parse a simple snippet
-	result, err := tspack.Process(`include *.txt`)
+	result, err := tspack.Process(`include *.txt`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1944,7 +1944,7 @@ func Test_SmokePymanifest(t *testing.T) {
 
 func Test_SmokePython(t *testing.T) {
 	// Smoke test: load python and parse a simple snippet
-	result, err := tspack.Process(`print('hello')`)
+	result, err := tspack.Process(`print('hello')`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1953,7 +1953,7 @@ func Test_SmokePython(t *testing.T) {
 
 func Test_SmokeQl(t *testing.T) {
 	// Smoke test: load ql and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1962,7 +1962,7 @@ func Test_SmokeQl(t *testing.T) {
 
 func Test_SmokeQmldir(t *testing.T) {
 	// Smoke test: load qmldir and parse a simple snippet
-	result, err := tspack.Process(`module Example`)
+	result, err := tspack.Process(`module Example`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1972,7 +1972,7 @@ func Test_SmokeQmldir(t *testing.T) {
 func Test_SmokeQmljs(t *testing.T) {
 	// Smoke test: load qmljs and parse a simple snippet
 	result, err := tspack.Process(`import QtQuick 2.0
-Item {}`)
+Item {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1981,7 +1981,7 @@ Item {}`)
 
 func Test_SmokeQuery(t *testing.T) {
 	// Smoke test: load query and parse a simple snippet
-	result, err := tspack.Process(`(identifier) @name`)
+	result, err := tspack.Process(`(identifier) @name`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -1990,7 +1990,7 @@ func Test_SmokeQuery(t *testing.T) {
 
 func Test_SmokeR(t *testing.T) {
 	// Smoke test: load r and parse a simple snippet
-	result, err := tspack.Process(`print('hello')`)
+	result, err := tspack.Process(`print('hello')`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2000,7 +2000,7 @@ func Test_SmokeR(t *testing.T) {
 func Test_SmokeRacket(t *testing.T) {
 	// Smoke test: load racket and parse a simple snippet
 	result, err := tspack.Process(`#lang racket
-(define x 1)`)
+(define x 1)`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2009,7 +2009,7 @@ func Test_SmokeRacket(t *testing.T) {
 
 func Test_SmokeRasi(t *testing.T) {
 	// Smoke test: load rasi and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2018,7 +2018,7 @@ func Test_SmokeRasi(t *testing.T) {
 
 func Test_SmokeRazor(t *testing.T) {
 	// Smoke test: load razor and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2027,7 +2027,7 @@ func Test_SmokeRazor(t *testing.T) {
 
 func Test_SmokeRbs(t *testing.T) {
 	// Smoke test: load rbs and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2038,7 +2038,7 @@ func Test_SmokeRe2c(t *testing.T) {
 	// Smoke test: load re2c and parse a simple snippet
 	result, err := tspack.Process(`/*!re2c
   [a-z]+ { return; }
-*/`)
+*/`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2047,7 +2047,7 @@ func Test_SmokeRe2c(t *testing.T) {
 
 func Test_SmokeReadline(t *testing.T) {
 	// Smoke test: load readline and parse a simple snippet
-	result, err := tspack.Process(`set editing-mode vi`)
+	result, err := tspack.Process(`set editing-mode vi`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2056,7 +2056,7 @@ func Test_SmokeReadline(t *testing.T) {
 
 func Test_SmokeRegex(t *testing.T) {
 	// Smoke test: load regex and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2066,7 +2066,7 @@ func Test_SmokeRegex(t *testing.T) {
 func Test_SmokeRego(t *testing.T) {
 	// Smoke test: load rego and parse a simple snippet
 	result, err := tspack.Process(`package main
-default allow = false`)
+default allow = false`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2075,7 +2075,7 @@ default allow = false`)
 
 func Test_SmokeRequirements(t *testing.T) {
 	// Smoke test: load requirements and parse a simple snippet
-	result, err := tspack.Process(`flask>=2.0`)
+	result, err := tspack.Process(`flask>=2.0`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2084,7 +2084,7 @@ func Test_SmokeRequirements(t *testing.T) {
 
 func Test_SmokeRescript(t *testing.T) {
 	// Smoke test: load rescript and parse a simple snippet
-	result, err := tspack.Process(`let x = 1`)
+	result, err := tspack.Process(`let x = 1`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2093,7 +2093,7 @@ func Test_SmokeRescript(t *testing.T) {
 
 func Test_SmokeRobot(t *testing.T) {
 	// Smoke test: load robot and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2102,7 +2102,7 @@ func Test_SmokeRobot(t *testing.T) {
 
 func Test_SmokeRoc(t *testing.T) {
 	// Smoke test: load roc and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2111,7 +2111,7 @@ func Test_SmokeRoc(t *testing.T) {
 
 func Test_SmokeRon(t *testing.T) {
 	// Smoke test: load ron and parse a simple snippet
-	result, err := tspack.Process(`(key: "value")`)
+	result, err := tspack.Process(`(key: "value")`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2123,7 +2123,7 @@ func Test_SmokeRst(t *testing.T) {
 	result, err := tspack.Process(`Hello
 =====
 
-World`)
+World`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2132,7 +2132,7 @@ World`)
 
 func Test_SmokeRtf(t *testing.T) {
 	// Smoke test: load rtf and parse a simple snippet
-	result, err := tspack.Process(`{\rtf1 hello}`)
+	result, err := tspack.Process(`{\rtf1 hello}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2141,7 +2141,7 @@ func Test_SmokeRtf(t *testing.T) {
 
 func Test_SmokeRuby(t *testing.T) {
 	// Smoke test: load ruby and parse a simple snippet
-	result, err := tspack.Process(`puts 'hello'`)
+	result, err := tspack.Process(`puts 'hello'`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2150,7 +2150,7 @@ func Test_SmokeRuby(t *testing.T) {
 
 func Test_SmokeRust(t *testing.T) {
 	// Smoke test: load rust and parse a simple snippet
-	result, err := tspack.Process(`fn main() {}`)
+	result, err := tspack.Process(`fn main() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2159,7 +2159,7 @@ func Test_SmokeRust(t *testing.T) {
 
 func Test_SmokeScala(t *testing.T) {
 	// Smoke test: load scala and parse a simple snippet
-	result, err := tspack.Process(`object Main`)
+	result, err := tspack.Process(`object Main`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2168,7 +2168,7 @@ func Test_SmokeScala(t *testing.T) {
 
 func Test_SmokeScheme(t *testing.T) {
 	// Smoke test: load scheme and parse a simple snippet
-	result, err := tspack.Process(`(define x 1)`)
+	result, err := tspack.Process(`(define x 1)`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2178,7 +2178,7 @@ func Test_SmokeScheme(t *testing.T) {
 func Test_SmokeScss(t *testing.T) {
 	// Smoke test: load scss and parse a simple snippet
 	result, err := tspack.Process(`$color: red;
-body { color: $color; }`)
+body { color: $color; }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2187,7 +2187,7 @@ body { color: $color; }`)
 
 func Test_SmokeSlang(t *testing.T) {
 	// Smoke test: load slang and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2197,7 +2197,7 @@ func Test_SmokeSlang(t *testing.T) {
 func Test_SmokeSmali(t *testing.T) {
 	// Smoke test: load smali and parse a simple snippet
 	result, err := tspack.Process(`.class public LMain;
-.super Ljava/lang/Object;`)
+.super Ljava/lang/Object;`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2206,7 +2206,7 @@ func Test_SmokeSmali(t *testing.T) {
 
 func Test_SmokeSmalltalk(t *testing.T) {
 	// Smoke test: load smalltalk and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2216,7 +2216,7 @@ func Test_SmokeSmalltalk(t *testing.T) {
 func Test_SmokeSmithy(t *testing.T) {
 	// Smoke test: load smithy and parse a simple snippet
 	result, err := tspack.Process(`namespace example
-string MyString`)
+string MyString`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2225,7 +2225,7 @@ string MyString`)
 
 func Test_SmokeSml(t *testing.T) {
 	// Smoke test: load sml and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2234,7 +2234,7 @@ func Test_SmokeSml(t *testing.T) {
 
 func Test_SmokeSnakemake(t *testing.T) {
 	// Smoke test: load snakemake and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2244,7 +2244,7 @@ func Test_SmokeSnakemake(t *testing.T) {
 func Test_SmokeSolidity(t *testing.T) {
 	// Smoke test: load solidity and parse a simple snippet
 	result, err := tspack.Process(`pragma solidity ^0.8.0;
-contract Main {}`)
+contract Main {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2253,7 +2253,7 @@ contract Main {}`)
 
 func Test_SmokeSouffle(t *testing.T) {
 	// Smoke test: load souffle and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2262,7 +2262,7 @@ func Test_SmokeSouffle(t *testing.T) {
 
 func Test_SmokeSourcepawn(t *testing.T) {
 	// Smoke test: load sourcepawn and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2271,7 +2271,7 @@ func Test_SmokeSourcepawn(t *testing.T) {
 
 func Test_SmokeSparql(t *testing.T) {
 	// Smoke test: load sparql and parse a simple snippet
-	result, err := tspack.Process(`SELECT ?s WHERE { ?s ?p ?o }`)
+	result, err := tspack.Process(`SELECT ?s WHERE { ?s ?p ?o }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2280,7 +2280,7 @@ func Test_SmokeSparql(t *testing.T) {
 
 func Test_SmokeSql(t *testing.T) {
 	// Smoke test: load sql and parse a simple snippet
-	result, err := tspack.Process(`SELECT 1;`)
+	result, err := tspack.Process(`SELECT 1;`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2289,7 +2289,7 @@ func Test_SmokeSql(t *testing.T) {
 
 func Test_SmokeSqlBigquery(t *testing.T) {
 	// Smoke test: load sql_bigquery and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2298,7 +2298,7 @@ func Test_SmokeSqlBigquery(t *testing.T) {
 
 func Test_SmokeSquirrel(t *testing.T) {
 	// Smoke test: load squirrel and parse a simple snippet
-	result, err := tspack.Process(`function main() {}`)
+	result, err := tspack.Process(`function main() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2308,7 +2308,7 @@ func Test_SmokeSquirrel(t *testing.T) {
 func Test_SmokeSshConfig(t *testing.T) {
 	// Smoke test: load ssh_config and parse a simple snippet
 	result, err := tspack.Process(`Host example
-  HostName example.com`)
+  HostName example.com`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2317,7 +2317,7 @@ func Test_SmokeSshConfig(t *testing.T) {
 
 func Test_SmokeStan(t *testing.T) {
 	// Smoke test: load stan and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2326,7 +2326,7 @@ func Test_SmokeStan(t *testing.T) {
 
 func Test_SmokeStarlark(t *testing.T) {
 	// Smoke test: load starlark and parse a simple snippet
-	result, err := tspack.Process(`def hello(): pass`)
+	result, err := tspack.Process(`def hello(): pass`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2335,7 +2335,7 @@ func Test_SmokeStarlark(t *testing.T) {
 
 func Test_SmokeSuperhtml(t *testing.T) {
 	// Smoke test: load superhtml and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2344,7 +2344,7 @@ func Test_SmokeSuperhtml(t *testing.T) {
 
 func Test_SmokeSvelte(t *testing.T) {
 	// Smoke test: load svelte and parse a simple snippet
-	result, err := tspack.Process(`<script>let x = 1;</script>`)
+	result, err := tspack.Process(`<script>let x = 1;</script>`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2353,7 +2353,7 @@ func Test_SmokeSvelte(t *testing.T) {
 
 func Test_SmokeSway(t *testing.T) {
 	// Smoke test: load sway and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2362,7 +2362,7 @@ func Test_SmokeSway(t *testing.T) {
 
 func Test_SmokeSwift(t *testing.T) {
 	// Smoke test: load swift and parse a simple snippet
-	result, err := tspack.Process(`print("hello")`)
+	result, err := tspack.Process(`print("hello")`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2371,7 +2371,7 @@ func Test_SmokeSwift(t *testing.T) {
 
 func Test_SmokeSystemverilog(t *testing.T) {
 	// Smoke test: load systemverilog and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2380,7 +2380,7 @@ func Test_SmokeSystemverilog(t *testing.T) {
 
 func Test_SmokeTablegen(t *testing.T) {
 	// Smoke test: load tablegen and parse a simple snippet
-	result, err := tspack.Process(`def Hello : Base {}`)
+	result, err := tspack.Process(`def Hello : Base {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2389,7 +2389,7 @@ func Test_SmokeTablegen(t *testing.T) {
 
 func Test_SmokeTact(t *testing.T) {
 	// Smoke test: load tact and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2398,7 +2398,7 @@ func Test_SmokeTact(t *testing.T) {
 
 func Test_SmokeTcl(t *testing.T) {
 	// Smoke test: load tcl and parse a simple snippet
-	result, err := tspack.Process(`puts hello`)
+	result, err := tspack.Process(`puts hello`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2407,7 +2407,7 @@ func Test_SmokeTcl(t *testing.T) {
 
 func Test_SmokeTeal(t *testing.T) {
 	// Smoke test: load teal and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2416,7 +2416,7 @@ func Test_SmokeTeal(t *testing.T) {
 
 func Test_SmokeTempl(t *testing.T) {
 	// Smoke test: load templ and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2425,7 +2425,7 @@ func Test_SmokeTempl(t *testing.T) {
 
 func Test_SmokeTera(t *testing.T) {
 	// Smoke test: load tera and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2434,7 +2434,7 @@ func Test_SmokeTera(t *testing.T) {
 
 func Test_SmokeTerraform(t *testing.T) {
 	// Smoke test: load terraform and parse a simple snippet
-	result, err := tspack.Process(`resource "null_resource" "main" {}`)
+	result, err := tspack.Process(`resource "null_resource" "main" {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2447,7 +2447,7 @@ func Test_SmokeTest(t *testing.T) {
 Test
 ===========
 ---
-(node)`)
+(node)`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2456,7 +2456,7 @@ Test
 
 func Test_SmokeTextproto(t *testing.T) {
 	// Smoke test: load textproto and parse a simple snippet
-	result, err := tspack.Process(`key: "value"`)
+	result, err := tspack.Process(`key: "value"`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2465,7 +2465,7 @@ func Test_SmokeTextproto(t *testing.T) {
 
 func Test_SmokeThrift(t *testing.T) {
 	// Smoke test: load thrift and parse a simple snippet
-	result, err := tspack.Process(`service HelloService {}`)
+	result, err := tspack.Process(`service HelloService {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2475,7 +2475,7 @@ func Test_SmokeThrift(t *testing.T) {
 func Test_SmokeTlaplus(t *testing.T) {
 	// Smoke test: load tlaplus and parse a simple snippet
 	result, err := tspack.Process(`---- MODULE Main ----
-====`)
+====`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2484,7 +2484,7 @@ func Test_SmokeTlaplus(t *testing.T) {
 
 func Test_SmokeTmux(t *testing.T) {
 	// Smoke test: load tmux and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2493,7 +2493,7 @@ func Test_SmokeTmux(t *testing.T) {
 
 func Test_SmokeTodotxt(t *testing.T) {
 	// Smoke test: load todotxt and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2502,7 +2502,7 @@ func Test_SmokeTodotxt(t *testing.T) {
 
 func Test_SmokeToml(t *testing.T) {
 	// Smoke test: load toml and parse a simple snippet
-	result, err := tspack.Process(`key = "value"`)
+	result, err := tspack.Process(`key = "value"`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2512,7 +2512,7 @@ func Test_SmokeToml(t *testing.T) {
 func Test_SmokeTsv(t *testing.T) {
 	// Smoke test: load tsv and parse a simple snippet
 	result, err := tspack.Process(`a	b	c
-1	2	3`)
+1	2	3`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2521,7 +2521,7 @@ func Test_SmokeTsv(t *testing.T) {
 
 func Test_SmokeTsx(t *testing.T) {
 	// Smoke test: load tsx and parse a simple snippet
-	result, err := tspack.Process(`const App = () => <div />;`)
+	result, err := tspack.Process(`const App = () => <div />;`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2530,7 +2530,7 @@ func Test_SmokeTsx(t *testing.T) {
 
 func Test_SmokeTurtle(t *testing.T) {
 	// Smoke test: load turtle and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2539,7 +2539,7 @@ func Test_SmokeTurtle(t *testing.T) {
 
 func Test_SmokeTwig(t *testing.T) {
 	// Smoke test: load twig and parse a simple snippet
-	result, err := tspack.Process(`{{ variable }}`)
+	result, err := tspack.Process(`{{ variable }}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2548,7 +2548,7 @@ func Test_SmokeTwig(t *testing.T) {
 
 func Test_SmokeTypescript(t *testing.T) {
 	// Smoke test: load typescript and parse a simple snippet
-	result, err := tspack.Process(`const x: number = 42;`)
+	result, err := tspack.Process(`const x: number = 42;`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2557,7 +2557,7 @@ func Test_SmokeTypescript(t *testing.T) {
 
 func Test_SmokeTypespec(t *testing.T) {
 	// Smoke test: load typespec and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2566,7 +2566,7 @@ func Test_SmokeTypespec(t *testing.T) {
 
 func Test_SmokeTyposcript(t *testing.T) {
 	// Smoke test: load typoscript and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2575,7 +2575,7 @@ func Test_SmokeTyposcript(t *testing.T) {
 
 func Test_SmokeTypst(t *testing.T) {
 	// Smoke test: load typst and parse a simple snippet
-	result, err := tspack.Process(`#let x = 1`)
+	result, err := tspack.Process(`#let x = 1`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2584,7 +2584,7 @@ func Test_SmokeTypst(t *testing.T) {
 
 func Test_SmokeUdev(t *testing.T) {
 	// Smoke test: load udev and parse a simple snippet
-	result, err := tspack.Process(`ACTION=="add", KERNEL=="sd*"`)
+	result, err := tspack.Process(`ACTION=="add", KERNEL=="sd*"`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2594,7 +2594,7 @@ func Test_SmokeUdev(t *testing.T) {
 func Test_SmokeUngrammar(t *testing.T) {
 	// Smoke test: load ungrammar and parse a simple snippet
 	result, err := tspack.Process(`Root = Item*
-Item = 'token'`)
+Item = 'token'`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2603,7 +2603,7 @@ Item = 'token'`)
 
 func Test_SmokeUxntal(t *testing.T) {
 	// Smoke test: load uxntal and parse a simple snippet
-	result, err := tspack.Process(`|0100 LIT 01`)
+	result, err := tspack.Process(`|0100 LIT 01`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2612,7 +2612,7 @@ func Test_SmokeUxntal(t *testing.T) {
 
 func Test_SmokeV(t *testing.T) {
 	// Smoke test: load v and parse a simple snippet
-	result, err := tspack.Process(`fn main() {}`)
+	result, err := tspack.Process(`fn main() {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2622,7 +2622,7 @@ func Test_SmokeV(t *testing.T) {
 func Test_SmokeVb(t *testing.T) {
 	// Smoke test: load vb and parse a simple snippet
 	result, err := tspack.Process(`Module Main
-End Module`)
+End Module`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2631,7 +2631,7 @@ End Module`)
 
 func Test_SmokeVerilog(t *testing.T) {
 	// Smoke test: load verilog and parse a simple snippet
-	result, err := tspack.Process(`module main; endmodule`)
+	result, err := tspack.Process(`module main; endmodule`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2640,7 +2640,7 @@ func Test_SmokeVerilog(t *testing.T) {
 
 func Test_SmokeVhdl(t *testing.T) {
 	// Smoke test: load vhdl and parse a simple snippet
-	result, err := tspack.Process(`entity main is end main;`)
+	result, err := tspack.Process(`entity main is end main;`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2649,7 +2649,7 @@ func Test_SmokeVhdl(t *testing.T) {
 
 func Test_SmokeVhs(t *testing.T) {
 	// Smoke test: load vhs and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2658,7 +2658,7 @@ func Test_SmokeVhs(t *testing.T) {
 
 func Test_SmokeVim(t *testing.T) {
 	// Smoke test: load vim and parse a simple snippet
-	result, err := tspack.Process(`echo 'hello'`)
+	result, err := tspack.Process(`echo 'hello'`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2667,7 +2667,7 @@ func Test_SmokeVim(t *testing.T) {
 
 func Test_SmokeVimdoc(t *testing.T) {
 	// Smoke test: load vimdoc and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2676,7 +2676,7 @@ func Test_SmokeVimdoc(t *testing.T) {
 
 func Test_SmokeVrl(t *testing.T) {
 	// Smoke test: load vrl and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2685,7 +2685,7 @@ func Test_SmokeVrl(t *testing.T) {
 
 func Test_SmokeVue(t *testing.T) {
 	// Smoke test: load vue and parse a simple snippet
-	result, err := tspack.Process(`<template><div>hello</div></template>`)
+	result, err := tspack.Process(`<template><div>hello</div></template>`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2694,7 +2694,7 @@ func Test_SmokeVue(t *testing.T) {
 
 func Test_SmokeWast(t *testing.T) {
 	// Smoke test: load wast and parse a simple snippet
-	result, err := tspack.Process(`(module)`)
+	result, err := tspack.Process(`(module)`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2703,7 +2703,7 @@ func Test_SmokeWast(t *testing.T) {
 
 func Test_SmokeWat(t *testing.T) {
 	// Smoke test: load wat and parse a simple snippet
-	result, err := tspack.Process(`(module)`)
+	result, err := tspack.Process(`(module)`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2712,7 +2712,7 @@ func Test_SmokeWat(t *testing.T) {
 
 func Test_SmokeWgsl(t *testing.T) {
 	// Smoke test: load wgsl and parse a simple snippet
-	result, err := tspack.Process(`@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }`)
+	result, err := tspack.Process(`@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2721,7 +2721,7 @@ func Test_SmokeWgsl(t *testing.T) {
 
 func Test_SmokeWgslBevy(t *testing.T) {
 	// Smoke test: load wgsl_bevy and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2730,7 +2730,7 @@ func Test_SmokeWgslBevy(t *testing.T) {
 
 func Test_SmokeWit(t *testing.T) {
 	// Smoke test: load wit and parse a simple snippet
-	result, err := tspack.Process(`package example:pkg;`)
+	result, err := tspack.Process(`package example:pkg;`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2739,7 +2739,7 @@ func Test_SmokeWit(t *testing.T) {
 
 func Test_SmokeWolfram(t *testing.T) {
 	// Smoke test: load wolfram and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2748,7 +2748,7 @@ func Test_SmokeWolfram(t *testing.T) {
 
 func Test_SmokeX86asm(t *testing.T) {
 	// Smoke test: load x86asm and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2757,7 +2757,7 @@ func Test_SmokeX86asm(t *testing.T) {
 
 func Test_SmokeXcompose(t *testing.T) {
 	// Smoke test: load xcompose and parse a simple snippet
-	result, err := tspack.Process(`<Multi_key> <a> : "a"`)
+	result, err := tspack.Process(`<Multi_key> <a> : "a"`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2767,7 +2767,7 @@ func Test_SmokeXcompose(t *testing.T) {
 func Test_SmokeXml(t *testing.T) {
 	// Smoke test: load xml and parse a simple snippet
 	result, err := tspack.Process(`<?xml version="1.0"?>
-<root>hello</root>`)
+<root>hello</root>`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2776,7 +2776,7 @@ func Test_SmokeXml(t *testing.T) {
 
 func Test_SmokeYaml(t *testing.T) {
 	// Smoke test: load yaml and parse a simple snippet
-	result, err := tspack.Process(`key: value`)
+	result, err := tspack.Process(`key: value`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2785,7 +2785,7 @@ func Test_SmokeYaml(t *testing.T) {
 
 func Test_SmokeYuck(t *testing.T) {
 	// Smoke test: load yuck and parse a simple snippet
-	result, err := tspack.Process(`(defwidget main [] (label :text "hi"))`)
+	result, err := tspack.Process(`(defwidget main [] (label :text "hi"))`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2794,7 +2794,7 @@ func Test_SmokeYuck(t *testing.T) {
 
 func Test_SmokeZig(t *testing.T) {
 	// Smoke test: load zig and parse a simple snippet
-	result, err := tspack.Process(`pub fn main() void {}`)
+	result, err := tspack.Process(`pub fn main() void {}`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2803,7 +2803,7 @@ func Test_SmokeZig(t *testing.T) {
 
 func Test_SmokeZiggy(t *testing.T) {
 	// Smoke test: load ziggy and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2812,7 +2812,7 @@ func Test_SmokeZiggy(t *testing.T) {
 
 func Test_SmokeZiggySchema(t *testing.T) {
 	// Smoke test: load ziggy_schema and parse a simple snippet
-	result, err := tspack.Process(`x`)
+	result, err := tspack.Process(`x`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -2821,7 +2821,7 @@ func Test_SmokeZiggySchema(t *testing.T) {
 
 func Test_SmokeZsh(t *testing.T) {
 	// Smoke test: load zsh and parse a simple snippet
-	result, err := tspack.Process(`echo hello`)
+	result, err := tspack.Process(`echo hello`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}

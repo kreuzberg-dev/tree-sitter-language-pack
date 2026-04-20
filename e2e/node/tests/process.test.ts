@@ -4,26 +4,26 @@ import { process } from '@kreuzberg/tree-sitter-language-pack';
 
 describe('process', () => {
   it('process_javascript_exports_detail: JavaScript with exports, verify export count', () => {
-    const result = process("export function greet(name) {\n  return \`Hello \${name}\`;\n}\n\nexport const VERSION = '1.0';\n");
+    const result = process("export function greet(name) {\n  return \`Hello \${name}\`;\n}\n\nexport const VERSION = '1.0';\n", { language: "javascript" });
     expect(result.language.trim()).toBe("javascript");
     expect(result.exports.length).toBeGreaterThanOrEqual(1);
   });
 
   it('process_python_comments: Python with comments, verify comment count', () => {
-    const result = process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n");
+    const result = process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", { language: "python" });
     expect(result.language.trim()).toBe("python");
     expect(result.comments.length).toBeGreaterThanOrEqual(1);
   });
 
   it('process_python_imports_detail: Python with multiple imports, verify imports contain specific source', () => {
-    const result = process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n");
+    const result = process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", { language: "python" });
     expect(result.language.trim()).toBe("python");
     expect(result.imports.length).toBeGreaterThanOrEqual(2);
     expect(result.importSources).toContain("os");
   });
 
   it('process_python_metrics_detail: Python code with metrics assertions', () => {
-    const result = process("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n");
+    const result = process("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", { language: "python" });
     expect(result.language.trim()).toBe("python");
     expect(result.metrics.codeLines).toBeGreaterThanOrEqual(4);
     expect(result.metrics.commentLines).toBeGreaterThanOrEqual(1);
@@ -31,7 +31,7 @@ describe('process', () => {
   });
 
   it('process_rust_structure_name: Rust struct with name, verify structure name contains value', () => {
-    const result = process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n");
+    const result = process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", { language: "rust" });
     expect(result.language.trim()).toBe("rust");
     expect(result.structure.length).toBeGreaterThanOrEqual(1);
     expect(result.structureNames).toContain("MyConfig");

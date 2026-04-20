@@ -2,13 +2,17 @@
 	"id": "ruby_class_process",
 	"description": "Intel: Ruby class with method",
 	"category": "process",
-	"tags": ["intel"],
+	"tags": [
+		"intel"
+	],
 	"skip": {
 		"reason": "Requires ruby language"
 	},
 	"input": {
-		"language": "ruby",
-		"source_code": "require 'json'\n\nclass Greeter\n  def greet(name)\n    \"Hello #{name}\"\n  end\nend\n"
+		"source_code": "require 'json'\n\nclass Greeter\n  def greet(name)\n    \"Hello #{name}\"\n  end\nend\n",
+		"config": {
+			"language": "ruby"
+		}
 	},
 	"assertions": [
 		{

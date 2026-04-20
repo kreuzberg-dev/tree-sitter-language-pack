@@ -6,8 +6,10 @@
 		"metadata"
 	],
 	"input": {
-		"language": "python",
-		"source_code": "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
+		"source_code": "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+		"config": {
+			"language": "python"
+		}
 	},
 	"assertions": [
 		{

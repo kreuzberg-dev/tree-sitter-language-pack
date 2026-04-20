@@ -9,7 +9,7 @@ class ProcessTest {
     @Test
     void testProcessJavascriptExportsDetail() throws Exception {
         // JavaScript with exports, verify export count
-        var result = TreeSitterLanguagePack.process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n");
+        var result = TreeSitterLanguagePack.process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", "{\"language\":\"javascript\"}");
         assertEquals("javascript", result.language().trim());
         assertTrue(result.exports().size() >= 1, "expected at least 1 elements");
     }
@@ -17,7 +17,7 @@ class ProcessTest {
     @Test
     void testProcessPythonComments() throws Exception {
         // Python with comments, verify comment count
-        var result = TreeSitterLanguagePack.process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n");
+        var result = TreeSitterLanguagePack.process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", "{\"language\":\"python\"}");
         assertEquals("python", result.language().trim());
         assertTrue(result.comments().size() >= 1, "expected at least 1 elements");
     }
@@ -25,7 +25,7 @@ class ProcessTest {
     @Test
     void testProcessPythonImportsDetail() throws Exception {
         // Python with multiple imports, verify imports contain specific source
-        var result = TreeSitterLanguagePack.process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n");
+        var result = TreeSitterLanguagePack.process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", "{\"language\":\"python\"}");
         assertEquals("python", result.language().trim());
         assertTrue(result.imports().size() >= 2, "expected at least 2 elements");
         assertTrue(result.importSources().contains("os"), "expected to contain: " + "os");
@@ -34,7 +34,7 @@ class ProcessTest {
     @Test
     void testProcessPythonMetricsDetail() throws Exception {
         // Python code with metrics assertions
-        var result = TreeSitterLanguagePack.process("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n");
+        var result = TreeSitterLanguagePack.process("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", "{\"language\":\"python\"}");
         assertEquals("python", result.language().trim());
         assertTrue(result.metrics().codeLines() >= 4, "expected >= 4");
         assertTrue(result.metrics().commentLines() >= 1, "expected >= 1");
@@ -44,7 +44,7 @@ class ProcessTest {
     @Test
     void testProcessRustStructureName() throws Exception {
         // Rust struct with name, verify structure name contains value
-        var result = TreeSitterLanguagePack.process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n");
+        var result = TreeSitterLanguagePack.process("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", "{\"language\":\"rust\"}");
         assertEquals("rust", result.language().trim());
         assertTrue(result.structure().size() >= 1, "expected at least 1 elements");
         assertTrue(result.structureNames().contains("MyConfig"), "expected to contain: " + "MyConfig");
