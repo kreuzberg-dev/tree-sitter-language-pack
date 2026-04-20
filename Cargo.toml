@@ -4,7 +4,7 @@ exclude = ["crates/ts-pack-elixir", "crates/ts-pack-java", "tests/test_apps/rust
 resolver = "2"
 
 [workspace.package]
-version = "1.6.2"
+version = "1.6.3"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"

@@ -34,7 +34,7 @@ defmodule TreeSitterLanguagePack do
   check availability before calling these functions if you want to avoid handling errors.
   """
 
-  @version "1.6.2"
+  @version "1.6.3"
 
   @force_build System.get_env("TSLP_BUILD") in ["1", "true"]
 

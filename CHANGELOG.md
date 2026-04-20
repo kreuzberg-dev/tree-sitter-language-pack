@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.3] - 2026-04-20
+
+### Fixed
+
+- Go: fix FFI build defaults — add `TSLP_LINK_MODE` and `TSLP_LANGUAGES` env vars to Go task (#102)
+- Go: fix CGO `LDFLAGS` paths — point to workspace `target/release/` instead of crate-local path (#102)
+- Go: remove duplicate forward declarations from `ffi.go` (already in `ts_pack.h`) (#102)
+- Go: fix README examples — proper error handling, correct API signatures (`Init`, `Download`) (#102)
+- FFI: add extra libs dir from `cache_dir()` to registry on creation (#102)
+- Docs: fix textlint pre-commit hook — add `additional_dependencies` for all textlint plugins (#102)
+
 ## [1.6.2] - 2026-04-18
 
 ### Fixed

@@ -99,7 +99,7 @@ repos:
 
   # Shell scripts: formatting and linting
   - repo: https://github.com/scop/pre-commit-shfmt
-    rev: v3.14.2-1
+    rev: v3.13.1-1
     hooks:
       - id: shfmt
         args: ["-w", "-i", "2"]
@@ -146,8 +146,8 @@ repos:
           - textlint-rule-stop-words@5.2.0
           - textlint-rule-terminology@5.2.16
           - textlint-rule-write-good@2.0.0
-          - '@textlint-rule/textlint-rule-no-invalid-control-character@3.0.0'
-          - '@textlint-rule/textlint-rule-no-unmatched-pair@2.0.4'
+          - "@textlint-rule/textlint-rule-no-invalid-control-character@3.0.0"
+          - "@textlint-rule/textlint-rule-no-unmatched-pair@2.0.4"
         files: ^docs/.*\.md$
         exclude: ^docs/(CHANGELOG|snippets/)
         pass_filenames: true
