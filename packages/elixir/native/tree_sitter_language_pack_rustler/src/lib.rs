@@ -664,16 +664,6 @@ impl std::panic::RefUnwindSafe for DownloadManager {}
 impl rustler::Resource for DownloadManager {}
 
 #[derive(Clone)]
-pub struct Tree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
-}
-
-// SAFETY: See gen_opaque_resource in alef-backend-rustler for rationale.
-impl std::panic::RefUnwindSafe for Tree {}
-
-impl rustler::Resource for Tree {}
-
-#[derive(Clone)]
 pub struct Language {
     inner: Arc<tree_sitter_language_pack::Language>,
 }
@@ -692,6 +682,16 @@ pub struct Parser {
 impl std::panic::RefUnwindSafe for Parser {}
 
 impl rustler::Resource for Parser {}
+
+#[derive(Clone)]
+pub struct Tree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
+}
+
+// SAFETY: See gen_opaque_resource in alef-backend-rustler for rationale.
+impl std::panic::RefUnwindSafe for Tree {}
+
+impl rustler::Resource for Tree {}
 
 #[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize, rustler::NifUnitEnum)]
 pub enum CaptureOutput {
@@ -1007,8 +1007,7 @@ pub fn configure(config: Option<String>) -> Result<(), String> {
 
 #[rustler::nif]
 pub fn download(names: Vec<String>) -> Result<usize, String> {
-    let result = tree_sitter_language_pack::download(&names).map_err(|e| e.to_string())?;
-    Ok(result)
+    Err(String::from("Not implemented: download"))
 }
 
 #[rustler::nif]
@@ -1129,13 +1128,7 @@ pub fn languageregistry_process(
     source: String,
     config: ProcessConfig,
 ) -> Result<ProcessResult, String> {
-    let result = resource
-        .inner
-        .as_ref()
-        .clone()
-        .process(&source, &config.clone().into())
-        .map_err(|e| e.to_string())?;
-    Ok(result.into())
+    Err(String::from("Not implemented: languageregistry_process"))
 }
 
 #[rustler::nif]
@@ -1195,7 +1188,13 @@ pub fn downloadmanager_ensure_languages(
 
 #[rustler::nif]
 pub fn downloadmanager_ensure_group(resource: ResourceArc<DownloadManager>, group: String) -> Result<(), String> {
-    Err(String::from("Not implemented: downloadmanager_ensure_group"))
+    let result = resource
+        .inner
+        .as_ref()
+        .clone()
+        .ensure_group(&group)
+        .map_err(|e| e.to_string())?;
+    Ok(result)
 }
 
 #[rustler::nif]
@@ -1211,7 +1210,13 @@ pub fn downloadmanager_lib_path(resource: ResourceArc<DownloadManager>, name: St
 
 #[rustler::nif]
 pub fn downloadmanager_fetch_manifest(resource: ResourceArc<DownloadManager>) -> Result<ParserManifest, String> {
-    Err(String::from("Not implemented: downloadmanager_fetch_manifest"))
+    let result = resource
+        .inner
+        .as_ref()
+        .clone()
+        .fetch_manifest()
+        .map_err(|e| e.to_string())?;
+    Ok(result.into())
 }
 
 #[rustler::nif]
@@ -2012,11 +2017,11 @@ fn on_load(env: rustler::Env, _info: rustler::Term) -> bool {
         .expect("Failed to register resource type LanguageRegistry");
     env.register::<DownloadManager>()
         .expect("Failed to register resource type DownloadManager");
-    env.register::<Tree>().expect("Failed to register resource type Tree");
     env.register::<Language>()
         .expect("Failed to register resource type Language");
     env.register::<Parser>()
         .expect("Failed to register resource type Parser");
+    env.register::<Tree>().expect("Failed to register resource type Tree");
     true
 }
 

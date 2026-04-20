@@ -330,7 +330,7 @@ pub struct JsLanguageRegistry {
 #[napi]
 impl JsLanguageRegistry {
     #[napi(js_name = "addExtraLibsDir")]
-    pub fn add_extra_libs_dir(&self, dir: String) -> () {
+    pub fn add_extra_libs_dir(&self, dir: String) {
         self.inner.add_extra_libs_dir(std::path::PathBuf::from(dir))
     }
 
@@ -417,19 +417,19 @@ pub struct JsLanguageInfo {
 #[derive(Clone)]
 #[napi]
 pub struct JsDownloadManager {
-    inner: Arc<std::sync::Mutex<tree_sitter_language_pack::DownloadManager>>,
+    inner: Arc<tree_sitter_language_pack::DownloadManager>,
 }
 
 #[napi]
 impl JsDownloadManager {
     #[napi(js_name = "cacheDir")]
     pub fn cache_dir(&self) -> String {
-        self.inner.lock().unwrap().cache_dir().to_string_lossy().to_string()
+        self.inner.cache_dir().to_string_lossy().to_string()
     }
 
     #[napi(js_name = "installedLanguages")]
     pub fn installed_languages(&self) -> Vec<String> {
-        self.inner.lock().unwrap().installed_languages()
+        self.inner.installed_languages()
     }
 
     #[allow(clippy::missing_errors_doc)]
@@ -437,8 +437,6 @@ impl JsDownloadManager {
     pub fn ensure_languages(&self, names: Vec<String>) -> Result<()> {
         let names_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
         self.inner
-            .lock()
-            .unwrap()
             .ensure_languages(&names_refs)
             .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
         Ok(())
@@ -447,33 +445,31 @@ impl JsDownloadManager {
     #[allow(clippy::missing_errors_doc)]
     #[napi(js_name = "ensureGroup")]
     pub fn ensure_group(&self, group: String) -> Result<()> {
-        let _ = group;
-        Err(napi::Error::new(
-            napi::Status::GenericFailure,
-            "Not implemented: DownloadManager.ensure_group",
-        ))
+        self.inner
+            .ensure_group(&group)
+            .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+        Ok(())
     }
 
     #[napi(js_name = "libPath")]
     pub fn lib_path(&self, name: String) -> String {
-        self.inner.lock().unwrap().lib_path(&name).to_string_lossy().to_string()
+        self.inner.lib_path(&name).to_string_lossy().to_string()
     }
 
     #[allow(clippy::missing_errors_doc)]
     #[napi(js_name = "fetchManifest")]
     pub fn fetch_manifest(&self) -> Result<JsParserManifest> {
-        Err(napi::Error::new(
-            napi::Status::GenericFailure,
-            "Not implemented: DownloadManager.fetch_manifest",
-        ))
+        let result = self
+            .inner
+            .fetch_manifest()
+            .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+        Ok(result.into())
     }
 
     #[allow(clippy::missing_errors_doc)]
     #[napi(js_name = "cleanCache")]
     pub fn clean_cache(&self) -> Result<()> {
         self.inner
-            .lock()
-            .unwrap()
             .clean_cache()
             .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
         Ok(())
@@ -483,17 +479,17 @@ impl JsDownloadManager {
     #[napi]
     pub fn new(version: String) -> Result<JsDownloadManager> {
         tree_sitter_language_pack::DownloadManager::new(&version)
-            .map(|val| Self { inner: Arc::new(std::sync::Mutex::new(val)) })
+            .map(|val| Self { inner: Arc::new(val) })
             .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
     }
 
     #[napi(js_name = "withCacheDir")]
     pub fn with_cache_dir(version: String, cache_dir: String) -> JsDownloadManager {
         Self {
-            inner: Arc::new(std::sync::Mutex::new(tree_sitter_language_pack::DownloadManager::with_cache_dir(
+            inner: Arc::new(tree_sitter_language_pack::DownloadManager::with_cache_dir(
                 &version,
                 std::path::PathBuf::from(cache_dir),
-            ))),
+            )),
         }
     }
 
@@ -505,15 +501,6 @@ impl JsDownloadManager {
             .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
     }
 }
-
-#[derive(Clone)]
-#[napi]
-pub struct JsTree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
-}
-
-#[napi]
-impl JsTree {}
 
 #[derive(Clone)]
 #[napi]
@@ -532,6 +519,15 @@ pub struct JsParser {
 
 #[napi]
 impl JsParser {}
+
+#[derive(Clone)]
+#[napi]
+pub struct JsTree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
+}
+
+#[napi]
+impl JsTree {}
 
 #[napi(string_enum)]
 #[derive(Clone, serde::Serialize, serde::Deserialize)]
@@ -679,7 +675,10 @@ pub fn detect_language_from_content(content: String) -> Option<String> {
 #[allow(clippy::missing_errors_doc)]
 #[napi(js_name = "validateExtraction")]
 pub fn validate_extraction(config: JsExtractionConfig) -> Result<JsValidationResult> {
-    let config_core: tree_sitter_language_pack::ExtractionConfig = config.into();
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json)
+        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
     tree_sitter_language_pack::extract::validate_extraction(&config_core)
         .map(|val| val.into())
         .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
@@ -688,7 +687,10 @@ pub fn validate_extraction(config: JsExtractionConfig) -> Result<JsValidationRes
 #[allow(clippy::missing_errors_doc)]
 #[napi]
 pub fn process(source: String, config: JsProcessConfig, registry: &JsLanguageRegistry) -> Result<JsProcessResult> {
-    let config_core: tree_sitter_language_pack::ProcessConfig = config.into();
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ProcessConfig = serde_json::from_str(&config_json)
+        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
     tree_sitter_language_pack::intel::process(&source, &config_core, &registry.inner)
         .map(|val| val.into())
         .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
@@ -806,7 +808,10 @@ pub fn language_count() -> i64 {
 #[allow(clippy::missing_errors_doc)]
 #[napi(js_name = "extractPatterns")]
 pub fn extract_patterns(source: String, config: JsExtractionConfig) -> Result<JsExtractionResult> {
-    let config_core: tree_sitter_language_pack::ExtractionConfig = config.into();
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json)
+        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
     tree_sitter_language_pack::extract_patterns(&source, &config_core)
         .map(|val| val.into())
         .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
@@ -815,17 +820,25 @@ pub fn extract_patterns(source: String, config: JsExtractionConfig) -> Result<Js
 #[allow(clippy::missing_errors_doc)]
 #[napi]
 pub fn init(config: JsPackConfig) -> Result<()> {
-    let config_core: tree_sitter_language_pack::PackConfig = config.into();
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+    let config_core: tree_sitter_language_pack::PackConfig = serde_json::from_str(&config_json)
+        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
     tree_sitter_language_pack::init(&config_core)
-        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
+        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+    Ok(())
 }
 
 #[allow(clippy::missing_errors_doc)]
 #[napi]
 pub fn configure(config: JsPackConfig) -> Result<()> {
-    let config_core: tree_sitter_language_pack::PackConfig = config.into();
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+    let config_core: tree_sitter_language_pack::PackConfig = serde_json::from_str(&config_json)
+        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
     tree_sitter_language_pack::configure(&config_core)
-        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
+        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+    Ok(())
 }
 
 #[allow(clippy::missing_errors_doc)]

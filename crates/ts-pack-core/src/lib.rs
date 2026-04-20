@@ -126,7 +126,7 @@ pub fn get_language(name: &str) -> Result<Language, Error> {
     {
         ensure_cache_registered()?;
         let cache_dir = effective_cache_dir()?;
-        let mut dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+        let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
         dm.ensure_languages(&[name])?;
         REGISTRY.get_language(name)
     }
@@ -345,7 +345,7 @@ pub fn init(config: &PackConfig) -> Result<(), Error> {
     }
     if let Some(ref groups) = config.groups {
         let cache_dir = effective_cache_dir()?;
-        let mut dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+        let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
         for group in groups {
             dm.ensure_group(group)?;
         }
@@ -416,7 +416,7 @@ pub fn configure(config: &PackConfig) -> Result<(), Error> {
 pub fn download(names: &[&str]) -> Result<usize, Error> {
     ensure_cache_registered()?;
     let cache_dir = effective_cache_dir()?;
-    let mut dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+    let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
     let before = dm.installed_languages().len();
     dm.ensure_languages(names)?;
     let after = dm.installed_languages().len();
@@ -467,7 +467,7 @@ pub fn download_all() -> Result<usize, Error> {
 #[cfg(feature = "download")]
 pub fn manifest_languages() -> Result<Vec<String>, Error> {
     let cache_dir = effective_cache_dir()?;
-    let mut dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+    let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
     let manifest = dm.fetch_manifest()?;
     let mut langs: Vec<String> = manifest.languages.keys().cloned().collect();
     langs.sort_unstable();

@@ -6,15 +6,15 @@
     clippy::let_unit_value,
     clippy::needless_borrow,
     clippy::redundant_locals,
-    clippy::drop_ref
+    dropping_references
 )]
 
 use std::cell::RefCell;
 use std::ffi::{c_char, CStr, CString};
 
 thread_local! {
-    static LAST_ERROR_CODE: RefCell<i32> = RefCell::new(0);
-    static LAST_ERROR_CONTEXT: RefCell<Option<CString>> = RefCell::new(None);
+    static LAST_ERROR_CODE: RefCell<i32> = const { RefCell::new(0) };
+    static LAST_ERROR_CONTEXT: RefCell<Option<CString>> = const { RefCell::new(None) };
 }
 
 fn set_last_error(code: i32, message: &str) {
@@ -4008,8 +4008,8 @@ pub unsafe extern "C" fn ts_pack_language_registry_language_count(
     }
     // SAFETY: null check above guarantees this is a valid pointer.
     let obj = unsafe { &*this };
-    let result = obj.language_count();
-    result
+    
+    obj.language_count()
 }
 
 /// Parse source code and extract file intelligence based on config in a single pass.
@@ -4596,7 +4596,7 @@ pub unsafe extern "C" fn ts_pack_download_manager_installed_languages(
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_download_manager_ensure_languages(
-    this: *mut tree_sitter_language_pack::DownloadManager,
+    this: *const tree_sitter_language_pack::DownloadManager,
     names: *const std::ffi::c_char,
 ) -> i32 {
     clear_last_error();
@@ -4604,8 +4604,8 @@ pub unsafe extern "C" fn ts_pack_download_manager_ensure_languages(
         set_last_error(1, "Null pointer passed for self");
         return -1;
     }
-    // SAFETY: null check above guarantees this is a valid pointer; caller ensures exclusive access.
-    let obj = unsafe { &mut *this };
+    // SAFETY: null check above guarantees this is a valid pointer.
+    let obj = unsafe { &*this };
     if names.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'names'");
         return -1;
@@ -4641,7 +4641,7 @@ pub unsafe extern "C" fn ts_pack_download_manager_ensure_languages(
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_download_manager_ensure_group(
-    this: *mut tree_sitter_language_pack::DownloadManager,
+    this: *const tree_sitter_language_pack::DownloadManager,
     group: *const std::ffi::c_char,
 ) -> i32 {
     clear_last_error();
@@ -4649,8 +4649,8 @@ pub unsafe extern "C" fn ts_pack_download_manager_ensure_group(
         set_last_error(1, "Null pointer passed for self");
         return -1;
     }
-    // SAFETY: null check above guarantees this is a valid pointer; caller ensures exclusive access.
-    let obj = unsafe { &mut *this };
+    // SAFETY: null check above guarantees this is a valid pointer.
+    let obj = unsafe { &*this };
     if group.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'group'");
         return -1;
@@ -4712,15 +4712,15 @@ pub unsafe extern "C" fn ts_pack_download_manager_lib_path(
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_download_manager_fetch_manifest(
-    this: *mut tree_sitter_language_pack::DownloadManager,
+    this: *const tree_sitter_language_pack::DownloadManager,
 ) -> *mut tree_sitter_language_pack::download::ParserManifest {
     clear_last_error();
     if this.is_null() {
         set_last_error(1, "Null pointer passed for self");
         return std::ptr::null_mut();
     }
-    // SAFETY: null check above guarantees this is a valid pointer; caller ensures exclusive access.
-    let obj = unsafe { &mut *this };
+    // SAFETY: null check above guarantees this is a valid pointer.
+    let obj = unsafe { &*this };
     let result = obj.fetch_manifest();
     match result {
         Ok(val) => Box::into_raw(Box::new(val)),
@@ -4756,18 +4756,6 @@ pub unsafe extern "C" fn ts_pack_download_manager_clean_cache(
     }
 }
 
-/// Free a `Tree` handle.
-/// # Safety
-/// Pointer must have been returned by this library, or be null.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_tree_free(ptr: *mut tree_sitter_language_pack::Tree) {
-    if !ptr.is_null() {
-        unsafe {
-            drop(Box::from_raw(ptr));
-        }
-    }
-}
-
 /// Free a `Language` handle.
 /// # Safety
 /// Pointer must have been returned by this library, or be null.
@@ -4785,6 +4773,18 @@ pub unsafe extern "C" fn ts_pack_language_free(ptr: *mut tree_sitter_language_pa
 /// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_parser_free(ptr: *mut tree_sitter_language_pack::Parser) {
+    if !ptr.is_null() {
+        unsafe {
+            drop(Box::from_raw(ptr));
+        }
+    }
+}
+
+/// Free a `Tree` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_tree_free(ptr: *mut tree_sitter_language_pack::Tree) {
     if !ptr.is_null() {
         unsafe {
             drop(Box::from_raw(ptr));
@@ -5587,8 +5587,8 @@ pub unsafe extern "C" fn ts_pack_tree_error_count(tree: *const tree_sitter_langu
         return 0;
     }
     let tree_rs = unsafe { &*tree };
-    let result = tree_sitter_language_pack::tree_error_count(&tree_rs);
-    result
+    
+    tree_sitter_language_pack::tree_error_count(&tree_rs)
 }
 
 /// Get the highlights query for a language, if bundled.
@@ -6034,8 +6034,8 @@ pub unsafe extern "C" fn ts_pack_has_language(name: *const std::ffi::c_char) -> 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_language_count() -> usize {
     clear_last_error();
-    let result = tree_sitter_language_pack::language_count();
-    result
+    
+    tree_sitter_language_pack::language_count()
 }
 
 /// Run extraction patterns against source code.

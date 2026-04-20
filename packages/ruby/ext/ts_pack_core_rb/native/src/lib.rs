@@ -1816,13 +1816,10 @@ impl LanguageRegistry {
     }
 
     fn process(&self, source: String, config: ProcessConfig) -> Result<ProcessResult, Error> {
-        let result = self.inner.process(&source, config.into()).map_err(|e| {
-            magnus::Error::new(
-                unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
-                e.to_string(),
-            )
-        })?;
-        Ok(result.into())
+        Err(magnus::Error::new(
+            unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
+            "Not implemented: process",
+        ))
     }
 }
 
@@ -1977,10 +1974,13 @@ impl DownloadManager {
     }
 
     fn ensure_group(&self, group: String) -> Result<(), Error> {
-        Err(magnus::Error::new(
-            unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
-            "Not implemented: ensure_group",
-        ))
+        self.inner.ensure_group(&group).map_err(|e| {
+            magnus::Error::new(
+                unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
+                e.to_string(),
+            )
+        })?;
+        Ok(())
     }
 
     fn lib_path(&self, name: String) -> String {
@@ -1988,10 +1988,13 @@ impl DownloadManager {
     }
 
     fn fetch_manifest(&self) -> Result<ParserManifest, Error> {
-        Err(magnus::Error::new(
-            unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
-            "Not implemented: fetch_manifest",
-        ))
+        let result = self.inner.fetch_manifest().map_err(|e| {
+            magnus::Error::new(
+                unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
+                e.to_string(),
+            )
+        })?;
+        Ok(result.into())
     }
 
     fn clean_cache(&self) -> Result<(), Error> {
@@ -2004,24 +2007,6 @@ impl DownloadManager {
         Ok(())
     }
 }
-
-#[derive(Clone)]
-#[magnus::wrap(class = "TreeSitterLanguagePack::Tree")]
-pub struct Tree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
-}
-
-unsafe impl IntoValueFromNative for Tree {}
-
-impl magnus::TryConvert for Tree {
-    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Tree = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
-    }
-}
-unsafe impl TryConvertOwned for Tree {}
-
-impl Tree {}
 
 #[derive(Clone)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::Language")]
@@ -2058,6 +2043,24 @@ impl magnus::TryConvert for Parser {
 unsafe impl TryConvertOwned for Parser {}
 
 impl Parser {}
+
+#[derive(Clone)]
+#[magnus::wrap(class = "TreeSitterLanguagePack::Tree")]
+pub struct Tree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
+}
+
+unsafe impl IntoValueFromNative for Tree {}
+
+impl magnus::TryConvert for Tree {
+    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
+        let r: &Tree = magnus::TryConvert::try_convert(val)?;
+        Ok(r.clone())
+    }
+}
+unsafe impl TryConvertOwned for Tree {}
+
+impl Tree {}
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, serde::Serialize, serde::Deserialize)]
 pub enum CaptureOutput {
@@ -2365,13 +2368,10 @@ fn validate_extraction(config: String) -> Result<ValidationResult, Error> {
             .map_err(|e| magnus::Error::new(unsafe { Ruby::get_unchecked() }.exception_type_error(), e.to_string()))?;
         core.into()
     };
-    let result = tree_sitter_language_pack::extract::validate_extraction(config.into()).map_err(|e| {
-        magnus::Error::new(
-            unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
-            e.to_string(),
-        )
-    })?;
-    Ok(result.into())
+    Err(magnus::Error::new(
+        unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
+        "Not implemented: validate_extraction",
+    ))
 }
 
 fn process(source: String, config: String, registry: LanguageRegistry) -> Result<ProcessResult, Error> {
@@ -2380,13 +2380,10 @@ fn process(source: String, config: String, registry: LanguageRegistry) -> Result
             .map_err(|e| magnus::Error::new(unsafe { Ruby::get_unchecked() }.exception_type_error(), e.to_string()))?;
         core.into()
     };
-    let result = tree_sitter_language_pack::intel::process(&source, config.into(), &registry.inner).map_err(|e| {
-        magnus::Error::new(
-            unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
-            e.to_string(),
-        )
-    })?;
-    Ok(result.into())
+    Err(magnus::Error::new(
+        unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
+        "Not implemented: process",
+    ))
 }
 
 fn root_node_info(tree: Tree) -> NodeInfo {
@@ -2503,13 +2500,10 @@ fn extract_patterns(source: String, config: String) -> Result<ExtractionResult, 
             .map_err(|e| magnus::Error::new(unsafe { Ruby::get_unchecked() }.exception_type_error(), e.to_string()))?;
         core.into()
     };
-    let result = tree_sitter_language_pack::extract_patterns(&source, config.into()).map_err(|e| {
-        magnus::Error::new(
-            unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
-            e.to_string(),
-        )
-    })?;
-    Ok(result.into())
+    Err(magnus::Error::new(
+        unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
+        "Not implemented: extract_patterns",
+    ))
 }
 
 fn configure(config: String) -> Result<(), Error> {
@@ -2518,23 +2512,17 @@ fn configure(config: String) -> Result<(), Error> {
             .map_err(|e| magnus::Error::new(unsafe { Ruby::get_unchecked() }.exception_type_error(), e.to_string()))?;
         core.into()
     };
-    let result = tree_sitter_language_pack::configure(config.into()).map_err(|e| {
-        magnus::Error::new(
-            unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
-            e.to_string(),
-        )
-    })?;
-    Ok(result)
+    Err(magnus::Error::new(
+        unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
+        "Not implemented: configure",
+    ))
 }
 
 fn download(names: Vec<String>) -> Result<usize, Error> {
-    let result = tree_sitter_language_pack::download(&names).map_err(|e| {
-        magnus::Error::new(
-            unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
-            e.to_string(),
-        )
-    })?;
-    Ok(result)
+    Err(magnus::Error::new(
+        unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
+        "Not implemented: download",
+    ))
 }
 
 fn download_all() -> Result<usize, Error> {
@@ -3609,11 +3597,11 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_method("fetch_manifest", method!(DownloadManager::fetch_manifest, 0))?;
     class.define_method("clean_cache", method!(DownloadManager::clean_cache, 0))?;
 
-    let _class = module.define_class("Tree", ruby.class_object())?;
-
     let _class = module.define_class("Language", ruby.class_object())?;
 
     let _class = module.define_class("Parser", ruby.class_object())?;
+
+    let _class = module.define_class("Tree", ruby.class_object())?;
 
     module.define_module_function(
         "detect_language_from_extension",

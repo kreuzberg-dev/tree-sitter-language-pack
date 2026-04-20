@@ -2107,7 +2107,7 @@ impl WasmLanguageRegistry {
     }
 
     #[wasm_bindgen(js_name = "addExtraLibsDir")]
-    pub fn add_extra_libs_dir(&self, dir: String) -> () {
+    pub fn add_extra_libs_dir(&self, dir: String) {
         self.inner.add_extra_libs_dir(std::path::PathBuf::from(dir))
     }
 
@@ -2140,13 +2140,8 @@ impl WasmLanguageRegistry {
 
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen]
-    pub fn process(&self, source: String, config: WasmProcessConfig) -> Result<WasmProcessResult, JsValue> {
-        let config_core: tree_sitter_language_pack::ProcessConfig = config.into();
-        let result = self
-            .inner
-            .process(&source, &config_core)
-            .map_err(|e| JsValue::from_str(&e.to_string()))?;
-        Ok(result.into())
+    pub fn process(&self, _source: String, _config: WasmProcessConfig) -> Result<WasmProcessResult, JsValue> {
+        Err(JsValue::from_str("Not implemented: process"))
     }
 
     #[allow(clippy::should_implement_trait)]
@@ -2355,8 +2350,11 @@ impl WasmDownloadManager {
 
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen(js_name = "ensureGroup")]
-    pub fn ensure_group(&self, _group: String) -> Result<(), JsValue> {
-        Err(JsValue::from_str("Not implemented: ensure_group"))
+    pub fn ensure_group(&self, group: String) -> Result<(), JsValue> {
+        self.inner
+            .ensure_group(&group)
+            .map_err(|e| JsValue::from_str(&e.to_string()))?;
+        Ok(())
     }
 
     #[wasm_bindgen(js_name = "libPath")]
@@ -2367,7 +2365,11 @@ impl WasmDownloadManager {
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen(js_name = "fetchManifest")]
     pub fn fetch_manifest(&self) -> Result<WasmParserManifest, JsValue> {
-        Err(JsValue::from_str("Not implemented: fetch_manifest"))
+        let result = self
+            .inner
+            .fetch_manifest()
+            .map_err(|e| JsValue::from_str(&e.to_string()))?;
+        Ok(result.into())
     }
 
     #[allow(clippy::missing_errors_doc)]
@@ -2379,15 +2381,6 @@ impl WasmDownloadManager {
         Ok(())
     }
 }
-
-#[derive(Clone)]
-#[wasm_bindgen]
-pub struct WasmTree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
-}
-
-#[wasm_bindgen]
-impl WasmTree {}
 
 #[derive(Clone)]
 #[wasm_bindgen]
@@ -2406,6 +2399,15 @@ pub struct WasmParser {
 
 #[wasm_bindgen]
 impl WasmParser {}
+
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct WasmTree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
+}
+
+#[wasm_bindgen]
+impl WasmTree {}
 
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -2551,24 +2553,18 @@ pub fn detect_language_from_content(content: String) -> Option<String> {
 
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "validateExtraction")]
-pub fn validate_extraction(config: WasmExtractionConfig) -> Result<WasmValidationResult, JsValue> {
-    let config_core: tree_sitter_language_pack::ExtractionConfig = config.into();
-    let result = tree_sitter_language_pack::extract::validate_extraction(&config_core)
-        .map_err(|e| JsValue::from_str(&e.to_string()))?;
-    Ok(result.into())
+pub fn validate_extraction(_config: WasmExtractionConfig) -> Result<WasmValidationResult, JsValue> {
+    Err(JsValue::from_str("Not implemented: validate_extraction"))
 }
 
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen]
 pub fn process(
-    source: String,
-    config: WasmProcessConfig,
-    registry: WasmLanguageRegistry,
+    _source: String,
+    _config: WasmProcessConfig,
+    _registry: WasmLanguageRegistry,
 ) -> Result<WasmProcessResult, JsValue> {
-    let config_core: tree_sitter_language_pack::ProcessConfig = config.into();
-    let result = tree_sitter_language_pack::intel::process(&source, &config_core, &registry.inner)
-        .map_err(|e| JsValue::from_str(&e.to_string()))?;
-    Ok(result.into())
+    Err(JsValue::from_str("Not implemented: process"))
 }
 
 #[wasm_bindgen(js_name = "rootNodeInfo")]
@@ -2690,35 +2686,26 @@ pub fn language_count() -> usize {
 
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "extractPatterns")]
-pub fn extract_patterns(source: String, config: WasmExtractionConfig) -> Result<WasmExtractionResult, JsValue> {
-    let config_core: tree_sitter_language_pack::ExtractionConfig = config.into();
-    let result = tree_sitter_language_pack::extract_patterns(&source, &config_core)
-        .map_err(|e| JsValue::from_str(&e.to_string()))?;
-    Ok(result.into())
+pub fn extract_patterns(_source: String, _config: WasmExtractionConfig) -> Result<WasmExtractionResult, JsValue> {
+    Err(JsValue::from_str("Not implemented: extract_patterns"))
 }
 
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen]
-pub fn init(config: WasmPackConfig) -> Result<(), JsValue> {
-    let config_core: tree_sitter_language_pack::PackConfig = config.into();
-    let result = tree_sitter_language_pack::init(&config_core).map_err(|e| JsValue::from_str(&e.to_string()))?;
-    Ok(result)
+pub fn init(_config: WasmPackConfig) -> Result<(), JsValue> {
+    Err(JsValue::from_str("Not implemented: init"))
 }
 
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen]
-pub fn configure(config: WasmPackConfig) -> Result<(), JsValue> {
-    let config_core: tree_sitter_language_pack::PackConfig = config.into();
-    let result = tree_sitter_language_pack::configure(&config_core).map_err(|e| JsValue::from_str(&e.to_string()))?;
-    Ok(result)
+pub fn configure(_config: WasmPackConfig) -> Result<(), JsValue> {
+    Err(JsValue::from_str("Not implemented: configure"))
 }
 
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen]
-pub fn download(names: Vec<String>) -> Result<usize, JsValue> {
-    let names_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
-    let result = tree_sitter_language_pack::download(&names_refs).map_err(|e| JsValue::from_str(&e.to_string()))?;
-    Ok(result)
+pub fn download(_names: Vec<String>) -> Result<usize, JsValue> {
+    Err(JsValue::from_str("Not implemented: download"))
 }
 
 #[allow(clippy::missing_errors_doc)]

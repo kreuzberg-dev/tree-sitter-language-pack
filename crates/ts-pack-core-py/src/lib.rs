@@ -1209,19 +1209,19 @@ impl LanguageInfo {
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
 pub struct DownloadManager {
-    inner: Arc<std::sync::Mutex<tree_sitter_language_pack::DownloadManager>>,
+    inner: Arc<tree_sitter_language_pack::DownloadManager>,
 }
 
 #[pymethods]
 impl DownloadManager {
     #[pyo3(signature = ())]
     pub fn cache_dir(&self) -> String {
-        self.inner.lock().unwrap().cache_dir().to_string_lossy().to_string()
+        self.inner.cache_dir().to_string_lossy().to_string()
     }
 
     #[pyo3(signature = ())]
     pub fn installed_languages(&self) -> Vec<String> {
-        self.inner.lock().unwrap().installed_languages()
+        self.inner.installed_languages()
     }
 
     #[allow(clippy::missing_errors_doc)]
@@ -1229,8 +1229,6 @@ impl DownloadManager {
     pub fn ensure_languages(&self, names: Vec<String>) -> PyResult<()> {
         let names_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
         self.inner
-            .lock()
-            .unwrap()
             .ensure_languages(&names_refs)
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
         Ok(())
@@ -1239,31 +1237,31 @@ impl DownloadManager {
     #[allow(clippy::missing_errors_doc)]
     #[pyo3(signature = (group))]
     pub fn ensure_group(&self, group: String) -> PyResult<()> {
-        let _ = group;
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "Not implemented: DownloadManager.ensure_group",
-        ))
+        self.inner
+            .ensure_group(&group)
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+        Ok(())
     }
 
     #[pyo3(signature = (name))]
     pub fn lib_path(&self, name: String) -> String {
-        self.inner.lock().unwrap().lib_path(&name).to_string_lossy().to_string()
+        self.inner.lib_path(&name).to_string_lossy().to_string()
     }
 
     #[allow(clippy::missing_errors_doc)]
     #[pyo3(signature = ())]
     pub fn fetch_manifest(&self) -> PyResult<ParserManifest> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "Not implemented: DownloadManager.fetch_manifest",
-        ))
+        let result = self
+            .inner
+            .fetch_manifest()
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+        Ok(result.into())
     }
 
     #[allow(clippy::missing_errors_doc)]
     #[pyo3(signature = ())]
     pub fn clean_cache(&self) -> PyResult<()> {
         self.inner
-            .lock()
-            .unwrap()
             .clean_cache()
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
         Ok(())
@@ -1274,7 +1272,7 @@ impl DownloadManager {
     #[pyo3(signature = (version))]
     pub fn new(version: String) -> PyResult<DownloadManager> {
         tree_sitter_language_pack::DownloadManager::new(&version)
-            .map(|val| Self { inner: Arc::new(std::sync::Mutex::new(val)) })
+            .map(|val| Self { inner: Arc::new(val) })
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
     }
 
@@ -1282,10 +1280,10 @@ impl DownloadManager {
     #[pyo3(signature = (version, cache_dir))]
     pub fn with_cache_dir(version: String, cache_dir: String) -> DownloadManager {
         Self {
-            inner: Arc::new(std::sync::Mutex::new(tree_sitter_language_pack::DownloadManager::with_cache_dir(
+            inner: Arc::new(tree_sitter_language_pack::DownloadManager::with_cache_dir(
                 &version,
                 std::path::PathBuf::from(cache_dir),
-            ))),
+            )),
         }
     }
 
@@ -1301,12 +1299,6 @@ impl DownloadManager {
 
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
-pub struct Tree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
-}
-
-#[derive(Clone)]
-#[pyclass(frozen, from_py_object)]
 pub struct Language {
     inner: Arc<tree_sitter_language_pack::Language>,
 }
@@ -1315,6 +1307,12 @@ pub struct Language {
 #[pyclass(frozen, from_py_object)]
 pub struct Parser {
     inner: Arc<tree_sitter_language_pack::Parser>,
+}
+
+#[derive(Clone)]
+#[pyclass(frozen, from_py_object)]
+pub struct Tree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
 }
 
 #[derive(Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
@@ -1328,6 +1326,7 @@ pub enum CaptureOutput {
 
 #[derive(Clone)]
 #[pyclass(frozen)]
+#[derive(Default)]
 pub struct StructureKind {
     pub(crate) inner: tree_sitter_language_pack::StructureKind,
 }
@@ -1362,13 +1361,6 @@ impl serde::Serialize for StructureKind {
     }
 }
 
-impl Default for StructureKind {
-    fn default() -> Self {
-        Self {
-            inner: Default::default(),
-        }
-    }
-}
 
 impl<'de> serde::Deserialize<'de> for StructureKind {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
@@ -1388,6 +1380,7 @@ pub enum CommentKind {
 
 #[derive(Clone)]
 #[pyclass(frozen)]
+#[derive(Default)]
 pub struct DocstringFormat {
     pub(crate) inner: tree_sitter_language_pack::DocstringFormat,
 }
@@ -1422,13 +1415,6 @@ impl serde::Serialize for DocstringFormat {
     }
 }
 
-impl Default for DocstringFormat {
-    fn default() -> Self {
-        Self {
-            inner: Default::default(),
-        }
-    }
-}
 
 impl<'de> serde::Deserialize<'de> for DocstringFormat {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
@@ -1448,6 +1434,7 @@ pub enum ExportKind {
 
 #[derive(Clone)]
 #[pyclass(frozen)]
+#[derive(Default)]
 pub struct SymbolKind {
     pub(crate) inner: tree_sitter_language_pack::SymbolKind,
 }
@@ -1482,13 +1469,6 @@ impl serde::Serialize for SymbolKind {
     }
 }
 
-impl Default for SymbolKind {
-    fn default() -> Self {
-        Self {
-            inner: Default::default(),
-        }
-    }
-}
 
 impl<'de> serde::Deserialize<'de> for SymbolKind {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
@@ -1535,9 +1515,12 @@ pub fn detect_language_from_content(content: String) -> Option<String> {
 #[pyfunction]
 #[pyo3(signature = (config))]
 pub fn validate_extraction(config: ExtractionConfig) -> PyResult<ValidationResult> {
-    let config_core: tree_sitter_language_pack::ExtractionConfig = config.into();
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ExtractionConfig =
+        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
     tree_sitter_language_pack::extract::validate_extraction(&config_core)
-        .map(|val| val.into())
+        .map(ValidationResult::from)
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
@@ -1545,9 +1528,12 @@ pub fn validate_extraction(config: ExtractionConfig) -> PyResult<ValidationResul
 #[pyfunction]
 #[pyo3(signature = (source, config, registry))]
 pub fn process(source: String, config: ProcessConfig, registry: LanguageRegistry) -> PyResult<ProcessResult> {
-    let config_core: tree_sitter_language_pack::ProcessConfig = config.into();
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ProcessConfig =
+        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
     tree_sitter_language_pack::intel::process(&source, &config_core, &registry.inner)
-        .map(|val| val.into())
+        .map(ProcessResult::from)
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
@@ -1599,7 +1585,7 @@ pub fn tree_has_error_nodes(tree: Tree) -> bool {
 #[pyfunction]
 #[pyo3(signature = (tree))]
 pub fn tree_to_sexp(tree: Tree) -> String {
-    tree_sitter_language_pack::tree_to_sexp(&tree.inner).into()
+    tree_sitter_language_pack::tree_to_sexp(&tree.inner)
 }
 
 #[pyfunction]
@@ -1664,9 +1650,7 @@ pub fn get_parser(name: String) -> PyResult<Parser> {
 #[pyo3(signature = ())]
 pub fn available_languages() -> Vec<String> {
     tree_sitter_language_pack::available_languages()
-        .into_iter()
-        .map(Into::into)
-        .collect()
+        .into_iter().collect()
 }
 
 #[pyfunction]
@@ -1685,9 +1669,12 @@ pub fn language_count() -> usize {
 #[pyfunction]
 #[pyo3(signature = (source, config))]
 pub fn extract_patterns(source: String, config: ExtractionConfig) -> PyResult<ExtractionResult> {
-    let config_core: tree_sitter_language_pack::ExtractionConfig = config.into();
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ExtractionConfig =
+        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
     tree_sitter_language_pack::extract_patterns(&source, &config_core)
-        .map(|val| val.into())
+        .map(ExtractionResult::from)
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
@@ -1695,17 +1682,26 @@ pub fn extract_patterns(source: String, config: ExtractionConfig) -> PyResult<Ex
 #[pyfunction]
 #[pyo3(signature = (config))]
 pub fn init(config: PackConfig) -> PyResult<()> {
-    let config_core: tree_sitter_language_pack::PackConfig = config.into();
-    tree_sitter_language_pack::init(&config_core).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    let config_core: tree_sitter_language_pack::PackConfig =
+        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    tree_sitter_language_pack::init(&config_core)
+        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    Ok(())
 }
 
 #[allow(clippy::missing_errors_doc)]
 #[pyfunction]
 #[pyo3(signature = (config))]
 pub fn configure(config: PackConfig) -> PyResult<()> {
-    let config_core: tree_sitter_language_pack::PackConfig = config.into();
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    let config_core: tree_sitter_language_pack::PackConfig =
+        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
     tree_sitter_language_pack::configure(&config_core)
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    Ok(())
 }
 
 #[allow(clippy::missing_errors_doc)]
@@ -1729,7 +1725,7 @@ pub fn download_all() -> PyResult<usize> {
 #[pyo3(signature = ())]
 pub fn manifest_languages() -> PyResult<Vec<String>> {
     tree_sitter_language_pack::manifest_languages()
-        .map(|val| val.into_iter().map(Into::into).collect())
+        .map(|val| val.into_iter().collect())
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
@@ -1737,9 +1733,7 @@ pub fn manifest_languages() -> PyResult<Vec<String>> {
 #[pyo3(signature = ())]
 pub fn downloaded_languages() -> Vec<String> {
     tree_sitter_language_pack::downloaded_languages()
-        .into_iter()
-        .map(Into::into)
-        .collect()
+        .into_iter().collect()
 }
 
 #[allow(clippy::missing_errors_doc)]
@@ -2504,9 +2498,9 @@ pub fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PlatformBundle>()?;
     m.add_class::<LanguageInfo>()?;
     m.add_class::<DownloadManager>()?;
-    m.add_class::<Tree>()?;
     m.add_class::<Language>()?;
     m.add_class::<Parser>()?;
+    m.add_class::<Tree>()?;
     m.add_class::<CaptureOutput>()?;
     m.add_class::<StructureKind>()?;
     m.add_class::<CommentKind>()?;

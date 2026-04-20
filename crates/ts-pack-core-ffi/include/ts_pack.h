@@ -1849,7 +1849,7 @@ char *ts_pack_download_manager_installed_languages(const TS_PACKDownloadManager 
  * Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
-int32_t ts_pack_download_manager_ensure_languages(TS_PACKDownloadManager *this_,
+int32_t ts_pack_download_manager_ensure_languages(const TS_PACKDownloadManager *this_,
                                                   const char *names);
 
 /**
@@ -1858,7 +1858,7 @@ int32_t ts_pack_download_manager_ensure_languages(TS_PACKDownloadManager *this_,
  * Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
-int32_t ts_pack_download_manager_ensure_group(TS_PACKDownloadManager *this_,
+int32_t ts_pack_download_manager_ensure_group(const TS_PACKDownloadManager *this_,
                                               const char *group);
 
 /**
@@ -1876,7 +1876,7 @@ char *ts_pack_download_manager_lib_path(const TS_PACKDownloadManager *this_,
  * Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
-TS_PACKParserManifest *ts_pack_download_manager_fetch_manifest(TS_PACKDownloadManager *this_);
+TS_PACKParserManifest *ts_pack_download_manager_fetch_manifest(const TS_PACKDownloadManager *this_);
 
 /**
  * Remove all cached parser libraries.
@@ -1885,13 +1885,6 @@ TS_PACKParserManifest *ts_pack_download_manager_fetch_manifest(TS_PACKDownloadMa
  * Returned pointers must be freed with the appropriate free function.
  */
 int32_t ts_pack_download_manager_clean_cache(const TS_PACKDownloadManager *this_);
-
-/**
- * Free a `Tree` handle.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void ts_pack_tree_free(TS_PACKTree *ptr);
 
 /**
  * Free a `Language` handle.
@@ -1906,6 +1899,13 @@ void ts_pack_language_free(TS_PACKLanguage *ptr);
  * Pointer must have been returned by this library, or be null.
  */
 void ts_pack_parser_free(TS_PACKParser *ptr);
+
+/**
+ * Free a `Tree` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_tree_free(TS_PACKTree *ptr);
 
 /**
  * Convert an integer to a `CaptureOutput` variant. Returns -1 on invalid input.

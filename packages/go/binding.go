@@ -1684,20 +1684,6 @@ func (h *DownloadManager) Free() {
 }
 
 
-// Tree is an opaque handle type.
-type Tree struct {
-    ptr unsafe.Pointer
-}
-
-// Free releases the resources held by this handle.
-func (h *Tree) Free() {
-    if h.ptr != nil {
-        C.ts_pack_tree_free((*C.TS_PACKTree)(h.ptr))
-        h.ptr = nil
-    }
-}
-
-
 // Language is an opaque handle type.
 type Language struct {
     ptr unsafe.Pointer
@@ -1721,6 +1707,20 @@ type Parser struct {
 func (h *Parser) Free() {
     if h.ptr != nil {
         C.ts_pack_parser_free((*C.TS_PACKParser)(h.ptr))
+        h.ptr = nil
+    }
+}
+
+
+// Tree is an opaque handle type.
+type Tree struct {
+    ptr unsafe.Pointer
+}
+
+// Free releases the resources held by this handle.
+func (h *Tree) Free() {
+    if h.ptr != nil {
+        C.ts_pack_tree_free((*C.TS_PACKTree)(h.ptr))
         h.ptr = nil
     }
 }

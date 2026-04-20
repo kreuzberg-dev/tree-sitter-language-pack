@@ -46,15 +46,15 @@ class DownloadManager
 {
 }
 
-class Tree
-{
-}
-
 class Language
 {
 }
 
 class Parser
+{
+}
+
+class Tree
 {
 }
 
