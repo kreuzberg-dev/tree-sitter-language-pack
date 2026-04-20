@@ -5,5 +5,5 @@ defmodule TreeSitterLanguagePack.CommentInfo do
   defstruct text: "",
             kind: :line,
             span: nil,
-            associated_node: nil
+            associated_node: ""
 end

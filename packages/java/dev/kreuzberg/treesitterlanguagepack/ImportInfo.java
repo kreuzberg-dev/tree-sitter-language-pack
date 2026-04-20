@@ -12,4 +12,7 @@ public record ImportInfo(
     @JsonProperty("is_wildcard") boolean isWildcard,
     Span span
 ) {
+    public static ImportInfoBuilder builder() {
+        return new ImportInfoBuilder();
+    }
 }

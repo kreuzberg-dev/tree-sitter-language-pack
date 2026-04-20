@@ -4,4 +4,7 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.Optional;
 
 public record DocSection(String kind, Optional<String> name, String description) {
+    public static DocSectionBuilder builder() {
+        return new DocSectionBuilder();
+    }
 }

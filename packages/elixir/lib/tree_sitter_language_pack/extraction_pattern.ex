@@ -5,6 +5,6 @@ defmodule TreeSitterLanguagePack.ExtractionPattern do
   defstruct query: "",
             capture_output: :full,
             child_fields: [],
-            max_results: nil,
-            byte_range: nil
+            max_results: 0,
+            byte_range: ""
 end

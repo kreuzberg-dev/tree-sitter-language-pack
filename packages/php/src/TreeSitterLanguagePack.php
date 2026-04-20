@@ -119,10 +119,10 @@ final class TreeSitterLanguagePack
      * Returns an error if the language cannot be loaded.
      *
      * @param ExtractionConfig $config
-     * @return string
+     * @return ValidationResult
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
-    public static function validateExtraction(ExtractionConfig $config): string
+    public static function validateExtraction(ExtractionConfig $config): ValidationResult
     {
         return \Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi::validateExtraction($config); // delegate to native extension class
     }

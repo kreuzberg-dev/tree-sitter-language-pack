@@ -21,7 +21,7 @@ public sealed class ExtractionPattern
     /// What to include in each capture result.
     /// </summary>
     [JsonPropertyName("capture_output")]
-    public CaptureOutput CaptureOutput { get; set; } = default!;
+    public CaptureOutput CaptureOutput { get; set; } = default;
 
     /// <summary>
     /// Field names to extract from child nodes of each capture.

@@ -153,7 +153,7 @@ public static class TreeSitterLanguagePackLib
     /// Returns an error if the language cannot be loaded.
     /// </summary>
     /// <param name="config"></param>
-    public static string ValidateExtraction(ExtractionConfig config)
+    public static ValidationResult ValidateExtraction(ExtractionConfig config)
     {
         ArgumentNullException.ThrowIfNull(config);
         var configJson = JsonSerializer.Serialize(config, JsonOptions);
@@ -162,8 +162,11 @@ public static class TreeSitterLanguagePackLib
             configHandle
         );
         if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
-        var returnValue = Marshal.PtrToStringUTF8(result) ?? string.Empty;
-        NativeMethods.FreeString(result);
+        var jsonPtr = NativeMethods.ValidationResultToJson(result);
+        var json = Marshal.PtrToStringUTF8(jsonPtr);
+        NativeMethods.FreeString(jsonPtr);
+        NativeMethods.ValidationResultFree(result);
+        var returnValue = JsonSerializer.Deserialize<ValidationResult>(json ?? "null", JsonOptions)!;
         NativeMethods.ExtractionConfigFree(configHandle);
         return returnValue;
     }

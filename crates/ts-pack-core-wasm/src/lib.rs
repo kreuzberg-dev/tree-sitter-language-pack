@@ -44,16 +44,16 @@ pub struct WasmExtractionPattern {
 impl WasmExtractionPattern {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        query: String,
-        capture_output: WasmCaptureOutput,
-        child_fields: Vec<String>,
+        query: Option<String>,
+        capture_output: Option<WasmCaptureOutput>,
+        child_fields: Option<Vec<String>>,
         max_results: Option<usize>,
         byte_range: Option<String>,
     ) -> WasmExtractionPattern {
         WasmExtractionPattern {
-            query,
-            capture_output,
-            child_fields,
+            query: query.unwrap_or_default(),
+            capture_output: capture_output.unwrap_or_default(),
+            child_fields: child_fields.unwrap_or_default(),
             max_results,
             byte_range,
         }
@@ -120,8 +120,11 @@ pub struct WasmExtractionConfig {
 #[wasm_bindgen]
 impl WasmExtractionConfig {
     #[wasm_bindgen(constructor)]
-    pub fn new(language: String, patterns: String) -> WasmExtractionConfig {
-        WasmExtractionConfig { language, patterns }
+    pub fn new(language: Option<String>, patterns: Option<String>) -> WasmExtractionConfig {
+        WasmExtractionConfig {
+            language: language.unwrap_or_default(),
+            patterns: patterns.unwrap_or_default(),
+        }
     }
 
     #[wasm_bindgen(getter)]
@@ -147,6 +150,162 @@ impl WasmExtractionConfig {
 
 #[derive(Clone, Default)]
 #[wasm_bindgen]
+pub struct WasmCaptureResult {
+    name: String,
+    node: Option<WasmNodeInfo>,
+    text: Option<String>,
+    child_fields: String,
+    start_byte: usize,
+}
+
+#[wasm_bindgen]
+impl WasmCaptureResult {
+    #[wasm_bindgen(constructor)]
+    pub fn new(
+        name: Option<String>,
+        child_fields: Option<String>,
+        start_byte: Option<usize>,
+        node: Option<WasmNodeInfo>,
+        text: Option<String>,
+    ) -> WasmCaptureResult {
+        WasmCaptureResult {
+            name: name.unwrap_or_default(),
+            node,
+            text,
+            child_fields: child_fields.unwrap_or_default(),
+            start_byte: start_byte.unwrap_or_default(),
+        }
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn name(&self) -> String {
+        self.name.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_name(&mut self, value: String) {
+        self.name = value;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn node(&self) -> Option<WasmNodeInfo> {
+        self.node.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_node(&mut self, value: Option<WasmNodeInfo>) {
+        self.node = value;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn text(&self) -> Option<String> {
+        self.text.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_text(&mut self, value: Option<String>) {
+        self.text = value;
+    }
+
+    #[wasm_bindgen(getter, js_name = "childFields")]
+    pub fn child_fields(&self) -> String {
+        self.child_fields.clone()
+    }
+
+    #[wasm_bindgen(setter, js_name = "childFields")]
+    pub fn set_child_fields(&mut self, value: String) {
+        self.child_fields = value;
+    }
+
+    #[wasm_bindgen(getter, js_name = "startByte")]
+    pub fn start_byte(&self) -> usize {
+        self.start_byte
+    }
+
+    #[wasm_bindgen(setter, js_name = "startByte")]
+    pub fn set_start_byte(&mut self, value: usize) {
+        self.start_byte = value;
+    }
+}
+
+#[derive(Clone, Default)]
+#[wasm_bindgen]
+pub struct WasmMatchResult {
+    pattern_index: usize,
+    captures: Vec<WasmCaptureResult>,
+}
+
+#[wasm_bindgen]
+impl WasmMatchResult {
+    #[wasm_bindgen(constructor)]
+    pub fn new(pattern_index: Option<usize>, captures: Option<Vec<WasmCaptureResult>>) -> WasmMatchResult {
+        WasmMatchResult {
+            pattern_index: pattern_index.unwrap_or_default(),
+            captures: captures.unwrap_or_default(),
+        }
+    }
+
+    #[wasm_bindgen(getter, js_name = "patternIndex")]
+    pub fn pattern_index(&self) -> usize {
+        self.pattern_index
+    }
+
+    #[wasm_bindgen(setter, js_name = "patternIndex")]
+    pub fn set_pattern_index(&mut self, value: usize) {
+        self.pattern_index = value;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn captures(&self) -> Vec<WasmCaptureResult> {
+        self.captures.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_captures(&mut self, value: Vec<WasmCaptureResult>) {
+        self.captures = value;
+    }
+}
+
+#[derive(Clone, Default)]
+#[wasm_bindgen]
+pub struct WasmPatternResult {
+    matches: Vec<WasmMatchResult>,
+    total_count: usize,
+}
+
+#[wasm_bindgen]
+impl WasmPatternResult {
+    #[wasm_bindgen(constructor)]
+    pub fn new(matches: Option<Vec<WasmMatchResult>>, total_count: Option<usize>) -> WasmPatternResult {
+        WasmPatternResult {
+            matches: matches.unwrap_or_default(),
+            total_count: total_count.unwrap_or_default(),
+        }
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn matches(&self) -> Vec<WasmMatchResult> {
+        self.matches.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_matches(&mut self, value: Vec<WasmMatchResult>) {
+        self.matches = value;
+    }
+
+    #[wasm_bindgen(getter, js_name = "totalCount")]
+    pub fn total_count(&self) -> usize {
+        self.total_count
+    }
+
+    #[wasm_bindgen(setter, js_name = "totalCount")]
+    pub fn set_total_count(&mut self, value: usize) {
+        self.total_count = value;
+    }
+}
+
+#[derive(Clone, Default)]
+#[wasm_bindgen]
 pub struct WasmExtractionResult {
     language: String,
     results: String,
@@ -155,8 +314,11 @@ pub struct WasmExtractionResult {
 #[wasm_bindgen]
 impl WasmExtractionResult {
     #[wasm_bindgen(constructor)]
-    pub fn new(language: String, results: String) -> WasmExtractionResult {
-        WasmExtractionResult { language, results }
+    pub fn new(language: Option<String>, results: Option<String>) -> WasmExtractionResult {
+        WasmExtractionResult {
+            language: language.unwrap_or_default(),
+            results: results.unwrap_or_default(),
+        }
     }
 
     #[wasm_bindgen(getter)]
@@ -182,6 +344,124 @@ impl WasmExtractionResult {
 
 #[derive(Clone, Default)]
 #[wasm_bindgen]
+pub struct WasmPatternValidation {
+    valid: bool,
+    capture_names: Vec<String>,
+    pattern_count: usize,
+    warnings: Vec<String>,
+    errors: Vec<String>,
+}
+
+#[wasm_bindgen]
+impl WasmPatternValidation {
+    #[wasm_bindgen(constructor)]
+    pub fn new(
+        valid: Option<bool>,
+        capture_names: Option<Vec<String>>,
+        pattern_count: Option<usize>,
+        warnings: Option<Vec<String>>,
+        errors: Option<Vec<String>>,
+    ) -> WasmPatternValidation {
+        WasmPatternValidation {
+            valid: valid.unwrap_or_default(),
+            capture_names: capture_names.unwrap_or_default(),
+            pattern_count: pattern_count.unwrap_or_default(),
+            warnings: warnings.unwrap_or_default(),
+            errors: errors.unwrap_or_default(),
+        }
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn valid(&self) -> bool {
+        self.valid
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_valid(&mut self, value: bool) {
+        self.valid = value;
+    }
+
+    #[wasm_bindgen(getter, js_name = "captureNames")]
+    pub fn capture_names(&self) -> Vec<String> {
+        self.capture_names.clone()
+    }
+
+    #[wasm_bindgen(setter, js_name = "captureNames")]
+    pub fn set_capture_names(&mut self, value: Vec<String>) {
+        self.capture_names = value;
+    }
+
+    #[wasm_bindgen(getter, js_name = "patternCount")]
+    pub fn pattern_count(&self) -> usize {
+        self.pattern_count
+    }
+
+    #[wasm_bindgen(setter, js_name = "patternCount")]
+    pub fn set_pattern_count(&mut self, value: usize) {
+        self.pattern_count = value;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn warnings(&self) -> Vec<String> {
+        self.warnings.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_warnings(&mut self, value: Vec<String>) {
+        self.warnings = value;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn errors(&self) -> Vec<String> {
+        self.errors.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_errors(&mut self, value: Vec<String>) {
+        self.errors = value;
+    }
+}
+
+#[derive(Clone, Default)]
+#[wasm_bindgen]
+pub struct WasmValidationResult {
+    valid: bool,
+    patterns: String,
+}
+
+#[wasm_bindgen]
+impl WasmValidationResult {
+    #[wasm_bindgen(constructor)]
+    pub fn new(valid: Option<bool>, patterns: Option<String>) -> WasmValidationResult {
+        WasmValidationResult {
+            valid: valid.unwrap_or_default(),
+            patterns: patterns.unwrap_or_default(),
+        }
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn valid(&self) -> bool {
+        self.valid
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_valid(&mut self, value: bool) {
+        self.valid = value;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn patterns(&self) -> String {
+        self.patterns.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_patterns(&mut self, value: String) {
+        self.patterns = value;
+    }
+}
+
+#[derive(Clone, Default)]
+#[wasm_bindgen]
 pub struct WasmSpan {
     start_byte: usize,
     end_byte: usize,
@@ -195,20 +475,20 @@ pub struct WasmSpan {
 impl WasmSpan {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        start_byte: usize,
-        end_byte: usize,
-        start_line: usize,
-        start_column: usize,
-        end_line: usize,
-        end_column: usize,
+        start_byte: Option<usize>,
+        end_byte: Option<usize>,
+        start_line: Option<usize>,
+        start_column: Option<usize>,
+        end_line: Option<usize>,
+        end_column: Option<usize>,
     ) -> WasmSpan {
         WasmSpan {
-            start_byte,
-            end_byte,
-            start_line,
-            start_column,
-            end_line,
-            end_column,
+            start_byte: start_byte.unwrap_or_default(),
+            end_byte: end_byte.unwrap_or_default(),
+            start_line: start_line.unwrap_or_default(),
+            start_column: start_column.unwrap_or_default(),
+            end_line: end_line.unwrap_or_default(),
+            end_column: end_column.unwrap_or_default(),
         }
     }
 
@@ -571,10 +851,10 @@ impl WasmStructureItem {
     #[allow(clippy::too_many_arguments)]
     #[wasm_bindgen(constructor)]
     pub fn new(
-        kind: WasmStructureKind,
-        span: WasmSpan,
-        children: Vec<WasmStructureItem>,
-        decorators: Vec<String>,
+        kind: Option<WasmStructureKind>,
+        span: Option<WasmSpan>,
+        children: Option<Vec<WasmStructureItem>>,
+        decorators: Option<Vec<String>>,
         name: Option<String>,
         visibility: Option<String>,
         doc_comment: Option<String>,
@@ -582,12 +862,12 @@ impl WasmStructureItem {
         body_span: Option<WasmSpan>,
     ) -> WasmStructureItem {
         WasmStructureItem {
-            kind,
+            kind: kind.unwrap_or_default(),
             name,
             visibility,
-            span,
-            children,
-            decorators,
+            span: span.unwrap_or_default(),
+            children: children.unwrap_or_default(),
+            decorators: decorators.unwrap_or_default(),
             doc_comment,
             signature,
             body_span,
@@ -698,15 +978,15 @@ pub struct WasmCommentInfo {
 impl WasmCommentInfo {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        text: String,
-        kind: WasmCommentKind,
-        span: WasmSpan,
+        text: Option<String>,
+        kind: Option<WasmCommentKind>,
+        span: Option<WasmSpan>,
         associated_node: Option<String>,
     ) -> WasmCommentInfo {
         WasmCommentInfo {
-            text,
-            kind,
-            span,
+            text: text.unwrap_or_default(),
+            kind: kind.unwrap_or_default(),
+            span: span.unwrap_or_default(),
             associated_node,
         }
     }
@@ -766,18 +1046,18 @@ pub struct WasmDocstringInfo {
 impl WasmDocstringInfo {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        text: String,
-        format: WasmDocstringFormat,
-        span: WasmSpan,
-        parsed_sections: Vec<WasmDocSection>,
+        text: Option<String>,
+        format: Option<WasmDocstringFormat>,
+        span: Option<WasmSpan>,
+        parsed_sections: Option<Vec<WasmDocSection>>,
         associated_item: Option<String>,
     ) -> WasmDocstringInfo {
         WasmDocstringInfo {
-            text,
-            format,
-            span,
+            text: text.unwrap_or_default(),
+            format: format.unwrap_or_default(),
+            span: span.unwrap_or_default(),
             associated_item,
-            parsed_sections,
+            parsed_sections: parsed_sections.unwrap_or_default(),
         }
     }
 
@@ -843,11 +1123,11 @@ pub struct WasmDocSection {
 #[wasm_bindgen]
 impl WasmDocSection {
     #[wasm_bindgen(constructor)]
-    pub fn new(kind: String, description: String, name: Option<String>) -> WasmDocSection {
+    pub fn new(kind: Option<String>, description: Option<String>, name: Option<String>) -> WasmDocSection {
         WasmDocSection {
-            kind,
+            kind: kind.unwrap_or_default(),
             name,
-            description,
+            description: description.unwrap_or_default(),
         }
     }
 
@@ -896,18 +1176,18 @@ pub struct WasmImportInfo {
 impl WasmImportInfo {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        source: String,
-        items: Vec<String>,
-        is_wildcard: bool,
-        span: WasmSpan,
+        source: Option<String>,
+        items: Option<Vec<String>>,
+        is_wildcard: Option<bool>,
+        span: Option<WasmSpan>,
         alias: Option<String>,
     ) -> WasmImportInfo {
         WasmImportInfo {
-            source,
-            items,
+            source: source.unwrap_or_default(),
+            items: items.unwrap_or_default(),
             alias,
-            is_wildcard,
-            span,
+            is_wildcard: is_wildcard.unwrap_or_default(),
+            span: span.unwrap_or_default(),
         }
     }
 
@@ -973,8 +1253,12 @@ pub struct WasmExportInfo {
 #[wasm_bindgen]
 impl WasmExportInfo {
     #[wasm_bindgen(constructor)]
-    pub fn new(name: String, kind: WasmExportKind, span: WasmSpan) -> WasmExportInfo {
-        WasmExportInfo { name, kind, span }
+    pub fn new(name: Option<String>, kind: Option<WasmExportKind>, span: Option<WasmSpan>) -> WasmExportInfo {
+        WasmExportInfo {
+            name: name.unwrap_or_default(),
+            kind: kind.unwrap_or_default(),
+            span: span.unwrap_or_default(),
+        }
     }
 
     #[wasm_bindgen(getter)]
@@ -1022,16 +1306,16 @@ pub struct WasmSymbolInfo {
 impl WasmSymbolInfo {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        name: String,
-        kind: WasmSymbolKind,
-        span: WasmSpan,
+        name: Option<String>,
+        kind: Option<WasmSymbolKind>,
+        span: Option<WasmSpan>,
         type_annotation: Option<String>,
         doc: Option<String>,
     ) -> WasmSymbolInfo {
         WasmSymbolInfo {
-            name,
-            kind,
-            span,
+            name: name.unwrap_or_default(),
+            kind: kind.unwrap_or_default(),
+            span: span.unwrap_or_default(),
             type_annotation,
             doc,
         }
@@ -1099,11 +1383,15 @@ pub struct WasmDiagnostic {
 #[wasm_bindgen]
 impl WasmDiagnostic {
     #[wasm_bindgen(constructor)]
-    pub fn new(message: String, severity: WasmDiagnosticSeverity, span: WasmSpan) -> WasmDiagnostic {
+    pub fn new(
+        message: Option<String>,
+        severity: Option<WasmDiagnosticSeverity>,
+        span: Option<WasmSpan>,
+    ) -> WasmDiagnostic {
         WasmDiagnostic {
-            message,
-            severity,
-            span,
+            message: message.unwrap_or_default(),
+            severity: severity.unwrap_or_default(),
+            span: span.unwrap_or_default(),
         }
     }
 
@@ -1153,20 +1441,20 @@ pub struct WasmCodeChunk {
 impl WasmCodeChunk {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        content: String,
-        start_byte: usize,
-        end_byte: usize,
-        start_line: usize,
-        end_line: usize,
-        metadata: WasmChunkContext,
+        content: Option<String>,
+        start_byte: Option<usize>,
+        end_byte: Option<usize>,
+        start_line: Option<usize>,
+        end_line: Option<usize>,
+        metadata: Option<WasmChunkContext>,
     ) -> WasmCodeChunk {
         WasmCodeChunk {
-            content,
-            start_byte,
-            end_byte,
-            start_line,
-            end_line,
-            metadata,
+            content: content.unwrap_or_default(),
+            start_byte: start_byte.unwrap_or_default(),
+            end_byte: end_byte.unwrap_or_default(),
+            start_line: start_line.unwrap_or_default(),
+            end_line: end_line.unwrap_or_default(),
+            metadata: metadata.unwrap_or_default(),
         }
     }
 
@@ -1250,26 +1538,26 @@ impl WasmChunkContext {
     #[allow(clippy::too_many_arguments)]
     #[wasm_bindgen(constructor)]
     pub fn new(
-        language: String,
-        chunk_index: usize,
-        total_chunks: usize,
-        node_types: Vec<String>,
-        context_path: Vec<String>,
-        symbols_defined: Vec<String>,
-        comments: Vec<WasmCommentInfo>,
-        docstrings: Vec<WasmDocstringInfo>,
-        has_error_nodes: bool,
+        language: Option<String>,
+        chunk_index: Option<usize>,
+        total_chunks: Option<usize>,
+        node_types: Option<Vec<String>>,
+        context_path: Option<Vec<String>>,
+        symbols_defined: Option<Vec<String>>,
+        comments: Option<Vec<WasmCommentInfo>>,
+        docstrings: Option<Vec<WasmDocstringInfo>>,
+        has_error_nodes: Option<bool>,
     ) -> WasmChunkContext {
         WasmChunkContext {
-            language,
-            chunk_index,
-            total_chunks,
-            node_types,
-            context_path,
-            symbols_defined,
-            comments,
-            docstrings,
-            has_error_nodes,
+            language: language.unwrap_or_default(),
+            chunk_index: chunk_index.unwrap_or_default(),
+            total_chunks: total_chunks.unwrap_or_default(),
+            node_types: node_types.unwrap_or_default(),
+            context_path: context_path.unwrap_or_default(),
+            symbols_defined: symbols_defined.unwrap_or_default(),
+            comments: comments.unwrap_or_default(),
+            docstrings: docstrings.unwrap_or_default(),
+            has_error_nodes: has_error_nodes.unwrap_or_default(),
         }
     }
 
@@ -1385,30 +1673,30 @@ impl WasmNodeInfo {
     #[allow(clippy::too_many_arguments)]
     #[wasm_bindgen(constructor)]
     pub fn new(
-        kind: String,
-        is_named: bool,
-        start_byte: usize,
-        end_byte: usize,
-        start_row: usize,
-        start_col: usize,
-        end_row: usize,
-        end_col: usize,
-        named_child_count: usize,
-        is_error: bool,
-        is_missing: bool,
+        kind: Option<String>,
+        is_named: Option<bool>,
+        start_byte: Option<usize>,
+        end_byte: Option<usize>,
+        start_row: Option<usize>,
+        start_col: Option<usize>,
+        end_row: Option<usize>,
+        end_col: Option<usize>,
+        named_child_count: Option<usize>,
+        is_error: Option<bool>,
+        is_missing: Option<bool>,
     ) -> WasmNodeInfo {
         WasmNodeInfo {
-            kind,
-            is_named,
-            start_byte,
-            end_byte,
-            start_row,
-            start_col,
-            end_row,
-            end_col,
-            named_child_count,
-            is_error,
-            is_missing,
+            kind: kind.unwrap_or_default(),
+            is_named: is_named.unwrap_or_default(),
+            start_byte: start_byte.unwrap_or_default(),
+            end_byte: end_byte.unwrap_or_default(),
+            start_row: start_row.unwrap_or_default(),
+            start_col: start_col.unwrap_or_default(),
+            end_row: end_row.unwrap_or_default(),
+            end_col: end_col.unwrap_or_default(),
+            named_child_count: named_child_count.unwrap_or_default(),
+            is_error: is_error.unwrap_or_default(),
+            is_missing: is_missing.unwrap_or_default(),
         }
     }
 
@@ -1773,10 +2061,10 @@ pub struct WasmQueryMatch {
 #[wasm_bindgen]
 impl WasmQueryMatch {
     #[wasm_bindgen(constructor)]
-    pub fn new(pattern_index: usize, captures: Vec<String>) -> WasmQueryMatch {
+    pub fn new(pattern_index: Option<usize>, captures: Option<Vec<String>>) -> WasmQueryMatch {
         WasmQueryMatch {
-            pattern_index,
-            captures,
+            pattern_index: pattern_index.unwrap_or_default(),
+            captures: captures.unwrap_or_default(),
         }
     }
 
@@ -1853,9 +2141,10 @@ impl WasmLanguageRegistry {
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen]
     pub fn process(&self, source: String, config: WasmProcessConfig) -> Result<WasmProcessResult, JsValue> {
+        let config_core: tree_sitter_language_pack::ProcessConfig = config.into();
         let result = self
             .inner
-            .process(&source, config.into())
+            .process(&source, &config_core)
             .map_err(|e| JsValue::from_str(&e.to_string()))?;
         Ok(result.into())
     }
@@ -2093,12 +2382,12 @@ impl WasmDownloadManager {
 
 #[derive(Clone)]
 #[wasm_bindgen]
-pub struct WasmParser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
+pub struct WasmTree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
 }
 
 #[wasm_bindgen]
-impl WasmParser {}
+impl WasmTree {}
 
 #[derive(Clone)]
 #[wasm_bindgen]
@@ -2111,12 +2400,12 @@ impl WasmLanguage {}
 
 #[derive(Clone)]
 #[wasm_bindgen]
-pub struct WasmTree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
+pub struct WasmParser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
 }
 
 #[wasm_bindgen]
-impl WasmTree {}
+impl WasmParser {}
 
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -2262,8 +2551,11 @@ pub fn detect_language_from_content(content: String) -> Option<String> {
 
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "validateExtraction")]
-pub fn validate_extraction(_config: WasmExtractionConfig) -> Result<String, JsValue> {
-    Err(JsValue::from_str("Not implemented: validate_extraction"))
+pub fn validate_extraction(config: WasmExtractionConfig) -> Result<WasmValidationResult, JsValue> {
+    let config_core: tree_sitter_language_pack::ExtractionConfig = config.into();
+    let result = tree_sitter_language_pack::extract::validate_extraction(&config_core)
+        .map_err(|e| JsValue::from_str(&e.to_string()))?;
+    Ok(result.into())
 }
 
 #[allow(clippy::missing_errors_doc)]
@@ -2424,7 +2716,8 @@ pub fn configure(config: WasmPackConfig) -> Result<(), JsValue> {
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen]
 pub fn download(names: Vec<String>) -> Result<usize, JsValue> {
-    let result = tree_sitter_language_pack::download(&names).map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let names_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
+    let result = tree_sitter_language_pack::download(&names_refs).map_err(|e| JsValue::from_str(&e.to_string()))?;
     Ok(result)
 }
 
@@ -2491,6 +2784,36 @@ impl From<tree_sitter_language_pack::ExtractionConfig> for WasmExtractionConfig 
     }
 }
 
+impl From<tree_sitter_language_pack::CaptureResult> for WasmCaptureResult {
+    fn from(val: tree_sitter_language_pack::CaptureResult) -> Self {
+        Self {
+            name: val.name,
+            node: val.node.map(Into::into),
+            text: val.text,
+            child_fields: format!("{:?}", val.child_fields),
+            start_byte: val.start_byte,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::MatchResult> for WasmMatchResult {
+    fn from(val: tree_sitter_language_pack::MatchResult) -> Self {
+        Self {
+            pattern_index: val.pattern_index,
+            captures: val.captures.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternResult> for WasmPatternResult {
+    fn from(val: tree_sitter_language_pack::PatternResult) -> Self {
+        Self {
+            matches: val.matches.into_iter().map(Into::into).collect(),
+            total_count: val.total_count,
+        }
+    }
+}
+
 impl From<WasmExtractionResult> for tree_sitter_language_pack::ExtractionResult {
     fn from(val: WasmExtractionResult) -> Self {
         Self {
@@ -2505,6 +2828,36 @@ impl From<tree_sitter_language_pack::ExtractionResult> for WasmExtractionResult 
         Self {
             language: val.language,
             results: format!("{:?}", val.results),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternValidation> for WasmPatternValidation {
+    fn from(val: tree_sitter_language_pack::PatternValidation) -> Self {
+        Self {
+            valid: val.valid,
+            capture_names: val.capture_names,
+            pattern_count: val.pattern_count,
+            warnings: val.warnings,
+            errors: val.errors,
+        }
+    }
+}
+
+impl From<WasmValidationResult> for tree_sitter_language_pack::ValidationResult {
+    fn from(val: WasmValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: Default::default(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ValidationResult> for WasmValidationResult {
+    fn from(val: tree_sitter_language_pack::ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: format!("{:?}", val.patterns),
         }
     }
 }

@@ -46,7 +46,7 @@ class DownloadManager
 {
 }
 
-class Parser
+class Tree
 {
 }
 
@@ -54,7 +54,7 @@ class Language
 {
 }
 
-class Tree
+class Parser
 {
 }
 
@@ -107,6 +107,76 @@ class ExtractionConfig
 }
 
 /**
+ * A single captured node within a match.
+ */
+class CaptureResult
+{
+    public string $name;
+    public ?NodeInfo $node;
+    public ?string $text;
+    public string $child_fields;
+    public int $start_byte;
+
+    public function __construct(
+        string $name,
+        string $child_fields,
+        int $start_byte,
+        ?NodeInfo $node = null,
+        ?string $text = null
+    ) { }
+
+    public function getName(): string { }
+    public function getNode(): ?NodeInfo { }
+    public function getText(): ?string { }
+    public function getChildFields(): string { }
+    public function getStartByte(): int { }
+}
+
+/**
+ * A single query match containing one or more captures.
+ */
+class MatchResult
+{
+    public int $pattern_index;
+    /** @var array<CaptureResult> */
+    public array $captures;
+
+    /**
+     * @param array<CaptureResult> $captures
+     */
+    public function __construct(
+        int $pattern_index,
+        array $captures
+    ) { }
+
+    public function getPatternIndex(): int { }
+    /** @return array<CaptureResult> */
+    public function getCaptures(): array { }
+}
+
+/**
+ * Results for a single named pattern.
+ */
+class PatternResult
+{
+    /** @var array<MatchResult> */
+    public array $matches;
+    public int $total_count;
+
+    /**
+     * @param array<MatchResult> $matches
+     */
+    public function __construct(
+        array $matches,
+        int $total_count
+    ) { }
+
+    /** @return array<MatchResult> */
+    public function getMatches(): array { }
+    public function getTotalCount(): int { }
+}
+
+/**
  * Complete extraction results for all patterns.
  */
 class ExtractionResult
@@ -121,6 +191,60 @@ class ExtractionResult
 
     public function getLanguage(): string { }
     public function getResults(): string { }
+}
+
+/**
+ * Validation information for a single pattern.
+ */
+class PatternValidation
+{
+    public bool $valid;
+    /** @var array<string> */
+    public array $capture_names;
+    public int $pattern_count;
+    /** @var array<string> */
+    public array $warnings;
+    /** @var array<string> */
+    public array $errors;
+
+    /**
+     * @param array<string> $capture_names
+     * @param array<string> $warnings
+     * @param array<string> $errors
+     */
+    public function __construct(
+        bool $valid,
+        array $capture_names,
+        int $pattern_count,
+        array $warnings,
+        array $errors
+    ) { }
+
+    public function getValid(): bool { }
+    /** @return array<string> */
+    public function getCaptureNames(): array { }
+    public function getPatternCount(): int { }
+    /** @return array<string> */
+    public function getWarnings(): array { }
+    /** @return array<string> */
+    public function getErrors(): array { }
+}
+
+/**
+ * Validation results for an entire extraction config.
+ */
+class ValidationResult
+{
+    public bool $valid;
+    public string $patterns;
+
+    public function __construct(
+        bool $valid,
+        string $patterns
+    ) { }
+
+    public function getValid(): bool { }
+    public function getPatterns(): string { }
 }
 
 /**
@@ -887,7 +1011,7 @@ class TreeSitterLanguagePackApi
     public static function detectLanguageFromPath(string $path): ?string { }
     public static function extensionAmbiguity(string $ext): ?string { }
     public static function detectLanguageFromContent(string $content): ?string { }
-    public static function validateExtraction(\Tree\Sitter\Language\Pack\ExtractionConfig $config): string { }
+    public static function validateExtraction(\Tree\Sitter\Language\Pack\ExtractionConfig $config): \Tree\Sitter\Language\Pack\ValidationResult { }
     public static function process(string $source, \Tree\Sitter\Language\Pack\ProcessConfig $config, \Tree\Sitter\Language\Pack\LanguageRegistry $registry): \Tree\Sitter\Language\Pack\ProcessResult { }
     public static function rootNodeInfo(\Tree\Sitter\Language\Pack\Tree $tree): \Tree\Sitter\Language\Pack\NodeInfo { }
     public static function findNodesByType(\Tree\Sitter\Language\Pack\Tree $tree, string $node_type): array { }

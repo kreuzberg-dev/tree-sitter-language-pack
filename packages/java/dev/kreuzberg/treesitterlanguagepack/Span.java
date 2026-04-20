@@ -11,4 +11,7 @@ public record Span(
     @JsonProperty("end_line") long endLine,
     @JsonProperty("end_column") long endColumn
 ) {
+    public static SpanBuilder builder() {
+        return new SpanBuilder();
+    }
 }

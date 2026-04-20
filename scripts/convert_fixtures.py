@@ -25,7 +25,7 @@ def convert_fixture(old: dict) -> dict:
         new["tags"] = old["tags"]
 
     # Convert skip conditions
-    if "skip" in old and old["skip"]:
+    if old.get("skip"):
         skip = old["skip"]
         if "requires_language" in skip:
             new["skip"] = {"reason": f"Requires {skip['requires_language']} language"}
@@ -47,9 +47,7 @@ def convert_fixture(old: dict) -> dict:
     return new
 
 
-def _classify_and_convert(
-    old: dict, a: dict
-) -> tuple[str | None, dict | None, list[dict]]:
+def _classify_and_convert(old: dict, a: dict) -> tuple[str | None, dict | None, list[dict]]:
     """Determine call type and convert assertions."""
     assertions: list[dict] = []
     input_data: dict = {}
@@ -88,9 +86,7 @@ def _classify_and_convert(
         call = "has_language"
         language = old.get("language", "python")
         input_data = {"language": language}
-        assertions.append(
-            {"type": "is_true" if a["language_available"] else "is_false"}
-        )
+        assertions.append({"type": "is_true" if a["language_available"] else "is_false"})
         return call, input_data, assertions
 
     if a.get("languages_not_empty"):
@@ -142,9 +138,7 @@ def _classify_and_convert(
         input_data = {"language": language, "source_code": source_code}
 
         if "process_language" in a:
-            assertions.append(
-                {"type": "equals", "field": "language", "value": a["process_language"]}
-            )
+            assertions.append({"type": "equals", "field": "language", "value": a["process_language"]})
         if "process_structure_count_min" in a:
             assertions.append(
                 {
@@ -330,7 +324,7 @@ def _classify_and_convert(
         return call, input_data, assertions
 
     # --- Parse/smoke fixtures (default: parse call) ---
-    if "expect_error" in a and a["expect_error"]:
+    if a.get("expect_error"):
         call = "parse"
         language = old.get("language", "unknown")
         source_code = old.get("source_code", "")
@@ -389,10 +383,7 @@ def convert_file(path: Path) -> None:
     content = path.read_text()
     data = json.loads(content)
 
-    if isinstance(data, list):
-        converted = [convert_fixture(f) for f in data]
-    else:
-        converted = convert_fixture(data)
+    converted = [convert_fixture(f) for f in data] if isinstance(data, list) else convert_fixture(data)
 
     path.write_text(json.dumps(converted, indent="\t", ensure_ascii=False) + "\n")
 

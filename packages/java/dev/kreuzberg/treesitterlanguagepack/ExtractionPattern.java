@@ -12,4 +12,7 @@ public record ExtractionPattern(
     @JsonProperty("max_results") Optional<Long> maxResults,
     @JsonProperty("byte_range") Optional<String> byteRange
 ) {
+    public static ExtractionPatternBuilder builder() {
+        return new ExtractionPatternBuilder();
+    }
 }

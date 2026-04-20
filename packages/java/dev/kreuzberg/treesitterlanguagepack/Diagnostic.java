@@ -3,4 +3,7 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 
 public record Diagnostic(String message, DiagnosticSeverity severity, Span span) {
+    public static DiagnosticBuilder builder() {
+        return new DiagnosticBuilder();
+    }
 }

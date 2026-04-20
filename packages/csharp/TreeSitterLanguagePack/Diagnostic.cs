@@ -15,7 +15,7 @@ public sealed class Diagnostic
     public string Message { get; set; } = "";
 
     [JsonPropertyName("severity")]
-    public DiagnosticSeverity Severity { get; set; } = default!;
+    public DiagnosticSeverity Severity { get; set; } = default;
 
     [JsonPropertyName("span")]
     public Span Span { get; set; } = default!;

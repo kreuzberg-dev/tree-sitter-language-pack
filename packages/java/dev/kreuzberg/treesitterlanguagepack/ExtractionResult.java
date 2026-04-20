@@ -3,4 +3,7 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 
 public record ExtractionResult(String language, String results) {
+    public static ExtractionResultBuilder builder() {
+        return new ExtractionResultBuilder();
+    }
 }

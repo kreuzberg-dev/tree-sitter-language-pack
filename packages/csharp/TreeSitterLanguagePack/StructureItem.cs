@@ -12,7 +12,7 @@ namespace TreeSitterLanguagePack;
 public sealed class StructureItem
 {
     [JsonPropertyName("kind")]
-    public JsonElement Kind { get; set; } = default!;
+    public JsonElement Kind { get; set; } = default;
 
     [JsonPropertyName("name")]
     public string? Name { get; set; } = null;

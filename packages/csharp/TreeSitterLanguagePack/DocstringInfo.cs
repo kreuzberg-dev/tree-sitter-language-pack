@@ -15,7 +15,7 @@ public sealed class DocstringInfo
     public string Text { get; set; } = "";
 
     [JsonPropertyName("format")]
-    public JsonElement Format { get; set; } = default!;
+    public JsonElement Format { get; set; } = default;
 
     [JsonPropertyName("span")]
     public Span Span { get; set; } = default!;

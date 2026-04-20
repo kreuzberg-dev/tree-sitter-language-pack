@@ -8,6 +8,163 @@ from enum import Enum
 from typing import Any, TypedDict
 
 
+class CaptureOutput(str, Enum):
+    """Controls what data is captured for each query match."""
+
+    TEXT = "text"
+    NODE = "node"
+    FULL = "full"
+
+
+class CommentKind(str, Enum):
+    """The kind of a comment found in source code."""
+
+    LINE = "line"
+    BLOCK = "block"
+    DOC = "doc"
+
+
+class ExportKind(str, Enum):
+    """The kind of an export statement found in source code."""
+
+    NAMED = "named"
+    DEFAULT = "default"
+    RE_EXPORT = "re_export"
+
+
+class DiagnosticSeverity(str, Enum):
+    """Severity level of a diagnostic produced during parsing."""
+
+    ERROR = "error"
+    WARNING = "warning"
+    INFO = "info"
+
+
+@dataclass
+class ExtractionPattern:
+    """Defines a single extraction pattern and its configuration."""
+
+    query: str = ""
+    """The tree-sitter query string (S-expression)."""
+
+    capture_output: str = "full"
+    """What to include in each capture result."""
+
+    child_fields: list[str] = field(default_factory=list)
+    """Field names to extract from child nodes of each capture."""
+
+    max_results: int | None = None
+    """Maximum number of matches to return. `None` means unlimited."""
+
+    byte_range: str | None = None
+    """Restrict matches to a byte range `(start, end)`."""
+
+
+@dataclass
+class ExtractionConfig:
+    """Configuration for an extraction run against a single language."""
+
+    language: str = ""
+    """The language name (e.g., `"python"`)."""
+
+    patterns: str = ""
+    """Named patterns to run. Keys become the keys in `ExtractionResult::results`."""
+
+
+@dataclass
+class CaptureResult:
+    """A single captured node within a match."""
+
+    name: str = ""
+    """The capture name from the query (e.g., `"fn_name"`)."""
+
+    node: Any | None = None
+    """The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`."""
+
+    text: str | None = None
+    """The matched source text, present when `CaptureOutput` is `Text` or `Full`."""
+
+    child_fields: str = ""
+    """Values of requested child fields, keyed by field name."""
+
+    start_byte: int = 0
+    """Byte offset where this capture starts in the source."""
+
+
+@dataclass
+class MatchResult:
+    """A single query match containing one or more captures."""
+
+    pattern_index: int = 0
+    """The pattern index within the query that produced this match."""
+
+    captures: list[Any] = field(default_factory=list)
+    """The captures for this match."""
+
+
+@dataclass
+class PatternResult:
+    """Results for a single named pattern."""
+
+    matches: list[Any] = field(default_factory=list)
+    """The individual matches."""
+
+    total_count: int = 0
+    """Total number of matches before `max_results` truncation."""
+
+
+class ExtractionResult(TypedDict, total=False):
+    """Complete extraction results for all patterns."""
+
+    language: str
+    """The language that was used."""
+
+    results: str
+    """Results keyed by pattern name."""
+
+
+@dataclass
+class PatternValidation:
+    """Validation information for a single pattern."""
+
+    valid: bool = False
+    """Whether the pattern compiled successfully."""
+
+    capture_names: list[str] = field(default_factory=list)
+    """Names of captures defined in the query."""
+
+    pattern_count: int = 0
+    """Number of patterns in the query."""
+
+    warnings: list[str] = field(default_factory=list)
+    """Non-fatal warnings (e.g., unused captures)."""
+
+    errors: list[str] = field(default_factory=list)
+    """Fatal errors (e.g., query syntax errors)."""
+
+
+class ValidationResult(TypedDict, total=False):
+    """Validation results for an entire extraction config."""
+
+    valid: bool
+    """Whether all patterns are valid."""
+
+    patterns: str
+    """Per-pattern validation details."""
+
+
+@dataclass
+class Span:
+    """Byte and line/column range in source code."""
+
+    start_byte: int = 0
+    end_byte: int = 0
+    start_line: int = 0
+    start_column: int = 0
+    end_line: int = 0
+    end_column: int = 0
+
+
 class ProcessResult(TypedDict, total=False):
     """Complete analysis result from processing a source file."""
 
@@ -37,6 +194,156 @@ class FileMetrics:
     node_count: int = 0
     error_count: int = 0
     max_depth: int = 0
+
+
+@dataclass
+class StructureItem:
+    """A structural item (function, class, struct, etc.) in source code."""
+
+    kind: dict[str, Any] | None = None
+    name: str | None = None
+    visibility: str | None = None
+    span: Any | None = None
+    children: list[Any] = field(default_factory=list)
+    decorators: list[str] = field(default_factory=list)
+    doc_comment: str | None = None
+    signature: str | None = None
+    body_span: Any | None = None
+
+
+@dataclass
+class CommentInfo:
+    """A comment extracted from source code."""
+
+    text: str = ""
+    kind: str = "line"
+    span: Any | None = None
+    associated_node: str | None = None
+
+
+@dataclass
+class DocstringInfo:
+    """A docstring extracted from source code."""
+
+    text: str = ""
+    format: dict[str, Any] | None = None
+    span: Any | None = None
+    associated_item: str | None = None
+    parsed_sections: list[Any] = field(default_factory=list)
+
+
+@dataclass
+class DocSection:
+    """A section within a docstring (e.g., Args, Returns, Raises)."""
+
+    kind: str = ""
+    name: str | None = None
+    description: str = ""
+
+
+@dataclass
+class ImportInfo:
+    """An import statement extracted from source code."""
+
+    source: str = ""
+    items: list[str] = field(default_factory=list)
+    alias: str | None = None
+    is_wildcard: bool = False
+    span: Any | None = None
+
+
+@dataclass
+class ExportInfo:
+    """An export statement extracted from source code."""
+
+    name: str = ""
+    kind: str = "named"
+    span: Any | None = None
+
+
+@dataclass
+class SymbolInfo:
+    """A symbol (variable, function, type, etc.) extracted from source code."""
+
+    name: str = ""
+    kind: dict[str, Any] | None = None
+    span: Any | None = None
+    type_annotation: str | None = None
+    doc: str | None = None
+
+
+@dataclass
+class Diagnostic:
+    """A diagnostic (syntax error, missing node, etc.) from parsing."""
+
+    message: str = ""
+    severity: str = "error"
+    span: Any | None = None
+
+
+@dataclass
+class CodeChunk:
+    """A chunk of source code with rich metadata."""
+
+    content: str = ""
+    start_byte: int = 0
+    end_byte: int = 0
+    start_line: int = 0
+    end_line: int = 0
+    metadata: Any | None = None
+
+
+@dataclass
+class ChunkContext:
+    """Metadata for a single chunk of source code."""
+
+    language: str = ""
+    chunk_index: int = 0
+    total_chunks: int = 0
+    node_types: list[str] = field(default_factory=list)
+    context_path: list[str] = field(default_factory=list)
+    symbols_defined: list[str] = field(default_factory=list)
+    comments: list[Any] = field(default_factory=list)
+    docstrings: list[Any] = field(default_factory=list)
+    has_error_nodes: bool = False
+
+
+class NodeInfo(TypedDict, total=False):
+    """Lightweight snapshot of a tree-sitter node's properties."""
+
+    kind: str
+    """The grammar type name (e.g., "function_definition", "identifier")."""
+
+    is_named: bool
+    """Whether this is a named node (vs anonymous like punctuation)."""
+
+    start_byte: int
+    """Start byte offset in source."""
+
+    end_byte: int
+    """End byte offset in source."""
+
+    start_row: int
+    """Start row (zero-indexed)."""
+
+    start_col: int
+    """Start column (zero-indexed)."""
+
+    end_row: int
+    """End row (zero-indexed)."""
+
+    end_col: int
+    """End column (zero-indexed)."""
+
+    named_child_count: int
+    """Number of named children."""
+
+    is_error: bool
+    """Whether this node is an ERROR node."""
+
+    is_missing: bool
+    """Whether this node is a MISSING node."""
+
 
 @dataclass
 class PackConfig:
@@ -85,3 +392,14 @@ class ProcessConfig:
 
     extractions: str | None = None
     """Custom extraction patterns to run against the parsed tree."""
+
+
+@dataclass
+class QueryMatch:
+    """A single match from a tree-sitter query, with captured nodes."""
+
+    pattern_index: int = 0
+    """The pattern index that matched (position in the query string)."""
+
+    captures: list[str] = field(default_factory=list)
+    """Captures: list of (capture_name, node_info) pairs."""

@@ -15,7 +15,7 @@ public sealed class ExportInfo
     public string Name { get; set; } = "";
 
     [JsonPropertyName("kind")]
-    public ExportKind Kind { get; set; } = default!;
+    public ExportKind Kind { get; set; } = default;
 
     [JsonPropertyName("span")]
     public Span Span { get; set; } = default!;

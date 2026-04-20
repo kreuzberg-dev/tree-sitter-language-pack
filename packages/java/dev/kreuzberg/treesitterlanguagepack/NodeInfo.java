@@ -16,4 +16,7 @@ public record NodeInfo(
     @JsonProperty("is_error") boolean isError,
     @JsonProperty("is_missing") boolean isMissing
 ) {
+    public static NodeInfoBuilder builder() {
+        return new NodeInfoBuilder();
+    }
 }

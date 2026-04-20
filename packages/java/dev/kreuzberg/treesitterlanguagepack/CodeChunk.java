@@ -11,4 +11,7 @@ public record CodeChunk(
     @JsonProperty("end_line") long endLine,
     ChunkContext metadata
 ) {
+    public static CodeChunkBuilder builder() {
+        return new CodeChunkBuilder();
+    }
 }

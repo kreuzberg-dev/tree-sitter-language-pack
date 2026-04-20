@@ -292,6 +292,352 @@ pub unsafe extern "C" fn ts_pack_extraction_config_language(
     }
 }
 
+/// Create a `CaptureResult` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `ts_pack_capture_result_free`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_capture_result_from_json(
+    json: *const c_char,
+) -> *mut tree_sitter_language_pack::CaptureResult {
+    clear_last_error();
+    if json.is_null() {
+        set_last_error(1, "Null pointer passed for JSON string");
+        return std::ptr::null_mut();
+    }
+    let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
+        Ok(s) => s,
+        Err(_) => {
+            set_last_error(1, "Invalid UTF-8 in JSON string");
+            return std::ptr::null_mut();
+        }
+    };
+    match serde_json::from_str::<tree_sitter_language_pack::CaptureResult>(c_str) {
+        Ok(val) => Box::into_raw(Box::new(val)),
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Serialize a `CaptureResult` to a JSON string. Returns null on failure.
+/// # Safety
+/// `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+/// The returned string must be freed with `ts_pack_free_string`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_capture_result_to_json(
+    ptr: *const tree_sitter_language_pack::CaptureResult,
+) -> *mut c_char {
+    clear_last_error();
+    if ptr.is_null() {
+        set_last_error(1, "Null pointer passed to to_json");
+        return std::ptr::null_mut();
+    }
+    let val = unsafe { &*ptr };
+    match serde_json::to_string(val) {
+        Ok(s) => match CString::new(s) {
+            Ok(cs) => cs.into_raw(),
+            Err(e) => {
+                set_last_error(2, &e.to_string());
+                std::ptr::null_mut()
+            }
+        },
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Free a `CaptureResult` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_capture_result_free(ptr: *mut tree_sitter_language_pack::CaptureResult) {
+    if !ptr.is_null() {
+        unsafe {
+            drop(Box::from_raw(ptr));
+        }
+    }
+}
+
+/// Get the `name` field from a `CaptureResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_capture_result_name(
+    ptr: *const tree_sitter_language_pack::CaptureResult,
+) -> *mut std::ffi::c_char {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+    let obj = unsafe { &*ptr };
+    match CString::new(obj.name.to_string()) {
+        Ok(cs) => cs.into_raw(),
+        Err(_) => std::ptr::null_mut(),
+    }
+}
+
+/// Get the `node` field from a `CaptureResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_capture_result_node(
+    ptr: *const tree_sitter_language_pack::CaptureResult,
+) -> *mut tree_sitter_language_pack::NodeInfo {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+    let obj = unsafe { &*ptr };
+    match &obj.node {
+        Some(val) => Box::into_raw(Box::new(val.clone())),
+        None => std::ptr::null_mut(),
+    }
+}
+
+/// Get the `text` field from a `CaptureResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_capture_result_text(
+    ptr: *const tree_sitter_language_pack::CaptureResult,
+) -> *mut std::ffi::c_char {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+    let obj = unsafe { &*ptr };
+    match &obj.text {
+        Some(val) => match CString::new(val.to_string()) {
+            Ok(cs) => cs.into_raw(),
+            Err(_) => std::ptr::null_mut(),
+        },
+        None => std::ptr::null_mut(),
+    }
+}
+
+/// Get the `start_byte` field from a `CaptureResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_capture_result_start_byte(
+    ptr: *const tree_sitter_language_pack::CaptureResult,
+) -> usize {
+    if ptr.is_null() {
+        return 0;
+    }
+    let obj = unsafe { &*ptr };
+    obj.start_byte
+}
+
+/// Create a `MatchResult` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `ts_pack_match_result_free`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_match_result_from_json(
+    json: *const c_char,
+) -> *mut tree_sitter_language_pack::MatchResult {
+    clear_last_error();
+    if json.is_null() {
+        set_last_error(1, "Null pointer passed for JSON string");
+        return std::ptr::null_mut();
+    }
+    let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
+        Ok(s) => s,
+        Err(_) => {
+            set_last_error(1, "Invalid UTF-8 in JSON string");
+            return std::ptr::null_mut();
+        }
+    };
+    match serde_json::from_str::<tree_sitter_language_pack::MatchResult>(c_str) {
+        Ok(val) => Box::into_raw(Box::new(val)),
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Serialize a `MatchResult` to a JSON string. Returns null on failure.
+/// # Safety
+/// `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+/// The returned string must be freed with `ts_pack_free_string`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_match_result_to_json(
+    ptr: *const tree_sitter_language_pack::MatchResult,
+) -> *mut c_char {
+    clear_last_error();
+    if ptr.is_null() {
+        set_last_error(1, "Null pointer passed to to_json");
+        return std::ptr::null_mut();
+    }
+    let val = unsafe { &*ptr };
+    match serde_json::to_string(val) {
+        Ok(s) => match CString::new(s) {
+            Ok(cs) => cs.into_raw(),
+            Err(e) => {
+                set_last_error(2, &e.to_string());
+                std::ptr::null_mut()
+            }
+        },
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Free a `MatchResult` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_match_result_free(ptr: *mut tree_sitter_language_pack::MatchResult) {
+    if !ptr.is_null() {
+        unsafe {
+            drop(Box::from_raw(ptr));
+        }
+    }
+}
+
+/// Get the `pattern_index` field from a `MatchResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_match_result_pattern_index(
+    ptr: *const tree_sitter_language_pack::MatchResult,
+) -> usize {
+    if ptr.is_null() {
+        return 0;
+    }
+    let obj = unsafe { &*ptr };
+    obj.pattern_index
+}
+
+/// Get the `captures` field from a `MatchResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_match_result_captures(
+    ptr: *const tree_sitter_language_pack::MatchResult,
+) -> *mut std::ffi::c_char {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+    let obj = unsafe { &*ptr };
+    match serde_json::to_string(&obj.captures) {
+        Ok(s) => match CString::new(s) {
+            Ok(cs) => cs.into_raw(),
+            Err(_) => std::ptr::null_mut(),
+        },
+        Err(_) => std::ptr::null_mut(),
+    }
+}
+
+/// Create a `PatternResult` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `ts_pack_pattern_result_free`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_result_from_json(
+    json: *const c_char,
+) -> *mut tree_sitter_language_pack::PatternResult {
+    clear_last_error();
+    if json.is_null() {
+        set_last_error(1, "Null pointer passed for JSON string");
+        return std::ptr::null_mut();
+    }
+    let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
+        Ok(s) => s,
+        Err(_) => {
+            set_last_error(1, "Invalid UTF-8 in JSON string");
+            return std::ptr::null_mut();
+        }
+    };
+    match serde_json::from_str::<tree_sitter_language_pack::PatternResult>(c_str) {
+        Ok(val) => Box::into_raw(Box::new(val)),
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Serialize a `PatternResult` to a JSON string. Returns null on failure.
+/// # Safety
+/// `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+/// The returned string must be freed with `ts_pack_free_string`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_result_to_json(
+    ptr: *const tree_sitter_language_pack::PatternResult,
+) -> *mut c_char {
+    clear_last_error();
+    if ptr.is_null() {
+        set_last_error(1, "Null pointer passed to to_json");
+        return std::ptr::null_mut();
+    }
+    let val = unsafe { &*ptr };
+    match serde_json::to_string(val) {
+        Ok(s) => match CString::new(s) {
+            Ok(cs) => cs.into_raw(),
+            Err(e) => {
+                set_last_error(2, &e.to_string());
+                std::ptr::null_mut()
+            }
+        },
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Free a `PatternResult` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_result_free(ptr: *mut tree_sitter_language_pack::PatternResult) {
+    if !ptr.is_null() {
+        unsafe {
+            drop(Box::from_raw(ptr));
+        }
+    }
+}
+
+/// Get the `matches` field from a `PatternResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_result_matches(
+    ptr: *const tree_sitter_language_pack::PatternResult,
+) -> *mut std::ffi::c_char {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+    let obj = unsafe { &*ptr };
+    match serde_json::to_string(&obj.matches) {
+        Ok(s) => match CString::new(s) {
+            Ok(cs) => cs.into_raw(),
+            Err(_) => std::ptr::null_mut(),
+        },
+        Err(_) => std::ptr::null_mut(),
+    }
+}
+
+/// Get the `total_count` field from a `PatternResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_result_total_count(
+    ptr: *const tree_sitter_language_pack::PatternResult,
+) -> usize {
+    if ptr.is_null() {
+        return 0;
+    }
+    let obj = unsafe { &*ptr };
+    obj.total_count
+}
+
 /// Create a `ExtractionResult` from a JSON string. Returns null on failure.
 /// # Safety
 /// JSON string must be valid UTF-8 and null-terminated.
@@ -377,6 +723,248 @@ pub unsafe extern "C" fn ts_pack_extraction_result_language(
         Ok(cs) => cs.into_raw(),
         Err(_) => std::ptr::null_mut(),
     }
+}
+
+/// Create a `PatternValidation` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `ts_pack_pattern_validation_free`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_validation_from_json(
+    json: *const c_char,
+) -> *mut tree_sitter_language_pack::PatternValidation {
+    clear_last_error();
+    if json.is_null() {
+        set_last_error(1, "Null pointer passed for JSON string");
+        return std::ptr::null_mut();
+    }
+    let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
+        Ok(s) => s,
+        Err(_) => {
+            set_last_error(1, "Invalid UTF-8 in JSON string");
+            return std::ptr::null_mut();
+        }
+    };
+    match serde_json::from_str::<tree_sitter_language_pack::PatternValidation>(c_str) {
+        Ok(val) => Box::into_raw(Box::new(val)),
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Serialize a `PatternValidation` to a JSON string. Returns null on failure.
+/// # Safety
+/// `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+/// The returned string must be freed with `ts_pack_free_string`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_validation_to_json(
+    ptr: *const tree_sitter_language_pack::PatternValidation,
+) -> *mut c_char {
+    clear_last_error();
+    if ptr.is_null() {
+        set_last_error(1, "Null pointer passed to to_json");
+        return std::ptr::null_mut();
+    }
+    let val = unsafe { &*ptr };
+    match serde_json::to_string(val) {
+        Ok(s) => match CString::new(s) {
+            Ok(cs) => cs.into_raw(),
+            Err(e) => {
+                set_last_error(2, &e.to_string());
+                std::ptr::null_mut()
+            }
+        },
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Free a `PatternValidation` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_validation_free(ptr: *mut tree_sitter_language_pack::PatternValidation) {
+    if !ptr.is_null() {
+        unsafe {
+            drop(Box::from_raw(ptr));
+        }
+    }
+}
+
+/// Get the `valid` field from a `PatternValidation`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_validation_valid(
+    ptr: *const tree_sitter_language_pack::PatternValidation,
+) -> i32 {
+    if ptr.is_null() {
+        return 0;
+    }
+    let obj = unsafe { &*ptr };
+    obj.valid as i32
+}
+
+/// Get the `capture_names` field from a `PatternValidation`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_validation_capture_names(
+    ptr: *const tree_sitter_language_pack::PatternValidation,
+) -> *mut std::ffi::c_char {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+    let obj = unsafe { &*ptr };
+    match serde_json::to_string(&obj.capture_names) {
+        Ok(s) => match CString::new(s) {
+            Ok(cs) => cs.into_raw(),
+            Err(_) => std::ptr::null_mut(),
+        },
+        Err(_) => std::ptr::null_mut(),
+    }
+}
+
+/// Get the `pattern_count` field from a `PatternValidation`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_validation_pattern_count(
+    ptr: *const tree_sitter_language_pack::PatternValidation,
+) -> usize {
+    if ptr.is_null() {
+        return 0;
+    }
+    let obj = unsafe { &*ptr };
+    obj.pattern_count
+}
+
+/// Get the `warnings` field from a `PatternValidation`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_validation_warnings(
+    ptr: *const tree_sitter_language_pack::PatternValidation,
+) -> *mut std::ffi::c_char {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+    let obj = unsafe { &*ptr };
+    match serde_json::to_string(&obj.warnings) {
+        Ok(s) => match CString::new(s) {
+            Ok(cs) => cs.into_raw(),
+            Err(_) => std::ptr::null_mut(),
+        },
+        Err(_) => std::ptr::null_mut(),
+    }
+}
+
+/// Get the `errors` field from a `PatternValidation`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_pattern_validation_errors(
+    ptr: *const tree_sitter_language_pack::PatternValidation,
+) -> *mut std::ffi::c_char {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+    let obj = unsafe { &*ptr };
+    match serde_json::to_string(&obj.errors) {
+        Ok(s) => match CString::new(s) {
+            Ok(cs) => cs.into_raw(),
+            Err(_) => std::ptr::null_mut(),
+        },
+        Err(_) => std::ptr::null_mut(),
+    }
+}
+
+/// Create a `ValidationResult` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `ts_pack_validation_result_free`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_validation_result_from_json(
+    json: *const c_char,
+) -> *mut tree_sitter_language_pack::ValidationResult {
+    clear_last_error();
+    if json.is_null() {
+        set_last_error(1, "Null pointer passed for JSON string");
+        return std::ptr::null_mut();
+    }
+    let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
+        Ok(s) => s,
+        Err(_) => {
+            set_last_error(1, "Invalid UTF-8 in JSON string");
+            return std::ptr::null_mut();
+        }
+    };
+    match serde_json::from_str::<tree_sitter_language_pack::ValidationResult>(c_str) {
+        Ok(val) => Box::into_raw(Box::new(val)),
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Serialize a `ValidationResult` to a JSON string. Returns null on failure.
+/// # Safety
+/// `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+/// The returned string must be freed with `ts_pack_free_string`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_validation_result_to_json(
+    ptr: *const tree_sitter_language_pack::ValidationResult,
+) -> *mut c_char {
+    clear_last_error();
+    if ptr.is_null() {
+        set_last_error(1, "Null pointer passed to to_json");
+        return std::ptr::null_mut();
+    }
+    let val = unsafe { &*ptr };
+    match serde_json::to_string(val) {
+        Ok(s) => match CString::new(s) {
+            Ok(cs) => cs.into_raw(),
+            Err(e) => {
+                set_last_error(2, &e.to_string());
+                std::ptr::null_mut()
+            }
+        },
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Free a `ValidationResult` handle.
+/// # Safety
+/// Pointer must have been returned by this library, or be null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_validation_result_free(ptr: *mut tree_sitter_language_pack::ValidationResult) {
+    if !ptr.is_null() {
+        unsafe {
+            drop(Box::from_raw(ptr));
+        }
+    }
+}
+
+/// Get the `valid` field from a `ValidationResult`.
+/// # Safety
+/// Pointer must be a valid handle returned by this library.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_validation_result_valid(
+    ptr: *const tree_sitter_language_pack::ValidationResult,
+) -> i32 {
+    if ptr.is_null() {
+        return 0;
+    }
+    let obj = unsafe { &*ptr };
+    obj.valid as i32
 }
 
 /// Create a `Span` from a JSON string. Returns null on failure.
@@ -2854,7 +3442,7 @@ pub unsafe extern "C" fn ts_pack_pack_config_from_toml_file(
     };
     let result = tree_sitter_language_pack::PackConfig::from_toml_file(path_rs.as_path());
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => Box::into_raw(Box::new(val)),
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -3136,6 +3724,62 @@ pub unsafe extern "C" fn ts_pack_process_config_minimal(
     Box::into_raw(Box::new(result))
 }
 
+/// Create a `QueryMatch` from a JSON string. Returns null on failure.
+/// # Safety
+/// JSON string must be valid UTF-8 and null-terminated.
+/// Returned handle must be freed with `ts_pack_query_match_free`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_query_match_from_json(
+    json: *const c_char,
+) -> *mut tree_sitter_language_pack::QueryMatch {
+    clear_last_error();
+    if json.is_null() {
+        set_last_error(1, "Null pointer passed for JSON string");
+        return std::ptr::null_mut();
+    }
+    let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
+        Ok(s) => s,
+        Err(_) => {
+            set_last_error(1, "Invalid UTF-8 in JSON string");
+            return std::ptr::null_mut();
+        }
+    };
+    match serde_json::from_str::<tree_sitter_language_pack::QueryMatch>(c_str) {
+        Ok(val) => Box::into_raw(Box::new(val)),
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Serialize a `QueryMatch` to a JSON string. Returns null on failure.
+/// # Safety
+/// `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+/// The returned string must be freed with `ts_pack_free_string`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_query_match_to_json(ptr: *const tree_sitter_language_pack::QueryMatch) -> *mut c_char {
+    clear_last_error();
+    if ptr.is_null() {
+        set_last_error(1, "Null pointer passed to to_json");
+        return std::ptr::null_mut();
+    }
+    let val = unsafe { &*ptr };
+    match serde_json::to_string(val) {
+        Ok(s) => match CString::new(s) {
+            Ok(cs) => cs.into_raw(),
+            Err(e) => {
+                set_last_error(2, &e.to_string());
+                std::ptr::null_mut()
+            }
+        },
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
 /// Free a `QueryMatch` handle.
 /// # Safety
 /// Pointer must have been returned by this library, or be null.
@@ -3170,15 +3814,6 @@ pub unsafe extern "C" fn ts_pack_language_registry_free(ptr: *mut tree_sitter_la
             drop(Box::from_raw(ptr));
         }
     }
-}
-
-/// Create a new `LanguageRegistry` with default values.
-/// # Safety
-/// Returned handle must be freed with `ts_pack_language_registry_free`.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_language_registry_new() -> *mut tree_sitter_language_pack::LanguageRegistry {
-    clear_last_error();
-    Box::into_raw(Box::new(tree_sitter_language_pack::LanguageRegistry::default()))
 }
 
 /// Create a registry with a custom directory for dynamic libraries.
@@ -3263,7 +3898,7 @@ pub unsafe extern "C" fn ts_pack_language_registry_add_extra_libs_dir(
 pub unsafe extern "C" fn ts_pack_language_registry_get_language(
     this: *const tree_sitter_language_pack::LanguageRegistry,
     name: *const std::ffi::c_char,
-) -> *mut tree_sitter::Language {
+) -> *mut tree_sitter_language_pack::Language {
     clear_last_error();
     if this.is_null() {
         set_last_error(1, "Null pointer passed for self");
@@ -3284,7 +3919,7 @@ pub unsafe extern "C" fn ts_pack_language_registry_get_language(
     };
     let result = obj.get_language(&name_rs);
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => Box::into_raw(Box::new(val)),
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -3409,10 +4044,10 @@ pub unsafe extern "C" fn ts_pack_language_registry_process(
         set_last_error(1, "Null pointer passed for parameter 'config'");
         return std::ptr::null_mut();
     }
-    let config_rs = unsafe { &*config }.clone();
+    let config_rs = unsafe { &*config };
     let result = obj.process(&source_rs, &config_rs);
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => Box::into_raw(Box::new(val)),
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -3830,7 +4465,7 @@ pub unsafe extern "C" fn ts_pack_download_manager_new(
     };
     let result = tree_sitter_language_pack::DownloadManager::new(&version_rs);
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => Box::into_raw(Box::new(val)),
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -3982,14 +4617,15 @@ pub unsafe extern "C" fn ts_pack_download_manager_ensure_languages(
             return -1;
         }
     };
-    let names_rs = match serde_json::from_str::<Vec<_>>(names_rs_str) {
+    let names_rs = match serde_json::from_str::<Vec<String>>(names_rs_str) {
         Ok(v) => v,
         Err(e) => {
             set_last_error(2, &e.to_string());
             return -1;
         }
     };
-    let result = obj.ensure_languages(&names_rs);
+    let names_rs_refs: Vec<&str> = names_rs.iter().map(|s| s.as_str()).collect();
+    let result = obj.ensure_languages(&names_rs_refs);
     match result {
         Ok(()) => 0,
         Err(e) => {
@@ -4087,7 +4723,7 @@ pub unsafe extern "C" fn ts_pack_download_manager_fetch_manifest(
     let obj = unsafe { &mut *this };
     let result = obj.fetch_manifest();
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => Box::into_raw(Box::new(val)),
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -4120,25 +4756,16 @@ pub unsafe extern "C" fn ts_pack_download_manager_clean_cache(
     }
 }
 
-/// Free a `Parser` handle.
+/// Free a `Tree` handle.
 /// # Safety
 /// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_parser_free(ptr: *mut tree_sitter_language_pack::Parser) {
+pub unsafe extern "C" fn ts_pack_tree_free(ptr: *mut tree_sitter_language_pack::Tree) {
     if !ptr.is_null() {
         unsafe {
             drop(Box::from_raw(ptr));
         }
     }
-}
-
-/// Create a new `Parser` with default values.
-/// # Safety
-/// Returned handle must be freed with `ts_pack_parser_free`.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_parser_new() -> *mut tree_sitter_language_pack::Parser {
-    clear_last_error();
-    Box::into_raw(Box::new(tree_sitter_language_pack::Parser::default()))
 }
 
 /// Free a `Language` handle.
@@ -4153,34 +4780,16 @@ pub unsafe extern "C" fn ts_pack_language_free(ptr: *mut tree_sitter_language_pa
     }
 }
 
-/// Create a new `Language` with default values.
-/// # Safety
-/// Returned handle must be freed with `ts_pack_language_free`.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_language_new() -> *mut tree_sitter_language_pack::Language {
-    clear_last_error();
-    Box::into_raw(Box::new(tree_sitter_language_pack::Language::default()))
-}
-
-/// Free a `Tree` handle.
+/// Free a `Parser` handle.
 /// # Safety
 /// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_tree_free(ptr: *mut tree_sitter_language_pack::Tree) {
+pub unsafe extern "C" fn ts_pack_parser_free(ptr: *mut tree_sitter_language_pack::Parser) {
     if !ptr.is_null() {
         unsafe {
             drop(Box::from_raw(ptr));
         }
     }
-}
-
-/// Create a new `Tree` with default values.
-/// # Safety
-/// Returned handle must be freed with `ts_pack_tree_free`.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_tree_new() -> *mut tree_sitter_language_pack::Tree {
-    clear_last_error();
-    Box::into_raw(Box::new(tree_sitter_language_pack::Tree::default()))
 }
 
 /// Convert an integer to a `CaptureOutput` variant. Returns -1 on invalid input.
@@ -4693,11 +5302,22 @@ pub unsafe extern "C" fn ts_pack_detect_language_from_content(
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_validate_extraction(
-    _config: *const tree_sitter_language_pack::ExtractionConfig,
-) -> *mut std::ffi::c_char {
+    config: *const tree_sitter_language_pack::ExtractionConfig,
+) -> *mut tree_sitter_language_pack::ValidationResult {
     clear_last_error();
-    set_last_error(99, "Not implemented: validate_extraction");
-    std::ptr::null_mut()
+    if config.is_null() {
+        set_last_error(1, "Null pointer passed for parameter 'config'");
+        return std::ptr::null_mut();
+    }
+    let config_rs = unsafe { &*config };
+    let result = tree_sitter_language_pack::extract::validate_extraction(&config_rs);
+    match result {
+        Ok(val) => Box::into_raw(Box::new(val)),
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
 }
 
 /// Process source code: parse once, extract intelligence based on config, and return it.
@@ -4726,15 +5346,15 @@ pub unsafe extern "C" fn ts_pack_process(
         set_last_error(1, "Null pointer passed for parameter 'config'");
         return std::ptr::null_mut();
     }
-    let config_rs = unsafe { &*config }.clone();
+    let config_rs = unsafe { &*config };
     if registry.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'registry'");
         return std::ptr::null_mut();
     }
-    let registry_rs = unsafe { &*registry }.clone();
+    let registry_rs = unsafe { &*registry };
     let result = tree_sitter_language_pack::intel::process(&source_rs, &config_rs, &registry_rs);
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => Box::into_raw(Box::new(val)),
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -4748,14 +5368,14 @@ pub unsafe extern "C" fn ts_pack_process(
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_root_node_info(
-    tree: *const tree_sitter::Tree,
+    tree: *const tree_sitter_language_pack::Tree,
 ) -> *mut tree_sitter_language_pack::NodeInfo {
     clear_last_error();
     if tree.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return std::ptr::null_mut();
     }
-    let tree_rs = unsafe { &*tree }.clone();
+    let tree_rs = unsafe { &*tree };
     let result = tree_sitter_language_pack::root_node_info(&tree_rs);
     Box::into_raw(Box::new(result))
 }
@@ -4768,7 +5388,7 @@ pub unsafe extern "C" fn ts_pack_root_node_info(
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_find_nodes_by_type(
-    tree: *const tree_sitter::Tree,
+    tree: *const tree_sitter_language_pack::Tree,
     node_type: *const std::ffi::c_char,
 ) -> *mut std::ffi::c_char {
     clear_last_error();
@@ -4776,7 +5396,7 @@ pub unsafe extern "C" fn ts_pack_find_nodes_by_type(
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return std::ptr::null_mut();
     }
-    let tree_rs = unsafe { &*tree }.clone();
+    let tree_rs = unsafe { &*tree };
     if node_type.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'node_type'");
         return std::ptr::null_mut();
@@ -4806,13 +5426,15 @@ pub unsafe extern "C" fn ts_pack_find_nodes_by_type(
 /// Caller must ensure all pointer arguments are valid or null.
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_named_children_info(tree: *const tree_sitter::Tree) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn ts_pack_named_children_info(
+    tree: *const tree_sitter_language_pack::Tree,
+) -> *mut std::ffi::c_char {
     clear_last_error();
     if tree.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return std::ptr::null_mut();
     }
-    let tree_rs = unsafe { &*tree }.clone();
+    let tree_rs = unsafe { &*tree };
     let result = tree_sitter_language_pack::named_children_info(&tree_rs);
     match serde_json::to_string(&result) {
         Ok(s) => match CString::new(s) {
@@ -4843,7 +5465,7 @@ pub unsafe extern "C" fn ts_pack_parse_string(
     language: *const std::ffi::c_char,
     source: *const u8,
     source_len: usize,
-) -> *mut tree_sitter::Tree {
+) -> *mut tree_sitter_language_pack::Tree {
     clear_last_error();
     if language.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'language'");
@@ -4863,7 +5485,7 @@ pub unsafe extern "C" fn ts_pack_parse_string(
     let source_rs = unsafe { std::slice::from_raw_parts(source, source_len) }.to_vec();
     let result = tree_sitter_language_pack::parse_string(&language_rs, &source_rs);
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => Box::into_raw(Box::new(val)),
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -4879,7 +5501,7 @@ pub unsafe extern "C" fn ts_pack_parse_string(
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_tree_contains_node_type(
-    tree: *const tree_sitter::Tree,
+    tree: *const tree_sitter_language_pack::Tree,
     node_type: *const std::ffi::c_char,
 ) -> i32 {
     clear_last_error();
@@ -4887,7 +5509,7 @@ pub unsafe extern "C" fn ts_pack_tree_contains_node_type(
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return 0;
     }
-    let tree_rs = unsafe { &*tree }.clone();
+    let tree_rs = unsafe { &*tree };
     if node_type.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'node_type'");
         return 0;
@@ -4914,13 +5536,13 @@ pub unsafe extern "C" fn ts_pack_tree_contains_node_type(
 /// Caller must ensure all pointer arguments are valid or null.
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_tree_has_error_nodes(tree: *const tree_sitter::Tree) -> i32 {
+pub unsafe extern "C" fn ts_pack_tree_has_error_nodes(tree: *const tree_sitter_language_pack::Tree) -> i32 {
     clear_last_error();
     if tree.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return 0;
     }
-    let tree_rs = unsafe { &*tree }.clone();
+    let tree_rs = unsafe { &*tree };
     let result = tree_sitter_language_pack::tree_has_error_nodes(&tree_rs);
     if result {
         1
@@ -4937,13 +5559,13 @@ pub unsafe extern "C" fn ts_pack_tree_has_error_nodes(tree: *const tree_sitter::
 /// Caller must ensure all pointer arguments are valid or null.
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_tree_to_sexp(tree: *const tree_sitter::Tree) -> *mut std::ffi::c_char {
+pub unsafe extern "C" fn ts_pack_tree_to_sexp(tree: *const tree_sitter_language_pack::Tree) -> *mut std::ffi::c_char {
     clear_last_error();
     if tree.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return std::ptr::null_mut();
     }
-    let tree_rs = unsafe { &*tree }.clone();
+    let tree_rs = unsafe { &*tree };
     let result = tree_sitter_language_pack::tree_to_sexp(&tree_rs);
     match CString::new(result) {
         Ok(cs) => cs.into_raw(),
@@ -4958,13 +5580,13 @@ pub unsafe extern "C" fn ts_pack_tree_to_sexp(tree: *const tree_sitter::Tree) ->
 /// Caller must ensure all pointer arguments are valid or null.
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_tree_error_count(tree: *const tree_sitter::Tree) -> usize {
+pub unsafe extern "C" fn ts_pack_tree_error_count(tree: *const tree_sitter_language_pack::Tree) -> usize {
     clear_last_error();
     if tree.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return 0;
     }
-    let tree_rs = unsafe { &*tree }.clone();
+    let tree_rs = unsafe { &*tree };
     let result = tree_sitter_language_pack::tree_error_count(&tree_rs);
     result
 }
@@ -5129,7 +5751,7 @@ pub unsafe extern "C" fn ts_pack_get_locals_query(language: *const std::ffi::c_c
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_run_query(
-    tree: *const tree_sitter::Tree,
+    tree: *const tree_sitter_language_pack::Tree,
     language: *const std::ffi::c_char,
     query_source: *const std::ffi::c_char,
     source: *const u8,
@@ -5140,7 +5762,7 @@ pub unsafe extern "C" fn ts_pack_run_query(
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return std::ptr::null_mut();
     }
-    let tree_rs = unsafe { &*tree }.clone();
+    let tree_rs = unsafe { &*tree };
     if language.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'language'");
         return std::ptr::null_mut();
@@ -5217,7 +5839,7 @@ pub unsafe extern "C" fn ts_pack_run_query(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_split_code(
     _source: *const std::ffi::c_char,
-    _tree: *const tree_sitter::Tree,
+    _tree: *const tree_sitter_language_pack::Tree,
     _max_chunk_size: usize,
 ) -> *mut std::ffi::c_char {
     clear_last_error();
@@ -5252,7 +5874,9 @@ pub unsafe extern "C" fn ts_pack_split_code(
 /// Caller must ensure all pointer arguments are valid or null.
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_get_language(name: *const std::ffi::c_char) -> *mut tree_sitter::Language {
+pub unsafe extern "C" fn ts_pack_get_language(
+    name: *const std::ffi::c_char,
+) -> *mut tree_sitter_language_pack::Language {
     clear_last_error();
     if name.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'name'");
@@ -5267,7 +5891,7 @@ pub unsafe extern "C" fn ts_pack_get_language(name: *const std::ffi::c_char) -> 
     };
     let result = tree_sitter_language_pack::get_language(&name_rs);
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => Box::into_raw(Box::new(val)),
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -5298,7 +5922,7 @@ pub unsafe extern "C" fn ts_pack_get_language(name: *const std::ffi::c_char) -> 
 /// Caller must ensure all pointer arguments are valid or null.
 /// Returned pointers must be freed with the appropriate free function.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_get_parser(name: *const std::ffi::c_char) -> *mut tree_sitter::Parser {
+pub unsafe extern "C" fn ts_pack_get_parser(name: *const std::ffi::c_char) -> *mut tree_sitter_language_pack::Parser {
     clear_last_error();
     if name.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'name'");
@@ -5313,7 +5937,7 @@ pub unsafe extern "C" fn ts_pack_get_parser(name: *const std::ffi::c_char) -> *m
     };
     let result = tree_sitter_language_pack::get_parser(&name_rs);
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => Box::into_raw(Box::new(val)),
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -5464,10 +6088,10 @@ pub unsafe extern "C" fn ts_pack_extract_patterns(
         set_last_error(1, "Null pointer passed for parameter 'config'");
         return std::ptr::null_mut();
     }
-    let config_rs = unsafe { &*config }.clone();
+    let config_rs = unsafe { &*config };
     let result = tree_sitter_language_pack::extract_patterns(&source_rs, &config_rs);
     match result {
-        Ok(val) => Box::into_raw(Box::new(val.clone())),
+        Ok(val) => Box::into_raw(Box::new(val)),
         Err(e) => {
             set_last_error(2, &e.to_string());
             std::ptr::null_mut()
@@ -5507,7 +6131,7 @@ pub unsafe extern "C" fn ts_pack_init(config: *const tree_sitter_language_pack::
         set_last_error(1, "Null pointer passed for parameter 'config'");
         return -1;
     }
-    let config_rs = unsafe { &*config }.clone();
+    let config_rs = unsafe { &*config };
     let result = tree_sitter_language_pack::init(&config_rs);
     match result {
         Ok(()) => 0,
@@ -5552,7 +6176,7 @@ pub unsafe extern "C" fn ts_pack_configure(config: *const tree_sitter_language_p
         set_last_error(1, "Null pointer passed for parameter 'config'");
         return -1;
     }
-    let config_rs = unsafe { &*config }.clone();
+    let config_rs = unsafe { &*config };
     let result = tree_sitter_language_pack::configure(&config_rs);
     match result {
         Ok(()) => 0,
@@ -5598,14 +6222,15 @@ pub unsafe extern "C" fn ts_pack_download(names: *const std::ffi::c_char) -> usi
             return 0;
         }
     };
-    let names_rs = match serde_json::from_str::<Vec<_>>(names_rs_str) {
+    let names_rs = match serde_json::from_str::<Vec<String>>(names_rs_str) {
         Ok(v) => v,
         Err(e) => {
             set_last_error(2, &e.to_string());
             return 0;
         }
     };
-    let result = tree_sitter_language_pack::download(&names_rs);
+    let names_rs_refs: Vec<&str> = names_rs.iter().map(|s| s.as_str()).collect();
+    let result = tree_sitter_language_pack::download(&names_rs_refs);
     match result {
         Ok(val) => val,
         Err(e) => {

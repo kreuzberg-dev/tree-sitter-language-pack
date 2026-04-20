@@ -16,4 +16,7 @@ public record StructureItem(
     Optional<String> signature,
     @JsonProperty("body_span") Optional<Span> bodySpan
 ) {
+    public static StructureItemBuilder builder() {
+        return new StructureItemBuilder();
+    }
 }

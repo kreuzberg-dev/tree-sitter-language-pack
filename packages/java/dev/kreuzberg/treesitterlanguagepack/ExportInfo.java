@@ -3,4 +3,7 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 
 public record ExportInfo(String name, ExportKind kind, Span span) {
+    public static ExportInfoBuilder builder() {
+        return new ExportInfoBuilder();
+    }
 }

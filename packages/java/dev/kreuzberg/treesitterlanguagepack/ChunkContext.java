@@ -15,4 +15,7 @@ public record ChunkContext(
     List<DocstringInfo> docstrings,
     @JsonProperty("has_error_nodes") boolean hasErrorNodes
 ) {
+    public static ChunkContextBuilder builder() {
+        return new ChunkContextBuilder();
+    }
 }

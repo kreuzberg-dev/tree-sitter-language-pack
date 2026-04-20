@@ -54,8 +54,90 @@ pub struct ExtractionConfig {
 
 #[php_impl]
 impl ExtractionConfig {
-    pub fn __construct(language: String, patterns: String) -> Self {
-        Self { language, patterns }
+    pub fn __construct(language: Option<String>, patterns: Option<String>) -> Self {
+        Self {
+            language: language.unwrap_or_default(),
+            patterns: patterns.unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Clone, serde::Serialize, serde::Deserialize, Default)]
+#[php_class]
+#[php(name = "Tree\\Sitter\\Language\\Pack\\CaptureResult")]
+#[allow(clippy::similar_names)]
+pub struct CaptureResult {
+    /// The capture name from the query (e.g., `"fn_name"`).
+    #[php(prop, name = "name")]
+    pub name: String,
+    /// The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`.
+    pub node: Option<NodeInfo>,
+    /// The matched source text, present when `CaptureOutput` is `Text` or `Full`.
+    #[php(prop, name = "text")]
+    pub text: Option<String>,
+    /// Values of requested child fields, keyed by field name.
+    #[php(prop, name = "child_fields")]
+    pub child_fields: String,
+    /// Byte offset where this capture starts in the source.
+    #[php(prop, name = "start_byte")]
+    pub start_byte: i64,
+}
+
+#[php_impl]
+impl CaptureResult {
+    pub fn from_json(json: String) -> PhpResult<Self> {
+        serde_json::from_str(&json).map_err(|e| PhpException::default(e.to_string()))
+    }
+
+    #[php(getter)]
+    pub fn get_node(&self) -> Option<NodeInfo> {
+        self.node.clone()
+    }
+}
+
+#[derive(Clone, serde::Serialize, serde::Deserialize, Default)]
+#[php_class]
+#[php(name = "Tree\\Sitter\\Language\\Pack\\MatchResult")]
+pub struct MatchResult {
+    /// The pattern index within the query that produced this match.
+    #[php(prop, name = "pattern_index")]
+    pub pattern_index: i64,
+    /// The captures for this match.
+    pub captures: Vec<CaptureResult>,
+}
+
+#[php_impl]
+impl MatchResult {
+    pub fn from_json(json: String) -> PhpResult<Self> {
+        serde_json::from_str(&json).map_err(|e| PhpException::default(e.to_string()))
+    }
+
+    #[php(getter)]
+    pub fn get_captures(&self) -> Vec<CaptureResult> {
+        self.captures.clone()
+    }
+}
+
+#[derive(Clone, serde::Serialize, serde::Deserialize, Default)]
+#[php_class]
+#[php(name = "Tree\\Sitter\\Language\\Pack\\PatternResult")]
+pub struct PatternResult {
+    /// The individual matches.
+    pub matches: Vec<MatchResult>,
+    /// Total number of matches before `max_results` truncation.
+    #[php(prop, name = "total_count")]
+    pub total_count: i64,
+}
+
+#[php_impl]
+impl PatternResult {
+    pub fn from_json(json: String) -> PhpResult<Self> {
+        serde_json::from_str(&json).map_err(|e| PhpException::default(e.to_string()))
+    }
+
+    #[php(getter)]
+    pub fn get_matches(&self) -> Vec<MatchResult> {
+        self.matches.clone()
     }
 }
 
@@ -73,8 +155,73 @@ pub struct ExtractionResult {
 
 #[php_impl]
 impl ExtractionResult {
-    pub fn __construct(language: String, results: String) -> Self {
-        Self { language, results }
+    pub fn __construct(language: Option<String>, results: Option<String>) -> Self {
+        Self {
+            language: language.unwrap_or_default(),
+            results: results.unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Clone, serde::Serialize, serde::Deserialize, Default)]
+#[php_class]
+#[php(name = "Tree\\Sitter\\Language\\Pack\\PatternValidation")]
+pub struct PatternValidation {
+    /// Whether the pattern compiled successfully.
+    #[php(prop, name = "valid")]
+    pub valid: bool,
+    /// Names of captures defined in the query.
+    #[php(prop, name = "capture_names")]
+    pub capture_names: Vec<String>,
+    /// Number of patterns in the query.
+    #[php(prop, name = "pattern_count")]
+    pub pattern_count: i64,
+    /// Non-fatal warnings (e.g., unused captures).
+    #[php(prop, name = "warnings")]
+    pub warnings: Vec<String>,
+    /// Fatal errors (e.g., query syntax errors).
+    #[php(prop, name = "errors")]
+    pub errors: Vec<String>,
+}
+
+#[php_impl]
+impl PatternValidation {
+    pub fn __construct(
+        valid: Option<bool>,
+        capture_names: Option<Vec<String>>,
+        pattern_count: Option<i64>,
+        warnings: Option<Vec<String>>,
+        errors: Option<Vec<String>>,
+    ) -> Self {
+        Self {
+            valid: valid.unwrap_or_default(),
+            capture_names: capture_names.unwrap_or_default(),
+            pattern_count: pattern_count.unwrap_or_default(),
+            warnings: warnings.unwrap_or_default(),
+            errors: errors.unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Clone, serde::Serialize, serde::Deserialize, Default)]
+#[php_class]
+#[php(name = "Tree\\Sitter\\Language\\Pack\\ValidationResult")]
+pub struct ValidationResult {
+    /// Whether all patterns are valid.
+    #[php(prop, name = "valid")]
+    pub valid: bool,
+    /// Per-pattern validation details.
+    #[php(prop, name = "patterns")]
+    pub patterns: String,
+}
+
+#[php_impl]
+impl ValidationResult {
+    pub fn __construct(valid: Option<bool>, patterns: Option<String>) -> Self {
+        Self {
+            valid: valid.unwrap_or_default(),
+            patterns: patterns.unwrap_or_default(),
+        }
     }
 }
 
@@ -99,20 +246,20 @@ pub struct Span {
 #[php_impl]
 impl Span {
     pub fn __construct(
-        start_byte: i64,
-        end_byte: i64,
-        start_line: i64,
-        start_column: i64,
-        end_line: i64,
-        end_column: i64,
+        start_byte: Option<i64>,
+        end_byte: Option<i64>,
+        start_line: Option<i64>,
+        start_column: Option<i64>,
+        end_line: Option<i64>,
+        end_column: Option<i64>,
     ) -> Self {
         Self {
-            start_byte,
-            end_byte,
-            start_line,
-            start_column,
-            end_line,
-            end_column,
+            start_byte: start_byte.unwrap_or_default(),
+            end_byte: end_byte.unwrap_or_default(),
+            start_line: start_line.unwrap_or_default(),
+            start_column: start_column.unwrap_or_default(),
+            end_line: end_line.unwrap_or_default(),
+            end_column: end_column.unwrap_or_default(),
         }
     }
 }
@@ -350,11 +497,11 @@ pub struct DocSection {
 
 #[php_impl]
 impl DocSection {
-    pub fn __construct(kind: String, description: String, name: Option<String>) -> Self {
+    pub fn __construct(kind: Option<String>, name: Option<String>, description: Option<String>) -> Self {
         Self {
-            kind,
+            kind: kind.unwrap_or_default(),
             name,
-            description,
+            description: description.unwrap_or_default(),
         }
     }
 }
@@ -570,30 +717,30 @@ pub struct NodeInfo {
 #[php_impl]
 impl NodeInfo {
     pub fn __construct(
-        kind: String,
-        is_named: bool,
-        start_byte: i64,
-        end_byte: i64,
-        start_row: i64,
-        start_col: i64,
-        end_row: i64,
-        end_col: i64,
-        named_child_count: i64,
-        is_error: bool,
-        is_missing: bool,
+        kind: Option<String>,
+        is_named: Option<bool>,
+        start_byte: Option<i64>,
+        end_byte: Option<i64>,
+        start_row: Option<i64>,
+        start_col: Option<i64>,
+        end_row: Option<i64>,
+        end_col: Option<i64>,
+        named_child_count: Option<i64>,
+        is_error: Option<bool>,
+        is_missing: Option<bool>,
     ) -> Self {
         Self {
-            kind,
-            is_named,
-            start_byte,
-            end_byte,
-            start_row,
-            start_col,
-            end_row,
-            end_col,
-            named_child_count,
-            is_error,
-            is_missing,
+            kind: kind.unwrap_or_default(),
+            is_named: is_named.unwrap_or_default(),
+            start_byte: start_byte.unwrap_or_default(),
+            end_byte: end_byte.unwrap_or_default(),
+            start_row: start_row.unwrap_or_default(),
+            start_col: start_col.unwrap_or_default(),
+            end_row: end_row.unwrap_or_default(),
+            end_col: end_col.unwrap_or_default(),
+            named_child_count: named_child_count.unwrap_or_default(),
+            is_error: is_error.unwrap_or_default(),
+            is_missing: is_missing.unwrap_or_default(),
         }
     }
 }
@@ -772,10 +919,10 @@ pub struct QueryMatch {
 
 #[php_impl]
 impl QueryMatch {
-    pub fn __construct(pattern_index: i64, captures: Vec<String>) -> Self {
+    pub fn __construct(pattern_index: Option<i64>, captures: Option<Vec<String>>) -> Self {
         Self {
-            pattern_index,
-            captures,
+            pattern_index: pattern_index.unwrap_or_default(),
+            captures: captures.unwrap_or_default(),
         }
     }
 }
@@ -816,9 +963,10 @@ impl LanguageRegistry {
     }
 
     pub fn process(&self, source: String, config: &ProcessConfig) -> PhpResult<ProcessResult> {
+        let config_core: tree_sitter_language_pack::ProcessConfig = config.clone().into();
         let result = self
             .inner
-            .process(&source, config.clone().into())
+            .process(&source, &config_core)
             .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
         Ok(result.into())
     }
@@ -978,19 +1126,19 @@ impl DownloadManager {
 
 #[derive(Clone)]
 #[php_class]
-#[php(name = "Tree\\Sitter\\Language\\Pack\\Parser")]
-pub struct Parser {
-    inner: Arc<tree_sitter::Parser>,
+#[php(name = "Tree\\Sitter\\Language\\Pack\\Tree")]
+pub struct Tree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
 }
 
 #[php_impl]
-impl Parser {}
+impl Tree {}
 
 #[derive(Clone)]
 #[php_class]
 #[php(name = "Tree\\Sitter\\Language\\Pack\\Language")]
 pub struct Language {
-    inner: Arc<tree_sitter::Language>,
+    inner: Arc<tree_sitter_language_pack::Language>,
 }
 
 #[php_impl]
@@ -998,13 +1146,13 @@ impl Language {}
 
 #[derive(Clone)]
 #[php_class]
-#[php(name = "Tree\\Sitter\\Language\\Pack\\Tree")]
-pub struct Tree {
-    inner: Arc<tree_sitter::Tree>,
+#[php(name = "Tree\\Sitter\\Language\\Pack\\Parser")]
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
 }
 
 #[php_impl]
-impl Tree {}
+impl Parser {}
 
 // CaptureOutput enum values
 pub const CAPTUREOUTPUT_TEXT: &str = "Text";
@@ -1080,10 +1228,11 @@ impl TreeSitterLanguagePackApi {
         tree_sitter_language_pack::detect_language_from_content(&content).map(Into::into)
     }
 
-    pub fn validate_extraction(config: &ExtractionConfig) -> PhpResult<String> {
-        Err(ext_php_rs::exception::PhpException::default(
-            "Not implemented: validate_extraction".to_string(),
-        ))
+    pub fn validate_extraction(config: &ExtractionConfig) -> PhpResult<ValidationResult> {
+        let config_core: tree_sitter_language_pack::ExtractionConfig = config.clone().into();
+        let result = tree_sitter_language_pack::extract::validate_extraction(&config_core)
+            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
+        Ok(result.into())
     }
 
     pub fn process(source: String, config: &ProcessConfig, registry: &LanguageRegistry) -> PhpResult<ProcessResult> {
@@ -1212,7 +1361,8 @@ impl TreeSitterLanguagePackApi {
     }
 
     pub fn download(names: Vec<String>) -> PhpResult<i64> {
-        let result = tree_sitter_language_pack::download(&names[..])
+        let names_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
+        let result = tree_sitter_language_pack::download(&names_refs)
             .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
         Ok(result as i64)
     }
@@ -1279,6 +1429,36 @@ impl From<tree_sitter_language_pack::ExtractionConfig> for ExtractionConfig {
     }
 }
 
+impl From<tree_sitter_language_pack::CaptureResult> for CaptureResult {
+    fn from(val: tree_sitter_language_pack::CaptureResult) -> Self {
+        Self {
+            name: val.name,
+            node: val.node.map(Into::into),
+            text: val.text,
+            child_fields: format!("{:?}", val.child_fields),
+            start_byte: val.start_byte as i64,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::MatchResult> for MatchResult {
+    fn from(val: tree_sitter_language_pack::MatchResult) -> Self {
+        Self {
+            pattern_index: val.pattern_index as i64,
+            captures: val.captures.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternResult> for PatternResult {
+    fn from(val: tree_sitter_language_pack::PatternResult) -> Self {
+        Self {
+            matches: val.matches.into_iter().map(Into::into).collect(),
+            total_count: val.total_count as i64,
+        }
+    }
+}
+
 impl From<ExtractionResult> for tree_sitter_language_pack::ExtractionResult {
     fn from(val: ExtractionResult) -> Self {
         Self {
@@ -1293,6 +1473,36 @@ impl From<tree_sitter_language_pack::ExtractionResult> for ExtractionResult {
         Self {
             language: val.language,
             results: format!("{:?}", val.results),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternValidation> for PatternValidation {
+    fn from(val: tree_sitter_language_pack::PatternValidation) -> Self {
+        Self {
+            valid: val.valid,
+            capture_names: val.capture_names,
+            pattern_count: val.pattern_count as i64,
+            warnings: val.warnings,
+            errors: val.errors,
+        }
+    }
+}
+
+impl From<ValidationResult> for tree_sitter_language_pack::ValidationResult {
+    fn from(val: ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: Default::default(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ValidationResult> for ValidationResult {
+    fn from(val: tree_sitter_language_pack::ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: format!("{:?}", val.patterns),
         }
     }
 }
@@ -1809,7 +2019,12 @@ pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
     module
         .class::<ExtractionPattern>()
         .class::<ExtractionConfig>()
+        .class::<CaptureResult>()
+        .class::<MatchResult>()
+        .class::<PatternResult>()
         .class::<ExtractionResult>()
+        .class::<PatternValidation>()
+        .class::<ValidationResult>()
         .class::<Span>()
         .class::<ProcessResult>()
         .class::<FileMetrics>()
@@ -1832,8 +2047,8 @@ pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
         .class::<PlatformBundle>()
         .class::<LanguageInfo>()
         .class::<DownloadManager>()
-        .class::<Parser>()
-        .class::<Language>()
         .class::<Tree>()
+        .class::<Language>()
+        .class::<Parser>()
         .class::<TreeSitterLanguagePackApi>()
 }

@@ -5,6 +5,6 @@ defmodule TreeSitterLanguagePack.DocstringInfo do
   defstruct text: "",
             format: :python_triple_quote,
             span: nil,
-            associated_item: nil,
+            associated_item: "",
             parsed_sections: []
 end

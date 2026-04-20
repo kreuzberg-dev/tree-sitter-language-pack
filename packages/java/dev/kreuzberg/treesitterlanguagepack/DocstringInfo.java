@@ -12,4 +12,7 @@ public record DocstringInfo(
     @JsonProperty("associated_item") Optional<String> associatedItem,
     @JsonProperty("parsed_sections") List<DocSection> parsedSections
 ) {
+    public static DocstringInfoBuilder builder() {
+        return new DocstringInfoBuilder();
+    }
 }

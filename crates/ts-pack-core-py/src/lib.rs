@@ -42,19 +42,19 @@ pub struct ExtractionPattern {
 #[pymethods]
 impl ExtractionPattern {
     #[must_use]
-    #[pyo3(signature = (query, capture_output, child_fields, max_results=None, byte_range=None))]
+    #[pyo3(signature = (query=None, capture_output=None, child_fields=None, max_results=None, byte_range=None))]
     #[new]
     pub fn new(
-        query: String,
-        capture_output: CaptureOutput,
-        child_fields: Vec<String>,
+        query: Option<String>,
+        capture_output: Option<CaptureOutput>,
+        child_fields: Option<Vec<String>>,
         max_results: Option<usize>,
         byte_range: Option<String>,
     ) -> Self {
         Self {
-            query,
-            capture_output,
-            child_fields,
+            query: query.unwrap_or_default(),
+            capture_output: capture_output.unwrap_or_default(),
+            child_fields: child_fields.unwrap_or_default(),
             max_results,
             byte_range,
         }
@@ -75,10 +75,104 @@ pub struct ExtractionConfig {
 #[pymethods]
 impl ExtractionConfig {
     #[must_use]
-    #[pyo3(signature = (language, patterns))]
+    #[pyo3(signature = (language=None, patterns=None))]
     #[new]
-    pub fn new(language: String, patterns: String) -> Self {
-        Self { language, patterns }
+    pub fn new(language: Option<String>, patterns: Option<String>) -> Self {
+        Self {
+            language: language.unwrap_or_default(),
+            patterns: patterns.unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[pyclass(frozen, from_py_object)]
+#[allow(clippy::similar_names)]
+pub struct CaptureResult {
+    /// The capture name from the query (e.g., `"fn_name"`).
+    #[pyo3(get)]
+    pub name: String,
+    /// The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`.
+    #[pyo3(get)]
+    pub node: Option<NodeInfo>,
+    /// The matched source text, present when `CaptureOutput` is `Text` or `Full`.
+    #[pyo3(get)]
+    pub text: Option<String>,
+    /// Values of requested child fields, keyed by field name.
+    #[pyo3(get)]
+    pub child_fields: String,
+    /// Byte offset where this capture starts in the source.
+    #[pyo3(get)]
+    pub start_byte: usize,
+}
+
+#[pymethods]
+impl CaptureResult {
+    #[must_use]
+    #[pyo3(signature = (name=None, child_fields=None, start_byte=None, node=None, text=None))]
+    #[new]
+    pub fn new(
+        name: Option<String>,
+        child_fields: Option<String>,
+        start_byte: Option<usize>,
+        node: Option<NodeInfo>,
+        text: Option<String>,
+    ) -> Self {
+        Self {
+            name: name.unwrap_or_default(),
+            node,
+            text,
+            child_fields: child_fields.unwrap_or_default(),
+            start_byte: start_byte.unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[pyclass(frozen, from_py_object)]
+pub struct MatchResult {
+    /// The pattern index within the query that produced this match.
+    #[pyo3(get)]
+    pub pattern_index: usize,
+    /// The captures for this match.
+    #[pyo3(get)]
+    pub captures: Vec<CaptureResult>,
+}
+
+#[pymethods]
+impl MatchResult {
+    #[must_use]
+    #[pyo3(signature = (pattern_index=None, captures=None))]
+    #[new]
+    pub fn new(pattern_index: Option<usize>, captures: Option<Vec<CaptureResult>>) -> Self {
+        Self {
+            pattern_index: pattern_index.unwrap_or_default(),
+            captures: captures.unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[pyclass(frozen, from_py_object)]
+pub struct PatternResult {
+    /// The individual matches.
+    #[pyo3(get)]
+    pub matches: Vec<MatchResult>,
+    /// Total number of matches before `max_results` truncation.
+    #[pyo3(get)]
+    pub total_count: usize,
+}
+
+#[pymethods]
+impl PatternResult {
+    #[must_use]
+    #[pyo3(signature = (matches=None, total_count=None))]
+    #[new]
+    pub fn new(matches: Option<Vec<MatchResult>>, total_count: Option<usize>) -> Self {
+        Self {
+            matches: matches.unwrap_or_default(),
+            total_count: total_count.unwrap_or_default(),
+        }
     }
 }
 
@@ -96,10 +190,79 @@ pub struct ExtractionResult {
 #[pymethods]
 impl ExtractionResult {
     #[must_use]
-    #[pyo3(signature = (language, results))]
+    #[pyo3(signature = (language=None, results=None))]
     #[new]
-    pub fn new(language: String, results: String) -> Self {
-        Self { language, results }
+    pub fn new(language: Option<String>, results: Option<String>) -> Self {
+        Self {
+            language: language.unwrap_or_default(),
+            results: results.unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[pyclass(frozen, from_py_object)]
+pub struct PatternValidation {
+    /// Whether the pattern compiled successfully.
+    #[pyo3(get)]
+    pub valid: bool,
+    /// Names of captures defined in the query.
+    #[pyo3(get)]
+    pub capture_names: Vec<String>,
+    /// Number of patterns in the query.
+    #[pyo3(get)]
+    pub pattern_count: usize,
+    /// Non-fatal warnings (e.g., unused captures).
+    #[pyo3(get)]
+    pub warnings: Vec<String>,
+    /// Fatal errors (e.g., query syntax errors).
+    #[pyo3(get)]
+    pub errors: Vec<String>,
+}
+
+#[pymethods]
+impl PatternValidation {
+    #[must_use]
+    #[pyo3(signature = (valid=None, capture_names=None, pattern_count=None, warnings=None, errors=None))]
+    #[new]
+    pub fn new(
+        valid: Option<bool>,
+        capture_names: Option<Vec<String>>,
+        pattern_count: Option<usize>,
+        warnings: Option<Vec<String>>,
+        errors: Option<Vec<String>>,
+    ) -> Self {
+        Self {
+            valid: valid.unwrap_or_default(),
+            capture_names: capture_names.unwrap_or_default(),
+            pattern_count: pattern_count.unwrap_or_default(),
+            warnings: warnings.unwrap_or_default(),
+            errors: errors.unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[pyclass(frozen, from_py_object)]
+pub struct ValidationResult {
+    /// Whether all patterns are valid.
+    #[pyo3(get)]
+    pub valid: bool,
+    /// Per-pattern validation details.
+    #[pyo3(get)]
+    pub patterns: String,
+}
+
+#[pymethods]
+impl ValidationResult {
+    #[must_use]
+    #[pyo3(signature = (valid=None, patterns=None))]
+    #[new]
+    pub fn new(valid: Option<bool>, patterns: Option<String>) -> Self {
+        Self {
+            valid: valid.unwrap_or_default(),
+            patterns: patterns.unwrap_or_default(),
+        }
     }
 }
 
@@ -123,23 +286,23 @@ pub struct Span {
 #[pymethods]
 impl Span {
     #[must_use]
-    #[pyo3(signature = (start_byte, end_byte, start_line, start_column, end_line, end_column))]
+    #[pyo3(signature = (start_byte=None, end_byte=None, start_line=None, start_column=None, end_line=None, end_column=None))]
     #[new]
     pub fn new(
-        start_byte: usize,
-        end_byte: usize,
-        start_line: usize,
-        start_column: usize,
-        end_line: usize,
-        end_column: usize,
+        start_byte: Option<usize>,
+        end_byte: Option<usize>,
+        start_line: Option<usize>,
+        start_column: Option<usize>,
+        end_line: Option<usize>,
+        end_column: Option<usize>,
     ) -> Self {
         Self {
-            start_byte,
-            end_byte,
-            start_line,
-            start_column,
-            end_line,
-            end_column,
+            start_byte: start_byte.unwrap_or_default(),
+            end_byte: end_byte.unwrap_or_default(),
+            start_line: start_line.unwrap_or_default(),
+            start_column: start_column.unwrap_or_default(),
+            end_line: end_line.unwrap_or_default(),
+            end_column: end_column.unwrap_or_default(),
         }
     }
 }
@@ -285,13 +448,13 @@ pub struct StructureItem {
 impl StructureItem {
     #[allow(clippy::too_many_arguments)]
     #[must_use]
-    #[pyo3(signature = (kind, span, children, decorators, name=None, visibility=None, doc_comment=None, signature=None, body_span=None))]
+    #[pyo3(signature = (kind=None, span=None, children=None, decorators=None, name=None, visibility=None, doc_comment=None, signature=None, body_span=None))]
     #[new]
     pub fn new(
-        kind: StructureKind,
-        span: Span,
-        children: Vec<StructureItem>,
-        decorators: Vec<String>,
+        kind: Option<StructureKind>,
+        span: Option<Span>,
+        children: Option<Vec<StructureItem>>,
+        decorators: Option<Vec<String>>,
         name: Option<String>,
         visibility: Option<String>,
         doc_comment: Option<String>,
@@ -299,12 +462,12 @@ impl StructureItem {
         body_span: Option<Span>,
     ) -> Self {
         Self {
-            kind,
+            kind: kind.unwrap_or_default(),
             name,
             visibility,
-            span,
-            children,
-            decorators,
+            span: span.unwrap_or_default(),
+            children: children.unwrap_or_default(),
+            decorators: decorators.unwrap_or_default(),
             doc_comment,
             signature,
             body_span,
@@ -328,13 +491,18 @@ pub struct CommentInfo {
 #[pymethods]
 impl CommentInfo {
     #[must_use]
-    #[pyo3(signature = (text, kind, span, associated_node=None))]
+    #[pyo3(signature = (text=None, kind=None, span=None, associated_node=None))]
     #[new]
-    pub fn new(text: String, kind: CommentKind, span: Span, associated_node: Option<String>) -> Self {
+    pub fn new(
+        text: Option<String>,
+        kind: Option<CommentKind>,
+        span: Option<Span>,
+        associated_node: Option<String>,
+    ) -> Self {
         Self {
-            text,
-            kind,
-            span,
+            text: text.unwrap_or_default(),
+            kind: kind.unwrap_or_default(),
+            span: span.unwrap_or_default(),
             associated_node,
         }
     }
@@ -358,21 +526,21 @@ pub struct DocstringInfo {
 #[pymethods]
 impl DocstringInfo {
     #[must_use]
-    #[pyo3(signature = (text, format, span, parsed_sections, associated_item=None))]
+    #[pyo3(signature = (text=None, format=None, span=None, parsed_sections=None, associated_item=None))]
     #[new]
     pub fn new(
-        text: String,
-        format: DocstringFormat,
-        span: Span,
-        parsed_sections: Vec<DocSection>,
+        text: Option<String>,
+        format: Option<DocstringFormat>,
+        span: Option<Span>,
+        parsed_sections: Option<Vec<DocSection>>,
         associated_item: Option<String>,
     ) -> Self {
         Self {
-            text,
-            format,
-            span,
+            text: text.unwrap_or_default(),
+            format: format.unwrap_or_default(),
+            span: span.unwrap_or_default(),
             associated_item,
-            parsed_sections,
+            parsed_sections: parsed_sections.unwrap_or_default(),
         }
     }
 }
@@ -391,13 +559,13 @@ pub struct DocSection {
 #[pymethods]
 impl DocSection {
     #[must_use]
-    #[pyo3(signature = (kind, description, name=None))]
+    #[pyo3(signature = (kind=None, description=None, name=None))]
     #[new]
-    pub fn new(kind: String, description: String, name: Option<String>) -> Self {
+    pub fn new(kind: Option<String>, description: Option<String>, name: Option<String>) -> Self {
         Self {
-            kind,
+            kind: kind.unwrap_or_default(),
             name,
-            description,
+            description: description.unwrap_or_default(),
         }
     }
 }
@@ -420,15 +588,21 @@ pub struct ImportInfo {
 #[pymethods]
 impl ImportInfo {
     #[must_use]
-    #[pyo3(signature = (source, items, is_wildcard, span, alias=None))]
+    #[pyo3(signature = (source=None, items=None, is_wildcard=None, span=None, alias=None))]
     #[new]
-    pub fn new(source: String, items: Vec<String>, is_wildcard: bool, span: Span, alias: Option<String>) -> Self {
+    pub fn new(
+        source: Option<String>,
+        items: Option<Vec<String>>,
+        is_wildcard: Option<bool>,
+        span: Option<Span>,
+        alias: Option<String>,
+    ) -> Self {
         Self {
-            source,
-            items,
+            source: source.unwrap_or_default(),
+            items: items.unwrap_or_default(),
             alias,
-            is_wildcard,
-            span,
+            is_wildcard: is_wildcard.unwrap_or_default(),
+            span: span.unwrap_or_default(),
         }
     }
 }
@@ -447,10 +621,14 @@ pub struct ExportInfo {
 #[pymethods]
 impl ExportInfo {
     #[must_use]
-    #[pyo3(signature = (name, kind, span))]
+    #[pyo3(signature = (name=None, kind=None, span=None))]
     #[new]
-    pub fn new(name: String, kind: ExportKind, span: Span) -> Self {
-        Self { name, kind, span }
+    pub fn new(name: Option<String>, kind: Option<ExportKind>, span: Option<Span>) -> Self {
+        Self {
+            name: name.unwrap_or_default(),
+            kind: kind.unwrap_or_default(),
+            span: span.unwrap_or_default(),
+        }
     }
 }
 
@@ -472,19 +650,19 @@ pub struct SymbolInfo {
 #[pymethods]
 impl SymbolInfo {
     #[must_use]
-    #[pyo3(signature = (name, kind, span, type_annotation=None, doc=None))]
+    #[pyo3(signature = (name=None, kind=None, span=None, type_annotation=None, doc=None))]
     #[new]
     pub fn new(
-        name: String,
-        kind: SymbolKind,
-        span: Span,
+        name: Option<String>,
+        kind: Option<SymbolKind>,
+        span: Option<Span>,
         type_annotation: Option<String>,
         doc: Option<String>,
     ) -> Self {
         Self {
-            name,
-            kind,
-            span,
+            name: name.unwrap_or_default(),
+            kind: kind.unwrap_or_default(),
+            span: span.unwrap_or_default(),
             type_annotation,
             doc,
         }
@@ -505,13 +683,13 @@ pub struct Diagnostic {
 #[pymethods]
 impl Diagnostic {
     #[must_use]
-    #[pyo3(signature = (message, severity, span))]
+    #[pyo3(signature = (message=None, severity=None, span=None))]
     #[new]
-    pub fn new(message: String, severity: DiagnosticSeverity, span: Span) -> Self {
+    pub fn new(message: Option<String>, severity: Option<DiagnosticSeverity>, span: Option<Span>) -> Self {
         Self {
-            message,
-            severity,
-            span,
+            message: message.unwrap_or_default(),
+            severity: severity.unwrap_or_default(),
+            span: span.unwrap_or_default(),
         }
     }
 }
@@ -536,23 +714,23 @@ pub struct CodeChunk {
 #[pymethods]
 impl CodeChunk {
     #[must_use]
-    #[pyo3(signature = (content, start_byte, end_byte, start_line, end_line, metadata))]
+    #[pyo3(signature = (content=None, start_byte=None, end_byte=None, start_line=None, end_line=None, metadata=None))]
     #[new]
     pub fn new(
-        content: String,
-        start_byte: usize,
-        end_byte: usize,
-        start_line: usize,
-        end_line: usize,
-        metadata: ChunkContext,
+        content: Option<String>,
+        start_byte: Option<usize>,
+        end_byte: Option<usize>,
+        start_line: Option<usize>,
+        end_line: Option<usize>,
+        metadata: Option<ChunkContext>,
     ) -> Self {
         Self {
-            content,
-            start_byte,
-            end_byte,
-            start_line,
-            end_line,
-            metadata,
+            content: content.unwrap_or_default(),
+            start_byte: start_byte.unwrap_or_default(),
+            end_byte: end_byte.unwrap_or_default(),
+            start_line: start_line.unwrap_or_default(),
+            end_line: end_line.unwrap_or_default(),
+            metadata: metadata.unwrap_or_default(),
         }
     }
 }
@@ -584,29 +762,29 @@ pub struct ChunkContext {
 impl ChunkContext {
     #[allow(clippy::too_many_arguments)]
     #[must_use]
-    #[pyo3(signature = (language, chunk_index, total_chunks, node_types, context_path, symbols_defined, comments, docstrings, has_error_nodes))]
+    #[pyo3(signature = (language=None, chunk_index=None, total_chunks=None, node_types=None, context_path=None, symbols_defined=None, comments=None, docstrings=None, has_error_nodes=None))]
     #[new]
     pub fn new(
-        language: String,
-        chunk_index: usize,
-        total_chunks: usize,
-        node_types: Vec<String>,
-        context_path: Vec<String>,
-        symbols_defined: Vec<String>,
-        comments: Vec<CommentInfo>,
-        docstrings: Vec<DocstringInfo>,
-        has_error_nodes: bool,
+        language: Option<String>,
+        chunk_index: Option<usize>,
+        total_chunks: Option<usize>,
+        node_types: Option<Vec<String>>,
+        context_path: Option<Vec<String>>,
+        symbols_defined: Option<Vec<String>>,
+        comments: Option<Vec<CommentInfo>>,
+        docstrings: Option<Vec<DocstringInfo>>,
+        has_error_nodes: Option<bool>,
     ) -> Self {
         Self {
-            language,
-            chunk_index,
-            total_chunks,
-            node_types,
-            context_path,
-            symbols_defined,
-            comments,
-            docstrings,
-            has_error_nodes,
+            language: language.unwrap_or_default(),
+            chunk_index: chunk_index.unwrap_or_default(),
+            total_chunks: total_chunks.unwrap_or_default(),
+            node_types: node_types.unwrap_or_default(),
+            context_path: context_path.unwrap_or_default(),
+            symbols_defined: symbols_defined.unwrap_or_default(),
+            comments: comments.unwrap_or_default(),
+            docstrings: docstrings.unwrap_or_default(),
+            has_error_nodes: has_error_nodes.unwrap_or_default(),
         }
     }
 }
@@ -654,33 +832,33 @@ pub struct NodeInfo {
 impl NodeInfo {
     #[allow(clippy::too_many_arguments)]
     #[must_use]
-    #[pyo3(signature = (kind, is_named, start_byte, end_byte, start_row, start_col, end_row, end_col, named_child_count, is_error, is_missing))]
+    #[pyo3(signature = (kind=None, is_named=None, start_byte=None, end_byte=None, start_row=None, start_col=None, end_row=None, end_col=None, named_child_count=None, is_error=None, is_missing=None))]
     #[new]
     pub fn new(
-        kind: String,
-        is_named: bool,
-        start_byte: usize,
-        end_byte: usize,
-        start_row: usize,
-        start_col: usize,
-        end_row: usize,
-        end_col: usize,
-        named_child_count: usize,
-        is_error: bool,
-        is_missing: bool,
+        kind: Option<String>,
+        is_named: Option<bool>,
+        start_byte: Option<usize>,
+        end_byte: Option<usize>,
+        start_row: Option<usize>,
+        start_col: Option<usize>,
+        end_row: Option<usize>,
+        end_col: Option<usize>,
+        named_child_count: Option<usize>,
+        is_error: Option<bool>,
+        is_missing: Option<bool>,
     ) -> Self {
         Self {
-            kind,
-            is_named,
-            start_byte,
-            end_byte,
-            start_row,
-            start_col,
-            end_row,
-            end_col,
-            named_child_count,
-            is_error,
-            is_missing,
+            kind: kind.unwrap_or_default(),
+            is_named: is_named.unwrap_or_default(),
+            start_byte: start_byte.unwrap_or_default(),
+            end_byte: end_byte.unwrap_or_default(),
+            start_row: start_row.unwrap_or_default(),
+            start_col: start_col.unwrap_or_default(),
+            end_row: end_row.unwrap_or_default(),
+            end_col: end_col.unwrap_or_default(),
+            named_child_count: named_child_count.unwrap_or_default(),
+            is_error: is_error.unwrap_or_default(),
+            is_missing: is_missing.unwrap_or_default(),
         }
     }
 }
@@ -874,12 +1052,12 @@ pub struct QueryMatch {
 #[pymethods]
 impl QueryMatch {
     #[must_use]
-    #[pyo3(signature = (pattern_index, captures))]
+    #[pyo3(signature = (pattern_index=None, captures=None))]
     #[new]
-    pub fn new(pattern_index: usize, captures: Vec<String>) -> Self {
+    pub fn new(pattern_index: Option<usize>, captures: Option<Vec<String>>) -> Self {
         Self {
-            pattern_index,
-            captures,
+            pattern_index: pattern_index.unwrap_or_default(),
+            captures: captures.unwrap_or_default(),
         }
     }
 }
@@ -1031,28 +1209,31 @@ impl LanguageInfo {
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
 pub struct DownloadManager {
-    inner: Arc<tree_sitter_language_pack::DownloadManager>,
+    inner: Arc<std::sync::Mutex<tree_sitter_language_pack::DownloadManager>>,
 }
 
 #[pymethods]
 impl DownloadManager {
     #[pyo3(signature = ())]
     pub fn cache_dir(&self) -> String {
-        self.inner.cache_dir().to_string_lossy().to_string()
+        self.inner.lock().unwrap().cache_dir().to_string_lossy().to_string()
     }
 
     #[pyo3(signature = ())]
     pub fn installed_languages(&self) -> Vec<String> {
-        self.inner.installed_languages()
+        self.inner.lock().unwrap().installed_languages()
     }
 
     #[allow(clippy::missing_errors_doc)]
     #[pyo3(signature = (names))]
     pub fn ensure_languages(&self, names: Vec<String>) -> PyResult<()> {
-        let _ = names;
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "Not implemented: DownloadManager.ensure_languages",
-        ))
+        let names_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
+        self.inner
+            .lock()
+            .unwrap()
+            .ensure_languages(&names_refs)
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+        Ok(())
     }
 
     #[allow(clippy::missing_errors_doc)]
@@ -1066,7 +1247,7 @@ impl DownloadManager {
 
     #[pyo3(signature = (name))]
     pub fn lib_path(&self, name: String) -> String {
-        self.inner.lib_path(&name).to_string_lossy().to_string()
+        self.inner.lock().unwrap().lib_path(&name).to_string_lossy().to_string()
     }
 
     #[allow(clippy::missing_errors_doc)]
@@ -1081,6 +1262,8 @@ impl DownloadManager {
     #[pyo3(signature = ())]
     pub fn clean_cache(&self) -> PyResult<()> {
         self.inner
+            .lock()
+            .unwrap()
             .clean_cache()
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
         Ok(())
@@ -1091,7 +1274,7 @@ impl DownloadManager {
     #[pyo3(signature = (version))]
     pub fn new(version: String) -> PyResult<DownloadManager> {
         tree_sitter_language_pack::DownloadManager::new(&version)
-            .map(|val| Self { inner: Arc::new(val) })
+            .map(|val| Self { inner: Arc::new(std::sync::Mutex::new(val)) })
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
     }
 
@@ -1099,10 +1282,10 @@ impl DownloadManager {
     #[pyo3(signature = (version, cache_dir))]
     pub fn with_cache_dir(version: String, cache_dir: String) -> DownloadManager {
         Self {
-            inner: Arc::new(tree_sitter_language_pack::DownloadManager::with_cache_dir(
+            inner: Arc::new(std::sync::Mutex::new(tree_sitter_language_pack::DownloadManager::with_cache_dir(
                 &version,
                 std::path::PathBuf::from(cache_dir),
-            )),
+            ))),
         }
     }
 
@@ -1118,20 +1301,20 @@ impl DownloadManager {
 
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
-pub struct Parser {
-    inner: Arc<tree_sitter::Parser>,
+pub struct Tree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
 }
 
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
 pub struct Language {
-    inner: Arc<tree_sitter::Language>,
+    inner: Arc<tree_sitter_language_pack::Language>,
 }
 
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
-pub struct Tree {
-    inner: Arc<tree_sitter::Tree>,
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
 }
 
 #[derive(Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
@@ -1351,11 +1534,8 @@ pub fn detect_language_from_content(content: String) -> Option<String> {
 #[allow(clippy::missing_errors_doc)]
 #[pyfunction]
 #[pyo3(signature = (config))]
-pub fn validate_extraction(config: ExtractionConfig) -> PyResult<String> {
-    let config_json =
-        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    let config_core: tree_sitter_language_pack::ExtractionConfig =
-        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+pub fn validate_extraction(config: ExtractionConfig) -> PyResult<ValidationResult> {
+    let config_core: tree_sitter_language_pack::ExtractionConfig = config.into();
     tree_sitter_language_pack::extract::validate_extraction(&config_core)
         .map(|val| val.into())
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
@@ -1532,7 +1712,9 @@ pub fn configure(config: PackConfig) -> PyResult<()> {
 #[pyfunction]
 #[pyo3(signature = (names))]
 pub fn download(names: Vec<String>) -> PyResult<usize> {
-    tree_sitter_language_pack::download(&names).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+    let names_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
+    tree_sitter_language_pack::download(&names_refs)
+        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
 #[allow(clippy::missing_errors_doc)]
@@ -1638,6 +1820,36 @@ impl From<tree_sitter_language_pack::ExtractionConfig> for ExtractionConfig {
     }
 }
 
+impl From<tree_sitter_language_pack::CaptureResult> for CaptureResult {
+    fn from(val: tree_sitter_language_pack::CaptureResult) -> Self {
+        Self {
+            name: val.name,
+            node: val.node.map(Into::into),
+            text: val.text,
+            child_fields: format!("{:?}", val.child_fields),
+            start_byte: val.start_byte,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::MatchResult> for MatchResult {
+    fn from(val: tree_sitter_language_pack::MatchResult) -> Self {
+        Self {
+            pattern_index: val.pattern_index,
+            captures: val.captures.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternResult> for PatternResult {
+    fn from(val: tree_sitter_language_pack::PatternResult) -> Self {
+        Self {
+            matches: val.matches.into_iter().map(Into::into).collect(),
+            total_count: val.total_count,
+        }
+    }
+}
+
 impl From<ExtractionResult> for tree_sitter_language_pack::ExtractionResult {
     fn from(val: ExtractionResult) -> Self {
         Self {
@@ -1652,6 +1864,36 @@ impl From<tree_sitter_language_pack::ExtractionResult> for ExtractionResult {
         Self {
             language: val.language,
             results: format!("{:?}", val.results),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternValidation> for PatternValidation {
+    fn from(val: tree_sitter_language_pack::PatternValidation) -> Self {
+        Self {
+            valid: val.valid,
+            capture_names: val.capture_names,
+            pattern_count: val.pattern_count,
+            warnings: val.warnings,
+            errors: val.errors,
+        }
+    }
+}
+
+impl From<ValidationResult> for tree_sitter_language_pack::ValidationResult {
+    fn from(val: ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: Default::default(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ValidationResult> for ValidationResult {
+    fn from(val: tree_sitter_language_pack::ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: format!("{:?}", val.patterns),
         }
     }
 }
@@ -2234,7 +2476,12 @@ impl From<tree_sitter_language_pack::DiagnosticSeverity> for DiagnosticSeverity 
 pub fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<ExtractionPattern>()?;
     m.add_class::<ExtractionConfig>()?;
+    m.add_class::<CaptureResult>()?;
+    m.add_class::<MatchResult>()?;
+    m.add_class::<PatternResult>()?;
     m.add_class::<ExtractionResult>()?;
+    m.add_class::<PatternValidation>()?;
+    m.add_class::<ValidationResult>()?;
     m.add_class::<Span>()?;
     m.add_class::<ProcessResult>()?;
     m.add_class::<FileMetrics>()?;
@@ -2257,9 +2504,9 @@ pub fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PlatformBundle>()?;
     m.add_class::<LanguageInfo>()?;
     m.add_class::<DownloadManager>()?;
-    m.add_class::<Parser>()?;
-    m.add_class::<Language>()?;
     m.add_class::<Tree>()?;
+    m.add_class::<Language>()?;
+    m.add_class::<Parser>()?;
     m.add_class::<CaptureOutput>()?;
     m.add_class::<StructureKind>()?;
     m.add_class::<CommentKind>()?;

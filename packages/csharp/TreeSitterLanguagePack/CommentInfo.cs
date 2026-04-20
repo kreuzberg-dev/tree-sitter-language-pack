@@ -15,7 +15,7 @@ public sealed class CommentInfo
     public string Text { get; set; } = "";
 
     [JsonPropertyName("kind")]
-    public CommentKind Kind { get; set; } = default!;
+    public CommentKind Kind { get; set; } = default;
 
     [JsonPropertyName("span")]
     public Span Span { get; set; } = default!;

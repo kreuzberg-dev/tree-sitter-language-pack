@@ -1,6 +1,11 @@
 [workspace]
 members = ["crates/*", "tools/snippet-runner"]
-exclude = ["tests/test_apps/rust", "crates/ts-pack-elixir", "crates/ts-pack-java", "crates/ts-pack-ruby"]
+exclude = [
+    "crates/ts-pack-elixir",
+    "crates/ts-pack-java",
+    "crates/ts-pack-ruby",
+    "tests/test_apps/rust",
+]
 resolver = "2"
 
 [workspace.package]

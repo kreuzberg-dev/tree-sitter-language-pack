@@ -4,7 +4,7 @@ defmodule TreeSitterLanguagePack.ImportInfo do
 
   defstruct source: "",
             items: [],
-            alias: nil,
+            alias: "",
             is_wildcard: false,
             span: nil
 end

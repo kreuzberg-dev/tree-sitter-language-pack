@@ -8,8 +8,27 @@ from typing import TYPE_CHECKING
 import tree_sitter_language_pack._native as _rust
 
 if TYPE_CHECKING:
-    from ._native import ExtractionConfig, ExtractionResult, Language, LanguageRegistry, NodeInfo, Parser, ProcessResult, QueryMatch, Tree
-    from .options import PackConfig, ProcessConfig
+    from ._native import (
+        ExtractionResult,
+        Language,
+        LanguageRegistry,
+        NodeInfo,
+        Parser,
+        ProcessResult,
+        Tree,
+        ValidationResult,
+    )
+    from .options import ExtractionConfig, PackConfig, ProcessConfig, QueryMatch
+
+
+def _to_rust_extraction_config(value: ExtractionConfig | None) -> _rust.ExtractionConfig | None:
+    """Convert Python ExtractionConfig to Rust binding type."""
+    if value is None:
+        return None
+    return _rust.ExtractionConfig(
+        language=value.language,
+        patterns=value.patterns,
+    )
 
 
 def _to_rust_process_config(value: ProcessConfig | None) -> _rust.ProcessConfig | None:
@@ -34,8 +53,7 @@ def _to_rust_language_registry(value: LanguageRegistry | None) -> _rust.Language
     """Convert Python LanguageRegistry to Rust binding type."""
     if value is None:
         return None
-    return _rust.LanguageRegistry(
-    )
+    return _rust.LanguageRegistry()
 
 
 def _to_rust_pack_config(value: PackConfig | None) -> _rust.PackConfig | None:
@@ -69,9 +87,10 @@ def detect_language_from_content(content: str) -> str | None:
     return _rust.detect_language_from_content(content)
 
 
-def validate_extraction(config: ExtractionConfig) -> str:
+def validate_extraction(config: ExtractionConfig) -> ValidationResult:
     """Validate an extraction config without running it."""
-    return _rust.validate_extraction(config)
+    _rust_config = _to_rust_extraction_config(config)
+    return _rust.validate_extraction(_rust_config)
 
 
 def process(source: str, config: ProcessConfig, registry: LanguageRegistry) -> ProcessResult:
@@ -173,7 +192,8 @@ def language_count() -> int:
 
 def extract_patterns(source: str, config: ExtractionConfig) -> ExtractionResult:
     """Run extraction patterns against source code."""
-    return _rust.extract_patterns(source, config)
+    _rust_config = _to_rust_extraction_config(config)
+    return _rust.extract_patterns(source, _rust_config)
 
 
 def init(config: PackConfig) -> None:

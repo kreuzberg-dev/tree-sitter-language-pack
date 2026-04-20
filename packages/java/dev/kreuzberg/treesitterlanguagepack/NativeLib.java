@@ -348,6 +348,16 @@ final class NativeLib {
         FunctionDescriptor.of(ValueLayout.ADDRESS)
     );
 
+    static final MethodHandle TS_PACK_VALIDATION_RESULT_TO_JSON = LINKER.downcallHandle(
+        LIB.find("ts_pack_validation_result_to_json").orElseThrow(),
+        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+    );
+
+    static final MethodHandle TS_PACK_VALIDATION_RESULT_FREE = LINKER.downcallHandle(
+        LIB.find("ts_pack_validation_result_free").orElseThrow(),
+        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
+    );
+
     static final MethodHandle TS_PACK_PROCESS_RESULT_TO_JSON = LINKER.downcallHandle(
         LIB.find("ts_pack_process_result_to_json").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)

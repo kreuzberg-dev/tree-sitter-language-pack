@@ -72,7 +72,7 @@ public final class TreeSitterLanguagePackRs {
         }
     }
 
-    public static String validateExtraction(ExtractionConfig config) throws TreeSitterLanguagePackRsException {
+    public static ValidationResult validateExtraction(ExtractionConfig config) throws TreeSitterLanguagePackRsException {
         try (var arena = Arena.ofConfined()) {
             var cconfigJson = config != null ? createObjectMapper().writeValueAsString(config) : null;
             var cconfigJsonSeg = cconfigJson != null ? arena.allocateFrom(cconfigJson) : MemorySegment.NULL;
@@ -87,9 +87,15 @@ public final class TreeSitterLanguagePackRs {
                 checkLastError();
                 return null;
             }
-            String result = resultPtr.reinterpret(Long.MAX_VALUE).getString(0);
-            NativeLib.TS_PACK_FREE_STRING.invoke(resultPtr);
-            return result;
+            var jsonPtr = (MemorySegment) NativeLib.TS_PACK_VALIDATION_RESULT_TO_JSON.invoke(resultPtr);
+            NativeLib.TS_PACK_VALIDATION_RESULT_FREE.invoke(resultPtr);
+            if (jsonPtr.equals(MemorySegment.NULL)) {
+                checkLastError();
+                return null;
+            }
+            String json = jsonPtr.reinterpret(Long.MAX_VALUE).getString(0);
+            NativeLib.TS_PACK_FREE_STRING.invoke(jsonPtr);
+            return createObjectMapper().readValue(json, ValidationResult.class);
         } catch (Throwable e) {
             throw new TreeSitterLanguagePackRsException("FFI call failed", e);
         }

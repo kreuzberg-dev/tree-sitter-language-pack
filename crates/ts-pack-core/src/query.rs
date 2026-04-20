@@ -22,6 +22,7 @@ thread_local! {
 
 /// A single match from a tree-sitter query, with captured nodes.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct QueryMatch {
     /// The pattern index that matched (position in the query string).
     pub pattern_index: usize,

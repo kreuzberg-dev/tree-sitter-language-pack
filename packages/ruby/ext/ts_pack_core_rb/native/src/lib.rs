@@ -42,6 +42,7 @@ fn json_to_ruby(handle: &Ruby, val: serde_json::Value) -> magnus::Value {
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::ExtractionPattern")]
+#[serde(default)]
 pub struct ExtractionPattern {
     pub query: String,
     pub capture_output: CaptureOutput,
@@ -62,16 +63,16 @@ unsafe impl TryConvertOwned for ExtractionPattern {}
 
 impl ExtractionPattern {
     fn new(
-        query: String,
-        capture_output: CaptureOutput,
-        child_fields: Vec<String>,
+        query: Option<String>,
+        capture_output: Option<CaptureOutput>,
+        child_fields: Option<Vec<String>>,
         max_results: Option<usize>,
         byte_range: Option<String>,
     ) -> Self {
         Self {
-            query,
-            capture_output,
-            child_fields,
+            query: query.unwrap_or_default(),
+            capture_output: capture_output.unwrap_or_default(),
+            child_fields: child_fields.unwrap_or_default(),
             max_results,
             byte_range,
         }
@@ -98,8 +99,9 @@ impl ExtractionPattern {
     }
 }
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::ExtractionConfig")]
+#[serde(default)]
 pub struct ExtractionConfig {
     pub language: String,
     pub patterns: String,
@@ -115,9 +117,21 @@ impl magnus::TryConvert for ExtractionConfig {
 }
 unsafe impl TryConvertOwned for ExtractionConfig {}
 
+impl Default for ExtractionConfig {
+    fn default() -> Self {
+        Self {
+            language: Default::default(),
+            patterns: Default::default(),
+        }
+    }
+}
+
 impl ExtractionConfig {
-    fn new(language: String, patterns: String) -> Self {
-        Self { language, patterns }
+    fn new(language: Option<String>, patterns: Option<String>) -> Self {
+        Self {
+            language: language.unwrap_or_default(),
+            patterns: patterns.unwrap_or_default(),
+        }
     }
 
     fn language(&self) -> String {
@@ -129,8 +143,168 @@ impl ExtractionConfig {
     }
 }
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[magnus::wrap(class = "TreeSitterLanguagePack::CaptureResult")]
+#[serde(default)]
+pub struct CaptureResult {
+    pub name: String,
+    pub node: Option<NodeInfo>,
+    pub text: Option<String>,
+    pub child_fields: String,
+    pub start_byte: usize,
+}
+
+unsafe impl IntoValueFromNative for CaptureResult {}
+
+impl magnus::TryConvert for CaptureResult {
+    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
+        let r: &CaptureResult = magnus::TryConvert::try_convert(val)?;
+        Ok(r.clone())
+    }
+}
+unsafe impl TryConvertOwned for CaptureResult {}
+
+impl Default for CaptureResult {
+    fn default() -> Self {
+        Self {
+            name: Default::default(),
+            node: Default::default(),
+            text: Default::default(),
+            child_fields: Default::default(),
+            start_byte: Default::default(),
+        }
+    }
+}
+
+impl CaptureResult {
+    fn new(
+        name: Option<String>,
+        node: Option<NodeInfo>,
+        text: Option<String>,
+        child_fields: Option<String>,
+        start_byte: Option<usize>,
+    ) -> Self {
+        Self {
+            name: name.unwrap_or_default(),
+            node,
+            text,
+            child_fields: child_fields.unwrap_or_default(),
+            start_byte: start_byte.unwrap_or_default(),
+        }
+    }
+
+    fn name(&self) -> String {
+        self.name.clone()
+    }
+
+    fn node(&self) -> Option<NodeInfo> {
+        self.node.clone()
+    }
+
+    fn text(&self) -> Option<String> {
+        self.text.clone()
+    }
+
+    fn child_fields(&self) -> String {
+        self.child_fields.clone()
+    }
+
+    fn start_byte(&self) -> usize {
+        self.start_byte
+    }
+}
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[magnus::wrap(class = "TreeSitterLanguagePack::MatchResult")]
+#[serde(default)]
+pub struct MatchResult {
+    pub pattern_index: usize,
+    pub captures: Vec<CaptureResult>,
+}
+
+unsafe impl IntoValueFromNative for MatchResult {}
+
+impl magnus::TryConvert for MatchResult {
+    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
+        let r: &MatchResult = magnus::TryConvert::try_convert(val)?;
+        Ok(r.clone())
+    }
+}
+unsafe impl TryConvertOwned for MatchResult {}
+
+impl Default for MatchResult {
+    fn default() -> Self {
+        Self {
+            pattern_index: Default::default(),
+            captures: Default::default(),
+        }
+    }
+}
+
+impl MatchResult {
+    fn new(pattern_index: Option<usize>, captures: Option<Vec<CaptureResult>>) -> Self {
+        Self {
+            pattern_index: pattern_index.unwrap_or_default(),
+            captures: captures.unwrap_or_default(),
+        }
+    }
+
+    fn pattern_index(&self) -> usize {
+        self.pattern_index
+    }
+
+    fn captures(&self) -> Vec<CaptureResult> {
+        self.captures.clone()
+    }
+}
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[magnus::wrap(class = "TreeSitterLanguagePack::PatternResult")]
+#[serde(default)]
+pub struct PatternResult {
+    pub matches: Vec<MatchResult>,
+    pub total_count: usize,
+}
+
+unsafe impl IntoValueFromNative for PatternResult {}
+
+impl magnus::TryConvert for PatternResult {
+    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
+        let r: &PatternResult = magnus::TryConvert::try_convert(val)?;
+        Ok(r.clone())
+    }
+}
+unsafe impl TryConvertOwned for PatternResult {}
+
+impl Default for PatternResult {
+    fn default() -> Self {
+        Self {
+            matches: Default::default(),
+            total_count: Default::default(),
+        }
+    }
+}
+
+impl PatternResult {
+    fn new(matches: Option<Vec<MatchResult>>, total_count: Option<usize>) -> Self {
+        Self {
+            matches: matches.unwrap_or_default(),
+            total_count: total_count.unwrap_or_default(),
+        }
+    }
+
+    fn matches(&self) -> Vec<MatchResult> {
+        self.matches.clone()
+    }
+
+    fn total_count(&self) -> usize {
+        self.total_count
+    }
+}
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::ExtractionResult")]
+#[serde(default)]
 pub struct ExtractionResult {
     pub language: String,
     pub results: String,
@@ -146,9 +320,21 @@ impl magnus::TryConvert for ExtractionResult {
 }
 unsafe impl TryConvertOwned for ExtractionResult {}
 
+impl Default for ExtractionResult {
+    fn default() -> Self {
+        Self {
+            language: Default::default(),
+            results: Default::default(),
+        }
+    }
+}
+
 impl ExtractionResult {
-    fn new(language: String, results: String) -> Self {
-        Self { language, results }
+    fn new(language: Option<String>, results: Option<String>) -> Self {
+        Self {
+            language: language.unwrap_or_default(),
+            results: results.unwrap_or_default(),
+        }
     }
 
     fn language(&self) -> String {
@@ -160,8 +346,124 @@ impl ExtractionResult {
     }
 }
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[magnus::wrap(class = "TreeSitterLanguagePack::PatternValidation")]
+#[serde(default)]
+pub struct PatternValidation {
+    pub valid: bool,
+    pub capture_names: Vec<String>,
+    pub pattern_count: usize,
+    pub warnings: Vec<String>,
+    pub errors: Vec<String>,
+}
+
+unsafe impl IntoValueFromNative for PatternValidation {}
+
+impl magnus::TryConvert for PatternValidation {
+    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
+        let r: &PatternValidation = magnus::TryConvert::try_convert(val)?;
+        Ok(r.clone())
+    }
+}
+unsafe impl TryConvertOwned for PatternValidation {}
+
+impl Default for PatternValidation {
+    fn default() -> Self {
+        Self {
+            valid: Default::default(),
+            capture_names: Default::default(),
+            pattern_count: Default::default(),
+            warnings: Default::default(),
+            errors: Default::default(),
+        }
+    }
+}
+
+impl PatternValidation {
+    fn new(
+        valid: Option<bool>,
+        capture_names: Option<Vec<String>>,
+        pattern_count: Option<usize>,
+        warnings: Option<Vec<String>>,
+        errors: Option<Vec<String>>,
+    ) -> Self {
+        Self {
+            valid: valid.unwrap_or_default(),
+            capture_names: capture_names.unwrap_or_default(),
+            pattern_count: pattern_count.unwrap_or_default(),
+            warnings: warnings.unwrap_or_default(),
+            errors: errors.unwrap_or_default(),
+        }
+    }
+
+    fn valid(&self) -> bool {
+        self.valid
+    }
+
+    fn capture_names(&self) -> Vec<String> {
+        self.capture_names.clone()
+    }
+
+    fn pattern_count(&self) -> usize {
+        self.pattern_count
+    }
+
+    fn warnings(&self) -> Vec<String> {
+        self.warnings.clone()
+    }
+
+    fn errors(&self) -> Vec<String> {
+        self.errors.clone()
+    }
+}
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[magnus::wrap(class = "TreeSitterLanguagePack::ValidationResult")]
+#[serde(default)]
+pub struct ValidationResult {
+    pub valid: bool,
+    pub patterns: String,
+}
+
+unsafe impl IntoValueFromNative for ValidationResult {}
+
+impl magnus::TryConvert for ValidationResult {
+    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
+        let r: &ValidationResult = magnus::TryConvert::try_convert(val)?;
+        Ok(r.clone())
+    }
+}
+unsafe impl TryConvertOwned for ValidationResult {}
+
+impl Default for ValidationResult {
+    fn default() -> Self {
+        Self {
+            valid: Default::default(),
+            patterns: Default::default(),
+        }
+    }
+}
+
+impl ValidationResult {
+    fn new(valid: Option<bool>, patterns: Option<String>) -> Self {
+        Self {
+            valid: valid.unwrap_or_default(),
+            patterns: patterns.unwrap_or_default(),
+        }
+    }
+
+    fn valid(&self) -> bool {
+        self.valid
+    }
+
+    fn patterns(&self) -> String {
+        self.patterns.clone()
+    }
+}
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::Span")]
+#[serde(default)]
 pub struct Span {
     pub start_byte: usize,
     pub end_byte: usize,
@@ -181,22 +483,35 @@ impl magnus::TryConvert for Span {
 }
 unsafe impl TryConvertOwned for Span {}
 
+impl Default for Span {
+    fn default() -> Self {
+        Self {
+            start_byte: Default::default(),
+            end_byte: Default::default(),
+            start_line: Default::default(),
+            start_column: Default::default(),
+            end_line: Default::default(),
+            end_column: Default::default(),
+        }
+    }
+}
+
 impl Span {
     fn new(
-        start_byte: usize,
-        end_byte: usize,
-        start_line: usize,
-        start_column: usize,
-        end_line: usize,
-        end_column: usize,
+        start_byte: Option<usize>,
+        end_byte: Option<usize>,
+        start_line: Option<usize>,
+        start_column: Option<usize>,
+        end_line: Option<usize>,
+        end_column: Option<usize>,
     ) -> Self {
         Self {
-            start_byte,
-            end_byte,
-            start_line,
-            start_column,
-            end_line,
-            end_column,
+            start_byte: start_byte.unwrap_or_default(),
+            end_byte: end_byte.unwrap_or_default(),
+            start_line: start_line.unwrap_or_default(),
+            start_column: start_column.unwrap_or_default(),
+            end_line: end_line.unwrap_or_default(),
+            end_column: end_column.unwrap_or_default(),
         }
     }
 
@@ -225,7 +540,7 @@ impl Span {
     }
 }
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::ProcessResult")]
 #[serde(default)]
 pub struct ProcessResult {
@@ -251,6 +566,24 @@ impl magnus::TryConvert for ProcessResult {
     }
 }
 unsafe impl TryConvertOwned for ProcessResult {}
+
+impl Default for ProcessResult {
+    fn default() -> Self {
+        Self {
+            language: Default::default(),
+            metrics: Default::default(),
+            structure: Default::default(),
+            imports: Default::default(),
+            exports: Default::default(),
+            comments: Default::default(),
+            docstrings: Default::default(),
+            symbols: Default::default(),
+            diagnostics: Default::default(),
+            chunks: Default::default(),
+            extractions: Default::default(),
+        }
+    }
+}
 
 impl ProcessResult {
     fn new(
@@ -423,6 +756,7 @@ impl FileMetrics {
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::StructureItem")]
+#[serde(default)]
 pub struct StructureItem {
     pub kind: StructureKind,
     pub name: Option<String>,
@@ -447,23 +781,23 @@ unsafe impl TryConvertOwned for StructureItem {}
 
 impl StructureItem {
     fn new(
-        kind: StructureKind,
-        span: Span,
-        children: Vec<StructureItem>,
-        decorators: Vec<String>,
+        kind: Option<StructureKind>,
         name: Option<String>,
         visibility: Option<String>,
+        span: Option<Span>,
+        children: Option<Vec<StructureItem>>,
+        decorators: Option<Vec<String>>,
         doc_comment: Option<String>,
         signature: Option<String>,
         body_span: Option<Span>,
     ) -> Self {
         Self {
-            kind,
+            kind: kind.unwrap_or_default(),
             name,
             visibility,
-            span,
-            children,
-            decorators,
+            span: span.unwrap_or_default(),
+            children: children.unwrap_or_default(),
+            decorators: decorators.unwrap_or_default(),
             doc_comment,
             signature,
             body_span,
@@ -509,6 +843,7 @@ impl StructureItem {
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::CommentInfo")]
+#[serde(default)]
 pub struct CommentInfo {
     pub text: String,
     pub kind: CommentKind,
@@ -527,11 +862,16 @@ impl magnus::TryConvert for CommentInfo {
 unsafe impl TryConvertOwned for CommentInfo {}
 
 impl CommentInfo {
-    fn new(text: String, kind: CommentKind, span: Span, associated_node: Option<String>) -> Self {
+    fn new(
+        text: Option<String>,
+        kind: Option<CommentKind>,
+        span: Option<Span>,
+        associated_node: Option<String>,
+    ) -> Self {
         Self {
-            text,
-            kind,
-            span,
+            text: text.unwrap_or_default(),
+            kind: kind.unwrap_or_default(),
+            span: span.unwrap_or_default(),
             associated_node,
         }
     }
@@ -555,6 +895,7 @@ impl CommentInfo {
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::DocstringInfo")]
+#[serde(default)]
 pub struct DocstringInfo {
     pub text: String,
     pub format: DocstringFormat,
@@ -575,18 +916,18 @@ unsafe impl TryConvertOwned for DocstringInfo {}
 
 impl DocstringInfo {
     fn new(
-        text: String,
-        format: DocstringFormat,
-        span: Span,
-        parsed_sections: Vec<DocSection>,
+        text: Option<String>,
+        format: Option<DocstringFormat>,
+        span: Option<Span>,
         associated_item: Option<String>,
+        parsed_sections: Option<Vec<DocSection>>,
     ) -> Self {
         Self {
-            text,
-            format,
-            span,
+            text: text.unwrap_or_default(),
+            format: format.unwrap_or_default(),
+            span: span.unwrap_or_default(),
             associated_item,
-            parsed_sections,
+            parsed_sections: parsed_sections.unwrap_or_default(),
         }
     }
 
@@ -611,8 +952,9 @@ impl DocstringInfo {
     }
 }
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::DocSection")]
+#[serde(default)]
 pub struct DocSection {
     pub kind: String,
     pub name: Option<String>,
@@ -629,12 +971,22 @@ impl magnus::TryConvert for DocSection {
 }
 unsafe impl TryConvertOwned for DocSection {}
 
-impl DocSection {
-    fn new(kind: String, description: String, name: Option<String>) -> Self {
+impl Default for DocSection {
+    fn default() -> Self {
         Self {
-            kind,
+            kind: Default::default(),
+            name: Default::default(),
+            description: Default::default(),
+        }
+    }
+}
+
+impl DocSection {
+    fn new(kind: Option<String>, name: Option<String>, description: Option<String>) -> Self {
+        Self {
+            kind: kind.unwrap_or_default(),
             name,
-            description,
+            description: description.unwrap_or_default(),
         }
     }
 
@@ -651,8 +1003,9 @@ impl DocSection {
     }
 }
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::ImportInfo")]
+#[serde(default)]
 pub struct ImportInfo {
     pub source: String,
     pub items: Vec<String>,
@@ -671,14 +1024,32 @@ impl magnus::TryConvert for ImportInfo {
 }
 unsafe impl TryConvertOwned for ImportInfo {}
 
-impl ImportInfo {
-    fn new(source: String, items: Vec<String>, is_wildcard: bool, span: Span, alias: Option<String>) -> Self {
+impl Default for ImportInfo {
+    fn default() -> Self {
         Self {
-            source,
-            items,
+            source: Default::default(),
+            items: Default::default(),
+            alias: Default::default(),
+            is_wildcard: Default::default(),
+            span: Default::default(),
+        }
+    }
+}
+
+impl ImportInfo {
+    fn new(
+        source: Option<String>,
+        items: Option<Vec<String>>,
+        alias: Option<String>,
+        is_wildcard: Option<bool>,
+        span: Option<Span>,
+    ) -> Self {
+        Self {
+            source: source.unwrap_or_default(),
+            items: items.unwrap_or_default(),
             alias,
-            is_wildcard,
-            span,
+            is_wildcard: is_wildcard.unwrap_or_default(),
+            span: span.unwrap_or_default(),
         }
     }
 
@@ -705,6 +1076,7 @@ impl ImportInfo {
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::ExportInfo")]
+#[serde(default)]
 pub struct ExportInfo {
     pub name: String,
     pub kind: ExportKind,
@@ -722,8 +1094,12 @@ impl magnus::TryConvert for ExportInfo {
 unsafe impl TryConvertOwned for ExportInfo {}
 
 impl ExportInfo {
-    fn new(name: String, kind: ExportKind, span: Span) -> Self {
-        Self { name, kind, span }
+    fn new(name: Option<String>, kind: Option<ExportKind>, span: Option<Span>) -> Self {
+        Self {
+            name: name.unwrap_or_default(),
+            kind: kind.unwrap_or_default(),
+            span: span.unwrap_or_default(),
+        }
     }
 
     fn name(&self) -> String {
@@ -741,6 +1117,7 @@ impl ExportInfo {
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::SymbolInfo")]
+#[serde(default)]
 pub struct SymbolInfo {
     pub name: String,
     pub kind: SymbolKind,
@@ -760,11 +1137,17 @@ impl magnus::TryConvert for SymbolInfo {
 unsafe impl TryConvertOwned for SymbolInfo {}
 
 impl SymbolInfo {
-    fn new(name: String, kind: SymbolKind, span: Span, type_annotation: Option<String>, doc: Option<String>) -> Self {
+    fn new(
+        name: Option<String>,
+        kind: Option<SymbolKind>,
+        span: Option<Span>,
+        type_annotation: Option<String>,
+        doc: Option<String>,
+    ) -> Self {
         Self {
-            name,
-            kind,
-            span,
+            name: name.unwrap_or_default(),
+            kind: kind.unwrap_or_default(),
+            span: span.unwrap_or_default(),
             type_annotation,
             doc,
         }
@@ -793,6 +1176,7 @@ impl SymbolInfo {
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::Diagnostic")]
+#[serde(default)]
 pub struct Diagnostic {
     pub message: String,
     pub severity: DiagnosticSeverity,
@@ -810,11 +1194,11 @@ impl magnus::TryConvert for Diagnostic {
 unsafe impl TryConvertOwned for Diagnostic {}
 
 impl Diagnostic {
-    fn new(message: String, severity: DiagnosticSeverity, span: Span) -> Self {
+    fn new(message: Option<String>, severity: Option<DiagnosticSeverity>, span: Option<Span>) -> Self {
         Self {
-            message,
-            severity,
-            span,
+            message: message.unwrap_or_default(),
+            severity: severity.unwrap_or_default(),
+            span: span.unwrap_or_default(),
         }
     }
 
@@ -831,8 +1215,9 @@ impl Diagnostic {
     }
 }
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::CodeChunk")]
+#[serde(default)]
 pub struct CodeChunk {
     pub content: String,
     pub start_byte: usize,
@@ -852,22 +1237,35 @@ impl magnus::TryConvert for CodeChunk {
 }
 unsafe impl TryConvertOwned for CodeChunk {}
 
+impl Default for CodeChunk {
+    fn default() -> Self {
+        Self {
+            content: Default::default(),
+            start_byte: Default::default(),
+            end_byte: Default::default(),
+            start_line: Default::default(),
+            end_line: Default::default(),
+            metadata: Default::default(),
+        }
+    }
+}
+
 impl CodeChunk {
     fn new(
-        content: String,
-        start_byte: usize,
-        end_byte: usize,
-        start_line: usize,
-        end_line: usize,
-        metadata: ChunkContext,
+        content: Option<String>,
+        start_byte: Option<usize>,
+        end_byte: Option<usize>,
+        start_line: Option<usize>,
+        end_line: Option<usize>,
+        metadata: Option<ChunkContext>,
     ) -> Self {
         Self {
-            content,
-            start_byte,
-            end_byte,
-            start_line,
-            end_line,
-            metadata,
+            content: content.unwrap_or_default(),
+            start_byte: start_byte.unwrap_or_default(),
+            end_byte: end_byte.unwrap_or_default(),
+            start_line: start_line.unwrap_or_default(),
+            end_line: end_line.unwrap_or_default(),
+            metadata: metadata.unwrap_or_default(),
         }
     }
 
@@ -896,8 +1294,9 @@ impl CodeChunk {
     }
 }
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::ChunkContext")]
+#[serde(default)]
 pub struct ChunkContext {
     pub language: String,
     pub chunk_index: usize,
@@ -920,28 +1319,44 @@ impl magnus::TryConvert for ChunkContext {
 }
 unsafe impl TryConvertOwned for ChunkContext {}
 
+impl Default for ChunkContext {
+    fn default() -> Self {
+        Self {
+            language: Default::default(),
+            chunk_index: Default::default(),
+            total_chunks: Default::default(),
+            node_types: Default::default(),
+            context_path: Default::default(),
+            symbols_defined: Default::default(),
+            comments: Default::default(),
+            docstrings: Default::default(),
+            has_error_nodes: Default::default(),
+        }
+    }
+}
+
 impl ChunkContext {
     fn new(
-        language: String,
-        chunk_index: usize,
-        total_chunks: usize,
-        node_types: Vec<String>,
-        context_path: Vec<String>,
-        symbols_defined: Vec<String>,
-        comments: Vec<CommentInfo>,
-        docstrings: Vec<DocstringInfo>,
-        has_error_nodes: bool,
+        language: Option<String>,
+        chunk_index: Option<usize>,
+        total_chunks: Option<usize>,
+        node_types: Option<Vec<String>>,
+        context_path: Option<Vec<String>>,
+        symbols_defined: Option<Vec<String>>,
+        comments: Option<Vec<CommentInfo>>,
+        docstrings: Option<Vec<DocstringInfo>>,
+        has_error_nodes: Option<bool>,
     ) -> Self {
         Self {
-            language,
-            chunk_index,
-            total_chunks,
-            node_types,
-            context_path,
-            symbols_defined,
-            comments,
-            docstrings,
-            has_error_nodes,
+            language: language.unwrap_or_default(),
+            chunk_index: chunk_index.unwrap_or_default(),
+            total_chunks: total_chunks.unwrap_or_default(),
+            node_types: node_types.unwrap_or_default(),
+            context_path: context_path.unwrap_or_default(),
+            symbols_defined: symbols_defined.unwrap_or_default(),
+            comments: comments.unwrap_or_default(),
+            docstrings: docstrings.unwrap_or_default(),
+            has_error_nodes: has_error_nodes.unwrap_or_default(),
         }
     }
 
@@ -982,8 +1397,9 @@ impl ChunkContext {
     }
 }
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::NodeInfo")]
+#[serde(default)]
 pub struct NodeInfo {
     pub kind: String,
     pub is_named: bool,
@@ -1008,32 +1424,50 @@ impl magnus::TryConvert for NodeInfo {
 }
 unsafe impl TryConvertOwned for NodeInfo {}
 
+impl Default for NodeInfo {
+    fn default() -> Self {
+        Self {
+            kind: Default::default(),
+            is_named: Default::default(),
+            start_byte: Default::default(),
+            end_byte: Default::default(),
+            start_row: Default::default(),
+            start_col: Default::default(),
+            end_row: Default::default(),
+            end_col: Default::default(),
+            named_child_count: Default::default(),
+            is_error: Default::default(),
+            is_missing: Default::default(),
+        }
+    }
+}
+
 impl NodeInfo {
     fn new(
-        kind: String,
-        is_named: bool,
-        start_byte: usize,
-        end_byte: usize,
-        start_row: usize,
-        start_col: usize,
-        end_row: usize,
-        end_col: usize,
-        named_child_count: usize,
-        is_error: bool,
-        is_missing: bool,
+        kind: Option<String>,
+        is_named: Option<bool>,
+        start_byte: Option<usize>,
+        end_byte: Option<usize>,
+        start_row: Option<usize>,
+        start_col: Option<usize>,
+        end_row: Option<usize>,
+        end_col: Option<usize>,
+        named_child_count: Option<usize>,
+        is_error: Option<bool>,
+        is_missing: Option<bool>,
     ) -> Self {
         Self {
-            kind,
-            is_named,
-            start_byte,
-            end_byte,
-            start_row,
-            start_col,
-            end_row,
-            end_col,
-            named_child_count,
-            is_error,
-            is_missing,
+            kind: kind.unwrap_or_default(),
+            is_named: is_named.unwrap_or_default(),
+            start_byte: start_byte.unwrap_or_default(),
+            end_byte: end_byte.unwrap_or_default(),
+            start_row: start_row.unwrap_or_default(),
+            start_col: start_col.unwrap_or_default(),
+            end_row: end_row.unwrap_or_default(),
+            end_col: end_col.unwrap_or_default(),
+            named_child_count: named_child_count.unwrap_or_default(),
+            is_error: is_error.unwrap_or_default(),
+            is_missing: is_missing.unwrap_or_default(),
         }
     }
 
@@ -1292,8 +1726,9 @@ impl ProcessConfig {
     }
 }
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::QueryMatch")]
+#[serde(default)]
 pub struct QueryMatch {
     pub pattern_index: usize,
     pub captures: Vec<String>,
@@ -1309,11 +1744,20 @@ impl magnus::TryConvert for QueryMatch {
 }
 unsafe impl TryConvertOwned for QueryMatch {}
 
-impl QueryMatch {
-    fn new(pattern_index: usize, captures: Vec<String>) -> Self {
+impl Default for QueryMatch {
+    fn default() -> Self {
         Self {
-            pattern_index,
-            captures,
+            pattern_index: Default::default(),
+            captures: Default::default(),
+        }
+    }
+}
+
+impl QueryMatch {
+    fn new(pattern_index: Option<usize>, captures: Option<Vec<String>>) -> Self {
+        Self {
+            pattern_index: pattern_index.unwrap_or_default(),
+            captures: captures.unwrap_or_default(),
         }
     }
 
@@ -1562,22 +2006,22 @@ impl DownloadManager {
 }
 
 #[derive(Clone)]
-#[magnus::wrap(class = "TreeSitterLanguagePack::Parser")]
-pub struct Parser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
+#[magnus::wrap(class = "TreeSitterLanguagePack::Tree")]
+pub struct Tree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
 }
 
-unsafe impl IntoValueFromNative for Parser {}
+unsafe impl IntoValueFromNative for Tree {}
 
-impl magnus::TryConvert for Parser {
+impl magnus::TryConvert for Tree {
     fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Parser = magnus::TryConvert::try_convert(val)?;
+        let r: &Tree = magnus::TryConvert::try_convert(val)?;
         Ok(r.clone())
     }
 }
-unsafe impl TryConvertOwned for Parser {}
+unsafe impl TryConvertOwned for Tree {}
 
-impl Parser {}
+impl Tree {}
 
 #[derive(Clone)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::Language")]
@@ -1598,22 +2042,22 @@ unsafe impl TryConvertOwned for Language {}
 impl Language {}
 
 #[derive(Clone)]
-#[magnus::wrap(class = "TreeSitterLanguagePack::Tree")]
-pub struct Tree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
+#[magnus::wrap(class = "TreeSitterLanguagePack::Parser")]
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
 }
 
-unsafe impl IntoValueFromNative for Tree {}
+unsafe impl IntoValueFromNative for Parser {}
 
-impl magnus::TryConvert for Tree {
+impl magnus::TryConvert for Parser {
     fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Tree = magnus::TryConvert::try_convert(val)?;
+        let r: &Parser = magnus::TryConvert::try_convert(val)?;
         Ok(r.clone())
     }
 }
-unsafe impl TryConvertOwned for Tree {}
+unsafe impl TryConvertOwned for Parser {}
 
-impl Tree {}
+impl Parser {}
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, serde::Serialize, serde::Deserialize)]
 pub enum CaptureOutput {
@@ -1915,16 +2359,19 @@ fn detect_language_from_content(content: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_content(&content).map(Into::into)
 }
 
-fn validate_extraction(config: String) -> Result<String, Error> {
+fn validate_extraction(config: String) -> Result<ValidationResult, Error> {
     let config: ExtractionConfig = {
         let core: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config)
             .map_err(|e| magnus::Error::new(unsafe { Ruby::get_unchecked() }.exception_type_error(), e.to_string()))?;
         core.into()
     };
-    Err(magnus::Error::new(
-        unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
-        "Not implemented: validate_extraction",
-    ))
+    let result = tree_sitter_language_pack::extract::validate_extraction(config.into()).map_err(|e| {
+        magnus::Error::new(
+            unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
+            e.to_string(),
+        )
+    })?;
+    Ok(result.into())
 }
 
 fn process(source: String, config: String, registry: LanguageRegistry) -> Result<ProcessResult, Error> {
@@ -2164,6 +2611,36 @@ impl From<tree_sitter_language_pack::ExtractionConfig> for ExtractionConfig {
     }
 }
 
+impl From<tree_sitter_language_pack::CaptureResult> for CaptureResult {
+    fn from(val: tree_sitter_language_pack::CaptureResult) -> Self {
+        Self {
+            name: val.name,
+            node: val.node.map(Into::into),
+            text: val.text,
+            child_fields: format!("{:?}", val.child_fields),
+            start_byte: val.start_byte,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::MatchResult> for MatchResult {
+    fn from(val: tree_sitter_language_pack::MatchResult) -> Self {
+        Self {
+            pattern_index: val.pattern_index,
+            captures: val.captures.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternResult> for PatternResult {
+    fn from(val: tree_sitter_language_pack::PatternResult) -> Self {
+        Self {
+            matches: val.matches.into_iter().map(Into::into).collect(),
+            total_count: val.total_count,
+        }
+    }
+}
+
 impl From<ExtractionResult> for tree_sitter_language_pack::ExtractionResult {
     fn from(val: ExtractionResult) -> Self {
         Self {
@@ -2178,6 +2655,36 @@ impl From<tree_sitter_language_pack::ExtractionResult> for ExtractionResult {
         Self {
             language: val.language,
             results: format!("{:?}", val.results),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternValidation> for PatternValidation {
+    fn from(val: tree_sitter_language_pack::PatternValidation) -> Self {
+        Self {
+            valid: val.valid,
+            capture_names: val.capture_names,
+            pattern_count: val.pattern_count,
+            warnings: val.warnings,
+            errors: val.errors,
+        }
+    }
+}
+
+impl From<ValidationResult> for tree_sitter_language_pack::ValidationResult {
+    fn from(val: ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: Default::default(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ValidationResult> for ValidationResult {
+    fn from(val: tree_sitter_language_pack::ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: format!("{:?}", val.patterns),
         }
     }
 }
@@ -2874,10 +3381,41 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_method("language", method!(ExtractionConfig::language, 0))?;
     class.define_method("patterns", method!(ExtractionConfig::patterns, 0))?;
 
+    let class = module.define_class("CaptureResult", ruby.class_object())?;
+    class.define_singleton_method("new", function!(CaptureResult::new, 5))?;
+    class.define_method("name", method!(CaptureResult::name, 0))?;
+    class.define_method("node", method!(CaptureResult::node, 0))?;
+    class.define_method("text", method!(CaptureResult::text, 0))?;
+    class.define_method("child_fields", method!(CaptureResult::child_fields, 0))?;
+    class.define_method("start_byte", method!(CaptureResult::start_byte, 0))?;
+
+    let class = module.define_class("MatchResult", ruby.class_object())?;
+    class.define_singleton_method("new", function!(MatchResult::new, 2))?;
+    class.define_method("pattern_index", method!(MatchResult::pattern_index, 0))?;
+    class.define_method("captures", method!(MatchResult::captures, 0))?;
+
+    let class = module.define_class("PatternResult", ruby.class_object())?;
+    class.define_singleton_method("new", function!(PatternResult::new, 2))?;
+    class.define_method("matches", method!(PatternResult::matches, 0))?;
+    class.define_method("total_count", method!(PatternResult::total_count, 0))?;
+
     let class = module.define_class("ExtractionResult", ruby.class_object())?;
     class.define_singleton_method("new", function!(ExtractionResult::new, 2))?;
     class.define_method("language", method!(ExtractionResult::language, 0))?;
     class.define_method("results", method!(ExtractionResult::results, 0))?;
+
+    let class = module.define_class("PatternValidation", ruby.class_object())?;
+    class.define_singleton_method("new", function!(PatternValidation::new, 5))?;
+    class.define_method("valid", method!(PatternValidation::valid, 0))?;
+    class.define_method("capture_names", method!(PatternValidation::capture_names, 0))?;
+    class.define_method("pattern_count", method!(PatternValidation::pattern_count, 0))?;
+    class.define_method("warnings", method!(PatternValidation::warnings, 0))?;
+    class.define_method("errors", method!(PatternValidation::errors, 0))?;
+
+    let class = module.define_class("ValidationResult", ruby.class_object())?;
+    class.define_singleton_method("new", function!(ValidationResult::new, 2))?;
+    class.define_method("valid", method!(ValidationResult::valid, 0))?;
+    class.define_method("patterns", method!(ValidationResult::patterns, 0))?;
 
     let class = module.define_class("Span", ruby.class_object())?;
     class.define_singleton_method("new", function!(Span::new, 6))?;
@@ -3071,11 +3609,11 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_method("fetch_manifest", method!(DownloadManager::fetch_manifest, 0))?;
     class.define_method("clean_cache", method!(DownloadManager::clean_cache, 0))?;
 
-    let _class = module.define_class("Parser", ruby.class_object())?;
+    let _class = module.define_class("Tree", ruby.class_object())?;
 
     let _class = module.define_class("Language", ruby.class_object())?;
 
-    let _class = module.define_class("Tree", ruby.class_object())?;
+    let _class = module.define_class("Parser", ruby.class_object())?;
 
     module.define_module_function(
         "detect_language_from_extension",

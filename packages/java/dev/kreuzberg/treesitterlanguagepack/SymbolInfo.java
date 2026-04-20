@@ -11,4 +11,7 @@ public record SymbolInfo(
     @JsonProperty("type_annotation") Optional<String> typeAnnotation,
     Optional<String> doc
 ) {
+    public static SymbolInfoBuilder builder() {
+        return new SymbolInfoBuilder();
+    }
 }

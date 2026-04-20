@@ -15,7 +15,7 @@ public sealed class SymbolInfo
     public string Name { get; set; } = "";
 
     [JsonPropertyName("kind")]
-    public JsonElement Kind { get; set; } = default!;
+    public JsonElement Kind { get; set; } = default;
 
     [JsonPropertyName("span")]
     public Span Span { get; set; } = default!;

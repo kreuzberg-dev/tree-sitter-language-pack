@@ -8,4 +8,7 @@ public record QueryMatch(
     @JsonProperty("pattern_index") long patternIndex,
     List<String> captures
 ) {
+    public static QueryMatchBuilder builder() {
+        return new QueryMatchBuilder();
+    }
 }

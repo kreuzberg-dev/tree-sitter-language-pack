@@ -27,7 +27,7 @@ defmodule TreeSitterLanguagePack do
   end
 
   @doc "Validate an extraction config without running it."
-  @spec validate_extraction(map()) :: {:ok, String.t()} | {:error, String.t()}
+  @spec validate_extraction(String.t() | nil) :: {:ok, String.t() | nil} | {:error, String.t()}
   def validate_extraction(config) do
     TreeSitterLanguagePack.Native.validate_extraction(config)
   end
@@ -39,19 +39,19 @@ defmodule TreeSitterLanguagePack do
   end
 
   @doc "Get a `NodeInfo` snapshot of the root node."
-  @spec root_node_info(reference()) :: map()
+  @spec root_node_info(reference()) :: String.t() | nil
   def root_node_info(tree) do
     TreeSitterLanguagePack.Native.root_node_info(tree)
   end
 
   @doc "Find all nodes matching the given type name, returning their `NodeInfo`."
-  @spec find_nodes_by_type(reference(), String.t()) :: [map()]
+  @spec find_nodes_by_type(reference(), String.t()) :: [String.t() | nil]
   def find_nodes_by_type(tree, node_type) do
     TreeSitterLanguagePack.Native.find_nodes_by_type(tree, node_type)
   end
 
   @doc "Get `NodeInfo` for all named children of the root node."
-  @spec named_children_info(reference()) :: [map()]
+  @spec named_children_info(reference()) :: [String.t() | nil]
   def named_children_info(tree) do
     TreeSitterLanguagePack.Native.named_children_info(tree)
   end
@@ -105,7 +105,7 @@ defmodule TreeSitterLanguagePack do
   end
 
   @doc "Execute a tree-sitter query pattern against a parsed tree."
-  @spec run_query(reference(), String.t(), String.t(), binary()) :: {:ok, [map()]} | {:error, String.t()}
+  @spec run_query(reference(), String.t(), String.t(), binary()) :: {:ok, [String.t() | nil]} | {:error, String.t()}
   def run_query(tree, language, query_source, source) do
     TreeSitterLanguagePack.Native.run_query(tree, language, query_source, source)
   end
@@ -147,7 +147,7 @@ defmodule TreeSitterLanguagePack do
   end
 
   @doc "Run extraction patterns against source code."
-  @spec extract_patterns(String.t(), map()) :: {:ok, map()} | {:error, String.t()}
+  @spec extract_patterns(String.t(), String.t() | nil) :: {:ok, String.t() | nil} | {:error, String.t()}
   def extract_patterns(source, config) do
     TreeSitterLanguagePack.Native.extract_patterns(source, config)
   end

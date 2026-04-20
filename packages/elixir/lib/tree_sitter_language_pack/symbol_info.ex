@@ -5,6 +5,6 @@ defmodule TreeSitterLanguagePack.SymbolInfo do
   defstruct name: "",
             kind: :variable,
             span: nil,
-            type_annotation: nil,
-            doc: nil
+            type_annotation: "",
+            doc: ""
 end

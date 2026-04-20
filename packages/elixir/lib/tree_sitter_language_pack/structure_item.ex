@@ -3,12 +3,12 @@ defmodule TreeSitterLanguagePack.StructureItem do
   @moduledoc "A structural item (function, class, struct, etc.) in source code."
 
   defstruct kind: :function,
-            name: nil,
-            visibility: nil,
+            name: "",
+            visibility: "",
             span: nil,
             children: [],
             decorators: [],
-            doc_comment: nil,
-            signature: nil,
+            doc_comment: "",
+            signature: "",
             body_span: nil
 end

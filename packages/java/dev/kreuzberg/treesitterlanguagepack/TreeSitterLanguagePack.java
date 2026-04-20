@@ -106,7 +106,7 @@ public final class TreeSitterLanguagePack {
      *
      * Returns an error if the language cannot be loaded.
      */
-    public static String validateExtraction(ExtractionConfig config) throws TreeSitterLanguagePackRsException {
+    public static ValidationResult validateExtraction(ExtractionConfig config) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(config, "config must not be null");
         return TreeSitterLanguagePackRs.validateExtraction(config);
     }

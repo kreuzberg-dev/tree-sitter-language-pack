@@ -3,6 +3,6 @@ defmodule TreeSitterLanguagePack.DocSection do
   @moduledoc "A section within a docstring (e.g., Args, Returns, Raises)."
 
   defstruct kind: "",
-            name: nil,
+            name: "",
             description: ""
 end

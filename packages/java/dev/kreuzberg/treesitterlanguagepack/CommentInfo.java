@@ -10,4 +10,7 @@ public record CommentInfo(
     Span span,
     @JsonProperty("associated_node") Optional<String> associatedNode
 ) {
+    public static CommentInfoBuilder builder() {
+        return new CommentInfoBuilder();
+    }
 }

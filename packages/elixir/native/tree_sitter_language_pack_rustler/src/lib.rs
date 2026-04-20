@@ -13,8 +13,7 @@ use rustler::ResourceArc;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.ExtractionPattern"]
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct ExtractionPattern {
     pub query: String,
     pub capture_output: CaptureOutput,
@@ -23,22 +22,157 @@ pub struct ExtractionPattern {
     pub byte_range: Option<String>,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.ExtractionConfig"]
+impl ExtractionPattern {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            query: opts.get("query").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            capture_output: opts
+                .get("capture_output")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            child_fields: opts
+                .get("child_fields")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            max_results: opts.get("max_results").and_then(|t| t.decode().ok()),
+            byte_range: opts.get("byte_range").and_then(|t| t.decode().ok()),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct ExtractionConfig {
     pub language: String,
     pub patterns: String,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.ExtractionResult"]
+impl ExtractionConfig {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            language: opts.get("language").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            patterns: opts.get("patterns").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
+pub struct CaptureResult {
+    pub name: String,
+    pub node: Option<NodeInfo>,
+    pub text: Option<String>,
+    pub child_fields: String,
+    pub start_byte: usize,
+}
+
+impl CaptureResult {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            name: opts.get("name").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            node: opts.get("node").and_then(|t| t.decode().ok()),
+            text: opts.get("text").and_then(|t| t.decode().ok()),
+            child_fields: opts
+                .get("child_fields")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            start_byte: opts.get("start_byte").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
+pub struct MatchResult {
+    pub pattern_index: usize,
+    pub captures: Vec<CaptureResult>,
+}
+
+impl MatchResult {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            pattern_index: opts
+                .get("pattern_index")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            captures: opts.get("captures").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
+pub struct PatternResult {
+    pub matches: Vec<MatchResult>,
+    pub total_count: usize,
+}
+
+impl PatternResult {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            matches: opts.get("matches").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            total_count: opts
+                .get("total_count")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct ExtractionResult {
     pub language: String,
     pub results: String,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.Span"]
+impl ExtractionResult {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            language: opts.get("language").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            results: opts.get("results").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
+pub struct PatternValidation {
+    pub valid: bool,
+    pub capture_names: Vec<String>,
+    pub pattern_count: usize,
+    pub warnings: Vec<String>,
+    pub errors: Vec<String>,
+}
+
+impl PatternValidation {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            valid: opts.get("valid").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            capture_names: opts
+                .get("capture_names")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            pattern_count: opts
+                .get("pattern_count")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            warnings: opts.get("warnings").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            errors: opts.get("errors").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
+pub struct ValidationResult {
+    pub valid: bool,
+    pub patterns: String,
+}
+
+impl ValidationResult {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            valid: opts.get("valid").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            patterns: opts.get("patterns").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct Span {
     pub start_byte: usize,
     pub end_byte: usize,
@@ -46,6 +180,22 @@ pub struct Span {
     pub start_column: usize,
     pub end_line: usize,
     pub end_column: usize,
+}
+
+impl Span {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            start_byte: opts.get("start_byte").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            end_byte: opts.get("end_byte").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            start_line: opts.get("start_line").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            start_column: opts
+                .get("start_column")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            end_line: opts.get("end_line").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            end_column: opts.get("end_column").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
@@ -129,8 +279,7 @@ impl FileMetrics {
     }
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.StructureItem"]
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct StructureItem {
     pub kind: StructureKind,
     pub name: Option<String>,
@@ -143,8 +292,23 @@ pub struct StructureItem {
     pub body_span: Option<Span>,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.CommentInfo"]
+impl StructureItem {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            kind: opts.get("kind").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            name: opts.get("name").and_then(|t| t.decode().ok()),
+            visibility: opts.get("visibility").and_then(|t| t.decode().ok()),
+            span: opts.get("span").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            children: opts.get("children").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            decorators: opts.get("decorators").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            doc_comment: opts.get("doc_comment").and_then(|t| t.decode().ok()),
+            signature: opts.get("signature").and_then(|t| t.decode().ok()),
+            body_span: opts.get("body_span").and_then(|t| t.decode().ok()),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct CommentInfo {
     pub text: String,
     pub kind: CommentKind,
@@ -152,8 +316,18 @@ pub struct CommentInfo {
     pub associated_node: Option<String>,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.DocstringInfo"]
+impl CommentInfo {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            text: opts.get("text").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            kind: opts.get("kind").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            span: opts.get("span").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            associated_node: opts.get("associated_node").and_then(|t| t.decode().ok()),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct DocstringInfo {
     pub text: String,
     pub format: DocstringFormat,
@@ -162,16 +336,42 @@ pub struct DocstringInfo {
     pub parsed_sections: Vec<DocSection>,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.DocSection"]
+impl DocstringInfo {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            text: opts.get("text").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            format: opts.get("format").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            span: opts.get("span").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            associated_item: opts.get("associated_item").and_then(|t| t.decode().ok()),
+            parsed_sections: opts
+                .get("parsed_sections")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct DocSection {
     pub kind: String,
     pub name: Option<String>,
     pub description: String,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.ImportInfo"]
+impl DocSection {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            kind: opts.get("kind").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            name: opts.get("name").and_then(|t| t.decode().ok()),
+            description: opts
+                .get("description")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct ImportInfo {
     pub source: String,
     pub items: Vec<String>,
@@ -180,16 +380,39 @@ pub struct ImportInfo {
     pub span: Span,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.ExportInfo"]
+impl ImportInfo {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            source: opts.get("source").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            items: opts.get("items").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            alias: opts.get("alias").and_then(|t| t.decode().ok()),
+            is_wildcard: opts
+                .get("is_wildcard")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            span: opts.get("span").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct ExportInfo {
     pub name: String,
     pub kind: ExportKind,
     pub span: Span,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.SymbolInfo"]
+impl ExportInfo {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            name: opts.get("name").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            kind: opts.get("kind").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            span: opts.get("span").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct SymbolInfo {
     pub name: String,
     pub kind: SymbolKind,
@@ -198,16 +421,36 @@ pub struct SymbolInfo {
     pub doc: Option<String>,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.Diagnostic"]
+impl SymbolInfo {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            name: opts.get("name").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            kind: opts.get("kind").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            span: opts.get("span").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            type_annotation: opts.get("type_annotation").and_then(|t| t.decode().ok()),
+            doc: opts.get("doc").and_then(|t| t.decode().ok()),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct Diagnostic {
     pub message: String,
     pub severity: DiagnosticSeverity,
     pub span: Span,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.CodeChunk"]
+impl Diagnostic {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            message: opts.get("message").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            severity: opts.get("severity").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            span: opts.get("span").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct CodeChunk {
     pub content: String,
     pub start_byte: usize,
@@ -217,8 +460,20 @@ pub struct CodeChunk {
     pub metadata: ChunkContext,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.ChunkContext"]
+impl CodeChunk {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            content: opts.get("content").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            start_byte: opts.get("start_byte").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            end_byte: opts.get("end_byte").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            start_line: opts.get("start_line").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            end_line: opts.get("end_line").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            metadata: opts.get("metadata").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct ChunkContext {
     pub language: String,
     pub chunk_index: usize,
@@ -231,8 +486,38 @@ pub struct ChunkContext {
     pub has_error_nodes: bool,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.NodeInfo"]
+impl ChunkContext {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            language: opts.get("language").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            chunk_index: opts
+                .get("chunk_index")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            total_chunks: opts
+                .get("total_chunks")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            node_types: opts.get("node_types").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            context_path: opts
+                .get("context_path")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            symbols_defined: opts
+                .get("symbols_defined")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            comments: opts.get("comments").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            docstrings: opts.get("docstrings").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            has_error_nodes: opts
+                .get("has_error_nodes")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct NodeInfo {
     pub kind: String,
     pub is_named: bool,
@@ -245,6 +530,27 @@ pub struct NodeInfo {
     pub named_child_count: usize,
     pub is_error: bool,
     pub is_missing: bool,
+}
+
+impl NodeInfo {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            kind: opts.get("kind").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            is_named: opts.get("is_named").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            start_byte: opts.get("start_byte").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            end_byte: opts.get("end_byte").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            start_row: opts.get("start_row").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            start_col: opts.get("start_col").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            end_row: opts.get("end_row").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            end_col: opts.get("end_col").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            named_child_count: opts
+                .get("named_child_count")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            is_error: opts.get("is_error").and_then(|t| t.decode().ok()).unwrap_or_default(),
+            is_missing: opts.get("is_missing").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
@@ -295,11 +601,22 @@ impl ProcessConfig {
     }
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifStruct)]
-#[module = "TreeSitterLanguagePack.QueryMatch"]
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, rustler::NifMap)]
 pub struct QueryMatch {
     pub pattern_index: usize,
     pub captures: Vec<String>,
+}
+
+impl QueryMatch {
+    pub fn new(opts: std::collections::HashMap<String, rustler::Term>) -> Self {
+        Self {
+            pattern_index: opts
+                .get("pattern_index")
+                .and_then(|t| t.decode().ok())
+                .unwrap_or_default(),
+            captures: opts.get("captures").and_then(|t| t.decode().ok()).unwrap_or_default(),
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -347,14 +664,14 @@ impl std::panic::RefUnwindSafe for DownloadManager {}
 impl rustler::Resource for DownloadManager {}
 
 #[derive(Clone)]
-pub struct Parser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
+pub struct Tree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
 }
 
 // SAFETY: See gen_opaque_resource in alef-backend-rustler for rationale.
-impl std::panic::RefUnwindSafe for Parser {}
+impl std::panic::RefUnwindSafe for Tree {}
 
-impl rustler::Resource for Parser {}
+impl rustler::Resource for Tree {}
 
 #[derive(Clone)]
 pub struct Language {
@@ -367,14 +684,14 @@ impl std::panic::RefUnwindSafe for Language {}
 impl rustler::Resource for Language {}
 
 #[derive(Clone)]
-pub struct Tree {
-    inner: Arc<tree_sitter_language_pack::Tree>,
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
 }
 
 // SAFETY: See gen_opaque_resource in alef-backend-rustler for rationale.
-impl std::panic::RefUnwindSafe for Tree {}
+impl std::panic::RefUnwindSafe for Parser {}
 
-impl rustler::Resource for Tree {}
+impl rustler::Resource for Parser {}
 
 #[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize, rustler::NifUnitEnum)]
 pub enum CaptureOutput {
@@ -512,8 +829,15 @@ pub fn detect_language_from_content(content: String) -> Option<String> {
 }
 
 #[rustler::nif]
-pub fn validate_extraction(config: ExtractionConfig) -> Result<String, String> {
-    Err(String::from("Not implemented: validate_extraction"))
+pub fn validate_extraction(config: Option<String>) -> Result<ValidationResult, String> {
+    let config_core: Option<tree_sitter_language_pack::ExtractionConfig> = config
+        .map(|s| serde_json::from_str::<tree_sitter_language_pack::ExtractionConfig>(&s))
+        .transpose()
+        .map_err(|e| e.to_string())?;
+    let result =
+        tree_sitter_language_pack::extract::validate_extraction(config_core.as_ref().unwrap_or(&Default::default()))
+            .map_err(|e| e.to_string())?;
+    Ok(result.into())
 }
 
 #[rustler::nif]
@@ -648,9 +972,14 @@ pub fn language_count() -> usize {
 }
 
 #[rustler::nif]
-pub fn extract_patterns(source: String, config: ExtractionConfig) -> Result<ExtractionResult, String> {
+pub fn extract_patterns(source: String, config: Option<String>) -> Result<ExtractionResult, String> {
+    let config_core: Option<tree_sitter_language_pack::ExtractionConfig> = config
+        .map(|s| serde_json::from_str::<tree_sitter_language_pack::ExtractionConfig>(&s))
+        .transpose()
+        .map_err(|e| e.to_string())?;
     let result =
-        tree_sitter_language_pack::extract_patterns(&source, &config.clone().into()).map_err(|e| e.to_string())?;
+        tree_sitter_language_pack::extract_patterns(&source, config_core.as_ref().unwrap_or(&Default::default()))
+            .map_err(|e| e.to_string())?;
     Ok(result.into())
 }
 
@@ -926,6 +1255,36 @@ impl From<tree_sitter_language_pack::ExtractionConfig> for ExtractionConfig {
     }
 }
 
+impl From<tree_sitter_language_pack::CaptureResult> for CaptureResult {
+    fn from(val: tree_sitter_language_pack::CaptureResult) -> Self {
+        Self {
+            name: val.name,
+            node: val.node.map(Into::into),
+            text: val.text,
+            child_fields: format!("{:?}", val.child_fields),
+            start_byte: val.start_byte,
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::MatchResult> for MatchResult {
+    fn from(val: tree_sitter_language_pack::MatchResult) -> Self {
+        Self {
+            pattern_index: val.pattern_index,
+            captures: val.captures.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternResult> for PatternResult {
+    fn from(val: tree_sitter_language_pack::PatternResult) -> Self {
+        Self {
+            matches: val.matches.into_iter().map(Into::into).collect(),
+            total_count: val.total_count,
+        }
+    }
+}
+
 impl From<ExtractionResult> for tree_sitter_language_pack::ExtractionResult {
     fn from(val: ExtractionResult) -> Self {
         Self {
@@ -940,6 +1299,36 @@ impl From<tree_sitter_language_pack::ExtractionResult> for ExtractionResult {
         Self {
             language: val.language,
             results: format!("{:?}", val.results),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternValidation> for PatternValidation {
+    fn from(val: tree_sitter_language_pack::PatternValidation) -> Self {
+        Self {
+            valid: val.valid,
+            capture_names: val.capture_names,
+            pattern_count: val.pattern_count,
+            warnings: val.warnings,
+            errors: val.errors,
+        }
+    }
+}
+
+impl From<ValidationResult> for tree_sitter_language_pack::ValidationResult {
+    fn from(val: ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: Default::default(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ValidationResult> for ValidationResult {
+    fn from(val: tree_sitter_language_pack::ValidationResult) -> Self {
+        Self {
+            valid: val.valid,
+            patterns: format!("{:?}", val.patterns),
         }
     }
 }
@@ -1623,11 +2012,11 @@ fn on_load(env: rustler::Env, _info: rustler::Term) -> bool {
         .expect("Failed to register resource type LanguageRegistry");
     env.register::<DownloadManager>()
         .expect("Failed to register resource type DownloadManager");
-    env.register::<Parser>()
-        .expect("Failed to register resource type Parser");
+    env.register::<Tree>().expect("Failed to register resource type Tree");
     env.register::<Language>()
         .expect("Failed to register resource type Language");
-    env.register::<Tree>().expect("Failed to register resource type Tree");
+    env.register::<Parser>()
+        .expect("Failed to register resource type Parser");
     true
 }
 

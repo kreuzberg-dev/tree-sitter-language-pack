@@ -4,7 +4,7 @@ defmodule TreeSitterLanguagePack.Native do
 
   use RustlerPrecompiled,
     otp_app: :tree_sitter_language_pack,
-    crate: "tree_sitter_language_pack_rustler",
+    crate: "tree_sitter_language_pack_nif",
     base_url:
       "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v#{Mix.Project.config()[:version]}",
     version: Mix.Project.config()[:version],

@@ -17,11 +17,11 @@ use std::sync::Arc;
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsExtractionPattern {
-    pub query: String,
+    pub query: Option<String>,
     #[napi(js_name = "captureOutput")]
-    pub capture_output: JsCaptureOutput,
+    pub capture_output: Option<JsCaptureOutput>,
     #[napi(js_name = "childFields")]
-    pub child_fields: Vec<String>,
+    pub child_fields: Option<Vec<String>>,
     #[napi(js_name = "maxResults")]
     pub max_results: Option<i64>,
     #[napi(js_name = "byteRange")]
@@ -31,32 +31,79 @@ pub struct JsExtractionPattern {
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsExtractionConfig {
-    pub language: String,
-    pub patterns: String,
+    pub language: Option<String>,
+    pub patterns: Option<String>,
+}
+
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[napi(object)]
+pub struct JsCaptureResult {
+    pub name: Option<String>,
+    pub node: Option<JsNodeInfo>,
+    pub text: Option<String>,
+    #[napi(js_name = "childFields")]
+    pub child_fields: Option<String>,
+    #[napi(js_name = "startByte")]
+    pub start_byte: Option<i64>,
+}
+
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[napi(object)]
+pub struct JsMatchResult {
+    #[napi(js_name = "patternIndex")]
+    pub pattern_index: Option<i64>,
+    pub captures: Option<Vec<JsCaptureResult>>,
+}
+
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[napi(object)]
+pub struct JsPatternResult {
+    pub matches: Option<Vec<JsMatchResult>>,
+    #[napi(js_name = "totalCount")]
+    pub total_count: Option<i64>,
 }
 
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsExtractionResult {
-    pub language: String,
-    pub results: String,
+    pub language: Option<String>,
+    pub results: Option<String>,
+}
+
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[napi(object)]
+pub struct JsPatternValidation {
+    pub valid: Option<bool>,
+    #[napi(js_name = "captureNames")]
+    pub capture_names: Option<Vec<String>>,
+    #[napi(js_name = "patternCount")]
+    pub pattern_count: Option<i64>,
+    pub warnings: Option<Vec<String>>,
+    pub errors: Option<Vec<String>>,
+}
+
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[napi(object)]
+pub struct JsValidationResult {
+    pub valid: Option<bool>,
+    pub patterns: Option<String>,
 }
 
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsSpan {
     #[napi(js_name = "startByte")]
-    pub start_byte: i64,
+    pub start_byte: Option<i64>,
     #[napi(js_name = "endByte")]
-    pub end_byte: i64,
+    pub end_byte: Option<i64>,
     #[napi(js_name = "startLine")]
-    pub start_line: i64,
+    pub start_line: Option<i64>,
     #[napi(js_name = "startColumn")]
-    pub start_column: i64,
+    pub start_column: Option<i64>,
     #[napi(js_name = "endLine")]
-    pub end_line: i64,
+    pub end_line: Option<i64>,
     #[napi(js_name = "endColumn")]
-    pub end_column: i64,
+    pub end_column: Option<i64>,
 }
 
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
@@ -99,12 +146,12 @@ pub struct JsFileMetrics {
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsStructureItem {
-    pub kind: JsStructureKind,
+    pub kind: Option<JsStructureKind>,
     pub name: Option<String>,
     pub visibility: Option<String>,
-    pub span: JsSpan,
-    pub children: Vec<JsStructureItem>,
-    pub decorators: Vec<String>,
+    pub span: Option<JsSpan>,
+    pub children: Option<Vec<JsStructureItem>>,
+    pub decorators: Option<Vec<String>>,
     #[napi(js_name = "docComment")]
     pub doc_comment: Option<String>,
     pub signature: Option<String>,
@@ -115,9 +162,9 @@ pub struct JsStructureItem {
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsCommentInfo {
-    pub text: String,
-    pub kind: JsCommentKind,
-    pub span: JsSpan,
+    pub text: Option<String>,
+    pub kind: Option<JsCommentKind>,
+    pub span: Option<JsSpan>,
     #[napi(js_name = "associatedNode")]
     pub associated_node: Option<String>,
 }
@@ -125,48 +172,48 @@ pub struct JsCommentInfo {
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsDocstringInfo {
-    pub text: String,
-    pub format: JsDocstringFormat,
-    pub span: JsSpan,
+    pub text: Option<String>,
+    pub format: Option<JsDocstringFormat>,
+    pub span: Option<JsSpan>,
     #[napi(js_name = "associatedItem")]
     pub associated_item: Option<String>,
     #[napi(js_name = "parsedSections")]
-    pub parsed_sections: Vec<JsDocSection>,
+    pub parsed_sections: Option<Vec<JsDocSection>>,
 }
 
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsDocSection {
-    pub kind: String,
+    pub kind: Option<String>,
     pub name: Option<String>,
-    pub description: String,
+    pub description: Option<String>,
 }
 
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsImportInfo {
-    pub source: String,
-    pub items: Vec<String>,
+    pub source: Option<String>,
+    pub items: Option<Vec<String>>,
     pub alias: Option<String>,
     #[napi(js_name = "isWildcard")]
-    pub is_wildcard: bool,
-    pub span: JsSpan,
+    pub is_wildcard: Option<bool>,
+    pub span: Option<JsSpan>,
 }
 
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsExportInfo {
-    pub name: String,
-    pub kind: JsExportKind,
-    pub span: JsSpan,
+    pub name: Option<String>,
+    pub kind: Option<JsExportKind>,
+    pub span: Option<JsSpan>,
 }
 
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsSymbolInfo {
-    pub name: String,
-    pub kind: JsSymbolKind,
-    pub span: JsSpan,
+    pub name: Option<String>,
+    pub kind: Option<JsSymbolKind>,
+    pub span: Option<JsSpan>,
     #[napi(js_name = "typeAnnotation")]
     pub type_annotation: Option<String>,
     pub doc: Option<String>,
@@ -175,70 +222,70 @@ pub struct JsSymbolInfo {
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsDiagnostic {
-    pub message: String,
-    pub severity: JsDiagnosticSeverity,
-    pub span: JsSpan,
+    pub message: Option<String>,
+    pub severity: Option<JsDiagnosticSeverity>,
+    pub span: Option<JsSpan>,
 }
 
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsCodeChunk {
-    pub content: String,
+    pub content: Option<String>,
     #[napi(js_name = "startByte")]
-    pub start_byte: i64,
+    pub start_byte: Option<i64>,
     #[napi(js_name = "endByte")]
-    pub end_byte: i64,
+    pub end_byte: Option<i64>,
     #[napi(js_name = "startLine")]
-    pub start_line: i64,
+    pub start_line: Option<i64>,
     #[napi(js_name = "endLine")]
-    pub end_line: i64,
-    pub metadata: JsChunkContext,
+    pub end_line: Option<i64>,
+    pub metadata: Option<JsChunkContext>,
 }
 
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsChunkContext {
-    pub language: String,
+    pub language: Option<String>,
     #[napi(js_name = "chunkIndex")]
-    pub chunk_index: i64,
+    pub chunk_index: Option<i64>,
     #[napi(js_name = "totalChunks")]
-    pub total_chunks: i64,
+    pub total_chunks: Option<i64>,
     #[napi(js_name = "nodeTypes")]
-    pub node_types: Vec<String>,
+    pub node_types: Option<Vec<String>>,
     #[napi(js_name = "contextPath")]
-    pub context_path: Vec<String>,
+    pub context_path: Option<Vec<String>>,
     #[napi(js_name = "symbolsDefined")]
-    pub symbols_defined: Vec<String>,
-    pub comments: Vec<JsCommentInfo>,
-    pub docstrings: Vec<JsDocstringInfo>,
+    pub symbols_defined: Option<Vec<String>>,
+    pub comments: Option<Vec<JsCommentInfo>>,
+    pub docstrings: Option<Vec<JsDocstringInfo>>,
     #[napi(js_name = "hasErrorNodes")]
-    pub has_error_nodes: bool,
+    pub has_error_nodes: Option<bool>,
 }
 
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[napi(object)]
 pub struct JsNodeInfo {
-    pub kind: String,
+    pub kind: Option<String>,
     #[napi(js_name = "isNamed")]
-    pub is_named: bool,
+    pub is_named: Option<bool>,
     #[napi(js_name = "startByte")]
-    pub start_byte: i64,
+    pub start_byte: Option<i64>,
     #[napi(js_name = "endByte")]
-    pub end_byte: i64,
+    pub end_byte: Option<i64>,
     #[napi(js_name = "startRow")]
-    pub start_row: i64,
+    pub start_row: Option<i64>,
     #[napi(js_name = "startCol")]
-    pub start_col: i64,
+    pub start_col: Option<i64>,
     #[napi(js_name = "endRow")]
-    pub end_row: i64,
+    pub end_row: Option<i64>,
     #[napi(js_name = "endCol")]
-    pub end_col: i64,
+    pub end_col: Option<i64>,
     #[napi(js_name = "namedChildCount")]
-    pub named_child_count: i64,
+    pub named_child_count: Option<i64>,
     #[napi(js_name = "isError")]
-    pub is_error: bool,
+    pub is_error: Option<bool>,
     #[napi(js_name = "isMissing")]
-    pub is_missing: bool,
+    pub is_missing: Option<bool>,
 }
 
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
@@ -270,8 +317,8 @@ pub struct JsProcessConfig {
 #[napi(object)]
 pub struct JsQueryMatch {
     #[napi(js_name = "patternIndex")]
-    pub pattern_index: i64,
-    pub captures: Vec<String>,
+    pub pattern_index: Option<i64>,
+    pub captures: Option<Vec<String>>,
 }
 
 #[derive(Clone)]
@@ -317,9 +364,10 @@ impl JsLanguageRegistry {
     #[allow(clippy::missing_errors_doc)]
     #[napi]
     pub fn process(&self, source: String, config: JsProcessConfig) -> Result<JsProcessResult> {
+        let config_core: tree_sitter_language_pack::ProcessConfig = config.into();
         let result = self
             .inner
-            .process(&source, config.into())
+            .process(&source, &config_core)
             .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
         Ok(result.into())
     }
@@ -369,29 +417,31 @@ pub struct JsLanguageInfo {
 #[derive(Clone)]
 #[napi]
 pub struct JsDownloadManager {
-    inner: Arc<tree_sitter_language_pack::DownloadManager>,
+    inner: Arc<std::sync::Mutex<tree_sitter_language_pack::DownloadManager>>,
 }
 
 #[napi]
 impl JsDownloadManager {
     #[napi(js_name = "cacheDir")]
     pub fn cache_dir(&self) -> String {
-        self.inner.cache_dir().to_string_lossy().to_string()
+        self.inner.lock().unwrap().cache_dir().to_string_lossy().to_string()
     }
 
     #[napi(js_name = "installedLanguages")]
     pub fn installed_languages(&self) -> Vec<String> {
-        self.inner.installed_languages()
+        self.inner.lock().unwrap().installed_languages()
     }
 
     #[allow(clippy::missing_errors_doc)]
     #[napi(js_name = "ensureLanguages")]
     pub fn ensure_languages(&self, names: Vec<String>) -> Result<()> {
-        let _ = names;
-        Err(napi::Error::new(
-            napi::Status::GenericFailure,
-            "Not implemented: DownloadManager.ensure_languages",
-        ))
+        let names_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
+        self.inner
+            .lock()
+            .unwrap()
+            .ensure_languages(&names_refs)
+            .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+        Ok(())
     }
 
     #[allow(clippy::missing_errors_doc)]
@@ -406,7 +456,7 @@ impl JsDownloadManager {
 
     #[napi(js_name = "libPath")]
     pub fn lib_path(&self, name: String) -> String {
-        self.inner.lib_path(&name).to_string_lossy().to_string()
+        self.inner.lock().unwrap().lib_path(&name).to_string_lossy().to_string()
     }
 
     #[allow(clippy::missing_errors_doc)]
@@ -422,6 +472,8 @@ impl JsDownloadManager {
     #[napi(js_name = "cleanCache")]
     pub fn clean_cache(&self) -> Result<()> {
         self.inner
+            .lock()
+            .unwrap()
             .clean_cache()
             .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
         Ok(())
@@ -431,17 +483,17 @@ impl JsDownloadManager {
     #[napi]
     pub fn new(version: String) -> Result<JsDownloadManager> {
         tree_sitter_language_pack::DownloadManager::new(&version)
-            .map(|val| Self { inner: Arc::new(val) })
+            .map(|val| Self { inner: Arc::new(std::sync::Mutex::new(val)) })
             .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
     }
 
     #[napi(js_name = "withCacheDir")]
     pub fn with_cache_dir(version: String, cache_dir: String) -> JsDownloadManager {
         Self {
-            inner: Arc::new(tree_sitter_language_pack::DownloadManager::with_cache_dir(
+            inner: Arc::new(std::sync::Mutex::new(tree_sitter_language_pack::DownloadManager::with_cache_dir(
                 &version,
                 std::path::PathBuf::from(cache_dir),
-            )),
+            ))),
         }
     }
 
@@ -456,17 +508,17 @@ impl JsDownloadManager {
 
 #[derive(Clone)]
 #[napi]
-pub struct JsParser {
-    inner: Arc<tree_sitter::Parser>,
+pub struct JsTree {
+    inner: Arc<tree_sitter_language_pack::Tree>,
 }
 
 #[napi]
-impl JsParser {}
+impl JsTree {}
 
 #[derive(Clone)]
 #[napi]
 pub struct JsLanguage {
-    inner: Arc<tree_sitter::Language>,
+    inner: Arc<tree_sitter_language_pack::Language>,
 }
 
 #[napi]
@@ -474,12 +526,12 @@ impl JsLanguage {}
 
 #[derive(Clone)]
 #[napi]
-pub struct JsTree {
-    inner: Arc<tree_sitter::Tree>,
+pub struct JsParser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
 }
 
 #[napi]
-impl JsTree {}
+impl JsParser {}
 
 #[napi(string_enum)]
 #[derive(Clone, serde::Serialize, serde::Deserialize)]
@@ -626,12 +678,10 @@ pub fn detect_language_from_content(content: String) -> Option<String> {
 
 #[allow(clippy::missing_errors_doc)]
 #[napi(js_name = "validateExtraction")]
-pub fn validate_extraction(config: JsExtractionConfig) -> Result<String> {
-    let config_json =
-        serde_json::to_string(&config).map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
-    let config_core: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json)
-        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+pub fn validate_extraction(config: JsExtractionConfig) -> Result<JsValidationResult> {
+    let config_core: tree_sitter_language_pack::ExtractionConfig = config.into();
     tree_sitter_language_pack::extract::validate_extraction(&config_core)
+        .map(|val| val.into())
         .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
 }
 
@@ -781,7 +831,8 @@ pub fn configure(config: JsPackConfig) -> Result<()> {
 #[allow(clippy::missing_errors_doc)]
 #[napi]
 pub fn download(names: Vec<String>) -> Result<i64> {
-    tree_sitter_language_pack::download(&names)
+    let names_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
+    tree_sitter_language_pack::download(&names_refs)
         .map(|val| val as i64)
         .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
 }
@@ -823,9 +874,9 @@ pub fn cache_dir() -> Result<String> {
 impl From<tree_sitter_language_pack::ExtractionPattern> for JsExtractionPattern {
     fn from(val: tree_sitter_language_pack::ExtractionPattern) -> Self {
         Self {
-            query: val.query,
-            capture_output: val.capture_output.into(),
-            child_fields: val.child_fields,
+            query: Some(val.query),
+            capture_output: Some(val.capture_output.into()),
+            child_fields: Some(val.child_fields),
             max_results: val.max_results.map(|v| v as i64),
             byte_range: val.byte_range.as_ref().map(|v| format!("{:?}", v)),
         }
@@ -835,7 +886,7 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for JsExtractionPattern 
 impl From<JsExtractionConfig> for tree_sitter_language_pack::ExtractionConfig {
     fn from(val: JsExtractionConfig) -> Self {
         Self {
-            language: val.language,
+            language: val.language.unwrap_or_default(),
             patterns: Default::default(),
         }
     }
@@ -844,8 +895,38 @@ impl From<JsExtractionConfig> for tree_sitter_language_pack::ExtractionConfig {
 impl From<tree_sitter_language_pack::ExtractionConfig> for JsExtractionConfig {
     fn from(val: tree_sitter_language_pack::ExtractionConfig) -> Self {
         Self {
-            language: val.language,
-            patterns: format!("{:?}", val.patterns),
+            language: Some(val.language),
+            patterns: Some(format!("{:?}", val.patterns)),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::CaptureResult> for JsCaptureResult {
+    fn from(val: tree_sitter_language_pack::CaptureResult) -> Self {
+        Self {
+            name: Some(val.name),
+            node: val.node.map(Into::into),
+            text: val.text,
+            child_fields: Some(format!("{:?}", val.child_fields)),
+            start_byte: Some(val.start_byte as i64),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::MatchResult> for JsMatchResult {
+    fn from(val: tree_sitter_language_pack::MatchResult) -> Self {
+        Self {
+            pattern_index: Some(val.pattern_index as i64),
+            captures: Some(val.captures.into_iter().map(Into::into).collect()),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternResult> for JsPatternResult {
+    fn from(val: tree_sitter_language_pack::PatternResult) -> Self {
+        Self {
+            matches: Some(val.matches.into_iter().map(Into::into).collect()),
+            total_count: Some(val.total_count as i64),
         }
     }
 }
@@ -853,7 +934,7 @@ impl From<tree_sitter_language_pack::ExtractionConfig> for JsExtractionConfig {
 impl From<JsExtractionResult> for tree_sitter_language_pack::ExtractionResult {
     fn from(val: JsExtractionResult) -> Self {
         Self {
-            language: val.language,
+            language: val.language.unwrap_or_default(),
             results: Default::default(),
         }
     }
@@ -862,8 +943,38 @@ impl From<JsExtractionResult> for tree_sitter_language_pack::ExtractionResult {
 impl From<tree_sitter_language_pack::ExtractionResult> for JsExtractionResult {
     fn from(val: tree_sitter_language_pack::ExtractionResult) -> Self {
         Self {
-            language: val.language,
-            results: format!("{:?}", val.results),
+            language: Some(val.language),
+            results: Some(format!("{:?}", val.results)),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::PatternValidation> for JsPatternValidation {
+    fn from(val: tree_sitter_language_pack::PatternValidation) -> Self {
+        Self {
+            valid: Some(val.valid),
+            capture_names: Some(val.capture_names),
+            pattern_count: Some(val.pattern_count as i64),
+            warnings: Some(val.warnings),
+            errors: Some(val.errors),
+        }
+    }
+}
+
+impl From<JsValidationResult> for tree_sitter_language_pack::ValidationResult {
+    fn from(val: JsValidationResult) -> Self {
+        Self {
+            valid: val.valid.unwrap_or_default(),
+            patterns: Default::default(),
+        }
+    }
+}
+
+impl From<tree_sitter_language_pack::ValidationResult> for JsValidationResult {
+    fn from(val: tree_sitter_language_pack::ValidationResult) -> Self {
+        Self {
+            valid: Some(val.valid),
+            patterns: Some(format!("{:?}", val.patterns)),
         }
     }
 }
@@ -871,12 +982,12 @@ impl From<tree_sitter_language_pack::ExtractionResult> for JsExtractionResult {
 impl From<JsSpan> for tree_sitter_language_pack::Span {
     fn from(val: JsSpan) -> Self {
         Self {
-            start_byte: val.start_byte as usize,
-            end_byte: val.end_byte as usize,
-            start_line: val.start_line as usize,
-            start_column: val.start_column as usize,
-            end_line: val.end_line as usize,
-            end_column: val.end_column as usize,
+            start_byte: val.start_byte.map(|v| v as usize).unwrap_or_default(),
+            end_byte: val.end_byte.map(|v| v as usize).unwrap_or_default(),
+            start_line: val.start_line.map(|v| v as usize).unwrap_or_default(),
+            start_column: val.start_column.map(|v| v as usize).unwrap_or_default(),
+            end_line: val.end_line.map(|v| v as usize).unwrap_or_default(),
+            end_column: val.end_column.map(|v| v as usize).unwrap_or_default(),
         }
     }
 }
@@ -884,12 +995,12 @@ impl From<JsSpan> for tree_sitter_language_pack::Span {
 impl From<tree_sitter_language_pack::Span> for JsSpan {
     fn from(val: tree_sitter_language_pack::Span) -> Self {
         Self {
-            start_byte: val.start_byte as i64,
-            end_byte: val.end_byte as i64,
-            start_line: val.start_line as i64,
-            start_column: val.start_column as i64,
-            end_line: val.end_line as i64,
-            end_column: val.end_column as i64,
+            start_byte: Some(val.start_byte as i64),
+            end_byte: Some(val.end_byte as i64),
+            start_line: Some(val.start_line as i64),
+            start_column: Some(val.start_column as i64),
+            end_line: Some(val.end_line as i64),
+            end_column: Some(val.end_column as i64),
         }
     }
 }
@@ -987,12 +1098,15 @@ impl From<tree_sitter_language_pack::FileMetrics> for JsFileMetrics {
 impl From<JsStructureItem> for tree_sitter_language_pack::StructureItem {
     fn from(val: JsStructureItem) -> Self {
         Self {
-            kind: val.kind.into(),
+            kind: val.kind.map(Into::into).unwrap_or_default(),
             name: val.name,
             visibility: val.visibility,
-            span: val.span.into(),
-            children: val.children.into_iter().map(Into::into).collect(),
-            decorators: val.decorators,
+            span: val.span.map(Into::into).unwrap_or_default(),
+            children: val
+                .children
+                .map(|v| v.into_iter().map(Into::into).collect())
+                .unwrap_or_default(),
+            decorators: val.decorators.unwrap_or_default(),
             doc_comment: val.doc_comment,
             signature: val.signature,
             body_span: val.body_span.map(Into::into),
@@ -1003,12 +1117,12 @@ impl From<JsStructureItem> for tree_sitter_language_pack::StructureItem {
 impl From<tree_sitter_language_pack::StructureItem> for JsStructureItem {
     fn from(val: tree_sitter_language_pack::StructureItem) -> Self {
         Self {
-            kind: val.kind.into(),
+            kind: Some(val.kind.into()),
             name: val.name,
             visibility: val.visibility,
-            span: val.span.into(),
-            children: val.children.into_iter().map(Into::into).collect(),
-            decorators: val.decorators,
+            span: Some(val.span.into()),
+            children: Some(val.children.into_iter().map(Into::into).collect()),
+            decorators: Some(val.decorators),
             doc_comment: val.doc_comment,
             signature: val.signature,
             body_span: val.body_span.map(Into::into),
@@ -1019,9 +1133,9 @@ impl From<tree_sitter_language_pack::StructureItem> for JsStructureItem {
 impl From<JsCommentInfo> for tree_sitter_language_pack::CommentInfo {
     fn from(val: JsCommentInfo) -> Self {
         Self {
-            text: val.text,
-            kind: val.kind.into(),
-            span: val.span.into(),
+            text: val.text.unwrap_or_default(),
+            kind: val.kind.map(Into::into).unwrap_or_default(),
+            span: val.span.map(Into::into).unwrap_or_default(),
             associated_node: val.associated_node,
         }
     }
@@ -1030,9 +1144,9 @@ impl From<JsCommentInfo> for tree_sitter_language_pack::CommentInfo {
 impl From<tree_sitter_language_pack::CommentInfo> for JsCommentInfo {
     fn from(val: tree_sitter_language_pack::CommentInfo) -> Self {
         Self {
-            text: val.text,
-            kind: val.kind.into(),
-            span: val.span.into(),
+            text: Some(val.text),
+            kind: Some(val.kind.into()),
+            span: Some(val.span.into()),
             associated_node: val.associated_node,
         }
     }
@@ -1041,11 +1155,14 @@ impl From<tree_sitter_language_pack::CommentInfo> for JsCommentInfo {
 impl From<JsDocstringInfo> for tree_sitter_language_pack::DocstringInfo {
     fn from(val: JsDocstringInfo) -> Self {
         Self {
-            text: val.text,
-            format: val.format.into(),
-            span: val.span.into(),
+            text: val.text.unwrap_or_default(),
+            format: val.format.map(Into::into).unwrap_or_default(),
+            span: val.span.map(Into::into).unwrap_or_default(),
             associated_item: val.associated_item,
-            parsed_sections: val.parsed_sections.into_iter().map(Into::into).collect(),
+            parsed_sections: val
+                .parsed_sections
+                .map(|v| v.into_iter().map(Into::into).collect())
+                .unwrap_or_default(),
         }
     }
 }
@@ -1053,11 +1170,11 @@ impl From<JsDocstringInfo> for tree_sitter_language_pack::DocstringInfo {
 impl From<tree_sitter_language_pack::DocstringInfo> for JsDocstringInfo {
     fn from(val: tree_sitter_language_pack::DocstringInfo) -> Self {
         Self {
-            text: val.text,
-            format: val.format.into(),
-            span: val.span.into(),
+            text: Some(val.text),
+            format: Some(val.format.into()),
+            span: Some(val.span.into()),
             associated_item: val.associated_item,
-            parsed_sections: val.parsed_sections.into_iter().map(Into::into).collect(),
+            parsed_sections: Some(val.parsed_sections.into_iter().map(Into::into).collect()),
         }
     }
 }
@@ -1065,9 +1182,9 @@ impl From<tree_sitter_language_pack::DocstringInfo> for JsDocstringInfo {
 impl From<JsDocSection> for tree_sitter_language_pack::DocSection {
     fn from(val: JsDocSection) -> Self {
         Self {
-            kind: val.kind,
+            kind: val.kind.unwrap_or_default(),
             name: val.name,
-            description: val.description,
+            description: val.description.unwrap_or_default(),
         }
     }
 }
@@ -1075,9 +1192,9 @@ impl From<JsDocSection> for tree_sitter_language_pack::DocSection {
 impl From<tree_sitter_language_pack::DocSection> for JsDocSection {
     fn from(val: tree_sitter_language_pack::DocSection) -> Self {
         Self {
-            kind: val.kind,
+            kind: Some(val.kind),
             name: val.name,
-            description: val.description,
+            description: Some(val.description),
         }
     }
 }
@@ -1085,11 +1202,11 @@ impl From<tree_sitter_language_pack::DocSection> for JsDocSection {
 impl From<JsImportInfo> for tree_sitter_language_pack::ImportInfo {
     fn from(val: JsImportInfo) -> Self {
         Self {
-            source: val.source,
-            items: val.items,
+            source: val.source.unwrap_or_default(),
+            items: val.items.unwrap_or_default(),
             alias: val.alias,
-            is_wildcard: val.is_wildcard,
-            span: val.span.into(),
+            is_wildcard: val.is_wildcard.unwrap_or_default(),
+            span: val.span.map(Into::into).unwrap_or_default(),
         }
     }
 }
@@ -1097,11 +1214,11 @@ impl From<JsImportInfo> for tree_sitter_language_pack::ImportInfo {
 impl From<tree_sitter_language_pack::ImportInfo> for JsImportInfo {
     fn from(val: tree_sitter_language_pack::ImportInfo) -> Self {
         Self {
-            source: val.source,
-            items: val.items,
+            source: Some(val.source),
+            items: Some(val.items),
             alias: val.alias,
-            is_wildcard: val.is_wildcard,
-            span: val.span.into(),
+            is_wildcard: Some(val.is_wildcard),
+            span: Some(val.span.into()),
         }
     }
 }
@@ -1109,9 +1226,9 @@ impl From<tree_sitter_language_pack::ImportInfo> for JsImportInfo {
 impl From<JsExportInfo> for tree_sitter_language_pack::ExportInfo {
     fn from(val: JsExportInfo) -> Self {
         Self {
-            name: val.name,
-            kind: val.kind.into(),
-            span: val.span.into(),
+            name: val.name.unwrap_or_default(),
+            kind: val.kind.map(Into::into).unwrap_or_default(),
+            span: val.span.map(Into::into).unwrap_or_default(),
         }
     }
 }
@@ -1119,9 +1236,9 @@ impl From<JsExportInfo> for tree_sitter_language_pack::ExportInfo {
 impl From<tree_sitter_language_pack::ExportInfo> for JsExportInfo {
     fn from(val: tree_sitter_language_pack::ExportInfo) -> Self {
         Self {
-            name: val.name,
-            kind: val.kind.into(),
-            span: val.span.into(),
+            name: Some(val.name),
+            kind: Some(val.kind.into()),
+            span: Some(val.span.into()),
         }
     }
 }
@@ -1129,9 +1246,9 @@ impl From<tree_sitter_language_pack::ExportInfo> for JsExportInfo {
 impl From<JsSymbolInfo> for tree_sitter_language_pack::SymbolInfo {
     fn from(val: JsSymbolInfo) -> Self {
         Self {
-            name: val.name,
-            kind: val.kind.into(),
-            span: val.span.into(),
+            name: val.name.unwrap_or_default(),
+            kind: val.kind.map(Into::into).unwrap_or_default(),
+            span: val.span.map(Into::into).unwrap_or_default(),
             type_annotation: val.type_annotation,
             doc: val.doc,
         }
@@ -1141,9 +1258,9 @@ impl From<JsSymbolInfo> for tree_sitter_language_pack::SymbolInfo {
 impl From<tree_sitter_language_pack::SymbolInfo> for JsSymbolInfo {
     fn from(val: tree_sitter_language_pack::SymbolInfo) -> Self {
         Self {
-            name: val.name,
-            kind: val.kind.into(),
-            span: val.span.into(),
+            name: Some(val.name),
+            kind: Some(val.kind.into()),
+            span: Some(val.span.into()),
             type_annotation: val.type_annotation,
             doc: val.doc,
         }
@@ -1153,9 +1270,9 @@ impl From<tree_sitter_language_pack::SymbolInfo> for JsSymbolInfo {
 impl From<JsDiagnostic> for tree_sitter_language_pack::Diagnostic {
     fn from(val: JsDiagnostic) -> Self {
         Self {
-            message: val.message,
-            severity: val.severity.into(),
-            span: val.span.into(),
+            message: val.message.unwrap_or_default(),
+            severity: val.severity.map(Into::into).unwrap_or_default(),
+            span: val.span.map(Into::into).unwrap_or_default(),
         }
     }
 }
@@ -1163,9 +1280,9 @@ impl From<JsDiagnostic> for tree_sitter_language_pack::Diagnostic {
 impl From<tree_sitter_language_pack::Diagnostic> for JsDiagnostic {
     fn from(val: tree_sitter_language_pack::Diagnostic) -> Self {
         Self {
-            message: val.message,
-            severity: val.severity.into(),
-            span: val.span.into(),
+            message: Some(val.message),
+            severity: Some(val.severity.into()),
+            span: Some(val.span.into()),
         }
     }
 }
@@ -1173,12 +1290,12 @@ impl From<tree_sitter_language_pack::Diagnostic> for JsDiagnostic {
 impl From<JsCodeChunk> for tree_sitter_language_pack::CodeChunk {
     fn from(val: JsCodeChunk) -> Self {
         Self {
-            content: val.content,
-            start_byte: val.start_byte as usize,
-            end_byte: val.end_byte as usize,
-            start_line: val.start_line as usize,
-            end_line: val.end_line as usize,
-            metadata: val.metadata.into(),
+            content: val.content.unwrap_or_default(),
+            start_byte: val.start_byte.map(|v| v as usize).unwrap_or_default(),
+            end_byte: val.end_byte.map(|v| v as usize).unwrap_or_default(),
+            start_line: val.start_line.map(|v| v as usize).unwrap_or_default(),
+            end_line: val.end_line.map(|v| v as usize).unwrap_or_default(),
+            metadata: val.metadata.map(Into::into).unwrap_or_default(),
         }
     }
 }
@@ -1186,12 +1303,12 @@ impl From<JsCodeChunk> for tree_sitter_language_pack::CodeChunk {
 impl From<tree_sitter_language_pack::CodeChunk> for JsCodeChunk {
     fn from(val: tree_sitter_language_pack::CodeChunk) -> Self {
         Self {
-            content: val.content,
-            start_byte: val.start_byte as i64,
-            end_byte: val.end_byte as i64,
-            start_line: val.start_line as i64,
-            end_line: val.end_line as i64,
-            metadata: val.metadata.into(),
+            content: Some(val.content),
+            start_byte: Some(val.start_byte as i64),
+            end_byte: Some(val.end_byte as i64),
+            start_line: Some(val.start_line as i64),
+            end_line: Some(val.end_line as i64),
+            metadata: Some(val.metadata.into()),
         }
     }
 }
@@ -1199,15 +1316,21 @@ impl From<tree_sitter_language_pack::CodeChunk> for JsCodeChunk {
 impl From<JsChunkContext> for tree_sitter_language_pack::ChunkContext {
     fn from(val: JsChunkContext) -> Self {
         Self {
-            language: val.language,
-            chunk_index: val.chunk_index as usize,
-            total_chunks: val.total_chunks as usize,
-            node_types: val.node_types,
-            context_path: val.context_path,
-            symbols_defined: val.symbols_defined,
-            comments: val.comments.into_iter().map(Into::into).collect(),
-            docstrings: val.docstrings.into_iter().map(Into::into).collect(),
-            has_error_nodes: val.has_error_nodes,
+            language: val.language.unwrap_or_default(),
+            chunk_index: val.chunk_index.map(|v| v as usize).unwrap_or_default(),
+            total_chunks: val.total_chunks.map(|v| v as usize).unwrap_or_default(),
+            node_types: val.node_types.unwrap_or_default(),
+            context_path: val.context_path.unwrap_or_default(),
+            symbols_defined: val.symbols_defined.unwrap_or_default(),
+            comments: val
+                .comments
+                .map(|v| v.into_iter().map(Into::into).collect())
+                .unwrap_or_default(),
+            docstrings: val
+                .docstrings
+                .map(|v| v.into_iter().map(Into::into).collect())
+                .unwrap_or_default(),
+            has_error_nodes: val.has_error_nodes.unwrap_or_default(),
         }
     }
 }
@@ -1215,15 +1338,15 @@ impl From<JsChunkContext> for tree_sitter_language_pack::ChunkContext {
 impl From<tree_sitter_language_pack::ChunkContext> for JsChunkContext {
     fn from(val: tree_sitter_language_pack::ChunkContext) -> Self {
         Self {
-            language: val.language,
-            chunk_index: val.chunk_index as i64,
-            total_chunks: val.total_chunks as i64,
-            node_types: val.node_types,
-            context_path: val.context_path,
-            symbols_defined: val.symbols_defined,
-            comments: val.comments.into_iter().map(Into::into).collect(),
-            docstrings: val.docstrings.into_iter().map(Into::into).collect(),
-            has_error_nodes: val.has_error_nodes,
+            language: Some(val.language),
+            chunk_index: Some(val.chunk_index as i64),
+            total_chunks: Some(val.total_chunks as i64),
+            node_types: Some(val.node_types),
+            context_path: Some(val.context_path),
+            symbols_defined: Some(val.symbols_defined),
+            comments: Some(val.comments.into_iter().map(Into::into).collect()),
+            docstrings: Some(val.docstrings.into_iter().map(Into::into).collect()),
+            has_error_nodes: Some(val.has_error_nodes),
         }
     }
 }
@@ -1232,16 +1355,16 @@ impl From<JsNodeInfo> for tree_sitter_language_pack::NodeInfo {
     fn from(val: JsNodeInfo) -> Self {
         Self {
             kind: Default::default(),
-            is_named: val.is_named,
-            start_byte: val.start_byte as usize,
-            end_byte: val.end_byte as usize,
-            start_row: val.start_row as usize,
-            start_col: val.start_col as usize,
-            end_row: val.end_row as usize,
-            end_col: val.end_col as usize,
-            named_child_count: val.named_child_count as usize,
-            is_error: val.is_error,
-            is_missing: val.is_missing,
+            is_named: val.is_named.unwrap_or_default(),
+            start_byte: val.start_byte.map(|v| v as usize).unwrap_or_default(),
+            end_byte: val.end_byte.map(|v| v as usize).unwrap_or_default(),
+            start_row: val.start_row.map(|v| v as usize).unwrap_or_default(),
+            start_col: val.start_col.map(|v| v as usize).unwrap_or_default(),
+            end_row: val.end_row.map(|v| v as usize).unwrap_or_default(),
+            end_col: val.end_col.map(|v| v as usize).unwrap_or_default(),
+            named_child_count: val.named_child_count.map(|v| v as usize).unwrap_or_default(),
+            is_error: val.is_error.unwrap_or_default(),
+            is_missing: val.is_missing.unwrap_or_default(),
         }
     }
 }
@@ -1249,17 +1372,17 @@ impl From<JsNodeInfo> for tree_sitter_language_pack::NodeInfo {
 impl From<tree_sitter_language_pack::NodeInfo> for JsNodeInfo {
     fn from(val: tree_sitter_language_pack::NodeInfo) -> Self {
         Self {
-            kind: format!("{:?}", val.kind),
-            is_named: val.is_named,
-            start_byte: val.start_byte as i64,
-            end_byte: val.end_byte as i64,
-            start_row: val.start_row as i64,
-            start_col: val.start_col as i64,
-            end_row: val.end_row as i64,
-            end_col: val.end_col as i64,
-            named_child_count: val.named_child_count as i64,
-            is_error: val.is_error,
-            is_missing: val.is_missing,
+            kind: Some(format!("{:?}", val.kind)),
+            is_named: Some(val.is_named),
+            start_byte: Some(val.start_byte as i64),
+            end_byte: Some(val.end_byte as i64),
+            start_row: Some(val.start_row as i64),
+            start_col: Some(val.start_col as i64),
+            end_row: Some(val.end_row as i64),
+            end_col: Some(val.end_col as i64),
+            named_child_count: Some(val.named_child_count as i64),
+            is_error: Some(val.is_error),
+            is_missing: Some(val.is_missing),
         }
     }
 }
@@ -1321,7 +1444,7 @@ impl From<tree_sitter_language_pack::ProcessConfig> for JsProcessConfig {
 impl From<JsQueryMatch> for tree_sitter_language_pack::QueryMatch {
     fn from(val: JsQueryMatch) -> Self {
         Self {
-            pattern_index: val.pattern_index as usize,
+            pattern_index: val.pattern_index.map(|v| v as usize).unwrap_or_default(),
             captures: Default::default(),
         }
     }
@@ -1330,8 +1453,8 @@ impl From<JsQueryMatch> for tree_sitter_language_pack::QueryMatch {
 impl From<tree_sitter_language_pack::QueryMatch> for JsQueryMatch {
     fn from(val: tree_sitter_language_pack::QueryMatch) -> Self {
         Self {
-            pattern_index: val.pattern_index as i64,
-            captures: val.captures.iter().map(|i| format!("{:?}", i)).collect(),
+            pattern_index: Some(val.pattern_index as i64),
+            captures: Some(val.captures.iter().map(|i| format!("{:?}", i)).collect()),
         }
     }
 }

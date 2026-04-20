@@ -1,15 +1,4 @@
-languages = [
-  "python",
-  "node",
-  "ruby",
-  "php",
-  "ffi",
-  "go",
-  "java",
-  "csharp",
-  "elixir",
-  "wasm",
-]
+languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
 [crate]
 name = "tree-sitter-language-pack"
@@ -21,77 +10,81 @@ features = ["download", "serde", "config"]
 
 [include]
 types = [
-  "ProcessConfig",
-  "ProcessResult",
-  "FileMetrics",
-  "StructureItem",
-  "StructureKind",
-  "ImportInfo",
-  "ExportInfo",
-  "ExportKind",
-  "CommentInfo",
-  "CommentKind",
-  "DocstringInfo",
-  "DocstringFormat",
-  "DocSection",
-  "SymbolInfo",
-  "SymbolKind",
-  "Diagnostic",
-  "DiagnosticSeverity",
-  "CodeChunk",
-  "ChunkContext",
-  "Span",
-  "PackConfig",
-  "ExtractionConfig",
-  "ExtractionPattern",
-  "ExtractionResult",
-  "CaptureOutput",
-  "NodeInfo",
-  "QueryMatch",
-  "Error",
-  "LanguageRegistry",
-  "DownloadManager",
+    "ProcessConfig",
+    "ProcessResult",
+    "FileMetrics",
+    "StructureItem",
+    "StructureKind",
+    "ImportInfo",
+    "ExportInfo",
+    "ExportKind",
+    "CommentInfo",
+    "CommentKind",
+    "DocstringInfo",
+    "DocstringFormat",
+    "DocSection",
+    "SymbolInfo",
+    "SymbolKind",
+    "Diagnostic",
+    "DiagnosticSeverity",
+    "CodeChunk",
+    "ChunkContext",
+    "Span",
+    "PackConfig",
+    "ExtractionConfig",
+    "ExtractionPattern",
+    "ExtractionResult",
+    "ValidationResult",
+    "PatternValidation",
+    "MatchResult",
+    "PatternResult",
+    "CaptureOutput",
+    "NodeInfo",
+    "QueryMatch",
+    "Error",
+    "LanguageRegistry",
+    "DownloadManager",
 ]
 functions = [
-  "available_languages",
-  "has_language",
-  "language_count",
-  "get_language",
-  "get_parser",
-  "parse_string",
-  "detect_language_from_path",
-  "detect_language_from_extension",
-  "detect_language_from_content",
-  "extension_ambiguity",
-  "get_highlights_query",
-  "get_injections_query",
-  "get_locals_query",
-  "process",
-  "extract_patterns",
-  "validate_extraction",
-  "tree_contains_node_type",
-  "tree_has_error_nodes",
-  "tree_to_sexp",
-  "tree_error_count",
-  "find_nodes_by_type",
-  "named_children_info",
-  "root_node_info",
-  "run_query",
-  "split_code",
-  "init",
-  "configure",
-  "download",
-  "download_all",
-  "manifest_languages",
-  "downloaded_languages",
-  "clean_cache",
-  "cache_dir",
+    "available_languages",
+    "has_language",
+    "language_count",
+    "get_language",
+    "get_parser",
+    "parse_string",
+    "detect_language_from_path",
+    "detect_language_from_extension",
+    "detect_language_from_content",
+    "extension_ambiguity",
+    "get_highlights_query",
+    "get_injections_query",
+    "get_locals_query",
+    "process",
+    "extract_patterns",
+    "validate_extraction",
+    "tree_contains_node_type",
+    "tree_has_error_nodes",
+    "tree_to_sexp",
+    "tree_error_count",
+    "find_nodes_by_type",
+    "named_children_info",
+    "root_node_info",
+    "run_query",
+    "split_code",
+    "init",
+    "configure",
+    "download",
+    "download_all",
+    "manifest_languages",
+    "downloaded_languages",
+    "clean_cache",
+    "cache_dir",
 ]
 
 [opaque_types]
-Language = "tree_sitter::Language"
-Parser = "tree_sitter::Parser"
-Tree = "tree_sitter::Tree"
+Language = "tree_sitter_language_pack::Language"
+Parser = "tree_sitter_language_pack::Parser"
+Tree = "tree_sitter_language_pack::Tree"
 
 [output]
 python = "crates/ts-pack-core-py/src/"
@@ -164,10 +157,7 @@ java = "record"
 csharp = "record"
 
 [sync]
-extra_paths = [
-  "crates/ts-pack-node/package.json",
-  "crates/ts-pack-node/npm/*/package.json",
-]
+extra_paths = ["crates/ts-pack-node/package.json", "crates/ts-pack-node/npm/*/package.json"]
 
 [[sync.text_replacements]]
 path = "tests/test_apps/node/package.json"
@@ -251,8 +241,8 @@ function = "process"
 module = "tree_sitter_language_pack"
 result_var = "result"
 args = [
-  { name = "source", field = "source_code", type = "string" },
-  { name = "config", field = "config", type = "json_object", optional = true },
+    { name = "source", field = "source_code", type = "string" },
+    { name = "config", field = "config", type = "json_object", optional = true },
 ]
 
 [e2e.call.overrides.rust]
@@ -277,41 +267,33 @@ function = "parse_string"
 module = "tree_sitter_language_pack"
 result_var = "tree"
 args = [
-  { name = "language", field = "language", type = "string" },
-  { name = "source", field = "source_code", type = "string" },
+    { name = "language", field = "language", type = "string" },
+    { name = "source", field = "source_code", type = "string" },
 ]
 
 [e2e.calls.detect_extension]
 function = "detect_language_from_extension"
 module = "tree_sitter_language_pack"
 result_var = "result"
-args = [
-  { name = "ext", field = "extension", type = "string" },
-]
+args = [{ name = "ext", field = "extension", type = "string" }]
 
 [e2e.calls.detect_path]
 function = "detect_language_from_path"
 module = "tree_sitter_language_pack"
 result_var = "result"
-args = [
-  { name = "path", field = "path", type = "string" },
-]
+args = [{ name = "path", field = "path", type = "string" }]
 
 [e2e.calls.detect_content]
 function = "detect_language_from_content"
 module = "tree_sitter_language_pack"
 result_var = "result"
-args = [
-  { name = "content", field = "content", type = "string" },
-]
+args = [{ name = "content", field = "content", type = "string" }]
 
 [e2e.calls.has_language]
 function = "has_language"
 module = "tree_sitter_language_pack"
 result_var = "result"
-args = [
-  { name = "name", field = "language", type = "string" },
-]
+args = [{ name = "name", field = "language", type = "string" }]
 
 [e2e.calls.list_languages]
 function = "available_languages"
@@ -323,17 +305,13 @@ args = []
 function = "extension_ambiguity"
 module = "tree_sitter_language_pack"
 result_var = "result"
-args = [
-  { name = "ext", field = "extension", type = "string" },
-]
+args = [{ name = "ext", field = "extension", type = "string" }]
 
 [e2e.calls.highlights]
 function = "get_highlights_query"
 module = "tree_sitter_language_pack"
 result_var = "result"
-args = [
-  { name = "language", field = "language", type = "string" },
-]
+args = [{ name = "language", field = "language", type = "string" }]
 
 [e2e.packages.rust]
 path = "../../crates/ts-pack-core"

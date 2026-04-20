@@ -132,7 +132,7 @@ type ExtractionPattern struct {
     // The tree-sitter query string (S-expression).
     Query string `json:"query"`
     // What to include in each capture result.
-    CaptureOutput CaptureOutput `json:"capture_output"`
+    CaptureOutput CaptureOutput `json:"capture_output,omitempty"`
     // Field names to extract from child nodes of each capture.
     // Maps a label to a tree-sitter field name used with `child_by_field_name`.
     ChildFields []string `json:"child_fields,omitempty"`
@@ -140,6 +140,50 @@ type ExtractionPattern struct {
     MaxResults *uint `json:"max_results,omitempty"`
     // Restrict matches to a byte range `(start, end)`.
     ByteRange *string `json:"byte_range,omitempty"`
+}
+
+
+// ExtractionPattern option function
+type ExtractionPatternOption func(*ExtractionPattern)
+
+// WithExtractionPatternQuery sets the query field.
+func WithExtractionPatternQuery(v string) ExtractionPatternOption {
+    return func(c *ExtractionPattern) { c.Query = v }
+}
+
+// WithExtractionPatternCaptureOutput sets the capture_output field.
+func WithExtractionPatternCaptureOutput(v CaptureOutput) ExtractionPatternOption {
+    return func(c *ExtractionPattern) { c.CaptureOutput = v }
+}
+
+// WithExtractionPatternChildFields sets the child_fields field.
+func WithExtractionPatternChildFields(v []string) ExtractionPatternOption {
+    return func(c *ExtractionPattern) { c.ChildFields = v }
+}
+
+// WithExtractionPatternMaxResults sets the max_results field.
+func WithExtractionPatternMaxResults(v uint) ExtractionPatternOption {
+    return func(c *ExtractionPattern) { c.MaxResults = &v }
+}
+
+// WithExtractionPatternByteRange sets the byte_range field.
+func WithExtractionPatternByteRange(v string) ExtractionPatternOption {
+    return func(c *ExtractionPattern) { c.ByteRange = &v }
+}
+
+// NewExtractionPattern creates a ExtractionPattern with optional parameters.
+func NewExtractionPattern(opts ...ExtractionPatternOption) *ExtractionPattern {
+    c := &ExtractionPattern {
+        Query: "",
+        CaptureOutput: "",
+        ChildFields: nil,
+        MaxResults: nil,
+        ByteRange: nil,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
 }
 
 
@@ -152,12 +196,287 @@ type ExtractionConfig struct {
 }
 
 
+// ExtractionConfig option function
+type ExtractionConfigOption func(*ExtractionConfig)
+
+// WithExtractionConfigLanguage sets the language field.
+func WithExtractionConfigLanguage(v string) ExtractionConfigOption {
+    return func(c *ExtractionConfig) { c.Language = v }
+}
+
+// WithExtractionConfigPatterns sets the patterns field.
+func WithExtractionConfigPatterns(v string) ExtractionConfigOption {
+    return func(c *ExtractionConfig) { c.Patterns = v }
+}
+
+// NewExtractionConfig creates a ExtractionConfig with optional parameters.
+func NewExtractionConfig(opts ...ExtractionConfigOption) *ExtractionConfig {
+    c := &ExtractionConfig {
+        Language: "",
+        Patterns: "",
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
+}
+
+
+// A single captured node within a match.
+type CaptureResult struct {
+    // The capture name from the query (e.g., `"fn_name"`).
+    Name string `json:"name"`
+    // The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`.
+    Node *NodeInfo `json:"node,omitempty"`
+    // The matched source text, present when `CaptureOutput` is `Text` or `Full`.
+    Text *string `json:"text,omitempty"`
+    // Values of requested child fields, keyed by field name.
+    ChildFields string `json:"child_fields"`
+    // Byte offset where this capture starts in the source.
+    StartByte uint `json:"start_byte"`
+}
+
+
+// CaptureResult option function
+type CaptureResultOption func(*CaptureResult)
+
+// WithCaptureResultName sets the name field.
+func WithCaptureResultName(v string) CaptureResultOption {
+    return func(c *CaptureResult) { c.Name = v }
+}
+
+// WithCaptureResultNode sets the node field.
+func WithCaptureResultNode(v NodeInfo) CaptureResultOption {
+    return func(c *CaptureResult) { c.Node = &v }
+}
+
+// WithCaptureResultText sets the text field.
+func WithCaptureResultText(v string) CaptureResultOption {
+    return func(c *CaptureResult) { c.Text = &v }
+}
+
+// WithCaptureResultChildFields sets the child_fields field.
+func WithCaptureResultChildFields(v string) CaptureResultOption {
+    return func(c *CaptureResult) { c.ChildFields = v }
+}
+
+// WithCaptureResultStartByte sets the start_byte field.
+func WithCaptureResultStartByte(v uint) CaptureResultOption {
+    return func(c *CaptureResult) { c.StartByte = v }
+}
+
+// NewCaptureResult creates a CaptureResult with optional parameters.
+func NewCaptureResult(opts ...CaptureResultOption) *CaptureResult {
+    c := &CaptureResult {
+        Name: "",
+        Node: nil,
+        Text: nil,
+        ChildFields: "",
+        StartByte: 0,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
+}
+
+
+// A single query match containing one or more captures.
+type MatchResult struct {
+    // The pattern index within the query that produced this match.
+    PatternIndex uint `json:"pattern_index"`
+    // The captures for this match.
+    Captures []CaptureResult `json:"captures,omitempty"`
+}
+
+
+// MatchResult option function
+type MatchResultOption func(*MatchResult)
+
+// WithMatchResultPatternIndex sets the pattern_index field.
+func WithMatchResultPatternIndex(v uint) MatchResultOption {
+    return func(c *MatchResult) { c.PatternIndex = v }
+}
+
+// WithMatchResultCaptures sets the captures field.
+func WithMatchResultCaptures(v []CaptureResult) MatchResultOption {
+    return func(c *MatchResult) { c.Captures = v }
+}
+
+// NewMatchResult creates a MatchResult with optional parameters.
+func NewMatchResult(opts ...MatchResultOption) *MatchResult {
+    c := &MatchResult {
+        PatternIndex: 0,
+        Captures: nil,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
+}
+
+
+// Results for a single named pattern.
+type PatternResult struct {
+    // The individual matches.
+    Matches []MatchResult `json:"matches,omitempty"`
+    // Total number of matches before `max_results` truncation.
+    TotalCount uint `json:"total_count"`
+}
+
+
+// PatternResult option function
+type PatternResultOption func(*PatternResult)
+
+// WithPatternResultMatches sets the matches field.
+func WithPatternResultMatches(v []MatchResult) PatternResultOption {
+    return func(c *PatternResult) { c.Matches = v }
+}
+
+// WithPatternResultTotalCount sets the total_count field.
+func WithPatternResultTotalCount(v uint) PatternResultOption {
+    return func(c *PatternResult) { c.TotalCount = v }
+}
+
+// NewPatternResult creates a PatternResult with optional parameters.
+func NewPatternResult(opts ...PatternResultOption) *PatternResult {
+    c := &PatternResult {
+        Matches: nil,
+        TotalCount: 0,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
+}
+
+
 // Complete extraction results for all patterns.
 type ExtractionResult struct {
     // The language that was used.
     Language string `json:"language"`
     // Results keyed by pattern name.
     Results string `json:"results"`
+}
+
+
+// ExtractionResult option function
+type ExtractionResultOption func(*ExtractionResult)
+
+// WithExtractionResultLanguage sets the language field.
+func WithExtractionResultLanguage(v string) ExtractionResultOption {
+    return func(c *ExtractionResult) { c.Language = v }
+}
+
+// WithExtractionResultResults sets the results field.
+func WithExtractionResultResults(v string) ExtractionResultOption {
+    return func(c *ExtractionResult) { c.Results = v }
+}
+
+// NewExtractionResult creates a ExtractionResult with optional parameters.
+func NewExtractionResult(opts ...ExtractionResultOption) *ExtractionResult {
+    c := &ExtractionResult {
+        Language: "",
+        Results: "",
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
+}
+
+
+// Validation information for a single pattern.
+type PatternValidation struct {
+    // Whether the pattern compiled successfully.
+    Valid bool `json:"valid"`
+    // Names of captures defined in the query.
+    CaptureNames []string `json:"capture_names,omitempty"`
+    // Number of patterns in the query.
+    PatternCount uint `json:"pattern_count"`
+    // Non-fatal warnings (e.g., unused captures).
+    Warnings []string `json:"warnings,omitempty"`
+    // Fatal errors (e.g., query syntax errors).
+    Errors []string `json:"errors,omitempty"`
+}
+
+
+// PatternValidation option function
+type PatternValidationOption func(*PatternValidation)
+
+// WithPatternValidationValid sets the valid field.
+func WithPatternValidationValid(v bool) PatternValidationOption {
+    return func(c *PatternValidation) { c.Valid = v }
+}
+
+// WithPatternValidationCaptureNames sets the capture_names field.
+func WithPatternValidationCaptureNames(v []string) PatternValidationOption {
+    return func(c *PatternValidation) { c.CaptureNames = v }
+}
+
+// WithPatternValidationPatternCount sets the pattern_count field.
+func WithPatternValidationPatternCount(v uint) PatternValidationOption {
+    return func(c *PatternValidation) { c.PatternCount = v }
+}
+
+// WithPatternValidationWarnings sets the warnings field.
+func WithPatternValidationWarnings(v []string) PatternValidationOption {
+    return func(c *PatternValidation) { c.Warnings = v }
+}
+
+// WithPatternValidationErrors sets the errors field.
+func WithPatternValidationErrors(v []string) PatternValidationOption {
+    return func(c *PatternValidation) { c.Errors = v }
+}
+
+// NewPatternValidation creates a PatternValidation with optional parameters.
+func NewPatternValidation(opts ...PatternValidationOption) *PatternValidation {
+    c := &PatternValidation {
+        Valid: false,
+        CaptureNames: nil,
+        PatternCount: 0,
+        Warnings: nil,
+        Errors: nil,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
+}
+
+
+// Validation results for an entire extraction config.
+type ValidationResult struct {
+    // Whether all patterns are valid.
+    Valid bool `json:"valid"`
+    // Per-pattern validation details.
+    Patterns string `json:"patterns"`
+}
+
+
+// ValidationResult option function
+type ValidationResultOption func(*ValidationResult)
+
+// WithValidationResultValid sets the valid field.
+func WithValidationResultValid(v bool) ValidationResultOption {
+    return func(c *ValidationResult) { c.Valid = v }
+}
+
+// WithValidationResultPatterns sets the patterns field.
+func WithValidationResultPatterns(v string) ValidationResultOption {
+    return func(c *ValidationResult) { c.Patterns = v }
+}
+
+// NewValidationResult creates a ValidationResult with optional parameters.
+func NewValidationResult(opts ...ValidationResultOption) *ValidationResult {
+    c := &ValidationResult {
+        Valid: false,
+        Patterns: "",
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
 }
 
 
@@ -172,6 +491,56 @@ type Span struct {
     StartColumn uint `json:"start_column"`
     EndLine uint `json:"end_line"`
     EndColumn uint `json:"end_column"`
+}
+
+
+// Span option function
+type SpanOption func(*Span)
+
+// WithSpanStartByte sets the start_byte field.
+func WithSpanStartByte(v uint) SpanOption {
+    return func(c *Span) { c.StartByte = v }
+}
+
+// WithSpanEndByte sets the end_byte field.
+func WithSpanEndByte(v uint) SpanOption {
+    return func(c *Span) { c.EndByte = v }
+}
+
+// WithSpanStartLine sets the start_line field.
+func WithSpanStartLine(v uint) SpanOption {
+    return func(c *Span) { c.StartLine = v }
+}
+
+// WithSpanStartColumn sets the start_column field.
+func WithSpanStartColumn(v uint) SpanOption {
+    return func(c *Span) { c.StartColumn = v }
+}
+
+// WithSpanEndLine sets the end_line field.
+func WithSpanEndLine(v uint) SpanOption {
+    return func(c *Span) { c.EndLine = v }
+}
+
+// WithSpanEndColumn sets the end_column field.
+func WithSpanEndColumn(v uint) SpanOption {
+    return func(c *Span) { c.EndColumn = v }
+}
+
+// NewSpan creates a Span with optional parameters.
+func NewSpan(opts ...SpanOption) *Span {
+    c := &Span {
+        StartByte: 0,
+        EndByte: 0,
+        StartLine: 0,
+        StartColumn: 0,
+        EndLine: 0,
+        EndColumn: 0,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
 }
 
 
@@ -378,12 +747,118 @@ type StructureItem struct {
 }
 
 
+// StructureItem option function
+type StructureItemOption func(*StructureItem)
+
+// WithStructureItemKind sets the kind field.
+func WithStructureItemKind(v StructureKind) StructureItemOption {
+    return func(c *StructureItem) { c.Kind = v }
+}
+
+// WithStructureItemName sets the name field.
+func WithStructureItemName(v string) StructureItemOption {
+    return func(c *StructureItem) { c.Name = &v }
+}
+
+// WithStructureItemVisibility sets the visibility field.
+func WithStructureItemVisibility(v string) StructureItemOption {
+    return func(c *StructureItem) { c.Visibility = &v }
+}
+
+// WithStructureItemSpan sets the span field.
+func WithStructureItemSpan(v Span) StructureItemOption {
+    return func(c *StructureItem) { c.Span = v }
+}
+
+// WithStructureItemChildren sets the children field.
+func WithStructureItemChildren(v []StructureItem) StructureItemOption {
+    return func(c *StructureItem) { c.Children = v }
+}
+
+// WithStructureItemDecorators sets the decorators field.
+func WithStructureItemDecorators(v []string) StructureItemOption {
+    return func(c *StructureItem) { c.Decorators = v }
+}
+
+// WithStructureItemDocComment sets the doc_comment field.
+func WithStructureItemDocComment(v string) StructureItemOption {
+    return func(c *StructureItem) { c.DocComment = &v }
+}
+
+// WithStructureItemSignature sets the signature field.
+func WithStructureItemSignature(v string) StructureItemOption {
+    return func(c *StructureItem) { c.Signature = &v }
+}
+
+// WithStructureItemBodySpan sets the body_span field.
+func WithStructureItemBodySpan(v Span) StructureItemOption {
+    return func(c *StructureItem) { c.BodySpan = &v }
+}
+
+// NewStructureItem creates a StructureItem with optional parameters.
+func NewStructureItem(opts ...StructureItemOption) *StructureItem {
+    c := &StructureItem {
+        Kind: StructureKind{},
+        Name: nil,
+        Visibility: nil,
+        Span: Span{},
+        Children: nil,
+        Decorators: nil,
+        DocComment: nil,
+        Signature: nil,
+        BodySpan: nil,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
+}
+
+
 // A comment extracted from source code.
 type CommentInfo struct {
     Text string `json:"text"`
-    Kind CommentKind `json:"kind"`
+    Kind CommentKind `json:"kind,omitempty"`
     Span Span `json:"span"`
     AssociatedNode *string `json:"associated_node,omitempty"`
+}
+
+
+// CommentInfo option function
+type CommentInfoOption func(*CommentInfo)
+
+// WithCommentInfoText sets the text field.
+func WithCommentInfoText(v string) CommentInfoOption {
+    return func(c *CommentInfo) { c.Text = v }
+}
+
+// WithCommentInfoKind sets the kind field.
+func WithCommentInfoKind(v CommentKind) CommentInfoOption {
+    return func(c *CommentInfo) { c.Kind = v }
+}
+
+// WithCommentInfoSpan sets the span field.
+func WithCommentInfoSpan(v Span) CommentInfoOption {
+    return func(c *CommentInfo) { c.Span = v }
+}
+
+// WithCommentInfoAssociatedNode sets the associated_node field.
+func WithCommentInfoAssociatedNode(v string) CommentInfoOption {
+    return func(c *CommentInfo) { c.AssociatedNode = &v }
+}
+
+// NewCommentInfo creates a CommentInfo with optional parameters.
+func NewCommentInfo(opts ...CommentInfoOption) *CommentInfo {
+    c := &CommentInfo {
+        Text: "",
+        Kind: "",
+        Span: Span{},
+        AssociatedNode: nil,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
 }
 
 
@@ -397,11 +872,87 @@ type DocstringInfo struct {
 }
 
 
+// DocstringInfo option function
+type DocstringInfoOption func(*DocstringInfo)
+
+// WithDocstringInfoText sets the text field.
+func WithDocstringInfoText(v string) DocstringInfoOption {
+    return func(c *DocstringInfo) { c.Text = v }
+}
+
+// WithDocstringInfoFormat sets the format field.
+func WithDocstringInfoFormat(v DocstringFormat) DocstringInfoOption {
+    return func(c *DocstringInfo) { c.Format = v }
+}
+
+// WithDocstringInfoSpan sets the span field.
+func WithDocstringInfoSpan(v Span) DocstringInfoOption {
+    return func(c *DocstringInfo) { c.Span = v }
+}
+
+// WithDocstringInfoAssociatedItem sets the associated_item field.
+func WithDocstringInfoAssociatedItem(v string) DocstringInfoOption {
+    return func(c *DocstringInfo) { c.AssociatedItem = &v }
+}
+
+// WithDocstringInfoParsedSections sets the parsed_sections field.
+func WithDocstringInfoParsedSections(v []DocSection) DocstringInfoOption {
+    return func(c *DocstringInfo) { c.ParsedSections = v }
+}
+
+// NewDocstringInfo creates a DocstringInfo with optional parameters.
+func NewDocstringInfo(opts ...DocstringInfoOption) *DocstringInfo {
+    c := &DocstringInfo {
+        Text: "",
+        Format: DocstringFormat{},
+        Span: Span{},
+        AssociatedItem: nil,
+        ParsedSections: nil,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
+}
+
+
 // A section within a docstring (e.g., Args, Returns, Raises).
 type DocSection struct {
     Kind string `json:"kind"`
     Name *string `json:"name,omitempty"`
     Description string `json:"description"`
+}
+
+
+// DocSection option function
+type DocSectionOption func(*DocSection)
+
+// WithDocSectionKind sets the kind field.
+func WithDocSectionKind(v string) DocSectionOption {
+    return func(c *DocSection) { c.Kind = v }
+}
+
+// WithDocSectionName sets the name field.
+func WithDocSectionName(v string) DocSectionOption {
+    return func(c *DocSection) { c.Name = &v }
+}
+
+// WithDocSectionDescription sets the description field.
+func WithDocSectionDescription(v string) DocSectionOption {
+    return func(c *DocSection) { c.Description = v }
+}
+
+// NewDocSection creates a DocSection with optional parameters.
+func NewDocSection(opts ...DocSectionOption) *DocSection {
+    c := &DocSection {
+        Kind: "",
+        Name: nil,
+        Description: "",
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
 }
 
 
@@ -415,11 +966,87 @@ type ImportInfo struct {
 }
 
 
+// ImportInfo option function
+type ImportInfoOption func(*ImportInfo)
+
+// WithImportInfoSource sets the source field.
+func WithImportInfoSource(v string) ImportInfoOption {
+    return func(c *ImportInfo) { c.Source = v }
+}
+
+// WithImportInfoItems sets the items field.
+func WithImportInfoItems(v []string) ImportInfoOption {
+    return func(c *ImportInfo) { c.Items = v }
+}
+
+// WithImportInfoAlias sets the alias field.
+func WithImportInfoAlias(v string) ImportInfoOption {
+    return func(c *ImportInfo) { c.Alias = &v }
+}
+
+// WithImportInfoIsWildcard sets the is_wildcard field.
+func WithImportInfoIsWildcard(v bool) ImportInfoOption {
+    return func(c *ImportInfo) { c.IsWildcard = v }
+}
+
+// WithImportInfoSpan sets the span field.
+func WithImportInfoSpan(v Span) ImportInfoOption {
+    return func(c *ImportInfo) { c.Span = v }
+}
+
+// NewImportInfo creates a ImportInfo with optional parameters.
+func NewImportInfo(opts ...ImportInfoOption) *ImportInfo {
+    c := &ImportInfo {
+        Source: "",
+        Items: nil,
+        Alias: nil,
+        IsWildcard: false,
+        Span: Span{},
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
+}
+
+
 // An export statement extracted from source code.
 type ExportInfo struct {
     Name string `json:"name"`
-    Kind ExportKind `json:"kind"`
+    Kind ExportKind `json:"kind,omitempty"`
     Span Span `json:"span"`
+}
+
+
+// ExportInfo option function
+type ExportInfoOption func(*ExportInfo)
+
+// WithExportInfoName sets the name field.
+func WithExportInfoName(v string) ExportInfoOption {
+    return func(c *ExportInfo) { c.Name = v }
+}
+
+// WithExportInfoKind sets the kind field.
+func WithExportInfoKind(v ExportKind) ExportInfoOption {
+    return func(c *ExportInfo) { c.Kind = v }
+}
+
+// WithExportInfoSpan sets the span field.
+func WithExportInfoSpan(v Span) ExportInfoOption {
+    return func(c *ExportInfo) { c.Span = v }
+}
+
+// NewExportInfo creates a ExportInfo with optional parameters.
+func NewExportInfo(opts ...ExportInfoOption) *ExportInfo {
+    c := &ExportInfo {
+        Name: "",
+        Kind: "",
+        Span: Span{},
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
 }
 
 
@@ -433,11 +1060,87 @@ type SymbolInfo struct {
 }
 
 
+// SymbolInfo option function
+type SymbolInfoOption func(*SymbolInfo)
+
+// WithSymbolInfoName sets the name field.
+func WithSymbolInfoName(v string) SymbolInfoOption {
+    return func(c *SymbolInfo) { c.Name = v }
+}
+
+// WithSymbolInfoKind sets the kind field.
+func WithSymbolInfoKind(v SymbolKind) SymbolInfoOption {
+    return func(c *SymbolInfo) { c.Kind = v }
+}
+
+// WithSymbolInfoSpan sets the span field.
+func WithSymbolInfoSpan(v Span) SymbolInfoOption {
+    return func(c *SymbolInfo) { c.Span = v }
+}
+
+// WithSymbolInfoTypeAnnotation sets the type_annotation field.
+func WithSymbolInfoTypeAnnotation(v string) SymbolInfoOption {
+    return func(c *SymbolInfo) { c.TypeAnnotation = &v }
+}
+
+// WithSymbolInfoDoc sets the doc field.
+func WithSymbolInfoDoc(v string) SymbolInfoOption {
+    return func(c *SymbolInfo) { c.Doc = &v }
+}
+
+// NewSymbolInfo creates a SymbolInfo with optional parameters.
+func NewSymbolInfo(opts ...SymbolInfoOption) *SymbolInfo {
+    c := &SymbolInfo {
+        Name: "",
+        Kind: SymbolKind{},
+        Span: Span{},
+        TypeAnnotation: nil,
+        Doc: nil,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
+}
+
+
 // A diagnostic (syntax error, missing node, etc.) from parsing.
 type Diagnostic struct {
     Message string `json:"message"`
-    Severity DiagnosticSeverity `json:"severity"`
+    Severity DiagnosticSeverity `json:"severity,omitempty"`
     Span Span `json:"span"`
+}
+
+
+// Diagnostic option function
+type DiagnosticOption func(*Diagnostic)
+
+// WithDiagnosticMessage sets the message field.
+func WithDiagnosticMessage(v string) DiagnosticOption {
+    return func(c *Diagnostic) { c.Message = v }
+}
+
+// WithDiagnosticSeverity sets the severity field.
+func WithDiagnosticSeverity(v DiagnosticSeverity) DiagnosticOption {
+    return func(c *Diagnostic) { c.Severity = v }
+}
+
+// WithDiagnosticSpan sets the span field.
+func WithDiagnosticSpan(v Span) DiagnosticOption {
+    return func(c *Diagnostic) { c.Span = v }
+}
+
+// NewDiagnostic creates a Diagnostic with optional parameters.
+func NewDiagnostic(opts ...DiagnosticOption) *Diagnostic {
+    c := &Diagnostic {
+        Message: "",
+        Severity: "",
+        Span: Span{},
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
 }
 
 
@@ -452,6 +1155,56 @@ type CodeChunk struct {
 }
 
 
+// CodeChunk option function
+type CodeChunkOption func(*CodeChunk)
+
+// WithCodeChunkContent sets the content field.
+func WithCodeChunkContent(v string) CodeChunkOption {
+    return func(c *CodeChunk) { c.Content = v }
+}
+
+// WithCodeChunkStartByte sets the start_byte field.
+func WithCodeChunkStartByte(v uint) CodeChunkOption {
+    return func(c *CodeChunk) { c.StartByte = v }
+}
+
+// WithCodeChunkEndByte sets the end_byte field.
+func WithCodeChunkEndByte(v uint) CodeChunkOption {
+    return func(c *CodeChunk) { c.EndByte = v }
+}
+
+// WithCodeChunkStartLine sets the start_line field.
+func WithCodeChunkStartLine(v uint) CodeChunkOption {
+    return func(c *CodeChunk) { c.StartLine = v }
+}
+
+// WithCodeChunkEndLine sets the end_line field.
+func WithCodeChunkEndLine(v uint) CodeChunkOption {
+    return func(c *CodeChunk) { c.EndLine = v }
+}
+
+// WithCodeChunkMetadata sets the metadata field.
+func WithCodeChunkMetadata(v ChunkContext) CodeChunkOption {
+    return func(c *CodeChunk) { c.Metadata = v }
+}
+
+// NewCodeChunk creates a CodeChunk with optional parameters.
+func NewCodeChunk(opts ...CodeChunkOption) *CodeChunk {
+    c := &CodeChunk {
+        Content: "",
+        StartByte: 0,
+        EndByte: 0,
+        StartLine: 0,
+        EndLine: 0,
+        Metadata: ChunkContext{},
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
+}
+
+
 // Metadata for a single chunk of source code.
 type ChunkContext struct {
     Language string `json:"language"`
@@ -463,6 +1216,74 @@ type ChunkContext struct {
     Comments []CommentInfo `json:"comments,omitempty"`
     Docstrings []DocstringInfo `json:"docstrings,omitempty"`
     HasErrorNodes bool `json:"has_error_nodes"`
+}
+
+
+// ChunkContext option function
+type ChunkContextOption func(*ChunkContext)
+
+// WithChunkContextLanguage sets the language field.
+func WithChunkContextLanguage(v string) ChunkContextOption {
+    return func(c *ChunkContext) { c.Language = v }
+}
+
+// WithChunkContextChunkIndex sets the chunk_index field.
+func WithChunkContextChunkIndex(v uint) ChunkContextOption {
+    return func(c *ChunkContext) { c.ChunkIndex = v }
+}
+
+// WithChunkContextTotalChunks sets the total_chunks field.
+func WithChunkContextTotalChunks(v uint) ChunkContextOption {
+    return func(c *ChunkContext) { c.TotalChunks = v }
+}
+
+// WithChunkContextNodeTypes sets the node_types field.
+func WithChunkContextNodeTypes(v []string) ChunkContextOption {
+    return func(c *ChunkContext) { c.NodeTypes = v }
+}
+
+// WithChunkContextContextPath sets the context_path field.
+func WithChunkContextContextPath(v []string) ChunkContextOption {
+    return func(c *ChunkContext) { c.ContextPath = v }
+}
+
+// WithChunkContextSymbolsDefined sets the symbols_defined field.
+func WithChunkContextSymbolsDefined(v []string) ChunkContextOption {
+    return func(c *ChunkContext) { c.SymbolsDefined = v }
+}
+
+// WithChunkContextComments sets the comments field.
+func WithChunkContextComments(v []CommentInfo) ChunkContextOption {
+    return func(c *ChunkContext) { c.Comments = v }
+}
+
+// WithChunkContextDocstrings sets the docstrings field.
+func WithChunkContextDocstrings(v []DocstringInfo) ChunkContextOption {
+    return func(c *ChunkContext) { c.Docstrings = v }
+}
+
+// WithChunkContextHasErrorNodes sets the has_error_nodes field.
+func WithChunkContextHasErrorNodes(v bool) ChunkContextOption {
+    return func(c *ChunkContext) { c.HasErrorNodes = v }
+}
+
+// NewChunkContext creates a ChunkContext with optional parameters.
+func NewChunkContext(opts ...ChunkContextOption) *ChunkContext {
+    c := &ChunkContext {
+        Language: "",
+        ChunkIndex: 0,
+        TotalChunks: 0,
+        NodeTypes: nil,
+        ContextPath: nil,
+        SymbolsDefined: nil,
+        Comments: nil,
+        Docstrings: nil,
+        HasErrorNodes: false,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
 }
 
 
@@ -494,6 +1315,86 @@ type NodeInfo struct {
     IsError bool `json:"is_error"`
     // Whether this node is a MISSING node.
     IsMissing bool `json:"is_missing"`
+}
+
+
+// NodeInfo option function
+type NodeInfoOption func(*NodeInfo)
+
+// WithNodeInfoKind sets the kind field.
+func WithNodeInfoKind(v string) NodeInfoOption {
+    return func(c *NodeInfo) { c.Kind = v }
+}
+
+// WithNodeInfoIsNamed sets the is_named field.
+func WithNodeInfoIsNamed(v bool) NodeInfoOption {
+    return func(c *NodeInfo) { c.IsNamed = v }
+}
+
+// WithNodeInfoStartByte sets the start_byte field.
+func WithNodeInfoStartByte(v uint) NodeInfoOption {
+    return func(c *NodeInfo) { c.StartByte = v }
+}
+
+// WithNodeInfoEndByte sets the end_byte field.
+func WithNodeInfoEndByte(v uint) NodeInfoOption {
+    return func(c *NodeInfo) { c.EndByte = v }
+}
+
+// WithNodeInfoStartRow sets the start_row field.
+func WithNodeInfoStartRow(v uint) NodeInfoOption {
+    return func(c *NodeInfo) { c.StartRow = v }
+}
+
+// WithNodeInfoStartCol sets the start_col field.
+func WithNodeInfoStartCol(v uint) NodeInfoOption {
+    return func(c *NodeInfo) { c.StartCol = v }
+}
+
+// WithNodeInfoEndRow sets the end_row field.
+func WithNodeInfoEndRow(v uint) NodeInfoOption {
+    return func(c *NodeInfo) { c.EndRow = v }
+}
+
+// WithNodeInfoEndCol sets the end_col field.
+func WithNodeInfoEndCol(v uint) NodeInfoOption {
+    return func(c *NodeInfo) { c.EndCol = v }
+}
+
+// WithNodeInfoNamedChildCount sets the named_child_count field.
+func WithNodeInfoNamedChildCount(v uint) NodeInfoOption {
+    return func(c *NodeInfo) { c.NamedChildCount = v }
+}
+
+// WithNodeInfoIsError sets the is_error field.
+func WithNodeInfoIsError(v bool) NodeInfoOption {
+    return func(c *NodeInfo) { c.IsError = v }
+}
+
+// WithNodeInfoIsMissing sets the is_missing field.
+func WithNodeInfoIsMissing(v bool) NodeInfoOption {
+    return func(c *NodeInfo) { c.IsMissing = v }
+}
+
+// NewNodeInfo creates a NodeInfo with optional parameters.
+func NewNodeInfo(opts ...NodeInfoOption) *NodeInfo {
+    c := &NodeInfo {
+        Kind: "",
+        IsNamed: false,
+        StartByte: 0,
+        EndByte: 0,
+        StartRow: 0,
+        StartCol: 0,
+        EndRow: 0,
+        EndCol: 0,
+        NamedChildCount: 0,
+        IsError: false,
+        IsMissing: false,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
 }
 
 
@@ -686,6 +1587,32 @@ type QueryMatch struct {
 }
 
 
+// QueryMatch option function
+type QueryMatchOption func(*QueryMatch)
+
+// WithQueryMatchPatternIndex sets the pattern_index field.
+func WithQueryMatchPatternIndex(v uint) QueryMatchOption {
+    return func(c *QueryMatch) { c.PatternIndex = v }
+}
+
+// WithQueryMatchCaptures sets the captures field.
+func WithQueryMatchCaptures(v []string) QueryMatchOption {
+    return func(c *QueryMatch) { c.Captures = v }
+}
+
+// NewQueryMatch creates a QueryMatch with optional parameters.
+func NewQueryMatch(opts ...QueryMatchOption) *QueryMatch {
+    c := &QueryMatch {
+        PatternIndex: 0,
+        Captures: nil,
+    }
+    for _, opt := range opts {
+        opt(c)
+    }
+    return c
+}
+
+
 // Thread-safe registry of tree-sitter language parsers.
 //
 // Manages both statically compiled and dynamically loaded language grammars.
@@ -757,15 +1684,15 @@ func (h *DownloadManager) Free() {
 }
 
 
-// Parser is an opaque handle type.
-type Parser struct {
+// Tree is an opaque handle type.
+type Tree struct {
     ptr unsafe.Pointer
 }
 
 // Free releases the resources held by this handle.
-func (h *Parser) Free() {
+func (h *Tree) Free() {
     if h.ptr != nil {
-        C.ts_pack_parser_free((*C.TS_PACKParser)(h.ptr))
+        C.ts_pack_tree_free((*C.TS_PACKTree)(h.ptr))
         h.ptr = nil
     }
 }
@@ -785,15 +1712,15 @@ func (h *Language) Free() {
 }
 
 
-// Tree is an opaque handle type.
-type Tree struct {
+// Parser is an opaque handle type.
+type Parser struct {
     ptr unsafe.Pointer
 }
 
 // Free releases the resources held by this handle.
-func (h *Tree) Free() {
+func (h *Parser) Free() {
     if h.ptr != nil {
-        C.ts_pack_tree_free((*C.TS_PACKTree)(h.ptr))
+        C.ts_pack_parser_free((*C.TS_PACKParser)(h.ptr))
         h.ptr = nil
     }
 }
@@ -905,7 +1832,7 @@ func DetectLanguageFromContent(content string) **string {
 // # Errors
 //
 // Returns an error if the language cannot be loaded.
-func ValidateExtraction(config ExtractionConfig) (*string, error) {
+func ValidateExtraction(config ExtractionConfig) (*ValidationResult, error) {
     jsonBytescConfig, err := json.Marshal(config)
     if err != nil {
         return nil, fmt.Errorf("failed to marshal: %w", err)
@@ -918,12 +1845,19 @@ func ValidateExtraction(config ExtractionConfig) (*string, error) {
     ptr := C.ts_pack_validate_extraction(cConfig)
     if err := lastError(); err != nil {
         if ptr != nil {
-            C.ts_pack_free_string(ptr)
+            C.ts_pack_validation_result_free(ptr)
         }
         return nil, err
     }
-    defer C.ts_pack_free_string(ptr)
-    return func() *string { v := C.GoString(ptr); return &v }(), nil
+    defer C.ts_pack_validation_result_free(ptr)
+    return func() *ValidationResult {
+	jsonPtr := C.ts_pack_validation_result_to_json(ptr)
+	if jsonPtr == nil { return nil }
+	defer C.ts_pack_free_string(jsonPtr)
+	var result ValidationResult
+	if err := json.Unmarshal([]byte(C.GoString(jsonPtr)), &result); err != nil { return nil }
+	return &result
+}(), nil
 }
 
 
