@@ -1,17 +1,35 @@
 {
 	"id": "rust_chunking_process",
-	"category": "process",
 	"description": "Intel: chunk multi-function Rust source into pieces",
-	"language": "rust",
-	"source_code": "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n",
-	"assertions": {
-		"process_language": "rust",
-		"process_chunk_count_min": 2,
-		"process_chunk_max_size": 30,
-		"process_metrics_total_lines_min": 7
-	},
+	"category": "process",
+	"tags": ["intel", "chunking"],
 	"skip": {
-		"requires_language": "rust"
+		"reason": "Requires rust language"
 	},
-	"tags": ["intel", "chunking"]
+	"input": {
+		"language": "rust",
+		"source_code": "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n"
+	},
+	"assertions": [
+		{
+			"type": "equals",
+			"field": "language",
+			"value": "rust"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "metrics.total_lines",
+			"value": 7
+		},
+		{
+			"type": "count_min",
+			"field": "chunks",
+			"value": 2
+		},
+		{
+			"type": "less_than_or_equal",
+			"field": "max_chunk_size",
+			"value": 30
+		}
+	]
 }

@@ -1,12 +1,24 @@
 {
 	"id": "parsing_html_element",
-	"category": "parsing",
 	"description": "Parse an HTML element and assert node type",
-	"language": "html",
-	"source_code": "<div>hello</div>",
-	"assertions": {
-		"tree_not_null": true,
-		"root_contains_node_type": "element"
+	"category": "parsing",
+	"tags": ["parsing", "html"],
+	"call": "parse",
+	"input": {
+		"language": "html",
+		"source_code": "<div>hello</div>"
 	},
-	"tags": ["parsing", "html"]
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "method_result",
+			"method": "contains_node_type",
+			"args": {
+				"node_type": "element"
+			},
+			"check": "is_true"
+		}
+	]
 }

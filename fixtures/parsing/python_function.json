@@ -1,12 +1,24 @@
 {
 	"id": "parsing_python_function",
-	"category": "parsing",
 	"description": "Parse a Python function definition and assert node type",
-	"language": "python",
-	"source_code": "def hello(): pass",
-	"assertions": {
-		"tree_not_null": true,
-		"root_contains_node_type": "function_definition"
+	"category": "parsing",
+	"tags": ["parsing", "python"],
+	"call": "parse",
+	"input": {
+		"language": "python",
+		"source_code": "def hello(): pass"
 	},
-	"tags": ["parsing", "python"]
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "method_result",
+			"method": "contains_node_type",
+			"args": {
+				"node_type": "function_definition"
+			},
+			"check": "is_true"
+		}
+	]
 }

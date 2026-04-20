@@ -1,18 +1,40 @@
 {
 	"id": "ruby_class_process",
-	"category": "process",
 	"description": "Intel: Ruby class with method",
-	"language": "ruby",
-	"source_code": "require 'json'\n\nclass Greeter\n  def greet(name)\n    \"Hello #{name}\"\n  end\nend\n",
-	"assertions": {
-		"process_language": "ruby",
-		"process_structure_count_min": 1,
-		"process_structure_contains_kind": "Class",
-		"process_metrics_total_lines_min": 7,
-		"process_metrics_error_count": 0
-	},
+	"category": "process",
+	"tags": ["intel"],
 	"skip": {
-		"requires_language": "ruby"
+		"reason": "Requires ruby language"
 	},
-	"tags": ["intel"]
+	"input": {
+		"language": "ruby",
+		"source_code": "require 'json'\n\nclass Greeter\n  def greet(name)\n    \"Hello #{name}\"\n  end\nend\n"
+	},
+	"assertions": [
+		{
+			"type": "equals",
+			"field": "language",
+			"value": "ruby"
+		},
+		{
+			"type": "count_min",
+			"field": "structure",
+			"value": 1
+		},
+		{
+			"type": "contains",
+			"field": "structure_kinds",
+			"value": "Class"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "metrics.total_lines",
+			"value": 7
+		},
+		{
+			"type": "equals",
+			"field": "metrics.error_count",
+			"value": 0
+		}
+	]
 }

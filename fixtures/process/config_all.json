@@ -1,19 +1,45 @@
 {
 	"id": "config_all_python",
-	"category": "process",
 	"description": "Intel: process with all features enabled",
-	"language": "python",
-	"source_code": "# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n",
-	"assertions": {
-		"process_language": "python",
-		"process_structure_count_min": 1,
-		"process_structure_contains_kind": "Function",
-		"process_imports_count_min": 1,
-		"process_metrics_total_lines_min": 6,
-		"process_metrics_error_count": 0
-	},
+	"category": "process",
+	"tags": ["intel", "config"],
 	"skip": {
-		"requires_language": "python"
+		"reason": "Requires python language"
 	},
-	"tags": ["intel", "config"]
+	"input": {
+		"language": "python",
+		"source_code": "# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n"
+	},
+	"assertions": [
+		{
+			"type": "equals",
+			"field": "language",
+			"value": "python"
+		},
+		{
+			"type": "count_min",
+			"field": "structure",
+			"value": 1
+		},
+		{
+			"type": "contains",
+			"field": "structure_kinds",
+			"value": "Function"
+		},
+		{
+			"type": "count_min",
+			"field": "imports",
+			"value": 1
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "metrics.total_lines",
+			"value": 6
+		},
+		{
+			"type": "equals",
+			"field": "metrics.error_count",
+			"value": 0
+		}
+	]
 }

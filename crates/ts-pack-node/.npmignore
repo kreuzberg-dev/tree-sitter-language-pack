@@ -1,7 +1,0 @@
-target/
-src/
-Cargo.toml
-Cargo.lock
-artifacts/
-npm/
-*.rs

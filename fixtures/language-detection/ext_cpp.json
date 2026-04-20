@@ -1,10 +1,16 @@
 {
 	"id": "detect_ext_cpp",
-	"category": "language-detection",
 	"description": "detect_language_from_extension recognizes .cpp as cpp",
-	"assertions": {
-		"detect_from_extension": "cpp",
-		"detect_result": "cpp"
+	"category": "language-detection",
+	"tags": ["language-detection", "extension"],
+	"call": "detect_extension",
+	"input": {
+		"extension": "cpp"
 	},
-	"tags": ["language-detection", "extension"]
+	"assertions": [
+		{
+			"type": "equals",
+			"value": "cpp"
+		}
+	]
 }

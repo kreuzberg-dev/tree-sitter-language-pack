@@ -1,18 +1,40 @@
 {
 	"id": "python_chunking_medium",
-	"category": "process",
 	"description": "Intel: Python code with medium chunk size",
-	"language": "python",
-	"source_code": "def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n",
-	"assertions": {
-		"process_language": "python",
-		"process_structure_count_min": 3,
-		"process_chunk_max_size": 50,
-		"process_chunk_count_min": 2,
-		"process_metrics_error_count": 0
-	},
+	"category": "process",
+	"tags": ["intel", "chunking"],
 	"skip": {
-		"requires_language": "python"
+		"reason": "Requires python language"
 	},
-	"tags": ["intel", "chunking"]
+	"input": {
+		"language": "python",
+		"source_code": "def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n"
+	},
+	"assertions": [
+		{
+			"type": "equals",
+			"field": "language",
+			"value": "python"
+		},
+		{
+			"type": "count_min",
+			"field": "structure",
+			"value": 3
+		},
+		{
+			"type": "equals",
+			"field": "metrics.error_count",
+			"value": 0
+		},
+		{
+			"type": "count_min",
+			"field": "chunks",
+			"value": 2
+		},
+		{
+			"type": "less_than_or_equal",
+			"field": "max_chunk_size",
+			"value": 50
+		}
+	]
 }

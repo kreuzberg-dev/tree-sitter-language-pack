@@ -1,19 +1,45 @@
 {
 	"id": "java_class_process",
-	"category": "process",
 	"description": "Intel: Java class with methods and imports",
-	"language": "java",
-	"source_code": "import java.util.List;\n\npublic class Greeter {\n    public String greet(String name) {\n        return \"Hello \" + name;\n    }\n}\n",
-	"assertions": {
-		"process_language": "java",
-		"process_structure_count_min": 1,
-		"process_structure_contains_kind": "Class",
-		"process_imports_count_min": 1,
-		"process_metrics_total_lines_min": 7,
-		"process_metrics_error_count": 0
-	},
+	"category": "process",
+	"tags": ["intel"],
 	"skip": {
-		"requires_language": "java"
+		"reason": "Requires java language"
 	},
-	"tags": ["intel"]
+	"input": {
+		"language": "java",
+		"source_code": "import java.util.List;\n\npublic class Greeter {\n    public String greet(String name) {\n        return \"Hello \" + name;\n    }\n}\n"
+	},
+	"assertions": [
+		{
+			"type": "equals",
+			"field": "language",
+			"value": "java"
+		},
+		{
+			"type": "count_min",
+			"field": "structure",
+			"value": 1
+		},
+		{
+			"type": "contains",
+			"field": "structure_kinds",
+			"value": "Class"
+		},
+		{
+			"type": "count_min",
+			"field": "imports",
+			"value": 1
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "metrics.total_lines",
+			"value": 7
+		},
+		{
+			"type": "equals",
+			"field": "metrics.error_count",
+			"value": 0
+		}
+	]
 }

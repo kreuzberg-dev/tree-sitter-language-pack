@@ -1,12 +1,21 @@
 {
-	"assertions": {
-		"root_child_count_min": 1,
-		"tree_not_null": true
-	},
-	"category": "smoke",
-	"description": "Smoke test: load pony and parse a simple snippet",
 	"id": "smoke_pony",
-	"language": "pony",
-	"source_code": "actor Main\n  new create(env: Env) => None",
-	"tags": ["smoke"]
+	"description": "Smoke test: load pony and parse a simple snippet",
+	"category": "smoke",
+	"tags": ["smoke"],
+	"call": "parse",
+	"input": {
+		"language": "pony",
+		"source_code": "actor Main\n  new create(env: Env) => None"
+	},
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "root_child_count",
+			"value": 1
+		}
+	]
 }

@@ -1,9 +1,12 @@
 {
 	"id": "registry_list_languages",
-	"category": "registry",
 	"description": "available_languages should return a non-empty list",
-	"assertions": {
-		"languages_not_empty": true
-	},
-	"tags": ["registry"]
+	"category": "registry",
+	"tags": ["registry"],
+	"call": "list_languages",
+	"assertions": [
+		{
+			"type": "not_empty"
+		}
+	]
 }

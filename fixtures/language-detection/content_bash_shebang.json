@@ -1,10 +1,16 @@
 {
 	"id": "detect_content_bash_shebang",
-	"category": "language-detection",
 	"description": "detect_language_from_content recognizes #!/bin/bash shebang",
-	"assertions": {
-		"detect_from_content": "#!/bin/bash\necho hi",
-		"detect_result": "bash"
+	"category": "language-detection",
+	"tags": ["language-detection", "content", "shebang"],
+	"call": "detect_content",
+	"input": {
+		"content": "#!/bin/bash\necho hi"
 	},
-	"tags": ["language-detection", "content", "shebang"]
+	"assertions": [
+		{
+			"type": "equals",
+			"value": "bash"
+		}
+	]
 }

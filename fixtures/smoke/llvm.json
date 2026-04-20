@@ -1,12 +1,21 @@
 {
-	"assertions": {
-		"root_child_count_min": 1,
-		"tree_not_null": true
-	},
-	"category": "smoke",
-	"description": "Smoke test: load llvm and parse a simple snippet",
 	"id": "smoke_llvm",
-	"language": "llvm",
-	"source_code": "define i32 @main() { ret i32 0 }",
-	"tags": ["smoke"]
+	"description": "Smoke test: load llvm and parse a simple snippet",
+	"category": "smoke",
+	"tags": ["smoke"],
+	"call": "parse",
+	"input": {
+		"language": "llvm",
+		"source_code": "define i32 @main() { ret i32 0 }"
+	},
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "root_child_count",
+			"value": 1
+		}
+	]
 }

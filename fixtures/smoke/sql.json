@@ -1,12 +1,21 @@
 {
-	"assertions": {
-		"root_child_count_min": 1,
-		"tree_not_null": true
-	},
-	"category": "smoke",
-	"description": "Smoke test: load sql and parse a simple snippet",
 	"id": "smoke_sql",
-	"language": "sql",
-	"source_code": "SELECT 1;",
-	"tags": ["smoke"]
+	"description": "Smoke test: load sql and parse a simple snippet",
+	"category": "smoke",
+	"tags": ["smoke"],
+	"call": "parse",
+	"input": {
+		"language": "sql",
+		"source_code": "SELECT 1;"
+	},
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "root_child_count",
+			"value": 1
+		}
+	]
 }

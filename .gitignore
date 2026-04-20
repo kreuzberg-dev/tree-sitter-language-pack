@@ -137,3 +137,12 @@ GEMINI.md
 .alef/
 .gemini/
 GEMINI.md
+*.pyd
+.venv/
+.gems/
+vendor/bundle/
+*.h.bak
+*.test
+bin/
+obj/
+*.nupkg

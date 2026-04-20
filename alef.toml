@@ -1,0 +1,357 @@
+languages = [
+  "python",
+  "node",
+  "ruby",
+  "php",
+  "ffi",
+  "go",
+  "java",
+  "csharp",
+  "elixir",
+  "wasm",
+]
+
+[crate]
+name = "tree-sitter-language-pack"
+core_import = "tree_sitter_language_pack"
+sources = ["crates/ts-pack-core/src/lib.rs"]
+version_from = "Cargo.toml"
+workspace_root = "."
+features = ["download", "serde", "config"]
+
+[include]
+types = [
+  "ProcessConfig",
+  "ProcessResult",
+  "FileMetrics",
+  "StructureItem",
+  "StructureKind",
+  "ImportInfo",
+  "ExportInfo",
+  "ExportKind",
+  "CommentInfo",
+  "CommentKind",
+  "DocstringInfo",
+  "DocstringFormat",
+  "DocSection",
+  "SymbolInfo",
+  "SymbolKind",
+  "Diagnostic",
+  "DiagnosticSeverity",
+  "CodeChunk",
+  "ChunkContext",
+  "Span",
+  "PackConfig",
+  "ExtractionConfig",
+  "ExtractionPattern",
+  "ExtractionResult",
+  "CaptureOutput",
+  "NodeInfo",
+  "QueryMatch",
+  "Error",
+  "LanguageRegistry",
+  "DownloadManager",
+]
+functions = [
+  "available_languages",
+  "has_language",
+  "language_count",
+  "get_language",
+  "get_parser",
+  "parse_string",
+  "detect_language_from_path",
+  "detect_language_from_extension",
+  "detect_language_from_content",
+  "extension_ambiguity",
+  "get_highlights_query",
+  "get_injections_query",
+  "get_locals_query",
+  "process",
+  "extract_patterns",
+  "validate_extraction",
+  "tree_contains_node_type",
+  "tree_has_error_nodes",
+  "tree_to_sexp",
+  "tree_error_count",
+  "find_nodes_by_type",
+  "named_children_info",
+  "root_node_info",
+  "run_query",
+  "split_code",
+  "init",
+  "configure",
+  "download",
+  "download_all",
+  "manifest_languages",
+  "downloaded_languages",
+  "clean_cache",
+  "cache_dir",
+]
+
+[opaque_types]
+Language = "tree_sitter::Language"
+Parser = "tree_sitter::Parser"
+Tree = "tree_sitter::Tree"
+
+[output]
+python = "crates/ts-pack-core-py/src/"
+node = "crates/ts-pack-core-node/src/"
+ruby = "packages/ruby/ext/ts_pack_core_rb/native/src/"
+php = "crates/ts-pack-core-php/src/"
+ffi = "crates/ts-pack-core-ffi/src/"
+go = "packages/go/"
+java = "packages/java/"
+csharp = "packages/csharp/"
+elixir = "packages/elixir/native/tree_sitter_language_pack_rustler/src/"
+wasm = "crates/ts-pack-core-wasm/src/"
+
+[python]
+module_name = "_native"
+pip_name = "tree-sitter-language-pack"
+release_gil = true
+
+[python.stubs]
+output = "packages/python/tree_sitter_language_pack/"
+
+[python.capsule_types]
+Language = "tree_sitter.Language"
+
+[node]
+package_name = "@kreuzberg/tree-sitter-language-pack"
+
+[ffi]
+prefix = "ts_pack"
+header_name = "ts_pack.h"
+lib_name = "ts_pack_ffi"
+
+[go]
+module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
+package_name = "tspack"
+
+[java]
+package = "dev.kreuzberg.treesitterlanguagepack"
+
+[csharp]
+namespace = "TreeSitterLanguagePack"
+
+[elixir]
+app_name = "tree_sitter_language_pack"
+
+[wasm]
+env_shims = ["iswspace", "iswalnum", "towupper", "iswalpha"]
+
+[ruby]
+gem_name = "tree_sitter_language_pack"
+
+[php]
+extension_name = "tree_sitter_language_pack"
+
+[scaffold]
+description = "Pre-compiled tree-sitter grammars for 305 programming languages"
+license = "MIT"
+repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+authors = ["Kreuzberg Team"]
+keywords = ["tree-sitter", "parser", "syntax", "language-pack"]
+
+[dto]
+python = "dataclass"
+python_output = "typed-dict"
+node = "interface"
+ruby = "struct"
+php = "readonly-class"
+go = "struct"
+java = "record"
+csharp = "record"
+
+[sync]
+extra_paths = [
+  "crates/ts-pack-node/package.json",
+  "crates/ts-pack-node/npm/*/package.json",
+]
+
+[[sync.text_replacements]]
+path = "tests/test_apps/node/package.json"
+search = '"@kreuzberg/tree-sitter-language-pack": "[^"]*"'
+replace = '"@kreuzberg/tree-sitter-language-pack": "{version}"'
+
+[[sync.text_replacements]]
+path = "tests/test_apps/wasm/package.json"
+search = '"@kreuzberg/tree-sitter-language-pack-wasm": "[^"]*"'
+replace = '"@kreuzberg/tree-sitter-language-pack-wasm": "{version}"'
+
+[[sync.text_replacements]]
+path = "tests/test_apps/java/pom.xml"
+search = "<version>{version}</version>"
+replace = "<version>{version}</version>"
+
+[[sync.text_replacements]]
+path = "tests/test_apps/csharp/TestApp.csproj"
+search = 'Include="TreeSitterLanguagePack" Version="[^"]*"'
+replace = 'Include="TreeSitterLanguagePack" Version="{version}"'
+
+[[sync.text_replacements]]
+path = "tests/test_apps/go/go.mod"
+search = 'kreuzberg-dev/tree-sitter-language-pack/packages/go v[^\s]*'
+replace = 'kreuzberg-dev/tree-sitter-language-pack/packages/go v{version}'
+
+[[sync.text_replacements]]
+path = "tests/test_apps/rust/Cargo.toml"
+search = 'tree-sitter-language-pack = \{ version = "[^"]*"'
+replace = 'tree-sitter-language-pack = { version = "{version}"'
+
+[[sync.text_replacements]]
+path = "tests/test_apps/ruby/Gemfile"
+search = "gem 'tree_sitter_language_pack', '[^']*'"
+replace = "gem 'tree_sitter_language_pack', '{version}'"
+
+[test.python]
+command = "task python:test"
+e2e = "cd e2e/python && python3 -m pytest tests/ -q"
+
+[test.node]
+command = "task node:test"
+e2e = "cd e2e/typescript && npx vitest run"
+
+[test.go]
+command = "task go:test"
+e2e = "cd e2e/go && go test ./... -count=1"
+
+[test.ruby]
+command = "task ruby:test"
+
+[test.php]
+command = "task php:test"
+
+[test.java]
+command = "task java:test"
+
+[test.csharp]
+command = "task csharp:test"
+
+[test.elixir]
+command = "task elixir:test"
+e2e = "cd e2e/elixir && mix test"
+
+[test.wasm]
+e2e = "cd e2e/wasm && npm test"
+
+[test.rust]
+e2e = "cd e2e/rust && cargo test"
+
+[test.c]
+e2e = "cd e2e/c && make clean && make && DYLD_LIBRARY_PATH=../../target/release ./test_runner"
+
+# E2E test generation configuration
+[e2e]
+fixtures = "fixtures"
+output = "e2e"
+
+[e2e.call]
+function = "process"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [
+  { name = "source", field = "source_code", type = "string" },
+  { name = "config", field = "config", type = "json_object", optional = true },
+]
+
+[e2e.call.overrides.rust]
+crate_name = "tree_sitter_language_pack"
+function = "process"
+
+[e2e.call.overrides.python]
+module = "tree_sitter_language_pack"
+function = "process"
+
+[e2e.call.overrides.node]
+module = "@kreuzberg/tree-sitter-language-pack"
+function = "process"
+
+[e2e.call.overrides.go]
+module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
+function = "Process"
+alias = "tspack"
+
+[e2e.calls.parse]
+function = "parse_string"
+module = "tree_sitter_language_pack"
+result_var = "tree"
+args = [
+  { name = "language", field = "language", type = "string" },
+  { name = "source", field = "source_code", type = "string" },
+]
+
+[e2e.calls.detect_extension]
+function = "detect_language_from_extension"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [
+  { name = "ext", field = "extension", type = "string" },
+]
+
+[e2e.calls.detect_path]
+function = "detect_language_from_path"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [
+  { name = "path", field = "path", type = "string" },
+]
+
+[e2e.calls.detect_content]
+function = "detect_language_from_content"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [
+  { name = "content", field = "content", type = "string" },
+]
+
+[e2e.calls.has_language]
+function = "has_language"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [
+  { name = "name", field = "language", type = "string" },
+]
+
+[e2e.calls.list_languages]
+function = "available_languages"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = []
+
+[e2e.calls.ambiguity]
+function = "extension_ambiguity"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [
+  { name = "ext", field = "extension", type = "string" },
+]
+
+[e2e.calls.highlights]
+function = "get_highlights_query"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [
+  { name = "language", field = "language", type = "string" },
+]
+
+[e2e.packages.rust]
+path = "../../crates/ts-pack-core"
+
+[e2e.packages.python]
+name = "tree-sitter-language-pack"
+path = "../../packages/python"
+
+[e2e.packages.node]
+name = "@kreuzberg/tree-sitter-language-pack"
+path = "../../crates/ts-pack-node"
+
+[e2e.packages.go]
+module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
+path = "../../packages/go"
+version = "v0.0.0"
+
+[e2e.format]
+python = "ruff check --fix {dir} && ruff format {dir}"
+go = "gofmt -w {dir}"
+rust = "cargo fmt --manifest-path {dir}/Cargo.toml"

@@ -1,12 +1,21 @@
 {
-	"assertions": {
-		"root_child_count_min": 1,
-		"tree_not_null": true
-	},
-	"category": "smoke",
-	"description": "Smoke test: load superhtml and parse a simple snippet",
 	"id": "smoke_superhtml",
-	"language": "superhtml",
-	"source_code": "x",
-	"tags": ["smoke"]
+	"description": "Smoke test: load superhtml and parse a simple snippet",
+	"category": "smoke",
+	"tags": ["smoke"],
+	"call": "parse",
+	"input": {
+		"language": "superhtml",
+		"source_code": "x"
+	},
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "root_child_count",
+			"value": 1
+		}
+	]
 }

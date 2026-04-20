@@ -1,12 +1,21 @@
 {
-	"assertions": {
-		"root_child_count_min": 1,
-		"tree_not_null": true
-	},
-	"category": "smoke",
-	"description": "Smoke test: load svelte and parse a simple snippet",
 	"id": "smoke_svelte",
-	"language": "svelte",
-	"source_code": "<script>let x = 1;</script>",
-	"tags": ["smoke"]
+	"description": "Smoke test: load svelte and parse a simple snippet",
+	"category": "smoke",
+	"tags": ["smoke"],
+	"call": "parse",
+	"input": {
+		"language": "svelte",
+		"source_code": "<script>let x = 1;</script>"
+	},
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "root_child_count",
+			"value": 1
+		}
+	]
 }

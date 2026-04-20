@@ -1,12 +1,24 @@
 {
 	"id": "parsing_go_function",
-	"category": "parsing",
 	"description": "Parse a Go function declaration and assert node type",
-	"language": "go",
-	"source_code": "package main\nfunc main() {}",
-	"assertions": {
-		"tree_not_null": true,
-		"root_contains_node_type": "function_declaration"
+	"category": "parsing",
+	"tags": ["parsing", "go"],
+	"call": "parse",
+	"input": {
+		"language": "go",
+		"source_code": "package main\nfunc main() {}"
 	},
-	"tags": ["parsing", "go"]
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "method_result",
+			"method": "contains_node_type",
+			"args": {
+				"node_type": "function_declaration"
+			},
+			"check": "is_true"
+		}
+	]
 }

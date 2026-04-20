@@ -1,12 +1,21 @@
 {
-	"assertions": {
-		"root_child_count_min": 1,
-		"tree_not_null": true
-	},
-	"category": "smoke",
-	"description": "Smoke test: load erlang and parse a simple snippet",
 	"id": "smoke_erlang",
-	"language": "erlang",
-	"source_code": "main() -> ok.",
-	"tags": ["smoke"]
+	"description": "Smoke test: load erlang and parse a simple snippet",
+	"category": "smoke",
+	"tags": ["smoke"],
+	"call": "parse",
+	"input": {
+		"language": "erlang",
+		"source_code": "main() -> ok."
+	},
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "root_child_count",
+			"value": 1
+		}
+	]
 }

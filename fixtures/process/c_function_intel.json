@@ -1,18 +1,40 @@
 {
 	"id": "c_function_process",
-	"category": "process",
 	"description": "Intel: C function with include",
-	"language": "c",
-	"source_code": "#include <stdio.h>\n\nint main() {\n    printf(\"hello\");\n    return 0;\n}\n",
-	"assertions": {
-		"process_language": "c",
-		"process_structure_count_min": 1,
-		"process_structure_contains_kind": "Function",
-		"process_metrics_total_lines_min": 6,
-		"process_metrics_error_count": 0
-	},
+	"category": "process",
+	"tags": ["intel"],
 	"skip": {
-		"requires_language": "c"
+		"reason": "Requires c language"
 	},
-	"tags": ["intel"]
+	"input": {
+		"language": "c",
+		"source_code": "#include <stdio.h>\n\nint main() {\n    printf(\"hello\");\n    return 0;\n}\n"
+	},
+	"assertions": [
+		{
+			"type": "equals",
+			"field": "language",
+			"value": "c"
+		},
+		{
+			"type": "count_min",
+			"field": "structure",
+			"value": 1
+		},
+		{
+			"type": "contains",
+			"field": "structure_kinds",
+			"value": "Function"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "metrics.total_lines",
+			"value": 6
+		},
+		{
+			"type": "equals",
+			"field": "metrics.error_count",
+			"value": 0
+		}
+	]
 }

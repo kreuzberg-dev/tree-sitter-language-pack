@@ -1,12 +1,21 @@
 {
-	"assertions": {
-		"root_child_count_min": 1,
-		"tree_not_null": true
-	},
-	"category": "smoke",
-	"description": "Smoke test: load rst and parse a simple snippet",
 	"id": "smoke_rst",
-	"language": "rst",
-	"source_code": "Hello\n=====\n\nWorld",
-	"tags": ["smoke"]
+	"description": "Smoke test: load rst and parse a simple snippet",
+	"category": "smoke",
+	"tags": ["smoke"],
+	"call": "parse",
+	"input": {
+		"language": "rst",
+		"source_code": "Hello\n=====\n\nWorld"
+	},
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "root_child_count",
+			"value": 1
+		}
+	]
 }

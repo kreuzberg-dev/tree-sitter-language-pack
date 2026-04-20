@@ -1,7 +1,0 @@
-# frozen_string_literal: true
-
-target :lib do
-  signature 'sig'
-  check 'lib'
-  ignore 'lib/tree_sitter_language_pack/ts_pack_ruby.rb'
-end

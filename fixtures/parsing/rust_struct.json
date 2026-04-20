@@ -1,12 +1,21 @@
 {
 	"id": "parsing_rust_struct",
-	"category": "parsing",
 	"description": "Parse a Rust struct definition.",
-	"language": "rust",
-	"source_code": "struct Point { x: f64, y: f64 }",
-	"assertions": {
-		"tree_not_null": true,
-		"root_child_count_min": 1
+	"category": "parsing",
+	"tags": ["parsing"],
+	"call": "parse",
+	"input": {
+		"language": "rust",
+		"source_code": "struct Point { x: f64, y: f64 }"
 	},
-	"tags": ["parsing"]
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "root_child_count",
+			"value": 1
+		}
+	]
 }
