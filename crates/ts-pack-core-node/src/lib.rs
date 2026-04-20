@@ -504,21 +504,21 @@ impl JsDownloadManager {
 
 #[derive(Clone)]
 #[napi]
-pub struct JsLanguage {
-    inner: Arc<tree_sitter_language_pack::Language>,
-}
-
-#[napi]
-impl JsLanguage {}
-
-#[derive(Clone)]
-#[napi]
 pub struct JsParser {
     inner: Arc<tree_sitter_language_pack::Parser>,
 }
 
 #[napi]
 impl JsParser {}
+
+#[derive(Clone)]
+#[napi]
+pub struct JsLanguage {
+    inner: Arc<tree_sitter_language_pack::Language>,
+}
+
+#[napi]
+impl JsLanguage {}
 
 #[derive(Clone)]
 #[napi]

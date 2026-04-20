@@ -46,11 +46,11 @@ class DownloadManager
 {
 }
 
-class Language
+class Parser
 {
 }
 
-class Parser
+class Language
 {
 }
 

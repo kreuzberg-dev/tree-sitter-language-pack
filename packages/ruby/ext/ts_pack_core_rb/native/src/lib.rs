@@ -2009,24 +2009,6 @@ impl DownloadManager {
 }
 
 #[derive(Clone)]
-#[magnus::wrap(class = "TreeSitterLanguagePack::Language")]
-pub struct Language {
-    inner: Arc<tree_sitter_language_pack::Language>,
-}
-
-unsafe impl IntoValueFromNative for Language {}
-
-impl magnus::TryConvert for Language {
-    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Language = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
-    }
-}
-unsafe impl TryConvertOwned for Language {}
-
-impl Language {}
-
-#[derive(Clone)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::Parser")]
 pub struct Parser {
     inner: Arc<tree_sitter_language_pack::Parser>,
@@ -2043,6 +2025,24 @@ impl magnus::TryConvert for Parser {
 unsafe impl TryConvertOwned for Parser {}
 
 impl Parser {}
+
+#[derive(Clone)]
+#[magnus::wrap(class = "TreeSitterLanguagePack::Language")]
+pub struct Language {
+    inner: Arc<tree_sitter_language_pack::Language>,
+}
+
+unsafe impl IntoValueFromNative for Language {}
+
+impl magnus::TryConvert for Language {
+    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
+        let r: &Language = magnus::TryConvert::try_convert(val)?;
+        Ok(r.clone())
+    }
+}
+unsafe impl TryConvertOwned for Language {}
+
+impl Language {}
 
 #[derive(Clone)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::Tree")]
@@ -3597,9 +3597,9 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_method("fetch_manifest", method!(DownloadManager::fetch_manifest, 0))?;
     class.define_method("clean_cache", method!(DownloadManager::clean_cache, 0))?;
 
-    let _class = module.define_class("Language", ruby.class_object())?;
-
     let _class = module.define_class("Parser", ruby.class_object())?;
+
+    let _class = module.define_class("Language", ruby.class_object())?;
 
     let _class = module.define_class("Tree", ruby.class_object())?;
 

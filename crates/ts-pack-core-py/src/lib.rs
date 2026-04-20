@@ -1299,14 +1299,14 @@ impl DownloadManager {
 
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
-pub struct Language {
-    inner: Arc<tree_sitter_language_pack::Language>,
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
 }
 
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
-pub struct Parser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
+pub struct Language {
+    inner: Arc<tree_sitter_language_pack::Language>,
 }
 
 #[derive(Clone)]
@@ -2498,8 +2498,8 @@ pub fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PlatformBundle>()?;
     m.add_class::<LanguageInfo>()?;
     m.add_class::<DownloadManager>()?;
-    m.add_class::<Language>()?;
     m.add_class::<Parser>()?;
+    m.add_class::<Language>()?;
     m.add_class::<Tree>()?;
     m.add_class::<CaptureOutput>()?;
     m.add_class::<StructureKind>()?;

@@ -936,7 +936,7 @@ pub struct LanguageRegistry {
 
 #[php_impl]
 impl LanguageRegistry {
-    pub fn add_extra_libs_dir(&self, dir: String) {
+    pub fn add_extra_libs_dir(&self, dir: String) -> () {
         self.inner.add_extra_libs_dir(std::path::PathBuf::from(dir))
     }
 
@@ -963,9 +963,12 @@ impl LanguageRegistry {
     }
 
     pub fn process(&self, source: String, config: &ProcessConfig) -> PhpResult<ProcessResult> {
-        Err(ext_php_rs::exception::PhpException::default(
-            "Not implemented: process".to_string(),
-        ))
+        let config_core: tree_sitter_language_pack::ProcessConfig = config.clone().into();
+        let result = self
+            .inner
+            .process(&source, &config_core)
+            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
+        Ok(result.into())
     }
 
     pub fn with_libs_dir(libs_dir: String) -> LanguageRegistry {
@@ -1071,9 +1074,11 @@ impl DownloadManager {
     }
 
     pub fn ensure_languages(&self, names: Vec<String>) -> PhpResult<()> {
-        Err(ext_php_rs::exception::PhpException::default(
-            "Not implemented: ensure_languages".to_string(),
-        ))
+        let names_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
+        self.inner
+            .ensure_languages(&names_refs)
+            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
+        Ok(())
     }
 
     pub fn ensure_group(&self, group: String) -> PhpResult<()> {
@@ -1126,16 +1131,6 @@ impl DownloadManager {
 
 #[derive(Clone)]
 #[php_class]
-#[php(name = "Tree\\Sitter\\Language\\Pack\\Language")]
-pub struct Language {
-    inner: Arc<tree_sitter_language_pack::Language>,
-}
-
-#[php_impl]
-impl Language {}
-
-#[derive(Clone)]
-#[php_class]
 #[php(name = "Tree\\Sitter\\Language\\Pack\\Parser")]
 pub struct Parser {
     inner: Arc<tree_sitter_language_pack::Parser>,
@@ -1143,6 +1138,16 @@ pub struct Parser {
 
 #[php_impl]
 impl Parser {}
+
+#[derive(Clone)]
+#[php_class]
+#[php(name = "Tree\\Sitter\\Language\\Pack\\Language")]
+pub struct Language {
+    inner: Arc<tree_sitter_language_pack::Language>,
+}
+
+#[php_impl]
+impl Language {}
 
 #[derive(Clone)]
 #[php_class]
@@ -1221,7 +1226,7 @@ impl TreeSitterLanguagePackApi {
     }
 
     pub fn extension_ambiguity(ext: String) -> Option<String> {
-        None
+        tree_sitter_language_pack::extension_ambiguity(&ext).map(|(name, _)| name.to_string())
     }
 
     pub fn detect_language_from_content(content: String) -> Option<String> {
@@ -1229,15 +1234,17 @@ impl TreeSitterLanguagePackApi {
     }
 
     pub fn validate_extraction(config: &ExtractionConfig) -> PhpResult<ValidationResult> {
-        Err(ext_php_rs::exception::PhpException::default(
-            "Not implemented: validate_extraction".to_string(),
-        ))
+        let config_core: tree_sitter_language_pack::ExtractionConfig = config.clone().into();
+        let result = tree_sitter_language_pack::extract::validate_extraction(&config_core)
+            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
+        Ok(result.into())
     }
 
     pub fn process(source: String, config: &ProcessConfig, registry: &LanguageRegistry) -> PhpResult<ProcessResult> {
-        Err(ext_php_rs::exception::PhpException::default(
-            "Not implemented: process".to_string(),
-        ))
+        let config_core: tree_sitter_language_pack::ProcessConfig = config.clone().into();
+        let result = tree_sitter_language_pack::intel::process(&source, &config_core, &registry.inner)
+            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
+        Ok(result.into())
     }
 
     pub fn root_node_info(tree: &Tree) -> NodeInfo {
@@ -1306,7 +1313,10 @@ impl TreeSitterLanguagePackApi {
     }
 
     pub fn split_code(source: String, tree: &Tree, max_chunk_size: i64) -> Vec<String> {
-        Vec::new()
+        tree_sitter_language_pack::split_code(&source, &tree.inner, max_chunk_size as usize)
+            .into_iter()
+            .map(|(start, end)| source[start..end].to_string())
+            .collect()
     }
 
     pub fn get_language(name: String) -> PhpResult<Language> {
@@ -1338,27 +1348,31 @@ impl TreeSitterLanguagePackApi {
     }
 
     pub fn extract_patterns(source: String, config: &ExtractionConfig) -> PhpResult<ExtractionResult> {
-        Err(ext_php_rs::exception::PhpException::default(
-            "Not implemented: extract_patterns".to_string(),
-        ))
+        let config_core: tree_sitter_language_pack::ExtractionConfig = config.clone().into();
+        let result = tree_sitter_language_pack::extract_patterns(&source, &config_core)
+            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
+        Ok(result.into())
     }
 
     pub fn init(config: &PackConfig) -> PhpResult<()> {
-        Err(ext_php_rs::exception::PhpException::default(
-            "Not implemented: init".to_string(),
-        ))
+        let config_core: tree_sitter_language_pack::PackConfig = config.clone().into();
+        let result = tree_sitter_language_pack::init(&config_core)
+            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
+        Ok(result)
     }
 
     pub fn configure(config: &PackConfig) -> PhpResult<()> {
-        Err(ext_php_rs::exception::PhpException::default(
-            "Not implemented: configure".to_string(),
-        ))
+        let config_core: tree_sitter_language_pack::PackConfig = config.clone().into();
+        let result = tree_sitter_language_pack::configure(&config_core)
+            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
+        Ok(result)
     }
 
     pub fn download(names: Vec<String>) -> PhpResult<i64> {
-        Err(ext_php_rs::exception::PhpException::default(
-            "Not implemented: download".to_string(),
-        ))
+        let names_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
+        let result = tree_sitter_language_pack::download(&names_refs)
+            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
+        Ok(result as i64)
     }
 
     pub fn download_all() -> PhpResult<i64> {
@@ -2041,8 +2055,8 @@ pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
         .class::<PlatformBundle>()
         .class::<LanguageInfo>()
         .class::<DownloadManager>()
-        .class::<Language>()
         .class::<Parser>()
+        .class::<Language>()
         .class::<Tree>()
         .class::<TreeSitterLanguagePackApi>()
 }

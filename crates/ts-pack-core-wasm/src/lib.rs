@@ -2384,21 +2384,21 @@ impl WasmDownloadManager {
 
 #[derive(Clone)]
 #[wasm_bindgen]
-pub struct WasmLanguage {
-    inner: Arc<tree_sitter_language_pack::Language>,
-}
-
-#[wasm_bindgen]
-impl WasmLanguage {}
-
-#[derive(Clone)]
-#[wasm_bindgen]
 pub struct WasmParser {
     inner: Arc<tree_sitter_language_pack::Parser>,
 }
 
 #[wasm_bindgen]
 impl WasmParser {}
+
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct WasmLanguage {
+    inner: Arc<tree_sitter_language_pack::Language>,
+}
+
+#[wasm_bindgen]
+impl WasmLanguage {}
 
 #[derive(Clone)]
 #[wasm_bindgen]

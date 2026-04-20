@@ -664,16 +664,6 @@ impl std::panic::RefUnwindSafe for DownloadManager {}
 impl rustler::Resource for DownloadManager {}
 
 #[derive(Clone)]
-pub struct Language {
-    inner: Arc<tree_sitter_language_pack::Language>,
-}
-
-// SAFETY: See gen_opaque_resource in alef-backend-rustler for rationale.
-impl std::panic::RefUnwindSafe for Language {}
-
-impl rustler::Resource for Language {}
-
-#[derive(Clone)]
 pub struct Parser {
     inner: Arc<tree_sitter_language_pack::Parser>,
 }
@@ -682,6 +672,16 @@ pub struct Parser {
 impl std::panic::RefUnwindSafe for Parser {}
 
 impl rustler::Resource for Parser {}
+
+#[derive(Clone)]
+pub struct Language {
+    inner: Arc<tree_sitter_language_pack::Language>,
+}
+
+// SAFETY: See gen_opaque_resource in alef-backend-rustler for rationale.
+impl std::panic::RefUnwindSafe for Language {}
+
+impl rustler::Resource for Language {}
 
 #[derive(Clone)]
 pub struct Tree {
@@ -2017,10 +2017,10 @@ fn on_load(env: rustler::Env, _info: rustler::Term) -> bool {
         .expect("Failed to register resource type LanguageRegistry");
     env.register::<DownloadManager>()
         .expect("Failed to register resource type DownloadManager");
-    env.register::<Language>()
-        .expect("Failed to register resource type Language");
     env.register::<Parser>()
         .expect("Failed to register resource type Parser");
+    env.register::<Language>()
+        .expect("Failed to register resource type Language");
     env.register::<Tree>().expect("Failed to register resource type Tree");
     true
 }
