@@ -22,7 +22,7 @@ final class ProcessTest extends TestCase
     /** Python with comments, verify comment count */
     public function test_process_python_comments(): void
     {
-        $result = TreeSitterLanguagePack::process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", ["language" => "python"]);
+        $result = TreeSitterLanguagePack::process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", ["comments" => true, "language" => "python"]);
         $this->assertEquals("python", $result->language);
         $this->assertGreaterThanOrEqual(1, count($result->comments));
     }

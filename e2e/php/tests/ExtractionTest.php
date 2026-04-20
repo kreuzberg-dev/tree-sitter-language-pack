@@ -14,14 +14,14 @@ final class ExtractionTest extends TestCase
     /** Extraction query that matches nothing returns empty results */
     public function test_extract_patterns_no_matches(): void
     {
-        $result = TreeSitterLanguagePack::process("x = 1\ny = 2\n", ["language" => "python", "patterns" => ["classes" => ["capture_output" => "Full", "query" => "(class_definition name: (identifier) @name)"]]]);
+        $result = TreeSitterLanguagePack::extract_patterns("x = 1\ny = 2\n", ["language" => "python", "patterns" => ["classes" => ["capture_output" => "Full", "query" => "(class_definition name: (identifier) @name)"]]]);
         $this->assertCount(0, $result->results->classes->matches);
     }
 
     /** Extract function definitions from Python source using tree-sitter query */
     public function test_extract_patterns_python_functions(): void
     {
-        $result = TreeSitterLanguagePack::process("def hello():\n    pass\n\ndef world(x):\n    return x * 2\n", ["language" => "python", "patterns" => ["functions" => ["capture_output" => "Full", "query" => "(function_definition name: (identifier) @name)"]]]);
+        $result = TreeSitterLanguagePack::extract_patterns("def hello():\n    pass\n\ndef world(x):\n    return x * 2\n", ["language" => "python", "patterns" => ["functions" => ["capture_output" => "Full", "query" => "(function_definition name: (identifier) @name)"]]]);
         $this->assertEquals("python", $result->language);
         $this->assertGreaterThanOrEqual(2, count($result->results->functions->matches));
     }
@@ -30,13 +30,13 @@ final class ExtractionTest extends TestCase
     public function test_validate_extraction_invalid_query(): void
     {
         $this->expectException(\Exception::class);
-        TreeSitterLanguagePack::process("", ["language" => "python", "patterns" => ["broken" => ["capture_output" => "Full", "query" => "(this_is_not_a_valid_node @x"]]]);
+        TreeSitterLanguagePack::validate_extraction(["language" => "python", "patterns" => ["broken" => ["capture_output" => "Full", "query" => "(this_is_not_a_valid_node @x"]]]);
     }
 
     /** Valid extraction config passes validation */
     public function test_validate_extraction_valid_config(): void
     {
-        $result = TreeSitterLanguagePack::process("", ["language" => "python", "patterns" => ["functions" => ["capture_output" => "Full", "query" => "(function_definition name: (identifier) @name)"]]]);
+        $result = TreeSitterLanguagePack::validate_extraction(["language" => "python", "patterns" => ["functions" => ["capture_output" => "Full", "query" => "(function_definition name: (identifier) @name)"]]]);
         $this->assertEquals(true, $result->valid);
     }
 }

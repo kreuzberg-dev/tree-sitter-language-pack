@@ -114,7 +114,7 @@ def test_process_javascript_exports_detail() -> None:
 def test_process_python_comments() -> None:
     """Python with comments, verify comment count."""
     source = "# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n"
-    config = {"language": "python"}
+    config = {"comments": True, "language": "python"}
     result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.comments) >= 1  # noqa: S101

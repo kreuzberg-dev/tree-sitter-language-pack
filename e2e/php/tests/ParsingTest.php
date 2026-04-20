@@ -14,50 +14,50 @@ final class ParsingTest extends TestCase
     /** Parse a Go function declaration and assert node type */
     public function test_parsing_go_function(): void
     {
-        $result = TreeSitterLanguagePack::process("package main\nfunc main() {}", null);
+        $tree = TreeSitterLanguagePack::parse_string("go", "package main\nfunc main() {}");
         // TODO: unsupported assertion type: method_result
     }
 
     /** Parse an HTML element and assert node type */
     public function test_parsing_html_element(): void
     {
-        $result = TreeSitterLanguagePack::process("<div>hello</div>", null);
+        $tree = TreeSitterLanguagePack::parse_string("html", "<div>hello</div>");
         // TODO: unsupported assertion type: method_result
     }
 
     /** Parse a JavaScript class declaration. */
     public function test_parsing_javascript_class(): void
     {
-        $result = TreeSitterLanguagePack::process("class Foo { bar() {} }", null);
-        $this->assertGreaterThanOrEqual(1, $result->root_child_count);
+        $tree = TreeSitterLanguagePack::parse_string("javascript", "class Foo { bar() {} }");
+        $this->assertGreaterThanOrEqual(1, $tree->root_child_count);
         // TODO: unsupported assertion type: method_result
     }
 
     /** Parse a JavaScript variable declaration and assert node type */
     public function test_parsing_javascript_variable(): void
     {
-        $result = TreeSitterLanguagePack::process("const x = 1;", null);
+        $tree = TreeSitterLanguagePack::parse_string("javascript", "const x = 1;");
         // TODO: unsupported assertion type: method_result
     }
 
     /** Parse a Python function definition and assert node type */
     public function test_parsing_python_function(): void
     {
-        $result = TreeSitterLanguagePack::process("def hello(): pass", null);
+        $tree = TreeSitterLanguagePack::parse_string("python", "def hello(): pass");
         // TODO: unsupported assertion type: method_result
     }
 
     /** Parse a Rust function definition and assert node type */
     public function test_parsing_rust_function(): void
     {
-        $result = TreeSitterLanguagePack::process("fn main() {}", null);
+        $tree = TreeSitterLanguagePack::parse_string("rust", "fn main() {}");
         // TODO: unsupported assertion type: method_result
     }
 
     /** Parse a Rust struct definition. */
     public function test_parsing_rust_struct(): void
     {
-        $result = TreeSitterLanguagePack::process("struct Point { x: f64, y: f64 }", null);
-        $this->assertGreaterThanOrEqual(1, $result->root_child_count);
+        $tree = TreeSitterLanguagePack::parse_string("rust", "struct Point { x: f64, y: f64 }");
+        $this->assertGreaterThanOrEqual(1, $tree->root_child_count);
     }
 }

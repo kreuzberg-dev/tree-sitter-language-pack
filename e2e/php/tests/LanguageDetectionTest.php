@@ -14,161 +14,161 @@ final class LanguageDetectionTest extends TestCase
     /** The .h extension is ambiguous (could be C, C++, or Objective-C) */
     public function test_ambiguity_h_extension(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::extension_ambiguity("h");
         $this->assertNotEmpty($result);
     }
 
     /** The .py extension is NOT ambiguous (only maps to python) */
     public function test_ambiguity_py_extension(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::extension_ambiguity("py");
         $this->assertEmpty($result);
     }
 
     /** Unknown extension returns empty (no ambiguity data) */
     public function test_ambiguity_unknown_extension(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::extension_ambiguity("zzzzz_nonexistent");
         $this->assertEmpty($result);
     }
 
     /** detect_language_from_content recognizes #!/bin/bash shebang */
     public function test_detect_content_bash_shebang(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_content("#!/bin/bash\necho hi");
         $this->assertEquals("bash", $result);
     }
 
     /** detect_language_from_content returns None when no shebang present */
     public function test_detect_content_no_shebang(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_content("no shebang here");
         $this->assertEmpty($result);
     }
 
     /** detect_language_from_content recognizes #!/usr/bin/env python3 shebang */
     public function test_detect_content_python_shebang(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_content("#!/usr/bin/env python3\npass");
         $this->assertEquals("python", $result);
     }
 
     /** detect_language_from_extension recognizes .cpp as cpp */
     public function test_detect_ext_cpp(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_extension("cpp");
         $this->assertEquals("cpp", $result);
     }
 
     /** detect_language_from_extension recognizes .go as go */
     public function test_detect_ext_go(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_extension("go");
         $this->assertEquals("go", $result);
     }
 
     /** detect_language_from_extension recognizes .java as java */
     public function test_detect_ext_java(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_extension("java");
         $this->assertEquals("java", $result);
     }
 
     /** detect_language_from_extension recognizes .js as javascript */
     public function test_detect_ext_javascript(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_extension("js");
         $this->assertEquals("javascript", $result);
     }
 
     /** detect_language_from_extension recognizes .php as php */
     public function test_detect_ext_php(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_extension("php");
         $this->assertEquals("php", $result);
     }
 
     /** detect_language_from_extension recognizes .py as python */
     public function test_detect_ext_python(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_extension("py");
         $this->assertEquals("python", $result);
     }
 
     /** detect_language_from_extension recognizes .rb as ruby */
     public function test_detect_ext_ruby(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_extension("rb");
         $this->assertEquals("ruby", $result);
     }
 
     /** detect_language_from_extension recognizes .rs as rust */
     public function test_detect_ext_rust(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_extension("rs");
         $this->assertEquals("rust", $result);
     }
 
     /** detect_language_from_extension recognizes .ts as typescript */
     public function test_detect_ext_typescript(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_extension("ts");
         $this->assertEquals("typescript", $result);
     }
 
     /** detect_language_from_extension returns None for unknown extension .xyz */
     public function test_detect_ext_unknown(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_extension("xyz");
         $this->assertEmpty($result);
     }
 
     /** detect_language_from_path returns None for dotfile .gitignore (no standard extension) */
     public function test_detect_path_dotfile(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_path(".gitignore");
         $this->assertEmpty($result);
     }
 
     /** detect_language_from_path extracts extension from nested path lib/server.go */
     public function test_detect_path_go_nested(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_path("lib/server.go");
         $this->assertEquals("go", $result);
     }
 
     /** detect_language_from_path recognizes Main.java in root directory */
     public function test_detect_path_java_root(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_path("Main.java");
         $this->assertEquals("java", $result);
     }
 
     /** detect_language_from_path recognizes app.js in root directory */
     public function test_detect_path_js_root(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_path("app.js");
         $this->assertEquals("javascript", $result);
     }
 
     /** detect_language_from_path extracts extension from nested path src/main.py */
     public function test_detect_path_nested(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_path("src/main.py");
         $this->assertEquals("python", $result);
     }
 
     /** detect_language_from_path returns None for extensionless file Makefile */
     public function test_detect_path_no_extension(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_path("Makefile");
         $this->assertEmpty($result);
     }
 
     /** detect_language_from_path extracts extension from nested path src/main.rs */
     public function test_detect_path_rust_src(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::detect_language_from_path("src/main.rs");
         $this->assertEquals("rust", $result);
     }
 }

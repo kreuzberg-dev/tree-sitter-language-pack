@@ -13,7 +13,7 @@ defmodule E2e.ProcessTest do
 
   describe "process_python_comments" do
     test "Python with comments, verify comment count" do
-      {:ok, result} = TreeSitterLanguagePack.process("\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n", %{"language" => "python"})
+      {:ok, result} = TreeSitterLanguagePack.process("\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n", %{"comments" => true, "language" => "python"})
       assert String.trim(result.language) == "python"
       assert length(result.comments) >= 1
     end

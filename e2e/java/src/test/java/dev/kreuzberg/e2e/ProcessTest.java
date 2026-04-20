@@ -17,7 +17,7 @@ class ProcessTest {
     @Test
     void testProcessPythonComments() throws Exception {
         // Python with comments, verify comment count
-        var result = TreeSitterLanguagePack.process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", "{\"language\":\"python\"}");
+        var result = TreeSitterLanguagePack.process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", "{\"comments\":true,\"language\":\"python\"}");
         assertEquals("python", result.language().trim());
         assertTrue(result.comments().size() >= 1, "expected at least 1 elements");
     }

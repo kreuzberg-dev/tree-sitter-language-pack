@@ -14,28 +14,28 @@ final class RegistryTest extends TestCase
     /** has_language('nonexistent') should return false */
     public function test_registry_has_language_false(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::has_language("nonexistent");
         // TODO: unsupported assertion type: is_false
     }
 
     /** has_language('python') should return true */
     public function test_registry_has_language_true(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::has_language("python");
         $this->assertTrue($result);
     }
 
     /** language_count returns a value greater than 300 */
     public function test_registry_language_count(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::language_count([]);
         $this->assertGreaterThanOrEqual(300, $result);
     }
 
     /** available_languages should return a non-empty list */
     public function test_registry_list_languages(): void
     {
-        $result = TreeSitterLanguagePack::process("", null);
+        $result = TreeSitterLanguagePack::available_languages(null);
         $this->assertNotEmpty($result);
     }
 }

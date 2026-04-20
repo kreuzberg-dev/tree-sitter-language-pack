@@ -31,7 +31,7 @@ func Test_ProcessPythonComments(t *testing.T) {
 def hello():
     # inline comment
     pass
-`, `{"language":"python"}`)
+`, `{"comments":true,"language":"python"}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}

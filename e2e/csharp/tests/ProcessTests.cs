@@ -25,7 +25,7 @@ public class ProcessTests
     public void Test_ProcessPythonComments()
     {
         // Python with comments, verify comment count
-        var result = TreeSitterLanguagePackLib.Process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", "{\"language\":\"python\"}");
+        var result = TreeSitterLanguagePackLib.Process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", "{\"comments\":true,\"language\":\"python\"}");
         Assert.Equal("python", result.Language.Trim());
         Assert.True(result.Comments.Count >= 1, "expected at least 1 elements");
     }

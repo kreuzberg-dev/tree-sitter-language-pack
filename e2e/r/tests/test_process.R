@@ -8,7 +8,7 @@ test_that("process_javascript_exports_detail: JavaScript with exports, verify ex
 })
 
 test_that("process_python_comments: Python with comments, verify comment count", {
-  result <- process(source = "# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", config = list("language" = "python"))
+  result <- process(source = "# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", config = list("comments" = TRUE, "language" = "python"))
   expect_equal(trimws(result$language), "python")
   expect_true(length(result$comments) >= 1)
 })

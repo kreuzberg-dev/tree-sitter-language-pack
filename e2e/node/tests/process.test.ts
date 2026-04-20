@@ -10,7 +10,7 @@ describe('process', () => {
   });
 
   it('process_python_comments: Python with comments, verify comment count', () => {
-    const result = process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", { language: "python" });
+    const result = process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", { comments: true, language: "python" });
     expect(result.language.trim()).toBe("python");
     expect(result.comments.length).toBeGreaterThanOrEqual(1);
   });

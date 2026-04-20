@@ -14,56 +14,56 @@ final class TreeInspectionTest extends TestCase
     /** Parse broken Python code and verify error count >= 1 */
     public function test_tree_error_count_broken(): void
     {
-        $result = TreeSitterLanguagePack::process("def (broken syntax @@@ !!!", null);
+        $tree = TreeSitterLanguagePack::parse_string("python", "def (broken syntax @@@ !!!");
         // TODO: unsupported assertion type: method_result
     }
 
     /** Parse valid Python code and verify zero error count */
     public function test_tree_error_count_valid(): void
     {
-        $result = TreeSitterLanguagePack::process("x = 1\ny = 2\n", null);
+        $tree = TreeSitterLanguagePack::parse_string("python", "x = 1\ny = 2\n");
         // TODO: unsupported assertion type: method_result
     }
 
     /** Parse Python with 2 functions and verify find_nodes_by_type count */
     public function test_tree_find_nodes_two_functions(): void
     {
-        $result = TreeSitterLanguagePack::process("def foo():\n    pass\n\ndef bar():\n    pass\n", null);
+        $tree = TreeSitterLanguagePack::parse_string("python", "def foo():\n    pass\n\ndef bar():\n    pass\n");
         // TODO: unsupported assertion type: method_result
     }
 
     /** tree_has_error_nodes returns true for syntactically broken code */
     public function test_tree_has_error_nodes_broken_syntax(): void
     {
-        $result = TreeSitterLanguagePack::process("def broken(\n    x = \n", null);
+        $tree = TreeSitterLanguagePack::parse_string("python", "def broken(\n    x = \n");
         // TODO: unsupported assertion type: method_result
     }
 
     /** tree_has_error_nodes returns false for valid Python code */
     public function test_tree_has_error_nodes_valid_code(): void
     {
-        $result = TreeSitterLanguagePack::process("def greet(name):\n    return f'Hello {name}'\n", null);
+        $tree = TreeSitterLanguagePack::parse_string("python", "def greet(name):\n    return f'Hello {name}'\n");
         // TODO: unsupported assertion type: method_result
     }
 
     /** Parse Python with class and function, verify named children count */
     public function test_tree_named_children_class_and_function(): void
     {
-        $result = TreeSitterLanguagePack::process("class Foo:\n    pass\n\ndef bar():\n    pass\n", null);
+        $tree = TreeSitterLanguagePack::parse_string("python", "class Foo:\n    pass\n\ndef bar():\n    pass\n");
         // TODO: unsupported assertion type: method_result
     }
 
     /** Parse Python source and verify root node info */
     public function test_tree_root_node_info_python(): void
     {
-        $result = TreeSitterLanguagePack::process("def hello():\n    pass\n", null);
+        $tree = TreeSitterLanguagePack::parse_string("python", "def hello():\n    pass\n");
         // TODO: unsupported assertion type: method_result
     }
 
     /** Parse Python and verify tree_to_sexp returns valid S-expression containing module */
     public function test_tree_to_sexp_python(): void
     {
-        $result = TreeSitterLanguagePack::process("x = 1\n", null);
+        $tree = TreeSitterLanguagePack::parse_string("python", "x = 1\n");
         // TODO: unsupported assertion type: method_result
     }
 }

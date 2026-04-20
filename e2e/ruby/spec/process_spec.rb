@@ -12,7 +12,7 @@ RSpec.describe 'process' do
   end
 
   it 'process_python_comments: Python with comments, verify comment count' do
-    result = TreeSitterLanguagePack.process("\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n", { 'language' => 'python' })
+    result = TreeSitterLanguagePack.process("\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n", { 'comments' => true, 'language' => 'python' })
     expect(result.language).to eq('python')
     expect(result.comments.length).to be >= 1
   end
