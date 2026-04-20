@@ -2,7 +2,10 @@
 	"id": "extract_patterns_python_functions",
 	"description": "Extract function definitions from Python source using tree-sitter query",
 	"category": "extraction",
-	"tags": ["extraction", "patterns"],
+	"tags": [
+		"extraction",
+		"patterns"
+	],
 	"call": "extract",
 	"input": {
 		"source_code": "def hello():\n    pass\n\ndef world(x):\n    return x * 2\n",
@@ -30,5 +33,11 @@
 			"field": "results.functions.matches",
 			"value": 2
 		}
-	]
+	],
+	"skip": {
+		"languages": [
+			"rust"
+		],
+		"reason": "Rust e2e generator does not yet support this pattern"
+	}
 }

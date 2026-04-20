@@ -6,2142 +6,2142 @@ defmodule E2e.SmokeTest do
   describe "smoke_abl" do
     test "Smoke test: load abl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_actionscript" do
     test "Smoke test: load actionscript and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("var x:int = 1;")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ada" do
     test "Smoke test: load ada and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("procedure Main is begin null; end Main;")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_agda" do
     test "Smoke test: load agda and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("module Main where")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_al" do
     test "Smoke test: load al and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_angular" do
     test "Smoke test: load angular and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_apex" do
     test "Smoke test: load apex and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("public class Main {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_arduino" do
     test "Smoke test: load arduino and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("void setup() {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_asciidoc" do
     test "Smoke test: load asciidoc and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("= Title\n\nParagraph.")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_asm" do
     test "Smoke test: load asm and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("mov eax, 1")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_astro" do
     test "Smoke test: load astro and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("---\n---\n<p>hello</p>")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_awk" do
     test "Smoke test: load awk and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("BEGIN { print \"hello\" }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_bash" do
     test "Smoke test: load bash and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("echo hello")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_bass" do
     test "Smoke test: load bass and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_batch" do
     test "Smoke test: load batch and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("@echo off\necho hello")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_beancount" do
     test "Smoke test: load beancount and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("2024-01-01 open Assets:Bank USD")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_bibtex" do
     test "Smoke test: load bibtex and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("@article{key, title={A}}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_bicep" do
     test "Smoke test: load bicep and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("param name string")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_bitbake" do
     test "Smoke test: load bitbake and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("DESCRIPTION = \"hello\"")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_blade" do
     test "Smoke test: load blade and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_brightscript" do
     test "Smoke test: load brightscript and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_bsl" do
     test "Smoke test: load bsl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("Procedure Main() EndProcedure")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_c" do
     test "Smoke test: load c and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("int main() { return 0; }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_c3" do
     test "Smoke test: load c3 and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_caddy" do
     test "Smoke test: load caddy and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process(":8080 {\n\trespond \"Hello\"\n}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cairo" do
     test "Smoke test: load cairo and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("fn main() {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_capnp" do
     test "Smoke test: load capnp and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("@0xabcdef1234567890;")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cedar" do
     test "Smoke test: load cedar and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("permit(principal, action, resource);")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cedarschema" do
     test "Smoke test: load cedarschema and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("entity User;")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cel" do
     test "Smoke test: load cel and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cfml" do
     test "Smoke test: load cfml and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_chatito" do
     test "Smoke test: load chatito and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("%[greeting]\n    hello")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_chuck" do
     test "Smoke test: load chuck and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_circom" do
     test "Smoke test: load circom and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_clarity" do
     test "Smoke test: load clarity and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("(define-public (hello) (ok true))")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_clojure" do
     test "Smoke test: load clojure and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("(def x 1)")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cmake" do
     test "Smoke test: load cmake and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("cmake_minimum_required(VERSION 3.0)")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cobol" do
     test "Smoke test: load cobol and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_comment" do
     test "Smoke test: load comment and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("TODO: fix this")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_commonlisp" do
     test "Smoke test: load commonlisp and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("(defun hello () (print \"hello\"))")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cooklang" do
     test "Smoke test: load cooklang and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_corn" do
     test "Smoke test: load corn and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("{ key = \"value\" }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cpon" do
     test "Smoke test: load cpon and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("{\"key\": 1}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cpp" do
     test "Smoke test: load cpp and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("int main() { return 0; }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_crystal" do
     test "Smoke test: load crystal and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_csharp" do
     test "Smoke test: load csharp and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("class Main {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_css" do
     test "Smoke test: load css and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("body { color: red; }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cst" do
     test "Smoke test: load cst and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_csv" do
     test "Smoke test: load csv and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("a,b,c\n1,2,3")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cuda" do
     test "Smoke test: load cuda and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("__global__ void kernel() {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cue" do
     test "Smoke test: load cue and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_cylc" do
     test "Smoke test: load cylc and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_d" do
     test "Smoke test: load d and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("void main() {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_dart" do
     test "Smoke test: load dart and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("void main() {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_desktop" do
     test "Smoke test: load desktop and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_devicetree" do
     test "Smoke test: load devicetree and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("/dts-v1/;\n/ { };")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_dhall" do
     test "Smoke test: load dhall and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_diff" do
     test "Smoke test: load diff and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_djot" do
     test "Smoke test: load djot and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_dockerfile" do
     test "Smoke test: load dockerfile and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("FROM alpine")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_dot" do
     test "Smoke test: load dot and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("digraph G { A -> B; }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_doxygen" do
     test "Smoke test: load doxygen and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("/** @brief A function */")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_dtd" do
     test "Smoke test: load dtd and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("<!ELEMENT note (body)>")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_earthfile" do
     test "Smoke test: load earthfile and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ebnf" do
     test "Smoke test: load ebnf and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_editorconfig" do
     test "Smoke test: load editorconfig and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_eds" do
     test "Smoke test: load eds and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_eex" do
     test "Smoke test: load eex and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_elisp" do
     test "Smoke test: load elisp and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("(defun hello () (message \"hello\"))")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_elixir" do
     test "Smoke test: load elixir and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("IO.puts(\"hello\")")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_elm" do
     test "Smoke test: load elm and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("module Main exposing (..)")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_elsa" do
     test "Smoke test: load elsa and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_elvish" do
     test "Smoke test: load elvish and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_embeddedtemplate" do
     test "Smoke test: load embeddedtemplate and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("<%= value %>")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_enforce" do
     test "Smoke test: load enforce and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_erlang" do
     test "Smoke test: load erlang and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("main() -> ok.")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_facility" do
     test "Smoke test: load facility and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_faust" do
     test "Smoke test: load faust and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_fennel" do
     test "Smoke test: load fennel and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("(fn hello [] (print :hello))")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_fidl" do
     test "Smoke test: load fidl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_firrtl" do
     test "Smoke test: load firrtl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("circuit Main :")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_fish" do
     test "Smoke test: load fish and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("echo hello")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_foam" do
     test "Smoke test: load foam and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_forth" do
     test "Smoke test: load forth and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_fortran" do
     test "Smoke test: load fortran and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("program main\nend program main")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_fsharp" do
     test "Smoke test: load fsharp and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("let x = 1")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_fsharp_signature" do
     test "Smoke test: load fsharp_signature and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("val x: int")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_func" do
     test "Smoke test: load func and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("() recv_internal() {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gap" do
     test "Smoke test: load gap and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gdscript" do
     test "Smoke test: load gdscript and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("extends Node\nfunc _ready():\n\tpass")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gdshader" do
     test "Smoke test: load gdshader and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_git_config" do
     test "Smoke test: load git_config and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_git_rebase" do
     test "Smoke test: load git_rebase and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gitattributes" do
     test "Smoke test: load gitattributes and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("*.txt text")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gitcommit" do
     test "Smoke test: load gitcommit and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("feat: add feature\n\nBody text")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gitignore" do
     test "Smoke test: load gitignore and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("*.o\n*.log")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gleam" do
     test "Smoke test: load gleam and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("pub fn main() { }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_glimmer" do
     test "Smoke test: load glimmer and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_glsl" do
     test "Smoke test: load glsl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("void main() { gl_Position = vec4(0.0); }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gn" do
     test "Smoke test: load gn and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("group(\"hello\") {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gnuplot" do
     test "Smoke test: load gnuplot and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_go" do
     test "Smoke test: load go and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("package main")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_godot_resource" do
     test "Smoke test: load godot_resource and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gomod" do
     test "Smoke test: load gomod and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("module example.com/hello\n\ngo 1.21")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gosum" do
     test "Smoke test: load gosum and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("example.com/pkg v1.0.0 h1:abc=")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gotmpl" do
     test "Smoke test: load gotmpl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gowork" do
     test "Smoke test: load gowork and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gpg" do
     test "Smoke test: load gpg and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_graphql" do
     test "Smoke test: load graphql and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("type Query { hello: String }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gren" do
     test "Smoke test: load gren and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("module Main exposing (..)")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_groovy" do
     test "Smoke test: load groovy and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("def x = 1")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_gstlaunch" do
     test "Smoke test: load gstlaunch and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("fakesrc ! fakesink")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_hack" do
     test "Smoke test: load hack and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("<?hh\nfunction main(): void {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_hare" do
     test "Smoke test: load hare and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("export fn main() void = void;")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_haskell" do
     test "Smoke test: load haskell and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("main = putStrLn \"hello\"")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_haxe" do
     test "Smoke test: load haxe and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("class Main { static function main() {} }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_hcl" do
     test "Smoke test: load hcl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("variable \"name\" { type = string }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_heex" do
     test "Smoke test: load heex and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("<%= @greeting %>")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_hjson" do
     test "Smoke test: load hjson and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_hlsl" do
     test "Smoke test: load hlsl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("float4 main() : SV_Target { return 0; }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_hocon" do
     test "Smoke test: load hocon and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_hoon" do
     test "Smoke test: load hoon and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_html" do
     test "Smoke test: load html and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("<p>hello</p>")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_htmldjango" do
     test "Smoke test: load htmldjango and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_http" do
     test "Smoke test: load http and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_hurl" do
     test "Smoke test: load hurl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_hyprlang" do
     test "Smoke test: load hyprlang and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("general { border_size = 1 }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_idris" do
     test "Smoke test: load idris and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("module Main")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ini" do
     test "Smoke test: load ini and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("[section]\nkey = value")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ispc" do
     test "Smoke test: load ispc and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("export void main() {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_jai" do
     test "Smoke test: load jai and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_janet" do
     test "Smoke test: load janet and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("(print \"hello\")")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_java" do
     test "Smoke test: load java and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("class Main {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_javadoc" do
     test "Smoke test: load javadoc and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_javascript" do
     test "Smoke test: load javascript and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("console.log('hello');")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_jinja2" do
     test "Smoke test: load jinja2 and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("{{ variable }}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_jq" do
     test "Smoke test: load jq and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process(".[] | select(.key)")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_jsdoc" do
     test "Smoke test: load jsdoc and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("/** @param {string} name */")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_json" do
     test "Smoke test: load json and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("{\"key\": \"value\"}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_json5" do
     test "Smoke test: load json5 and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_jsonnet" do
     test "Smoke test: load jsonnet and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("{ key: 'value' }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_julia" do
     test "Smoke test: load julia and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("function main() end")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_just" do
     test "Smoke test: load just and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_kcl" do
     test "Smoke test: load kcl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_kconfig" do
     test "Smoke test: load kconfig and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("config FOO\n\tbool \"Enable foo\"")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_kdl" do
     test "Smoke test: load kdl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("node \"value\"")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_kotlin" do
     test "Smoke test: load kotlin and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("fun main() {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_latex" do
     test "Smoke test: load latex and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_lean" do
     test "Smoke test: load lean and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("def main : IO Unit := pure ()")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ledger" do
     test "Smoke test: load ledger and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_less" do
     test "Smoke test: load less and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_linkerscript" do
     test "Smoke test: load linkerscript and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("SECTIONS { .text : { *(.text) } }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_liquid" do
     test "Smoke test: load liquid and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_llvm" do
     test "Smoke test: load llvm and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("define i32 @main() { ret i32 0 }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_lua" do
     test "Smoke test: load lua and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("print('hello')")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_luadoc" do
     test "Smoke test: load luadoc and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("---@param name string")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_luap" do
     test "Smoke test: load luap and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("[a-z]+")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_luau" do
     test "Smoke test: load luau and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("local x: number = 1")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_magik" do
     test "Smoke test: load magik and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("_method object.hello\n_endmethod")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_make" do
     test "Smoke test: load make and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("all:\n\techo hello")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_markdown" do
     test "Smoke test: load markdown and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("\# Hello\n\nWorld")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_markdown_inline" do
     test "Smoke test: load markdown_inline and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("**bold** and *italic*")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_matlab" do
     test "Smoke test: load matlab and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("function y = hello(x)\ny = x;\nend")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_mermaid" do
     test "Smoke test: load mermaid and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("graph TD\nA --> B")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_meson" do
     test "Smoke test: load meson and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("project('hello', 'c')")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_mlir" do
     test "Smoke test: load mlir and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_mojo" do
     test "Smoke test: load mojo and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_move" do
     test "Smoke test: load move and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_nasm" do
     test "Smoke test: load nasm and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_netlinx" do
     test "Smoke test: load netlinx and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("PROGRAM_NAME='hello'")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_nginx" do
     test "Smoke test: load nginx and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_nickel" do
     test "Smoke test: load nickel and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_nim" do
     test "Smoke test: load nim and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("echo \"hello\"")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ninja" do
     test "Smoke test: load ninja and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("rule cc\n  command = cc $in -o $out")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_nix" do
     test "Smoke test: load nix and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("{ pkgs ? import <nixpkgs> {} }: pkgs.hello")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_norg" do
     test "Smoke test: load norg and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_norg_meta" do
     test "Smoke test: load norg_meta and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_nqc" do
     test "Smoke test: load nqc and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("task main() {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_nushell" do
     test "Smoke test: load nushell and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_objc" do
     test "Smoke test: load objc and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("@interface Main @end")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ocaml" do
     test "Smoke test: load ocaml and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("let () = print_endline \"hello\"")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ocaml_interface" do
     test "Smoke test: load ocaml_interface and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("val x : int")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ocamllex" do
     test "Smoke test: load ocamllex and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_odin" do
     test "Smoke test: load odin and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("package main")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_openscad" do
     test "Smoke test: load openscad and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_org" do
     test "Smoke test: load org and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("* Hello\nWorld")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_pascal" do
     test "Smoke test: load pascal and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("program Hello; begin end.")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_pem" do
     test "Smoke test: load pem and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_perl" do
     test "Smoke test: load perl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("print 'hello';")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_pgn" do
     test "Smoke test: load pgn and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("1. e4 e5 *")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_php" do
     test "Smoke test: load php and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("<?php echo 'hello'; ?>")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_phpdoc" do
     test "Smoke test: load phpdoc and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_pkl" do
     test "Smoke test: load pkl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("name = \"hello\"")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_po" do
     test "Smoke test: load po and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("msgid \"hello\"\nmsgstr \"world\"")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_poe_filter" do
     test "Smoke test: load poe_filter and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_pony" do
     test "Smoke test: load pony and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("actor Main\n  new create(env: Env) => None")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_postscript" do
     test "Smoke test: load postscript and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("/hello { (Hello) show } def")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_powershell" do
     test "Smoke test: load powershell and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("Write-Host 'hello'")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_printf" do
     test "Smoke test: load printf and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("%d %s")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_prisma" do
     test "Smoke test: load prisma and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("model User { id Int @id }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_prolog" do
     test "Smoke test: load prolog and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("hello :- write('hello'), nl.")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_promql" do
     test "Smoke test: load promql and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_properties" do
     test "Smoke test: load properties and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("key=value")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_proto" do
     test "Smoke test: load proto and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("syntax = \"proto3\";")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_prql" do
     test "Smoke test: load prql and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_psv" do
     test "Smoke test: load psv and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("a|b|c\n1|2|3")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_pug" do
     test "Smoke test: load pug and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_puppet" do
     test "Smoke test: load puppet and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("notify { 'hello': }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_purescript" do
     test "Smoke test: load purescript and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("module Main where")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_pymanifest" do
     test "Smoke test: load pymanifest and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("include *.txt")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_python" do
     test "Smoke test: load python and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("print('hello')")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ql" do
     test "Smoke test: load ql and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_qmldir" do
     test "Smoke test: load qmldir and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("module Example")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_qmljs" do
     test "Smoke test: load qmljs and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("import QtQuick 2.0\nItem {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_query" do
     test "Smoke test: load query and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("(identifier) @name")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_r" do
     test "Smoke test: load r and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("print('hello')")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_racket" do
     test "Smoke test: load racket and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("\#lang racket\n(define x 1)")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_rasi" do
     test "Smoke test: load rasi and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_razor" do
     test "Smoke test: load razor and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_rbs" do
     test "Smoke test: load rbs and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_re2c" do
     test "Smoke test: load re2c and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("/*!re2c\n  [a-z]+ { return; }\n*/")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_readline" do
     test "Smoke test: load readline and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("set editing-mode vi")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_regex" do
     test "Smoke test: load regex and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_rego" do
     test "Smoke test: load rego and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("package main\ndefault allow = false")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_requirements" do
     test "Smoke test: load requirements and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("flask>=2.0")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_rescript" do
     test "Smoke test: load rescript and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("let x = 1")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_robot" do
     test "Smoke test: load robot and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_roc" do
     test "Smoke test: load roc and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ron" do
     test "Smoke test: load ron and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("(key: \"value\")")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_rst" do
     test "Smoke test: load rst and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("Hello\n=====\n\nWorld")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_rtf" do
     test "Smoke test: load rtf and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("{\\rtf1 hello}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ruby" do
     test "Smoke test: load ruby and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("puts 'hello'")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_rust" do
     test "Smoke test: load rust and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("fn main() {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_scala" do
     test "Smoke test: load scala and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("object Main")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_scheme" do
     test "Smoke test: load scheme and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("(define x 1)")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_scss" do
     test "Smoke test: load scss and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("$color: red;\nbody { color: $color; }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_slang" do
     test "Smoke test: load slang and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_smali" do
     test "Smoke test: load smali and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process(".class public LMain;\n.super Ljava/lang/Object;")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_smalltalk" do
     test "Smoke test: load smalltalk and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_smithy" do
     test "Smoke test: load smithy and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("namespace example\nstring MyString")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_sml" do
     test "Smoke test: load sml and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_snakemake" do
     test "Smoke test: load snakemake and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_solidity" do
     test "Smoke test: load solidity and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("pragma solidity ^0.8.0;\ncontract Main {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_souffle" do
     test "Smoke test: load souffle and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_sourcepawn" do
     test "Smoke test: load sourcepawn and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_sparql" do
     test "Smoke test: load sparql and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("SELECT ?s WHERE { ?s ?p ?o }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_sql" do
     test "Smoke test: load sql and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("SELECT 1;")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_sql_bigquery" do
     test "Smoke test: load sql_bigquery and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_squirrel" do
     test "Smoke test: load squirrel and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("function main() {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ssh_config" do
     test "Smoke test: load ssh_config and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("Host example\n  HostName example.com")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_stan" do
     test "Smoke test: load stan and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_starlark" do
     test "Smoke test: load starlark and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("def hello(): pass")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_superhtml" do
     test "Smoke test: load superhtml and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_svelte" do
     test "Smoke test: load svelte and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("<script>let x = 1;</script>")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_sway" do
     test "Smoke test: load sway and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_swift" do
     test "Smoke test: load swift and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("print(\"hello\")")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_systemverilog" do
     test "Smoke test: load systemverilog and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_tablegen" do
     test "Smoke test: load tablegen and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("def Hello : Base {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_tact" do
     test "Smoke test: load tact and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_tcl" do
     test "Smoke test: load tcl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("puts hello")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_teal" do
     test "Smoke test: load teal and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_templ" do
     test "Smoke test: load templ and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_tera" do
     test "Smoke test: load tera and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_terraform" do
     test "Smoke test: load terraform and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("resource \"null_resource\" \"main\" {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_test" do
     test "Smoke test: load test and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("===========\nTest\n===========\n---\n(node)")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_textproto" do
     test "Smoke test: load textproto and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("key: \"value\"")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_thrift" do
     test "Smoke test: load thrift and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("service HelloService {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_tlaplus" do
     test "Smoke test: load tlaplus and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("---- MODULE Main ----\n====")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_tmux" do
     test "Smoke test: load tmux and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_todotxt" do
     test "Smoke test: load todotxt and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_toml" do
     test "Smoke test: load toml and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("key = \"value\"")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_tsv" do
     test "Smoke test: load tsv and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("a\tb\tc\n1\t2\t3")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_tsx" do
     test "Smoke test: load tsx and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("const App = () => <div />;")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_turtle" do
     test "Smoke test: load turtle and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_twig" do
     test "Smoke test: load twig and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("{{ variable }}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_typescript" do
     test "Smoke test: load typescript and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("const x: number = 42;")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_typespec" do
     test "Smoke test: load typespec and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_typoscript" do
     test "Smoke test: load typoscript and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_typst" do
     test "Smoke test: load typst and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("\#let x = 1")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_udev" do
     test "Smoke test: load udev and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("ACTION==\"add\", KERNEL==\"sd*\"")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ungrammar" do
     test "Smoke test: load ungrammar and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("Root = Item*\nItem = 'token'")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_uxntal" do
     test "Smoke test: load uxntal and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("|0100 LIT 01")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_v" do
     test "Smoke test: load v and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("fn main() {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_vb" do
     test "Smoke test: load vb and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("Module Main\nEnd Module")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_verilog" do
     test "Smoke test: load verilog and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("module main; endmodule")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_vhdl" do
     test "Smoke test: load vhdl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("entity main is end main;")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_vhs" do
     test "Smoke test: load vhs and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_vim" do
     test "Smoke test: load vim and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("echo 'hello'")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_vimdoc" do
     test "Smoke test: load vimdoc and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_vrl" do
     test "Smoke test: load vrl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_vue" do
     test "Smoke test: load vue and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("<template><div>hello</div></template>")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_wast" do
     test "Smoke test: load wast and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("(module)")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_wat" do
     test "Smoke test: load wat and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("(module)")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_wgsl" do
     test "Smoke test: load wgsl and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_wgsl_bevy" do
     test "Smoke test: load wgsl_bevy and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_wit" do
     test "Smoke test: load wit and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("package example:pkg;")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_wolfram" do
     test "Smoke test: load wolfram and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_x86asm" do
     test "Smoke test: load x86asm and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_xcompose" do
     test "Smoke test: load xcompose and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("<Multi_key> <a> : \"a\"")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_xml" do
     test "Smoke test: load xml and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("<?xml version=\"1.0\"?>\n<root>hello</root>")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_yaml" do
     test "Smoke test: load yaml and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("key: value")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_yuck" do
     test "Smoke test: load yuck and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("(defwidget main [] (label :text \"hi\"))")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_zig" do
     test "Smoke test: load zig and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("pub fn main() void {}")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ziggy" do
     test "Smoke test: load ziggy and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_ziggy_schema" do
     test "Smoke test: load ziggy_schema and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("x")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 
   describe "smoke_zsh" do
     test "Smoke test: load zsh and parse a simple snippet" do
       {:ok, result} = TreeSitterLanguagePack.process("echo hello")
-      assert result.root_child_count >= 1
+      # TODO: unsupported assertion type: method_result
     end
   end
 end

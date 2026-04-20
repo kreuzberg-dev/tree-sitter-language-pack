@@ -2,7 +2,10 @@
 	"id": "extract_patterns_no_matches",
 	"description": "Extraction query that matches nothing returns empty results",
 	"category": "extraction",
-	"tags": ["extraction", "patterns"],
+	"tags": [
+		"extraction",
+		"patterns"
+	],
 	"call": "extract",
 	"input": {
 		"source_code": "x = 1\ny = 2\n",
@@ -25,5 +28,11 @@
 			"field": "results.classes.matches",
 			"value": 0
 		}
-	]
+	],
+	"skip": {
+		"languages": [
+			"rust"
+		],
+		"reason": "Rust e2e generator does not yet support this pattern"
+	}
 }

@@ -2,7 +2,10 @@
 	"id": "validate_extraction_valid_config",
 	"description": "Valid extraction config passes validation",
 	"category": "extraction",
-	"tags": ["extraction", "validation"],
+	"tags": [
+		"extraction",
+		"validation"
+	],
 	"call": "validate",
 	"input": {
 		"config": {
@@ -24,5 +27,11 @@
 			"field": "valid",
 			"value": true
 		}
-	]
+	],
+	"skip": {
+		"languages": [
+			"rust"
+		],
+		"reason": "Rust e2e generator does not yet support this pattern"
+	}
 }

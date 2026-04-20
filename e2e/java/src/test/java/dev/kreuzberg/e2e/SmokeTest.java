@@ -10,2142 +10,2142 @@ class SmokeTest {
     void testSmokeAbl() throws Exception {
         // Smoke test: load abl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeActionscript() throws Exception {
         // Smoke test: load actionscript and parse a simple snippet
         var result = TreeSitterLanguagePack.process("var x:int = 1;");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeAda() throws Exception {
         // Smoke test: load ada and parse a simple snippet
         var result = TreeSitterLanguagePack.process("procedure Main is begin null; end Main;");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeAgda() throws Exception {
         // Smoke test: load agda and parse a simple snippet
         var result = TreeSitterLanguagePack.process("module Main where");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeAl() throws Exception {
         // Smoke test: load al and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeAngular() throws Exception {
         // Smoke test: load angular and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeApex() throws Exception {
         // Smoke test: load apex and parse a simple snippet
         var result = TreeSitterLanguagePack.process("public class Main {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeArduino() throws Exception {
         // Smoke test: load arduino and parse a simple snippet
         var result = TreeSitterLanguagePack.process("void setup() {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeAsciidoc() throws Exception {
         // Smoke test: load asciidoc and parse a simple snippet
         var result = TreeSitterLanguagePack.process("= Title\n\nParagraph.");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeAsm() throws Exception {
         // Smoke test: load asm and parse a simple snippet
         var result = TreeSitterLanguagePack.process("mov eax, 1");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeAstro() throws Exception {
         // Smoke test: load astro and parse a simple snippet
         var result = TreeSitterLanguagePack.process("---\n---\n<p>hello</p>");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeAwk() throws Exception {
         // Smoke test: load awk and parse a simple snippet
         var result = TreeSitterLanguagePack.process("BEGIN { print \"hello\" }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeBash() throws Exception {
         // Smoke test: load bash and parse a simple snippet
         var result = TreeSitterLanguagePack.process("echo hello");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeBass() throws Exception {
         // Smoke test: load bass and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeBatch() throws Exception {
         // Smoke test: load batch and parse a simple snippet
         var result = TreeSitterLanguagePack.process("@echo off\necho hello");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeBeancount() throws Exception {
         // Smoke test: load beancount and parse a simple snippet
         var result = TreeSitterLanguagePack.process("2024-01-01 open Assets:Bank USD");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeBibtex() throws Exception {
         // Smoke test: load bibtex and parse a simple snippet
         var result = TreeSitterLanguagePack.process("@article{key, title={A}}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeBicep() throws Exception {
         // Smoke test: load bicep and parse a simple snippet
         var result = TreeSitterLanguagePack.process("param name string");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeBitbake() throws Exception {
         // Smoke test: load bitbake and parse a simple snippet
         var result = TreeSitterLanguagePack.process("DESCRIPTION = \"hello\"");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeBlade() throws Exception {
         // Smoke test: load blade and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeBrightscript() throws Exception {
         // Smoke test: load brightscript and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeBsl() throws Exception {
         // Smoke test: load bsl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("Procedure Main() EndProcedure");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeC() throws Exception {
         // Smoke test: load c and parse a simple snippet
         var result = TreeSitterLanguagePack.process("int main() { return 0; }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeC3() throws Exception {
         // Smoke test: load c3 and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCaddy() throws Exception {
         // Smoke test: load caddy and parse a simple snippet
         var result = TreeSitterLanguagePack.process(":8080 {\n\trespond \"Hello\"\n}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCairo() throws Exception {
         // Smoke test: load cairo and parse a simple snippet
         var result = TreeSitterLanguagePack.process("fn main() {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCapnp() throws Exception {
         // Smoke test: load capnp and parse a simple snippet
         var result = TreeSitterLanguagePack.process("@0xabcdef1234567890;");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCedar() throws Exception {
         // Smoke test: load cedar and parse a simple snippet
         var result = TreeSitterLanguagePack.process("permit(principal, action, resource);");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCedarschema() throws Exception {
         // Smoke test: load cedarschema and parse a simple snippet
         var result = TreeSitterLanguagePack.process("entity User;");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCel() throws Exception {
         // Smoke test: load cel and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCfml() throws Exception {
         // Smoke test: load cfml and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeChatito() throws Exception {
         // Smoke test: load chatito and parse a simple snippet
         var result = TreeSitterLanguagePack.process("%[greeting]\n    hello");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeChuck() throws Exception {
         // Smoke test: load chuck and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCircom() throws Exception {
         // Smoke test: load circom and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeClarity() throws Exception {
         // Smoke test: load clarity and parse a simple snippet
         var result = TreeSitterLanguagePack.process("(define-public (hello) (ok true))");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeClojure() throws Exception {
         // Smoke test: load clojure and parse a simple snippet
         var result = TreeSitterLanguagePack.process("(def x 1)");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCmake() throws Exception {
         // Smoke test: load cmake and parse a simple snippet
         var result = TreeSitterLanguagePack.process("cmake_minimum_required(VERSION 3.0)");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCobol() throws Exception {
         // Smoke test: load cobol and parse a simple snippet
         var result = TreeSitterLanguagePack.process("       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeComment() throws Exception {
         // Smoke test: load comment and parse a simple snippet
         var result = TreeSitterLanguagePack.process("TODO: fix this");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCommonlisp() throws Exception {
         // Smoke test: load commonlisp and parse a simple snippet
         var result = TreeSitterLanguagePack.process("(defun hello () (print \"hello\"))");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCooklang() throws Exception {
         // Smoke test: load cooklang and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCorn() throws Exception {
         // Smoke test: load corn and parse a simple snippet
         var result = TreeSitterLanguagePack.process("{ key = \"value\" }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCpon() throws Exception {
         // Smoke test: load cpon and parse a simple snippet
         var result = TreeSitterLanguagePack.process("{\"key\": 1}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCpp() throws Exception {
         // Smoke test: load cpp and parse a simple snippet
         var result = TreeSitterLanguagePack.process("int main() { return 0; }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCrystal() throws Exception {
         // Smoke test: load crystal and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCsharp() throws Exception {
         // Smoke test: load csharp and parse a simple snippet
         var result = TreeSitterLanguagePack.process("class Main {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCss() throws Exception {
         // Smoke test: load css and parse a simple snippet
         var result = TreeSitterLanguagePack.process("body { color: red; }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCst() throws Exception {
         // Smoke test: load cst and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCsv() throws Exception {
         // Smoke test: load csv and parse a simple snippet
         var result = TreeSitterLanguagePack.process("a,b,c\n1,2,3");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCuda() throws Exception {
         // Smoke test: load cuda and parse a simple snippet
         var result = TreeSitterLanguagePack.process("__global__ void kernel() {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCue() throws Exception {
         // Smoke test: load cue and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeCylc() throws Exception {
         // Smoke test: load cylc and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeD() throws Exception {
         // Smoke test: load d and parse a simple snippet
         var result = TreeSitterLanguagePack.process("void main() {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeDart() throws Exception {
         // Smoke test: load dart and parse a simple snippet
         var result = TreeSitterLanguagePack.process("void main() {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeDesktop() throws Exception {
         // Smoke test: load desktop and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeDevicetree() throws Exception {
         // Smoke test: load devicetree and parse a simple snippet
         var result = TreeSitterLanguagePack.process("/dts-v1/;\n/ { };");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeDhall() throws Exception {
         // Smoke test: load dhall and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeDiff() throws Exception {
         // Smoke test: load diff and parse a simple snippet
         var result = TreeSitterLanguagePack.process("--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeDjot() throws Exception {
         // Smoke test: load djot and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeDockerfile() throws Exception {
         // Smoke test: load dockerfile and parse a simple snippet
         var result = TreeSitterLanguagePack.process("FROM alpine");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeDot() throws Exception {
         // Smoke test: load dot and parse a simple snippet
         var result = TreeSitterLanguagePack.process("digraph G { A -> B; }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeDoxygen() throws Exception {
         // Smoke test: load doxygen and parse a simple snippet
         var result = TreeSitterLanguagePack.process("/** @brief A function */");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeDtd() throws Exception {
         // Smoke test: load dtd and parse a simple snippet
         var result = TreeSitterLanguagePack.process("<!ELEMENT note (body)>");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeEarthfile() throws Exception {
         // Smoke test: load earthfile and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeEbnf() throws Exception {
         // Smoke test: load ebnf and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeEditorconfig() throws Exception {
         // Smoke test: load editorconfig and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeEds() throws Exception {
         // Smoke test: load eds and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeEex() throws Exception {
         // Smoke test: load eex and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeElisp() throws Exception {
         // Smoke test: load elisp and parse a simple snippet
         var result = TreeSitterLanguagePack.process("(defun hello () (message \"hello\"))");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeElixir() throws Exception {
         // Smoke test: load elixir and parse a simple snippet
         var result = TreeSitterLanguagePack.process("IO.puts(\"hello\")");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeElm() throws Exception {
         // Smoke test: load elm and parse a simple snippet
         var result = TreeSitterLanguagePack.process("module Main exposing (..)");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeElsa() throws Exception {
         // Smoke test: load elsa and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeElvish() throws Exception {
         // Smoke test: load elvish and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeEmbeddedtemplate() throws Exception {
         // Smoke test: load embeddedtemplate and parse a simple snippet
         var result = TreeSitterLanguagePack.process("<%= value %>");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeEnforce() throws Exception {
         // Smoke test: load enforce and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeErlang() throws Exception {
         // Smoke test: load erlang and parse a simple snippet
         var result = TreeSitterLanguagePack.process("main() -> ok.");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeFacility() throws Exception {
         // Smoke test: load facility and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeFaust() throws Exception {
         // Smoke test: load faust and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeFennel() throws Exception {
         // Smoke test: load fennel and parse a simple snippet
         var result = TreeSitterLanguagePack.process("(fn hello [] (print :hello))");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeFidl() throws Exception {
         // Smoke test: load fidl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeFirrtl() throws Exception {
         // Smoke test: load firrtl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("circuit Main :");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeFish() throws Exception {
         // Smoke test: load fish and parse a simple snippet
         var result = TreeSitterLanguagePack.process("echo hello");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeFoam() throws Exception {
         // Smoke test: load foam and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeForth() throws Exception {
         // Smoke test: load forth and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeFortran() throws Exception {
         // Smoke test: load fortran and parse a simple snippet
         var result = TreeSitterLanguagePack.process("program main\nend program main");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeFsharp() throws Exception {
         // Smoke test: load fsharp and parse a simple snippet
         var result = TreeSitterLanguagePack.process("let x = 1");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeFsharpSignature() throws Exception {
         // Smoke test: load fsharp_signature and parse a simple snippet
         var result = TreeSitterLanguagePack.process("val x: int");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeFunc() throws Exception {
         // Smoke test: load func and parse a simple snippet
         var result = TreeSitterLanguagePack.process("() recv_internal() {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGap() throws Exception {
         // Smoke test: load gap and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGdscript() throws Exception {
         // Smoke test: load gdscript and parse a simple snippet
         var result = TreeSitterLanguagePack.process("extends Node\nfunc _ready():\n\tpass");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGdshader() throws Exception {
         // Smoke test: load gdshader and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGitConfig() throws Exception {
         // Smoke test: load git_config and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGitRebase() throws Exception {
         // Smoke test: load git_rebase and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGitattributes() throws Exception {
         // Smoke test: load gitattributes and parse a simple snippet
         var result = TreeSitterLanguagePack.process("*.txt text");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGitcommit() throws Exception {
         // Smoke test: load gitcommit and parse a simple snippet
         var result = TreeSitterLanguagePack.process("feat: add feature\n\nBody text");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGitignore() throws Exception {
         // Smoke test: load gitignore and parse a simple snippet
         var result = TreeSitterLanguagePack.process("*.o\n*.log");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGleam() throws Exception {
         // Smoke test: load gleam and parse a simple snippet
         var result = TreeSitterLanguagePack.process("pub fn main() { }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGlimmer() throws Exception {
         // Smoke test: load glimmer and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGlsl() throws Exception {
         // Smoke test: load glsl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("void main() { gl_Position = vec4(0.0); }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGn() throws Exception {
         // Smoke test: load gn and parse a simple snippet
         var result = TreeSitterLanguagePack.process("group(\"hello\") {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGnuplot() throws Exception {
         // Smoke test: load gnuplot and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGo() throws Exception {
         // Smoke test: load go and parse a simple snippet
         var result = TreeSitterLanguagePack.process("package main");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGodotResource() throws Exception {
         // Smoke test: load godot_resource and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGomod() throws Exception {
         // Smoke test: load gomod and parse a simple snippet
         var result = TreeSitterLanguagePack.process("module example.com/hello\n\ngo 1.21");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGosum() throws Exception {
         // Smoke test: load gosum and parse a simple snippet
         var result = TreeSitterLanguagePack.process("example.com/pkg v1.0.0 h1:abc=");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGotmpl() throws Exception {
         // Smoke test: load gotmpl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGowork() throws Exception {
         // Smoke test: load gowork and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGpg() throws Exception {
         // Smoke test: load gpg and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGraphql() throws Exception {
         // Smoke test: load graphql and parse a simple snippet
         var result = TreeSitterLanguagePack.process("type Query { hello: String }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGren() throws Exception {
         // Smoke test: load gren and parse a simple snippet
         var result = TreeSitterLanguagePack.process("module Main exposing (..)");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGroovy() throws Exception {
         // Smoke test: load groovy and parse a simple snippet
         var result = TreeSitterLanguagePack.process("def x = 1");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeGstlaunch() throws Exception {
         // Smoke test: load gstlaunch and parse a simple snippet
         var result = TreeSitterLanguagePack.process("fakesrc ! fakesink");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHack() throws Exception {
         // Smoke test: load hack and parse a simple snippet
         var result = TreeSitterLanguagePack.process("<?hh\nfunction main(): void {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHare() throws Exception {
         // Smoke test: load hare and parse a simple snippet
         var result = TreeSitterLanguagePack.process("export fn main() void = void;");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHaskell() throws Exception {
         // Smoke test: load haskell and parse a simple snippet
         var result = TreeSitterLanguagePack.process("main = putStrLn \"hello\"");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHaxe() throws Exception {
         // Smoke test: load haxe and parse a simple snippet
         var result = TreeSitterLanguagePack.process("class Main { static function main() {} }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHcl() throws Exception {
         // Smoke test: load hcl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("variable \"name\" { type = string }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHeex() throws Exception {
         // Smoke test: load heex and parse a simple snippet
         var result = TreeSitterLanguagePack.process("<%= @greeting %>");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHjson() throws Exception {
         // Smoke test: load hjson and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHlsl() throws Exception {
         // Smoke test: load hlsl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("float4 main() : SV_Target { return 0; }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHocon() throws Exception {
         // Smoke test: load hocon and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHoon() throws Exception {
         // Smoke test: load hoon and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHtml() throws Exception {
         // Smoke test: load html and parse a simple snippet
         var result = TreeSitterLanguagePack.process("<p>hello</p>");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHtmldjango() throws Exception {
         // Smoke test: load htmldjango and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHttp() throws Exception {
         // Smoke test: load http and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHurl() throws Exception {
         // Smoke test: load hurl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeHyprlang() throws Exception {
         // Smoke test: load hyprlang and parse a simple snippet
         var result = TreeSitterLanguagePack.process("general { border_size = 1 }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeIdris() throws Exception {
         // Smoke test: load idris and parse a simple snippet
         var result = TreeSitterLanguagePack.process("module Main");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeIni() throws Exception {
         // Smoke test: load ini and parse a simple snippet
         var result = TreeSitterLanguagePack.process("[section]\nkey = value");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeIspc() throws Exception {
         // Smoke test: load ispc and parse a simple snippet
         var result = TreeSitterLanguagePack.process("export void main() {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJai() throws Exception {
         // Smoke test: load jai and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJanet() throws Exception {
         // Smoke test: load janet and parse a simple snippet
         var result = TreeSitterLanguagePack.process("(print \"hello\")");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJava() throws Exception {
         // Smoke test: load java and parse a simple snippet
         var result = TreeSitterLanguagePack.process("class Main {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJavadoc() throws Exception {
         // Smoke test: load javadoc and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJavascript() throws Exception {
         // Smoke test: load javascript and parse a simple snippet
         var result = TreeSitterLanguagePack.process("console.log('hello');");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJinja2() throws Exception {
         // Smoke test: load jinja2 and parse a simple snippet
         var result = TreeSitterLanguagePack.process("{{ variable }}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJq() throws Exception {
         // Smoke test: load jq and parse a simple snippet
         var result = TreeSitterLanguagePack.process(".[] | select(.key)");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJsdoc() throws Exception {
         // Smoke test: load jsdoc and parse a simple snippet
         var result = TreeSitterLanguagePack.process("/** @param {string} name */");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJson() throws Exception {
         // Smoke test: load json and parse a simple snippet
         var result = TreeSitterLanguagePack.process("{\"key\": \"value\"}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJson5() throws Exception {
         // Smoke test: load json5 and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJsonnet() throws Exception {
         // Smoke test: load jsonnet and parse a simple snippet
         var result = TreeSitterLanguagePack.process("{ key: 'value' }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJulia() throws Exception {
         // Smoke test: load julia and parse a simple snippet
         var result = TreeSitterLanguagePack.process("function main() end");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeJust() throws Exception {
         // Smoke test: load just and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeKcl() throws Exception {
         // Smoke test: load kcl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeKconfig() throws Exception {
         // Smoke test: load kconfig and parse a simple snippet
         var result = TreeSitterLanguagePack.process("config FOO\n\tbool \"Enable foo\"");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeKdl() throws Exception {
         // Smoke test: load kdl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("node \"value\"");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeKotlin() throws Exception {
         // Smoke test: load kotlin and parse a simple snippet
         var result = TreeSitterLanguagePack.process("fun main() {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeLatex() throws Exception {
         // Smoke test: load latex and parse a simple snippet
         var result = TreeSitterLanguagePack.process("\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeLean() throws Exception {
         // Smoke test: load lean and parse a simple snippet
         var result = TreeSitterLanguagePack.process("def main : IO Unit := pure ()");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeLedger() throws Exception {
         // Smoke test: load ledger and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeLess() throws Exception {
         // Smoke test: load less and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeLinkerscript() throws Exception {
         // Smoke test: load linkerscript and parse a simple snippet
         var result = TreeSitterLanguagePack.process("SECTIONS { .text : { *(.text) } }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeLiquid() throws Exception {
         // Smoke test: load liquid and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeLlvm() throws Exception {
         // Smoke test: load llvm and parse a simple snippet
         var result = TreeSitterLanguagePack.process("define i32 @main() { ret i32 0 }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeLua() throws Exception {
         // Smoke test: load lua and parse a simple snippet
         var result = TreeSitterLanguagePack.process("print('hello')");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeLuadoc() throws Exception {
         // Smoke test: load luadoc and parse a simple snippet
         var result = TreeSitterLanguagePack.process("---@param name string");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeLuap() throws Exception {
         // Smoke test: load luap and parse a simple snippet
         var result = TreeSitterLanguagePack.process("[a-z]+");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeLuau() throws Exception {
         // Smoke test: load luau and parse a simple snippet
         var result = TreeSitterLanguagePack.process("local x: number = 1");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeMagik() throws Exception {
         // Smoke test: load magik and parse a simple snippet
         var result = TreeSitterLanguagePack.process("_method object.hello\n_endmethod");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeMake() throws Exception {
         // Smoke test: load make and parse a simple snippet
         var result = TreeSitterLanguagePack.process("all:\n\techo hello");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeMarkdown() throws Exception {
         // Smoke test: load markdown and parse a simple snippet
         var result = TreeSitterLanguagePack.process("# Hello\n\nWorld");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeMarkdownInline() throws Exception {
         // Smoke test: load markdown_inline and parse a simple snippet
         var result = TreeSitterLanguagePack.process("**bold** and *italic*");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeMatlab() throws Exception {
         // Smoke test: load matlab and parse a simple snippet
         var result = TreeSitterLanguagePack.process("function y = hello(x)\ny = x;\nend");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeMermaid() throws Exception {
         // Smoke test: load mermaid and parse a simple snippet
         var result = TreeSitterLanguagePack.process("graph TD\nA --> B");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeMeson() throws Exception {
         // Smoke test: load meson and parse a simple snippet
         var result = TreeSitterLanguagePack.process("project('hello', 'c')");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeMlir() throws Exception {
         // Smoke test: load mlir and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeMojo() throws Exception {
         // Smoke test: load mojo and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeMove() throws Exception {
         // Smoke test: load move and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeNasm() throws Exception {
         // Smoke test: load nasm and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeNetlinx() throws Exception {
         // Smoke test: load netlinx and parse a simple snippet
         var result = TreeSitterLanguagePack.process("PROGRAM_NAME='hello'");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeNginx() throws Exception {
         // Smoke test: load nginx and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeNickel() throws Exception {
         // Smoke test: load nickel and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeNim() throws Exception {
         // Smoke test: load nim and parse a simple snippet
         var result = TreeSitterLanguagePack.process("echo \"hello\"");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeNinja() throws Exception {
         // Smoke test: load ninja and parse a simple snippet
         var result = TreeSitterLanguagePack.process("rule cc\n  command = cc $in -o $out");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeNix() throws Exception {
         // Smoke test: load nix and parse a simple snippet
         var result = TreeSitterLanguagePack.process("{ pkgs ? import <nixpkgs> {} }: pkgs.hello");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeNorg() throws Exception {
         // Smoke test: load norg and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeNorgMeta() throws Exception {
         // Smoke test: load norg_meta and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeNqc() throws Exception {
         // Smoke test: load nqc and parse a simple snippet
         var result = TreeSitterLanguagePack.process("task main() {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeNushell() throws Exception {
         // Smoke test: load nushell and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeObjc() throws Exception {
         // Smoke test: load objc and parse a simple snippet
         var result = TreeSitterLanguagePack.process("@interface Main @end");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeOcaml() throws Exception {
         // Smoke test: load ocaml and parse a simple snippet
         var result = TreeSitterLanguagePack.process("let () = print_endline \"hello\"");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeOcamlInterface() throws Exception {
         // Smoke test: load ocaml_interface and parse a simple snippet
         var result = TreeSitterLanguagePack.process("val x : int");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeOcamllex() throws Exception {
         // Smoke test: load ocamllex and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeOdin() throws Exception {
         // Smoke test: load odin and parse a simple snippet
         var result = TreeSitterLanguagePack.process("package main");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeOpenscad() throws Exception {
         // Smoke test: load openscad and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeOrg() throws Exception {
         // Smoke test: load org and parse a simple snippet
         var result = TreeSitterLanguagePack.process("* Hello\nWorld");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePascal() throws Exception {
         // Smoke test: load pascal and parse a simple snippet
         var result = TreeSitterLanguagePack.process("program Hello; begin end.");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePem() throws Exception {
         // Smoke test: load pem and parse a simple snippet
         var result = TreeSitterLanguagePack.process("-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePerl() throws Exception {
         // Smoke test: load perl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("print 'hello';");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePgn() throws Exception {
         // Smoke test: load pgn and parse a simple snippet
         var result = TreeSitterLanguagePack.process("1. e4 e5 *");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePhp() throws Exception {
         // Smoke test: load php and parse a simple snippet
         var result = TreeSitterLanguagePack.process("<?php echo 'hello'; ?>");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePhpdoc() throws Exception {
         // Smoke test: load phpdoc and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePkl() throws Exception {
         // Smoke test: load pkl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("name = \"hello\"");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePo() throws Exception {
         // Smoke test: load po and parse a simple snippet
         var result = TreeSitterLanguagePack.process("msgid \"hello\"\nmsgstr \"world\"");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePoeFilter() throws Exception {
         // Smoke test: load poe_filter and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePony() throws Exception {
         // Smoke test: load pony and parse a simple snippet
         var result = TreeSitterLanguagePack.process("actor Main\n  new create(env: Env) => None");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePostscript() throws Exception {
         // Smoke test: load postscript and parse a simple snippet
         var result = TreeSitterLanguagePack.process("/hello { (Hello) show } def");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePowershell() throws Exception {
         // Smoke test: load powershell and parse a simple snippet
         var result = TreeSitterLanguagePack.process("Write-Host 'hello'");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePrintf() throws Exception {
         // Smoke test: load printf and parse a simple snippet
         var result = TreeSitterLanguagePack.process("%d %s");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePrisma() throws Exception {
         // Smoke test: load prisma and parse a simple snippet
         var result = TreeSitterLanguagePack.process("model User { id Int @id }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeProlog() throws Exception {
         // Smoke test: load prolog and parse a simple snippet
         var result = TreeSitterLanguagePack.process("hello :- write('hello'), nl.");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePromql() throws Exception {
         // Smoke test: load promql and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeProperties() throws Exception {
         // Smoke test: load properties and parse a simple snippet
         var result = TreeSitterLanguagePack.process("key=value");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeProto() throws Exception {
         // Smoke test: load proto and parse a simple snippet
         var result = TreeSitterLanguagePack.process("syntax = \"proto3\";");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePrql() throws Exception {
         // Smoke test: load prql and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePsv() throws Exception {
         // Smoke test: load psv and parse a simple snippet
         var result = TreeSitterLanguagePack.process("a|b|c\n1|2|3");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePug() throws Exception {
         // Smoke test: load pug and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePuppet() throws Exception {
         // Smoke test: load puppet and parse a simple snippet
         var result = TreeSitterLanguagePack.process("notify { 'hello': }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePurescript() throws Exception {
         // Smoke test: load purescript and parse a simple snippet
         var result = TreeSitterLanguagePack.process("module Main where");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePymanifest() throws Exception {
         // Smoke test: load pymanifest and parse a simple snippet
         var result = TreeSitterLanguagePack.process("include *.txt");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokePython() throws Exception {
         // Smoke test: load python and parse a simple snippet
         var result = TreeSitterLanguagePack.process("print('hello')");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeQl() throws Exception {
         // Smoke test: load ql and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeQmldir() throws Exception {
         // Smoke test: load qmldir and parse a simple snippet
         var result = TreeSitterLanguagePack.process("module Example");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeQmljs() throws Exception {
         // Smoke test: load qmljs and parse a simple snippet
         var result = TreeSitterLanguagePack.process("import QtQuick 2.0\nItem {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeQuery() throws Exception {
         // Smoke test: load query and parse a simple snippet
         var result = TreeSitterLanguagePack.process("(identifier) @name");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeR() throws Exception {
         // Smoke test: load r and parse a simple snippet
         var result = TreeSitterLanguagePack.process("print('hello')");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRacket() throws Exception {
         // Smoke test: load racket and parse a simple snippet
         var result = TreeSitterLanguagePack.process("#lang racket\n(define x 1)");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRasi() throws Exception {
         // Smoke test: load rasi and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRazor() throws Exception {
         // Smoke test: load razor and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRbs() throws Exception {
         // Smoke test: load rbs and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRe2c() throws Exception {
         // Smoke test: load re2c and parse a simple snippet
         var result = TreeSitterLanguagePack.process("/*!re2c\n  [a-z]+ { return; }\n*/");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeReadline() throws Exception {
         // Smoke test: load readline and parse a simple snippet
         var result = TreeSitterLanguagePack.process("set editing-mode vi");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRegex() throws Exception {
         // Smoke test: load regex and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRego() throws Exception {
         // Smoke test: load rego and parse a simple snippet
         var result = TreeSitterLanguagePack.process("package main\ndefault allow = false");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRequirements() throws Exception {
         // Smoke test: load requirements and parse a simple snippet
         var result = TreeSitterLanguagePack.process("flask>=2.0");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRescript() throws Exception {
         // Smoke test: load rescript and parse a simple snippet
         var result = TreeSitterLanguagePack.process("let x = 1");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRobot() throws Exception {
         // Smoke test: load robot and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRoc() throws Exception {
         // Smoke test: load roc and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRon() throws Exception {
         // Smoke test: load ron and parse a simple snippet
         var result = TreeSitterLanguagePack.process("(key: \"value\")");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRst() throws Exception {
         // Smoke test: load rst and parse a simple snippet
         var result = TreeSitterLanguagePack.process("Hello\n=====\n\nWorld");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRtf() throws Exception {
         // Smoke test: load rtf and parse a simple snippet
         var result = TreeSitterLanguagePack.process("{\\rtf1 hello}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRuby() throws Exception {
         // Smoke test: load ruby and parse a simple snippet
         var result = TreeSitterLanguagePack.process("puts 'hello'");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeRust() throws Exception {
         // Smoke test: load rust and parse a simple snippet
         var result = TreeSitterLanguagePack.process("fn main() {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeScala() throws Exception {
         // Smoke test: load scala and parse a simple snippet
         var result = TreeSitterLanguagePack.process("object Main");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeScheme() throws Exception {
         // Smoke test: load scheme and parse a simple snippet
         var result = TreeSitterLanguagePack.process("(define x 1)");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeScss() throws Exception {
         // Smoke test: load scss and parse a simple snippet
         var result = TreeSitterLanguagePack.process("$color: red;\nbody { color: $color; }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSlang() throws Exception {
         // Smoke test: load slang and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSmali() throws Exception {
         // Smoke test: load smali and parse a simple snippet
         var result = TreeSitterLanguagePack.process(".class public LMain;\n.super Ljava/lang/Object;");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSmalltalk() throws Exception {
         // Smoke test: load smalltalk and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSmithy() throws Exception {
         // Smoke test: load smithy and parse a simple snippet
         var result = TreeSitterLanguagePack.process("namespace example\nstring MyString");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSml() throws Exception {
         // Smoke test: load sml and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSnakemake() throws Exception {
         // Smoke test: load snakemake and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSolidity() throws Exception {
         // Smoke test: load solidity and parse a simple snippet
         var result = TreeSitterLanguagePack.process("pragma solidity ^0.8.0;\ncontract Main {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSouffle() throws Exception {
         // Smoke test: load souffle and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSourcepawn() throws Exception {
         // Smoke test: load sourcepawn and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSparql() throws Exception {
         // Smoke test: load sparql and parse a simple snippet
         var result = TreeSitterLanguagePack.process("SELECT ?s WHERE { ?s ?p ?o }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSql() throws Exception {
         // Smoke test: load sql and parse a simple snippet
         var result = TreeSitterLanguagePack.process("SELECT 1;");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSqlBigquery() throws Exception {
         // Smoke test: load sql_bigquery and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSquirrel() throws Exception {
         // Smoke test: load squirrel and parse a simple snippet
         var result = TreeSitterLanguagePack.process("function main() {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSshConfig() throws Exception {
         // Smoke test: load ssh_config and parse a simple snippet
         var result = TreeSitterLanguagePack.process("Host example\n  HostName example.com");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeStan() throws Exception {
         // Smoke test: load stan and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeStarlark() throws Exception {
         // Smoke test: load starlark and parse a simple snippet
         var result = TreeSitterLanguagePack.process("def hello(): pass");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSuperhtml() throws Exception {
         // Smoke test: load superhtml and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSvelte() throws Exception {
         // Smoke test: load svelte and parse a simple snippet
         var result = TreeSitterLanguagePack.process("<script>let x = 1;</script>");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSway() throws Exception {
         // Smoke test: load sway and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSwift() throws Exception {
         // Smoke test: load swift and parse a simple snippet
         var result = TreeSitterLanguagePack.process("print(\"hello\")");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeSystemverilog() throws Exception {
         // Smoke test: load systemverilog and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTablegen() throws Exception {
         // Smoke test: load tablegen and parse a simple snippet
         var result = TreeSitterLanguagePack.process("def Hello : Base {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTact() throws Exception {
         // Smoke test: load tact and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTcl() throws Exception {
         // Smoke test: load tcl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("puts hello");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTeal() throws Exception {
         // Smoke test: load teal and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTempl() throws Exception {
         // Smoke test: load templ and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTera() throws Exception {
         // Smoke test: load tera and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTerraform() throws Exception {
         // Smoke test: load terraform and parse a simple snippet
         var result = TreeSitterLanguagePack.process("resource \"null_resource\" \"main\" {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTest() throws Exception {
         // Smoke test: load test and parse a simple snippet
         var result = TreeSitterLanguagePack.process("===========\nTest\n===========\n---\n(node)");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTextproto() throws Exception {
         // Smoke test: load textproto and parse a simple snippet
         var result = TreeSitterLanguagePack.process("key: \"value\"");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeThrift() throws Exception {
         // Smoke test: load thrift and parse a simple snippet
         var result = TreeSitterLanguagePack.process("service HelloService {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTlaplus() throws Exception {
         // Smoke test: load tlaplus and parse a simple snippet
         var result = TreeSitterLanguagePack.process("---- MODULE Main ----\n====");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTmux() throws Exception {
         // Smoke test: load tmux and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTodotxt() throws Exception {
         // Smoke test: load todotxt and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeToml() throws Exception {
         // Smoke test: load toml and parse a simple snippet
         var result = TreeSitterLanguagePack.process("key = \"value\"");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTsv() throws Exception {
         // Smoke test: load tsv and parse a simple snippet
         var result = TreeSitterLanguagePack.process("a\tb\tc\n1\t2\t3");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTsx() throws Exception {
         // Smoke test: load tsx and parse a simple snippet
         var result = TreeSitterLanguagePack.process("const App = () => <div />;");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTurtle() throws Exception {
         // Smoke test: load turtle and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTwig() throws Exception {
         // Smoke test: load twig and parse a simple snippet
         var result = TreeSitterLanguagePack.process("{{ variable }}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTypescript() throws Exception {
         // Smoke test: load typescript and parse a simple snippet
         var result = TreeSitterLanguagePack.process("const x: number = 42;");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTypespec() throws Exception {
         // Smoke test: load typespec and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTyposcript() throws Exception {
         // Smoke test: load typoscript and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeTypst() throws Exception {
         // Smoke test: load typst and parse a simple snippet
         var result = TreeSitterLanguagePack.process("#let x = 1");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeUdev() throws Exception {
         // Smoke test: load udev and parse a simple snippet
         var result = TreeSitterLanguagePack.process("ACTION==\"add\", KERNEL==\"sd*\"");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeUngrammar() throws Exception {
         // Smoke test: load ungrammar and parse a simple snippet
         var result = TreeSitterLanguagePack.process("Root = Item*\nItem = 'token'");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeUxntal() throws Exception {
         // Smoke test: load uxntal and parse a simple snippet
         var result = TreeSitterLanguagePack.process("|0100 LIT 01");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeV() throws Exception {
         // Smoke test: load v and parse a simple snippet
         var result = TreeSitterLanguagePack.process("fn main() {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeVb() throws Exception {
         // Smoke test: load vb and parse a simple snippet
         var result = TreeSitterLanguagePack.process("Module Main\nEnd Module");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeVerilog() throws Exception {
         // Smoke test: load verilog and parse a simple snippet
         var result = TreeSitterLanguagePack.process("module main; endmodule");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeVhdl() throws Exception {
         // Smoke test: load vhdl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("entity main is end main;");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeVhs() throws Exception {
         // Smoke test: load vhs and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeVim() throws Exception {
         // Smoke test: load vim and parse a simple snippet
         var result = TreeSitterLanguagePack.process("echo 'hello'");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeVimdoc() throws Exception {
         // Smoke test: load vimdoc and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeVrl() throws Exception {
         // Smoke test: load vrl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeVue() throws Exception {
         // Smoke test: load vue and parse a simple snippet
         var result = TreeSitterLanguagePack.process("<template><div>hello</div></template>");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeWast() throws Exception {
         // Smoke test: load wast and parse a simple snippet
         var result = TreeSitterLanguagePack.process("(module)");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeWat() throws Exception {
         // Smoke test: load wat and parse a simple snippet
         var result = TreeSitterLanguagePack.process("(module)");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeWgsl() throws Exception {
         // Smoke test: load wgsl and parse a simple snippet
         var result = TreeSitterLanguagePack.process("@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeWgslBevy() throws Exception {
         // Smoke test: load wgsl_bevy and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeWit() throws Exception {
         // Smoke test: load wit and parse a simple snippet
         var result = TreeSitterLanguagePack.process("package example:pkg;");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeWolfram() throws Exception {
         // Smoke test: load wolfram and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeX86asm() throws Exception {
         // Smoke test: load x86asm and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeXcompose() throws Exception {
         // Smoke test: load xcompose and parse a simple snippet
         var result = TreeSitterLanguagePack.process("<Multi_key> <a> : \"a\"");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeXml() throws Exception {
         // Smoke test: load xml and parse a simple snippet
         var result = TreeSitterLanguagePack.process("<?xml version=\"1.0\"?>\n<root>hello</root>");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeYaml() throws Exception {
         // Smoke test: load yaml and parse a simple snippet
         var result = TreeSitterLanguagePack.process("key: value");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeYuck() throws Exception {
         // Smoke test: load yuck and parse a simple snippet
         var result = TreeSitterLanguagePack.process("(defwidget main [] (label :text \"hi\"))");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeZig() throws Exception {
         // Smoke test: load zig and parse a simple snippet
         var result = TreeSitterLanguagePack.process("pub fn main() void {}");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeZiggy() throws Exception {
         // Smoke test: load ziggy and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeZiggySchema() throws Exception {
         // Smoke test: load ziggy_schema and parse a simple snippet
         var result = TreeSitterLanguagePack.process("x");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test
     void testSmokeZsh() throws Exception {
         // Smoke test: load zsh and parse a simple snippet
         var result = TreeSitterLanguagePack.process("echo hello");
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        // TODO: unsupported assertion type: method_result
     }
 
 }

@@ -13,12 +13,15 @@ if TYPE_CHECKING:
         Language,
         LanguageRegistry,
         NodeInfo,
+        PackConfig,
         Parser,
+        ProcessConfig,
         ProcessResult,
+        QueryMatch,
         Tree,
         ValidationResult,
     )
-    from .options import ExtractionConfig, PackConfig, ProcessConfig, QueryMatch
+    from .options import ExtractionConfig
 
 
 def _to_rust_extraction_config(value: ExtractionConfig | None) -> _rust.ExtractionConfig | None:

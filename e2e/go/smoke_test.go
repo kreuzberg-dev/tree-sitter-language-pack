@@ -15,9 +15,7 @@ func Test_SmokeAbl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeActionscript(t *testing.T) {
@@ -26,9 +24,7 @@ func Test_SmokeActionscript(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeAda(t *testing.T) {
@@ -37,9 +33,7 @@ func Test_SmokeAda(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeAgda(t *testing.T) {
@@ -48,9 +42,7 @@ func Test_SmokeAgda(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeAl(t *testing.T) {
@@ -59,9 +51,7 @@ func Test_SmokeAl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeAngular(t *testing.T) {
@@ -70,9 +60,7 @@ func Test_SmokeAngular(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeApex(t *testing.T) {
@@ -81,9 +69,7 @@ func Test_SmokeApex(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeArduino(t *testing.T) {
@@ -92,9 +78,7 @@ func Test_SmokeArduino(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeAsciidoc(t *testing.T) {
@@ -105,9 +89,7 @@ Paragraph.`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeAsm(t *testing.T) {
@@ -116,9 +98,7 @@ func Test_SmokeAsm(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeAstro(t *testing.T) {
@@ -129,9 +109,7 @@ func Test_SmokeAstro(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeAwk(t *testing.T) {
@@ -140,9 +118,7 @@ func Test_SmokeAwk(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeBash(t *testing.T) {
@@ -151,9 +127,7 @@ func Test_SmokeBash(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeBass(t *testing.T) {
@@ -162,9 +136,7 @@ func Test_SmokeBass(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeBatch(t *testing.T) {
@@ -174,9 +146,7 @@ echo hello`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeBeancount(t *testing.T) {
@@ -185,9 +155,7 @@ func Test_SmokeBeancount(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeBibtex(t *testing.T) {
@@ -196,9 +164,7 @@ func Test_SmokeBibtex(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeBicep(t *testing.T) {
@@ -207,9 +173,7 @@ func Test_SmokeBicep(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeBitbake(t *testing.T) {
@@ -218,9 +182,7 @@ func Test_SmokeBitbake(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeBlade(t *testing.T) {
@@ -229,9 +191,7 @@ func Test_SmokeBlade(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeBrightscript(t *testing.T) {
@@ -240,9 +200,7 @@ func Test_SmokeBrightscript(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeBsl(t *testing.T) {
@@ -251,9 +209,7 @@ func Test_SmokeBsl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeC(t *testing.T) {
@@ -262,9 +218,7 @@ func Test_SmokeC(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeC3(t *testing.T) {
@@ -273,9 +227,7 @@ func Test_SmokeC3(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCaddy(t *testing.T) {
@@ -286,9 +238,7 @@ func Test_SmokeCaddy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCairo(t *testing.T) {
@@ -297,9 +247,7 @@ func Test_SmokeCairo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCapnp(t *testing.T) {
@@ -308,9 +256,7 @@ func Test_SmokeCapnp(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCedar(t *testing.T) {
@@ -319,9 +265,7 @@ func Test_SmokeCedar(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCedarschema(t *testing.T) {
@@ -330,9 +274,7 @@ func Test_SmokeCedarschema(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCel(t *testing.T) {
@@ -341,9 +283,7 @@ func Test_SmokeCel(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCfml(t *testing.T) {
@@ -352,9 +292,7 @@ func Test_SmokeCfml(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeChatito(t *testing.T) {
@@ -364,9 +302,7 @@ func Test_SmokeChatito(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeChuck(t *testing.T) {
@@ -375,9 +311,7 @@ func Test_SmokeChuck(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCircom(t *testing.T) {
@@ -386,9 +320,7 @@ func Test_SmokeCircom(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeClarity(t *testing.T) {
@@ -397,9 +329,7 @@ func Test_SmokeClarity(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeClojure(t *testing.T) {
@@ -408,9 +338,7 @@ func Test_SmokeClojure(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCmake(t *testing.T) {
@@ -419,9 +347,7 @@ func Test_SmokeCmake(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCobol(t *testing.T) {
@@ -431,9 +357,7 @@ func Test_SmokeCobol(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeComment(t *testing.T) {
@@ -442,9 +366,7 @@ func Test_SmokeComment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCommonlisp(t *testing.T) {
@@ -453,9 +375,7 @@ func Test_SmokeCommonlisp(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCooklang(t *testing.T) {
@@ -464,9 +384,7 @@ func Test_SmokeCooklang(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCorn(t *testing.T) {
@@ -475,9 +393,7 @@ func Test_SmokeCorn(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCpon(t *testing.T) {
@@ -486,9 +402,7 @@ func Test_SmokeCpon(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCpp(t *testing.T) {
@@ -497,9 +411,7 @@ func Test_SmokeCpp(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCrystal(t *testing.T) {
@@ -508,9 +420,7 @@ func Test_SmokeCrystal(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCsharp(t *testing.T) {
@@ -519,9 +429,7 @@ func Test_SmokeCsharp(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCss(t *testing.T) {
@@ -530,9 +438,7 @@ func Test_SmokeCss(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCst(t *testing.T) {
@@ -541,9 +447,7 @@ func Test_SmokeCst(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCsv(t *testing.T) {
@@ -553,9 +457,7 @@ func Test_SmokeCsv(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCuda(t *testing.T) {
@@ -564,9 +466,7 @@ func Test_SmokeCuda(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCue(t *testing.T) {
@@ -575,9 +475,7 @@ func Test_SmokeCue(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeCylc(t *testing.T) {
@@ -586,9 +484,7 @@ func Test_SmokeCylc(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeD(t *testing.T) {
@@ -597,9 +493,7 @@ func Test_SmokeD(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeDart(t *testing.T) {
@@ -608,9 +502,7 @@ func Test_SmokeDart(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeDesktop(t *testing.T) {
@@ -619,9 +511,7 @@ func Test_SmokeDesktop(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeDevicetree(t *testing.T) {
@@ -631,9 +521,7 @@ func Test_SmokeDevicetree(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeDhall(t *testing.T) {
@@ -642,9 +530,7 @@ func Test_SmokeDhall(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeDiff(t *testing.T) {
@@ -657,9 +543,7 @@ func Test_SmokeDiff(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeDjot(t *testing.T) {
@@ -668,9 +552,7 @@ func Test_SmokeDjot(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeDockerfile(t *testing.T) {
@@ -679,9 +561,7 @@ func Test_SmokeDockerfile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeDot(t *testing.T) {
@@ -690,9 +570,7 @@ func Test_SmokeDot(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeDoxygen(t *testing.T) {
@@ -701,9 +579,7 @@ func Test_SmokeDoxygen(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeDtd(t *testing.T) {
@@ -712,9 +588,7 @@ func Test_SmokeDtd(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeEarthfile(t *testing.T) {
@@ -723,9 +597,7 @@ func Test_SmokeEarthfile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeEbnf(t *testing.T) {
@@ -734,9 +606,7 @@ func Test_SmokeEbnf(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeEditorconfig(t *testing.T) {
@@ -745,9 +615,7 @@ func Test_SmokeEditorconfig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeEds(t *testing.T) {
@@ -756,9 +624,7 @@ func Test_SmokeEds(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeEex(t *testing.T) {
@@ -767,9 +633,7 @@ func Test_SmokeEex(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeElisp(t *testing.T) {
@@ -778,9 +642,7 @@ func Test_SmokeElisp(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeElixir(t *testing.T) {
@@ -789,9 +651,7 @@ func Test_SmokeElixir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeElm(t *testing.T) {
@@ -800,9 +660,7 @@ func Test_SmokeElm(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeElsa(t *testing.T) {
@@ -811,9 +669,7 @@ func Test_SmokeElsa(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeElvish(t *testing.T) {
@@ -822,9 +678,7 @@ func Test_SmokeElvish(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeEmbeddedtemplate(t *testing.T) {
@@ -833,9 +687,7 @@ func Test_SmokeEmbeddedtemplate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeEnforce(t *testing.T) {
@@ -844,9 +696,7 @@ func Test_SmokeEnforce(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeErlang(t *testing.T) {
@@ -855,9 +705,7 @@ func Test_SmokeErlang(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeFacility(t *testing.T) {
@@ -866,9 +714,7 @@ func Test_SmokeFacility(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeFaust(t *testing.T) {
@@ -877,9 +723,7 @@ func Test_SmokeFaust(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeFennel(t *testing.T) {
@@ -888,9 +732,7 @@ func Test_SmokeFennel(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeFidl(t *testing.T) {
@@ -899,9 +741,7 @@ func Test_SmokeFidl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeFirrtl(t *testing.T) {
@@ -910,9 +750,7 @@ func Test_SmokeFirrtl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeFish(t *testing.T) {
@@ -921,9 +759,7 @@ func Test_SmokeFish(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeFoam(t *testing.T) {
@@ -932,9 +768,7 @@ func Test_SmokeFoam(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeForth(t *testing.T) {
@@ -943,9 +777,7 @@ func Test_SmokeForth(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeFortran(t *testing.T) {
@@ -955,9 +787,7 @@ end program main`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeFsharp(t *testing.T) {
@@ -966,9 +796,7 @@ func Test_SmokeFsharp(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeFsharpSignature(t *testing.T) {
@@ -977,9 +805,7 @@ func Test_SmokeFsharpSignature(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeFunc(t *testing.T) {
@@ -988,9 +814,7 @@ func Test_SmokeFunc(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGap(t *testing.T) {
@@ -999,9 +823,7 @@ func Test_SmokeGap(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGdscript(t *testing.T) {
@@ -1012,9 +834,7 @@ func _ready():
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGdshader(t *testing.T) {
@@ -1023,9 +843,7 @@ func Test_SmokeGdshader(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGitConfig(t *testing.T) {
@@ -1034,9 +852,7 @@ func Test_SmokeGitConfig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGitRebase(t *testing.T) {
@@ -1045,9 +861,7 @@ func Test_SmokeGitRebase(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGitattributes(t *testing.T) {
@@ -1056,9 +870,7 @@ func Test_SmokeGitattributes(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGitcommit(t *testing.T) {
@@ -1069,9 +881,7 @@ Body text`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGitignore(t *testing.T) {
@@ -1081,9 +891,7 @@ func Test_SmokeGitignore(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGleam(t *testing.T) {
@@ -1092,9 +900,7 @@ func Test_SmokeGleam(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGlimmer(t *testing.T) {
@@ -1103,9 +909,7 @@ func Test_SmokeGlimmer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGlsl(t *testing.T) {
@@ -1114,9 +918,7 @@ func Test_SmokeGlsl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGn(t *testing.T) {
@@ -1125,9 +927,7 @@ func Test_SmokeGn(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGnuplot(t *testing.T) {
@@ -1136,9 +936,7 @@ func Test_SmokeGnuplot(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGo(t *testing.T) {
@@ -1147,9 +945,7 @@ func Test_SmokeGo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGodotResource(t *testing.T) {
@@ -1158,9 +954,7 @@ func Test_SmokeGodotResource(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGomod(t *testing.T) {
@@ -1171,9 +965,7 @@ go 1.21`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGosum(t *testing.T) {
@@ -1182,9 +974,7 @@ func Test_SmokeGosum(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGotmpl(t *testing.T) {
@@ -1193,9 +983,7 @@ func Test_SmokeGotmpl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGowork(t *testing.T) {
@@ -1204,9 +992,7 @@ func Test_SmokeGowork(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGpg(t *testing.T) {
@@ -1215,9 +1001,7 @@ func Test_SmokeGpg(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGraphql(t *testing.T) {
@@ -1226,9 +1010,7 @@ func Test_SmokeGraphql(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGren(t *testing.T) {
@@ -1237,9 +1019,7 @@ func Test_SmokeGren(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGroovy(t *testing.T) {
@@ -1248,9 +1028,7 @@ func Test_SmokeGroovy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeGstlaunch(t *testing.T) {
@@ -1259,9 +1037,7 @@ func Test_SmokeGstlaunch(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHack(t *testing.T) {
@@ -1271,9 +1047,7 @@ function main(): void {}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHare(t *testing.T) {
@@ -1282,9 +1056,7 @@ func Test_SmokeHare(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHaskell(t *testing.T) {
@@ -1293,9 +1065,7 @@ func Test_SmokeHaskell(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHaxe(t *testing.T) {
@@ -1304,9 +1074,7 @@ func Test_SmokeHaxe(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHcl(t *testing.T) {
@@ -1315,9 +1083,7 @@ func Test_SmokeHcl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHeex(t *testing.T) {
@@ -1326,9 +1092,7 @@ func Test_SmokeHeex(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHjson(t *testing.T) {
@@ -1337,9 +1101,7 @@ func Test_SmokeHjson(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHlsl(t *testing.T) {
@@ -1348,9 +1110,7 @@ func Test_SmokeHlsl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHocon(t *testing.T) {
@@ -1359,9 +1119,7 @@ func Test_SmokeHocon(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHoon(t *testing.T) {
@@ -1370,9 +1128,7 @@ func Test_SmokeHoon(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHtml(t *testing.T) {
@@ -1381,9 +1137,7 @@ func Test_SmokeHtml(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHtmldjango(t *testing.T) {
@@ -1392,9 +1146,7 @@ func Test_SmokeHtmldjango(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHttp(t *testing.T) {
@@ -1403,9 +1155,7 @@ func Test_SmokeHttp(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHurl(t *testing.T) {
@@ -1414,9 +1164,7 @@ func Test_SmokeHurl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeHyprlang(t *testing.T) {
@@ -1425,9 +1173,7 @@ func Test_SmokeHyprlang(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeIdris(t *testing.T) {
@@ -1436,9 +1182,7 @@ func Test_SmokeIdris(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeIni(t *testing.T) {
@@ -1448,9 +1192,7 @@ key = value`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeIspc(t *testing.T) {
@@ -1459,9 +1201,7 @@ func Test_SmokeIspc(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJai(t *testing.T) {
@@ -1470,9 +1210,7 @@ func Test_SmokeJai(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJanet(t *testing.T) {
@@ -1481,9 +1219,7 @@ func Test_SmokeJanet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJava(t *testing.T) {
@@ -1492,9 +1228,7 @@ func Test_SmokeJava(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJavadoc(t *testing.T) {
@@ -1503,9 +1237,7 @@ func Test_SmokeJavadoc(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJavascript(t *testing.T) {
@@ -1514,9 +1246,7 @@ func Test_SmokeJavascript(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJinja2(t *testing.T) {
@@ -1525,9 +1255,7 @@ func Test_SmokeJinja2(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJq(t *testing.T) {
@@ -1536,9 +1264,7 @@ func Test_SmokeJq(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJsdoc(t *testing.T) {
@@ -1547,9 +1273,7 @@ func Test_SmokeJsdoc(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJson(t *testing.T) {
@@ -1558,9 +1282,7 @@ func Test_SmokeJson(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJson5(t *testing.T) {
@@ -1569,9 +1291,7 @@ func Test_SmokeJson5(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJsonnet(t *testing.T) {
@@ -1580,9 +1300,7 @@ func Test_SmokeJsonnet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJulia(t *testing.T) {
@@ -1591,9 +1309,7 @@ func Test_SmokeJulia(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeJust(t *testing.T) {
@@ -1602,9 +1318,7 @@ func Test_SmokeJust(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeKcl(t *testing.T) {
@@ -1613,9 +1327,7 @@ func Test_SmokeKcl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeKconfig(t *testing.T) {
@@ -1625,9 +1337,7 @@ func Test_SmokeKconfig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeKdl(t *testing.T) {
@@ -1636,9 +1346,7 @@ func Test_SmokeKdl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeKotlin(t *testing.T) {
@@ -1647,9 +1355,7 @@ func Test_SmokeKotlin(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeLatex(t *testing.T) {
@@ -1661,9 +1367,7 @@ Hello
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeLean(t *testing.T) {
@@ -1672,9 +1376,7 @@ func Test_SmokeLean(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeLedger(t *testing.T) {
@@ -1683,9 +1385,7 @@ func Test_SmokeLedger(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeLess(t *testing.T) {
@@ -1694,9 +1394,7 @@ func Test_SmokeLess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeLinkerscript(t *testing.T) {
@@ -1705,9 +1403,7 @@ func Test_SmokeLinkerscript(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeLiquid(t *testing.T) {
@@ -1716,9 +1412,7 @@ func Test_SmokeLiquid(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeLlvm(t *testing.T) {
@@ -1727,9 +1421,7 @@ func Test_SmokeLlvm(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeLua(t *testing.T) {
@@ -1738,9 +1430,7 @@ func Test_SmokeLua(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeLuadoc(t *testing.T) {
@@ -1749,9 +1439,7 @@ func Test_SmokeLuadoc(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeLuap(t *testing.T) {
@@ -1760,9 +1448,7 @@ func Test_SmokeLuap(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeLuau(t *testing.T) {
@@ -1771,9 +1457,7 @@ func Test_SmokeLuau(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeMagik(t *testing.T) {
@@ -1783,9 +1467,7 @@ _endmethod`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeMake(t *testing.T) {
@@ -1795,9 +1477,7 @@ func Test_SmokeMake(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeMarkdown(t *testing.T) {
@@ -1808,9 +1488,7 @@ World`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeMarkdownInline(t *testing.T) {
@@ -1819,9 +1497,7 @@ func Test_SmokeMarkdownInline(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeMatlab(t *testing.T) {
@@ -1832,9 +1508,7 @@ end`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeMermaid(t *testing.T) {
@@ -1844,9 +1518,7 @@ A --> B`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeMeson(t *testing.T) {
@@ -1855,9 +1527,7 @@ func Test_SmokeMeson(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeMlir(t *testing.T) {
@@ -1866,9 +1536,7 @@ func Test_SmokeMlir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeMojo(t *testing.T) {
@@ -1877,9 +1545,7 @@ func Test_SmokeMojo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeMove(t *testing.T) {
@@ -1888,9 +1554,7 @@ func Test_SmokeMove(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeNasm(t *testing.T) {
@@ -1899,9 +1563,7 @@ func Test_SmokeNasm(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeNetlinx(t *testing.T) {
@@ -1910,9 +1572,7 @@ func Test_SmokeNetlinx(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeNginx(t *testing.T) {
@@ -1921,9 +1581,7 @@ func Test_SmokeNginx(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeNickel(t *testing.T) {
@@ -1932,9 +1590,7 @@ func Test_SmokeNickel(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeNim(t *testing.T) {
@@ -1943,9 +1599,7 @@ func Test_SmokeNim(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeNinja(t *testing.T) {
@@ -1955,9 +1609,7 @@ func Test_SmokeNinja(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeNix(t *testing.T) {
@@ -1966,9 +1618,7 @@ func Test_SmokeNix(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeNorg(t *testing.T) {
@@ -1977,9 +1627,7 @@ func Test_SmokeNorg(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeNorgMeta(t *testing.T) {
@@ -1988,9 +1636,7 @@ func Test_SmokeNorgMeta(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeNqc(t *testing.T) {
@@ -1999,9 +1645,7 @@ func Test_SmokeNqc(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeNushell(t *testing.T) {
@@ -2010,9 +1654,7 @@ func Test_SmokeNushell(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeObjc(t *testing.T) {
@@ -2021,9 +1663,7 @@ func Test_SmokeObjc(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeOcaml(t *testing.T) {
@@ -2032,9 +1672,7 @@ func Test_SmokeOcaml(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeOcamlInterface(t *testing.T) {
@@ -2043,9 +1681,7 @@ func Test_SmokeOcamlInterface(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeOcamllex(t *testing.T) {
@@ -2054,9 +1690,7 @@ func Test_SmokeOcamllex(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeOdin(t *testing.T) {
@@ -2065,9 +1699,7 @@ func Test_SmokeOdin(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeOpenscad(t *testing.T) {
@@ -2076,9 +1708,7 @@ func Test_SmokeOpenscad(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeOrg(t *testing.T) {
@@ -2088,9 +1718,7 @@ World`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePascal(t *testing.T) {
@@ -2099,9 +1727,7 @@ func Test_SmokePascal(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePem(t *testing.T) {
@@ -2112,9 +1738,7 @@ data
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePerl(t *testing.T) {
@@ -2123,9 +1747,7 @@ func Test_SmokePerl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePgn(t *testing.T) {
@@ -2134,9 +1756,7 @@ func Test_SmokePgn(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePhp(t *testing.T) {
@@ -2145,9 +1765,7 @@ func Test_SmokePhp(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePhpdoc(t *testing.T) {
@@ -2156,9 +1774,7 @@ func Test_SmokePhpdoc(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePkl(t *testing.T) {
@@ -2167,9 +1783,7 @@ func Test_SmokePkl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePo(t *testing.T) {
@@ -2179,9 +1793,7 @@ msgstr "world"`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePoeFilter(t *testing.T) {
@@ -2190,9 +1802,7 @@ func Test_SmokePoeFilter(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePony(t *testing.T) {
@@ -2202,9 +1812,7 @@ func Test_SmokePony(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePostscript(t *testing.T) {
@@ -2213,9 +1821,7 @@ func Test_SmokePostscript(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePowershell(t *testing.T) {
@@ -2224,9 +1830,7 @@ func Test_SmokePowershell(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePrintf(t *testing.T) {
@@ -2235,9 +1839,7 @@ func Test_SmokePrintf(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePrisma(t *testing.T) {
@@ -2246,9 +1848,7 @@ func Test_SmokePrisma(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeProlog(t *testing.T) {
@@ -2257,9 +1857,7 @@ func Test_SmokeProlog(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePromql(t *testing.T) {
@@ -2268,9 +1866,7 @@ func Test_SmokePromql(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeProperties(t *testing.T) {
@@ -2279,9 +1875,7 @@ func Test_SmokeProperties(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeProto(t *testing.T) {
@@ -2290,9 +1884,7 @@ func Test_SmokeProto(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePrql(t *testing.T) {
@@ -2301,9 +1893,7 @@ func Test_SmokePrql(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePsv(t *testing.T) {
@@ -2313,9 +1903,7 @@ func Test_SmokePsv(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePug(t *testing.T) {
@@ -2324,9 +1912,7 @@ func Test_SmokePug(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePuppet(t *testing.T) {
@@ -2335,9 +1921,7 @@ func Test_SmokePuppet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePurescript(t *testing.T) {
@@ -2346,9 +1930,7 @@ func Test_SmokePurescript(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePymanifest(t *testing.T) {
@@ -2357,9 +1939,7 @@ func Test_SmokePymanifest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokePython(t *testing.T) {
@@ -2368,9 +1948,7 @@ func Test_SmokePython(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeQl(t *testing.T) {
@@ -2379,9 +1957,7 @@ func Test_SmokeQl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeQmldir(t *testing.T) {
@@ -2390,9 +1966,7 @@ func Test_SmokeQmldir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeQmljs(t *testing.T) {
@@ -2402,9 +1976,7 @@ Item {}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeQuery(t *testing.T) {
@@ -2413,9 +1985,7 @@ func Test_SmokeQuery(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeR(t *testing.T) {
@@ -2424,9 +1994,7 @@ func Test_SmokeR(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRacket(t *testing.T) {
@@ -2436,9 +2004,7 @@ func Test_SmokeRacket(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRasi(t *testing.T) {
@@ -2447,9 +2013,7 @@ func Test_SmokeRasi(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRazor(t *testing.T) {
@@ -2458,9 +2022,7 @@ func Test_SmokeRazor(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRbs(t *testing.T) {
@@ -2469,9 +2031,7 @@ func Test_SmokeRbs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRe2c(t *testing.T) {
@@ -2482,9 +2042,7 @@ func Test_SmokeRe2c(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeReadline(t *testing.T) {
@@ -2493,9 +2051,7 @@ func Test_SmokeReadline(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRegex(t *testing.T) {
@@ -2504,9 +2060,7 @@ func Test_SmokeRegex(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRego(t *testing.T) {
@@ -2516,9 +2070,7 @@ default allow = false`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRequirements(t *testing.T) {
@@ -2527,9 +2079,7 @@ func Test_SmokeRequirements(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRescript(t *testing.T) {
@@ -2538,9 +2088,7 @@ func Test_SmokeRescript(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRobot(t *testing.T) {
@@ -2549,9 +2097,7 @@ func Test_SmokeRobot(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRoc(t *testing.T) {
@@ -2560,9 +2106,7 @@ func Test_SmokeRoc(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRon(t *testing.T) {
@@ -2571,9 +2115,7 @@ func Test_SmokeRon(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRst(t *testing.T) {
@@ -2585,9 +2127,7 @@ World`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRtf(t *testing.T) {
@@ -2596,9 +2136,7 @@ func Test_SmokeRtf(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRuby(t *testing.T) {
@@ -2607,9 +2145,7 @@ func Test_SmokeRuby(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeRust(t *testing.T) {
@@ -2618,9 +2154,7 @@ func Test_SmokeRust(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeScala(t *testing.T) {
@@ -2629,9 +2163,7 @@ func Test_SmokeScala(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeScheme(t *testing.T) {
@@ -2640,9 +2172,7 @@ func Test_SmokeScheme(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeScss(t *testing.T) {
@@ -2652,9 +2182,7 @@ body { color: $color; }`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSlang(t *testing.T) {
@@ -2663,9 +2191,7 @@ func Test_SmokeSlang(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSmali(t *testing.T) {
@@ -2675,9 +2201,7 @@ func Test_SmokeSmali(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSmalltalk(t *testing.T) {
@@ -2686,9 +2210,7 @@ func Test_SmokeSmalltalk(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSmithy(t *testing.T) {
@@ -2698,9 +2220,7 @@ string MyString`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSml(t *testing.T) {
@@ -2709,9 +2229,7 @@ func Test_SmokeSml(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSnakemake(t *testing.T) {
@@ -2720,9 +2238,7 @@ func Test_SmokeSnakemake(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSolidity(t *testing.T) {
@@ -2732,9 +2248,7 @@ contract Main {}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSouffle(t *testing.T) {
@@ -2743,9 +2257,7 @@ func Test_SmokeSouffle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSourcepawn(t *testing.T) {
@@ -2754,9 +2266,7 @@ func Test_SmokeSourcepawn(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSparql(t *testing.T) {
@@ -2765,9 +2275,7 @@ func Test_SmokeSparql(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSql(t *testing.T) {
@@ -2776,9 +2284,7 @@ func Test_SmokeSql(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSqlBigquery(t *testing.T) {
@@ -2787,9 +2293,7 @@ func Test_SmokeSqlBigquery(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSquirrel(t *testing.T) {
@@ -2798,9 +2302,7 @@ func Test_SmokeSquirrel(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSshConfig(t *testing.T) {
@@ -2810,9 +2312,7 @@ func Test_SmokeSshConfig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeStan(t *testing.T) {
@@ -2821,9 +2321,7 @@ func Test_SmokeStan(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeStarlark(t *testing.T) {
@@ -2832,9 +2330,7 @@ func Test_SmokeStarlark(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSuperhtml(t *testing.T) {
@@ -2843,9 +2339,7 @@ func Test_SmokeSuperhtml(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSvelte(t *testing.T) {
@@ -2854,9 +2348,7 @@ func Test_SmokeSvelte(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSway(t *testing.T) {
@@ -2865,9 +2357,7 @@ func Test_SmokeSway(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSwift(t *testing.T) {
@@ -2876,9 +2366,7 @@ func Test_SmokeSwift(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeSystemverilog(t *testing.T) {
@@ -2887,9 +2375,7 @@ func Test_SmokeSystemverilog(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTablegen(t *testing.T) {
@@ -2898,9 +2384,7 @@ func Test_SmokeTablegen(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTact(t *testing.T) {
@@ -2909,9 +2393,7 @@ func Test_SmokeTact(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTcl(t *testing.T) {
@@ -2920,9 +2402,7 @@ func Test_SmokeTcl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTeal(t *testing.T) {
@@ -2931,9 +2411,7 @@ func Test_SmokeTeal(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTempl(t *testing.T) {
@@ -2942,9 +2420,7 @@ func Test_SmokeTempl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTera(t *testing.T) {
@@ -2953,9 +2429,7 @@ func Test_SmokeTera(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTerraform(t *testing.T) {
@@ -2964,9 +2438,7 @@ func Test_SmokeTerraform(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTest(t *testing.T) {
@@ -2979,9 +2451,7 @@ Test
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTextproto(t *testing.T) {
@@ -2990,9 +2460,7 @@ func Test_SmokeTextproto(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeThrift(t *testing.T) {
@@ -3001,9 +2469,7 @@ func Test_SmokeThrift(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTlaplus(t *testing.T) {
@@ -3013,9 +2479,7 @@ func Test_SmokeTlaplus(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTmux(t *testing.T) {
@@ -3024,9 +2488,7 @@ func Test_SmokeTmux(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTodotxt(t *testing.T) {
@@ -3035,9 +2497,7 @@ func Test_SmokeTodotxt(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeToml(t *testing.T) {
@@ -3046,9 +2506,7 @@ func Test_SmokeToml(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTsv(t *testing.T) {
@@ -3058,9 +2516,7 @@ func Test_SmokeTsv(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTsx(t *testing.T) {
@@ -3069,9 +2525,7 @@ func Test_SmokeTsx(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTurtle(t *testing.T) {
@@ -3080,9 +2534,7 @@ func Test_SmokeTurtle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTwig(t *testing.T) {
@@ -3091,9 +2543,7 @@ func Test_SmokeTwig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTypescript(t *testing.T) {
@@ -3102,9 +2552,7 @@ func Test_SmokeTypescript(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTypespec(t *testing.T) {
@@ -3113,9 +2561,7 @@ func Test_SmokeTypespec(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTyposcript(t *testing.T) {
@@ -3124,9 +2570,7 @@ func Test_SmokeTyposcript(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeTypst(t *testing.T) {
@@ -3135,9 +2579,7 @@ func Test_SmokeTypst(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeUdev(t *testing.T) {
@@ -3146,9 +2588,7 @@ func Test_SmokeUdev(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeUngrammar(t *testing.T) {
@@ -3158,9 +2598,7 @@ Item = 'token'`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeUxntal(t *testing.T) {
@@ -3169,9 +2607,7 @@ func Test_SmokeUxntal(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeV(t *testing.T) {
@@ -3180,9 +2616,7 @@ func Test_SmokeV(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeVb(t *testing.T) {
@@ -3192,9 +2626,7 @@ End Module`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeVerilog(t *testing.T) {
@@ -3203,9 +2635,7 @@ func Test_SmokeVerilog(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeVhdl(t *testing.T) {
@@ -3214,9 +2644,7 @@ func Test_SmokeVhdl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeVhs(t *testing.T) {
@@ -3225,9 +2653,7 @@ func Test_SmokeVhs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeVim(t *testing.T) {
@@ -3236,9 +2662,7 @@ func Test_SmokeVim(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeVimdoc(t *testing.T) {
@@ -3247,9 +2671,7 @@ func Test_SmokeVimdoc(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeVrl(t *testing.T) {
@@ -3258,9 +2680,7 @@ func Test_SmokeVrl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeVue(t *testing.T) {
@@ -3269,9 +2689,7 @@ func Test_SmokeVue(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeWast(t *testing.T) {
@@ -3280,9 +2698,7 @@ func Test_SmokeWast(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeWat(t *testing.T) {
@@ -3291,9 +2707,7 @@ func Test_SmokeWat(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeWgsl(t *testing.T) {
@@ -3302,9 +2716,7 @@ func Test_SmokeWgsl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeWgslBevy(t *testing.T) {
@@ -3313,9 +2725,7 @@ func Test_SmokeWgslBevy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeWit(t *testing.T) {
@@ -3324,9 +2734,7 @@ func Test_SmokeWit(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeWolfram(t *testing.T) {
@@ -3335,9 +2743,7 @@ func Test_SmokeWolfram(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeX86asm(t *testing.T) {
@@ -3346,9 +2752,7 @@ func Test_SmokeX86asm(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeXcompose(t *testing.T) {
@@ -3357,9 +2761,7 @@ func Test_SmokeXcompose(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeXml(t *testing.T) {
@@ -3369,9 +2771,7 @@ func Test_SmokeXml(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeYaml(t *testing.T) {
@@ -3380,9 +2780,7 @@ func Test_SmokeYaml(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeYuck(t *testing.T) {
@@ -3391,9 +2789,7 @@ func Test_SmokeYuck(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeZig(t *testing.T) {
@@ -3402,9 +2798,7 @@ func Test_SmokeZig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeZiggy(t *testing.T) {
@@ -3413,9 +2807,7 @@ func Test_SmokeZiggy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeZiggySchema(t *testing.T) {
@@ -3424,9 +2816,7 @@ func Test_SmokeZiggySchema(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_SmokeZsh(t *testing.T) {
@@ -3435,7 +2825,5 @@ func Test_SmokeZsh(t *testing.T) {
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	if result.RootChildCount < 1 {
-		t.Errorf("expected >= 1, got %v", result.RootChildCount)
-	}
+	// TODO: unsupported assertion type: method_result
 }

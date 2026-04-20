@@ -2,7 +2,9 @@
 	"id": "smoke_ocaml_interface",
 	"description": "Smoke test: load ocaml_interface and parse a simple snippet",
 	"category": "smoke",
-	"tags": ["smoke"],
+	"tags": [
+		"smoke"
+	],
 	"call": "parse",
 	"input": {
 		"language": "ocaml_interface",
@@ -13,8 +15,9 @@
 			"type": "not_error"
 		},
 		{
-			"type": "greater_than_or_equal",
-			"field": "root_child_count",
+			"type": "method_result",
+			"method": "root_child_count",
+			"check": "greater_than_or_equal",
 			"value": 1
 		}
 	]

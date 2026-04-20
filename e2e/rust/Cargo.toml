@@ -10,7 +10,7 @@ license = "MIT"
 publish = false
 
 [dependencies]
-tree_sitter_language_pack = { package = "tree-sitter-language-pack", path = "../../crates/ts-pack-core" }
+tree_sitter_language_pack = { package = "tree-sitter-language-pack", path = "../../crates/ts-pack-core", features = ["download", "serde", "config"] }
 serde_json = "1"
 tokio = { version = "1", features = ["full"] }
 

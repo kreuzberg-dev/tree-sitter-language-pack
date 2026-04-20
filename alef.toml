@@ -268,7 +268,7 @@ module = "tree_sitter_language_pack"
 result_var = "tree"
 args = [
     { name = "language", field = "language", type = "string" },
-    { name = "source", field = "source_code", type = "string" },
+    { name = "source", field = "source_code", type = "bytes" },
 ]
 
 [e2e.calls.detect_extension]
