@@ -6,7 +6,7 @@ gitignore: true
 
 presets:
   - claude
-  - gemini
+  - copilot
   - codex
 
 builtins:
