@@ -91,7 +91,9 @@ pub async fn collect_provenance_report_async(
     let file_filter = normalize_filter(file_filter);
     let parse_call_ref_samples = project_path
         .map(Path::new)
-        .map(|path| provenance::collect_parse_provenance_samples(path, symbol_filter.as_deref(), file_filter.as_deref()))
+        .map(|path| {
+            provenance::collect_parse_provenance_samples(path, symbol_filter.as_deref(), file_filter.as_deref())
+        })
         .unwrap_or_default();
 
     let mut resolved_internal_samples = Vec::new();

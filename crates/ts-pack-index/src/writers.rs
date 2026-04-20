@@ -6,15 +6,15 @@ use serde_json::Value;
 use tokio::time::{Duration, sleep};
 
 use crate::{
-    graph_schema,
     ApiRouteCallRow, ApiRouteHandlerRow, CargoCrateFileRow, CargoCrateRow, CargoDependencyEdgeRow,
     CargoWorkspaceCrateRow, CargoWorkspaceRow, CloneCanonRow, CloneGroupRow, CloneMemberRow, DbEdgeRow, DbModelEdgeRow,
     ExportAliasEdgeRow, ExportSymbolEdgeRow, ExternalApiEdgeRow, ExternalApiNode, ExternalSymbolEdgeRow,
     ExternalSymbolNode, FileCloneCanonRow, FileCloneGroupRow, FileCloneMemberRow, FileEdgeRow, FileImportEdgeRow,
     FileNode, ImplicitImportSymbolEdgeRow, ImportNode, ImportSymbolEdgeRow, InferredCallRow, LaunchEdgeRow,
     PythonInferredCallRow, RelRow, ResourceBackingRow, ResourceTargetEdgeRow, ResourceUsageRow, RustImplTraitEdgeRow,
-    RustImplTypeEdgeRow, SymbolCallRow, SymbolNode, XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow,
-    XcodeTargetFileRow, XcodeTargetRow, XcodeWorkspaceProjectRow, XcodeWorkspaceRow,
+    RustImplTypeEdgeRow, SwiftExtendsTypeEdgeRow, SwiftImplementsTypeEdgeRow, SymbolCallRow, SymbolNode,
+    XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow, XcodeTargetRow,
+    XcodeWorkspaceProjectRow, XcodeWorkspaceRow, graph_schema,
 };
 
 fn json_to_bolt(v: Value) -> BoltType {
@@ -211,6 +211,7 @@ pub(crate) async fn write_symbol_nodes(
                        n.name        = item.name, \
                        n.kind        = item.kind, \
                        n.qualified_name = item.qualified_name, \
+                       n.container_name = item.container_name, \
                        n.project_id  = item.project_id, \
                        n.filepath    = item.filepath, \
                        n.start_line  = item.start_line, \
@@ -221,15 +222,20 @@ pub(crate) async fn write_symbol_nodes(
                        n.visibility  = item.visibility, \
                        n.is_exported = item.is_exported, \
                        n.doc_comment = item.doc_comment, \
+                       n.swift_extended_type = item.swift_extended_type, \
+                       n.swift_inherited_types = item.swift_inherited_types, \
                        n.last_seen_run = $run_id \
          ON MATCH SET  n.stable_id   = item.stable_id, \
                        n.start_line  = item.start_line, \
                        n.end_line    = item.end_line, \
                        n.qualified_name = item.qualified_name, \
+                       n.container_name = item.container_name, \
                        n.signature   = item.signature, \
                        n.visibility  = item.visibility, \
                        n.is_exported = item.is_exported, \
                        n.doc_comment = item.doc_comment, \
+                       n.swift_extended_type = item.swift_extended_type, \
+                       n.swift_inherited_types = item.swift_inherited_types, \
                        n.last_seen_run = $run_id \
          FOREACH (_ IN CASE WHEN item.kind = 'Method' THEN [1] ELSE [] END | SET n:Method)"
     );
@@ -401,7 +407,7 @@ pub(crate) async fn write_db_model_edges(
     let bolt = rows_to_bolt(batch, |r| r.to_value());
     let q = Query::new(
         "UNWIND $batch AS item \
-         MERGE (m:Model {id: item.pid + ':model:' + item.model}) \
+         MERGE (m:Node:Model {id: item.pid + ':model:' + item.model}) \
          SET m.project_id = item.pid, m.name = item.model, m.last_seen_run = $run_id \
          WITH item, m \
          MATCH (a:File {id: item.src}) \
@@ -447,7 +453,7 @@ pub(crate) async fn write_external_api_nodes(
     let bolt = rows_to_bolt(batch, |r| r.to_value());
     let q = Query::new(
         "UNWIND $batch AS item \
-         MERGE (e:ExternalAPI {id: item.id}) \
+         MERGE (e:Node:ExternalAPI {id: item.id}) \
          SET e.project_id = item.pid, \
              e.url = item.url, \
              e.last_seen_run = $run_id"
@@ -466,7 +472,7 @@ pub(crate) async fn write_clone_groups(
     let bolt = rows_to_bolt(batch, |r| r.to_value());
     let q = Query::new(
         "UNWIND $batch AS item \
-         MERGE (g:CloneGroup {id: item.id}) \
+         MERGE (g:Node:CloneGroup {id: item.id}) \
          SET g.project_id = item.project_id, \
              g.size = item.size, \
              g.method = item.method, \
@@ -524,7 +530,7 @@ pub(crate) async fn write_file_clone_groups(
     let bolt = rows_to_bolt(batch, |r| r.to_value());
     let q = Query::new(
         "UNWIND $batch AS item \
-         MERGE (g:FileCloneGroup {id: item.id}) \
+         MERGE (g:Node:FileCloneGroup {id: item.id}) \
          SET g.project_id = item.project_id, \
              g.size = item.size, \
              g.method = item.method, \
@@ -581,7 +587,10 @@ pub(crate) async fn write_file_clone_canon(
 pub(crate) async fn prune_stale_clone_data(graph: &Arc<Graph>, project_id: &str, run_id: &str) -> neo4rs::Result<()> {
     for (label, query_label) in [
         (graph_schema::NODE_LABEL_CLONE_GROUP, "prune_stale_clone_groups"),
-        (graph_schema::NODE_LABEL_FILE_CLONE_GROUP, "prune_stale_file_clone_groups"),
+        (
+            graph_schema::NODE_LABEL_FILE_CLONE_GROUP,
+            "prune_stale_file_clone_groups",
+        ),
     ] {
         prune_project_node_family(graph, project_id, run_id, label, query_label).await?;
     }
@@ -615,7 +624,7 @@ pub(crate) async fn write_external_symbol_nodes(
     let bolt = rows_to_bolt(batch, |r| r.to_value());
     let q = Query::new(
         "UNWIND $batch AS item \
-         MERGE (e:ExternalSymbol {id: item.id}) \
+         MERGE (e:Node:ExternalSymbol {id: item.id}) \
          SET e.project_id = item.pid, \
              e.name = item.name, \
              e.qualified_name = item.qualified_name, \
@@ -783,7 +792,7 @@ pub(crate) async fn write_api_route_calls(
     let q = Query::new(
         "UNWIND $batch AS item \
          MATCH (a:File {project_id: item.project_id, filepath: item.src}) \
-         MERGE (r:ApiRoute {project_id: item.project_id, path: item.path, method: item.method}) \
+         MERGE (r:Node:ApiRoute {project_id: item.project_id, path: item.path, method: item.method}) \
          ON CREATE SET r.name = item.method + ' ' + item.path, r.filepath = item.path \
          SET r.filepath = item.path, \
              r.last_seen_run = $run_id \
@@ -857,7 +866,7 @@ pub(crate) async fn write_resource_usage_edges(
     let q = Query::new(format!(
         "UNWIND $batch AS item \
          MATCH (a:File {{project_id: item.project_id, filepath: item.src}}) \
-         MERGE (res:Resource {{project_id: item.project_id, name: item.name, kind: item.kind}}) \
+         MERGE (res:Node:Resource {{project_id: item.project_id, name: item.name, kind: item.kind}}) \
          ON CREATE SET res.filepath = item.name \
          SET res.filepath = coalesce(item.filepath, res.filepath), \
              res.last_seen_run = $run_id \
@@ -897,7 +906,7 @@ pub(crate) async fn write_xcode_targets(
     let bolt = rows_to_bolt(batch, |r| r.to_value());
     let q = Query::new(
         "UNWIND $batch AS item \
-         MERGE (t:XcodeTarget {project_id: item.project_id, target_id: item.target_id}) \
+         MERGE (t:Node:XcodeTarget {project_id: item.project_id, target_id: item.target_id}) \
          SET t.name = item.name, \
              t.project_file = item.project_file, \
              t.last_seen_run = $run_id"
@@ -936,7 +945,7 @@ pub(crate) async fn write_xcode_target_resources(
     let bolt = rows_to_bolt(batch, |r| r.to_value());
     let q = Query::new(
         "UNWIND $batch AS item \
-         MERGE (r:Resource {project_id: item.project_id, name: item.name, kind: item.kind}) \
+         MERGE (r:Node:Resource {project_id: item.project_id, name: item.name, kind: item.kind}) \
          ON CREATE SET r.filepath = item.filepath \
          SET r.filepath = coalesce(item.filepath, r.filepath), \
              r.last_seen_run = $run_id \
@@ -992,7 +1001,7 @@ pub(crate) async fn write_xcode_workspaces(
     let bolt = rows_to_bolt(batch, |r| r.to_value());
     let q = Query::new(
         "UNWIND $batch AS item \
-         MERGE (w:XcodeWorkspace {project_id: item.project_id, filepath: item.workspace_path}) \
+         MERGE (w:Node:XcodeWorkspace {project_id: item.project_id, filepath: item.workspace_path}) \
          SET w.name = item.name, \
              w.last_seen_run = $run_id"
             .to_string(),
@@ -1030,7 +1039,7 @@ pub(crate) async fn write_xcode_schemes(
     let bolt = rows_to_bolt(batch, |r| r.to_value());
     let q = Query::new(
         "UNWIND $batch AS item \
-         MERGE (s:XcodeScheme {project_id: item.project_id, filepath: item.scheme_path}) \
+         MERGE (s:Node:XcodeScheme {project_id: item.project_id, filepath: item.scheme_path}) \
          SET s.name = item.name, \
              s.container_path = item.container_path, \
              s.last_seen_run = $run_id"
@@ -1085,7 +1094,10 @@ pub(crate) async fn write_xcode_scheme_files(
 pub(crate) async fn prune_stale_xcode_data(graph: &Arc<Graph>, project_id: &str, run_id: &str) -> neo4rs::Result<()> {
     for (label, rel_type) in [
         ("prune_stale_xcode_target_files", graph_schema::REL_BUNDLES_FILE),
-        ("prune_stale_xcode_workspace_projects", graph_schema::REL_REFERENCES_PROJECT),
+        (
+            "prune_stale_xcode_workspace_projects",
+            graph_schema::REL_REFERENCES_PROJECT,
+        ),
         ("prune_stale_xcode_scheme_targets", graph_schema::REL_BUILDS_TARGET),
         ("prune_stale_xcode_scheme_files", graph_schema::REL_DEFINED_IN_FILE),
     ] {
@@ -1109,9 +1121,11 @@ pub(crate) async fn prune_stale_xcode_data(graph: &Arc<Graph>, project_id: &str,
         .param("run_id", run_id.to_string());
     run_query_logged(graph, delete_schemes, "prune_stale_xcode_schemes").await?;
 
-    let delete_workspaces = Query::new(build_project_node_prune_cypher(graph_schema::NODE_LABEL_XCODE_WORKSPACE))
-        .param("pid", project_id.to_string())
-        .param("run_id", run_id.to_string());
+    let delete_workspaces = Query::new(build_project_node_prune_cypher(
+        graph_schema::NODE_LABEL_XCODE_WORKSPACE,
+    ))
+    .param("pid", project_id.to_string())
+    .param("run_id", run_id.to_string());
     run_query_logged(graph, delete_workspaces, "prune_stale_xcode_workspaces").await
 }
 
@@ -1123,7 +1137,7 @@ pub(crate) async fn write_cargo_crates(
     let bolt = rows_to_bolt(batch, |r| r.to_value());
     let q = Query::new(
         "UNWIND $batch AS item \
-         MERGE (c:CargoCrate {project_id: item.project_id, name: item.name}) \
+         MERGE (c:Node:CargoCrate {project_id: item.project_id, name: item.name}) \
          SET c.crate_name = item.crate_name, \
              c.manifest_path = coalesce(item.manifest_path, c.manifest_path), \
              c.last_seen_run = $run_id"
@@ -1142,7 +1156,7 @@ pub(crate) async fn write_cargo_workspaces(
     let bolt = rows_to_bolt(batch, |r| r.to_value());
     let q = Query::new(
         "UNWIND $batch AS item \
-         MERGE (w:CargoWorkspace {project_id: item.project_id, filepath: item.manifest_path}) \
+         MERGE (w:Node:CargoWorkspace {project_id: item.project_id, filepath: item.manifest_path}) \
          SET w.name = item.name, \
              w.last_seen_run = $run_id"
             .to_string(),
@@ -1231,9 +1245,11 @@ pub(crate) async fn prune_stale_cargo_data(graph: &Arc<Graph>, project_id: &str,
         run_query_logged(graph, q, label).await?;
     }
 
-    let delete_workspaces = Query::new(build_project_node_prune_cypher(graph_schema::NODE_LABEL_CARGO_WORKSPACE))
-        .param("pid", project_id.to_string())
-        .param("run_id", run_id.to_string());
+    let delete_workspaces = Query::new(build_project_node_prune_cypher(
+        graph_schema::NODE_LABEL_CARGO_WORKSPACE,
+    ))
+    .param("pid", project_id.to_string())
+    .param("run_id", run_id.to_string());
     run_query_logged(graph, delete_workspaces, "prune_stale_cargo_workspaces").await?;
 
     let delete_crates = Query::new(build_project_node_prune_cypher(graph_schema::NODE_LABEL_CARGO_CRATE))
@@ -1292,6 +1308,65 @@ pub(crate) async fn prune_stale_rust_impl_edges(
     ] {
         let q = Query::new(build_project_rel_prune_cypher(
             ":Impl {project_id: $pid}",
+            rel_type,
+            ":Node {project_id: $pid}",
+        ))
+        .param("pid", project_id.to_string())
+        .param("run_id", run_id.to_string());
+        run_query_logged(graph, q, label).await?;
+    }
+    Ok(())
+}
+
+pub(crate) async fn write_swift_extends_type_edges(
+    graph: &Arc<Graph>,
+    batch: &[SwiftExtendsTypeEdgeRow],
+    run_id: &str,
+) -> neo4rs::Result<()> {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MATCH (s:Node {id: item.src}) \
+         MATCH (t:Node {id: item.tgt}) \
+         MERGE (s)-[r:SWIFT_EXTENDS_TYPE]->(t) \
+         SET r.last_seen_run = $run_id"
+            .to_string(),
+    )
+    .param("batch", bolt)
+    .param("run_id", run_id.to_string());
+    run_query_logged(graph, q, "write_swift_extends_type_edges").await
+}
+
+pub(crate) async fn write_swift_implements_type_edges(
+    graph: &Arc<Graph>,
+    batch: &[SwiftImplementsTypeEdgeRow],
+    run_id: &str,
+) -> neo4rs::Result<()> {
+    let bolt = rows_to_bolt(batch, |r| r.to_value());
+    let q = Query::new(
+        "UNWIND $batch AS item \
+         MATCH (s:Node {id: item.src}) \
+         MATCH (t:Node {id: item.tgt}) \
+         MERGE (s)-[r:IMPLEMENTS_TYPE]->(t) \
+         SET r.last_seen_run = $run_id"
+            .to_string(),
+    )
+    .param("batch", bolt)
+    .param("run_id", run_id.to_string());
+    run_query_logged(graph, q, "write_swift_implements_type_edges").await
+}
+
+pub(crate) async fn prune_stale_swift_type_edges(
+    graph: &Arc<Graph>,
+    project_id: &str,
+    run_id: &str,
+) -> neo4rs::Result<()> {
+    for (label, rel_type) in [
+        ("prune_stale_swift_extends_type", graph_schema::REL_SWIFT_EXTENDS_TYPE),
+        ("prune_stale_swift_implements_type", graph_schema::REL_IMPLEMENTS_TYPE),
+    ] {
+        let q = Query::new(build_project_rel_prune_cypher(
+            ":Node {project_id: $pid}",
             rel_type,
             ":Node {project_id: $pid}",
         ))
@@ -1385,7 +1460,10 @@ pub(crate) async fn prune_stale_symbol_edge_data(
 ) -> neo4rs::Result<()> {
     for (label, rel_type) in [
         ("prune_stale_imports_symbol", graph_schema::REL_IMPORTS_SYMBOL),
-        ("prune_stale_implicit_imports_symbol", graph_schema::REL_IMPLICIT_IMPORTS_SYMBOL),
+        (
+            "prune_stale_implicit_imports_symbol",
+            graph_schema::REL_IMPLICIT_IMPORTS_SYMBOL,
+        ),
         ("prune_stale_exports_symbol", graph_schema::REL_EXPORTS_SYMBOL),
         ("prune_stale_exports_symbol_as", graph_schema::REL_EXPORTS_SYMBOL_AS),
     ] {
@@ -1421,12 +1499,11 @@ mod writer_consistency_tests {
 
     #[test]
     fn project_rel_prune_cypher_is_project_scoped_and_run_scoped() {
-        let cypher =
-            build_project_rel_prune_cypher(
-                ":File {project_id: $pid}",
-                graph_schema::REL_IMPORTS_SYMBOL,
-                ":Node {project_id: $pid}",
-            );
+        let cypher = build_project_rel_prune_cypher(
+            ":File {project_id: $pid}",
+            graph_schema::REL_IMPORTS_SYMBOL,
+            ":Node {project_id: $pid}",
+        );
         assert!(cypher.contains("MATCH (:File {project_id: $pid})-[r:IMPORTS_SYMBOL]->(:Node {project_id: $pid})"));
         assert!(cypher.contains("r.last_seen_run IS NULL OR r.last_seen_run <> $run_id"));
         assert!(cypher.contains("DELETE r"));
@@ -1471,6 +1548,7 @@ mod writer_consistency_tests {
             name: "run".into(),
             kind: "Function".into(),
             qualified_name: None,
+            container_name: None,
             filepath: "a.py".into(),
             project_id: Arc::from("shadow"),
             start_line: 1,
@@ -1481,6 +1559,8 @@ mod writer_consistency_tests {
             visibility: None,
             is_exported: true,
             doc_comment: None,
+            swift_extended_type: None,
+            swift_inherited_types: Vec::new(),
         };
         let symbol_json = symbol.to_value();
         assert_eq!(symbol_json["stable_id"], "canonical:function:a.py:run");

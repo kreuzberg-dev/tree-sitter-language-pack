@@ -113,7 +113,13 @@ pub struct StructureItem {
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     pub qualified_name: Option<String>,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
+    pub container_name: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     pub visibility: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
+    pub extended_type: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
+    pub inherited_types: Vec<String>,
     pub span: Span,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub children: Vec<StructureItem>,
@@ -256,6 +262,12 @@ pub struct SymbolInfo {
     pub span: Span,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub type_annotation: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
+    pub container_name: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
+    pub extended_type: Option<String>,
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
+    pub inherited_types: Vec<String>,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     pub doc: Option<String>,
 }

@@ -20,6 +20,7 @@ pub(crate) struct SymbolNode {
     pub(crate) name: String,
     pub(crate) kind: String,
     pub(crate) qualified_name: Option<String>,
+    pub(crate) container_name: Option<String>,
     pub(crate) filepath: String,
     pub(crate) project_id: Arc<str>,
     pub(crate) start_line: u32,
@@ -30,6 +31,8 @@ pub(crate) struct SymbolNode {
     pub(crate) visibility: Option<String>,
     pub(crate) is_exported: bool,
     pub(crate) doc_comment: Option<String>,
+    pub(crate) swift_extended_type: Option<String>,
+    pub(crate) swift_inherited_types: Vec<String>,
 }
 
 pub(crate) struct RelRow {
@@ -247,6 +250,16 @@ pub(crate) struct RustImplTypeEdgeRow {
     pub(crate) impl_id: String,
     pub(crate) type_name: String,
     pub(crate) project_id: String,
+}
+
+pub(crate) struct SwiftExtendsTypeEdgeRow {
+    pub(crate) src_id: String,
+    pub(crate) tgt_id: String,
+}
+
+pub(crate) struct SwiftImplementsTypeEdgeRow {
+    pub(crate) src_id: String,
+    pub(crate) tgt_id: String,
 }
 
 pub(crate) struct CloneGroupRow {
@@ -831,6 +844,28 @@ impl RustImplTypeEdgeRow {
     }
 }
 
+impl SwiftExtendsTypeEdgeRow {
+    pub(crate) fn to_value(&self) -> Value {
+        Value::Object({
+            let mut m = serde_json::Map::new();
+            m.insert("src".into(), Value::String(self.src_id.clone()));
+            m.insert("tgt".into(), Value::String(self.tgt_id.clone()));
+            m
+        })
+    }
+}
+
+impl SwiftImplementsTypeEdgeRow {
+    pub(crate) fn to_value(&self) -> Value {
+        Value::Object({
+            let mut m = serde_json::Map::new();
+            m.insert("src".into(), Value::String(self.src_id.clone()));
+            m.insert("tgt".into(), Value::String(self.tgt_id.clone()));
+            m
+        })
+    }
+}
+
 impl CloneGroupRow {
     pub(crate) fn to_value(&self) -> Value {
         Value::Object({
@@ -1014,6 +1049,13 @@ impl SymbolNode {
                     .map(|s| Value::String(s.into()))
                     .unwrap_or(Value::Null),
             );
+            m.insert(
+                "container_name".into(),
+                self.container_name
+                    .as_deref()
+                    .map(|s| Value::String(s.into()))
+                    .unwrap_or(Value::Null),
+            );
             m.insert("filepath".into(), Value::String(self.filepath.clone()));
             m.insert("project_id".into(), Value::String(self.project_id.to_string()));
             m.insert("start_line".into(), Value::Number(self.start_line.into()));
@@ -1047,6 +1089,23 @@ impl SymbolNode {
                     .as_deref()
                     .map(|s| Value::String(s.into()))
                     .unwrap_or(Value::Null),
+            );
+            m.insert(
+                "swift_extended_type".into(),
+                self.swift_extended_type
+                    .as_deref()
+                    .map(|s| Value::String(s.into()))
+                    .unwrap_or(Value::Null),
+            );
+            m.insert(
+                "swift_inherited_types".into(),
+                Value::Array(
+                    self.swift_inherited_types
+                        .iter()
+                        .cloned()
+                        .map(Value::String)
+                        .collect::<Vec<_>>(),
+                ),
             );
             m
         })

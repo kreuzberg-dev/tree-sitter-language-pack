@@ -8,6 +8,45 @@ use super::{
     one_i64, run,
 };
 
+async fn drop_stale_graphs_with_prefix(
+    graph: &Arc<Graph>,
+    prefix: &str,
+    project_id: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let graph_prefix = format!("{prefix}-{project_id}-");
+    let _ = run(
+        graph,
+        query(
+            "CALL gds.graph.list() YIELD graphName
+             WHERE graphName STARTS WITH $prefix
+             WITH collect(graphName) AS graphNames
+             UNWIND graphNames AS staleName
+             CALL gds.graph.drop(staleName, false) YIELD graphName
+             RETURN count(graphName) AS dropped",
+        )
+        .param("prefix", graph_prefix),
+    )
+    .await;
+    Ok(())
+}
+
+async fn count_pagerank_seed_nodes(
+    graph: &Arc<Graph>,
+    project_id: &str,
+) -> Result<i64, Box<dyn std::error::Error>> {
+    one_i64(
+        graph,
+        query(
+            "MATCH (n {project_id: $pid})
+             WHERE n:Function OR n:Class OR n:Struct OR n:Trait OR n:Enum
+             RETURN count(n) AS n",
+        )
+        .param("pid", project_id.to_string()),
+        "n",
+    )
+    .await
+}
+
 pub(super) struct FileGraphWriteJob<'a> {
     pub prefix: &'a str,
     pub write_cypher: &'a str,
@@ -24,6 +63,7 @@ pub(super) struct StandardFileGdsResults {
 pub(super) async fn project_file_graph(
     graph: &Arc<Graph>,
     graph_name: &str,
+    graph_prefix: &str,
     project_id: &str,
     rels: &[String],
 ) -> Result<(bool, Vec<i64>), Box<dyn std::error::Error>> {
@@ -37,6 +77,7 @@ pub(super) async fn project_file_graph(
     if sum < 2 {
         return Ok((false, counts));
     }
+    drop_stale_graphs_with_prefix(graph, graph_prefix, project_id).await?;
     let _ = run(
         graph,
         query("CALL gds.graph.drop($name, false) YIELD graphName").param("name", graph_name.to_string()),
@@ -77,7 +118,13 @@ pub(super) async fn project_file_graph(
 }
 
 pub(super) async fn run_pagerank(graph: &Arc<Graph>, project_id: &str) -> Result<i64, Box<dyn std::error::Error>> {
+    let seed_count = count_pagerank_seed_nodes(graph, project_id).await?;
+    let max_seed_nodes = env_i64("TS_PACK_GDS_PAGERANK_MAX_SYMBOL_NODES", 200_000);
+    if seed_count > max_seed_nodes {
+        return Ok(0);
+    }
     let name = graph_name("calls", project_id);
+    drop_stale_graphs_with_prefix(graph, "calls", project_id).await?;
     let _ = run(
         graph,
         query("CALL gds.graph.drop($name, false) YIELD graphName").param("name", name.clone()),
@@ -161,7 +208,17 @@ pub(super) async fn run_file_gds(
 ) -> Result<Value, Box<dyn std::error::Error>> {
     let name = graph_name(prefix, project_id);
     let file_count = count_file_nodes(graph, project_id).await.unwrap_or(0);
-    let (projected, rel_counts) = project_file_graph(graph, &name, project_id, rels).await?;
+    let max_file_nodes = env_i64("TS_PACK_GDS_STANDARD_MAX_FILE_NODES", 5000);
+    if file_count > max_file_nodes {
+        return Ok(json!({
+            "status": "skipped",
+            "updated": 0,
+            "file_nodes": file_count,
+            "reason": "file_count_above_threshold",
+            "threshold": max_file_nodes,
+        }));
+    }
+    let (projected, rel_counts) = project_file_graph(graph, &name, prefix, project_id, rels).await?;
     let total_rel_count: i64 = rel_counts.iter().sum();
     if !projected {
         return Ok(json!({
@@ -233,7 +290,7 @@ pub(super) async fn run_betweenness_gds(
     let concurrency = env_usize("TS_PACK_GDS_BETWEENNESS_CONCURRENCY", 1);
 
     let name = graph_name("betweenness", project_id);
-    let (projected, rel_counts) = project_file_graph(graph, &name, project_id, rels).await?;
+    let (projected, rel_counts) = project_file_graph(graph, &name, "betweenness", project_id, rels).await?;
     let total_rel_count: i64 = rel_counts.iter().sum();
     if !projected {
         return Ok(json!({
@@ -362,11 +419,21 @@ pub(super) async fn run_standard_file_gds_jobs(
 }
 
 pub(super) async fn run_isolated_file_gds(graph: &Arc<Graph>, project_id: &str, rels: &[String]) -> Value {
+    let file_count = count_file_nodes(graph, project_id).await.unwrap_or(0);
+    let max_file_nodes = env_i64("TS_PACK_GDS_STANDARD_MAX_FILE_NODES", 5000);
+    if file_count > max_file_nodes {
+        return json!({
+            "status": "skipped",
+            "updated": 0,
+            "file_nodes": file_count,
+            "reason": "file_count_above_threshold",
+            "threshold": max_file_nodes,
+        });
+    }
     let wcc_graph = graph_name("wcc", project_id);
-    match project_file_graph(graph, &wcc_graph, project_id, rels).await {
+    match project_file_graph(graph, &wcc_graph, "wcc", project_id, rels).await {
         Ok((true, rel_counts)) => {
             let total_rel_count: i64 = rel_counts.iter().sum();
-            let file_count = count_file_nodes(graph, project_id).await.unwrap_or(0);
             let write_result = run(
                 graph,
                 query("CALL gds.wcc.write($name, { writeProperty: 'wccComponent' })").param("name", wcc_graph.clone()),
@@ -425,7 +492,6 @@ pub(super) async fn run_isolated_file_gds(graph: &Arc<Graph>, project_id: &str, 
         }
         Ok((false, rel_counts)) => {
             let total_rel_count: i64 = rel_counts.iter().sum();
-            let file_count = count_file_nodes(graph, project_id).await.unwrap_or(0);
             json!({
                 "status": "skipped",
                 "updated": 0,

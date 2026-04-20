@@ -1,4 +1,4 @@
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 pub(super) fn rel_count_map(rels: &[String], counts: &[i64]) -> Value {
     let mut obj = serde_json::Map::new();

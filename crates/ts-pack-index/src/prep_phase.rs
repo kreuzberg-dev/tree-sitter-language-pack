@@ -13,8 +13,9 @@ use crate::{
     GoFileContext, ImplicitImportSymbolEdgeRow, ImportSymbolEdgeRow, ImportSymbolRequest, InferredCallRow,
     LaunchEdgeRow, PythonFileContext, PythonInferredCallRow, ReExportSymbolRequest, ResourceBackingRow,
     ResourceTargetEdgeRow, ResourceUsageRow, RustFileContext, RustImplTraitEdgeRow, RustImplTypeEdgeRow,
-    SwiftFileContext, SymbolCallRow, SymbolNode, XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow,
-    XcodeTargetFileRow, XcodeTargetRow, XcodeWorkspaceProjectRow, XcodeWorkspaceRow,
+    SwiftExtendsTypeEdgeRow, SwiftFileContext, SwiftImplementsTypeEdgeRow, SymbolCallRow, SymbolNode,
+    XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow, XcodeTargetRow,
+    XcodeWorkspaceProjectRow, XcodeWorkspaceRow,
 };
 
 pub(crate) struct PreparationOutputs {
@@ -45,6 +46,8 @@ pub(crate) struct PreparationOutputs {
     pub(crate) implicit_import_symbol_edges: Vec<ImplicitImportSymbolEdgeRow>,
     pub(crate) rust_impl_trait_edges: Vec<RustImplTraitEdgeRow>,
     pub(crate) rust_impl_type_edges: Vec<RustImplTypeEdgeRow>,
+    pub(crate) swift_extends_type_edges: Vec<SwiftExtendsTypeEdgeRow>,
+    pub(crate) swift_implements_type_edges: Vec<SwiftImplementsTypeEdgeRow>,
     pub(crate) symbol_call_rows: Vec<SymbolCallRow>,
     pub(crate) external_symbol_nodes: Vec<crate::ExternalSymbolNode>,
     pub(crate) external_symbol_edges: Vec<crate::ExternalSymbolEdgeRow>,
@@ -1062,6 +1065,8 @@ pub(crate) fn prepare_graph_facts(
 
     let mut rust_impl_trait_edges = Vec::new();
     let mut rust_impl_type_edges = Vec::new();
+    let mut swift_extends_type_edges = Vec::new();
+    let mut swift_implements_type_edges = Vec::new();
     let trait_symbols: HashMap<String, String> = all_symbols
         .get("Trait")
         .into_iter()
@@ -1106,6 +1111,62 @@ pub(crate) fn prepare_graph_facts(
         }
     }
 
+    let swift_type_symbols: HashMap<String, String> = all_symbols
+        .values()
+        .flat_map(|symbols| symbols.iter())
+        .filter(|sym| matches!(sym.kind.as_str(), "Class" | "Struct" | "Enum" | "Protocol" | "TypeAlias"))
+        .flat_map(|sym| {
+            let mut keys = Vec::new();
+            if let Some(name) = swift::normalize_swift_type(&sym.name) {
+                keys.push((name, sym.id.clone()));
+            }
+            if let Some(qualified_name) = sym.qualified_name.as_ref().and_then(|name| swift::normalize_swift_type(name))
+            {
+                keys.push((qualified_name.clone(), sym.id.clone()));
+                if let Some(simple) = qualified_name.rsplit('.').next()
+                    && !simple.is_empty()
+                {
+                    keys.push((simple.to_string(), sym.id.clone()));
+                }
+            }
+            keys
+        })
+        .collect();
+
+    let mut seen_swift_extends = HashSet::new();
+    let mut seen_swift_implements = HashSet::new();
+    for symbols in all_symbols.values() {
+        for sym in symbols {
+            if let Some(extended_type) = sym
+                .swift_extended_type
+                .as_deref()
+                .and_then(swift::normalize_swift_type)
+                && let Some(tgt_id) = swift_type_symbols.get(&extended_type)
+                && seen_swift_extends.insert((sym.id.clone(), tgt_id.clone()))
+            {
+                swift_extends_type_edges.push(SwiftExtendsTypeEdgeRow {
+                    src_id: sym.id.clone(),
+                    tgt_id: tgt_id.clone(),
+                });
+            }
+
+            for inherited_type in &sym.swift_inherited_types {
+                let Some(inherited_type) = swift::normalize_swift_type(inherited_type) else {
+                    continue;
+                };
+                let Some(tgt_id) = swift_type_symbols.get(&inherited_type) else {
+                    continue;
+                };
+                if seen_swift_implements.insert((sym.id.clone(), tgt_id.clone())) {
+                    swift_implements_type_edges.push(SwiftImplementsTypeEdgeRow {
+                        src_id: sym.id.clone(),
+                        tgt_id: tgt_id.clone(),
+                    });
+                }
+            }
+        }
+    }
+
     let asset = asset_phase::prepare_asset_graph_facts(all_files, file_facts, manifest_abs, project_id);
 
     PreparationOutputs {
@@ -1136,6 +1197,8 @@ pub(crate) fn prepare_graph_facts(
         implicit_import_symbol_edges,
         rust_impl_trait_edges,
         rust_impl_type_edges,
+        swift_extends_type_edges,
+        swift_implements_type_edges,
         symbol_call_rows,
         external_symbol_nodes,
         external_symbol_edges,
@@ -1208,6 +1271,7 @@ mod tests {
             name: name.to_string(),
             kind: "Function".to_string(),
             qualified_name: Some(format!("{name}.qualified")),
+            container_name: None,
             filepath: filepath.to_string(),
             project_id: Arc::from("proj"),
             start_line: 1,
@@ -1218,6 +1282,8 @@ mod tests {
             visibility: None,
             is_exported,
             doc_comment: None,
+            swift_extended_type: None,
+            swift_inherited_types: Vec::new(),
         }
     }
 
@@ -1894,6 +1960,7 @@ mod tests {
                 name: "parse".to_string(),
                 kind: "Method".to_string(),
                 qualified_name: Some("Parser.parse".to_string()),
+                container_name: Some("Parser".to_string()),
                 filepath: "pkg/helpers.py".to_string(),
                 project_id: Arc::from("proj"),
                 start_line: 1,
@@ -1904,6 +1971,8 @@ mod tests {
                 visibility: None,
                 is_exported: true,
                 doc_comment: None,
+                swift_extended_type: None,
+                swift_inherited_types: Vec::new(),
             }],
         );
         let all_files = vec![
@@ -2103,6 +2172,85 @@ mod tests {
             out.rust_impl_type_edges
                 .iter()
                 .any(|edge| edge.impl_id == "sym:impl" && edge.type_name == "Service")
+        );
+    }
+
+    #[test]
+    fn prepares_swift_extension_and_inheritance_edges() {
+        let mut all_symbols = HashMap::new();
+        all_symbols.insert(
+            "Protocol",
+            vec![SymbolNode {
+                kind: "Protocol".to_string(),
+                qualified_name: Some("EventLoop".to_string()),
+                ..symbol_node("sym:protocol", "EventLoop", "Sources/App/EventLoop.swift", true)
+            }],
+        );
+        all_symbols.insert(
+            "Class",
+            vec![SymbolNode {
+                kind: "Class".to_string(),
+                qualified_name: Some("BaseLoop".to_string()),
+                ..symbol_node("sym:base", "BaseLoop", "Sources/App/BaseLoop.swift", true)
+            }],
+        );
+        all_symbols.insert(
+            "Extension",
+            vec![SymbolNode {
+                kind: "Extension".to_string(),
+                qualified_name: Some("extension EventLoop@Sources/App/EventLoop.swift:4".to_string()),
+                swift_extended_type: Some("EventLoop".to_string()),
+                swift_inherited_types: vec!["BaseLoop".to_string()],
+                ..symbol_node("sym:extension", "EventLoop", "Sources/App/EventLoop.swift", false)
+            }],
+        );
+        all_symbols.insert(
+            "Struct",
+            vec![SymbolNode {
+                kind: "Struct".to_string(),
+                qualified_name: Some("Worker".to_string()),
+                swift_inherited_types: vec!["EventLoop".to_string()],
+                ..symbol_node("sym:worker", "Worker", "Sources/App/Worker.swift", true)
+            }],
+        );
+
+        let out = prepare_graph_facts(
+            &all_symbols,
+            &[
+                file_node("file:eventloop", "Sources/App/EventLoop.swift"),
+                file_node("file:base", "Sources/App/BaseLoop.swift"),
+                file_node("file:worker", "Sources/App/Worker.swift"),
+            ],
+            &Arc::from("proj"),
+            None,
+            &HashMap::new(),
+            &HashMap::new(),
+            vec![],
+            &[],
+            &[],
+            &[],
+            &[],
+            &HashMap::new(),
+            &[],
+            &[],
+            &[],
+            &[],
+        );
+
+        assert!(
+            out.swift_extends_type_edges
+                .iter()
+                .any(|edge| edge.src_id == "sym:extension" && edge.tgt_id == "sym:protocol")
+        );
+        assert!(
+            out.swift_implements_type_edges
+                .iter()
+                .any(|edge| edge.src_id == "sym:extension" && edge.tgt_id == "sym:base")
+        );
+        assert!(
+            out.swift_implements_type_edges
+                .iter()
+                .any(|edge| edge.src_id == "sym:worker" && edge.tgt_id == "sym:protocol")
         );
     }
 }

@@ -1,9 +1,9 @@
 use neo4rs::{BoltType, ConfigBuilder, Graph, Query, query};
 use serde_json::{Value, json};
-use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
 use std::sync::Arc;
+use std::time::Instant;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::time::{Duration, sleep};
 use ts_pack_index::graph_schema;
@@ -179,63 +179,73 @@ async fn ensure_manifest_file_nodes(
         return Ok(0);
     }
 
-    let mut result = graph
-        .execute(query("MATCH (f:File {project_id:$pid}) RETURN f.filepath AS fp").param("pid", project_id.to_string()))
-        .await?;
-    let mut existing_paths = HashSet::new();
-    while let Some(row) = result.next().await? {
-        let fp: String = row.get("fp").unwrap_or_default();
-        if !fp.is_empty() {
-            existing_paths.insert(fp);
-        }
-    }
-
-    let mut missing_rows = Vec::new();
-    let mut manifest_paths = Vec::new();
+    let mut manifest_ids = Vec::new();
+    let mut manifest_rows = Vec::new();
     let stable_project_id = canonical_project_id(project_id);
     for entry in &manifest {
         let Some(fp) = entry.get("rel_path").and_then(Value::as_str) else {
             continue;
         };
         let filepath = fp.replace('\\', "/");
-        manifest_paths.push(filepath.clone());
-        if existing_paths.contains(&filepath) {
-            continue;
-        }
+        let node_id = format!("{project_id}:file:{filepath}");
+        manifest_ids.push(node_id.clone());
         let name = Path::new(&filepath)
             .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("")
             .to_string();
-        missing_rows.push(json!({
-            "id": format!("{project_id}:file:{filepath}"),
+        manifest_rows.push(json!({
+            "id": node_id,
             "stable_id": format!("{stable_project_id}:file:{filepath}"),
             "filepath": filepath,
             "name": name,
         }));
     }
+    if manifest_ids.is_empty() {
+        return Ok(0);
+    }
+    let mut result = graph
+        .execute(
+            query(
+                "MATCH (f:File)
+                 WHERE f.id IN $ids
+                 RETURN f.id AS file_id",
+            )
+            .param("ids", strings_to_bolt(&manifest_ids)),
+        )
+        .await?;
+    let mut existing_ids = std::collections::HashSet::new();
+    while let Some(row) = result.next().await? {
+        let file_id: String = row.get("file_id").unwrap_or_default();
+        if !file_id.is_empty() {
+            existing_ids.insert(file_id);
+        }
+    }
 
-    let mut added = 0i64;
-    for chunk in missing_rows.chunks(200) {
+    let mut existing_rows = Vec::new();
+    let mut missing_rows = Vec::new();
+    for row in manifest_rows {
+        let is_existing = row
+            .get("id")
+            .and_then(Value::as_str)
+            .map(|id| existing_ids.contains(id))
+            .unwrap_or(false);
+        if is_existing {
+            existing_rows.push(row);
+        } else {
+            missing_rows.push(row);
+        }
+    }
+
+    for chunk in existing_rows.chunks(200) {
         run(
             graph,
             query(
                 "UNWIND $batch AS row
-                 MERGE (f {id: row.id})
-                 ON CREATE SET
-                    f:Node,
-                    f:File,
-                    f.stable_id = row.stable_id,
-                    f.project_id = $pid,
-                    f.filepath = row.filepath,
-                    f.file_path = row.filepath,
-                    f.name = row.name,
-                    f.indexed_at = timestamp(),
-                    f.parsed = false,
-                    f.last_seen_run = $run_id
+                 MATCH (f:File {id:row.id})
                  SET f:Node,
-                     f:File,
-                     f.stable_id = row.stable_id,
+                     f.project_id = $pid,
+                     f.filepath = row.filepath,
                      f.file_path = row.filepath,
                      f.last_seen_run = $run_id",
             )
@@ -253,22 +263,48 @@ async fn ensure_manifest_file_nodes(
             ),
         )
         .await?;
-        added += chunk.len() as i64;
     }
 
-    run(
-        graph,
-        query(
-            "MATCH (f:File {project_id:$pid})
-             WHERE f.filepath IN $paths
-             SET f:Node, f.last_seen_run = $run_id",
+    let added = missing_rows.len() as i64;
+    for chunk in missing_rows.chunks(200) {
+        run(
+            graph,
+            query(
+                "UNWIND $batch AS row
+                 MERGE (f:File {id: row.id})
+                 ON CREATE SET
+                    f:Node,
+                    f.stable_id = row.stable_id,
+                    f.project_id = $pid,
+                    f.filepath = row.filepath,
+                    f.file_path = row.filepath,
+                    f.name = row.name,
+                    f.indexed_at = timestamp(),
+                    f.parsed = false,
+                    f.last_seen_run = $run_id
+                 SET f:Node,
+                     f:File,
+                     f.stable_id = row.stable_id,
+                     f.project_id = $pid,
+                     f.filepath = row.filepath,
+                    f.file_path = row.filepath,
+                     f.last_seen_run = $run_id",
+            )
+            .param("pid", project_id.to_string())
+            .param("run_id", run_id.to_string())
+            .param(
+                "batch",
+                BoltType::from(
+                    chunk
+                        .iter()
+                        .cloned()
+                        .map(crate::swift_semantic::json_to_bolt)
+                        .collect::<Vec<_>>(),
+                ),
+            ),
         )
-        .param("pid", project_id.to_string())
-        .param("run_id", run_id.to_string())
-        .param("paths", strings_to_bolt(&manifest_paths)),
-    )
-    .await?;
-
+        .await?;
+    }
     Ok(added)
 }
 
@@ -351,6 +387,7 @@ pub async fn finalize_struct_graph_async(
     neo4j_db: &str,
     run_id: Option<&str>,
 ) -> Result<Value, Box<dyn std::error::Error>> {
+    let finalize_started_at = Instant::now();
     let neo4j_config = ConfigBuilder::default()
         .uri(neo4j_uri)
         .user(neo4j_user)
@@ -379,7 +416,13 @@ pub async fn finalize_struct_graph_async(
         return Err(format!("missing struct_index_run_id for project {project_id}").into());
     }
 
+    let ensure_manifest_started_at = Instant::now();
     let added_manifest = ensure_manifest_file_nodes(&graph, project_id, &current_run_id, manifest_file).await?;
+    eprintln!(
+        "[ts-pack-finalize] ensure_manifest_file_nodes done in {:.2}s (added={})",
+        ensure_manifest_started_at.elapsed().as_secs_f64(),
+        added_manifest,
+    );
     let root = fs::canonicalize(project_path).unwrap_or_else(|_| Path::new(project_path).to_path_buf());
     let parsed_paths = indexed_files
         .iter()
@@ -387,8 +430,21 @@ pub async fn finalize_struct_graph_async(
         .filter_map(|path| path.strip_prefix(&root).ok().map(|p| p.to_path_buf()))
         .map(|path| path.to_string_lossy().replace('\\', "/"))
         .collect::<Vec<_>>();
+    let mark_parsed_started_at = Instant::now();
     let parsed_marked = mark_manifest_parsed(&graph, project_id, &current_run_id, &parsed_paths).await?;
+    eprintln!(
+        "[ts-pack-finalize] mark_manifest_parsed done in {:.2}s (updated={})",
+        mark_parsed_started_at.elapsed().as_secs_f64(),
+        parsed_marked,
+    );
+    let alias_started_at = Instant::now();
     let aliased = sync_file_path_alias(&graph, project_id, &current_run_id).await?;
+    eprintln!(
+        "[ts-pack-finalize] sync_file_path_alias done in {:.2}s (updated={})",
+        alias_started_at.elapsed().as_secs_f64(),
+        aliased,
+    );
+    let swift_enrichment_started_at = Instant::now();
     let swift_enrichment = swift_semantic::enrich_swift_graph_async(
         project_path,
         project_id,
@@ -400,15 +456,46 @@ pub async fn finalize_struct_graph_async(
         &current_run_id,
     )
     .await?;
+    eprintln!(
+        "[ts-pack-finalize] enrich_swift_graph_async done in {:.2}s",
+        swift_enrichment_started_at.elapsed().as_secs_f64(),
+    );
+    let file_calls_started_at = Instant::now();
     let file_call_edges = file_graph::build_file_calls_from_symbol_graph(&graph, project_id, &current_run_id).await?;
+    eprintln!(
+        "[ts-pack-finalize] build_file_calls_from_symbol_graph done in {:.2}s (edges={})",
+        file_calls_started_at.elapsed().as_secs_f64(),
+        file_call_edges,
+    );
+    let file_graph_links_started_at = Instant::now();
     let file_graph_links = file_graph::build_file_graph_links(&graph, project_id, &current_run_id).await?;
+    eprintln!(
+        "[ts-pack-finalize] build_file_graph_links done in {:.2}s (edges={})",
+        file_graph_links_started_at.elapsed().as_secs_f64(),
+        file_graph_links,
+    );
     let rels = reporting::file_graph_projection_rels(FILE_GRAPH_PROJECTION_RELS);
+    let pagerank_started_at = Instant::now();
     let pagerank = gds::run_pagerank(&graph, project_id).await.unwrap_or(0);
+    eprintln!(
+        "[ts-pack-finalize] run_pagerank done in {:.2}s (updated={})",
+        pagerank_started_at.elapsed().as_secs_f64(),
+        pagerank,
+    );
+    let standard_gds_started_at = Instant::now();
     let gds::StandardFileGdsResults {
         louvain,
         betweenness,
         isolated,
     } = gds::run_standard_file_gds_jobs(&graph, project_id, &rels).await;
+    eprintln!(
+        "[ts-pack-finalize] run_standard_file_gds_jobs done in {:.2}s",
+        standard_gds_started_at.elapsed().as_secs_f64(),
+    );
+    eprintln!(
+        "[ts-pack-finalize] finalize_struct_graph total {:.2}s",
+        finalize_started_at.elapsed().as_secs_f64(),
+    );
 
     Ok(reporting::finalize_payload(
         added_manifest,

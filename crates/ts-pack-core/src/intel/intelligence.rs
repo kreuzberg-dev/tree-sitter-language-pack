@@ -3,15 +3,20 @@ use super::types::*;
 /// Extract all intelligence from a parsed source file.
 pub fn extract_intelligence(source: &str, language: &str, tree: &tree_sitter::Tree) -> ProcessResult {
     let root = tree.root_node();
+    let comments = extract_comments(&root, source, language);
+    let mut structure = extract_structure(&root, source, language);
+    let mut symbols = extract_symbols(&root, source, language);
+    attach_doc_comments_to_structure(&mut structure, &comments);
+    attach_doc_comments_to_symbols(&mut symbols, &comments);
     ProcessResult {
         language: language.to_string(),
         metrics: compute_metrics(source, &root),
-        structure: extract_structure(&root, source, language),
+        structure,
         imports: extract_imports(&root, source, language),
         exports: extract_exports(&root, source, language),
-        comments: extract_comments(&root, source, language),
+        comments,
         docstrings: extract_docstrings(&root, source, language),
-        symbols: extract_symbols(&root, source, language),
+        symbols,
         diagnostics: extract_diagnostics(&root, source),
         chunks: Vec::new(),
         extractions: ahash::AHashMap::new(),
@@ -35,6 +40,82 @@ fn node_text<'a>(node: &tree_sitter::Node, source: &'a str) -> &'a str {
     &source[node.start_byte()..node.end_byte()]
 }
 
+fn normalized_doc_comment_text(raw: &str) -> String {
+    let trimmed = raw.trim();
+    if trimmed.is_empty() {
+        return String::new();
+    }
+    if trimmed.starts_with("/**") || trimmed.starts_with("/*!") {
+        let mut lines = Vec::new();
+        for line in trimmed.lines() {
+            let mut piece = line.trim().to_string();
+            if let Some(rest) = piece.strip_prefix("/**") {
+                piece = rest.trim().to_string();
+            } else if let Some(rest) = piece.strip_prefix("/*!") {
+                piece = rest.trim().to_string();
+            }
+            if let Some(rest) = piece.strip_suffix("*/") {
+                piece = rest.trim().to_string();
+            }
+            if let Some(rest) = piece.strip_prefix('*') {
+                piece = rest.trim_start().to_string();
+            }
+            if !piece.is_empty() {
+                lines.push(piece);
+            }
+        }
+        return lines.join("\n").trim().to_string();
+    }
+    let mut lines = Vec::new();
+    for line in trimmed.lines() {
+        let line = line.trim();
+        let piece = line
+            .strip_prefix("///")
+            .or_else(|| line.strip_prefix("//!"))
+            .or_else(|| line.strip_prefix("##"))
+            .unwrap_or(line)
+            .trim_start()
+            .to_string();
+        if !piece.is_empty() {
+            lines.push(piece);
+        }
+    }
+    lines.join("\n").trim().to_string()
+}
+
+fn nearest_doc_comment(
+    span: &Span,
+    comments: &[CommentInfo],
+) -> Option<String> {
+    comments
+        .iter()
+        .filter(|comment| comment.kind == CommentKind::Doc)
+        .filter(|comment| comment.span.end_byte <= span.start_byte)
+        .filter(|comment| span.start_line <= comment.span.end_line + 2)
+        .min_by_key(|comment| span.start_byte - comment.span.end_byte)
+        .map(|comment| normalized_doc_comment_text(&comment.text))
+        .filter(|text| !text.is_empty())
+}
+
+fn attach_doc_comments_to_structure(items: &mut [StructureItem], comments: &[CommentInfo]) {
+    for item in items {
+        if item.doc_comment.is_none() {
+            item.doc_comment = nearest_doc_comment(&item.span, comments);
+        }
+        if !item.children.is_empty() {
+            attach_doc_comments_to_structure(&mut item.children, comments);
+        }
+    }
+}
+
+fn attach_doc_comments_to_symbols(symbols: &mut [SymbolInfo], comments: &[CommentInfo]) {
+    for symbol in symbols {
+        if symbol.doc.is_none() {
+            symbol.doc = nearest_doc_comment(&symbol.span, comments);
+        }
+    }
+}
+
 fn strip_quoted_text(raw: &str) -> String {
     let trimmed = raw.trim();
     if trimmed.len() >= 2 {
@@ -45,6 +126,148 @@ fn strip_quoted_text(raw: &str) -> String {
         }
     }
     trimmed.to_string()
+}
+
+fn swift_container_name(node: &tree_sitter::Node, source: &str) -> Option<String> {
+    let mut current = node.parent();
+    for _ in 0..32 {
+        let Some(parent) = current else {
+            break;
+        };
+        match parent.kind() {
+            "class_declaration"
+            | "struct_declaration"
+            | "enum_declaration"
+            | "extension_declaration"
+            | "protocol_declaration" => {
+                if let Some(name) = parent
+                    .child_by_field_name("name")
+                    .map(|n| node_text(&n, source).trim().to_string())
+                    .filter(|name| !name.is_empty())
+                {
+                    return Some(name);
+                }
+            }
+            _ => {}
+        }
+        current = parent.parent();
+    }
+    None
+}
+
+fn kotlin_identifier_node<'a>(node: &'a tree_sitter::Node<'a>) -> Option<tree_sitter::Node<'a>> {
+    let preferred: &[&str] = match node.kind() {
+        "class_declaration" | "interface_declaration" | "enum_declaration" | "object_declaration" | "type_alias" => {
+            &["type_identifier", "simple_identifier", "identifier"]
+        }
+        "function_declaration" | "property_declaration" => &["simple_identifier", "identifier"],
+        _ => &["simple_identifier", "type_identifier", "identifier"],
+    };
+    let mut cursor = node.walk();
+    let children: Vec<_> = node.children(&mut cursor).filter(|child| child.is_named()).collect();
+    for kind in preferred {
+        if let Some(found) = children.iter().find(|child| child.kind() == *kind) {
+            return Some(*found);
+        }
+    }
+    None
+}
+
+fn declaration_name_node<'a>(
+    node: &'a tree_sitter::Node<'a>,
+    language: &str,
+) -> Option<tree_sitter::Node<'a>> {
+    if let Some(name_node) = node.child_by_field_name("name") {
+        return Some(name_node);
+    }
+    if language == "kotlin" {
+        return kotlin_identifier_node(node);
+    }
+    None
+}
+
+fn kotlin_container_name(node: &tree_sitter::Node, source: &str) -> Option<String> {
+    let mut current = node.parent();
+    for _ in 0..32 {
+        let Some(parent) = current else {
+            break;
+        };
+        match parent.kind() {
+            "class_declaration" | "interface_declaration" | "enum_declaration" | "object_declaration" => {
+                if let Some(name) = declaration_name_node(&parent, "kotlin")
+                    .map(|n| node_text(&n, source).trim().to_string())
+                    .filter(|name| !name.is_empty())
+                {
+                    return Some(name);
+                }
+            }
+            _ => {}
+        }
+        current = parent.parent();
+    }
+    None
+}
+
+fn kotlin_qualified_name_for(node: &tree_sitter::Node, source: &str, name: &str) -> Option<String> {
+    let mut parts: Vec<String> = Vec::new();
+    let mut current = node.parent();
+    for _ in 0..32 {
+        let Some(parent) = current else {
+            break;
+        };
+        match parent.kind() {
+            "class_declaration" | "interface_declaration" | "enum_declaration" | "object_declaration" => {
+                if let Some(pname) = declaration_name_node(&parent, "kotlin")
+                    .map(|n| node_text(&n, source).trim().to_string())
+                    .filter(|name| !name.is_empty())
+                {
+                    parts.push(pname);
+                }
+            }
+            _ => {}
+        }
+        current = parent.parent();
+    }
+    if parts.is_empty() {
+        Some(name.to_string())
+    } else {
+        parts.reverse();
+        parts.push(name.to_string());
+        Some(parts.join("."))
+    }
+}
+
+fn kotlin_is_method(node: &tree_sitter::Node) -> bool {
+    let mut current = node.parent();
+    for _ in 0..32 {
+        let Some(parent) = current else {
+            break;
+        };
+        match parent.kind() {
+            "class_declaration" | "interface_declaration" | "object_declaration" | "enum_declaration" => return true,
+            "source_file" => return false,
+            _ => current = parent.parent(),
+        }
+    }
+    false
+}
+
+fn swift_inherited_types(node: &tree_sitter::Node, source: &str) -> Vec<String> {
+    let mut inherited = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    let mut cursor = node.walk();
+    for child in node.children(&mut cursor) {
+        if child.kind() != "inheritance_specifier" {
+            continue;
+        }
+        if let Some(target) = child.child_by_field_name("inherits_from") {
+            let name = node_text(&target, source).trim().to_string();
+            if !name.is_empty() && seen.insert(name.clone()) {
+                inherited.push(name);
+            }
+        }
+    }
+    inherited
 }
 
 fn go_type_spec_kind(node: &tree_sitter::Node) -> StructureKind {
@@ -922,6 +1145,9 @@ fn collect_symbol_on_node(
                 kind: SymbolKind::EnumCase,
                 span: span_from_node(&case_node),
                 type_annotation: None,
+                container_name: swift_container_name(&case_node, source),
+                extended_type: None,
+                inherited_types: Vec::new(),
                 doc: None,
             });
             added = true;
@@ -950,6 +1176,9 @@ fn collect_symbol_on_node(
                     type_annotation: node
                         .child_by_field_name("type")
                         .map(|n| node_text(&n, source).to_string()),
+                    container_name: None,
+                    extended_type: None,
+                    inherited_types: Vec::new(),
                     doc: None,
                 });
                 return false;
@@ -987,6 +1216,7 @@ fn collect_symbol_on_node(
     if let Some(sk) = symbol_kind
         && let Some(name_node) = node.child_by_field_name("name")
     {
+        let is_swift_extension = language == "swift" && sk == SymbolKind::Extension;
         symbols.push(SymbolInfo {
             name: node_text(&name_node, source).to_string(),
             kind: sk,
@@ -994,6 +1224,21 @@ fn collect_symbol_on_node(
             type_annotation: node
                 .child_by_field_name("type")
                 .map(|n| node_text(&n, source).to_string()),
+            container_name: if language == "swift" {
+                swift_container_name(node, source)
+            } else {
+                None
+            },
+            extended_type: if is_swift_extension {
+                Some(node_text(&name_node, source).trim().to_string())
+            } else {
+                None
+            },
+            inherited_types: if language == "swift" {
+                swift_inherited_types(node, source)
+            } else {
+                Vec::new()
+            },
             doc: None,
         });
     }
@@ -1856,7 +2101,10 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
             kind: StructureKind::Section,
             name: Some(heading_name),
             qualified_name: None,
+            container_name: None,
             visibility: None,
+            extended_type: None,
+            inherited_types: Vec::new(),
             span: span_from_node(node),
             children,
             decorators: Vec::new(),
@@ -1878,7 +2126,10 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
                 kind: StructureKind::EnumCase,
                 name: Some(case_name),
                 qualified_name,
+                container_name: swift_container_name(&case_node, source),
                 visibility: None,
+                extended_type: None,
+                inherited_types: Vec::new(),
                 span: span_from_node(&case_node),
                 children: Vec::new(),
                 decorators: Vec::new(),
@@ -1912,7 +2163,10 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
                         kind: StructureKind::Function,
                         name: Some(name),
                         qualified_name: None,
+                        container_name: None,
                         visibility: None,
+                        extended_type: None,
+                        inherited_types: Vec::new(),
                         span: span_from_node(node),
                         children: Vec::new(),
                         decorators: Vec::new(),
@@ -1940,7 +2194,10 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
                             kind: StructureKind::Function,
                             name: Some(name),
                             qualified_name: None,
+                            container_name: None,
                             visibility: None,
+                            extended_type: None,
+                            inherited_types: Vec::new(),
                             span: span_from_node(node),
                             children: Vec::new(),
                             decorators: Vec::new(),
@@ -1969,7 +2226,10 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
                             kind: StructureKind::Function,
                             name: Some(name),
                             qualified_name: None,
+                            container_name: None,
                             visibility: None,
+                            extended_type: None,
+                            inherited_types: Vec::new(),
                             span: span_from_node(node),
                             children: Vec::new(),
                             decorators: Vec::new(),
@@ -1988,6 +2248,8 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
         "function_definition" | "function_declaration" | "function_item" | "arrow_function" => {
             if language == "swift" && kind == "function_declaration" && is_swift_method(node) {
                 Some(StructureKind::Method)
+            } else if language == "kotlin" && kind == "function_declaration" && kotlin_is_method(node) {
+                Some(StructureKind::Method)
             } else {
                 Some(StructureKind::Function)
             }
@@ -2005,6 +2267,8 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
         "interface_declaration" | "interface_definition" => Some(StructureKind::Interface),
         "protocol_declaration" => Some(StructureKind::Protocol),
         "enum_item" | "enum_definition" | "enum_declaration" => Some(StructureKind::Enum),
+        "object_declaration" => Some(StructureKind::Class),
+        "type_alias" => Some(StructureKind::TypeAlias),
         "typealias_declaration" => Some(StructureKind::TypeAlias),
         "associatedtype_declaration" => Some(StructureKind::AssociatedType),
         "module_definition" | "mod_item" => Some(StructureKind::Module),
@@ -2017,7 +2281,7 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
         let name = if language == "rust" && sk == StructureKind::Impl {
             rust_impl_display_name(node, source)
         } else {
-            node.child_by_field_name("name")
+            declaration_name_node(node, language)
                 .map(|n| node_text(&n, source).to_string())
         };
         let qualified_name = match language {
@@ -2028,7 +2292,23 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
             "go" => name
                 .as_deref()
                 .and_then(|symbol_name| go_qualified_name_for(node, source, symbol_name, &sk)),
+            "kotlin" => name
+                .as_deref()
+                .and_then(|symbol_name| kotlin_qualified_name_for(node, source, symbol_name)),
             _ => None,
+        };
+        let (container_name, extended_type, inherited_types) = if language == "swift" {
+            let inherited_types = swift_inherited_types(node, source);
+            let extended_type = if sk == StructureKind::Extension {
+                name.clone()
+            } else {
+                None
+            };
+            (swift_container_name(node, source), extended_type, inherited_types)
+        } else if language == "kotlin" {
+            (kotlin_container_name(node, source), None, Vec::new())
+        } else {
+            (None, None, Vec::new())
         };
         let body_span = node.child_by_field_name("body").map(|n| span_from_node(&n));
         let mut children = Vec::new();
@@ -2048,6 +2328,13 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
             for child in node.children(&mut cursor) {
                 collect_structure(&child, source, language, &mut children);
             }
+        } else if language == "kotlin"
+            && matches!(sk, StructureKind::Class | StructureKind::Interface | StructureKind::Enum)
+        {
+            let mut cursor = node.walk();
+            for child in node.children(&mut cursor) {
+                collect_structure(&child, source, language, &mut children);
+            }
         }
         let signature = if language == "swift" && (sk == StructureKind::Function || sk == StructureKind::Method) {
             swift_signature(node, source)
@@ -2059,7 +2346,10 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
             kind: sk,
             name,
             qualified_name,
+            container_name,
             visibility: extract_visibility(node, source, language),
+            extended_type,
+            inherited_types,
             span: span_from_node(node),
             children,
             decorators: Vec::new(),
@@ -2295,6 +2585,9 @@ fn collect_symbols(node: &tree_sitter::Node, source: &str, language: &str, symbo
                 kind: SymbolKind::EnumCase,
                 span: span_from_node(&case_node),
                 type_annotation: None,
+                container_name: swift_container_name(&case_node, source),
+                extended_type: None,
+                inherited_types: Vec::new(),
                 doc: None,
             });
             added = true;
@@ -2324,6 +2617,9 @@ fn collect_symbols(node: &tree_sitter::Node, source: &str, language: &str, symbo
                     type_annotation: node
                         .child_by_field_name("type")
                         .map(|n| node_text(&n, source).to_string()),
+                    container_name: None,
+                    extended_type: None,
+                    inherited_types: Vec::new(),
                     doc: None,
                 });
                 return;
@@ -2346,19 +2642,24 @@ fn collect_symbols(node: &tree_sitter::Node, source: &str, language: &str, symbo
             }
         }
         "type_alias_declaration" | "type_item" => Some(SymbolKind::Type),
+        "type_alias" => Some(SymbolKind::TypeAlias),
         "type_spec" if language == "go" => Some(go_type_spec_symbol_kind(node)),
         "interface_declaration" => Some(SymbolKind::Interface),
         "protocol_declaration" => Some(SymbolKind::Protocol),
         "enum_item" | "enum_declaration" => Some(SymbolKind::Enum),
+        "object_declaration" => Some(SymbolKind::Class),
         "typealias_declaration" => Some(SymbolKind::TypeAlias),
         "associatedtype_declaration" => Some(SymbolKind::AssociatedType),
         "const_item" | "const_declaration" => Some(SymbolKind::Constant),
-        "let_declaration" | "variable_declaration" | "lexical_declaration" => Some(SymbolKind::Variable),
+        "let_declaration" | "variable_declaration" | "lexical_declaration" | "property_declaration" => {
+            Some(SymbolKind::Variable)
+        }
         _ => None,
     };
     if let Some(sk) = symbol_kind
-        && let Some(name_node) = node.child_by_field_name("name")
+        && let Some(name_node) = declaration_name_node(node, language)
     {
+        let is_swift_extension = language == "swift" && sk == SymbolKind::Extension;
         symbols.push(SymbolInfo {
             name: node_text(&name_node, source).to_string(),
             kind: sk,
@@ -2366,6 +2667,23 @@ fn collect_symbols(node: &tree_sitter::Node, source: &str, language: &str, symbo
             type_annotation: node
                 .child_by_field_name("type")
                 .map(|n| node_text(&n, source).to_string()),
+            container_name: if language == "swift" {
+                swift_container_name(node, source)
+            } else if language == "kotlin" {
+                kotlin_container_name(node, source)
+            } else {
+                None
+            },
+            extended_type: if is_swift_extension {
+                Some(node_text(&name_node, source).trim().to_string())
+            } else {
+                None
+            },
+            inherited_types: if language == "swift" {
+                swift_inherited_types(node, source)
+            } else {
+                Vec::new()
+            },
             doc: None,
         });
     }
@@ -2578,6 +2896,52 @@ mod tests {
     }
 
     #[test]
+    fn test_extract_kotlin_symbols_and_qualified_names() {
+        let source = r#"
+            package okhttp3.internal.http
+
+            class RealInterceptorChain {
+                fun getResponseWithInterceptorChain() {}
+                val callId = 1
+            }
+
+            fun newChain() {}
+        "#;
+        let Some(tree) = parse_or_skip(source, "kotlin") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "kotlin", &tree);
+        assert!(intel.structure.iter().any(|item| {
+            item.kind == StructureKind::Class
+                && item.name.as_deref() == Some("RealInterceptorChain")
+        }));
+        assert!(intel.structure.iter().any(|item| {
+            item.kind == StructureKind::Function
+                && item.name.as_deref() == Some("newChain")
+                && item.qualified_name.as_deref() == Some("newChain")
+        }));
+        assert!(intel.structure.iter().any(|item| {
+            item.kind == StructureKind::Method
+                && item.name.as_deref() == Some("getResponseWithInterceptorChain")
+                && item.qualified_name.as_deref() == Some("RealInterceptorChain.getResponseWithInterceptorChain")
+                && item.container_name.as_deref() == Some("RealInterceptorChain")
+        }));
+        assert!(intel.symbols.iter().any(|item| {
+            item.kind == SymbolKind::Class && item.name == "RealInterceptorChain"
+        }));
+        assert!(intel.symbols.iter().any(|item| {
+            item.kind == SymbolKind::Function
+                && item.name == "getResponseWithInterceptorChain"
+                && item.container_name.as_deref() == Some("RealInterceptorChain")
+        }));
+        assert!(intel.symbols.iter().any(|item| {
+            item.kind == SymbolKind::Variable
+                && item.name == "callId"
+                && item.container_name.as_deref() == Some("RealInterceptorChain")
+        }));
+    }
+
+    #[test]
     fn test_extract_typescript_namespace_reexport_alias() {
         let source = r#"export * as routes from "./routes";"#;
         let Some(tree) = parse_or_skip(source, "typescript") else {
@@ -2660,6 +3024,58 @@ mod tests {
             .find(|item| item.name.as_deref() == Some("DrawThingsCLI"))
             .expect("expected DrawThingsCLI");
         assert_eq!(item.kind, StructureKind::Struct);
+    }
+
+    #[test]
+    fn test_extract_swift_tree_sitter_owned_semantics() {
+        let source = r#"
+        public protocol EventLoop: Sendable {}
+
+        extension EventLoop: Foo, Bar {
+            /// Runs work.
+            func run() {}
+        }
+        "#;
+        let Some(tree) = parse_or_skip(source, "swift") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "swift", &tree);
+
+        let extension = intel
+            .structure
+            .iter()
+            .find(|item| item.kind == StructureKind::Extension)
+            .expect("expected extension");
+        assert_eq!(extension.name.as_deref(), Some("EventLoop"));
+        assert_eq!(extension.extended_type.as_deref(), Some("EventLoop"));
+        assert_eq!(
+            extension.inherited_types,
+            vec!["Foo".to_string(), "Bar".to_string()]
+        );
+        assert!(
+            extension
+                .qualified_name
+                .as_deref()
+                .is_some_and(|q| q.starts_with("extension EventLoop@"))
+        );
+
+        let method = extension
+            .children
+            .iter()
+            .find(|item| item.kind == StructureKind::Method)
+            .expect("expected method");
+        assert_eq!(method.name.as_deref(), Some("run"));
+        assert_eq!(method.container_name.as_deref(), Some("EventLoop"));
+        assert_eq!(method.qualified_name.as_deref(), Some("EventLoop.run"));
+        assert_eq!(method.doc_comment.as_deref(), Some("Runs work."));
+
+        let method_symbol = intel
+            .symbols
+            .iter()
+            .find(|item| item.name == "run")
+            .expect("expected method symbol");
+        assert_eq!(method_symbol.container_name.as_deref(), Some("EventLoop"));
+        assert_eq!(method_symbol.doc.as_deref(), Some("Runs work."));
     }
 
     // -- Import extraction tests --

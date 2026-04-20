@@ -71,6 +71,8 @@ struct TagExtraction {
     tags_secs: f64,
 }
 
+const SWIFT_SAFE_PAREN_NESTING_LIMIT: usize = 2048;
+
 fn is_apple_fact_file(path: &str) -> bool {
     let normalized = path.replace('\\', "/");
     normalized.ends_with(".xcodeproj/project.pbxproj")
@@ -147,6 +149,7 @@ fn walk_item(
         name: name.to_string(),
         kind: format!("{:?}", item.kind),
         qualified_name,
+        container_name: item.container_name.clone(),
         filepath: filepath.to_string(),
         project_id: Arc::clone(&project_id),
         start_line: (item.span.start_line + 1) as u32,
@@ -157,6 +160,8 @@ fn walk_item(
         visibility: item.visibility.clone(),
         is_exported,
         doc_comment: item.doc_comment.clone(),
+        swift_extended_type: item.extended_type.clone(),
+        swift_inherited_types: item.inherited_types.clone(),
     });
     relations.push(RelRow {
         parent: parent_id.to_string(),
@@ -247,6 +252,7 @@ fn add_symbol_info(
         name: sym.name.clone(),
         kind: format!("{:?}", sym.kind),
         qualified_name,
+        container_name: sym.container_name.clone(),
         filepath: filepath.to_string(),
         project_id: Arc::clone(&project_id),
         start_line: (sym.span.start_line + 1) as u32,
@@ -257,6 +263,8 @@ fn add_symbol_info(
         visibility: None,
         is_exported: exported_names.contains(&sym.name),
         doc_comment: sym.doc.clone(),
+        swift_extended_type: sym.extended_type.clone(),
+        swift_inherited_types: sym.inherited_types.clone(),
     });
     relations.push(RelRow {
         parent: parent_id.to_string(),
@@ -318,6 +326,7 @@ fn add_synthetic_swift_main_symbol(
         name: "main".to_string(),
         kind: "Function".to_string(),
         qualified_name: Some("main".to_string()),
+        container_name: None,
         filepath: filepath.to_string(),
         project_id,
         start_line,
@@ -328,6 +337,8 @@ fn add_synthetic_swift_main_symbol(
         visibility: None,
         is_exported: false,
         doc_comment: None,
+        swift_extended_type: None,
+        swift_inherited_types: Vec::new(),
     });
     relations.push(RelRow {
         parent: file_id.to_string(),
@@ -522,6 +533,26 @@ fn read_entry_source(entry: &ManifestEntry) -> Option<String> {
     Some(source)
 }
 
+fn max_delimiter_nesting(source: &str, opener: char, closer: char) -> usize {
+    let mut depth = 0usize;
+    let mut max_depth = 0usize;
+    for ch in source.chars() {
+        if ch == opener {
+            depth += 1;
+            if depth > max_depth {
+                max_depth = depth;
+            }
+        } else if ch == closer && depth > 0 {
+            depth -= 1;
+        }
+    }
+    max_depth
+}
+
+fn swift_requires_parse_guard(source: &str) -> bool {
+    max_delimiter_nesting(source, '(', ')') > SWIFT_SAFE_PAREN_NESTING_LIMIT
+}
+
 fn parse_source_tree(rel_path: &str, lang_name: &str, source: &str) -> Option<(Option<ts_pack::Tree>, f64)> {
     let t_parse_tree = Instant::now();
     let parsed_tree = if lang_name == "text" {
@@ -584,6 +615,20 @@ fn parse_entry_source(entry: &ManifestEntry) -> Option<ParsedSource> {
         return None;
     }
     let source = read_entry_source(entry)?;
+    if lang_name == "swift" && swift_requires_parse_guard(&source) {
+        eprintln!(
+            "[ts-pack-index] swift parse guard fallback: {} (paren_nesting>{})",
+            entry.rel_path, SWIFT_SAFE_PAREN_NESTING_LIMIT
+        );
+        return Some(ParsedSource {
+            lang_name,
+            source,
+            parsed_tree: None,
+            file_facts: ts_pack::FileFacts::default(),
+            process_result: None,
+            timings: ParseTimings::default(),
+        });
+    }
     let (parsed_tree, parse_tree_secs) = parse_source_tree(&entry.rel_path, lang_name, &source)?;
     let (file_facts, file_facts_secs) =
         extract_entry_file_facts(parsed_tree.as_ref(), &source, lang_name, &entry.rel_path);
@@ -847,8 +892,12 @@ fn parse_entry(
     entry: &ManifestEntry,
     pid: &Arc<str>,
     tag_query_bundles: Option<&tags::BatchTagQueryBundles>,
+    clone_enrich_enabled: bool,
 ) -> Option<FileResult> {
     let rel_basename = entry.rel_path.rsplit('/').next().unwrap_or(entry.rel_path.as_str());
+    // Producer-side standalone guard for a tiny set of repo-dotfiles that can
+    // still reach ts-pack outside the rest_proxy manifest path. Broader policy
+    // skips belong in the manifest builder, not here.
     if matches!(rel_basename, ".gitignore" | ".indexignore" | ".env" | ".env.example") {
         return None;
     }
@@ -862,6 +911,21 @@ fn parse_entry(
         process_result: result,
         mut timings,
     } = parse_entry_source(entry)?;
+    let debug_apple_facts = std::env::var("TS_PACK_DEBUG_APPLE_FACTS")
+        .ok()
+        .map(|v| v != "0" && !v.eq_ignore_ascii_case("false"))
+        .unwrap_or(false);
+    if debug_apple_facts && is_apple_fact_file(rel_path) {
+        eprintln!(
+            "[ts-pack-index] apple file facts: file={} targets={} bundled={} synced={} workspace_projects={} scheme_targets={}",
+            rel_path,
+            file_facts.apple_targets.len(),
+            file_facts.apple_bundled_files.len(),
+            file_facts.apple_synced_groups.len(),
+            file_facts.apple_workspace_projects.len(),
+            file_facts.apple_scheme_targets.len(),
+        );
+    }
 
     if entry.rel_path.contains("duplication_demo") {
         eprintln!(
@@ -966,11 +1030,9 @@ fn parse_entry(
         .map(|s| (s.start_byte, s.end_byte, s.id.clone()))
         .collect();
 
-    let clone_candidates = if std::env::var("LM_PROXY_CLONE_ENRICH")
-        .ok()
-        .map(|v| v != "0" && !v.eq_ignore_ascii_case("false"))
-        .unwrap_or(true)
-    {
+    // This only controls optional duplicate/clone grouping. Core symbols,
+    // relations, call edges, and Swift enrichment inputs are still produced.
+    let clone_candidates = if clone_enrich_enabled {
         build_clone_candidates(&symbols, &source)
     } else {
         Vec::new()
@@ -1169,9 +1231,14 @@ fn parse_entry(
     })
 }
 
-pub(crate) fn parse_manifest_batch(batch: &[ManifestEntry], project_id: Arc<str>) -> Vec<FileResult> {
+pub(crate) fn parse_manifest_batch(
+    batch: &[ManifestEntry],
+    project_id: Arc<str>,
+    clone_enrich_enabled: bool,
+) -> Vec<FileResult> {
     let tag_query_bundles = Arc::new(tags::build_js_ts_query_bundles());
-    let parse = |entry: &ManifestEntry| parse_entry(entry, &project_id, Some(tag_query_bundles.as_ref()));
+    let parse =
+        |entry: &ManifestEntry| parse_entry(entry, &project_id, Some(tag_query_bundles.as_ref()), clone_enrich_enabled);
     if std::env::var("TS_PACK_SERIAL_PARSE").is_ok() {
         batch.iter().filter_map(parse).collect()
     } else {
@@ -1182,6 +1249,7 @@ pub(crate) fn parse_manifest_batch(batch: &[ManifestEntry], project_id: Arc<str>
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::clone_enrich_requested;
 
     use serde::Deserialize;
     use std::fs;
@@ -1191,6 +1259,41 @@ mod tests {
     fn unique_temp_dir(name: &str) -> PathBuf {
         let nanos = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         std::env::temp_dir().join(format!("ts-pack-index-parse-{name}-{nanos}"))
+    }
+
+    #[test]
+    fn swift_parse_guard_trips_on_pathological_paren_nesting() {
+        let pathological = format!("func f() {{\nlet x = {}\n}}", "(".repeat(SWIFT_SAFE_PAREN_NESTING_LIMIT + 1));
+        assert!(swift_requires_parse_guard(&pathological));
+        assert!(!swift_requires_parse_guard("func f() { print(1) }"));
+    }
+
+    #[test]
+    fn swift_parse_guard_returns_safe_structural_fallback() {
+        let root = unique_temp_dir("swift-parse-guard-fallback");
+        let rel_path = "test/Parse/structure_overflow_paren_exprs.swift";
+        let abs_path = root.join(rel_path);
+        fs::create_dir_all(abs_path.parent().unwrap()).unwrap();
+        let source = format!(
+            "func pathological() {{\nlet x = {}\nprint(x)\n}}\n",
+            "(".repeat(SWIFT_SAFE_PAREN_NESTING_LIMIT + 1)
+        );
+        fs::write(&abs_path, source).unwrap();
+        let manifest = vec![ManifestEntry {
+            abs_path: abs_path.to_string_lossy().to_string(),
+            rel_path: rel_path.to_string(),
+            ext: "swift".to_string(),
+            size: fs::metadata(&abs_path).unwrap().len(),
+        }];
+
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"), clone_enrich_requested());
+        assert_eq!(results.len(), 1);
+        let result = &results[0];
+        assert_eq!(result.file_node.filepath, rel_path);
+        assert!(result.symbols.is_empty(), "guarded fallback should avoid native symbol extraction");
+        assert!(result.relations.is_empty(), "guarded fallback should not emit structural relations");
+        assert!(result.call_refs.is_empty(), "guarded fallback should not emit call refs");
+        assert!(result.clone_candidates.is_empty(), "guarded fallback should not emit clone candidates");
     }
 
     #[derive(Debug, Deserialize)]
@@ -1246,7 +1349,7 @@ mod tests {
     fn run_golden_fixture(group: &str, name: &str, ext: &str, rel_path: &str) {
         let (root, manifest_entry) = copy_fixture_to_temp(group, name, ext, rel_path);
         let manifest = vec![manifest_entry];
-        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"), clone_enrich_requested());
         assert_eq!(results.len(), 1);
         let result = &results[0];
         let expected = load_expectations(group, name);
@@ -1344,7 +1447,7 @@ def main():
             size: fs::metadata(&file_abs).unwrap().len(),
         }];
 
-        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"), clone_enrich_requested());
         assert_eq!(results.len(), 1);
         let result = &results[0];
         assert_eq!(result.file_node.filepath, "pkg/main.py");
@@ -1373,7 +1476,7 @@ def main():
             size: fs::metadata(&file_abs).unwrap().len(),
         }];
 
-        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"), clone_enrich_requested());
         assert_eq!(results.len(), 1);
         assert!(results[0].file_node.is_test);
 
@@ -1398,7 +1501,7 @@ def main():
             size: fs::metadata(&file_abs).unwrap().len(),
         }];
 
-        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"), clone_enrich_requested());
         assert_eq!(results.len(), 1);
         let funcs = results[0].symbols.get("Function").expect("functions");
         let public = funcs.iter().find(|sym| sym.name == "PublicThing").expect("PublicThing");
@@ -1456,7 +1559,7 @@ export const registerFinanceAdminRoutes = (router: Router) => {
             size: fs::metadata(&file_abs).unwrap().len(),
         }];
 
-        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"), clone_enrich_requested());
         assert_eq!(results.len(), 1);
         let funcs = results[0].symbols.get("Function").expect("functions");
         let exported = funcs
@@ -1491,7 +1594,7 @@ export * as routes from "./routes";
             size: fs::metadata(&file_abs).unwrap().len(),
         }];
 
-        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"), clone_enrich_requested());
         assert_eq!(results.len(), 1);
         let result = &results[0];
         assert_eq!(result.reexport_symbol_requests.len(), 3);
@@ -1626,7 +1729,7 @@ graph.trackGrad(tensor)
             size: fs::metadata(&file_abs).unwrap().len(),
         }];
 
-        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"), clone_enrich_requested());
         assert_eq!(results.len(), 1);
         let result = &results[0];
         let funcs = result.symbols.get("Function").expect("functions");
@@ -1670,7 +1773,7 @@ extension EventLoop {
             size: fs::metadata(&file_abs).unwrap().len(),
         }];
 
-        let results = parse_manifest_batch(&manifest, Arc::from("proj"));
+        let results = parse_manifest_batch(&manifest, Arc::from("proj"), clone_enrich_requested());
         assert_eq!(results.len(), 1);
         let result = &results[0];
         let protocols = result.symbols.get("Protocol").expect("protocols");

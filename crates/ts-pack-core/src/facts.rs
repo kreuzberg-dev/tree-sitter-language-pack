@@ -651,7 +651,7 @@ fn parse_cargo_facts(source: &str, file_path: &str, facts: &mut FileFacts) {
 }
 
 fn parse_pbxproj_facts(source: &str, file_path: &str, facts: &mut FileFacts) {
-    let project_file = file_path.trim_end_matches("/project.pbxproj").to_string();
+    let project_file = file_path.to_string();
     let target_re =
         Regex::new(r#"(?s)([A-F0-9]{8,}) /\* [^*]+ \*/ = \{\s*isa = PBXNativeTarget;.*?\bname = ([^;]+);"#).unwrap();
     for caps in target_re.captures_iter(source) {
@@ -671,10 +671,8 @@ fn parse_pbxproj_facts(source: &str, file_path: &str, facts: &mut FileFacts) {
 
     let build_file_re =
         Regex::new(r#"([A-F0-9]{8,}) /\* [^*]+ \*/ = \{\s*isa = PBXBuildFile;\s*fileRef = ([A-F0-9]{8,})"#).unwrap();
-    let file_ref_re = Regex::new(
-        r#"(?s)([A-F0-9]{8,}) /\* [^*]+ \*/ = \{\s*isa = PBXFileReference;.*?\bpath = ([^;]+);.*?\bsourceTree = ([^;]+);"#,
-    )
-    .unwrap();
+    let file_ref_re =
+        Regex::new(r#"(?s)([A-F0-9]{8,}) /\* [^*]+ \*/ = \{\s*isa = PBXFileReference;(.*?)\};"#).unwrap();
     let resources_re = Regex::new(
         r#"(?s)([A-F0-9]{8,}) /\* Resources \*/ = \{\s*isa = PBXResourcesBuildPhase;.*?\bfiles = \((.*?)\);"#,
     )
@@ -690,6 +688,10 @@ fn parse_pbxproj_facts(source: &str, file_path: &str, facts: &mut FileFacts) {
         r#"(?s)([A-F0-9]{8,}) /\* [^*]+ \*/ = \{\s*isa = PBXNativeTarget;.*?\bfileSystemSynchronizedGroups = \((.*?)\);"#,
     )
     .unwrap();
+    let group_re = Regex::new(
+        r#"(?s)([A-F0-9]{8,}) /\* [^*]+ \*/ = \{\s*isa = (PBXGroup|PBXVariantGroup|PBXFileSystemSynchronizedRootGroup);(.*?)\};"#,
+    )
+    .unwrap();
     let id_re = Regex::new(r#"([A-F0-9]{8,}) /\*"#).unwrap();
 
     let mut build_file_to_ref: AHashMap<String, String> = AHashMap::new();
@@ -697,12 +699,91 @@ fn parse_pbxproj_facts(source: &str, file_path: &str, facts: &mut FileFacts) {
         build_file_to_ref.insert(caps[1].to_string(), caps[2].to_string());
     }
 
+    let mut group_parent: AHashMap<String, String> = AHashMap::new();
+    let mut group_path: AHashMap<String, String> = AHashMap::new();
+    let mut group_source_tree: AHashMap<String, String> = AHashMap::new();
+    let mut variant_group_ids = Vec::<String>::new();
+    for caps in group_re.captures_iter(source) {
+        let group_id = caps[1].to_string();
+        let isa = caps.get(2).map(|m| m.as_str()).unwrap_or_default();
+        let body = caps.get(3).map(|m| m.as_str()).unwrap_or_default();
+        if isa == "PBXVariantGroup" {
+            variant_group_ids.push(group_id.clone());
+        }
+        if let Some(path) = pbxproj_object_field(body, "path")
+            && !path.is_empty()
+        {
+            group_path.insert(group_id.clone(), path);
+        }
+        if let Some(source_tree) = pbxproj_object_field(body, "sourceTree")
+            && !source_tree.is_empty()
+        {
+            group_source_tree.insert(group_id.clone(), source_tree);
+        }
+        if let Some(children_body) = pbxproj_children_body(body) {
+            for child_caps in id_re.captures_iter(children_body) {
+                group_parent.insert(child_caps[1].to_string(), group_id.clone());
+            }
+        }
+    }
+
+    let mut group_path_cache = AHashMap::<String, String>::new();
     let mut file_ref_to_path: AHashMap<String, String> = AHashMap::new();
+    for variant_group_id in &variant_group_ids {
+        let Some(raw_path) = group_path.get(variant_group_id) else {
+            continue;
+        };
+        let source_tree = group_source_tree
+            .get(variant_group_id)
+            .map(|value| value.as_str())
+            .unwrap_or("<group>");
+        let group_prefix = group_parent
+            .get(variant_group_id)
+            .map(|group_id| {
+                resolve_pbx_group_path(
+                    group_id,
+                    &group_parent,
+                    &group_path,
+                    &group_source_tree,
+                    &mut group_path_cache,
+                )
+            })
+            .unwrap_or_default();
+        let resolved_path =
+            resolve_pbxproj_file_reference_path(&project_file, raw_path, source_tree, &group_prefix);
+        if !resolved_path.is_empty() {
+            file_ref_to_path.insert(variant_group_id.clone(), resolved_path);
+        }
+    }
     for caps in file_ref_re.captures_iter(source) {
-        let clean_path = caps[2].trim().trim_matches('"');
-        let source_tree = caps[3].trim().trim_matches('"');
-        if !clean_path.is_empty() && source_tree != "BUILT_PRODUCTS_DIR" {
-            file_ref_to_path.insert(caps[1].to_string(), clean_path.to_string());
+        let file_ref_id = caps[1].to_string();
+        let body = caps.get(2).map(|m| m.as_str()).unwrap_or_default();
+        let Some(raw_path) = pbxproj_object_field(body, "path") else {
+            continue;
+        };
+        if raw_path.is_empty() {
+            continue;
+        }
+        let source_tree = pbxproj_object_field(body, "sourceTree").unwrap_or_else(|| "<group>".to_string());
+        if source_tree == "BUILT_PRODUCTS_DIR" {
+            continue;
+        }
+        let group_prefix = group_parent
+            .get(&file_ref_id)
+            .map(|group_id| {
+                resolve_pbx_group_path(
+                    group_id,
+                    &group_parent,
+                    &group_path,
+                    &group_source_tree,
+                    &mut group_path_cache,
+                )
+            })
+            .unwrap_or_default();
+        let resolved_path =
+            resolve_pbxproj_file_reference_path(&project_file, &raw_path, &source_tree, &group_prefix);
+        if !resolved_path.is_empty() {
+            file_ref_to_path.insert(file_ref_id, resolved_path);
         }
     }
 
@@ -803,7 +884,7 @@ fn parse_scheme_facts(source: &str, file_path: &str, facts: &mut FileFacts) {
         .unwrap_or_default()
         .to_string();
     let buildable_re =
-        Regex::new(r#"BlueprintIdentifier\s*=\s*"([^"]+)".*?ReferencedContainer\s*=\s*"([^"]+)""#).unwrap();
+        Regex::new(r#"(?s)BlueprintIdentifier\s*=\s*"([^"]+)".*?ReferencedContainer\s*=\s*"([^"]+)""#).unwrap();
     for caps in buildable_re.captures_iter(source) {
         let target_id = caps.get(1).map(|m| m.as_str().trim().to_string()).unwrap_or_default();
         let container = caps.get(2).map(|m| m.as_str().trim()).unwrap_or_default();
@@ -824,30 +905,104 @@ fn normalize_pbxproj_relative_path(project_file: &str, raw_path: &str) -> String
     if clean.is_empty() {
         return clean.to_string();
     }
-    let project_dir = Path::new(project_file)
-        .parent()
-        .map(|p| p.to_string_lossy().replace('\\', "/"))
-        .unwrap_or_default();
-    if project_dir.is_empty() {
+    let source_root = pbxproj_source_root(project_file);
+    if !source_root.is_empty()
+        && (clean == source_root || clean.starts_with(&(source_root.clone() + "/")))
+    {
+        return clean.to_string();
+    }
+    if source_root.is_empty() {
         clean.to_string()
     } else {
-        format!("{project_dir}/{clean}")
+        format!("{source_root}/{clean}").replace("//", "/")
+    }
+}
+
+fn pbxproj_object_field(body: &str, field: &str) -> Option<String> {
+    let pattern = format!(r#"\b{}\s*=\s*([^;]+);"#, regex::escape(field));
+    let re = Regex::new(&pattern).ok()?;
+    re.captures(body)
+        .and_then(|caps| caps.get(1))
+        .map(|m| m.as_str().trim().trim_matches('"').to_string())
+}
+
+fn pbxproj_children_body(body: &str) -> Option<&str> {
+    let re = Regex::new(r#"(?s)\bchildren\s*=\s*\((.*?)\);"#).ok()?;
+    re.captures(body).and_then(|caps| caps.get(1)).map(|m| m.as_str())
+}
+
+fn resolve_pbx_group_path(
+    group_id: &str,
+    group_parent: &AHashMap<String, String>,
+    group_path: &AHashMap<String, String>,
+    group_source_tree: &AHashMap<String, String>,
+    cache: &mut AHashMap<String, String>,
+) -> String {
+    if let Some(existing) = cache.get(group_id) {
+        return existing.clone();
+    }
+    let local_path = group_path.get(group_id).cloned().unwrap_or_default();
+    let source_tree = group_source_tree
+        .get(group_id)
+        .map(|value| value.as_str())
+        .unwrap_or("<group>");
+    let resolved = match source_tree {
+        "BUILT_PRODUCTS_DIR" => String::new(),
+        "SOURCE_ROOT" | "<group>" | "" => {
+            let parent_prefix = group_parent
+                .get(group_id)
+                .map(|parent_id| {
+                    resolve_pbx_group_path(parent_id, group_parent, group_path, group_source_tree, cache)
+                })
+                .unwrap_or_default();
+            join_pbx_group_path(&parent_prefix, &local_path)
+        }
+        _ => local_path.clone(),
+    };
+    cache.insert(group_id.to_string(), resolved.clone());
+    resolved
+}
+
+fn join_pbx_group_path(prefix: &str, segment: &str) -> String {
+    let clean_prefix = prefix.trim_matches('"').trim_end_matches('/').trim_start_matches("./");
+    let clean_segment = segment.trim_matches('"').trim_start_matches("./");
+    if clean_prefix.is_empty() {
+        clean_segment.to_string()
+    } else if clean_segment.is_empty() {
+        clean_prefix.to_string()
+    } else {
+        format!("{clean_prefix}/{clean_segment}")
+    }
+}
+
+fn resolve_pbxproj_file_reference_path(
+    project_file: &str,
+    raw_path: &str,
+    source_tree: &str,
+    group_prefix: &str,
+) -> String {
+    let clean_path = raw_path.trim().trim_matches('"').trim_start_matches("./");
+    if clean_path.is_empty() {
+        return String::new();
+    }
+    match source_tree.trim_matches('"') {
+        "BUILT_PRODUCTS_DIR" => String::new(),
+        "SOURCE_ROOT" => normalize_pbxproj_relative_path(project_file, clean_path),
+        "<group>" | "" => {
+            let combined = join_pbx_group_path(group_prefix, clean_path);
+            normalize_pbxproj_relative_path(project_file, &combined)
+        }
+        _ => normalize_pbxproj_relative_path(project_file, clean_path),
     }
 }
 
 fn normalize_workspace_project_path(workspace_path: &str, rel_ref: &str) -> String {
     let clean = rel_ref.trim().trim_start_matches("./");
-    if clean.ends_with(".xcodeproj") {
-        return format!("{clean}/project.pbxproj");
-    }
-    let workspace_dir = Path::new(workspace_path)
-        .parent()
-        .map(|p| p.to_string_lossy().replace('\\', "/"))
-        .unwrap_or_default();
-    let candidate = if workspace_dir.is_empty() {
+    let workspace_root = apple_container_source_root(workspace_path);
+    let candidate = if workspace_root.is_empty() {
         clean.to_string()
     } else {
-        format!("{workspace_dir}/{clean}")
+        format!("{workspace_root}/{clean}")
     };
     if candidate.ends_with(".xcodeproj") {
         format!("{candidate}/project.pbxproj")
@@ -863,23 +1018,61 @@ fn normalize_scheme_container_path(scheme_path: &str, container_ref: &str) -> St
         .unwrap_or(container_ref)
         .trim()
         .trim_start_matches("./");
-    if rel_ref.ends_with(".xcodeproj") {
-        return format!("{rel_ref}/project.pbxproj");
-    }
-    let scheme_dir = Path::new(scheme_path)
-        .parent()
-        .map(|p| p.to_string_lossy().replace('\\', "/"))
-        .unwrap_or_default();
-    let candidate = if scheme_dir.is_empty() {
+    let scheme_root = apple_container_source_root(scheme_path);
+    let candidate = if scheme_root.is_empty() {
         rel_ref.to_string()
     } else {
-        format!("{scheme_dir}/{rel_ref}")
+        format!("{scheme_root}/{rel_ref}")
     };
     if candidate.ends_with(".xcodeproj") {
         format!("{candidate}/project.pbxproj")
     } else {
         candidate
     }
+}
+
+fn pbxproj_source_root(project_file: &str) -> String {
+    let normalized = project_file.replace('\\', "/");
+    let project_path = Path::new(&normalized);
+    if normalized.ends_with(".xcodeproj/project.pbxproj") {
+        return project_path
+            .parent()
+            .and_then(|p| p.parent())
+            .map(|p| p.to_string_lossy().replace('\\', "/"))
+            .unwrap_or_default();
+    }
+    if normalized.ends_with(".xcodeproj") {
+        return project_path
+            .parent()
+            .map(|p| p.to_string_lossy().replace('\\', "/"))
+            .unwrap_or_default();
+    }
+    project_path
+        .parent()
+        .map(|p| p.to_string_lossy().replace('\\', "/"))
+        .unwrap_or_default()
+}
+
+fn apple_container_source_root(file_path: &str) -> String {
+    let normalized = file_path.replace('\\', "/");
+    if let Some((prefix, _)) = normalized.split_once(".xcodeproj/") {
+        let bundle_path = format!("{prefix}.xcodeproj");
+        return Path::new(&bundle_path)
+            .parent()
+            .map(|p| p.to_string_lossy().replace('\\', "/"))
+            .unwrap_or_default();
+    }
+    if let Some((prefix, _)) = normalized.split_once(".xcworkspace/") {
+        let bundle_path = format!("{prefix}.xcworkspace");
+        return Path::new(&bundle_path)
+            .parent()
+            .map(|p| p.to_string_lossy().replace('\\', "/"))
+            .unwrap_or_default();
+    }
+    Path::new(&normalized)
+        .parent()
+        .map(|p| p.to_string_lossy().replace('\\', "/"))
+        .unwrap_or_default()
 }
 
 fn normalize_cargo_member_manifest_path(workspace_manifest_path: &str, member_path: &str) -> String {
@@ -1650,7 +1843,11 @@ AA000020 /* App */ = { isa = PBXFileSystemSynchronizedRootGroup; path = App; sou
             facts
                 .apple_targets
                 .iter()
-                .any(|item| item.name == "App" && item.target_id == "AA000001")
+                .any(|item| {
+                    item.name == "App"
+                        && item.target_id == "AA000001"
+                        && item.project_file == "ios/App.xcodeproj/project.pbxproj"
+                })
         );
         assert!(
             facts
@@ -1667,8 +1864,138 @@ AA000020 /* App */ = { isa = PBXFileSystemSynchronizedRootGroup; path = App; sou
     }
 
     #[test]
+    fn resolves_xcode_group_relative_resource_paths() {
+        let source = r#"
+AA000001 /* App */ = {
+    isa = PBXNativeTarget;
+    buildPhases = (
+        AA000010 /* Resources */,
+    );
+    name = App;
+};
+AA000010 /* Resources */ = {
+    isa = PBXResourcesBuildPhase;
+    files = (
+        AA000101 /* Assets.xcassets in Resources */,
+    );
+};
+AA000101 /* Assets.xcassets in Resources */ = { isa = PBXBuildFile; fileRef = AA000201 /* Assets.xcassets */; };
+AA000201 /* Assets.xcassets */ = { isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+AA000301 /* Shared */ = {
+    isa = PBXGroup;
+    children = (
+        AA000302 /* Resources */,
+    );
+    path = Shared;
+    sourceTree = "<group>";
+};
+AA000302 /* Resources */ = {
+    isa = PBXGroup;
+    children = (
+        AA000201 /* Assets.xcassets */,
+    );
+    path = Resources;
+    sourceTree = "<group>";
+};
+"#;
+        let facts = extract_file_facts(source, "text", Some("ios/App.xcodeproj/project.pbxproj")).unwrap();
+        assert!(
+            facts
+                .apple_bundled_files
+                .iter()
+                .any(|item| item.filepath == "ios/Shared/Resources/Assets.xcassets"),
+            "bundled files were {:?}",
+            facts.apple_bundled_files
+        );
+    }
+
+    #[test]
+    fn resolves_xcode_source_root_resource_paths() {
+        let source = r#"
+AA000001 /* App */ = {
+    isa = PBXNativeTarget;
+    buildPhases = (
+        AA000010 /* Resources */,
+    );
+    name = App;
+};
+AA000010 /* Resources */ = {
+    isa = PBXResourcesBuildPhase;
+    files = (
+        AA000101 /* Config.plist in Resources */,
+    );
+};
+AA000101 /* Config.plist in Resources */ = { isa = PBXBuildFile; fileRef = AA000201 /* Config.plist */; };
+AA000201 /* Config.plist */ = { isa = PBXFileReference; path = Config/Config.plist; sourceTree = SOURCE_ROOT; };
+"#;
+        let facts = extract_file_facts(source, "text", Some("ios/App.xcodeproj/project.pbxproj")).unwrap();
+        assert!(
+            facts
+                .apple_bundled_files
+                .iter()
+                .any(|item| item.filepath == "ios/Config/Config.plist"),
+            "bundled files were {:?}",
+            facts.apple_bundled_files
+        );
+    }
+
+    #[test]
+    fn resolves_xcode_variant_group_localized_resources() {
+        let source = r#"
+AA000001 /* App */ = {
+    isa = PBXNativeTarget;
+    buildPhases = (
+        AA000010 /* Resources */,
+    );
+    name = App;
+};
+AA000010 /* Resources */ = {
+    isa = PBXResourcesBuildPhase;
+    files = (
+        AA000101 /* Localizable.strings in Resources */,
+    );
+};
+AA000101 /* Localizable.strings in Resources */ = { isa = PBXBuildFile; fileRef = AA000201 /* Localizable.strings */; };
+AA000201 /* Localizable.strings */ = {
+    isa = PBXVariantGroup;
+    children = (
+        AA000202 /* en */,
+        AA000203 /* ru */,
+    );
+    path = Localizable.strings;
+    sourceTree = "<group>";
+};
+AA000202 /* en */ = { isa = PBXFileReference; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+AA000203 /* ru */ = { isa = PBXFileReference; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+AA000301 /* Resources */ = {
+    isa = PBXGroup;
+    children = (
+        AA000201 /* Localizable.strings */,
+    );
+    path = Resources;
+    sourceTree = "<group>";
+};
+"#;
+        let facts = extract_file_facts(source, "text", Some("ios/App.xcodeproj/project.pbxproj")).unwrap();
+        assert!(
+            facts
+                .apple_bundled_files
+                .iter()
+                .any(|item| item.filepath == "ios/Resources/Localizable.strings"),
+            "bundled files were {:?}",
+            facts.apple_bundled_files
+        );
+    }
+
+    #[test]
     fn extracts_xcode_workspace_and_scheme_facts() {
         let workspace = r#"<Workspace version="1.0"><FileRef location="self:" /></Workspace>"#;
+        let group_workspace = r#"
+<Workspace version="1.0">
+  <FileRef location="group:BGMDriver/BGMDriver.xcodeproj" />
+  <FileRef location="group:BGMApp/BGMApp.xcodeproj" />
+</Workspace>
+"#;
         let scheme = r#"
 <Scheme>
   <BuildAction>
@@ -1693,6 +2020,25 @@ AA000020 /* App */ = { isa = PBXFileSystemSynchronizedRootGroup; path = App; sou
                 .any(|item| item.project_file == "ios/App.xcodeproj/project.pbxproj")
         );
 
+        let group_workspace_facts = extract_file_facts(
+            group_workspace,
+            "text",
+            Some("LoomBackgroundMusic/BGM.xcworkspace/contents.xcworkspacedata"),
+        )
+        .unwrap();
+        assert!(
+            group_workspace_facts
+                .apple_workspace_projects
+                .iter()
+                .any(|item| item.project_file == "LoomBackgroundMusic/BGMDriver/BGMDriver.xcodeproj/project.pbxproj")
+        );
+        assert!(
+            group_workspace_facts
+                .apple_workspace_projects
+                .iter()
+                .any(|item| item.project_file == "LoomBackgroundMusic/BGMApp/BGMApp.xcodeproj/project.pbxproj")
+        );
+
         let scheme_facts = extract_file_facts(
             scheme,
             "text",
@@ -1703,7 +2049,10 @@ AA000020 /* App */ = { isa = PBXFileSystemSynchronizedRootGroup; path = App; sou
             scheme_facts
                 .apple_scheme_targets
                 .iter()
-                .any(|item| item.target_id == "AA000001" && item.container_path == "App.xcodeproj/project.pbxproj")
+                .any(|item| {
+                    item.target_id == "AA000001"
+                        && item.container_path == "ios/App.xcodeproj/project.pbxproj"
+                })
         );
     }
 

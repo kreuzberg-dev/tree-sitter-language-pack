@@ -79,6 +79,10 @@ pub(crate) const REL_CONCURRENCY: usize = 2;
 
 /// Max files processed in one Rayon + Neo4j cycle before writing
 const MANIFEST_BATCH_SIZE: usize = 1000;
+// Clone enrichment is an optional duplicate-grouping phase. It is not required
+// for core structural indexing, Swift enrichment, or semantic retrieval, so we
+// disable it automatically on very large manifests to avoid runaway memory use.
+const DEFAULT_CLONE_ENRICH_MAX_FILES: usize = 5000;
 
 /// Max source file size: skip files larger than 1 MB
 pub(crate) const MAX_FILE_BYTES: usize = 1_000_000;
@@ -107,6 +111,28 @@ pub(crate) const WINNOW_LARGE_W: usize = 7;
 
 pub(crate) fn external_api_id(project_id: &str, url: &str) -> String {
     pathing::external_api_id(project_id, url)
+}
+
+pub(crate) fn clone_enrich_requested() -> bool {
+    std::env::var("LM_PROXY_CLONE_ENRICH")
+        .ok()
+        .map(|v| v != "0" && !v.eq_ignore_ascii_case("false"))
+        .unwrap_or(true)
+}
+
+pub(crate) fn clone_enrich_max_files() -> usize {
+    std::env::var("TS_PACK_CLONE_ENRICH_MAX_FILES")
+        .ok()
+        .and_then(|raw| raw.parse::<usize>().ok())
+        .unwrap_or(DEFAULT_CLONE_ENRICH_MAX_FILES)
+}
+
+pub(crate) fn clone_enrich_enabled_for_manifest(total_files: usize) -> bool {
+    if !clone_enrich_requested() {
+        return false;
+    }
+    let max_files = clone_enrich_max_files();
+    max_files == 0 || total_files <= max_files
 }
 
 pub(crate) fn external_symbol_id(project_id: &str, language: &str, qualified_name: &str) -> String {
@@ -186,6 +212,7 @@ pub async fn prune_project_shadow_graph(graph: &Arc<Graph>, project_id: &str, ru
     writers::prune_stale_xcode_data(graph, project_id, run_id).await?;
     writers::prune_stale_symbol_edge_data(graph, project_id, run_id).await?;
     writers::prune_stale_rust_impl_edges(graph, project_id, run_id).await?;
+    writers::prune_stale_swift_type_edges(graph, project_id, run_id).await?;
     writers::prune_stale_core_graph_data(graph, project_id, run_id).await?;
     writers::prune_stale_clone_data(graph, project_id, run_id).await?;
     Ok(())
@@ -420,9 +447,17 @@ pub async fn index_workspace(
     let project_root = project_root_from_manifest(&manifest);
 
     let total_files = manifest.len();
+    let clone_enrich_enabled = clone_enrich_enabled_for_manifest(total_files);
     let project_id: Arc<str> = Arc::from(config.project_id.as_str());
 
     eprintln!("[ts-pack-index] Starting — {total_files} files in manifest");
+    if clone_enrich_requested() && !clone_enrich_enabled {
+        eprintln!(
+            "[ts-pack-index] Clone enrichment disabled for this run — files={} exceeds TS_PACK_CLONE_ENRICH_MAX_FILES={} (core graph + Swift enrichment remain enabled)",
+            total_files,
+            clone_enrich_max_files(),
+        );
+    }
     mark_index_run_started(
         &graph,
         &run_id,
@@ -498,7 +533,8 @@ pub async fn index_workspace(
             batch_start + batch.len(),
         );
 
-        let batch_results = parse_phase::parse_manifest_batch(batch, Arc::clone(&project_id));
+        let batch_results =
+            parse_phase::parse_manifest_batch(batch, Arc::clone(&project_id), clone_enrich_enabled);
 
         // Merge batch results into global reservoirs
         for res in batch_results {
@@ -822,6 +858,8 @@ pub async fn index_workspace(
                 implicit_import_symbol_edges,
                 rust_impl_trait_edges: prep.rust_impl_trait_edges,
                 rust_impl_type_edges: prep.rust_impl_type_edges,
+                swift_extends_type_edges: prep.swift_extends_type_edges,
+                swift_implements_type_edges: prep.swift_implements_type_edges,
                 export_symbol_edges,
                 export_alias_edges,
                 launch_edges,
@@ -877,7 +915,10 @@ pub async fn index_workspace(
 
 #[cfg(test)]
 mod run_state_tests {
-    use super::{build_index_run_started_cypher, build_index_run_status_cypher};
+    use super::{
+        build_index_run_started_cypher, build_index_run_status_cypher, clone_enrich_enabled_for_manifest,
+        clone_enrich_max_files,
+    };
 
     #[test]
     fn index_run_started_cypher_tracks_manifest_when_present() {
@@ -907,5 +948,15 @@ mod run_state_tests {
         assert!(cypher.contains("p.struct_active_run_id = $run_id"));
         assert!(cypher.contains("p.struct_last_successful_run_id = $run_id"));
         assert!(cypher.contains("r.promoted_at = timestamp()"));
+    }
+
+    #[test]
+    fn clone_enrich_auto_disables_for_large_manifests() {
+        let max_files = clone_enrich_max_files();
+        if max_files == 0 {
+            return;
+        }
+        assert!(clone_enrich_enabled_for_manifest(max_files));
+        assert!(!clone_enrich_enabled_for_manifest(max_files + 1));
     }
 }

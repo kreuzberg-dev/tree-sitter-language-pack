@@ -6,11 +6,10 @@ use regex::Regex;
 use tree_sitter_language_pack as ts_pack;
 
 use crate::{
-    graph_schema,
     ApiRouteCallRow, ApiRouteHandlerRow, CargoCrateFileRow, CargoCrateRow, CargoDependencyEdgeRow,
     CargoWorkspaceCrateRow, CargoWorkspaceRow, FileEdgeRow, FileNode, ResourceBackingRow, ResourceTargetEdgeRow,
     ResourceUsageRow, XcodeSchemeFileRow, XcodeSchemeRow, XcodeSchemeTargetRow, XcodeTargetFileRow, XcodeTargetRow,
-    XcodeWorkspaceProjectRow, XcodeWorkspaceRow,
+    XcodeWorkspaceProjectRow, XcodeWorkspaceRow, graph_schema,
 };
 
 const HTTP_METHODS: &[&str] = &["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ANY"];
@@ -602,6 +601,10 @@ fn collect_apple_graph_rows(
     Vec<XcodeSchemeTargetRow>,
     Vec<XcodeSchemeFileRow>,
 ) {
+    let debug_apple_facts = std::env::var("TS_PACK_DEBUG_APPLE_FACTS")
+        .ok()
+        .map(|v| v != "0" && !v.eq_ignore_ascii_case("false"))
+        .unwrap_or(false);
     let resource_catalog = discover_apple_resources(file_paths);
     let mut resource_usages = Vec::new();
     let mut resource_backings = Vec::new();
@@ -679,10 +682,7 @@ fn collect_apple_graph_rows(
 
     for (target_id, raw_path) in raw_memberships {
         let project_file = target_project_files.get(&target_id).cloned().unwrap_or_default();
-        let project_dir = Path::new(&project_file)
-            .parent()
-            .map(|p| p.to_string_lossy().replace('\\', "/"))
-            .unwrap_or_default();
+        let project_dir = apple_project_source_root(&project_file);
         let candidates = vec![
             raw_path.trim_start_matches("./").trim_matches('"').to_string(),
             if !project_dir.is_empty() {
@@ -853,6 +853,31 @@ fn collect_apple_graph_rows(
         }
     }
 
+    if debug_apple_facts {
+        let apple_fact_files = file_facts
+            .values()
+            .filter(|facts| {
+                !facts.apple_targets.is_empty()
+                    || !facts.apple_bundled_files.is_empty()
+                    || !facts.apple_synced_groups.is_empty()
+                    || !facts.apple_workspace_projects.is_empty()
+                    || !facts.apple_scheme_targets.is_empty()
+            })
+            .count();
+        eprintln!(
+            "[ts-pack-index] apple facts: fact_files={} targets={} target_files={} target_resources={} workspaces={} workspace_projects={} schemes={} scheme_targets={} scheme_files={}",
+            apple_fact_files,
+            targets.len(),
+            target_file_rows.len(),
+            target_resource_rows.len(),
+            workspace_rows.len(),
+            workspace_project_rows.len(),
+            scheme_rows.len(),
+            scheme_target_rows.len(),
+            scheme_file_rows.len(),
+        );
+    }
+
     (
         resource_usages,
         resource_backings,
@@ -865,6 +890,26 @@ fn collect_apple_graph_rows(
         scheme_target_rows,
         scheme_file_rows,
     )
+}
+
+fn apple_project_source_root(project_file: &str) -> String {
+    let normalized = project_file.replace('\\', "/");
+    if let Some(bundle_root) = normalized.strip_suffix("/project.pbxproj") {
+        return Path::new(bundle_root)
+            .parent()
+            .map(|p| p.to_string_lossy().replace('\\', "/"))
+            .unwrap_or_default();
+    }
+    if normalized.ends_with(".xcodeproj") {
+        return Path::new(&normalized)
+            .parent()
+            .map(|p| p.to_string_lossy().replace('\\', "/"))
+            .unwrap_or_default();
+    }
+    Path::new(&normalized)
+        .parent()
+        .map(|p| p.to_string_lossy().replace('\\', "/"))
+        .unwrap_or_default()
 }
 
 fn collect_cargo_graph_rows(
@@ -1028,6 +1073,9 @@ fn workspace_display_name(workspace_path: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tree_sitter_language_pack::facts::{
+        AppleBundledFileFact, AppleSchemeTargetFact, AppleTargetFact, AppleWorkspaceProjectFact,
+    };
     use tree_sitter_language_pack::facts::{CargoDependencyFact, CargoPackageFact, CargoWorkspaceMemberFact};
     use tree_sitter_language_pack::facts::{HttpCallFact, RouteDefFact};
 
@@ -1115,6 +1163,243 @@ mod tests {
         assert!(dependencies.iter().any(|row| {
             row.src_crate_name == "api" && row.tgt_crate_name == "serde" && row.section == "dependencies"
         }));
+    }
+
+    #[test]
+    fn collects_xcode_rows_from_apple_facts() {
+        let mut file_facts = HashMap::new();
+        file_facts.insert(
+            "FrameCreator.xcodeproj/project.pbxproj".to_string(),
+            ts_pack::FileFacts {
+                apple_targets: vec![
+                    AppleTargetFact {
+                        target_id: "AA000001".to_string(),
+                        name: "FrameCreator".to_string(),
+                        project_file: "FrameCreator.xcodeproj/project.pbxproj".to_string(),
+                    },
+                    AppleTargetFact {
+                        target_id: "AA000002".to_string(),
+                        name: "FrameCreatorWidgets".to_string(),
+                        project_file: "FrameCreator.xcodeproj/project.pbxproj".to_string(),
+                    },
+                ],
+                apple_bundled_files: vec![AppleBundledFileFact {
+                    target_id: "AA000001".to_string(),
+                    filepath: "FrameCreator/Assets.xcassets".to_string(),
+                }],
+                ..Default::default()
+            },
+        );
+        file_facts.insert(
+            "FrameCreator.xcodeproj/project.xcworkspace/contents.xcworkspacedata".to_string(),
+            ts_pack::FileFacts {
+                apple_workspace_projects: vec![AppleWorkspaceProjectFact {
+                    workspace_path: "FrameCreator.xcodeproj/project.xcworkspace/contents.xcworkspacedata".to_string(),
+                    project_file: "FrameCreator.xcodeproj/project.pbxproj".to_string(),
+                }],
+                ..Default::default()
+            },
+        );
+        file_facts.insert(
+            "FrameCreator.xcodeproj/xcshareddata/xcschemes/FrameCreator.xcscheme".to_string(),
+            ts_pack::FileFacts {
+                apple_scheme_targets: vec![
+                    AppleSchemeTargetFact {
+                        scheme_path: "FrameCreator.xcodeproj/xcshareddata/xcschemes/FrameCreator.xcscheme".to_string(),
+                        scheme_name: "FrameCreator".to_string(),
+                        container_path: "FrameCreator.xcodeproj/project.pbxproj".to_string(),
+                        target_id: "AA000001".to_string(),
+                    },
+                    AppleSchemeTargetFact {
+                        scheme_path: "FrameCreator.xcodeproj/xcshareddata/xcschemes/FrameCreator.xcscheme".to_string(),
+                        scheme_name: "FrameCreator".to_string(),
+                        container_path: "FrameCreator.xcodeproj/project.pbxproj".to_string(),
+                        target_id: "AA000002".to_string(),
+                    },
+                ],
+                ..Default::default()
+            },
+        );
+
+        let file_paths = HashSet::from([
+            "FrameCreator.xcodeproj/project.pbxproj".to_string(),
+            "FrameCreator.xcodeproj/project.xcworkspace/contents.xcworkspacedata".to_string(),
+            "FrameCreator.xcodeproj/xcshareddata/xcschemes/FrameCreator.xcscheme".to_string(),
+            "FrameCreator/Assets.xcassets/AccentColor.colorset/Contents.json".to_string(),
+            "FrameCreator/Assets.xcassets/PlaceholderFrame.imageset/Contents.json".to_string(),
+        ]);
+        let file_id_by_path = HashMap::from([
+            (
+                "FrameCreator.xcodeproj/project.pbxproj".to_string(),
+                "file:pbxproj".to_string(),
+            ),
+            (
+                "FrameCreator.xcodeproj/project.xcworkspace/contents.xcworkspacedata".to_string(),
+                "file:workspace".to_string(),
+            ),
+            (
+                "FrameCreator.xcodeproj/xcshareddata/xcschemes/FrameCreator.xcscheme".to_string(),
+                "file:scheme".to_string(),
+            ),
+            (
+                "FrameCreator/Assets.xcassets/AccentColor.colorset/Contents.json".to_string(),
+                "file:accent".to_string(),
+            ),
+            (
+                "FrameCreator/Assets.xcassets/PlaceholderFrame.imageset/Contents.json".to_string(),
+                "file:placeholder".to_string(),
+            ),
+        ]);
+        let manifest_abs = HashMap::from([
+            (
+                "FrameCreator.xcodeproj/xcshareddata/xcschemes/FrameCreator.xcscheme".to_string(),
+                "/tmp/FrameCreator.xcodeproj/xcshareddata/xcschemes/FrameCreator.xcscheme".to_string(),
+            ),
+        ]);
+
+        let (
+            _,
+            _,
+            xcode_targets,
+            xcode_target_files,
+            xcode_target_resources,
+            xcode_workspaces,
+            xcode_workspace_projects,
+            xcode_schemes,
+            xcode_scheme_targets,
+            xcode_scheme_files,
+        ) =
+            collect_apple_graph_rows(&file_id_by_path, &file_paths, &file_facts, &manifest_abs, &Arc::from("proj"));
+
+        assert_eq!(xcode_targets.len(), 2);
+        assert_eq!(xcode_target_files.len(), 2);
+        assert_eq!(xcode_target_resources.len(), 2);
+        assert_eq!(xcode_workspaces.len(), 1);
+        assert_eq!(xcode_workspace_projects.len(), 1);
+        assert_eq!(xcode_schemes.len(), 1);
+        assert_eq!(xcode_scheme_targets.len(), 2);
+        assert_eq!(xcode_scheme_files.len(), 1);
+    }
+
+    #[test]
+    fn collects_multi_project_workspace_rows_from_apple_facts() {
+        let mut file_facts = HashMap::new();
+        file_facts.insert(
+            "BGM.xcworkspace/contents.xcworkspacedata".to_string(),
+            ts_pack::FileFacts {
+                apple_workspace_projects: vec![
+                    AppleWorkspaceProjectFact {
+                        workspace_path: "BGM.xcworkspace/contents.xcworkspacedata".to_string(),
+                        project_file: "BGMApp/BGMApp.xcodeproj/project.pbxproj".to_string(),
+                    },
+                    AppleWorkspaceProjectFact {
+                        workspace_path: "BGM.xcworkspace/contents.xcworkspacedata".to_string(),
+                        project_file: "BGMDriver/BGMDriver.xcodeproj/project.pbxproj".to_string(),
+                    },
+                ],
+                ..Default::default()
+            },
+        );
+        file_facts.insert(
+            "BGMApp/BGMAppTests/NullAudio/AudioDriverExamples.xcodeproj/project.xcworkspace/contents.xcworkspacedata"
+                .to_string(),
+            ts_pack::FileFacts {
+                apple_workspace_projects: vec![AppleWorkspaceProjectFact {
+                    workspace_path:
+                        "BGMApp/BGMAppTests/NullAudio/AudioDriverExamples.xcodeproj/project.xcworkspace/contents.xcworkspacedata"
+                            .to_string(),
+                    project_file:
+                        "BGMApp/BGMAppTests/NullAudio/AudioDriverExamples.xcodeproj/project.pbxproj"
+                            .to_string(),
+                }],
+                ..Default::default()
+            },
+        );
+
+        let file_paths = HashSet::from([
+            "BGM.xcworkspace/contents.xcworkspacedata".to_string(),
+            "BGMApp/BGMApp.xcodeproj/project.pbxproj".to_string(),
+            "BGMDriver/BGMDriver.xcodeproj/project.pbxproj".to_string(),
+            "BGMApp/BGMAppTests/NullAudio/AudioDriverExamples.xcodeproj/project.xcworkspace/contents.xcworkspacedata"
+                .to_string(),
+            "BGMApp/BGMAppTests/NullAudio/AudioDriverExamples.xcodeproj/project.pbxproj".to_string(),
+        ]);
+        let file_id_by_path = HashMap::from([
+            (
+                "BGM.xcworkspace/contents.xcworkspacedata".to_string(),
+                "file:bgm-workspace".to_string(),
+            ),
+            (
+                "BGMApp/BGMApp.xcodeproj/project.pbxproj".to_string(),
+                "file:bgm-app-project".to_string(),
+            ),
+            (
+                "BGMDriver/BGMDriver.xcodeproj/project.pbxproj".to_string(),
+                "file:bgm-driver-project".to_string(),
+            ),
+            (
+                "BGMApp/BGMAppTests/NullAudio/AudioDriverExamples.xcodeproj/project.xcworkspace/contents.xcworkspacedata"
+                    .to_string(),
+                "file:nullaudio-workspace".to_string(),
+            ),
+            (
+                "BGMApp/BGMAppTests/NullAudio/AudioDriverExamples.xcodeproj/project.pbxproj".to_string(),
+                "file:nullaudio-project".to_string(),
+            ),
+        ]);
+
+        let (
+            _,
+            _,
+            _,
+            _,
+            _,
+            xcode_workspaces,
+            xcode_workspace_projects,
+            _,
+            _,
+            _,
+        ) = collect_apple_graph_rows(
+            &file_id_by_path,
+            &file_paths,
+            &file_facts,
+            &HashMap::new(),
+            &Arc::from("proj"),
+        );
+
+        assert_eq!(xcode_workspaces.len(), 2);
+        assert_eq!(xcode_workspace_projects.len(), 3);
+        assert!(
+            xcode_workspaces
+                .iter()
+                .any(|row| row.workspace_path == "BGM.xcworkspace/contents.xcworkspacedata")
+        );
+        assert!(
+            xcode_workspaces.iter().any(|row| {
+                row.workspace_path
+                    == "BGMApp/BGMAppTests/NullAudio/AudioDriverExamples.xcodeproj/project.xcworkspace/contents.xcworkspacedata"
+            })
+        );
+        assert!(
+            xcode_workspace_projects.iter().any(|row| {
+                row.workspace_path == "BGM.xcworkspace/contents.xcworkspacedata"
+                    && row.filepath == "BGMApp/BGMApp.xcodeproj/project.pbxproj"
+            })
+        );
+        assert!(
+            xcode_workspace_projects.iter().any(|row| {
+                row.workspace_path == "BGM.xcworkspace/contents.xcworkspacedata"
+                    && row.filepath == "BGMDriver/BGMDriver.xcodeproj/project.pbxproj"
+            })
+        );
+        assert!(
+            xcode_workspace_projects.iter().any(|row| {
+                row.workspace_path
+                    == "BGMApp/BGMAppTests/NullAudio/AudioDriverExamples.xcodeproj/project.xcworkspace/contents.xcworkspacedata"
+                    && row.filepath
+                        == "BGMApp/BGMAppTests/NullAudio/AudioDriverExamples.xcodeproj/project.pbxproj"
+            })
+        );
     }
 
     #[test]
