@@ -21,7 +21,7 @@ thread_local! {
 }
 
 /// A single match from a tree-sitter query, with captured nodes.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct QueryMatch {
     /// The pattern index that matched (position in the query string).
     pub pattern_index: usize,

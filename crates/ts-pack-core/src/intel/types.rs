@@ -2,7 +2,7 @@
 ///
 /// Represents both byte offsets (for slicing) and human-readable line/column
 /// positions (for display and diagnostics).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Span {
     pub start_byte: usize,
@@ -61,7 +61,7 @@ pub struct ProcessResult {
 }
 
 /// Aggregate metrics for a source file.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FileMetrics {
     pub total_lines: usize,
@@ -79,9 +79,10 @@ pub struct FileMetrics {
 /// Categorizes top-level and nested declarations such as functions, classes,
 /// structs, enums, traits, and more. Use [`Other`](StructureKind::Other) for
 /// language-specific constructs that do not fit a standard category.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum StructureKind {
+    #[default]
     Function,
     Method,
     Class,
@@ -96,7 +97,7 @@ pub enum StructureKind {
 }
 
 /// A structural item (function, class, struct, etc.) in source code.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StructureItem {
     pub kind: StructureKind,
@@ -121,16 +122,17 @@ pub struct StructureItem {
 ///
 /// Distinguishes between single-line comments, block (multi-line) comments,
 /// and documentation comments.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum CommentKind {
+    #[default]
     Line,
     Block,
     Doc,
 }
 
 /// A comment extracted from source code.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommentInfo {
     pub text: String,
@@ -144,9 +146,10 @@ pub struct CommentInfo {
 ///
 /// Identifies the docstring convention used, which varies by language
 /// (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum DocstringFormat {
+    #[default]
     PythonTripleQuote,
     JSDoc,
     Rustdoc,
@@ -156,7 +159,7 @@ pub enum DocstringFormat {
 }
 
 /// A docstring extracted from source code.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DocstringInfo {
     pub text: String,
@@ -169,7 +172,7 @@ pub struct DocstringInfo {
 }
 
 /// A section within a docstring (e.g., Args, Returns, Raises).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DocSection {
     pub kind: String,
@@ -178,7 +181,7 @@ pub struct DocSection {
 }
 
 /// An import statement extracted from source code.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ImportInfo {
     pub source: String,
@@ -193,16 +196,17 @@ pub struct ImportInfo {
 /// The kind of an export statement found in source code.
 ///
 /// Covers named exports, default exports, and re-exports from other modules.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ExportKind {
+    #[default]
     Named,
     Default,
     ReExport,
 }
 
 /// An export statement extracted from source code.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ExportInfo {
     pub name: String,
@@ -214,9 +218,10 @@ pub struct ExportInfo {
 ///
 /// Categorizes symbol definitions such as variables, constants, functions,
 /// classes, types, interfaces, enums, and modules.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SymbolKind {
+    #[default]
     Variable,
     Constant,
     Function,
@@ -229,7 +234,7 @@ pub enum SymbolKind {
 }
 
 /// A symbol (variable, function, type, etc.) extracted from source code.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SymbolInfo {
     pub name: String,
@@ -245,16 +250,17 @@ pub struct SymbolInfo {
 ///
 /// Used to classify parse errors, warnings, and informational messages
 /// found in the syntax tree.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum DiagnosticSeverity {
+    #[default]
     Error,
     Warning,
     Info,
 }
 
 /// A diagnostic (syntax error, missing node, etc.) from parsing.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Diagnostic {
     pub message: String,
@@ -263,7 +269,7 @@ pub struct Diagnostic {
 }
 
 /// A chunk of source code with rich metadata.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CodeChunk {
     pub content: String,
@@ -275,7 +281,7 @@ pub struct CodeChunk {
 }
 
 /// Metadata for a single chunk of source code.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ChunkContext {
     pub language: String,
