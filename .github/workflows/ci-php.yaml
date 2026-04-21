@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "crates/ts-pack-php/**"
+      - "crates/ts-pack-core-php/**"
       - "crates/ts-pack-core/**"
       - "packages/php/**"
       - "Cargo.toml"
@@ -22,7 +22,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "crates/ts-pack-php/**"
+      - "crates/ts-pack-core-php/**"
       - "crates/ts-pack-core/**"
       - "packages/php/**"
       - "Cargo.toml"
@@ -166,13 +166,13 @@ jobs:
 
       - name: Clippy (ts-pack-php)
         if: matrix.php-version == '8.4' && matrix.os == 'ubuntu-latest'
-        run: cargo clippy --manifest-path crates/ts-pack-php/Cargo.toml -- -D warnings
+        run: cargo clippy --manifest-path crates/ts-pack-core-php/Cargo.toml -- -D warnings
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Build PHP extension
-        run: cargo build --release --manifest-path crates/ts-pack-php/Cargo.toml
+        run: cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
@@ -223,7 +223,7 @@ jobs:
           fi
 
       - name: Build PHP extension
-        run: cargo build --release --manifest-path crates/ts-pack-php/Cargo.toml
+        run: cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"

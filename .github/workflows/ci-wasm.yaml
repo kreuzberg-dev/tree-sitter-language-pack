@@ -136,7 +136,7 @@ jobs:
         uses: kreuzberg-dev/actions/install-wasi-sdk@v1
 
       - name: Build WASM (web target)
-        working-directory: crates/ts-pack-wasm
+        working-directory: crates/ts-pack-core-wasm
         run: wasm-pack build --target web --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
@@ -212,7 +212,7 @@ jobs:
         uses: kreuzberg-dev/actions/install-wasi-sdk@v1
 
       - name: Build WASM (Node.js target)
-        working-directory: crates/ts-pack-wasm
+        working-directory: crates/ts-pack-core-wasm
         run: wasm-pack build --target nodejs --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}

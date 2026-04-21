@@ -176,8 +176,8 @@ jobs:
       - name: Verify Maven pom.xml version
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
-          if [ -f crates/ts-pack-java/pom.xml ]; then
-            POM_VERSION=$(grep -m1 '<version>' crates/ts-pack-java/pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/' | tr -d '[:space:]')
+          if [ -f packages/java/pom.xml ]; then
+            POM_VERSION=$(grep -m1 '<version>' packages/java/pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/' | tr -d '[:space:]')
             if [[ "$POM_VERSION" != "$VERSION" ]]; then
               echo "::error::pom.xml version ($POM_VERSION) does not match tag version ($VERSION)"
               exit 1
@@ -996,7 +996,7 @@ jobs:
       - name: Stage Java native resources
         shell: bash
         run: |
-          RESOURCES_DIR="crates/ts-pack-java/src/main/resources/natives"
+          RESOURCES_DIR="packages/java/src/main/resources/natives"
           mkdir -p "$RESOURCES_DIR"
           for dir in artifacts/java-natives/*/; do
             rid=$(basename "$dir")
@@ -1007,14 +1007,14 @@ jobs:
           find "$RESOURCES_DIR" -type f | head -20
 
       - name: Build and package
-        working-directory: crates/ts-pack-java
+        working-directory: packages/java
         run: mvn clean package -DskipTests
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v7
         with:
           name: maven-packages
-          path: crates/ts-pack-java/target/*.jar
+          path: packages/java/target/*.jar
           retention-days: 14
 
   # ─── Build Elixir NIFs ────────────────────────────────────────────
@@ -1296,7 +1296,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Build PHP extension
-        run: cargo build --release --manifest-path crates/ts-pack-php/Cargo.toml
+        run: cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml
         env:
           PROJECT_ROOT: ${{ github.workspace }}
 
@@ -2044,13 +2044,13 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: maven-packages
-          path: crates/ts-pack-java/target
+          path: packages/java/target
 
       - name: Publish to Maven Central
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
         uses: kreuzberg-dev/actions/publish-maven@v1
         with:
-          pom-file: crates/ts-pack-java/pom.xml
+          pom-file: packages/java/pom.xml
           maven-profile: publish
           extra-args: -DskipTests
           dry-run: ${{ needs.prepare.outputs.dry_run }}

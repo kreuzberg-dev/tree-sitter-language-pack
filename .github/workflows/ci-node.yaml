@@ -173,7 +173,7 @@ jobs:
         shell: bash
         run: |
           echo "=== Node Native Module Artifacts ==="
-          find crates/ts-pack-node -maxdepth 1 -name "*.node" -exec ls -lh {} \;
+          find crates/ts-pack-core-node -maxdepth 1 -name "*.node" -exec ls -lh {} \;
 
       - name: Upload native module
         uses: actions/upload-artifact@v7
