@@ -2,9 +2,7 @@
 	"id": "java_class_process",
 	"description": "Intel: Java class with methods and imports",
 	"category": "process",
-	"tags": [
-		"intel"
-	],
+	"tags": ["intel"],
 	"skip": {
 		"reason": "Requires java language"
 	},

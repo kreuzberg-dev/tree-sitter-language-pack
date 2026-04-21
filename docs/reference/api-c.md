@@ -67,7 +67,7 @@ Returns `NULL` if the extension is unambiguous or unrecognized.
 **Signature:**
 
 ```c
-TsPackStaticstrStaticStaticstr* ts_pack_extension_ambiguity(const char* ext);
+void** ts_pack_extension_ambiguity(const char* ext);
 ```
 
 **Parameters:**
@@ -76,7 +76,7 @@ TsPackStaticstrStaticStaticstr* ts_pack_extension_ambiguity(const char* ext);
 |------|------|----------|-------------|
 | `ext` | `const char*` | Yes | The ext |
 
-**Returns:** `TsPackStaticstrStaticStaticstr*`
+**Returns:** `void**`
 
 
 ---
@@ -665,7 +665,7 @@ exceeds that limit).
 **Signature:**
 
 ```c
-TsPackUsizeUsize* ts_pack_split_code(const char* source, TsPackTree tree, uintptr_t max_chunk_size);
+void** ts_pack_split_code(const char* source, TsPackTree tree, uintptr_t max_chunk_size);
 ```
 
 **Parameters:**
@@ -676,7 +676,7 @@ TsPackUsizeUsize* ts_pack_split_code(const char* source, TsPackTree tree, uintpt
 | `tree` | `TsPackTree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
 | `max_chunk_size` | `uintptr_t` | Yes | Maximum size in bytes for each chunk. |
 
-**Returns:** `TsPackUsizeUsize*`
+**Returns:** `void**`
 
 
 ---
@@ -1431,7 +1431,7 @@ Defines a single extraction pattern and its configuration.
 | `capture_output` | `TsPackCaptureOutput` | `TS_PACK_TS_PACK_FULL` | What to include in each capture result. |
 | `child_fields` | `const char**` | `NULL` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `max_results` | `uintptr_t*` | `NULL` | Maximum number of matches to return. `None` means unlimited. |
-| `byte_range` | `TsPackUsizeUsize*` | `NULL` | Restrict matches to a byte range `(start, end)`. |
+| `byte_range` | `void**` | `NULL` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1893,7 +1893,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `pattern_index` | `uintptr_t` | — | The pattern index that matched (position in the query string). |
-| `captures` | `TsPackCowStaticStrNodeInfo*` | `NULL` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `void**` | `NULL` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---

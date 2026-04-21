@@ -3,6 +3,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * A chunk of source code with rich metadata.
+ */
 public record CodeChunk(
     String content,
     @JsonProperty("start_byte") long startByte,

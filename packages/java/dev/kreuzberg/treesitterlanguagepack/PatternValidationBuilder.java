@@ -3,6 +3,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import java.util.List;
 
+/**
+ * Validation information for a single pattern.
+ */
 public class PatternValidationBuilder {
 
     private boolean valid = false;

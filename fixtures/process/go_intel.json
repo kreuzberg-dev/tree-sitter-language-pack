@@ -2,9 +2,7 @@
 	"id": "go_function_process",
 	"description": "Intel: extract structure from Go function definition",
 	"category": "process",
-	"tags": [
-		"intel"
-	],
+	"tags": ["intel"],
 	"skip": {
 		"reason": "Requires go language"
 	},

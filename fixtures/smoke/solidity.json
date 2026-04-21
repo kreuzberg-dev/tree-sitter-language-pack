@@ -2,9 +2,7 @@
 	"id": "smoke_solidity",
 	"description": "Smoke test: load solidity and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "solidity",

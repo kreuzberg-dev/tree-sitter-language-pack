@@ -2,6 +2,9 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 
+/**
+ * An export statement extracted from source code.
+ */
 public record ExportInfo(String name, ExportKind kind, Span span) {
     public static ExportInfoBuilder builder() {
         return new ExportInfoBuilder();

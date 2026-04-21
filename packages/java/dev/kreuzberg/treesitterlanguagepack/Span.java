@@ -3,6 +3,12 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Byte and line/column range in source code.
+ *
+ * Represents both byte offsets (for slicing) and human-readable line/column
+ * positions (for display and diagnostics).
+ */
 public record Span(
     @JsonProperty("start_byte") long startByte,
     @JsonProperty("end_byte") long endByte,

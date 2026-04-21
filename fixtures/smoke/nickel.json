@@ -2,9 +2,7 @@
 	"id": "smoke_nickel",
 	"description": "Smoke test: load nickel and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "nickel",

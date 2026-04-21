@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * A structural item (function, class, struct, etc.) in source code.
+ */
 public record StructureItem(
     Object kind,
     Optional<String> name,

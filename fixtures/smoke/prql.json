@@ -2,9 +2,7 @@
 	"id": "smoke_prql",
 	"description": "Smoke test: load prql and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "prql",

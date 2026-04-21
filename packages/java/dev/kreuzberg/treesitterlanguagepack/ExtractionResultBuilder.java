@@ -2,6 +2,9 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 
+/**
+ * Complete extraction results for all patterns.
+ */
 public class ExtractionResultBuilder {
 
     private String language = "";

@@ -2,9 +2,7 @@
 	"id": "smoke_souffle",
 	"description": "Smoke test: load souffle and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "souffle",

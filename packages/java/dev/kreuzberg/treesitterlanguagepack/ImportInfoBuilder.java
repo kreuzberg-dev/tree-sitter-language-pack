@@ -4,6 +4,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * An import statement extracted from source code.
+ */
 public class ImportInfoBuilder {
 
     private String source = "";

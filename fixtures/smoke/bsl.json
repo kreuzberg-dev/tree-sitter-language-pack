@@ -2,9 +2,7 @@
 	"id": "smoke_bsl",
 	"description": "Smoke test: load bsl and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "bsl",

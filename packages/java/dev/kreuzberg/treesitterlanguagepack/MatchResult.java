@@ -4,8 +4,13 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * A single query match containing one or more captures.
+ */
 public record MatchResult(
+    /** The pattern index within the query that produced this match. */
     @JsonProperty("pattern_index") long patternIndex,
+    /** The captures for this match. */
     List<CaptureResult> captures
 ) {
     public static MatchResultBuilder builder() {

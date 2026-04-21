@@ -4,6 +4,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * A structural item (function, class, struct, etc.) in source code.
+ */
 public class StructureItemBuilder {
 
     private StructureKind kind = null;

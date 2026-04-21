@@ -67,7 +67,7 @@ Returns `null` if the extension is unambiguous or unrecognized.
 **Signature:**
 
 ```java
-public static Optional<StaticstrStaticStaticstr> extensionAmbiguity(String ext)
+public static Optional<Tuple<String, List<String>>> extensionAmbiguity(String ext)
 ```
 
 **Parameters:**
@@ -76,7 +76,7 @@ public static Optional<StaticstrStaticStaticstr> extensionAmbiguity(String ext)
 |------|------|----------|-------------|
 | `ext` | `String` | Yes | The ext |
 
-**Returns:** `Optional<StaticstrStaticStaticstr>`
+**Returns:** `Optional<Tuple<String, List<String>>>`
 
 
 ---
@@ -665,7 +665,7 @@ exceeds that limit).
 **Signature:**
 
 ```java
-public static List<UsizeUsize> splitCode(String source, Tree tree, long maxChunkSize)
+public static List<Tuple<long, long>> splitCode(String source, Tree tree, long maxChunkSize)
 ```
 
 **Parameters:**
@@ -676,7 +676,7 @@ public static List<UsizeUsize> splitCode(String source, Tree tree, long maxChunk
 | `tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
 | `maxChunkSize` | `long` | Yes | Maximum size in bytes for each chunk. |
 
-**Returns:** `List<UsizeUsize>`
+**Returns:** `List<Tuple<long, long>>`
 
 
 ---
@@ -1431,7 +1431,7 @@ Defines a single extraction pattern and its configuration.
 | `captureOutput` | `CaptureOutput` | `CaptureOutput.FULL` | What to include in each capture result. |
 | `childFields` | `List<String>` | `Collections.emptyList()` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `maxResults` | `Optional<long>` | `null` | Maximum number of matches to return. `None` means unlimited. |
-| `byteRange` | `Optional<UsizeUsize>` | `null` | Restrict matches to a byte range `(start, end)`. |
+| `byteRange` | `Optional<Tuple<long, long>>` | `null` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1893,7 +1893,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `patternIndex` | `long` | — | The pattern index that matched (position in the query string). |
-| `captures` | `List<CowStaticStrNodeInfo>` | `Collections.emptyList()` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `List<Tuple<CowStatic, Str, NodeInfo>>` | `Collections.emptyList()` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---

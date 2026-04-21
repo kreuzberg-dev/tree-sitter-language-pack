@@ -2,9 +2,7 @@
 	"id": "python_function_process",
 	"description": "Intel: extract structure from Python function definition",
 	"category": "process",
-	"tags": [
-		"intel"
-	],
+	"tags": ["intel"],
 	"skip": {
 		"reason": "Requires python language"
 	},

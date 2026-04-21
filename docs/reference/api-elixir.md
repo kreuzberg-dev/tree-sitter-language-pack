@@ -79,7 +79,7 @@ def extension_ambiguity(ext)
 |------|------|----------|-------------|
 | `ext` | `String.t()` | Yes | The ext |
 
-**Returns:** `StaticstrStaticStaticstr | nil`
+**Returns:** `{String.t(), list(String.t())} | nil`
 
 
 ---
@@ -702,7 +702,7 @@ def split_code(source, tree, max_chunk_size)
 | `tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
 | `max_chunk_size` | `integer()` | Yes | Maximum size in bytes for each chunk. |
 
-**Returns:** `list(UsizeUsize)`
+**Returns:** `list({integer(), integer()})`
 
 
 ---
@@ -1472,7 +1472,7 @@ Defines a single extraction pattern and its configuration.
 | `capture_output` | `CaptureOutput` | `:full` | What to include in each capture result. |
 | `child_fields` | `list(String.t())` | `[]` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `max_results` | `integer() | nil` | `nil` | Maximum number of matches to return. `None` means unlimited. |
-| `byte_range` | `UsizeUsize | nil` | `nil` | Restrict matches to a byte range `(start, end)`. |
+| `byte_range` | `{integer(), integer()} | nil` | `nil` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1934,7 +1934,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `pattern_index` | `integer()` | — | The pattern index that matched (position in the query string). |
-| `captures` | `list(CowStaticStrNodeInfo)` | `[]` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `list({CowStatic, Str, NodeInfo})` | `[]` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---

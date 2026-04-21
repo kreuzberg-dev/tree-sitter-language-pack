@@ -4,9 +4,15 @@ package dev.kreuzberg.treesitterlanguagepack;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Controls what data is captured for each query match.
+ */
 public enum CaptureOutput {
+    /** Capture only the matched text. */
     Text("text"),
+    /** Capture only the {@code NodeInfo}. */
     Node("node"),
+    /** Capture both text and {@code NodeInfo} (default). */
     Full("full");
 
     private final String value;

@@ -4756,11 +4756,11 @@ pub unsafe extern "C" fn ts_pack_download_manager_clean_cache(
     }
 }
 
-/// Free a `Parser` handle.
+/// Free a `Language` handle.
 /// # Safety
 /// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_parser_free(ptr: *mut tree_sitter_language_pack::Parser) {
+pub unsafe extern "C" fn ts_pack_language_free(ptr: *mut tree_sitter_language_pack::Language) {
     if !ptr.is_null() {
         unsafe {
             drop(Box::from_raw(ptr));
@@ -4768,11 +4768,11 @@ pub unsafe extern "C" fn ts_pack_parser_free(ptr: *mut tree_sitter_language_pack
     }
 }
 
-/// Free a `Language` handle.
+/// Free a `Parser` handle.
 /// # Safety
 /// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_language_free(ptr: *mut tree_sitter_language_pack::Language) {
+pub unsafe extern "C" fn ts_pack_parser_free(ptr: *mut tree_sitter_language_pack::Parser) {
     if !ptr.is_null() {
         unsafe {
             drop(Box::from_raw(ptr));

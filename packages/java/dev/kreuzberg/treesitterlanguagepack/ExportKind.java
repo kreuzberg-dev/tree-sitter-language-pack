@@ -4,6 +4,11 @@ package dev.kreuzberg.treesitterlanguagepack;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * The kind of an export statement found in source code.
+ *
+ * Covers named exports, default exports, and re-exports from other modules.
+ */
 public enum ExportKind {
     Named("named"),
     Default("default"),

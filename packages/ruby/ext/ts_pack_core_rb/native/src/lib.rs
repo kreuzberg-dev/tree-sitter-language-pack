@@ -2009,24 +2009,6 @@ impl DownloadManager {
 }
 
 #[derive(Clone)]
-#[magnus::wrap(class = "TreeSitterLanguagePack::Parser")]
-pub struct Parser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
-}
-
-unsafe impl IntoValueFromNative for Parser {}
-
-impl magnus::TryConvert for Parser {
-    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Parser = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
-    }
-}
-unsafe impl TryConvertOwned for Parser {}
-
-impl Parser {}
-
-#[derive(Clone)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::Language")]
 pub struct Language {
     inner: Arc<tree_sitter_language_pack::Language>,
@@ -2043,6 +2025,24 @@ impl magnus::TryConvert for Language {
 unsafe impl TryConvertOwned for Language {}
 
 impl Language {}
+
+#[derive(Clone)]
+#[magnus::wrap(class = "TreeSitterLanguagePack::Parser")]
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
+}
+
+unsafe impl IntoValueFromNative for Parser {}
+
+impl magnus::TryConvert for Parser {
+    fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
+        let r: &Parser = magnus::TryConvert::try_convert(val)?;
+        Ok(r.clone())
+    }
+}
+unsafe impl TryConvertOwned for Parser {}
+
+impl Parser {}
 
 #[derive(Clone)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::Tree")]
@@ -2576,7 +2576,7 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {
             capture_output: val.capture_output.into(),
             child_fields: val.child_fields,
             max_results: val.max_results,
-            byte_range: val.byte_range.as_ref().map(|v| format!("{:?}", v)),
+            byte_range: val.byte_range.as_ref().map(|v| format!("{v:?}")),
         }
     }
 }
@@ -3098,7 +3098,7 @@ impl From<tree_sitter_language_pack::ProcessConfig> for ProcessConfig {
             symbols: val.symbols,
             diagnostics: val.diagnostics,
             chunk_max_size: val.chunk_max_size,
-            extractions: val.extractions.as_ref().map(|v| format!("{:?}", v)),
+            extractions: val.extractions.as_ref().map(|v| format!("{v:?}")),
         }
     }
 }
@@ -3116,7 +3116,7 @@ impl From<tree_sitter_language_pack::QueryMatch> for QueryMatch {
     fn from(val: tree_sitter_language_pack::QueryMatch) -> Self {
         Self {
             pattern_index: val.pattern_index,
-            captures: val.captures.iter().map(|i| format!("{:?}", i)).collect(),
+            captures: val.captures.iter().map(|i| i.to_string()).collect(),
         }
     }
 }
@@ -3597,9 +3597,9 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_method("fetch_manifest", method!(DownloadManager::fetch_manifest, 0))?;
     class.define_method("clean_cache", method!(DownloadManager::clean_cache, 0))?;
 
-    let _class = module.define_class("Parser", ruby.class_object())?;
-
     let _class = module.define_class("Language", ruby.class_object())?;
+
+    let _class = module.define_class("Parser", ruby.class_object())?;
 
     let _class = module.define_class("Tree", ruby.class_object())?;
 

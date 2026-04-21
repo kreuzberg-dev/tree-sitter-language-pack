@@ -4,6 +4,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Metadata for a single chunk of source code.
+ */
 public record ChunkContext(
     String language,
     @JsonProperty("chunk_index") long chunkIndex,

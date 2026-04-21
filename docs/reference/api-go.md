@@ -67,7 +67,7 @@ Returns `nil` if the extension is unambiguous or unrecognized.
 **Signature:**
 
 ```go
-func ExtensionAmbiguity(ext string) *StaticstrStaticStaticstr
+func ExtensionAmbiguity(ext string) *(string, []string)
 ```
 
 **Parameters:**
@@ -76,7 +76,7 @@ func ExtensionAmbiguity(ext string) *StaticstrStaticStaticstr
 |------|------|----------|-------------|
 | `Ext` | `string` | Yes | The ext |
 
-**Returns:** `*StaticstrStaticStaticstr`
+**Returns:** `*(string, []string)`
 
 
 ---
@@ -665,7 +665,7 @@ exceeds that limit).
 **Signature:**
 
 ```go
-func SplitCode(source string, tree Tree, maxChunkSize int) []UsizeUsize
+func SplitCode(source string, tree Tree, maxChunkSize int) [](int, int)
 ```
 
 **Parameters:**
@@ -676,7 +676,7 @@ func SplitCode(source string, tree Tree, maxChunkSize int) []UsizeUsize
 | `Tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
 | `MaxChunkSize` | `int` | Yes | Maximum size in bytes for each chunk. |
 
-**Returns:** `[]UsizeUsize`
+**Returns:** `[](int, int)`
 
 
 ---
@@ -1431,7 +1431,7 @@ Defines a single extraction pattern and its configuration.
 | `CaptureOutput` | `CaptureOutput` | `CaptureOutput.Full` | What to include in each capture result. |
 | `ChildFields` | `[]string` | `nil` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `MaxResults` | `*int` | `nil` | Maximum number of matches to return. `None` means unlimited. |
-| `ByteRange` | `*UsizeUsize` | `nil` | Restrict matches to a byte range `(start, end)`. |
+| `ByteRange` | `*(int, int)` | `nil` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1893,7 +1893,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `PatternIndex` | `int` | — | The pattern index that matched (position in the query string). |
-| `Captures` | `[]CowStaticStrNodeInfo` | `nil` | Captures: list of (capture_name, node_info) pairs. |
+| `Captures` | `[](CowStatic, Str, NodeInfo)` | `nil` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---

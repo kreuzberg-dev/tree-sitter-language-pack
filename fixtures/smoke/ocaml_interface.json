@@ -2,9 +2,7 @@
 	"id": "smoke_ocaml_interface",
 	"description": "Smoke test: load ocaml_interface and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "ocaml_interface",

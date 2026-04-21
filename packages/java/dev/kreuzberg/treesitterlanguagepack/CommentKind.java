@@ -4,6 +4,12 @@ package dev.kreuzberg.treesitterlanguagepack;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * The kind of a comment found in source code.
+ *
+ * Distinguishes between single-line comments, block (multi-line) comments,
+ * and documentation comments.
+ */
 public enum CommentKind {
     Line("line"),
     Block("block"),

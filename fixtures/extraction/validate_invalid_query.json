@@ -2,11 +2,7 @@
 	"id": "validate_extraction_invalid_query",
 	"description": "Invalid query syntax fails validation",
 	"category": "extraction",
-	"tags": [
-		"extraction",
-		"validation",
-		"error"
-	],
+	"tags": ["extraction", "validation", "error"],
 	"call": "validate",
 	"input": {
 		"config": {
@@ -25,9 +21,7 @@
 		}
 	],
 	"skip": {
-		"languages": [
-			"rust"
-		],
+		"languages": ["rust"],
 		"reason": "Rust e2e generator does not yet support this pattern"
 	}
 }

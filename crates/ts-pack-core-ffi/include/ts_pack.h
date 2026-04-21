@@ -1887,18 +1887,18 @@ TS_PACKParserManifest *ts_pack_download_manager_fetch_manifest(const TS_PACKDown
 int32_t ts_pack_download_manager_clean_cache(const TS_PACKDownloadManager *this_);
 
 /**
- * Free a `Parser` handle.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void ts_pack_parser_free(TS_PACKParser *ptr);
-
-/**
  * Free a `Language` handle.
  * # Safety
  * Pointer must have been returned by this library, or be null.
  */
 void ts_pack_language_free(TS_PACKLanguage *ptr);
+
+/**
+ * Free a `Parser` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_parser_free(TS_PACKParser *ptr);
 
 /**
  * Free a `Tree` handle.

@@ -2,9 +2,7 @@
 	"id": "registry_has_language_false",
 	"description": "has_language('nonexistent') should return false",
 	"category": "registry",
-	"tags": [
-		"registry"
-	],
+	"tags": ["registry"],
 	"call": "has_language",
 	"input": {
 		"language": "nonexistent"
@@ -15,9 +13,7 @@
 		}
 	],
 	"skip": {
-		"languages": [
-			"rust"
-		],
+		"languages": ["rust"],
 		"reason": "Rust e2e generator does not yet support this pattern"
 	}
 }

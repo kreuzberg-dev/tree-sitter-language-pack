@@ -2,10 +2,7 @@
 	"id": "python_chunking_process_detail",
 	"description": "Intel: chunk multi-function Python source into multiple pieces",
 	"category": "process",
-	"tags": [
-		"metadata",
-		"chunking"
-	],
+	"tags": ["metadata", "chunking"],
 	"skip": {
 		"reason": "Requires python language"
 	},

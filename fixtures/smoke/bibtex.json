@@ -2,9 +2,7 @@
 	"id": "smoke_bibtex",
 	"description": "Smoke test: load bibtex and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "bibtex",

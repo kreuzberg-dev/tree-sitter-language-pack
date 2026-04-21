@@ -2,9 +2,7 @@
 	"id": "smoke_postscript",
 	"description": "Smoke test: load postscript and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "postscript",

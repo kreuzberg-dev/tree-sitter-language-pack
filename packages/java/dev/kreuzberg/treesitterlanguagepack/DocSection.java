@@ -3,6 +3,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import java.util.Optional;
 
+/**
+ * A section within a docstring (e.g., Args, Returns, Raises).
+ */
 public record DocSection(String kind, Optional<String> name, String description) {
     public static DocSectionBuilder builder() {
         return new DocSectionBuilder();

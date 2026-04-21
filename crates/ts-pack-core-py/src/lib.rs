@@ -1299,14 +1299,14 @@ impl DownloadManager {
 
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
-pub struct Parser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
+pub struct Language {
+    inner: Arc<tree_sitter_language_pack::Language>,
 }
 
 #[derive(Clone)]
 #[pyclass(frozen, from_py_object)]
-pub struct Language {
-    inner: Arc<tree_sitter_language_pack::Language>,
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
 }
 
 #[derive(Clone)]
@@ -1326,7 +1326,6 @@ pub enum CaptureOutput {
 
 #[derive(Clone)]
 #[pyclass(frozen)]
-#[derive(Default)]
 pub struct StructureKind {
     pub(crate) inner: tree_sitter_language_pack::StructureKind,
 }
@@ -1361,6 +1360,13 @@ impl serde::Serialize for StructureKind {
     }
 }
 
+impl Default for StructureKind {
+    fn default() -> Self {
+        Self {
+            inner: Default::default(),
+        }
+    }
+}
 
 impl<'de> serde::Deserialize<'de> for StructureKind {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
@@ -1380,7 +1386,6 @@ pub enum CommentKind {
 
 #[derive(Clone)]
 #[pyclass(frozen)]
-#[derive(Default)]
 pub struct DocstringFormat {
     pub(crate) inner: tree_sitter_language_pack::DocstringFormat,
 }
@@ -1415,6 +1420,13 @@ impl serde::Serialize for DocstringFormat {
     }
 }
 
+impl Default for DocstringFormat {
+    fn default() -> Self {
+        Self {
+            inner: Default::default(),
+        }
+    }
+}
 
 impl<'de> serde::Deserialize<'de> for DocstringFormat {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
@@ -1434,7 +1446,6 @@ pub enum ExportKind {
 
 #[derive(Clone)]
 #[pyclass(frozen)]
-#[derive(Default)]
 pub struct SymbolKind {
     pub(crate) inner: tree_sitter_language_pack::SymbolKind,
 }
@@ -1469,6 +1480,13 @@ impl serde::Serialize for SymbolKind {
     }
 }
 
+impl Default for SymbolKind {
+    fn default() -> Self {
+        Self {
+            inner: Default::default(),
+        }
+    }
+}
 
 impl<'de> serde::Deserialize<'de> for SymbolKind {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
@@ -1520,7 +1538,7 @@ pub fn validate_extraction(config: ExtractionConfig) -> PyResult<ValidationResul
     let config_core: tree_sitter_language_pack::ExtractionConfig =
         serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
     tree_sitter_language_pack::extract::validate_extraction(&config_core)
-        .map(ValidationResult::from)
+        .map(|val| ValidationResult::from(val))
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
@@ -1533,7 +1551,7 @@ pub fn process(source: String, config: ProcessConfig, registry: LanguageRegistry
     let config_core: tree_sitter_language_pack::ProcessConfig =
         serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
     tree_sitter_language_pack::intel::process(&source, &config_core, &registry.inner)
-        .map(ProcessResult::from)
+        .map(|val| ProcessResult::from(val))
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
@@ -1585,7 +1603,7 @@ pub fn tree_has_error_nodes(tree: Tree) -> bool {
 #[pyfunction]
 #[pyo3(signature = (tree))]
 pub fn tree_to_sexp(tree: Tree) -> String {
-    tree_sitter_language_pack::tree_to_sexp(&tree.inner)
+    tree_sitter_language_pack::tree_to_sexp(&tree.inner).into()
 }
 
 #[pyfunction]
@@ -1650,7 +1668,9 @@ pub fn get_parser(name: String) -> PyResult<Parser> {
 #[pyo3(signature = ())]
 pub fn available_languages() -> Vec<String> {
     tree_sitter_language_pack::available_languages()
-        .into_iter().collect()
+        .into_iter()
+        .map(Into::into)
+        .collect()
 }
 
 #[pyfunction]
@@ -1674,7 +1694,7 @@ pub fn extract_patterns(source: String, config: ExtractionConfig) -> PyResult<Ex
     let config_core: tree_sitter_language_pack::ExtractionConfig =
         serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
     tree_sitter_language_pack::extract_patterns(&source, &config_core)
-        .map(ExtractionResult::from)
+        .map(|val| ExtractionResult::from(val))
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
@@ -1725,7 +1745,7 @@ pub fn download_all() -> PyResult<usize> {
 #[pyo3(signature = ())]
 pub fn manifest_languages() -> PyResult<Vec<String>> {
     tree_sitter_language_pack::manifest_languages()
-        .map(|val| val.into_iter().collect())
+        .map(|val| val.into_iter().map(Into::into).collect())
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
@@ -1733,7 +1753,9 @@ pub fn manifest_languages() -> PyResult<Vec<String>> {
 #[pyo3(signature = ())]
 pub fn downloaded_languages() -> Vec<String> {
     tree_sitter_language_pack::downloaded_languages()
-        .into_iter().collect()
+        .into_iter()
+        .map(Into::into)
+        .collect()
 }
 
 #[allow(clippy::missing_errors_doc)]
@@ -1791,7 +1813,7 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {
             capture_output: val.capture_output.into(),
             child_fields: val.child_fields,
             max_results: val.max_results,
-            byte_range: val.byte_range.as_ref().map(|v| format!("{:?}", v)),
+            byte_range: val.byte_range.as_ref().map(|v| format!("{v:?}")),
         }
     }
 }
@@ -2313,7 +2335,7 @@ impl From<tree_sitter_language_pack::ProcessConfig> for ProcessConfig {
             symbols: val.symbols,
             diagnostics: val.diagnostics,
             chunk_max_size: val.chunk_max_size,
-            extractions: val.extractions.as_ref().map(|v| format!("{:?}", v)),
+            extractions: val.extractions.as_ref().map(|v| format!("{v:?}")),
         }
     }
 }
@@ -2331,7 +2353,7 @@ impl From<tree_sitter_language_pack::QueryMatch> for QueryMatch {
     fn from(val: tree_sitter_language_pack::QueryMatch) -> Self {
         Self {
             pattern_index: val.pattern_index,
-            captures: val.captures.iter().map(|i| format!("{:?}", i)).collect(),
+            captures: val.captures.iter().map(|(name, info)| format!("{}:{:?}", name, info)).collect(),
         }
     }
 }
@@ -2498,8 +2520,8 @@ pub fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PlatformBundle>()?;
     m.add_class::<LanguageInfo>()?;
     m.add_class::<DownloadManager>()?;
-    m.add_class::<Parser>()?;
     m.add_class::<Language>()?;
+    m.add_class::<Parser>()?;
     m.add_class::<Tree>()?;
     m.add_class::<CaptureOutput>()?;
     m.add_class::<StructureKind>()?;

@@ -2,9 +2,7 @@
 	"id": "smoke_kconfig",
 	"description": "Smoke test: load kconfig and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "kconfig",

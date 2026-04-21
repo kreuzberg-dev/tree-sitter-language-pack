@@ -2,10 +2,7 @@
 	"id": "python_class_with_methods_process_detail",
 	"description": "Intel: extract nested structure from Python class with methods",
 	"category": "process",
-	"tags": [
-		"metadata",
-		"nested"
-	],
+	"tags": ["metadata", "nested"],
 	"skip": {
 		"reason": "Requires python language"
 	},

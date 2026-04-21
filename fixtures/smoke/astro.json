@@ -2,9 +2,7 @@
 	"id": "smoke_astro",
 	"description": "Smoke test: load astro and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "astro",

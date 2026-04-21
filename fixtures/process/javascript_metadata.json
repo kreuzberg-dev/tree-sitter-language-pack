@@ -2,10 +2,7 @@
 	"id": "javascript_multi_import_process_detail",
 	"description": "Intel: detect multiple imports and function in JavaScript",
 	"category": "process",
-	"tags": [
-		"metadata",
-		"imports"
-	],
+	"tags": ["metadata", "imports"],
 	"skip": {
 		"reason": "Requires javascript language"
 	},

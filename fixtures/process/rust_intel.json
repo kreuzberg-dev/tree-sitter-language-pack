@@ -2,9 +2,7 @@
 	"id": "rust_function_process",
 	"description": "Intel: extract structure from Rust function definition",
 	"category": "process",
-	"tags": [
-		"intel"
-	],
+	"tags": ["intel"],
 	"skip": {
 		"reason": "Requires rust language"
 	},

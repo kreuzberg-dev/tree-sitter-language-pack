@@ -2,9 +2,7 @@
 	"id": "smoke_devicetree",
 	"description": "Smoke test: load devicetree and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "devicetree",

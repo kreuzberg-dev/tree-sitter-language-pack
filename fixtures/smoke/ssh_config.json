@@ -2,9 +2,7 @@
 	"id": "smoke_ssh_config",
 	"description": "Smoke test: load ssh_config and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "ssh_config",

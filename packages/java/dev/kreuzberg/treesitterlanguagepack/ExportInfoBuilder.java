@@ -2,6 +2,9 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 
+/**
+ * An export statement extracted from source code.
+ */
 public class ExportInfoBuilder {
 
     private String name = "";

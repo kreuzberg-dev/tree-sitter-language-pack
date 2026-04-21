@@ -2,9 +2,7 @@
 	"id": "smoke_textproto",
 	"description": "Smoke test: load textproto and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "textproto",

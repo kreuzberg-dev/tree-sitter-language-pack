@@ -2,6 +2,12 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 
+/**
+ * Byte and line/column range in source code.
+ *
+ * Represents both byte offsets (for slicing) and human-readable line/column
+ * positions (for display and diagnostics).
+ */
 public class SpanBuilder {
 
     private long startByte = 0;

@@ -3,6 +3,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import java.util.List;
 
+/**
+ * Metadata for a single chunk of source code.
+ */
 public class ChunkContextBuilder {
 
     private String language = "";

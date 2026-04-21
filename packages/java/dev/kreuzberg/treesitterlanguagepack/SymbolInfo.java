@@ -4,6 +4,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.Optional;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * A symbol (variable, function, type, etc.) extracted from source code.
+ */
 public record SymbolInfo(
     String name,
     Object kind,

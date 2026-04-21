@@ -67,7 +67,7 @@ Returns `null` if the extension is unambiguous or unrecognized.
 **Signature:**
 
 ```php
-public static function extensionAmbiguity(string $ext): ?StaticstrStaticStaticstr
+public static function extensionAmbiguity(string $ext): ?array{string, array<string>}
 ```
 
 **Parameters:**
@@ -76,7 +76,7 @@ public static function extensionAmbiguity(string $ext): ?StaticstrStaticStaticst
 |------|------|----------|-------------|
 | `ext` | `string` | Yes | The ext |
 
-**Returns:** `?StaticstrStaticStaticstr`
+**Returns:** `?array{string, array<string>}`
 
 
 ---
@@ -665,7 +665,7 @@ exceeds that limit).
 **Signature:**
 
 ```php
-public static function splitCode(string $source, Tree $tree, int $maxChunkSize): array<UsizeUsize>
+public static function splitCode(string $source, Tree $tree, int $maxChunkSize): array<array{int, int}>
 ```
 
 **Parameters:**
@@ -676,7 +676,7 @@ public static function splitCode(string $source, Tree $tree, int $maxChunkSize):
 | `tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
 | `maxChunkSize` | `int` | Yes | Maximum size in bytes for each chunk. |
 
-**Returns:** `array<UsizeUsize>`
+**Returns:** `array<array{int, int}>`
 
 
 ---
@@ -1431,7 +1431,7 @@ Defines a single extraction pattern and its configuration.
 | `captureOutput` | `CaptureOutput` | `CaptureOutput::Full` | What to include in each capture result. |
 | `childFields` | `array<string>` | `[]` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `maxResults` | `?int` | `null` | Maximum number of matches to return. `None` means unlimited. |
-| `byteRange` | `?UsizeUsize` | `null` | Restrict matches to a byte range `(start, end)`. |
+| `byteRange` | `?array{int, int}` | `null` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1893,7 +1893,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `patternIndex` | `int` | — | The pattern index that matched (position in the query string). |
-| `captures` | `array<CowStaticStrNodeInfo>` | `[]` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `array<array{CowStatic, Str, NodeInfo}>` | `[]` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---

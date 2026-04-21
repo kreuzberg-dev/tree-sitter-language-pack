@@ -4,6 +4,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * A docstring extracted from source code.
+ */
 public class DocstringInfoBuilder {
 
     private String text = "";

@@ -2,9 +2,7 @@
 	"id": "smoke_pascal",
 	"description": "Smoke test: load pascal and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "pascal",

@@ -2,6 +2,9 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 
+/**
+ * A chunk of source code with rich metadata.
+ */
 public class CodeChunkBuilder {
 
     private String content = "";

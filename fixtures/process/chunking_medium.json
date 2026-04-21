@@ -2,10 +2,7 @@
 	"id": "python_chunking_medium",
 	"description": "Intel: Python code with medium chunk size",
 	"category": "process",
-	"tags": [
-		"intel",
-		"chunking"
-	],
+	"tags": ["intel", "chunking"],
 	"skip": {
 		"reason": "Requires python language"
 	},

@@ -2,9 +2,7 @@
 	"id": "smoke_gdshader",
 	"description": "Smoke test: load gdshader and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "gdshader",

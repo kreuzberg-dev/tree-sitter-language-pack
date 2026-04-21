@@ -4,11 +4,19 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.Optional;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * A single captured node within a match.
+ */
 public record CaptureResult(
+    /** The capture name from the query (e.g., {@code "fn_name"}). */
     String name,
+    /** The {@code NodeInfo} snapshot, present when {@code CaptureOutput} is {@code Node} or {@code Full}. */
     Optional<NodeInfo> node,
+    /** The matched source text, present when {@code CaptureOutput} is {@code Text} or {@code Full}. */
     Optional<String> text,
+    /** Values of requested child fields, keyed by field name. */
     @JsonProperty("child_fields") String childFields,
+    /** Byte offset where this capture starts in the source. */
     @JsonProperty("start_byte") long startByte
 ) {
     public static CaptureResultBuilder builder() {

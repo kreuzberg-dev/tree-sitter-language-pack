@@ -330,7 +330,7 @@ pub struct JsLanguageRegistry {
 #[napi]
 impl JsLanguageRegistry {
     #[napi(js_name = "addExtraLibsDir")]
-    pub fn add_extra_libs_dir(&self, dir: String) {
+    pub fn add_extra_libs_dir(&self, dir: String) -> () {
         self.inner.add_extra_libs_dir(std::path::PathBuf::from(dir))
     }
 
@@ -504,21 +504,21 @@ impl JsDownloadManager {
 
 #[derive(Clone)]
 #[napi]
-pub struct JsParser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
-}
-
-#[napi]
-impl JsParser {}
-
-#[derive(Clone)]
-#[napi]
 pub struct JsLanguage {
     inner: Arc<tree_sitter_language_pack::Language>,
 }
 
 #[napi]
 impl JsLanguage {}
+
+#[derive(Clone)]
+#[napi]
+pub struct JsParser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
+}
+
+#[napi]
+impl JsParser {}
 
 #[derive(Clone)]
 #[napi]
@@ -891,7 +891,7 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for JsExtractionPattern 
             capture_output: Some(val.capture_output.into()),
             child_fields: Some(val.child_fields),
             max_results: val.max_results.map(|v| v as i64),
-            byte_range: val.byte_range.as_ref().map(|v| format!("{:?}", v)),
+            byte_range: val.byte_range.as_ref().map(|v| format!("{v:?}")),
         }
     }
 }
@@ -1449,7 +1449,7 @@ impl From<tree_sitter_language_pack::ProcessConfig> for JsProcessConfig {
             symbols: Some(val.symbols),
             diagnostics: Some(val.diagnostics),
             chunk_max_size: val.chunk_max_size.map(|v| v as i64),
-            extractions: val.extractions.as_ref().map(|v| format!("{:?}", v)),
+            extractions: val.extractions.as_ref().map(|v| format!("{v:?}")),
         }
     }
 }
@@ -1467,7 +1467,7 @@ impl From<tree_sitter_language_pack::QueryMatch> for JsQueryMatch {
     fn from(val: tree_sitter_language_pack::QueryMatch) -> Self {
         Self {
             pattern_index: Some(val.pattern_index as i64),
-            captures: Some(val.captures.iter().map(|i| format!("{:?}", i)).collect()),
+            captures: Some(val.captures.iter().map(|(name, info)| format!("{}:{:?}", name, info)).collect()),
         }
     }
 }

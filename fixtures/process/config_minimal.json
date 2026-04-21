@@ -2,10 +2,7 @@
 	"id": "config_minimal_python",
 	"description": "Intel: process with minimal config - only metrics",
 	"category": "process",
-	"tags": [
-		"intel",
-		"config"
-	],
+	"tags": ["intel", "config"],
 	"skip": {
 		"reason": "Requires python language"
 	},

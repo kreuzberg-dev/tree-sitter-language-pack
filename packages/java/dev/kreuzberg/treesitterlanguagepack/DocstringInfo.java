@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * A docstring extracted from source code.
+ */
 public record DocstringInfo(
     String text,
     Object format,

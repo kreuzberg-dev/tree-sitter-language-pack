@@ -2,9 +2,7 @@
 	"id": "c_function_process",
 	"description": "Intel: C function with include",
 	"category": "process",
-	"tags": [
-		"intel"
-	],
+	"tags": ["intel"],
 	"skip": {
 		"reason": "Requires c language"
 	},

@@ -4,6 +4,25 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Configuration for the tree-sitter language pack.
+ *
+ * Controls cache directory and which languages to pre-download.
+ * Can be loaded from a TOML file, constructed programmatically,
+ * or passed as a dict/object from language bindings.
+ *
+ * # Example
+ *
+ * {@code }{@code no_run}
+ * use tree_sitter_language_pack::PackConfig;
+ *
+ * let config = PackConfig {
+ *     cache_dir: None,
+ *     languages: Some(vec!["python".to_string(), "rust".to_string()]),
+ *     groups: None,
+ * };
+ * {@code }{@code }
+ */
 public class PackConfigBuilder {
 
     private Optional<java.nio.file.Path> cacheDir = Optional.empty();

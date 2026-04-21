@@ -67,7 +67,7 @@ Returns `null` if the extension is unambiguous or unrecognized.
 **Signature:**
 
 ```csharp
-public static StaticstrStaticStaticstr? ExtensionAmbiguity(string ext)
+public static (string, List<string>)? ExtensionAmbiguity(string ext)
 ```
 
 **Parameters:**
@@ -76,7 +76,7 @@ public static StaticstrStaticStaticstr? ExtensionAmbiguity(string ext)
 |------|------|----------|-------------|
 | `Ext` | `string` | Yes | The ext |
 
-**Returns:** `StaticstrStaticStaticstr?`
+**Returns:** `(string, List<string>)?`
 
 
 ---
@@ -665,7 +665,7 @@ exceeds that limit).
 **Signature:**
 
 ```csharp
-public static List<UsizeUsize> SplitCode(string source, Tree tree, nuint maxChunkSize)
+public static List<(long, long)> SplitCode(string source, Tree tree, nuint maxChunkSize)
 ```
 
 **Parameters:**
@@ -676,7 +676,7 @@ public static List<UsizeUsize> SplitCode(string source, Tree tree, nuint maxChun
 | `Tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
 | `MaxChunkSize` | `nuint` | Yes | Maximum size in bytes for each chunk. |
 
-**Returns:** `List<UsizeUsize>`
+**Returns:** `List<(long, long)>`
 
 
 ---
@@ -1431,7 +1431,7 @@ Defines a single extraction pattern and its configuration.
 | `CaptureOutput` | `CaptureOutput` | `CaptureOutput.Full` | What to include in each capture result. |
 | `ChildFields` | `List<string>` | `new List<string>()` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `MaxResults` | `nuint?` | `null` | Maximum number of matches to return. `None` means unlimited. |
-| `ByteRange` | `UsizeUsize?` | `null` | Restrict matches to a byte range `(start, end)`. |
+| `ByteRange` | `(long, long)?` | `null` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1893,7 +1893,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `PatternIndex` | `nuint` | — | The pattern index that matched (position in the query string). |
-| `Captures` | `List<CowStaticStrNodeInfo>` | `new List<CowStaticStrNodeInfo>()` | Captures: list of (capture_name, node_info) pairs. |
+| `Captures` | `List<(CowStatic, Str, NodeInfo)>` | `new List<(CowStatic, Str, NodeInfo)>()` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---

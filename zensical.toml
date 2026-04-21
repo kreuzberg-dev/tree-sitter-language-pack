@@ -26,18 +26,20 @@ nav = [
         { "Extraction Queries" = "guides/extraction.md" },
     ] },
     { "API Reference" = [
-        { "Python" = "api/python.md" },
-        { "TypeScript / Node.js" = "api/typescript.md" },
-        { "Rust" = "api/rust.md" },
-        { "Go" = "api/go.md" },
-        { "Java" = "api/java.md" },
-        { "C# / .NET" = "api/csharp.md" },
-        { "Ruby" = "api/ruby.md" },
-        { "Elixir" = "api/elixir.md" },
-        { "PHP" = "api/php.md" },
-        { "WebAssembly" = "api/wasm.md" },
-        { "C / FFI" = "api/c-ffi.md" },
-        { "CLI" = "api/cli.md" },
+        { "Python" = "reference/api-python.md" },
+        { "TypeScript / Node.js" = "reference/api-typescript.md" },
+        { "Rust" = "reference/api-rust.md" },
+        { "Go" = "reference/api-go.md" },
+        { "Java" = "reference/api-java.md" },
+        { "C# / .NET" = "reference/api-csharp.md" },
+        { "Ruby" = "reference/api-ruby.md" },
+        { "Elixir" = "reference/api-elixir.md" },
+        { "PHP" = "reference/api-php.md" },
+        { "WebAssembly" = "reference/api-wasm.md" },
+        { "C / FFI" = "reference/api-c.md" },
+        { "Types" = "reference/types.md" },
+        { "Errors" = "reference/errors.md" },
+        { "Configuration" = "reference/configuration.md" },
     ] },
     { "Languages" = "languages.md" },
     { "Changelog" = "CHANGELOG.md" },
@@ -45,6 +47,7 @@ nav = [
 ]
 
 [project.theme]
+name = "material"
 custom_dir = "docs/overrides"
 logo = "assets/logo.svg"
 favicon = "assets/favicon.ico"
@@ -64,6 +67,8 @@ features = [
     "navigation.top",
     "navigation.footer",
     "search.highlight",
+    "search.share",
+    "search.suggest",
     "toc.follow",
     "toc.integrate",
     "announce.dismiss",
@@ -118,6 +123,7 @@ anchor_linenums = true
 line_spans = "__span"
 pygments_lang_class = true
 linenums = false
+use_pygments = true
 
 [project.markdown_extensions.pymdownx.inlinehilite]
 [project.markdown_extensions.pymdownx.keys]
@@ -138,8 +144,7 @@ alternate_style = true
 combine_header_slug = true
 
 [project.markdown_extensions.pymdownx.tabbed.slugify]
-object = "pymdownx.slugs.slugify"
-kwds = { case = "lower" }
+case = "lower"
 
 [project.markdown_extensions.pymdownx.tasklist]
 custom_checkbox = true

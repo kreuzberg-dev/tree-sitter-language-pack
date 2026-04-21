@@ -4,8 +4,13 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * A single match from a tree-sitter query, with captured nodes.
+ */
 public record QueryMatch(
+    /** The pattern index that matched (position in the query string). */
     @JsonProperty("pattern_index") long patternIndex,
+    /** Captures: list of (capture_name, node_info) pairs. */
     List<String> captures
 ) {
     public static QueryMatchBuilder builder() {

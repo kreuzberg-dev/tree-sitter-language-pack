@@ -664,16 +664,6 @@ impl std::panic::RefUnwindSafe for DownloadManager {}
 impl rustler::Resource for DownloadManager {}
 
 #[derive(Clone)]
-pub struct Parser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
-}
-
-// SAFETY: See gen_opaque_resource in alef-backend-rustler for rationale.
-impl std::panic::RefUnwindSafe for Parser {}
-
-impl rustler::Resource for Parser {}
-
-#[derive(Clone)]
 pub struct Language {
     inner: Arc<tree_sitter_language_pack::Language>,
 }
@@ -682,6 +672,16 @@ pub struct Language {
 impl std::panic::RefUnwindSafe for Language {}
 
 impl rustler::Resource for Language {}
+
+#[derive(Clone)]
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
+}
+
+// SAFETY: See gen_opaque_resource in alef-backend-rustler for rationale.
+impl std::panic::RefUnwindSafe for Parser {}
+
+impl rustler::Resource for Parser {}
 
 #[derive(Clone)]
 pub struct Tree {
@@ -1237,7 +1237,7 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {
             capture_output: val.capture_output.into(),
             child_fields: val.child_fields,
             max_results: val.max_results,
-            byte_range: val.byte_range.as_ref().map(|v| format!("{:?}", v)),
+            byte_range: val.byte_range.as_ref().map(|v| format!("{v:?}")),
         }
     }
 }
@@ -1759,7 +1759,7 @@ impl From<tree_sitter_language_pack::ProcessConfig> for ProcessConfig {
             symbols: val.symbols,
             diagnostics: val.diagnostics,
             chunk_max_size: val.chunk_max_size,
-            extractions: val.extractions.as_ref().map(|v| format!("{:?}", v)),
+            extractions: val.extractions.as_ref().map(|v| format!("{v:?}")),
         }
     }
 }
@@ -1777,7 +1777,7 @@ impl From<tree_sitter_language_pack::QueryMatch> for QueryMatch {
     fn from(val: tree_sitter_language_pack::QueryMatch) -> Self {
         Self {
             pattern_index: val.pattern_index,
-            captures: val.captures.iter().map(|i| format!("{:?}", i)).collect(),
+            captures: val.captures.iter().map(|i| i.to_string()).collect(),
         }
     }
 }
@@ -2017,10 +2017,10 @@ fn on_load(env: rustler::Env, _info: rustler::Term) -> bool {
         .expect("Failed to register resource type LanguageRegistry");
     env.register::<DownloadManager>()
         .expect("Failed to register resource type DownloadManager");
-    env.register::<Parser>()
-        .expect("Failed to register resource type Parser");
     env.register::<Language>()
         .expect("Failed to register resource type Language");
+    env.register::<Parser>()
+        .expect("Failed to register resource type Parser");
     env.register::<Tree>().expect("Failed to register resource type Tree");
     true
 }

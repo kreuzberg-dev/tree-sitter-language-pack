@@ -2,9 +2,7 @@
 	"id": "smoke_xcompose",
 	"description": "Smoke test: load xcompose and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "xcompose",

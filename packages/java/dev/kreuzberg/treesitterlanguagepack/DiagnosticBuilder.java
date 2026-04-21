@@ -2,6 +2,9 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 
+/**
+ * A diagnostic (syntax error, missing node, etc.) from parsing.
+ */
 public class DiagnosticBuilder {
 
     private String message = "";

@@ -3,6 +3,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import java.util.Optional;
 
+/**
+ * A comment extracted from source code.
+ */
 public class CommentInfoBuilder {
 
     private String text = "";

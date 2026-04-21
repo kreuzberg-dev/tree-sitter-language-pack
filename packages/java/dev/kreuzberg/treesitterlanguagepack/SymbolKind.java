@@ -4,6 +4,12 @@ package dev.kreuzberg.treesitterlanguagepack;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * The kind of a symbol definition found in source code.
+ *
+ * Categorizes symbol definitions such as variables, constants, functions,
+ * classes, types, interfaces, enums, and modules.
+ */
 public enum SymbolKind {
     Variable("variable"),
     Constant("constant"),

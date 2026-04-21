@@ -4,16 +4,46 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.Optional;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Configuration for the {@code process()} function.
+ *
+ * Controls which analysis features are enabled and whether chunking is performed.
+ *
+ * # Examples
+ *
+ * {@code }{@code }
+ * use tree_sitter_language_pack::ProcessConfig;
+ *
+ * // Defaults: structure + imports + exports enabled
+ * let config = ProcessConfig::new("python");
+ *
+ * // With chunking
+ * let config = ProcessConfig::new("python").with_chunking(1000);
+ *
+ * // Everything enabled
+ * let config = ProcessConfig::new("python").all();
+ * {@code }{@code }
+ */
 public record ProcessConfig(
+    /** Language name (required). */
     String language,
+    /** Extract structural items (functions, classes, etc.). Default: true. */
     boolean structure,
+    /** Extract import statements. Default: true. */
     boolean imports,
+    /** Extract export statements. Default: true. */
     boolean exports,
+    /** Extract comments. Default: false. */
     boolean comments,
+    /** Extract docstrings. Default: false. */
     boolean docstrings,
+    /** Extract symbol definitions. Default: false. */
     boolean symbols,
+    /** Include parse diagnostics. Default: false. */
     boolean diagnostics,
+    /** Maximum chunk size in bytes. {@code None} disables chunking. */
     @JsonProperty("chunk_max_size") Optional<Long> chunkMaxSize,
+    /** Custom extraction patterns to run against the parsed tree. */
     Optional<String> extractions
 ) {
     public static ProcessConfigBuilder builder() {

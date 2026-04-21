@@ -3,6 +3,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Aggregate metrics for a source file.
+ */
 public record FileMetrics(
     @JsonProperty("total_lines") long totalLines,
     @JsonProperty("code_lines") long codeLines,

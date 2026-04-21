@@ -2,6 +2,9 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 
+/**
+ * Validation results for an entire extraction config.
+ */
 public class ValidationResultBuilder {
 
     private boolean valid = false;

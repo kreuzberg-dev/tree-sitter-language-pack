@@ -67,7 +67,7 @@ Returns `null` if the extension is unambiguous or unrecognized.
 **Signature:**
 
 ```typescript
-function extensionAmbiguity(ext: string): StaticstrStaticStaticstr | null
+function extensionAmbiguity(ext: string): [string, string[]] | null
 ```
 
 **Parameters:**
@@ -76,7 +76,7 @@ function extensionAmbiguity(ext: string): StaticstrStaticStaticstr | null
 |------|------|----------|-------------|
 | `ext` | `string` | Yes | The ext |
 
-**Returns:** `StaticstrStaticStaticstr | null`
+**Returns:** `[string, string[]] | null`
 
 
 ---
@@ -665,7 +665,7 @@ exceeds that limit).
 **Signature:**
 
 ```typescript
-function splitCode(source: string, tree: Tree, maxChunkSize: number): Array<UsizeUsize>
+function splitCode(source: string, tree: Tree, maxChunkSize: number): Array<[number, number]>
 ```
 
 **Parameters:**
@@ -676,7 +676,7 @@ function splitCode(source: string, tree: Tree, maxChunkSize: number): Array<Usiz
 | `tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
 | `maxChunkSize` | `number` | Yes | Maximum size in bytes for each chunk. |
 
-**Returns:** `Array<UsizeUsize>`
+**Returns:** `Array<[number, number]>`
 
 
 ---
@@ -1431,7 +1431,7 @@ Defines a single extraction pattern and its configuration.
 | `captureOutput` | `CaptureOutput` | `CaptureOutput.Full` | What to include in each capture result. |
 | `childFields` | `Array<string>` | `[]` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `maxResults` | `number | null` | `null` | Maximum number of matches to return. `None` means unlimited. |
-| `byteRange` | `UsizeUsize | null` | `null` | Restrict matches to a byte range `(start, end)`. |
+| `byteRange` | `[number, number] | null` | `null` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1893,7 +1893,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `patternIndex` | `number` | — | The pattern index that matched (position in the query string). |
-| `captures` | `Array<CowStaticStrNodeInfo>` | `[]` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `Array<[CowStatic, Str, NodeInfo]>` | `[]` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---

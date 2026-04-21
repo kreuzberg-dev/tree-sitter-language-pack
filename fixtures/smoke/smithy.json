@@ -2,9 +2,7 @@
 	"id": "smoke_smithy",
 	"description": "Smoke test: load smithy and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "smithy",

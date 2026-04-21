@@ -67,7 +67,7 @@ Returns `None` if the extension is unambiguous or unrecognized.
 **Signature:**
 
 ```python
-def extension_ambiguity(ext: str) -> StaticstrStaticStaticstr | None
+def extension_ambiguity(ext: str) -> tuple[str, list[str]] | None
 ```
 
 **Parameters:**
@@ -76,7 +76,7 @@ def extension_ambiguity(ext: str) -> StaticstrStaticStaticstr | None
 |------|------|----------|-------------|
 | `ext` | `str` | Yes | The ext |
 
-**Returns:** `StaticstrStaticStaticstr | None`
+**Returns:** `tuple[str, list[str]] | None`
 
 
 ---
@@ -665,7 +665,7 @@ exceeds that limit).
 **Signature:**
 
 ```python
-def split_code(source: str, tree: Tree, max_chunk_size: int) -> list[UsizeUsize]
+def split_code(source: str, tree: Tree, max_chunk_size: int) -> list[tuple[int, int]]
 ```
 
 **Parameters:**
@@ -676,7 +676,7 @@ def split_code(source: str, tree: Tree, max_chunk_size: int) -> list[UsizeUsize]
 | `tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
 | `max_chunk_size` | `int` | Yes | Maximum size in bytes for each chunk. |
 
-**Returns:** `list[UsizeUsize]`
+**Returns:** `list[tuple[int, int]]`
 
 
 ---
@@ -1438,7 +1438,7 @@ Defines a single extraction pattern and its configuration.
 | `capture_output` | `CaptureOutput` | `CaptureOutput.FULL` | What to include in each capture result. |
 | `child_fields` | `list[str]` | `[]` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `max_results` | `int | None` | `None` | Maximum number of matches to return. `None` means unlimited. |
-| `byte_range` | `UsizeUsize | None` | `None` | Restrict matches to a byte range `(start, end)`. |
+| `byte_range` | `tuple[int, int] | None` | `None` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1905,7 +1905,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `pattern_index` | `int` | — | The pattern index that matched (position in the query string). |
-| `captures` | `list[CowStaticStrNodeInfo]` | `[]` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `list[tuple[CowStatic, Str, NodeInfo]]` | `[]` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---

@@ -2,6 +2,9 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 
+/**
+ * Configuration for an extraction run against a single language.
+ */
 public record ExtractionConfig(String language, String patterns) {
     public static ExtractionConfigBuilder builder() {
         return new ExtractionConfigBuilder();

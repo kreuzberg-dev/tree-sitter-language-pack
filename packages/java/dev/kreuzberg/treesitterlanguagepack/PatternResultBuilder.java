@@ -3,6 +3,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import java.util.List;
 
+/**
+ * Results for a single named pattern.
+ */
 public class PatternResultBuilder {
 
     private List<MatchResult> matches = List.of();

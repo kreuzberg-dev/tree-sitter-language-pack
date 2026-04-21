@@ -2,10 +2,7 @@
 	"id": "rust_chunking_process_detail",
 	"description": "Intel: chunk multi-function Rust source into pieces",
 	"category": "process",
-	"tags": [
-		"metadata",
-		"chunking"
-	],
+	"tags": ["metadata", "chunking"],
 	"skip": {
 		"reason": "Requires rust language"
 	},

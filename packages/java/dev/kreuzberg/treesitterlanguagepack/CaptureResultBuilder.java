@@ -3,6 +3,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import java.util.Optional;
 
+/**
+ * A single captured node within a match.
+ */
 public class CaptureResultBuilder {
 
     private String name = "";

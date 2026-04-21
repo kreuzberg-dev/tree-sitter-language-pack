@@ -3,6 +3,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import java.util.List;
 
+/**
+ * A single query match containing one or more captures.
+ */
 public class MatchResultBuilder {
 
     private long patternIndex = 0;

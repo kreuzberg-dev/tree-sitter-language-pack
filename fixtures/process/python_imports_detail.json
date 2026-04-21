@@ -2,9 +2,7 @@
 	"id": "process_python_imports_detail",
 	"description": "Python with multiple imports, verify imports contain specific source",
 	"category": "process",
-	"tags": [
-		"metadata"
-	],
+	"tags": ["metadata"],
 	"input": {
 		"source_code": "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
 		"config": {
@@ -29,9 +27,7 @@
 		}
 	],
 	"skip": {
-		"languages": [
-			"rust"
-		],
+		"languages": ["rust"],
 		"reason": "Uses computed fields not on ProcessResult"
 	}
 }

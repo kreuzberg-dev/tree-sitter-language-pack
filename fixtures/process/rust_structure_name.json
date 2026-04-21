@@ -2,9 +2,7 @@
 	"id": "process_rust_structure_name",
 	"description": "Rust struct with name, verify structure name contains value",
 	"category": "process",
-	"tags": [
-		"metadata"
-	],
+	"tags": ["metadata"],
 	"input": {
 		"source_code": "pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n",
 		"config": {
@@ -29,9 +27,7 @@
 		}
 	],
 	"skip": {
-		"languages": [
-			"rust"
-		],
+		"languages": ["rust"],
 		"reason": "Uses computed fields not on ProcessResult"
 	}
 }

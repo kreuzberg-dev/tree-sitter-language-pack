@@ -3,6 +3,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import java.util.Optional;
 
+/**
+ * A symbol (variable, function, type, etc.) extracted from source code.
+ */
 public class SymbolInfoBuilder {
 
     private String name = "";

@@ -3,6 +3,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import java.util.List;
 
+/**
+ * A single match from a tree-sitter query, with captured nodes.
+ */
 public class QueryMatchBuilder {
 
     private long patternIndex = 0;

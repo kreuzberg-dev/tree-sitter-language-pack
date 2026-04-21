@@ -4,6 +4,12 @@ package dev.kreuzberg.treesitterlanguagepack;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Severity level of a diagnostic produced during parsing.
+ *
+ * Used to classify parse errors, warnings, and informational messages
+ * found in the syntax tree.
+ */
 public enum DiagnosticSeverity {
     Error("error"),
     Warning("warning"),

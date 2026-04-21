@@ -4,6 +4,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Defines a single extraction pattern and its configuration.
+ */
 public class ExtractionPatternBuilder {
 
     private String query = "";

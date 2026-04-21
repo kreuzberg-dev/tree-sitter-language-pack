@@ -4,6 +4,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.util.Optional;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * A comment extracted from source code.
+ */
 public record CommentInfo(
     String text,
     CommentKind kind,

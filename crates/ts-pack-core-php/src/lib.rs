@@ -1131,16 +1131,6 @@ impl DownloadManager {
 
 #[derive(Clone)]
 #[php_class]
-#[php(name = "Tree\\Sitter\\Language\\Pack\\Parser")]
-pub struct Parser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
-}
-
-#[php_impl]
-impl Parser {}
-
-#[derive(Clone)]
-#[php_class]
 #[php(name = "Tree\\Sitter\\Language\\Pack\\Language")]
 pub struct Language {
     inner: Arc<tree_sitter_language_pack::Language>,
@@ -1148,6 +1138,16 @@ pub struct Language {
 
 #[php_impl]
 impl Language {}
+
+#[derive(Clone)]
+#[php_class]
+#[php(name = "Tree\\Sitter\\Language\\Pack\\Parser")]
+pub struct Parser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
+}
+
+#[php_impl]
+impl Parser {}
 
 #[derive(Clone)]
 #[php_class]
@@ -1414,7 +1414,7 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {
                 .unwrap_or_default(),
             child_fields: val.child_fields,
             max_results: val.max_results.map(|v| v as i64),
-            byte_range: val.byte_range.as_ref().map(|v| format!("{:?}", v)),
+            byte_range: val.byte_range.as_ref().map(|v| format!("{v:?}")),
         }
     }
 }
@@ -1899,7 +1899,7 @@ impl From<tree_sitter_language_pack::ProcessConfig> for ProcessConfig {
             symbols: val.symbols,
             diagnostics: val.diagnostics,
             chunk_max_size: val.chunk_max_size.map(|v| v as i64),
-            extractions: val.extractions.as_ref().map(|v| format!("{:?}", v)),
+            extractions: val.extractions.as_ref().map(|v| format!("{v:?}")),
         }
     }
 }
@@ -1917,7 +1917,7 @@ impl From<tree_sitter_language_pack::QueryMatch> for QueryMatch {
     fn from(val: tree_sitter_language_pack::QueryMatch) -> Self {
         Self {
             pattern_index: val.pattern_index as i64,
-            captures: val.captures.iter().map(|i| format!("{:?}", i)).collect(),
+            captures: val.captures.iter().map(|(name, info)| format!("{}:{:?}", name, info)).collect(),
         }
     }
 }
@@ -2055,8 +2055,8 @@ pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
         .class::<PlatformBundle>()
         .class::<LanguageInfo>()
         .class::<DownloadManager>()
-        .class::<Parser>()
         .class::<Language>()
+        .class::<Parser>()
         .class::<Tree>()
         .class::<TreeSitterLanguagePackApi>()
 }

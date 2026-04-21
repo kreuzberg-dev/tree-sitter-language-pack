@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * An import statement extracted from source code.
+ */
 public record ImportInfo(
     String source,
     List<String> items,

@@ -16,7 +16,7 @@ Defines a single extraction pattern and its configuration.
 | `capture_output` | `CaptureOutput` | `CaptureOutput.FULL` | What to include in each capture result. |
 | `child_fields` | `list[str]` | `[]` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `max_results` | `int | None` | `None` | Maximum number of matches to return. `None` means unlimited. |
-| `byte_range` | `UsizeUsize | None` | `None` | Restrict matches to a byte range `(start, end)`. |
+| `byte_range` | `tuple[int, int] | None` | `None` | Restrict matches to a byte range `(start, end)`. |
 
 ---
 
@@ -372,7 +372,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `pattern_index` | `int` | — | The pattern index that matched (position in the query string). |
-| `captures` | `list[CowStaticStrNodeInfo]` | `[]` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `list[tuple[CowStatic, Str, NodeInfo]]` | `[]` | Captures: list of (capture_name, node_info) pairs. |
 
 ---
 

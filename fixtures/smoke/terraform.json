@@ -2,9 +2,7 @@
 	"id": "smoke_terraform",
 	"description": "Smoke test: load terraform and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "terraform",

@@ -2,9 +2,7 @@
 	"id": "registry_language_count",
 	"description": "language_count returns a value greater than 300",
 	"category": "registry",
-	"tags": [
-		"registry"
-	],
+	"tags": ["registry"],
 	"call": "language_count",
 	"input": {},
 	"assertions": [
@@ -14,9 +12,7 @@
 		}
 	],
 	"skip": {
-		"languages": [
-			"rust"
-		],
+		"languages": ["rust"],
 		"reason": "Rust e2e generator does not yet support this pattern"
 	}
 }

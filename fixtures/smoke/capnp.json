@@ -2,9 +2,7 @@
 	"id": "smoke_capnp",
 	"description": "Smoke test: load capnp and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "capnp",

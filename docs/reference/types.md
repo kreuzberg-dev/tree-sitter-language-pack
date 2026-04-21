@@ -378,7 +378,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `pattern_index` | `usize` | — | The pattern index that matched (position in the query string). |
-| `captures` | `Vec<(Cow<'static,str>, NodeInfo)>` | `vec![]` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `Vec<(Cow <'static,str>, NodeInfo)>` | `vec![]` | Captures: list of (capture_name, node_info) pairs. |
 
 ---
 
@@ -498,13 +498,13 @@ Manages downloading and caching of pre-built parser shared libraries.
 
 ---
 
-#### Language
+#### Tree
 
 *Opaque type — fields are not directly accessible.*
 
 ---
 
-#### Tree
+#### Language
 
 *Opaque type — fields are not directly accessible.*
 

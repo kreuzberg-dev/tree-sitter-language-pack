@@ -2,6 +2,9 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 
+/**
+ * Aggregate metrics for a source file.
+ */
 public class FileMetricsBuilder {
 
     private long totalLines = 0;

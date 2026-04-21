@@ -2,6 +2,13 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 
+/**
+ * Lightweight snapshot of a tree-sitter node's properties.
+ *
+ * Contains only primitive types for easy cross-language serialization.
+ * This is an owned type that can be passed across FFI boundaries, unlike
+ * {@code tree_sitter::Node} which borrows from the tree.
+ */
 public class NodeInfoBuilder {
 
     private String kind = "";

@@ -2,9 +2,7 @@
 	"id": "process_python_metrics_detail",
 	"description": "Python code with metrics assertions",
 	"category": "process",
-	"tags": [
-		"metadata"
-	],
+	"tags": ["metadata"],
 	"input": {
 		"source_code": "# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n",
 		"config": {

@@ -2,9 +2,7 @@
 	"id": "ruby_class_process",
 	"description": "Intel: Ruby class with method",
 	"category": "process",
-	"tags": [
-		"intel"
-	],
+	"tags": ["intel"],
 	"skip": {
 		"reason": "Requires ruby language"
 	},

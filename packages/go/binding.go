@@ -1684,20 +1684,6 @@ func (h *DownloadManager) Free() {
 }
 
 
-// Parser is an opaque handle type.
-type Parser struct {
-    ptr unsafe.Pointer
-}
-
-// Free releases the resources held by this handle.
-func (h *Parser) Free() {
-    if h.ptr != nil {
-        C.ts_pack_parser_free((*C.TS_PACKParser)(h.ptr))
-        h.ptr = nil
-    }
-}
-
-
 // Language is an opaque handle type.
 type Language struct {
     ptr unsafe.Pointer
@@ -1707,6 +1693,20 @@ type Language struct {
 func (h *Language) Free() {
     if h.ptr != nil {
         C.ts_pack_language_free((*C.TS_PACKLanguage)(h.ptr))
+        h.ptr = nil
+    }
+}
+
+
+// Parser is an opaque handle type.
+type Parser struct {
+    ptr unsafe.Pointer
+}
+
+// Free releases the resources held by this handle.
+func (h *Parser) Free() {
+    if h.ptr != nil {
+        C.ts_pack_parser_free((*C.TS_PACKParser)(h.ptr))
         h.ptr = nil
     }
 }
@@ -2675,10 +2675,10 @@ func PackConfigDiscover() **PackConfig {
 
 
 // Enable chunking with the given maximum chunk size in bytes.
-func (r *ProcessConfig) WithChunking(max_size uint) *ProcessConfig {
+func (r *ProcessConfig) WithChunking(max_size uint) (*ProcessConfig, error) {
     jsonBytesRecv, err := json.Marshal(r)
     if err != nil {
-        panic(fmt.Sprintf("failed to marshal receiver: %v", err))
+        return nil, fmt.Errorf("failed to marshal receiver: %w", err)
     }
     tmpStrRecv := C.CString(string(jsonBytesRecv))
     cRecv := C.ts_pack_process_config_from_json(tmpStrRecv)
@@ -2693,15 +2693,15 @@ func (r *ProcessConfig) WithChunking(max_size uint) *ProcessConfig {
 	var result ProcessConfig
 	if err := json.Unmarshal([]byte(C.GoString(jsonPtr)), &result); err != nil { return nil }
 	return &result
-}()
+}(), nil
 }
 
 
 // Enable all analysis features.
-func (r *ProcessConfig) All() *ProcessConfig {
+func (r *ProcessConfig) All() (*ProcessConfig, error) {
     jsonBytesRecv, err := json.Marshal(r)
     if err != nil {
-        panic(fmt.Sprintf("failed to marshal receiver: %v", err))
+        return nil, fmt.Errorf("failed to marshal receiver: %w", err)
     }
     tmpStrRecv := C.CString(string(jsonBytesRecv))
     cRecv := C.ts_pack_process_config_from_json(tmpStrRecv)
@@ -2716,15 +2716,15 @@ func (r *ProcessConfig) All() *ProcessConfig {
 	var result ProcessConfig
 	if err := json.Unmarshal([]byte(C.GoString(jsonPtr)), &result); err != nil { return nil }
 	return &result
-}()
+}(), nil
 }
 
 
 // Disable all analysis features (only metrics computed).
-func (r *ProcessConfig) Minimal() *ProcessConfig {
+func (r *ProcessConfig) Minimal() (*ProcessConfig, error) {
     jsonBytesRecv, err := json.Marshal(r)
     if err != nil {
-        panic(fmt.Sprintf("failed to marshal receiver: %v", err))
+        return nil, fmt.Errorf("failed to marshal receiver: %w", err)
     }
     tmpStrRecv := C.CString(string(jsonBytesRecv))
     cRecv := C.ts_pack_process_config_from_json(tmpStrRecv)
@@ -2739,7 +2739,7 @@ func (r *ProcessConfig) Minimal() *ProcessConfig {
 	var result ProcessConfig
 	if err := json.Unmarshal([]byte(C.GoString(jsonPtr)), &result); err != nil { return nil }
 	return &result
-}()
+}(), nil
 }
 
 

@@ -2,9 +2,7 @@
 	"id": "smoke_rbs",
 	"description": "Smoke test: load rbs and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "rbs",

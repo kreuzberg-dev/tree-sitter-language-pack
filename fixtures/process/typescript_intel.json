@@ -2,9 +2,7 @@
 	"id": "typescript_function_process",
 	"description": "Intel: extract structure from TypeScript function",
 	"category": "process",
-	"tags": [
-		"intel"
-	],
+	"tags": ["intel"],
 	"skip": {
 		"reason": "Requires typescript language"
 	},

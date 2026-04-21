@@ -2,9 +2,7 @@
 	"id": "smoke_dtd",
 	"description": "Smoke test: load dtd and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "dtd",

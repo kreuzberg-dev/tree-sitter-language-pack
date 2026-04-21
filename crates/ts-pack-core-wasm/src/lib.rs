@@ -30,6 +30,7 @@ pub extern "C" fn iswalpha(c: u32) -> i32 {
     char::from_u32(c).map_or(0, |ch| ch.is_alphabetic() as i32)
 }
 
+/// Defines a single extraction pattern and its configuration.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmExtractionPattern {
@@ -110,6 +111,7 @@ impl WasmExtractionPattern {
     }
 }
 
+/// Configuration for an extraction run against a single language.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmExtractionConfig {
@@ -148,6 +150,7 @@ impl WasmExtractionConfig {
     }
 }
 
+/// A single captured node within a match.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmCaptureResult {
@@ -228,6 +231,7 @@ impl WasmCaptureResult {
     }
 }
 
+/// A single query match containing one or more captures.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmMatchResult {
@@ -266,6 +270,7 @@ impl WasmMatchResult {
     }
 }
 
+/// Results for a single named pattern.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmPatternResult {
@@ -304,6 +309,7 @@ impl WasmPatternResult {
     }
 }
 
+/// Complete extraction results for all patterns.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmExtractionResult {
@@ -342,6 +348,7 @@ impl WasmExtractionResult {
     }
 }
 
+/// Validation information for a single pattern.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmPatternValidation {
@@ -422,6 +429,7 @@ impl WasmPatternValidation {
     }
 }
 
+/// Validation results for an entire extraction config.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmValidationResult {
@@ -460,6 +468,10 @@ impl WasmValidationResult {
     }
 }
 
+/// Byte and line/column range in source code.
+///
+/// Represents both byte offsets (for slicing) and human-readable line/column
+/// positions (for display and diagnostics).
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmSpan {
@@ -553,6 +565,24 @@ impl WasmSpan {
     }
 }
 
+/// Complete analysis result from processing a source file.
+///
+/// Contains metrics, structural analysis, imports/exports, comments,
+/// docstrings, symbols, diagnostics, and optionally chunked code segments.
+/// Fields are populated based on the [`crate::ProcessConfig`] flags.
+///
+/// # Fields
+///
+/// - `language` - The language used for parsing
+/// - `metrics` - Always computed: line counts, byte sizes, error counts
+/// - `structure` - Functions, classes, structs (when `config.structure = true`)
+/// - `imports` - Import statements (when `config.imports = true`)
+/// - `exports` - Export statements (when `config.exports = true`)
+/// - `comments` - Comments (when `config.comments = true`)
+/// - `docstrings` - Docstrings (when `config.docstrings = true`)
+/// - `symbols` - Symbol definitions (when `config.symbols = true`)
+/// - `diagnostics` - Parse errors (when `config.diagnostics = true`)
+/// - `chunks` - Chunked code segments (when `config.chunk_max_size` is set)
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmProcessResult {
@@ -712,6 +742,7 @@ impl WasmProcessResult {
     }
 }
 
+/// Aggregate metrics for a source file.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmFileMetrics {
@@ -832,6 +863,7 @@ impl WasmFileMetrics {
     }
 }
 
+/// A structural item (function, class, struct, etc.) in source code.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmStructureItem {
@@ -965,6 +997,7 @@ impl WasmStructureItem {
     }
 }
 
+/// A comment extracted from source code.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmCommentInfo {
@@ -1032,6 +1065,7 @@ impl WasmCommentInfo {
     }
 }
 
+/// A docstring extracted from source code.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmDocstringInfo {
@@ -1112,6 +1146,7 @@ impl WasmDocstringInfo {
     }
 }
 
+/// A section within a docstring (e.g., Args, Returns, Raises).
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmDocSection {
@@ -1162,6 +1197,7 @@ impl WasmDocSection {
     }
 }
 
+/// An import statement extracted from source code.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmImportInfo {
@@ -1242,6 +1278,7 @@ impl WasmImportInfo {
     }
 }
 
+/// An export statement extracted from source code.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmExportInfo {
@@ -1292,6 +1329,7 @@ impl WasmExportInfo {
     }
 }
 
+/// A symbol (variable, function, type, etc.) extracted from source code.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmSymbolInfo {
@@ -1372,6 +1410,7 @@ impl WasmSymbolInfo {
     }
 }
 
+/// A diagnostic (syntax error, missing node, etc.) from parsing.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmDiagnostic {
@@ -1426,6 +1465,7 @@ impl WasmDiagnostic {
     }
 }
 
+/// A chunk of source code with rich metadata.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmCodeChunk {
@@ -1519,6 +1559,7 @@ impl WasmCodeChunk {
     }
 }
 
+/// Metadata for a single chunk of source code.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmChunkContext {
@@ -1652,6 +1693,11 @@ impl WasmChunkContext {
     }
 }
 
+/// Lightweight snapshot of a tree-sitter node's properties.
+///
+/// Contains only primitive types for easy cross-language serialization.
+/// This is an owned type that can be passed across FFI boundaries, unlike
+/// `tree_sitter::Node` which borrows from the tree.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmNodeInfo {
@@ -1811,6 +1857,23 @@ impl WasmNodeInfo {
     }
 }
 
+/// Configuration for the tree-sitter language pack.
+///
+/// Controls cache directory and which languages to pre-download.
+/// Can be loaded from a TOML file, constructed programmatically,
+/// or passed as a dict/object from language bindings.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::PackConfig;
+///
+/// let config = PackConfig {
+///     cache_dir: None,
+///     languages: Some(vec!["python".to_string(), "rust".to_string()]),
+///     groups: None,
+/// };
+/// ```
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmPackConfig {
@@ -1864,6 +1927,20 @@ impl WasmPackConfig {
         self.groups = value;
     }
 
+    /// Load configuration from a TOML file.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the file cannot be read or the TOML is invalid.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use std::path::Path;
+    /// use tree_sitter_language_pack::PackConfig;
+    ///
+    /// let config = PackConfig::from_toml_file(Path::new("language-pack.toml")).unwrap();
+    /// ```
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen(js_name = "fromTomlFile")]
     pub fn from_toml_file(path: String) -> Result<WasmPackConfig, JsValue> {
@@ -1872,12 +1949,47 @@ impl WasmPackConfig {
         Ok(result.into())
     }
 
+    /// Discover configuration by searching for `language-pack.toml` in:
+    ///
+    /// 1. Current directory and up to 10 parent directories
+    /// 2. `$XDG_CONFIG_HOME/tree-sitter-language-pack/config.toml`
+    /// 3. `~/.config/tree-sitter-language-pack/config.toml`
+    ///
+    /// Returns `None` if no configuration file is found.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use tree_sitter_language_pack::PackConfig;
+    ///
+    /// if let Some(config) = PackConfig::discover() {
+    ///     println!("Found config with {:?} languages", config.languages);
+    /// }
+    /// ```
     #[wasm_bindgen]
     pub fn discover() -> Option<WasmPackConfig> {
         tree_sitter_language_pack::PackConfig::discover().map(Into::into)
     }
 }
 
+/// Configuration for the `process()` function.
+///
+/// Controls which analysis features are enabled and whether chunking is performed.
+///
+/// # Examples
+///
+/// ```
+/// use tree_sitter_language_pack::ProcessConfig;
+///
+/// // Defaults: structure + imports + exports enabled
+/// let config = ProcessConfig::new("python");
+///
+/// // With chunking
+/// let config = ProcessConfig::new("python").with_chunking(1000);
+///
+/// // Everything enabled
+/// let config = ProcessConfig::new("python").all();
+/// ```
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmProcessConfig {
@@ -2029,6 +2141,7 @@ impl WasmProcessConfig {
         tree_sitter_language_pack::ProcessConfig::default().into()
     }
 
+    /// Enable chunking with the given maximum chunk size in bytes.
     #[wasm_bindgen(js_name = "withChunking")]
     pub fn with_chunking(&self, max_size: usize) -> WasmProcessConfig {
         tree_sitter_language_pack::ProcessConfig::from(self.clone())
@@ -2036,6 +2149,7 @@ impl WasmProcessConfig {
             .into()
     }
 
+    /// Enable all analysis features.
     #[wasm_bindgen]
     pub fn all(&self) -> WasmProcessConfig {
         tree_sitter_language_pack::ProcessConfig::from(self.clone())
@@ -2043,6 +2157,7 @@ impl WasmProcessConfig {
             .into()
     }
 
+    /// Disable all analysis features (only metrics computed).
     #[wasm_bindgen]
     pub fn minimal(&self) -> WasmProcessConfig {
         tree_sitter_language_pack::ProcessConfig::from(self.clone())
@@ -2051,6 +2166,7 @@ impl WasmProcessConfig {
     }
 }
 
+/// A single match from a tree-sitter query, with captured nodes.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmQueryMatch {
@@ -2089,6 +2205,26 @@ impl WasmQueryMatch {
     }
 }
 
+/// Thread-safe registry of tree-sitter language parsers.
+///
+/// Manages both statically compiled and dynamically loaded language grammars.
+/// Use [`LanguageRegistry::new()`] for the default registry, or access the
+/// global instance via the module-level convenience functions
+/// ([`crate::get_language`], [`crate::available_languages`], etc.).
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::{LanguageRegistry, ProcessConfig};
+///
+/// let registry = LanguageRegistry::new();
+/// let langs = registry.available_languages();
+/// println!("Available: {:?}", langs);
+///
+/// let config = ProcessConfig::new("python").all();
+/// let result = registry.process("def hello(): pass", &config).unwrap();
+/// println!("Structure: {:?}", result.structure);
+/// ```
 #[derive(Clone)]
 #[wasm_bindgen]
 pub struct WasmLanguageRegistry {
@@ -2097,6 +2233,10 @@ pub struct WasmLanguageRegistry {
 
 #[wasm_bindgen]
 impl WasmLanguageRegistry {
+    /// Create a registry with a custom directory for dynamic libraries.
+    ///
+    /// Overrides the default build-time library directory. Useful when
+    /// dynamic grammar shared libraries are stored in a non-standard location.
     #[wasm_bindgen(js_name = "withLibsDir")]
     pub fn with_libs_dir(libs_dir: String) -> WasmLanguageRegistry {
         Self {
@@ -2106,11 +2246,30 @@ impl WasmLanguageRegistry {
         }
     }
 
+    /// Add an additional directory to search for dynamic libraries.
+    ///
+    /// When [`get_language`](Self::get_language) cannot find a grammar in the
+    /// primary library directory, it searches these extra directories in order.
+    /// Typically used by the download system to register its cache directory.
+    ///
+    /// Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
+    /// mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
+    /// immutable while the directory list is updated.
     #[wasm_bindgen(js_name = "addExtraLibsDir")]
-    pub fn add_extra_libs_dir(&self, dir: String) {
+    pub fn add_extra_libs_dir(&self, dir: String) -> () {
         self.inner.add_extra_libs_dir(std::path::PathBuf::from(dir))
     }
 
+    /// Get a tree-sitter [`Language`] by name.
+    ///
+    /// Resolves aliases (e.g., `"shell"` -> `"bash"`, `"makefile"` -> `"make"`),
+    /// then looks up the language in the static table. When the `dynamic-loading`
+    /// feature is enabled, falls back to loading a shared library on demand.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::LanguageNotFound`] if the name (after alias resolution)
+    /// does not match any known grammar.
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen(js_name = "getLanguage")]
     pub fn get_language(&self, name: String) -> Result<WasmLanguage, JsValue> {
@@ -2123,21 +2282,31 @@ impl WasmLanguageRegistry {
         })
     }
 
+    /// List all available language names, sorted and deduplicated.
+    ///
+    /// Includes statically compiled languages, dynamically loadable languages
+    /// (if the `dynamic-loading` feature is enabled), and all configured aliases.
     #[wasm_bindgen(js_name = "availableLanguages")]
     pub fn available_languages(&self) -> Vec<String> {
         self.inner.available_languages()
     }
 
+    /// Check whether a language is available by name or alias.
+    ///
+    /// Returns `true` if the language can be loaded, either from the static
+    /// table or from a dynamic library on disk.
     #[wasm_bindgen(js_name = "hasLanguage")]
     pub fn has_language(&self, name: String) -> bool {
         self.inner.has_language(&name)
     }
 
+    /// Return the total number of available languages (including aliases).
     #[wasm_bindgen(js_name = "languageCount")]
     pub fn language_count(&self) -> usize {
         self.inner.language_count()
     }
 
+    /// Parse source code and extract file intelligence based on config in a single pass.
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen]
     pub fn process(&self, _source: String, _config: WasmProcessConfig) -> Result<WasmProcessResult, JsValue> {
@@ -2153,6 +2322,7 @@ impl WasmLanguageRegistry {
     }
 }
 
+/// Manifest describing available parser downloads for a specific version.
 #[derive(Clone, Default)]
 #[wasm_bindgen]
 pub struct WasmParserManifest {
@@ -2296,6 +2466,7 @@ impl WasmLanguageInfo {
     }
 }
 
+/// Manages downloading and caching of pre-built parser shared libraries.
 #[derive(Clone)]
 #[wasm_bindgen]
 pub struct WasmDownloadManager {
@@ -2304,6 +2475,7 @@ pub struct WasmDownloadManager {
 
 #[wasm_bindgen]
 impl WasmDownloadManager {
+    /// Create a new download manager for the given version.
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen]
     pub fn new(version: String) -> Result<WasmDownloadManager, JsValue> {
@@ -2314,6 +2486,7 @@ impl WasmDownloadManager {
         })
     }
 
+    /// Create a download manager with a custom cache directory.
     #[wasm_bindgen(js_name = "withCacheDir")]
     pub fn with_cache_dir(version: String, cache_dir: String) -> WasmDownloadManager {
         Self {
@@ -2324,6 +2497,7 @@ impl WasmDownloadManager {
         }
     }
 
+    /// Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen(js_name = "defaultCacheDir")]
     pub fn default_cache_dir(version: String) -> Result<String, JsValue> {
@@ -2332,22 +2506,27 @@ impl WasmDownloadManager {
         Ok(result.to_string_lossy().to_string())
     }
 
+    /// Return the path to the libs cache directory.
     #[wasm_bindgen(js_name = "cacheDir")]
     pub fn cache_dir(&self) -> String {
         self.inner.cache_dir().to_string_lossy().to_string()
     }
 
+    /// List languages that are already downloaded and cached.
     #[wasm_bindgen(js_name = "installedLanguages")]
     pub fn installed_languages(&self) -> Vec<String> {
         self.inner.installed_languages()
     }
 
+    /// Ensure the specified languages are available in the cache.
+    /// Downloads the platform bundle if any requested languages are missing.
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen(js_name = "ensureLanguages")]
     pub fn ensure_languages(&self, _names: Vec<String>) -> Result<(), JsValue> {
         Err(JsValue::from_str("Not implemented: ensure_languages"))
     }
 
+    /// Ensure all languages in a named group are available.
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen(js_name = "ensureGroup")]
     pub fn ensure_group(&self, group: String) -> Result<(), JsValue> {
@@ -2357,11 +2536,13 @@ impl WasmDownloadManager {
         Ok(())
     }
 
+    /// Get the expected path for a language's shared library in the cache.
     #[wasm_bindgen(js_name = "libPath")]
     pub fn lib_path(&self, name: String) -> String {
         self.inner.lib_path(&name).to_string_lossy().to_string()
     }
 
+    /// Fetch the parser manifest from GitHub Releases.
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen(js_name = "fetchManifest")]
     pub fn fetch_manifest(&self) -> Result<WasmParserManifest, JsValue> {
@@ -2372,6 +2553,7 @@ impl WasmDownloadManager {
         Ok(result.into())
     }
 
+    /// Remove all cached parser libraries.
     #[allow(clippy::missing_errors_doc)]
     #[wasm_bindgen(js_name = "cleanCache")]
     pub fn clean_cache(&self) -> Result<(), JsValue> {
@@ -2384,21 +2566,21 @@ impl WasmDownloadManager {
 
 #[derive(Clone)]
 #[wasm_bindgen]
-pub struct WasmParser {
-    inner: Arc<tree_sitter_language_pack::Parser>,
-}
-
-#[wasm_bindgen]
-impl WasmParser {}
-
-#[derive(Clone)]
-#[wasm_bindgen]
 pub struct WasmLanguage {
     inner: Arc<tree_sitter_language_pack::Language>,
 }
 
 #[wasm_bindgen]
 impl WasmLanguage {}
+
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct WasmParser {
+    inner: Arc<tree_sitter_language_pack::Parser>,
+}
+
+#[wasm_bindgen]
+impl WasmParser {}
 
 #[derive(Clone)]
 #[wasm_bindgen]
@@ -2409,6 +2591,7 @@ pub struct WasmTree {
 #[wasm_bindgen]
 impl WasmTree {}
 
+/// Controls what data is captured for each query match.
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum WasmCaptureOutput {
@@ -2424,6 +2607,11 @@ impl Default for WasmCaptureOutput {
     }
 }
 
+/// The kind of structural item found in source code.
+///
+/// Categorizes top-level and nested declarations such as functions, classes,
+/// structs, enums, traits, and more. Use [`Other`](StructureKind::Other) for
+/// language-specific constructs that do not fit a standard category.
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum WasmStructureKind {
@@ -2447,6 +2635,10 @@ impl Default for WasmStructureKind {
     }
 }
 
+/// The kind of a comment found in source code.
+///
+/// Distinguishes between single-line comments, block (multi-line) comments,
+/// and documentation comments.
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum WasmCommentKind {
@@ -2462,6 +2654,10 @@ impl Default for WasmCommentKind {
     }
 }
 
+/// The format of a docstring extracted from source code.
+///
+/// Identifies the docstring convention used, which varies by language
+/// (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum WasmDocstringFormat {
@@ -2480,6 +2676,9 @@ impl Default for WasmDocstringFormat {
     }
 }
 
+/// The kind of an export statement found in source code.
+///
+/// Covers named exports, default exports, and re-exports from other modules.
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum WasmExportKind {
@@ -2495,6 +2694,10 @@ impl Default for WasmExportKind {
     }
 }
 
+/// The kind of a symbol definition found in source code.
+///
+/// Categorizes symbol definitions such as variables, constants, functions,
+/// classes, types, interfaces, enums, and modules.
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum WasmSymbolKind {
@@ -2516,6 +2719,10 @@ impl Default for WasmSymbolKind {
     }
 }
 
+/// Severity level of a diagnostic produced during parsing.
+///
+/// Used to classify parse errors, warnings, and informational messages
+/// found in the syntax tree.
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum WasmDiagnosticSeverity {
@@ -2531,32 +2738,103 @@ impl Default for WasmDiagnosticSeverity {
     }
 }
 
+/// Detect language name from a file extension (without leading dot).
+///
+/// Returns `None` for unrecognized extensions. The match is case-insensitive.
+///
+/// ```
+/// use tree_sitter_language_pack::detect_language_from_extension;
+/// assert_eq!(detect_language_from_extension("py"), Some("python"));
+/// assert_eq!(detect_language_from_extension("RS"), Some("rust"));
+/// assert_eq!(detect_language_from_extension("xyz"), None);
+/// ```
 #[wasm_bindgen(js_name = "detectLanguageFromExtension")]
 pub fn detect_language_from_extension(ext: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_extension(&ext).map(Into::into)
 }
 
+/// Detect language name from a file path.
+///
+/// Extracts the file extension and looks it up. Returns `None` if the
+/// path has no extension or the extension is not recognized.
+///
+/// ```
+/// use tree_sitter_language_pack::detect_language_from_path;
+/// assert_eq!(detect_language_from_path("src/main.rs"), Some("rust"));
+/// assert_eq!(detect_language_from_path("README.md"), Some("markdown"));
+/// assert_eq!(detect_language_from_path("Makefile"), None);
+/// ```
 #[wasm_bindgen(js_name = "detectLanguageFromPath")]
 pub fn detect_language_from_path(path: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_path(&path).map(Into::into)
 }
 
+/// Check if a file extension is ambiguous — i.e. it could reasonably belong to
+/// multiple languages.
+///
+/// Returns `Some((assigned_language, alternatives))` if the extension is known
+/// to be ambiguous, where `assigned_language` is what [`detect_language_from_extension`]
+/// returns and `alternatives` lists other languages it could also belong to.
+///
+/// Returns `None` if the extension is unambiguous or unrecognized.
+///
+/// ```
+/// use tree_sitter_language_pack::extension_ambiguity;
+/// // .m is assigned to objc but could also be matlab
+/// if let Some((assigned, alternatives)) = extension_ambiguity("m") {
+///     assert_eq!(assigned, "objc");
+///     assert!(alternatives.contains(&"matlab"));
+/// }
+/// // .py is unambiguous
+/// assert!(extension_ambiguity("py").is_none());
+/// ```
 #[wasm_bindgen(js_name = "extensionAmbiguity")]
 pub fn extension_ambiguity(_ext: String) -> Option<String> {
     None
 }
 
+/// Detect language name from file content using the shebang line (`#!`).
+///
+/// Inspects only the first line of `content`. If it begins with `#!`, the
+/// interpreter name is extracted and mapped to a language name.
+///
+/// Handles common patterns:
+/// - `#!/usr/bin/env python3` → `"python"`
+/// - `#!/bin/bash` → `"bash"`
+/// - `#!/usr/bin/env node` → `"javascript"`
+///
+/// The `-S` flag accepted by some `env` implementations is skipped automatically.
+/// Version suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.
+///
+/// Returns `None` when content does not start with `#!`, the shebang is
+/// malformed, or the interpreter is not recognised.
+///
+/// ```
+/// use tree_sitter_language_pack::detect_language_from_content;
+/// assert_eq!(detect_language_from_content("#!/usr/bin/env python3\npass"), Some("python"));
+/// assert_eq!(detect_language_from_content("#!/bin/bash\necho hi"), Some("bash"));
+/// assert_eq!(detect_language_from_content("no shebang here"), None);
+/// ```
 #[wasm_bindgen(js_name = "detectLanguageFromContent")]
 pub fn detect_language_from_content(content: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_content(&content).map(Into::into)
 }
 
+/// Validate an extraction config without running it.
+///
+/// Checks that the language exists and all query patterns compile. Returns
+/// detailed diagnostics per pattern.
+///
+/// # Errors
+///
+/// Returns an error if the language cannot be loaded.
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "validateExtraction")]
 pub fn validate_extraction(_config: WasmExtractionConfig) -> Result<WasmValidationResult, JsValue> {
     Err(JsValue::from_str("Not implemented: validate_extraction"))
 }
 
+/// Process source code: parse once, extract intelligence based on config, and return it.
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen]
 pub fn process(
@@ -2567,11 +2845,15 @@ pub fn process(
     Err(JsValue::from_str("Not implemented: process"))
 }
 
+/// Get a `NodeInfo` snapshot of the root node.
 #[wasm_bindgen(js_name = "rootNodeInfo")]
 pub fn root_node_info(tree: WasmTree) -> WasmNodeInfo {
     tree_sitter_language_pack::root_node_info(&tree.inner).into()
 }
 
+/// Find all nodes matching the given type name, returning their `NodeInfo`.
+///
+/// Performs a depth-first traversal. Returns an empty vec if no matches.
 #[wasm_bindgen(js_name = "findNodesByType")]
 pub fn find_nodes_by_type(tree: WasmTree, node_type: String) -> Vec<WasmNodeInfo> {
     tree_sitter_language_pack::find_nodes_by_type(&tree.inner, &node_type)
@@ -2580,6 +2862,10 @@ pub fn find_nodes_by_type(tree: WasmTree, node_type: String) -> Vec<WasmNodeInfo
         .collect()
 }
 
+/// Get `NodeInfo` for all named children of the root node.
+///
+/// Useful for understanding the top-level structure of a file
+/// (e.g., list of function definitions, class declarations, imports).
 #[wasm_bindgen(js_name = "namedChildrenInfo")]
 pub fn named_children_info(tree: WasmTree) -> Vec<WasmNodeInfo> {
     tree_sitter_language_pack::named_children_info(&tree.inner)
@@ -2588,6 +2874,18 @@ pub fn named_children_info(tree: WasmTree) -> Vec<WasmNodeInfo> {
         .collect()
 }
 
+/// Parse source code with the named language, returning the syntax tree.
+///
+/// Uses the global registry to look up the language by name.
+/// Caches parsers per-thread so repeated calls for the same language avoid
+/// re-creating the parser.
+///
+/// # Examples
+///
+/// ```no_run
+/// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
+/// assert_eq!(tree.root_node().kind(), "module");
+/// ```
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "parseString")]
 pub fn parse_string(language: String, source: Vec<u8>) -> Result<WasmTree, JsValue> {
@@ -2598,41 +2896,128 @@ pub fn parse_string(language: String, source: Vec<u8>) -> Result<WasmTree, JsVal
     })
 }
 
+/// Check whether any node in the tree matches the given type name.
+///
+/// Performs a depth-first traversal using `TreeCursor`.
 #[wasm_bindgen(js_name = "treeContainsNodeType")]
 pub fn tree_contains_node_type(tree: WasmTree, node_type: String) -> bool {
     tree_sitter_language_pack::tree_contains_node_type(&tree.inner, &node_type)
 }
 
+/// Check whether the tree contains any ERROR or MISSING nodes.
+///
+/// Useful for determining if the parse was clean or had syntax errors.
 #[wasm_bindgen(js_name = "treeHasErrorNodes")]
 pub fn tree_has_error_nodes(tree: WasmTree) -> bool {
     tree_sitter_language_pack::tree_has_error_nodes(&tree.inner)
 }
 
+/// Return the S-expression representation of the entire tree.
+///
+/// This is the standard tree-sitter debug format, useful for logging,
+/// snapshot testing, and debugging grammars.
 #[wasm_bindgen(js_name = "treeToSexp")]
 pub fn tree_to_sexp(tree: WasmTree) -> String {
     tree_sitter_language_pack::tree_to_sexp(&tree.inner)
 }
 
+/// Count the number of ERROR and MISSING nodes in the tree.
+///
+/// Returns 0 for a clean parse.
 #[wasm_bindgen(js_name = "treeErrorCount")]
 pub fn tree_error_count(tree: WasmTree) -> usize {
     tree_sitter_language_pack::tree_error_count(&tree.inner)
 }
 
+/// Get the highlights query for a language, if bundled.
+///
+/// Returns the contents of `highlights.scm` as a static string, or `None`
+/// if no highlights query is bundled for this language.
+///
+/// # Example
+///
+/// ```
+/// use tree_sitter_language_pack::get_highlights_query;
+///
+/// // Returns Some(...) for languages with bundled queries
+/// let query = get_highlights_query("python");
+/// // Returns None for languages without bundled highlights queries
+/// let missing = get_highlights_query("nonexistent_lang");
+/// assert!(missing.is_none());
+/// ```
 #[wasm_bindgen(js_name = "getHighlightsQuery")]
 pub fn get_highlights_query(language: String) -> Option<String> {
     tree_sitter_language_pack::get_highlights_query(&language).map(Into::into)
 }
 
+/// Get the injections query for a language, if bundled.
+///
+/// Returns the contents of `injections.scm` as a static string, or `None`
+/// if no injections query is bundled for this language.
+///
+/// # Example
+///
+/// ```
+/// use tree_sitter_language_pack::get_injections_query;
+///
+/// let query = get_injections_query("markdown");
+/// // Returns None for languages without bundled injections queries
+/// let missing = get_injections_query("nonexistent_lang");
+/// assert!(missing.is_none());
+/// ```
 #[wasm_bindgen(js_name = "getInjectionsQuery")]
 pub fn get_injections_query(language: String) -> Option<String> {
     tree_sitter_language_pack::get_injections_query(&language).map(Into::into)
 }
 
+/// Get the locals query for a language, if bundled.
+///
+/// Returns the contents of `locals.scm` as a static string, or `None`
+/// if no locals query is bundled for this language.
+///
+/// # Example
+///
+/// ```
+/// use tree_sitter_language_pack::get_locals_query;
+///
+/// let query = get_locals_query("python");
+/// // Returns None for languages without bundled locals queries
+/// let missing = get_locals_query("nonexistent_lang");
+/// assert!(missing.is_none());
+/// ```
 #[wasm_bindgen(js_name = "getLocalsQuery")]
 pub fn get_locals_query(language: String) -> Option<String> {
     tree_sitter_language_pack::get_locals_query(&language).map(Into::into)
 }
 
+/// Execute a tree-sitter query pattern against a parsed tree.
+///
+/// The `query_source` is an S-expression pattern like:
+/// ```text
+/// (function_definition name: (identifier) @name)
+/// ```
+///
+/// Returns all matches with their captured nodes.
+///
+/// # Arguments
+///
+/// * `tree` - The parsed syntax tree to query.
+/// * `language` - Language name (used to compile the query pattern).
+/// * `query_source` - The tree-sitter query pattern string.
+/// * `source` - The original source code bytes (needed for capture resolution).
+///
+/// # Examples
+///
+/// ```no_run
+/// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
+/// let matches = tree_sitter_language_pack::query::run_query(
+///     &tree,
+///     "python",
+///     "(function_definition name: (identifier) @fn_name)",
+///     b"def hello(): pass",
+/// ).unwrap();
+/// assert!(!matches.is_empty());
+/// ```
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "runQuery")]
 pub fn run_query(
@@ -2646,11 +3031,61 @@ pub fn run_query(
     Ok(result.into_iter().map(Into::into).collect())
 }
 
+/// Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
+/// Returns a list of `(start_byte, end_byte)` ranges.
+///
+/// The algorithm works by:
+/// 1. Walking the tree-sitter AST to collect all nodes with their depth.
+/// 2. Using depth as a semantic level: shallower nodes (functions, classes) are
+///    preferred split boundaries over deeper nodes (statements, expressions).
+/// 3. Greedily merging adjacent sections at the best semantic level that keeps
+///    each chunk under `max_chunk_size` bytes.
+/// 4. When no AST node boundary fits, falling back to line boundaries and
+///    ultimately to raw byte splits.
+///
+/// The function never splits in the middle of a token/leaf node when an AST
+/// boundary is available.
+///
+/// # Arguments
+///
+/// * `source` - The full source code string.
+/// * `tree`   - A tree-sitter `Tree` previously parsed from `source`.
+/// * `max_chunk_size` - Maximum size in bytes for each chunk.
+///
+/// # Returns
+///
+/// A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
+/// entire source. Ranges are non-overlapping, contiguous, and each range is
+/// at most `max_chunk_size` bytes (except when a single indivisible token
+/// exceeds that limit).
 #[wasm_bindgen(js_name = "splitCode")]
 pub fn split_code(_source: String, _tree: WasmTree, _max_chunk_size: usize) -> Vec<String> {
     Vec::new()
 }
 
+/// Get a tree-sitter [`Language`] by name using the global registry.
+///
+/// Resolves language aliases (e.g., `"shell"` maps to `"bash"`).
+/// When the `download` feature is enabled (default), automatically downloads
+/// the parser from GitHub releases if not found locally.
+///
+/// # Errors
+///
+/// Returns [`Error::LanguageNotFound`] if the language is not recognized,
+/// or [`Error::Download`] if auto-download fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::get_language;
+///
+/// let lang = get_language("python").unwrap();
+/// // Use the Language with a tree-sitter Parser
+/// let mut parser = tree_sitter::Parser::new();
+/// parser.set_language(&lang).unwrap();
+/// let tree = parser.parse("x = 1", None).unwrap();
+/// assert_eq!(tree.root_node().kind(), "module");
+/// ```
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "getLanguage")]
 pub fn get_language(name: String) -> Result<WasmLanguage, JsValue> {
@@ -2660,6 +3095,25 @@ pub fn get_language(name: String) -> Result<WasmLanguage, JsValue> {
     })
 }
 
+/// Get a tree-sitter [`Parser`] pre-configured for the given language.
+///
+/// This is a convenience function that calls [`get_language`] and configures
+/// a new parser in one step.
+///
+/// # Errors
+///
+/// Returns [`Error::LanguageNotFound`] if the language is not recognized, or
+/// [`Error::ParserSetup`] if the language cannot be applied to the parser.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::get_parser;
+///
+/// let mut parser = get_parser("rust").unwrap();
+/// let tree = parser.parse("fn main() {}", None).unwrap();
+/// assert!(!tree.root_node().has_error());
+/// ```
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "getParser")]
 pub fn get_parser(name: String) -> Result<WasmParser, JsValue> {
@@ -2669,45 +3123,193 @@ pub fn get_parser(name: String) -> Result<WasmParser, JsValue> {
     })
 }
 
+/// List all available language names (sorted, deduplicated, includes aliases).
+///
+/// Returns names of both statically compiled and dynamically loadable languages,
+/// plus any configured aliases.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::available_languages;
+///
+/// let langs = available_languages();
+/// for name in &langs {
+///     println!("{}", name);
+/// }
+/// ```
 #[wasm_bindgen(js_name = "availableLanguages")]
 pub fn available_languages() -> Vec<String> {
     tree_sitter_language_pack::available_languages()
 }
 
+/// Check if a language is available by name or alias.
+///
+/// Returns `true` if the language can be loaded (statically compiled,
+/// dynamically available, or a known alias for one of these).
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::has_language;
+///
+/// assert!(has_language("python"));
+/// assert!(has_language("shell")); // alias for "bash"
+/// assert!(!has_language("nonexistent_language"));
+/// ```
 #[wasm_bindgen(js_name = "hasLanguage")]
 pub fn has_language(name: String) -> bool {
     tree_sitter_language_pack::has_language(&name)
 }
 
+/// Return the number of available languages.
+///
+/// Includes statically compiled languages, dynamically loadable languages,
+/// and aliases.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::language_count;
+///
+/// let count = language_count();
+/// println!("{} languages available", count);
+/// ```
 #[wasm_bindgen(js_name = "languageCount")]
 pub fn language_count() -> usize {
     tree_sitter_language_pack::language_count()
 }
 
+/// Run extraction patterns against source code.
+///
+/// Convenience wrapper around [`extract::extract`].
+///
+/// # Errors
+///
+/// Returns an error if the language is not found, parsing fails, or a query
+/// pattern is invalid.
+///
+/// # Example
+///
+/// ```no_run
+/// use ahash::AHashMap;
+/// use tree_sitter_language_pack::{ExtractionConfig, ExtractionPattern, CaptureOutput, extract_patterns};
+///
+/// let mut patterns = AHashMap::new();
+/// patterns.insert("fns".to_string(), ExtractionPattern {
+///     query: "(function_definition name: (identifier) @fn_name)".to_string(),
+///     capture_output: CaptureOutput::default(),
+///     child_fields: Vec::new(),
+///     max_results: None,
+///     byte_range: None,
+/// });
+/// let config = ExtractionConfig { language: "python".to_string(), patterns };
+/// let result = extract_patterns("def hello(): pass", &config).unwrap();
+/// ```
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "extractPatterns")]
 pub fn extract_patterns(_source: String, _config: WasmExtractionConfig) -> Result<WasmExtractionResult, JsValue> {
     Err(JsValue::from_str("Not implemented: extract_patterns"))
 }
 
+/// Initialize the language pack with the given configuration.
+///
+/// Applies any custom cache directory, then downloads all languages and groups
+/// specified in the config. This is the recommended entry point when you want
+/// to pre-warm the cache before use.
+///
+/// # Errors
+///
+/// Returns an error if configuration cannot be applied or if downloads fail.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::{PackConfig, init};
+///
+/// let config = PackConfig {
+///     cache_dir: None,
+///     languages: Some(vec!["python".to_string(), "rust".to_string()]),
+///     groups: None,
+/// };
+/// init(&config).unwrap();
+/// ```
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen]
 pub fn init(_config: WasmPackConfig) -> Result<(), JsValue> {
     Err(JsValue::from_str("Not implemented: init"))
 }
 
+/// Apply download configuration without downloading anything.
+///
+/// Use this to set a custom cache directory before the first call to
+/// [`get_language`] or any download function. Changing the cache dir
+/// after languages have been registered has no effect on already-loaded
+/// languages.
+///
+/// # Errors
+///
+/// Returns an error if the lock cannot be acquired.
+///
+/// # Example
+///
+/// ```no_run
+/// use std::path::PathBuf;
+/// use tree_sitter_language_pack::{PackConfig, configure};
+///
+/// let config = PackConfig {
+///     cache_dir: Some(PathBuf::from("/tmp/my-parsers")),
+///     languages: None,
+///     groups: None,
+/// };
+/// configure(&config).unwrap();
+/// ```
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen]
 pub fn configure(_config: WasmPackConfig) -> Result<(), JsValue> {
     Err(JsValue::from_str("Not implemented: configure"))
 }
 
+/// Download specific languages to the local cache.
+///
+/// Returns the number of newly downloaded languages (languages that were
+/// already cached are not counted).
+///
+/// # Errors
+///
+/// Returns an error if any language is not available in the manifest or if
+/// the download fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::download;
+///
+/// let count = download(&["python", "rust", "typescript"]).unwrap();
+/// println!("Downloaded {} new languages", count);
+/// ```
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen]
 pub fn download(_names: Vec<String>) -> Result<usize, JsValue> {
     Err(JsValue::from_str("Not implemented: download"))
 }
 
+/// Download all available languages from the remote manifest.
+///
+/// Returns the number of newly downloaded languages.
+///
+/// # Errors
+///
+/// Returns an error if the manifest cannot be fetched or a download fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::download_all;
+///
+/// let count = download_all().unwrap();
+/// println!("Downloaded {} languages", count);
+/// ```
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "downloadAll")]
 pub fn download_all() -> Result<usize, JsValue> {
@@ -2715,6 +3317,24 @@ pub fn download_all() -> Result<usize, JsValue> {
     Ok(result)
 }
 
+/// Return all language names available in the remote manifest (305).
+///
+/// Fetches (and caches) the remote manifest to discover the full list of
+/// downloadable languages. Use [`downloaded_languages`] to list what is
+/// already cached locally.
+///
+/// # Errors
+///
+/// Returns an error if the manifest cannot be fetched.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::manifest_languages;
+///
+/// let langs = manifest_languages().unwrap();
+/// println!("{} languages available for download", langs.len());
+/// ```
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "manifestLanguages")]
 pub fn manifest_languages() -> Result<Vec<String>, JsValue> {
@@ -2722,11 +3342,41 @@ pub fn manifest_languages() -> Result<Vec<String>, JsValue> {
     Ok(result)
 }
 
+/// Return languages that are already downloaded and cached locally.
+///
+/// Does not perform any network requests. Returns an empty list if the
+/// cache directory does not exist or cannot be read.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::downloaded_languages;
+///
+/// let langs = downloaded_languages();
+/// println!("{} languages already cached", langs.len());
+/// ```
 #[wasm_bindgen(js_name = "downloadedLanguages")]
 pub fn downloaded_languages() -> Vec<String> {
     tree_sitter_language_pack::downloaded_languages()
 }
 
+/// Delete all cached parser shared libraries.
+///
+/// Resets the cache registration so the next call to [`get_language`] or
+/// a download function will re-register the (now empty) cache directory.
+///
+/// # Errors
+///
+/// Returns an error if the cache directory cannot be removed.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::clean_cache;
+///
+/// clean_cache().unwrap();
+/// println!("Cache cleared");
+/// ```
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "cleanCache")]
 pub fn clean_cache() -> Result<(), JsValue> {
@@ -2734,6 +3384,23 @@ pub fn clean_cache() -> Result<(), JsValue> {
     Ok(result)
 }
 
+/// Return the effective cache directory path.
+///
+/// This is either the custom path set via [`configure`] / [`init`] or the
+/// default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
+///
+/// # Errors
+///
+/// Returns an error if the system cache directory cannot be determined.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::cache_dir;
+///
+/// let dir = cache_dir().unwrap();
+/// println!("Cache directory: {}", dir.display());
+/// ```
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen(js_name = "cacheDir")]
 pub fn cache_dir() -> Result<String, JsValue> {
@@ -2748,7 +3415,7 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for WasmExtractionPatter
             capture_output: val.capture_output.into(),
             child_fields: val.child_fields,
             max_results: val.max_results,
-            byte_range: val.byte_range.as_ref().map(|v| format!("{:?}", v)),
+            byte_range: val.byte_range.as_ref().map(|v| format!("{v:?}")),
         }
     }
 }
@@ -3270,7 +3937,7 @@ impl From<tree_sitter_language_pack::ProcessConfig> for WasmProcessConfig {
             symbols: val.symbols,
             diagnostics: val.diagnostics,
             chunk_max_size: val.chunk_max_size,
-            extractions: val.extractions.as_ref().map(|v| format!("{:?}", v)),
+            extractions: val.extractions.as_ref().map(|v| format!("{v:?}")),
         }
     }
 }
@@ -3288,7 +3955,7 @@ impl From<tree_sitter_language_pack::QueryMatch> for WasmQueryMatch {
     fn from(val: tree_sitter_language_pack::QueryMatch) -> Self {
         Self {
             pattern_index: val.pattern_index,
-            captures: val.captures.iter().map(|i| format!("{:?}", i)).collect(),
+            captures: val.captures.iter().map(|i| i.to_string()).collect(),
         }
     }
 }
@@ -3517,8 +4184,32 @@ impl From<tree_sitter_language_pack::DiagnosticSeverity> for WasmDiagnosticSever
     }
 }
 
-/// Convert a `tree_sitter_language_pack::error::Error` error to a `JsValue` string.
+/// Return the error code string for a `tree_sitter_language_pack::error::Error` variant.
+#[allow(dead_code)]
+fn error_error_code(e: &tree_sitter_language_pack::error::Error) -> &'static str {
+    #[allow(unreachable_patterns)]
+    match e {
+        tree_sitter_language_pack::error::Error::LanguageNotFound(..) => "language_not_found",
+        tree_sitter_language_pack::error::Error::DynamicLoad(..) => "dynamic_load",
+        tree_sitter_language_pack::error::Error::NullLanguagePointer(..) => "null_language_pointer",
+        tree_sitter_language_pack::error::Error::ParserSetup(..) => "parser_setup",
+        tree_sitter_language_pack::error::Error::LockPoisoned(..) => "lock_poisoned",
+        tree_sitter_language_pack::error::Error::Config(..) => "config",
+        tree_sitter_language_pack::error::Error::ParseFailed => "parse_failed",
+        tree_sitter_language_pack::error::Error::QueryError(..) => "query_error",
+        tree_sitter_language_pack::error::Error::InvalidRange(..) => "invalid_range",
+        tree_sitter_language_pack::error::Error::Io(..) => "io",
+        _ => "error",
+    }
+}
+
+/// Convert a `tree_sitter_language_pack::error::Error` error to a `JsValue` object with `code` and `message` fields.
 #[allow(dead_code)]
 fn error_to_js_value(e: tree_sitter_language_pack::error::Error) -> wasm_bindgen::JsValue {
-    wasm_bindgen::JsValue::from_str(&e.to_string())
+    let code = error_error_code(&e);
+    let message = e.to_string();
+    let obj = js_sys::Object::new();
+    js_sys::Reflect::set(&obj, &"code".into(), &code.into()).ok();
+    js_sys::Reflect::set(&obj, &"message".into(), &message.into()).ok();
+    obj.into()
 }

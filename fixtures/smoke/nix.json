@@ -2,9 +2,7 @@
 	"id": "smoke_nix",
 	"description": "Smoke test: load nix and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "nix",

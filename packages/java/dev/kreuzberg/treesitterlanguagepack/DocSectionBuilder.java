@@ -3,6 +3,9 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import java.util.Optional;
 
+/**
+ * A section within a docstring (e.g., Args, Returns, Raises).
+ */
 public class DocSectionBuilder {
 
     private String kind = "";

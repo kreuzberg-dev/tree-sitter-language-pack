@@ -2,9 +2,7 @@
 	"id": "smoke_html",
 	"description": "Smoke test: load html and parse a simple snippet",
 	"category": "smoke",
-	"tags": [
-		"smoke"
-	],
+	"tags": ["smoke"],
 	"call": "parse",
 	"input": {
 		"language": "html",
