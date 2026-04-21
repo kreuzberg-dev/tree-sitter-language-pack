@@ -12,6 +12,16 @@ import (
 	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
+func Test_ExtractInvalidByteRange(t *testing.T) {
+	// extract_patterns() with out-of-bounds byte_range returns empty results
+	result, err := tspack.Process(`x = 1
+`, `{"language":"python","patterns":{"funcs":{"byte_range":[9999,99999],"capture_output":"Full","query":"(expression_statement) @e"}}}`)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	assert.Equal(t, len(result.Results.Funcs.Matches), 0, "expected exactly 0 elements")
+}
+
 func Test_ExtractPatternsNoMatches(t *testing.T) {
 	// Extraction query that matches nothing returns empty results
 	result, err := tspack.Process(`x = 1
@@ -38,6 +48,17 @@ def world(x):
 		t.Errorf("equals mismatch: got %v", result.Language)
 	}
 	assert.GreaterOrEqual(t, len(result.Results.Functions.Matches), 2, "expected at least 2 elements")
+}
+
+func Test_ValidateEmptyPatterns(t *testing.T) {
+	// validate_extraction() with empty patterns returns valid
+	result, err := tspack.Process("", `{"language":"python","patterns":{}}`)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	if result.Valid != true {
+		t.Errorf("equals mismatch: got %v", result.Valid)
+	}
 }
 
 func Test_ValidateExtractionInvalidQuery(t *testing.T) {

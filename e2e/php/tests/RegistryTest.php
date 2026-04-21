@@ -11,6 +11,34 @@ use Tree\Sitter\Language\Pack\TreeSitterLanguagePack;
 /** E2e tests for category: registry. */
 final class RegistryTest extends TestCase
 {
+    /** get_language('python') returns a valid Language object */
+    public function test_get_language_python(): void
+    {
+        $this->expectNotToPerformAssertions();
+        $language = TreeSitterLanguagePack::get_language("python");
+    }
+
+    /** get_language('nonexistent_xyz') returns an error for unknown language */
+    public function test_get_language_unknown(): void
+    {
+        $this->expectException(\Exception::class);
+        TreeSitterLanguagePack::get_language("nonexistent_xyz");
+    }
+
+    /** get_parser('python') returns a valid Parser object */
+    public function test_get_parser_python(): void
+    {
+        $this->expectNotToPerformAssertions();
+        $parser = TreeSitterLanguagePack::get_parser("python");
+    }
+
+    /** get_parser('nonexistent_xyz') returns an error for unknown language */
+    public function test_get_parser_unknown(): void
+    {
+        $this->expectException(\Exception::class);
+        TreeSitterLanguagePack::get_parser("nonexistent_xyz");
+    }
+
     /** has_language('nonexistent') should return false */
     public function test_registry_has_language_false(): void
     {
@@ -28,14 +56,14 @@ final class RegistryTest extends TestCase
     /** language_count returns a value greater than 300 */
     public function test_registry_language_count(): void
     {
-        $result = TreeSitterLanguagePack::language_count([]);
+        $result = TreeSitterLanguagePack::language_count();
         $this->assertGreaterThanOrEqual(300, $result);
     }
 
     /** available_languages should return a non-empty list */
     public function test_registry_list_languages(): void
     {
-        $result = TreeSitterLanguagePack::available_languages(null);
+        $result = TreeSitterLanguagePack::available_languages();
         $this->assertNotEmpty($result);
     }
 }

@@ -3,6 +3,14 @@
 # E2e tests for category: tree-inspection
 set -euo pipefail
 
+test_split_code_python() {
+    # parse_string() Python code with multiple functions finds all function_definition nodes
+    local output
+    output=$(tree_sitter_language_pack process)
+
+    # TODO: unsupported assertion type: method_result
+}
+
 test_tree_error_count_broken() {
     # Parse broken Python code and verify error count >= 1
     local output
@@ -11,8 +19,24 @@ test_tree_error_count_broken() {
     # TODO: unsupported assertion type: method_result
 }
 
+test_tree_error_count_multiple() {
+    # parse_string() with multiple syntax errors counts all error nodes
+    local output
+    output=$(tree_sitter_language_pack process)
+
+    # TODO: unsupported assertion type: method_result
+}
+
 test_tree_error_count_valid() {
     # Parse valid Python code and verify zero error count
+    local output
+    output=$(tree_sitter_language_pack process)
+
+    # TODO: unsupported assertion type: method_result
+}
+
+test_tree_find_nodes_no_match() {
+    # Parse Python with no class definitions and verify find_nodes_by_type returns 0
     local output
     output=$(tree_sitter_language_pack process)
 
@@ -51,6 +75,14 @@ test_tree_named_children_class_and_function() {
     # TODO: unsupported assertion type: method_result
 }
 
+test_tree_root_node_info_javascript() {
+    # Parse JavaScript source and verify root node type is program
+    local output
+    output=$(tree_sitter_language_pack process)
+
+    # TODO: unsupported assertion type: method_result
+}
+
 test_tree_root_node_info_python() {
     # Parse Python source and verify root node info
     local output
@@ -68,12 +100,16 @@ test_tree_to_sexp_python() {
 }
 
 run_tests_tree_inspection() {
+    run_test test_split_code_python
     run_test test_tree_error_count_broken
+    run_test test_tree_error_count_multiple
     run_test test_tree_error_count_valid
+    run_test test_tree_find_nodes_no_match
     run_test test_tree_find_nodes_two_functions
     run_test test_tree_has_error_nodes_broken_syntax
     run_test test_tree_has_error_nodes_valid_code
     run_test test_tree_named_children_class_and_function
+    run_test test_tree_root_node_info_javascript
     run_test test_tree_root_node_info_python
     run_test test_tree_to_sexp_python
 }

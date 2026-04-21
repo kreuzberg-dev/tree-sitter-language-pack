@@ -4,6 +4,24 @@
 use tree_sitter_language_pack::process;
 
 #[test]
+fn test_process_javascript_exports_count() {
+    // JavaScript with multiple exports, verify export count
+    let source = r#"export function greet() { return 'hi'; }
+export const VERSION = '1.0';
+export default class App {}
+"#;
+    let config_json = serde_json::json!({"language": "javascript"});
+    let config = serde_json::from_value(config_json).unwrap();
+    let result = process(&source, &config).expect("should succeed");
+    assert_eq!(result.language.trim(), r#"javascript"#, "equals assertion failed");
+    assert!(
+        result.exports.len() >= 2,
+        "expected at least 2 elements, got {}",
+        result.exports.len()
+    );
+}
+
+#[test]
 fn test_process_javascript_exports_detail() {
     // JavaScript with exports, verify export count
     let source = r#"export function greet(name) {
@@ -20,6 +38,38 @@ export const VERSION = '1.0';
 }
 
 #[test]
+fn test_process_python_all_features() {
+    // Python comprehensive source with all feature extraction enabled
+    let source = r#"import os
+from pathlib import Path
+
+# Configuration
+MY_CONST = 42
+
+def process_file(path):
+    """Process a file and return contents."""
+    with open(path) as f:
+        return f.read()
+
+class FileProcessor:
+    def __init__(self, base_dir):
+        self.base_dir = base_dir
+"#;
+    let config_json = serde_json::json!({"comments": true, "docstrings": true, "imports": true, "language": "python", "structure": true, "symbols": true});
+    let config = serde_json::from_value(config_json).unwrap();
+    let result = process(&source, &config).expect("should succeed");
+    assert_eq!(result.language.trim(), r#"python"#, "equals assertion failed");
+    assert!(
+        result.structure.len() >= 2,
+        "expected at least 2 elements, got {}",
+        result.structure.len()
+    );
+    assert!(!result.imports.is_empty(), "expected >= 1");
+    assert!(!result.comments.is_empty(), "expected >= 1");
+    assert!(result.metrics.total_lines >= 10, "expected >= 10");
+}
+
+#[test]
 fn test_process_python_comments() {
     // Python with comments, verify comment count
     let source = r#"# This is a comment
@@ -33,6 +83,20 @@ def hello():
     let result = process(&source, &config).expect("should succeed");
     assert_eq!(result.language.trim(), r#"python"#, "equals assertion failed");
     assert!(!result.comments.is_empty(), "expected >= 1");
+}
+
+#[test]
+fn test_process_python_docstrings() {
+    // Python with function docstring, verify docstring count
+    let source = r#"def greet(name):
+    """Say hello to someone."""
+    return f"Hello {name}"
+"#;
+    let config_json = serde_json::json!({"docstrings": true, "language": "python"});
+    let config = serde_json::from_value(config_json).unwrap();
+    let result = process(&source, &config).expect("should succeed");
+    assert_eq!(result.language.trim(), r#"python"#, "equals assertion failed");
+    assert!(result.metrics.total_lines >= 3, "expected >= 3");
 }
 
 #[test]
@@ -55,4 +119,18 @@ def world():
     assert!(result.metrics.code_lines >= 4, "expected >= 4");
     assert!(result.metrics.comment_lines >= 1, "expected >= 1");
     assert!(result.metrics.max_depth >= 1, "expected >= 1");
+}
+
+#[test]
+fn test_process_python_symbols() {
+    // Python with class and functions, verify symbol count
+    let source = r#"MY_CONST = 42
+def helper(): pass
+class Widget: pass
+"#;
+    let config_json = serde_json::json!({"language": "python", "symbols": true});
+    let config = serde_json::from_value(config_json).unwrap();
+    let result = process(&source, &config).expect("should succeed");
+    assert_eq!(result.language.trim(), r#"python"#, "equals assertion failed");
+    assert!(!result.symbols.is_empty(), "expected >= 1");
 }

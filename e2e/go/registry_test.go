@@ -9,6 +9,38 @@ import (
 	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
+func Test_GetLanguagePython(t *testing.T) {
+	// get_language('python') returns a valid Language object
+	_, err := tspack.Process("", nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+}
+
+func Test_GetLanguageUnknown(t *testing.T) {
+	// get_language('nonexistent_xyz') returns an error for unknown language
+	_, err := tspack.Process("", nil)
+	if err == nil {
+		t.Errorf("expected an error, but call succeeded")
+	}
+}
+
+func Test_GetParserPython(t *testing.T) {
+	// get_parser('python') returns a valid Parser object
+	_, err := tspack.Process("", nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+}
+
+func Test_GetParserUnknown(t *testing.T) {
+	// get_parser('nonexistent_xyz') returns an error for unknown language
+	_, err := tspack.Process("", nil)
+	if err == nil {
+		t.Errorf("expected an error, but call succeeded")
+	}
+}
+
 func Test_RegistryHasLanguageFalse(t *testing.T) {
 	// has_language('nonexistent') should return false
 	result, err := tspack.Process("", nil)

@@ -13,6 +13,34 @@ public class RegistryTests
     private static readonly JsonSerializerOptions ConfigOptions = new() { Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) }, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault };
 
     [Fact]
+    public void Test_GetLanguagePython()
+    {
+        // get_language('python') returns a valid Language object
+        var result = TreeSitterLanguagePackLib.Process("", null);
+    }
+
+    [Fact]
+    public void Test_GetLanguageUnknown()
+    {
+        // get_language('nonexistent_xyz') returns an error for unknown language
+        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("", null));
+    }
+
+    [Fact]
+    public void Test_GetParserPython()
+    {
+        // get_parser('python') returns a valid Parser object
+        var result = TreeSitterLanguagePackLib.Process("", null);
+    }
+
+    [Fact]
+    public void Test_GetParserUnknown()
+    {
+        // get_parser('nonexistent_xyz') returns an error for unknown language
+        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("", null));
+    }
+
+    [Fact]
     public void Test_RegistryHasLanguageFalse()
     {
         // has_language('nonexistent') should return false

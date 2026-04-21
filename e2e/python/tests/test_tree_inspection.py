@@ -3,6 +3,13 @@
 from tree_sitter_language_pack import parse_string
 
 
+def test_split_code_python() -> None:
+    """parse_string() Python code with multiple functions finds all function_definition nodes."""
+    language = "python"
+    source = "def foo():\n    pass\n\ndef bar():\n    pass\n\ndef baz():\n    pass\n"
+    tree = parse_string(language=language, source=source)
+    # TODO: unsupported assertion type: method_result
+
 def test_tree_error_count_broken() -> None:
     """Parse broken Python code and verify error count >= 1."""
     language = "python"
@@ -10,10 +17,24 @@ def test_tree_error_count_broken() -> None:
     tree = parse_string(language=language, source=source)
     # TODO: unsupported assertion type: method_result
 
+def test_tree_error_count_multiple() -> None:
+    """parse_string() with multiple syntax errors counts all error nodes."""
+    language = "python"
+    source = "def (\ndef (\n"
+    tree = parse_string(language=language, source=source)
+    # TODO: unsupported assertion type: method_result
+
 def test_tree_error_count_valid() -> None:
     """Parse valid Python code and verify zero error count."""
     language = "python"
     source = "x = 1\ny = 2\n"
+    tree = parse_string(language=language, source=source)
+    # TODO: unsupported assertion type: method_result
+
+def test_tree_find_nodes_no_match() -> None:
+    """Parse Python with no class definitions and verify find_nodes_by_type returns 0."""
+    language = "python"
+    source = "x = 1\n"
     tree = parse_string(language=language, source=source)
     # TODO: unsupported assertion type: method_result
 
@@ -42,6 +63,13 @@ def test_tree_named_children_class_and_function() -> None:
     """Parse Python with class and function, verify named children count."""
     language = "python"
     source = "class Foo:\n    pass\n\ndef bar():\n    pass\n"
+    tree = parse_string(language=language, source=source)
+    # TODO: unsupported assertion type: method_result
+
+def test_tree_root_node_info_javascript() -> None:
+    """Parse JavaScript source and verify root node type is program."""
+    language = "javascript"
+    source = "const x = 1;\n"
     tree = parse_string(language=language, source=source)
     # TODO: unsupported assertion type: method_result
 

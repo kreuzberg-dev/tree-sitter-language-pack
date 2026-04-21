@@ -13,6 +13,14 @@ public class TreeInspectionTests
     private static readonly JsonSerializerOptions ConfigOptions = new() { Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) }, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault };
 
     [Fact]
+    public void Test_SplitCodePython()
+    {
+        // parse_string() Python code with multiple functions finds all function_definition nodes
+        var result = TreeSitterLanguagePackLib.Process("def foo():\n    pass\n\ndef bar():\n    pass\n\ndef baz():\n    pass\n", null);
+        // TODO: unsupported assertion type: method_result
+    }
+
+    [Fact]
     public void Test_TreeErrorCountBroken()
     {
         // Parse broken Python code and verify error count >= 1
@@ -21,10 +29,26 @@ public class TreeInspectionTests
     }
 
     [Fact]
+    public void Test_TreeErrorCountMultiple()
+    {
+        // parse_string() with multiple syntax errors counts all error nodes
+        var result = TreeSitterLanguagePackLib.Process("def (\ndef (\n", null);
+        // TODO: unsupported assertion type: method_result
+    }
+
+    [Fact]
     public void Test_TreeErrorCountValid()
     {
         // Parse valid Python code and verify zero error count
         var result = TreeSitterLanguagePackLib.Process("x = 1\ny = 2\n", null);
+        // TODO: unsupported assertion type: method_result
+    }
+
+    [Fact]
+    public void Test_TreeFindNodesNoMatch()
+    {
+        // Parse Python with no class definitions and verify find_nodes_by_type returns 0
+        var result = TreeSitterLanguagePackLib.Process("x = 1\n", null);
         // TODO: unsupported assertion type: method_result
     }
 
@@ -57,6 +81,14 @@ public class TreeInspectionTests
     {
         // Parse Python with class and function, verify named children count
         var result = TreeSitterLanguagePackLib.Process("class Foo:\n    pass\n\ndef bar():\n    pass\n", null);
+        // TODO: unsupported assertion type: method_result
+    }
+
+    [Fact]
+    public void Test_TreeRootNodeInfoJavascript()
+    {
+        // Parse JavaScript source and verify root node type is program
+        var result = TreeSitterLanguagePackLib.Process("const x = 1;\n", null);
         // TODO: unsupported assertion type: method_result
     }
 

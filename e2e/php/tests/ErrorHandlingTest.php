@@ -38,4 +38,18 @@ final class ErrorHandlingTest extends TestCase
         $this->expectException(\Exception::class);
         TreeSitterLanguagePack::parse_string("nonexistent_xyz", "");
     }
+
+    /** parse_string() returns error with empty language name */
+    public function test_parse_empty_language(): void
+    {
+        $this->expectException(\Exception::class);
+        TreeSitterLanguagePack::parse_string("", "x = 1");
+    }
+
+    /** process() returns error when config language is unknown */
+    public function test_process_unknown_language(): void
+    {
+        $this->expectException(\Exception::class);
+        TreeSitterLanguagePack::process("x = 1", ["language" => "nonexistent_xyz"]);
+    }
 }

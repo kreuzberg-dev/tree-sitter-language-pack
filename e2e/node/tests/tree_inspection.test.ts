@@ -3,13 +3,28 @@ import { describe, it, expect } from 'vitest';
 import { process } from '@kreuzberg/tree-sitter-language-pack';
 
 describe('tree-inspection', () => {
+  it('split_code_python: parse_string() Python code with multiple functions finds all function_definition nodes', () => {
+    const result = process("def foo():\n    pass\n\ndef bar():\n    pass\n\ndef baz():\n    pass\n", null);
+    // TODO: unsupported assertion type: method_result
+  });
+
   it('tree_error_count_broken: Parse broken Python code and verify error count >= 1', () => {
     const result = process("def (broken syntax @@@ !!!", null);
     // TODO: unsupported assertion type: method_result
   });
 
+  it('tree_error_count_multiple: parse_string() with multiple syntax errors counts all error nodes', () => {
+    const result = process("def (\ndef (\n", null);
+    // TODO: unsupported assertion type: method_result
+  });
+
   it('tree_error_count_valid: Parse valid Python code and verify zero error count', () => {
     const result = process("x = 1\ny = 2\n", null);
+    // TODO: unsupported assertion type: method_result
+  });
+
+  it('tree_find_nodes_no_match: Parse Python with no class definitions and verify find_nodes_by_type returns 0', () => {
+    const result = process("x = 1\n", null);
     // TODO: unsupported assertion type: method_result
   });
 
@@ -30,6 +45,11 @@ describe('tree-inspection', () => {
 
   it('tree_named_children_class_and_function: Parse Python with class and function, verify named children count', () => {
     const result = process("class Foo:\n    pass\n\ndef bar():\n    pass\n", null);
+    // TODO: unsupported assertion type: method_result
+  });
+
+  it('tree_root_node_info_javascript: Parse JavaScript source and verify root node type is program', () => {
+    const result = process("const x = 1;\n", null);
     // TODO: unsupported assertion type: method_result
   });
 

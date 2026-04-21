@@ -37,11 +37,27 @@ public class QueryTests
     }
 
     [Fact]
+    public void Test_InjectionsQueryUnknownLanguage()
+    {
+        // get_injections_query returns empty for unknown language
+        var result = TreeSitterLanguagePackLib.Process("", null);
+        Assert.True(string.IsNullOrEmpty(result?.ToString()));
+    }
+
+    [Fact]
     public void Test_LocalsQueryPython()
     {
         // get_locals_query returns non-empty for python
         var result = TreeSitterLanguagePackLib.Process("", null);
         Assert.False(string.IsNullOrEmpty(result?.ToString()));
+    }
+
+    [Fact]
+    public void Test_LocalsQueryUnknownLanguage()
+    {
+        // get_locals_query returns empty for unknown language
+        var result = TreeSitterLanguagePackLib.Process("", null);
+        Assert.True(string.IsNullOrEmpty(result?.ToString()));
     }
 
     [Fact]

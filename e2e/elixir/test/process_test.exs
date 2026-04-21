@@ -3,6 +3,14 @@
 defmodule E2e.ProcessTest do
   use ExUnit.Case, async: true
 
+  describe "process_javascript_exports_count" do
+    test "JavaScript with multiple exports, verify export count" do
+      {:ok, result} = TreeSitterLanguagePack.process("export function greet() { return 'hi'; }\nexport const VERSION = '1.0';\nexport default class App {}\n", %{"language" => "javascript"})
+      assert String.trim(result.language) == "javascript"
+      assert length(result.exports) >= 2
+    end
+  end
+
   describe "process_javascript_exports_detail" do
     test "JavaScript with exports, verify export count" do
       {:ok, result} = TreeSitterLanguagePack.process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", %{"language" => "javascript"})
@@ -11,11 +19,30 @@ defmodule E2e.ProcessTest do
     end
   end
 
+  describe "process_python_all_features" do
+    test "Python comprehensive source with all feature extraction enabled" do
+      {:ok, result} = TreeSitterLanguagePack.process("import os\nfrom pathlib import Path\n\n\# Configuration\nMY_CONST = 42\n\ndef process_file(path):\n    \"\"\"Process a file and return contents.\"\"\"\n    with open(path) as f:\n        return f.read()\n\nclass FileProcessor:\n    def __init__(self, base_dir):\n        self.base_dir = base_dir\n", %{"comments" => true, "docstrings" => true, "imports" => true, "language" => "python", "structure" => true, "symbols" => true})
+      assert String.trim(result.language) == "python"
+      assert length(result.structure) >= 2
+      assert length(result.imports) >= 1
+      assert length(result.comments) >= 1
+      assert result.metrics.total_lines >= 10
+    end
+  end
+
   describe "process_python_comments" do
     test "Python with comments, verify comment count" do
       {:ok, result} = TreeSitterLanguagePack.process("\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n", %{"comments" => true, "language" => "python"})
       assert String.trim(result.language) == "python"
       assert length(result.comments) >= 1
+    end
+  end
+
+  describe "process_python_docstrings" do
+    test "Python with function docstring, verify docstring count" do
+      {:ok, result} = TreeSitterLanguagePack.process("def greet(name):\n    \"\"\"Say hello to someone.\"\"\"\n    return f\"Hello {name}\"\n", %{"docstrings" => true, "language" => "python"})
+      assert String.trim(result.language) == "python"
+      assert result.metrics.total_lines >= 3
     end
   end
 
@@ -35,6 +62,14 @@ defmodule E2e.ProcessTest do
       assert result.metrics.code_lines >= 4
       assert result.metrics.comment_lines >= 1
       assert result.metrics.max_depth >= 1
+    end
+  end
+
+  describe "process_python_symbols" do
+    test "Python with class and functions, verify symbol count" do
+      {:ok, result} = TreeSitterLanguagePack.process("MY_CONST = 42\ndef helper(): pass\nclass Widget: pass\n", %{"language" => "python", "symbols" => true})
+      assert String.trim(result.language) == "python"
+      assert length(result.symbols) >= 1
     end
   end
 

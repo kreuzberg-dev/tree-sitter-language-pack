@@ -34,9 +34,27 @@ test_error_handling_unknown_language() {
     fi
 }
 
+test_parse_empty_language() {
+    # parse_string() returns error with empty language name
+    if tree_sitter_language_pack process >/dev/null 2>&1; then
+        echo 'FAIL [error]: expected command to fail but it succeeded' >&2
+        return 1
+    fi
+}
+
+test_process_unknown_language() {
+    # process() returns error when config language is unknown
+    if tree_sitter_language_pack process >/dev/null 2>&1; then
+        echo 'FAIL [error]: expected command to fail but it succeeded' >&2
+        return 1
+    fi
+}
+
 run_tests_error_handling() {
     run_test test_error_empty_language_name
     run_test test_error_handling_empty_source
     run_test test_error_handling_invalid_syntax
     run_test test_error_handling_unknown_language
+    run_test test_parse_empty_language
+    run_test test_process_unknown_language
 }

@@ -4,14 +4,6 @@
 use tree_sitter_language_pack::{get_highlights_query, get_injections_query, get_locals_query, parse_string};
 
 #[test]
-fn test_highlights_query_python() {
-    // get_highlights_query returns non-empty string for python
-    let language = r#"python"#;
-    let result = get_highlights_query(&language);
-    assert!(result.is_some(), "expected non-empty value");
-}
-
-#[test]
 fn test_highlights_query_unknown_language() {
     // get_highlights_query returns None for unknown language
     let language = r#"nonexistent_language_xyz"#;
@@ -20,19 +12,19 @@ fn test_highlights_query_unknown_language() {
 }
 
 #[test]
-fn test_injections_query_javascript() {
-    // get_injections_query returns non-empty for javascript (has embedded languages)
-    let language = r#"javascript"#;
+fn test_injections_query_unknown_language() {
+    // get_injections_query returns empty for unknown language
+    let language = r#"nonexistent_xyz"#;
     let result = get_injections_query(&language);
-    assert!(result.is_some(), "expected non-empty value");
+    assert!(result.is_none(), "expected empty value");
 }
 
 #[test]
-fn test_locals_query_python() {
-    // get_locals_query returns non-empty for python
-    let language = r#"python"#;
+fn test_locals_query_unknown_language() {
+    // get_locals_query returns empty for unknown language
+    let language = r#"nonexistent_xyz"#;
     let result = get_locals_query(&language);
-    assert!(result.is_some(), "expected non-empty value");
+    assert!(result.is_none(), "expected empty value");
 }
 
 #[test]

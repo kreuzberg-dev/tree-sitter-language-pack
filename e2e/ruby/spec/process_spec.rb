@@ -5,16 +5,37 @@ require 'tree_sitter_language_pack'
 require 'json'
 
 RSpec.describe 'process' do
+  it 'process_javascript_exports_count: JavaScript with multiple exports, verify export count' do
+    result = TreeSitterLanguagePack.process("export function greet() { return 'hi'; }\nexport const VERSION = '1.0';\nexport default class App {}\n", { 'language' => 'javascript' })
+    expect(result.language).to eq('javascript')
+    expect(result.exports.length).to be >= 2
+  end
+
   it 'process_javascript_exports_detail: JavaScript with exports, verify export count' do
     result = TreeSitterLanguagePack.process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", { 'language' => 'javascript' })
     expect(result.language).to eq('javascript')
     expect(result.exports.length).to be >= 1
   end
 
+  it 'process_python_all_features: Python comprehensive source with all feature extraction enabled' do
+    result = TreeSitterLanguagePack.process("import os\nfrom pathlib import Path\n\n\# Configuration\nMY_CONST = 42\n\ndef process_file(path):\n    \"\"\"Process a file and return contents.\"\"\"\n    with open(path) as f:\n        return f.read()\n\nclass FileProcessor:\n    def __init__(self, base_dir):\n        self.base_dir = base_dir\n", { 'comments' => true, 'docstrings' => true, 'imports' => true, 'language' => 'python', 'structure' => true, 'symbols' => true })
+    expect(result.language).to eq('python')
+    expect(result.structure.length).to be >= 2
+    expect(result.imports.length).to be >= 1
+    expect(result.comments.length).to be >= 1
+    expect(result.metrics.total_lines).to be >= 10
+  end
+
   it 'process_python_comments: Python with comments, verify comment count' do
     result = TreeSitterLanguagePack.process("\# This is a comment\n\# Another comment\ndef hello():\n    \# inline comment\n    pass\n", { 'comments' => true, 'language' => 'python' })
     expect(result.language).to eq('python')
     expect(result.comments.length).to be >= 1
+  end
+
+  it 'process_python_docstrings: Python with function docstring, verify docstring count' do
+    result = TreeSitterLanguagePack.process("def greet(name):\n    \"\"\"Say hello to someone.\"\"\"\n    return f\"Hello {name}\"\n", { 'docstrings' => true, 'language' => 'python' })
+    expect(result.language).to eq('python')
+    expect(result.metrics.total_lines).to be >= 3
   end
 
   it 'process_python_imports_detail: Python with multiple imports, verify imports contain specific source' do
@@ -30,6 +51,12 @@ RSpec.describe 'process' do
     expect(result.metrics.code_lines).to be >= 4
     expect(result.metrics.comment_lines).to be >= 1
     expect(result.metrics.max_depth).to be >= 1
+  end
+
+  it 'process_python_symbols: Python with class and functions, verify symbol count' do
+    result = TreeSitterLanguagePack.process("MY_CONST = 42\ndef helper(): pass\nclass Widget: pass\n", { 'language' => 'python', 'symbols' => true })
+    expect(result.language).to eq('python')
+    expect(result.symbols.length).to be >= 1
   end
 
   it 'process_rust_structure_name: Rust struct with name, verify structure name contains value' do

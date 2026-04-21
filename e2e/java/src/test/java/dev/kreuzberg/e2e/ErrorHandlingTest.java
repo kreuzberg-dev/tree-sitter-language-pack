@@ -31,4 +31,16 @@ class ErrorHandlingTest {
         assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("", null));
     }
 
+    @Test
+    void testParseEmptyLanguage() throws Exception {
+        // parse_string() returns error with empty language name
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("x = 1", null));
+    }
+
+    @Test
+    void testProcessUnknownLanguage() throws Exception {
+        // process() returns error when config language is unknown
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("x = 1", "{\"language\":\"nonexistent_xyz\"}"));
+    }
+
 }

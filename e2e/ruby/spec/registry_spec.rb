@@ -5,6 +5,24 @@ require 'tree_sitter_language_pack'
 require 'json'
 
 RSpec.describe 'registry' do
+  it 'get_language_python: get_language(\'python\') returns a valid Language object' do
+    result = TreeSitterLanguagePack.process('', nil)
+    expect(result).not_to be_nil
+  end
+
+  it 'get_language_unknown: get_language(\'nonexistent_xyz\') returns an error for unknown language' do
+    expect { TreeSitterLanguagePack.process('', nil) }.to raise_error
+  end
+
+  it 'get_parser_python: get_parser(\'python\') returns a valid Parser object' do
+    result = TreeSitterLanguagePack.process('', nil)
+    expect(result).not_to be_nil
+  end
+
+  it 'get_parser_unknown: get_parser(\'nonexistent_xyz\') returns an error for unknown language' do
+    expect { TreeSitterLanguagePack.process('', nil) }.to raise_error
+  end
+
   it 'registry_has_language_false: has_language(\'nonexistent\') should return false' do
     result = TreeSitterLanguagePack.process('', nil)
     # TODO: unsupported assertion type: is_false

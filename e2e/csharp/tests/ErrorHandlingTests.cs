@@ -40,4 +40,18 @@ public class ErrorHandlingTests
         // Loading a nonexistent language should produce an error.
         Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("", null));
     }
+
+    [Fact]
+    public void Test_ParseEmptyLanguage()
+    {
+        // parse_string() returns error with empty language name
+        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("x = 1", null));
+    }
+
+    [Fact]
+    public void Test_ProcessUnknownLanguage()
+    {
+        // process() returns error when config language is unknown
+        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("x = 1", "{\"language\":\"nonexistent_xyz\"}"));
+    }
 }

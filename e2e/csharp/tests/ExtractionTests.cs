@@ -13,6 +13,14 @@ public class ExtractionTests
     private static readonly JsonSerializerOptions ConfigOptions = new() { Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) }, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault };
 
     [Fact]
+    public void Test_ExtractInvalidByteRange()
+    {
+        // extract_patterns() with out-of-bounds byte_range returns empty results
+        var result = TreeSitterLanguagePackLib.Process("x = 1\n", "{\"language\":\"python\",\"patterns\":{\"funcs\":{\"byte_range\":[9999,99999],\"capture_output\":\"Full\",\"query\":\"(expression_statement) @e\"}}}");
+        Assert.Equal(0, result.Results.Funcs.Matches.Count);
+    }
+
+    [Fact]
     public void Test_ExtractPatternsNoMatches()
     {
         // Extraction query that matches nothing returns empty results
@@ -27,6 +35,14 @@ public class ExtractionTests
         var result = TreeSitterLanguagePackLib.Process("def hello():\n    pass\n\ndef world(x):\n    return x * 2\n", "{\"language\":\"python\",\"patterns\":{\"functions\":{\"capture_output\":\"Full\",\"query\":\"(function_definition name: (identifier) @name)\"}}}");
         Assert.Equal("python", result.Language.Trim());
         Assert.True(result.Results.Functions.Matches.Count >= 2, "expected at least 2 elements");
+    }
+
+    [Fact]
+    public void Test_ValidateEmptyPatterns()
+    {
+        // validate_extraction() with empty patterns returns valid
+        var result = TreeSitterLanguagePackLib.Process("", "{\"language\":\"python\",\"patterns\":{}}");
+        Assert.Equal(true, result.Valid);
     }
 
     [Fact]

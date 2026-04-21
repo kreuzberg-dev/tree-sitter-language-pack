@@ -7,6 +7,14 @@ import static org.junit.jupiter.api.Assertions.*;
 /** E2e tests for category: process. */
 class ProcessTest {
     @Test
+    void testProcessJavascriptExportsCount() throws Exception {
+        // JavaScript with multiple exports, verify export count
+        var result = TreeSitterLanguagePack.process("export function greet() { return 'hi'; }\nexport const VERSION = '1.0';\nexport default class App {}\n", "{\"language\":\"javascript\"}");
+        assertEquals("javascript", result.language().trim());
+        assertTrue(result.exports().size() >= 2, "expected at least 2 elements");
+    }
+
+    @Test
     void testProcessJavascriptExportsDetail() throws Exception {
         // JavaScript with exports, verify export count
         var result = TreeSitterLanguagePack.process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", "{\"language\":\"javascript\"}");
@@ -15,11 +23,30 @@ class ProcessTest {
     }
 
     @Test
+    void testProcessPythonAllFeatures() throws Exception {
+        // Python comprehensive source with all feature extraction enabled
+        var result = TreeSitterLanguagePack.process("import os\nfrom pathlib import Path\n\n# Configuration\nMY_CONST = 42\n\ndef process_file(path):\n    \"\"\"Process a file and return contents.\"\"\"\n    with open(path) as f:\n        return f.read()\n\nclass FileProcessor:\n    def __init__(self, base_dir):\n        self.base_dir = base_dir\n", "{\"comments\":true,\"docstrings\":true,\"imports\":true,\"language\":\"python\",\"structure\":true,\"symbols\":true}");
+        assertEquals("python", result.language().trim());
+        assertTrue(result.structure().size() >= 2, "expected at least 2 elements");
+        assertTrue(result.imports().size() >= 1, "expected at least 1 elements");
+        assertTrue(result.comments().size() >= 1, "expected at least 1 elements");
+        assertTrue(result.metrics().totalLines() >= 10, "expected >= 10");
+    }
+
+    @Test
     void testProcessPythonComments() throws Exception {
         // Python with comments, verify comment count
         var result = TreeSitterLanguagePack.process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", "{\"comments\":true,\"language\":\"python\"}");
         assertEquals("python", result.language().trim());
         assertTrue(result.comments().size() >= 1, "expected at least 1 elements");
+    }
+
+    @Test
+    void testProcessPythonDocstrings() throws Exception {
+        // Python with function docstring, verify docstring count
+        var result = TreeSitterLanguagePack.process("def greet(name):\n    \"\"\"Say hello to someone.\"\"\"\n    return f\"Hello {name}\"\n", "{\"docstrings\":true,\"language\":\"python\"}");
+        assertEquals("python", result.language().trim());
+        assertTrue(result.metrics().totalLines() >= 3, "expected >= 3");
     }
 
     @Test
@@ -39,6 +66,14 @@ class ProcessTest {
         assertTrue(result.metrics().codeLines() >= 4, "expected >= 4");
         assertTrue(result.metrics().commentLines() >= 1, "expected >= 1");
         assertTrue(result.metrics().maxDepth() >= 1, "expected >= 1");
+    }
+
+    @Test
+    void testProcessPythonSymbols() throws Exception {
+        // Python with class and functions, verify symbol count
+        var result = TreeSitterLanguagePack.process("MY_CONST = 42\ndef helper(): pass\nclass Widget: pass\n", "{\"language\":\"python\",\"symbols\":true}");
+        assertEquals("python", result.language().trim());
+        assertTrue(result.symbols().size() >= 1, "expected at least 1 elements");
     }
 
     @Test

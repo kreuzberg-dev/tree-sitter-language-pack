@@ -41,3 +41,19 @@ func Test_ErrorHandlingUnknownLanguage(t *testing.T) {
 		t.Errorf("expected an error, but call succeeded")
 	}
 }
+
+func Test_ParseEmptyLanguage(t *testing.T) {
+	// parse_string() returns error with empty language name
+	_, err := tspack.Process(`x = 1`, nil)
+	if err == nil {
+		t.Errorf("expected an error, but call succeeded")
+	}
+}
+
+func Test_ProcessUnknownLanguage(t *testing.T) {
+	// process() returns error when config language is unknown
+	_, err := tspack.Process(`x = 1`, `{"language":"nonexistent_xyz"}`)
+	if err == nil {
+		t.Errorf("expected an error, but call succeeded")
+	}
+}

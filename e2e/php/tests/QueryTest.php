@@ -32,11 +32,25 @@ final class QueryTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
+    /** get_injections_query returns empty for unknown language */
+    public function test_injections_query_unknown_language(): void
+    {
+        $result = TreeSitterLanguagePack::get_injections_query("nonexistent_xyz");
+        $this->assertEmpty($result);
+    }
+
     /** get_locals_query returns non-empty for python */
     public function test_locals_query_python(): void
     {
         $result = TreeSitterLanguagePack::get_locals_query("python");
         $this->assertNotEmpty($result);
+    }
+
+    /** get_locals_query returns empty for unknown language */
+    public function test_locals_query_unknown_language(): void
+    {
+        $result = TreeSitterLanguagePack::get_locals_query("nonexistent_xyz");
+        $this->assertEmpty($result);
     }
 
     /** Parse Python and run a query to find function definitions */

@@ -4,6 +4,13 @@ import pytest
 from tree_sitter_language_pack import extract_patterns, validate_extraction
 
 
+def test_extract_invalid_byte_range() -> None:
+    """extract_patterns() with out-of-bounds byte_range returns empty results."""
+    source = "x = 1\n"
+    config = {"language": "python", "patterns": {"funcs": {"byte_range": [9999, 99999], "capture_output": "Full", "query": "(expression_statement) @e"}}}
+    result = extract_patterns(source=source, config=config)
+    assert len(result.results.funcs.matches) == 0  # noqa: S101
+
 def test_extract_patterns_no_matches() -> None:
     """Extraction query that matches nothing returns empty results."""
     source = "x = 1\ny = 2\n"
@@ -18,6 +25,12 @@ def test_extract_patterns_python_functions() -> None:
     result = extract_patterns(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.results.functions.matches) >= 2  # noqa: S101
+
+def test_validate_empty_patterns() -> None:
+    """validate_extraction() with empty patterns returns valid."""
+    config = {"language": "python", "patterns": {}}
+    result = validate_extraction(config=config)
+    assert result.valid is True  # noqa: S101
 
 def test_validate_extraction_invalid_query() -> None:
     """Invalid query syntax fails validation."""

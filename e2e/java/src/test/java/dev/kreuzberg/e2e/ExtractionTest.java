@@ -7,6 +7,13 @@ import static org.junit.jupiter.api.Assertions.*;
 /** E2e tests for category: extraction. */
 class ExtractionTest {
     @Test
+    void testExtractInvalidByteRange() throws Exception {
+        // extract_patterns() with out-of-bounds byte_range returns empty results
+        var result = TreeSitterLanguagePack.process("x = 1\n", "{\"language\":\"python\",\"patterns\":{\"funcs\":{\"byte_range\":[9999,99999],\"capture_output\":\"Full\",\"query\":\"(expression_statement) @e\"}}}");
+        assertEquals(0, result.results().funcs().matches().size(), "expected exactly 0 elements");
+    }
+
+    @Test
     void testExtractPatternsNoMatches() throws Exception {
         // Extraction query that matches nothing returns empty results
         var result = TreeSitterLanguagePack.process("x = 1\ny = 2\n", "{\"language\":\"python\",\"patterns\":{\"classes\":{\"capture_output\":\"Full\",\"query\":\"(class_definition name: (identifier) @name)\"}}}");
@@ -19,6 +26,13 @@ class ExtractionTest {
         var result = TreeSitterLanguagePack.process("def hello():\n    pass\n\ndef world(x):\n    return x * 2\n", "{\"language\":\"python\",\"patterns\":{\"functions\":{\"capture_output\":\"Full\",\"query\":\"(function_definition name: (identifier) @name)\"}}}");
         assertEquals("python", result.language().trim());
         assertTrue(result.results().functions().matches().size() >= 2, "expected at least 2 elements");
+    }
+
+    @Test
+    void testValidateEmptyPatterns() throws Exception {
+        // validate_extraction() with empty patterns returns valid
+        var result = TreeSitterLanguagePack.process("", "{\"language\":\"python\",\"patterns\":{}}");
+        assertEquals(true, result.valid());
     }
 
     @Test

@@ -17,3 +17,11 @@ test_that("error_handling_invalid_syntax: Parsing invalid syntax should produce 
 test_that("error_handling_unknown_language: Loading a nonexistent language should produce an error.", {
   expect_error(process(source = ""))
 })
+
+test_that("parse_empty_language: parse_string() returns error with empty language name", {
+  expect_error(process(source = "x = 1"))
+})
+
+test_that("process_unknown_language: process() returns error when config language is unknown", {
+  expect_error(process(source = "x = 1", config = list("language" = "nonexistent_xyz")))
+})

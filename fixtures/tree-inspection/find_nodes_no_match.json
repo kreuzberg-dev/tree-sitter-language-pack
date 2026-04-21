@@ -21,5 +21,9 @@
 			"check": "equals",
 			"value": 0
 		}
-	]
+	],
+	"skip": {
+		"languages": ["rust"],
+		"reason": "Rust e2e generator cannot compare Vec length with equals assertion"
+	}
 }

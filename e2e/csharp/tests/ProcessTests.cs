@@ -13,6 +13,15 @@ public class ProcessTests
     private static readonly JsonSerializerOptions ConfigOptions = new() { Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) }, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault };
 
     [Fact]
+    public void Test_ProcessJavascriptExportsCount()
+    {
+        // JavaScript with multiple exports, verify export count
+        var result = TreeSitterLanguagePackLib.Process("export function greet() { return 'hi'; }\nexport const VERSION = '1.0';\nexport default class App {}\n", "{\"language\":\"javascript\"}");
+        Assert.Equal("javascript", result.Language.Trim());
+        Assert.True(result.Exports.Count >= 2, "expected at least 2 elements");
+    }
+
+    [Fact]
     public void Test_ProcessJavascriptExportsDetail()
     {
         // JavaScript with exports, verify export count
@@ -22,12 +31,33 @@ public class ProcessTests
     }
 
     [Fact]
+    public void Test_ProcessPythonAllFeatures()
+    {
+        // Python comprehensive source with all feature extraction enabled
+        var result = TreeSitterLanguagePackLib.Process("import os\nfrom pathlib import Path\n\n# Configuration\nMY_CONST = 42\n\ndef process_file(path):\n    \"\"\"Process a file and return contents.\"\"\"\n    with open(path) as f:\n        return f.read()\n\nclass FileProcessor:\n    def __init__(self, base_dir):\n        self.base_dir = base_dir\n", "{\"comments\":true,\"docstrings\":true,\"imports\":true,\"language\":\"python\",\"structure\":true,\"symbols\":true}");
+        Assert.Equal("python", result.Language.Trim());
+        Assert.True(result.Structure.Count >= 2, "expected at least 2 elements");
+        Assert.True(result.Imports.Count >= 1, "expected at least 1 elements");
+        Assert.True(result.Comments.Count >= 1, "expected at least 1 elements");
+        Assert.True(result.Metrics.TotalLines >= 10, "expected >= 10");
+    }
+
+    [Fact]
     public void Test_ProcessPythonComments()
     {
         // Python with comments, verify comment count
         var result = TreeSitterLanguagePackLib.Process("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", "{\"comments\":true,\"language\":\"python\"}");
         Assert.Equal("python", result.Language.Trim());
         Assert.True(result.Comments.Count >= 1, "expected at least 1 elements");
+    }
+
+    [Fact]
+    public void Test_ProcessPythonDocstrings()
+    {
+        // Python with function docstring, verify docstring count
+        var result = TreeSitterLanguagePackLib.Process("def greet(name):\n    \"\"\"Say hello to someone.\"\"\"\n    return f\"Hello {name}\"\n", "{\"docstrings\":true,\"language\":\"python\"}");
+        Assert.Equal("python", result.Language.Trim());
+        Assert.True(result.Metrics.TotalLines >= 3, "expected >= 3");
     }
 
     [Fact]
@@ -49,6 +79,15 @@ public class ProcessTests
         Assert.True(result.Metrics.CodeLines >= 4, "expected >= 4");
         Assert.True(result.Metrics.CommentLines >= 1, "expected >= 1");
         Assert.True(result.Metrics.MaxDepth >= 1, "expected >= 1");
+    }
+
+    [Fact]
+    public void Test_ProcessPythonSymbols()
+    {
+        // Python with class and functions, verify symbol count
+        var result = TreeSitterLanguagePackLib.Process("MY_CONST = 42\ndef helper(): pass\nclass Widget: pass\n", "{\"language\":\"python\",\"symbols\":true}");
+        Assert.Equal("python", result.Language.Trim());
+        Assert.True(result.Symbols.Count >= 1, "expected at least 1 elements");
     }
 
     [Fact]

@@ -12,6 +12,21 @@ import (
 	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
+func Test_ProcessJavascriptExportsCount(t *testing.T) {
+	// JavaScript with multiple exports, verify export count
+	result, err := tspack.Process(`export function greet() { return 'hi'; }
+export const VERSION = '1.0';
+export default class App {}
+`, `{"language":"javascript"}`)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	if strings.TrimSpace(result.Language) != `javascript` {
+		t.Errorf("equals mismatch: got %v", result.Language)
+	}
+	assert.GreaterOrEqual(t, len(result.Exports), 2, "expected at least 2 elements")
+}
+
 func Test_ProcessJavascriptExportsDetail(t *testing.T) {
 	// JavaScript with exports, verify export count
 	result, err := tspack.Process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", `{"language":"javascript"}`)
@@ -22,6 +37,37 @@ func Test_ProcessJavascriptExportsDetail(t *testing.T) {
 		t.Errorf("equals mismatch: got %v", result.Language)
 	}
 	assert.GreaterOrEqual(t, len(result.Exports), 1, "expected at least 1 elements")
+}
+
+func Test_ProcessPythonAllFeatures(t *testing.T) {
+	// Python comprehensive source with all feature extraction enabled
+	result, err := tspack.Process(`import os
+from pathlib import Path
+
+# Configuration
+MY_CONST = 42
+
+def process_file(path):
+    """Process a file and return contents."""
+    with open(path) as f:
+        return f.read()
+
+class FileProcessor:
+    def __init__(self, base_dir):
+        self.base_dir = base_dir
+`, `{"comments":true,"docstrings":true,"imports":true,"language":"python","structure":true,"symbols":true}`)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	if strings.TrimSpace(result.Language) != `python` {
+		t.Errorf("equals mismatch: got %v", result.Language)
+	}
+	assert.GreaterOrEqual(t, len(result.Structure), 2, "expected at least 2 elements")
+	assert.GreaterOrEqual(t, len(result.Imports), 1, "expected at least 1 elements")
+	assert.GreaterOrEqual(t, len(result.Comments), 1, "expected at least 1 elements")
+	if result.Metrics.TotalLines < 10 {
+		t.Errorf("expected >= 10, got %v", result.Metrics.TotalLines)
+	}
 }
 
 func Test_ProcessPythonComments(t *testing.T) {
@@ -39,6 +85,23 @@ def hello():
 		t.Errorf("equals mismatch: got %v", result.Language)
 	}
 	assert.GreaterOrEqual(t, len(result.Comments), 1, "expected at least 1 elements")
+}
+
+func Test_ProcessPythonDocstrings(t *testing.T) {
+	// Python with function docstring, verify docstring count
+	result, err := tspack.Process(`def greet(name):
+    """Say hello to someone."""
+    return f"Hello {name}"
+`, `{"docstrings":true,"language":"python"}`)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	if strings.TrimSpace(result.Language) != `python` {
+		t.Errorf("equals mismatch: got %v", result.Language)
+	}
+	if result.Metrics.TotalLines < 3 {
+		t.Errorf("expected >= 3, got %v", result.Metrics.TotalLines)
+	}
 }
 
 func Test_ProcessPythonImportsDetail(t *testing.T) {
@@ -89,6 +152,21 @@ def world():
 	if result.Metrics.MaxDepth < 1 {
 		t.Errorf("expected >= 1, got %v", result.Metrics.MaxDepth)
 	}
+}
+
+func Test_ProcessPythonSymbols(t *testing.T) {
+	// Python with class and functions, verify symbol count
+	result, err := tspack.Process(`MY_CONST = 42
+def helper(): pass
+class Widget: pass
+`, `{"language":"python","symbols":true}`)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	if strings.TrimSpace(result.Language) != `python` {
+		t.Errorf("equals mismatch: got %v", result.Language)
+	}
+	assert.GreaterOrEqual(t, len(result.Symbols), 1, "expected at least 1 elements")
 }
 
 func Test_ProcessRustStructureName(t *testing.T) {

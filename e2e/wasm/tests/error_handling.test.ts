@@ -19,4 +19,12 @@ describe('error-handling', () => {
   it('error_handling_unknown_language: Loading a nonexistent language should produce an error.', () => {
     expect(() => process("", null)).toThrow();
   });
+
+  it('parse_empty_language: parse_string() returns error with empty language name', () => {
+    expect(() => process("x = 1", null)).toThrow();
+  });
+
+  it('process_unknown_language: process() returns error when config language is unknown', () => {
+    expect(() => process("x = 1", { language: "nonexistent_xyz" })).toThrow();
+  });
 });

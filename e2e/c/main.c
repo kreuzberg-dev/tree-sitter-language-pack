@@ -23,14 +23,30 @@ int main(void) {
     test_error_handling_unknown_language();
     printf(" PASSED\n");
     passed++;
+    printf("  Running test_parse_empty_language...");
+    test_parse_empty_language();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_process_unknown_language...");
+    test_process_unknown_language();
+    printf(" PASSED\n");
+    passed++;
 
     /* Category: extraction */
+    printf("  Running test_extract_invalid_byte_range...");
+    test_extract_invalid_byte_range();
+    printf(" PASSED\n");
+    passed++;
     printf("  Running test_extract_patterns_no_matches...");
     test_extract_patterns_no_matches();
     printf(" PASSED\n");
     passed++;
     printf("  Running test_extract_patterns_python_functions...");
     test_extract_patterns_python_functions();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_validate_empty_patterns...");
+    test_validate_empty_patterns();
     printf(" PASSED\n");
     passed++;
     printf("  Running test_validate_extraction_invalid_query...");
@@ -167,12 +183,24 @@ int main(void) {
     passed++;
 
     /* Category: process */
+    printf("  Running test_process_javascript_exports_count...");
+    test_process_javascript_exports_count();
+    printf(" PASSED\n");
+    passed++;
     printf("  Running test_process_javascript_exports_detail...");
     test_process_javascript_exports_detail();
     printf(" PASSED\n");
     passed++;
+    printf("  Running test_process_python_all_features...");
+    test_process_python_all_features();
+    printf(" PASSED\n");
+    passed++;
     printf("  Running test_process_python_comments...");
     test_process_python_comments();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_process_python_docstrings...");
+    test_process_python_docstrings();
     printf(" PASSED\n");
     passed++;
     printf("  Running test_process_python_imports_detail...");
@@ -181,6 +209,10 @@ int main(void) {
     passed++;
     printf("  Running test_process_python_metrics_detail...");
     test_process_python_metrics_detail();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_process_python_symbols...");
+    test_process_python_symbols();
     printf(" PASSED\n");
     passed++;
     printf("  Running test_process_rust_structure_name...");
@@ -201,8 +233,16 @@ int main(void) {
     test_injections_query_javascript();
     printf(" PASSED\n");
     passed++;
+    printf("  Running test_injections_query_unknown_language...");
+    test_injections_query_unknown_language();
+    printf(" PASSED\n");
+    passed++;
     printf("  Running test_locals_query_python...");
     test_locals_query_python();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_locals_query_unknown_language...");
+    test_locals_query_unknown_language();
     printf(" PASSED\n");
     passed++;
     printf("  Running test_run_query_python_functions...");
@@ -211,6 +251,22 @@ int main(void) {
     passed++;
 
     /* Category: registry */
+    printf("  Running test_get_language_python...");
+    test_get_language_python();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_get_language_unknown...");
+    test_get_language_unknown();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_get_parser_python...");
+    test_get_parser_python();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_get_parser_unknown...");
+    test_get_parser_unknown();
+    printf(" PASSED\n");
+    passed++;
     printf("  Running test_registry_has_language_false...");
     test_registry_has_language_false();
     printf(" PASSED\n");
@@ -1455,12 +1511,24 @@ int main(void) {
     passed++;
 
     /* Category: tree-inspection */
+    printf("  Running test_split_code_python...");
+    test_split_code_python();
+    printf(" PASSED\n");
+    passed++;
     printf("  Running test_tree_error_count_broken...");
     test_tree_error_count_broken();
     printf(" PASSED\n");
     passed++;
+    printf("  Running test_tree_error_count_multiple...");
+    test_tree_error_count_multiple();
+    printf(" PASSED\n");
+    passed++;
     printf("  Running test_tree_error_count_valid...");
     test_tree_error_count_valid();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_tree_find_nodes_no_match...");
+    test_tree_find_nodes_no_match();
     printf(" PASSED\n");
     passed++;
     printf("  Running test_tree_find_nodes_two_functions...");
@@ -1477,6 +1545,10 @@ int main(void) {
     passed++;
     printf("  Running test_tree_named_children_class_and_function...");
     test_tree_named_children_class_and_function();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_tree_root_node_info_javascript...");
+    test_tree_root_node_info_javascript();
     printf(" PASSED\n");
     passed++;
     printf("  Running test_tree_root_node_info_python...");

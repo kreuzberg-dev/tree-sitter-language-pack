@@ -24,8 +24,22 @@ test_injections_query_javascript() {
 
 }
 
+test_injections_query_unknown_language() {
+    # get_injections_query returns empty for unknown language
+    local output
+    output=$(tree_sitter_language_pack process)
+
+}
+
 test_locals_query_python() {
     # get_locals_query returns non-empty for python
+    local output
+    output=$(tree_sitter_language_pack process)
+
+}
+
+test_locals_query_unknown_language() {
+    # get_locals_query returns empty for unknown language
     local output
     output=$(tree_sitter_language_pack process)
 
@@ -43,6 +57,8 @@ run_tests_query() {
     run_test test_highlights_query_python
     run_test test_highlights_query_unknown_language
     run_test test_injections_query_javascript
+    run_test test_injections_query_unknown_language
     run_test test_locals_query_python
+    run_test test_locals_query_unknown_language
     run_test test_run_query_python_functions
 }

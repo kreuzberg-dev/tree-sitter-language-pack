@@ -11,6 +11,13 @@ use Tree\Sitter\Language\Pack\TreeSitterLanguagePack;
 /** E2e tests for category: extraction. */
 final class ExtractionTest extends TestCase
 {
+    /** extract_patterns() with out-of-bounds byte_range returns empty results */
+    public function test_extract_invalid_byte_range(): void
+    {
+        $result = TreeSitterLanguagePack::extract_patterns("x = 1\n", ["language" => "python", "patterns" => ["funcs" => ["byte_range" => [9999, 99999], "capture_output" => "Full", "query" => "(expression_statement) @e"]]]);
+        $this->assertCount(0, $result->results->funcs->matches);
+    }
+
     /** Extraction query that matches nothing returns empty results */
     public function test_extract_patterns_no_matches(): void
     {
@@ -24,6 +31,13 @@ final class ExtractionTest extends TestCase
         $result = TreeSitterLanguagePack::extract_patterns("def hello():\n    pass\n\ndef world(x):\n    return x * 2\n", ["language" => "python", "patterns" => ["functions" => ["capture_output" => "Full", "query" => "(function_definition name: (identifier) @name)"]]]);
         $this->assertEquals("python", $result->language);
         $this->assertGreaterThanOrEqual(2, count($result->results->functions->matches));
+    }
+
+    /** validate_extraction() with empty patterns returns valid */
+    public function test_validate_empty_patterns(): void
+    {
+        $result = TreeSitterLanguagePack::validate_extraction(["language" => "python", "patterns" => []]);
+        $this->assertEquals(true, $result->valid);
     }
 
     /** Invalid query syntax fails validation */

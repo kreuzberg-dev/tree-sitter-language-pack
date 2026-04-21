@@ -18,9 +18,19 @@ describe('query', () => {
     expect(result.length).toBeGreaterThan(0);
   });
 
+  it('injections_query_unknown_language: get_injections_query returns empty for unknown language', () => {
+    const result = process("", null);
+    expect(result).toHaveLength(0);
+  });
+
   it('locals_query_python: get_locals_query returns non-empty for python', () => {
     const result = process("", null);
     expect(result.length).toBeGreaterThan(0);
+  });
+
+  it('locals_query_unknown_language: get_locals_query returns empty for unknown language', () => {
+    const result = process("", null);
+    expect(result).toHaveLength(0);
   });
 
   it('run_query_python_functions: Parse Python and run a query to find function definitions', () => {

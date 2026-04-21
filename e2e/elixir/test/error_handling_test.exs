@@ -27,4 +27,16 @@ defmodule E2e.ErrorHandlingTest do
       assert {:error, _} = TreeSitterLanguagePack.process("", nil)
     end
   end
+
+  describe "parse_empty_language" do
+    test "parse_string() returns error with empty language name" do
+      assert {:error, _} = TreeSitterLanguagePack.process("x = 1", nil)
+    end
+  end
+
+  describe "process_unknown_language" do
+    test "process() returns error when config language is unknown" do
+      assert {:error, _} = TreeSitterLanguagePack.process("x = 1", %{"language" => "nonexistent_xyz"})
+    end
+  end
 end

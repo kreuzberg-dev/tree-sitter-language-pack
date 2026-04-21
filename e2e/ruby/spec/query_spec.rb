@@ -20,9 +20,19 @@ RSpec.describe 'query' do
     expect(result).not_to be_empty
   end
 
+  it 'injections_query_unknown_language: get_injections_query returns empty for unknown language' do
+    result = TreeSitterLanguagePack.process('', nil)
+    expect(result.nil? || result.empty?).to be(true)
+  end
+
   it 'locals_query_python: get_locals_query returns non-empty for python' do
     result = TreeSitterLanguagePack.process('', nil)
     expect(result).not_to be_empty
+  end
+
+  it 'locals_query_unknown_language: get_locals_query returns empty for unknown language' do
+    result = TreeSitterLanguagePack.process('', nil)
+    expect(result.nil? || result.empty?).to be(true)
   end
 
   it 'run_query_python_functions: Parse Python and run a query to find function definitions' do

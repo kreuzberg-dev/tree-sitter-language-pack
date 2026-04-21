@@ -7,6 +7,13 @@ import static org.junit.jupiter.api.Assertions.*;
 /** E2e tests for category: tree-inspection. */
 class TreeInspectionTest {
     @Test
+    void testSplitCodePython() throws Exception {
+        // parse_string() Python code with multiple functions finds all function_definition nodes
+        var result = TreeSitterLanguagePack.process("def foo():\n    pass\n\ndef bar():\n    pass\n\ndef baz():\n    pass\n", null);
+        // TODO: unsupported assertion type: method_result
+    }
+
+    @Test
     void testTreeErrorCountBroken() throws Exception {
         // Parse broken Python code and verify error count >= 1
         var result = TreeSitterLanguagePack.process("def (broken syntax @@@ !!!", null);
@@ -14,9 +21,23 @@ class TreeInspectionTest {
     }
 
     @Test
+    void testTreeErrorCountMultiple() throws Exception {
+        // parse_string() with multiple syntax errors counts all error nodes
+        var result = TreeSitterLanguagePack.process("def (\ndef (\n", null);
+        // TODO: unsupported assertion type: method_result
+    }
+
+    @Test
     void testTreeErrorCountValid() throws Exception {
         // Parse valid Python code and verify zero error count
         var result = TreeSitterLanguagePack.process("x = 1\ny = 2\n", null);
+        // TODO: unsupported assertion type: method_result
+    }
+
+    @Test
+    void testTreeFindNodesNoMatch() throws Exception {
+        // Parse Python with no class definitions and verify find_nodes_by_type returns 0
+        var result = TreeSitterLanguagePack.process("x = 1\n", null);
         // TODO: unsupported assertion type: method_result
     }
 
@@ -45,6 +66,13 @@ class TreeInspectionTest {
     void testTreeNamedChildrenClassAndFunction() throws Exception {
         // Parse Python with class and function, verify named children count
         var result = TreeSitterLanguagePack.process("class Foo:\n    pass\n\ndef bar():\n    pass\n", null);
+        // TODO: unsupported assertion type: method_result
+    }
+
+    @Test
+    void testTreeRootNodeInfoJavascript() throws Exception {
+        // Parse JavaScript source and verify root node type is program
+        var result = TreeSitterLanguagePack.process("const x = 1;\n", null);
         // TODO: unsupported assertion type: method_result
     }
 

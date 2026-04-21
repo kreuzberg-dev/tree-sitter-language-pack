@@ -28,10 +28,24 @@ class QueryTest {
     }
 
     @Test
+    void testInjectionsQueryUnknownLanguage() throws Exception {
+        // get_injections_query returns empty for unknown language
+        var result = TreeSitterLanguagePack.process("", null);
+        assertTrue(result.isEmpty(), "expected empty value");
+    }
+
+    @Test
     void testLocalsQueryPython() throws Exception {
         // get_locals_query returns non-empty for python
         var result = TreeSitterLanguagePack.process("", null);
         assertFalse(result.isEmpty(), "expected non-empty value");
+    }
+
+    @Test
+    void testLocalsQueryUnknownLanguage() throws Exception {
+        // get_locals_query returns empty for unknown language
+        var result = TreeSitterLanguagePack.process("", null);
+        assertTrue(result.isEmpty(), "expected empty value");
     }
 
     @Test

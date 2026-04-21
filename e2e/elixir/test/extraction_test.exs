@@ -3,6 +3,13 @@
 defmodule E2e.ExtractionTest do
   use ExUnit.Case, async: true
 
+  describe "extract_invalid_byte_range" do
+    test "extract_patterns() with out-of-bounds byte_range returns empty results" do
+      {:ok, result} = TreeSitterLanguagePack.process("x = 1\n", %{"language" => "python", "patterns" => %{"funcs" => %{"byte_range" => [9999, 99999], "capture_output" => "Full", "query" => "(expression_statement) @e"}}})
+      assert length(result.results.funcs.matches) == 0
+    end
+  end
+
   describe "extract_patterns_no_matches" do
     test "Extraction query that matches nothing returns empty results" do
       {:ok, result} = TreeSitterLanguagePack.process("x = 1\ny = 2\n", %{"language" => "python", "patterns" => %{"classes" => %{"capture_output" => "Full", "query" => "(class_definition name: (identifier) @name)"}}})
@@ -15,6 +22,13 @@ defmodule E2e.ExtractionTest do
       {:ok, result} = TreeSitterLanguagePack.process("def hello():\n    pass\n\ndef world(x):\n    return x * 2\n", %{"language" => "python", "patterns" => %{"functions" => %{"capture_output" => "Full", "query" => "(function_definition name: (identifier) @name)"}}})
       assert String.trim(result.language) == "python"
       assert length(result.results.functions.matches) >= 2
+    end
+  end
+
+  describe "validate_empty_patterns" do
+    test "validate_extraction() with empty patterns returns valid" do
+      {:ok, result} = TreeSitterLanguagePack.process("", %{"language" => "python", "patterns" => %{}})
+      assert result.valid == true
     end
   end
 

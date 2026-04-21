@@ -3,6 +3,26 @@ import { describe, it, expect } from 'vitest';
 import { process } from '@kreuzberg/tree-sitter-language-pack';
 
 describe('registry', () => {
+  it('get_language_python: get_language(\'python\') returns a valid Language object', () => {
+    process("", null);
+  });
+
+  it('get_language_unknown: get_language(\'nonexistent_xyz\') returns an error for unknown language', async () => {
+    await expect(async () => {
+      await process("", null);
+    }).rejects.toThrow();
+  });
+
+  it('get_parser_python: get_parser(\'python\') returns a valid Parser object', () => {
+    process("", null);
+  });
+
+  it('get_parser_unknown: get_parser(\'nonexistent_xyz\') returns an error for unknown language', async () => {
+    await expect(async () => {
+      await process("", null);
+    }).rejects.toThrow();
+  });
+
   it('registry_has_language_false: has_language(\'nonexistent\') should return false', () => {
     const result = process("", null);
     // TODO: unsupported assertion type: is_false

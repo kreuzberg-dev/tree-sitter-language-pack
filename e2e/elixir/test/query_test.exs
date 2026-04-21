@@ -24,10 +24,24 @@ defmodule E2e.QueryTest do
     end
   end
 
+  describe "injections_query_unknown_language" do
+    test "get_injections_query returns empty for unknown language" do
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      assert is_nil(result) or String.trim(result) == ""
+    end
+  end
+
   describe "locals_query_python" do
     test "get_locals_query returns non-empty for python" do
       {:ok, result} = TreeSitterLanguagePack.process("", nil)
       assert result != ""
+    end
+  end
+
+  describe "locals_query_unknown_language" do
+    test "get_locals_query returns empty for unknown language" do
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      assert is_nil(result) or String.trim(result) == ""
     end
   end
 

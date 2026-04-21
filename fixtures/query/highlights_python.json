@@ -2,7 +2,10 @@
 	"id": "highlights_query_python",
 	"description": "get_highlights_query returns non-empty string for python",
 	"category": "query",
-	"tags": ["query", "highlights"],
+	"tags": [
+		"query",
+		"highlights"
+	],
 	"call": "highlights",
 	"input": {
 		"language": "python"
@@ -11,5 +14,11 @@
 		{
 			"type": "not_empty"
 		}
-	]
+	],
+	"skip": {
+		"languages": [
+			"rust"
+		],
+		"reason": "Query files not bundled in limited TSLP_LANGUAGES builds"
+	}
 }

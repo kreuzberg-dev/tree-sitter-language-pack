@@ -16,9 +16,19 @@ test_that("injections_query_javascript: get_injections_query returns non-empty f
   expect_true(if (is.character(result)) nchar(result) > 0 else length(result) > 0)
 })
 
+test_that("injections_query_unknown_language: get_injections_query returns empty for unknown language", {
+  result <- process()
+  expect_equal(result, "")
+})
+
 test_that("locals_query_python: get_locals_query returns non-empty for python", {
   result <- process()
   expect_true(if (is.character(result)) nchar(result) > 0 else length(result) > 0)
+})
+
+test_that("locals_query_unknown_language: get_locals_query returns empty for unknown language", {
+  result <- process()
+  expect_equal(result, "")
 })
 
 test_that("run_query_python_functions: Parse Python and run a query to find function definitions", {

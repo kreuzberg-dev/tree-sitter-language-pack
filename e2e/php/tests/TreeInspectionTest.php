@@ -11,6 +11,13 @@ use Tree\Sitter\Language\Pack\TreeSitterLanguagePack;
 /** E2e tests for category: tree-inspection. */
 final class TreeInspectionTest extends TestCase
 {
+    /** parse_string() Python code with multiple functions finds all function_definition nodes */
+    public function test_split_code_python(): void
+    {
+        $tree = TreeSitterLanguagePack::parse_string("python", "def foo():\n    pass\n\ndef bar():\n    pass\n\ndef baz():\n    pass\n");
+        // TODO: unsupported assertion type: method_result
+    }
+
     /** Parse broken Python code and verify error count >= 1 */
     public function test_tree_error_count_broken(): void
     {
@@ -18,10 +25,24 @@ final class TreeInspectionTest extends TestCase
         // TODO: unsupported assertion type: method_result
     }
 
+    /** parse_string() with multiple syntax errors counts all error nodes */
+    public function test_tree_error_count_multiple(): void
+    {
+        $tree = TreeSitterLanguagePack::parse_string("python", "def (\ndef (\n");
+        // TODO: unsupported assertion type: method_result
+    }
+
     /** Parse valid Python code and verify zero error count */
     public function test_tree_error_count_valid(): void
     {
         $tree = TreeSitterLanguagePack::parse_string("python", "x = 1\ny = 2\n");
+        // TODO: unsupported assertion type: method_result
+    }
+
+    /** Parse Python with no class definitions and verify find_nodes_by_type returns 0 */
+    public function test_tree_find_nodes_no_match(): void
+    {
+        $tree = TreeSitterLanguagePack::parse_string("python", "x = 1\n");
         // TODO: unsupported assertion type: method_result
     }
 
@@ -50,6 +71,13 @@ final class TreeInspectionTest extends TestCase
     public function test_tree_named_children_class_and_function(): void
     {
         $tree = TreeSitterLanguagePack::parse_string("python", "class Foo:\n    pass\n\ndef bar():\n    pass\n");
+        // TODO: unsupported assertion type: method_result
+    }
+
+    /** Parse JavaScript source and verify root node type is program */
+    public function test_tree_root_node_info_javascript(): void
+    {
+        $tree = TreeSitterLanguagePack::parse_string("javascript", "const x = 1;\n");
         // TODO: unsupported assertion type: method_result
     }
 

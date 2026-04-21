@@ -9,9 +9,37 @@ import (
 	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
+func Test_SplitCodePython(t *testing.T) {
+	// parse_string() Python code with multiple functions finds all function_definition nodes
+	result, err := tspack.Process(`def foo():
+    pass
+
+def bar():
+    pass
+
+def baz():
+    pass
+`, nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	// TODO: unsupported assertion type: method_result
+}
+
 func Test_TreeErrorCountBroken(t *testing.T) {
 	// Parse broken Python code and verify error count >= 1
 	result, err := tspack.Process(`def (broken syntax @@@ !!!`, nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	// TODO: unsupported assertion type: method_result
+}
+
+func Test_TreeErrorCountMultiple(t *testing.T) {
+	// parse_string() with multiple syntax errors counts all error nodes
+	result, err := tspack.Process(`def (
+def (
+`, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -22,6 +50,16 @@ func Test_TreeErrorCountValid(t *testing.T) {
 	// Parse valid Python code and verify zero error count
 	result, err := tspack.Process(`x = 1
 y = 2
+`, nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	// TODO: unsupported assertion type: method_result
+}
+
+func Test_TreeFindNodesNoMatch(t *testing.T) {
+	// Parse Python with no class definitions and verify find_nodes_by_type returns 0
+	result, err := tspack.Process(`x = 1
 `, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
@@ -72,6 +110,16 @@ func Test_TreeNamedChildrenClassAndFunction(t *testing.T) {
 
 def bar():
     pass
+`, nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	// TODO: unsupported assertion type: method_result
+}
+
+func Test_TreeRootNodeInfoJavascript(t *testing.T) {
+	// Parse JavaScript source and verify root node type is program
+	result, err := tspack.Process(`const x = 1;
 `, nil)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)

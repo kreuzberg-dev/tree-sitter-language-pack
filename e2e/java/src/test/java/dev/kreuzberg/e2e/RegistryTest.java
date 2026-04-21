@@ -7,6 +7,30 @@ import static org.junit.jupiter.api.Assertions.*;
 /** E2e tests for category: registry. */
 class RegistryTest {
     @Test
+    void testGetLanguagePython() throws Exception {
+        // get_language('python') returns a valid Language object
+        var result = TreeSitterLanguagePack.process("", null);
+    }
+
+    @Test
+    void testGetLanguageUnknown() throws Exception {
+        // get_language('nonexistent_xyz') returns an error for unknown language
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("", null));
+    }
+
+    @Test
+    void testGetParserPython() throws Exception {
+        // get_parser('python') returns a valid Parser object
+        var result = TreeSitterLanguagePack.process("", null);
+    }
+
+    @Test
+    void testGetParserUnknown() throws Exception {
+        // get_parser('nonexistent_xyz') returns an error for unknown language
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("", null));
+    }
+
+    @Test
     void testRegistryHasLanguageFalse() throws Exception {
         // has_language('nonexistent') should return false
         var result = TreeSitterLanguagePack.process("", null);

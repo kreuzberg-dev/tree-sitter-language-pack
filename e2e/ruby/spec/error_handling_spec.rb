@@ -22,4 +22,12 @@ RSpec.describe 'error-handling' do
   it 'error_handling_unknown_language: Loading a nonexistent language should produce an error.' do
     expect { TreeSitterLanguagePack.process('', nil) }.to raise_error
   end
+
+  it 'parse_empty_language: parse_string() returns error with empty language name' do
+    expect { TreeSitterLanguagePack.process('x = 1', nil) }.to raise_error
+  end
+
+  it 'process_unknown_language: process() returns error when config language is unknown' do
+    expect { TreeSitterLanguagePack.process('x = 1', { 'language' => 'nonexistent_xyz' }) }.to raise_error
+  end
 end

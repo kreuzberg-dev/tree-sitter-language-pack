@@ -103,6 +103,14 @@ def test_javascript_multi_import_process_detail() -> None:
     assert result.metrics.total_lines >= 6  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
 
+def test_process_javascript_exports_count() -> None:
+    """JavaScript with multiple exports, verify export count."""
+    source = "export function greet() { return 'hi'; }\nexport const VERSION = '1.0';\nexport default class App {}\n"
+    config = {"language": "javascript"}
+    result = process(source=source, config=config)
+    assert result.language.strip() == "javascript"  # noqa: S101
+    assert len(result.exports) >= 2  # noqa: S101
+
 def test_process_javascript_exports_detail() -> None:
     """JavaScript with exports, verify export count."""
     source = "export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n"
@@ -111,6 +119,17 @@ def test_process_javascript_exports_detail() -> None:
     assert result.language.strip() == "javascript"  # noqa: S101
     assert len(result.exports) >= 1  # noqa: S101
 
+def test_process_python_all_features() -> None:
+    """Python comprehensive source with all feature extraction enabled."""
+    source = 'import os\nfrom pathlib import Path\n\n# Configuration\nMY_CONST = 42\n\ndef process_file(path):\n    """Process a file and return contents."""\n    with open(path) as f:\n        return f.read()\n\nclass FileProcessor:\n    def __init__(self, base_dir):\n        self.base_dir = base_dir\n'
+    config = {"comments": True, "docstrings": True, "imports": True, "language": "python", "structure": True, "symbols": True}
+    result = process(source=source, config=config)
+    assert result.language.strip() == "python"  # noqa: S101
+    assert len(result.structure) >= 2  # noqa: S101
+    assert len(result.imports) >= 1  # noqa: S101
+    assert len(result.comments) >= 1  # noqa: S101
+    assert result.metrics.total_lines >= 10  # noqa: S101
+
 def test_process_python_comments() -> None:
     """Python with comments, verify comment count."""
     source = "# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n"
@@ -118,6 +137,14 @@ def test_process_python_comments() -> None:
     result = process(source=source, config=config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.comments) >= 1  # noqa: S101
+
+def test_process_python_docstrings() -> None:
+    """Python with function docstring, verify docstring count."""
+    source = 'def greet(name):\n    """Say hello to someone."""\n    return f"Hello {name}"\n'
+    config = {"docstrings": True, "language": "python"}
+    result = process(source=source, config=config)
+    assert result.language.strip() == "python"  # noqa: S101
+    assert result.metrics.total_lines >= 3  # noqa: S101
 
 def test_process_python_imports_detail() -> None:
     """Python with multiple imports, verify imports contain specific source."""
@@ -137,6 +164,14 @@ def test_process_python_metrics_detail() -> None:
     assert result.metrics.code_lines >= 4  # noqa: S101
     assert result.metrics.comment_lines >= 1  # noqa: S101
     assert result.metrics.max_depth >= 1  # noqa: S101
+
+def test_process_python_symbols() -> None:
+    """Python with class and functions, verify symbol count."""
+    source = "MY_CONST = 42\ndef helper(): pass\nclass Widget: pass\n"
+    config = {"language": "python", "symbols": True}
+    result = process(source=source, config=config)
+    assert result.language.strip() == "python"  # noqa: S101
+    assert len(result.symbols) >= 1  # noqa: S101
 
 def test_process_rust_structure_name() -> None:
     """Rust struct with name, verify structure name contains value."""

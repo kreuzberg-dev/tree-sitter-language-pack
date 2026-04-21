@@ -3,6 +3,13 @@
 defmodule E2e.TreeInspectionTest do
   use ExUnit.Case, async: true
 
+  describe "split_code_python" do
+    test "parse_string() Python code with multiple functions finds all function_definition nodes" do
+      {:ok, result} = TreeSitterLanguagePack.process("def foo():\n    pass\n\ndef bar():\n    pass\n\ndef baz():\n    pass\n", nil)
+      # TODO: unsupported assertion type: method_result
+    end
+  end
+
   describe "tree_error_count_broken" do
     test "Parse broken Python code and verify error count >= 1" do
       {:ok, result} = TreeSitterLanguagePack.process("def (broken syntax @@@ !!!", nil)
@@ -10,9 +17,23 @@ defmodule E2e.TreeInspectionTest do
     end
   end
 
+  describe "tree_error_count_multiple" do
+    test "parse_string() with multiple syntax errors counts all error nodes" do
+      {:ok, result} = TreeSitterLanguagePack.process("def (\ndef (\n", nil)
+      # TODO: unsupported assertion type: method_result
+    end
+  end
+
   describe "tree_error_count_valid" do
     test "Parse valid Python code and verify zero error count" do
       {:ok, result} = TreeSitterLanguagePack.process("x = 1\ny = 2\n", nil)
+      # TODO: unsupported assertion type: method_result
+    end
+  end
+
+  describe "tree_find_nodes_no_match" do
+    test "Parse Python with no class definitions and verify find_nodes_by_type returns 0" do
+      {:ok, result} = TreeSitterLanguagePack.process("x = 1\n", nil)
       # TODO: unsupported assertion type: method_result
     end
   end
@@ -41,6 +62,13 @@ defmodule E2e.TreeInspectionTest do
   describe "tree_named_children_class_and_function" do
     test "Parse Python with class and function, verify named children count" do
       {:ok, result} = TreeSitterLanguagePack.process("class Foo:\n    pass\n\ndef bar():\n    pass\n", nil)
+      # TODO: unsupported assertion type: method_result
+    end
+  end
+
+  describe "tree_root_node_info_javascript" do
+    test "Parse JavaScript source and verify root node type is program" do
+      {:ok, result} = TreeSitterLanguagePack.process("const x = 1;\n", nil)
       # TODO: unsupported assertion type: method_result
     end
   end

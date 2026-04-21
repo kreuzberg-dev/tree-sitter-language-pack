@@ -3,6 +3,30 @@
 defmodule E2e.RegistryTest do
   use ExUnit.Case, async: true
 
+  describe "get_language_python" do
+    test "get_language('python') returns a valid Language object" do
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+    end
+  end
+
+  describe "get_language_unknown" do
+    test "get_language('nonexistent_xyz') returns an error for unknown language" do
+      assert {:error, _} = TreeSitterLanguagePack.process("", nil)
+    end
+  end
+
+  describe "get_parser_python" do
+    test "get_parser('python') returns a valid Parser object" do
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+    end
+  end
+
+  describe "get_parser_unknown" do
+    test "get_parser('nonexistent_xyz') returns an error for unknown language" do
+      assert {:error, _} = TreeSitterLanguagePack.process("", nil)
+    end
+  end
+
   describe "registry_has_language_false" do
     test "has_language('nonexistent') should return false" do
       {:ok, result} = TreeSitterLanguagePack.process("", nil)

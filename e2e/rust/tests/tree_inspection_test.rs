@@ -91,6 +91,20 @@ def bar():
 }
 
 #[test]
+fn test_tree_root_node_info_javascript() {
+    // Parse JavaScript source and verify root node type is program
+    let language = r#"javascript"#;
+    let source = r#"const x = 1;
+"#;
+    let tree = parse_string(&language, source.as_bytes()).expect("should succeed");
+    assert_eq!(
+        tree.root_node().kind(),
+        r#"program"#,
+        "method_result equals assertion failed"
+    );
+}
+
+#[test]
 fn test_tree_root_node_info_python() {
     // Parse Python source and verify root node info
     let language = r#"python"#;

@@ -42,6 +42,17 @@ func Test_InjectionsQueryJavascript(t *testing.T) {
 	}
 }
 
+func Test_InjectionsQueryUnknownLanguage(t *testing.T) {
+	// get_injections_query returns empty for unknown language
+	result, err := tspack.Process("", nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	if len(result) != 0 {
+		t.Errorf("expected empty value, got %v", result)
+	}
+}
+
 func Test_LocalsQueryPython(t *testing.T) {
 	// get_locals_query returns non-empty for python
 	result, err := tspack.Process("", nil)
@@ -50,6 +61,17 @@ func Test_LocalsQueryPython(t *testing.T) {
 	}
 	if len(result) == 0 {
 		t.Errorf("expected non-empty value")
+	}
+}
+
+func Test_LocalsQueryUnknownLanguage(t *testing.T) {
+	// get_locals_query returns empty for unknown language
+	result, err := tspack.Process("", nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	if len(result) != 0 {
+		t.Errorf("expected empty value, got %v", result)
 	}
 }
 

@@ -23,4 +23,16 @@ describe('error-handling', () => {
       await process("", null);
     }).rejects.toThrow();
   });
+
+  it('parse_empty_language: parse_string() returns error with empty language name', async () => {
+    await expect(async () => {
+      await process("x = 1", null);
+    }).rejects.toThrow();
+  });
+
+  it('process_unknown_language: process() returns error when config language is unknown', async () => {
+    await expect(async () => {
+      await process("x = 1", { language: "nonexistent_xyz" });
+    }).rejects.toThrow();
+  });
 });

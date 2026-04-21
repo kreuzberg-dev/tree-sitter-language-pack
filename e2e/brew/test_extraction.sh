@@ -3,6 +3,16 @@
 # E2e tests for category: extraction
 set -euo pipefail
 
+test_extract_invalid_byte_range() {
+    # extract_patterns() with out-of-bounds byte_range returns empty results
+    local output
+    output=$(tree_sitter_language_pack process)
+
+    local count_results_funcs_matches
+    count_results_funcs_matches=$(echo "$output" | jq '.results.funcs.matches | length')
+    [ "$count_results_funcs_matches" -eq 0 ] || exit 1
+}
+
 test_extract_patterns_no_matches() {
     # Extraction query that matches nothing returns empty results
     local output
@@ -26,6 +36,16 @@ test_extract_patterns_python_functions() {
     assert_count_min "$count_results_functions_matches" 2 'results.functions.matches'
 }
 
+test_validate_empty_patterns() {
+    # validate_extraction() with empty patterns returns valid
+    local output
+    output=$(tree_sitter_language_pack process)
+
+    local val_valid
+    val_valid=$(echo "$output" | jq -r '.valid')
+    assert_equals "$val_valid" 'true' 'valid'
+}
+
 test_validate_extraction_invalid_query() {
     # Invalid query syntax fails validation
     if tree_sitter_language_pack process >/dev/null 2>&1; then
@@ -45,8 +65,10 @@ test_validate_extraction_valid_config() {
 }
 
 run_tests_extraction() {
+    run_test test_extract_invalid_byte_range
     run_test test_extract_patterns_no_matches
     run_test test_extract_patterns_python_functions
+    run_test test_validate_empty_patterns
     run_test test_validate_extraction_invalid_query
     run_test test_validate_extraction_valid_config
 }
