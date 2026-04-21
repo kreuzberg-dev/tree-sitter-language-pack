@@ -1,196 +1,107 @@
 ---
 title: tree-sitter-language-pack
-description: "Comprehensive tree-sitter grammar compilation with bindings for Python, TypeScript, Rust, Go, Java, C#, Ruby, Elixir, PHP, and WebAssembly — 305 languages."
+description: "tree-sitter-language-pack — 306 tree-sitter parsers with bindings for Python, TypeScript, Rust, Go, Java, C#, Ruby, Elixir, PHP, and WebAssembly."
 ---
 
-**Universal code parser for 305 languages** — parse, analyze, and chunk source code across every major programming language.
+## tree-sitter-language-pack
+
+tree-sitter-language-pack bundles 306 [tree-sitter](https://tree-sitter.github.io/tree-sitter/) grammars behind a single Rust core with native bindings for Python, TypeScript, Rust, Go, Java, C#, Ruby, Elixir, PHP, WebAssembly, and more. Parsers download on demand and cache locally. One API surface for parsing, code intelligence, extraction queries, and syntax-aware chunking for LLM workflows. It ships as libraries per ecosystem plus the `ts-pack` CLI.
 
 <div class="hero-badges" markdown>
 [:material-lightning-bolt: Quick Start](getting-started/quickstart.md){ .md-button .md-button--primary }
 [:material-package-variant: Installation](getting-started/installation.md){ .md-button }
 [:fontawesome-brands-github: GitHub](https://github.com/kreuzberg-dev/tree-sitter-language-pack){ .md-button }
+[:fontawesome-brands-discord: Community](https://discord.gg/xt9WY3GnKR){ .md-button }
 </div>
-
-## Why tree-sitter-language-pack?
-
-<div class="grid cards" markdown>
-
-- :material-language-python:{ .lg .middle } **305 Languages**
-
-    ---
-
-    Parse Python, JavaScript, Rust, Go, Java, C, TypeScript, Ruby, and 240+ more with a single unified API. One dependency, every language.
-
-    [:material-arrow-right: See all languages](languages.md)
-
-- :material-download:{ .lg .middle } **Download on Demand**
-
-    ---
-
-    Parsers are downloaded and cached automatically on first use. No bloated installs — only fetch what you need.
-
-    [:material-arrow-right: Learn about the download model](concepts/download-model.md)
-
-- :material-code-braces:{ .lg .middle } **Code Intelligence**
-
-    ---
-
-    Extract functions, classes, imports, exports, comments, docstrings, and symbols — not just raw syntax trees.
-
-    [:material-arrow-right: Code intelligence concepts](concepts/code-intelligence.md)
-
-- :material-content-cut:{ .lg .middle } **Syntax-Aware Chunking**
-
-    ---
-
-    Split code at natural boundaries for LLMs. Never break a function in half or separate a decorator from its definition.
-
-    [:material-arrow-right: Chunking for LLMs](guides/chunking.md)
-
-- :material-translate:{ .lg .middle } **Available Everywhere**
-
-    ---
-
-    Python, Node.js, Rust, Go, Java, C#, Ruby, Elixir, PHP, WebAssembly, CLI — same API, all platforms.
-
-    [:material-arrow-right: Installation guide](getting-started/installation.md)
-
-- :material-speedometer:{ .lg .middle } **Native Performance**
-
-    ---
-
-    Rust core with zero-copy parsing. Tree-sitter powers production editors including Neovim, Helix, and Zed.
-
-    [:material-arrow-right: Architecture overview](concepts/architecture.md)
-
-- :material-magnify:{ .lg .middle } **Extraction Queries**
-
-    ---
-
-    Run custom tree-sitter queries and get structured results with text, metadata, and child fields.
-
-    [:material-arrow-right: Extraction guide](guides/extraction.md)
-
-</div>
-
-## Quick Example
-
-=== "Python"
-
-    --8<-- "snippets/python/quickstart.md"
-
-=== "Node.js"
-
-    --8<-- "snippets/typescript/quickstart.md"
-
-=== "Rust"
-
-    --8<-- "snippets/rust/quickstart.md"
-
-=== "Go"
-
-    --8<-- "snippets/go/quickstart.md"
-
-=== "Java"
-
-    --8<-- "snippets/java/quickstart.md"
-
-=== "C#"
-
-    --8<-- "snippets/csharp/quickstart.md"
-
-=== "Ruby"
-
-    --8<-- "snippets/ruby/quickstart.md"
-
-=== "Elixir"
-
-    --8<-- "snippets/elixir/quickstart.md"
-
-=== "PHP"
-
-    --8<-- "snippets/php/quickstart.md"
-
-=== "WASM"
-
-    --8<-- "snippets/wasm/quickstart.md"
-
-=== "CLI"
-
-    --8<-- "snippets/cli/quickstart.md"
-
-## Install
-
-=== "Python"
-
-    ```bash
-    pip install tree-sitter-language-pack
-    ```
-
-    ```bash
-    uv add tree-sitter-language-pack
-    ```
-
-=== "Node.js"
-
-    ```bash
-    npm install @kreuzberg/tree-sitter-language-pack
-    ```
-
-    ```bash
-    pnpm add @kreuzberg/tree-sitter-language-pack
-    ```
-
-=== "Rust"
-
-    ```bash
-    cargo add ts-pack-core
-    ```
-
-=== "Go"
-
-    ```bash
-    go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
-    ```
-
-=== "Java"
-
-    ```xml
-    <dependency>
-      <groupId>dev.kreuzberg</groupId>
-      <artifactId>tree-sitter-language-pack</artifactId>
-      <version>1.3.0</version>
-    </dependency>
-    ```
-
-=== "CLI"
-
-    ```bash
-    # Homebrew (macOS / Linux)
-    brew install kreuzberg-dev/tap/ts-pack
-    ```
-
-    ```bash
-    # Cargo
-    cargo install ts-pack
-    ```
-
-## Supported Ecosystems
-
-| Ecosystem | Package | Minimum Version |
-|-----------|---------|-----------------|
-| :fontawesome-brands-python: Python | [`tree-sitter-language-pack`](https://pypi.org/project/tree-sitter-language-pack/) | 3.10+ |
-| :fontawesome-brands-js: Node.js | [`@kreuzberg/tree-sitter-language-pack`](https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack) | 18+ |
-| :fontawesome-brands-rust: Rust | [`ts-pack-core`](https://crates.io/crates/tree-sitter-language-pack) | 1.75+ |
-| :fontawesome-brands-golang: Go | [`packages/go`](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go) | 1.26+ |
-| :fontawesome-brands-java: Java | [`dev.kreuzberg:tree-sitter-language-pack`](https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack) | 25+ |
-| :material-language-csharp: C# / .NET | [`TreeSitterLanguagePack`](https://www.nuget.org/packages/TreeSitterLanguagePack) | .NET 10+ |
-| :material-language-ruby: Ruby | [`tree_sitter_language_pack`](https://rubygems.org/gems/tree_sitter_language_pack) | 3.4+ |
-| :simple-elixir: Elixir | [`tree_sitter_language_pack`](https://hex.pm/packages/tree_sitter_language_pack) | 1.14+ / OTP 25+ |
-| :material-elephant: PHP | [`kreuzberg/tree-sitter-language-pack`](https://packagist.org/packages/kreuzberg/tree-sitter-language-pack) | 8.2+ |
-| :material-web: WebAssembly | [`@kreuzberg/tree-sitter-language-pack-wasm`](https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm) | Browser / Deno |
-| :material-console: CLI | [`ts-pack`](https://github.com/kreuzberg-dev/homebrew-tap) | — |
 
 ---
 
-tree-sitter-language-pack is part of the [kreuzberg.dev](https://kreuzberg.dev) open-source ecosystem.
+### Explore the Docs
+
+<div class="grid cards doc-explore-grid" markdown>
+
+- :material-rocket-launch-outline:{ .lg .middle } **Getting started**
+
+    ---
+
+    Install for your language, download parsers, and parse your first file.
+
+    [:material-arrow-right: Installation](getting-started/installation.md) · [:material-arrow-right: Quick start](getting-started/quickstart.md)
+
+- :material-code-braces:{ .lg .middle } **Parsing**
+
+    ---
+
+    Build syntax trees, choose a language, and handle parse errors.
+
+    [:material-arrow-right: Parsing guide](guides/parsing.md)
+
+- :material-lightbulb-on-outline:{ .lg .middle } **Code intelligence**
+
+    ---
+
+    Structure, imports, exports, symbols, comments, and docstrings — not just raw nodes.
+
+    [:material-arrow-right: Code intelligence guide](guides/intelligence.md)
+
+- :material-content-cut:{ .lg .middle } **Chunking for LLMs**
+
+    ---
+
+    Split source at natural boundaries so chunks stay semantically intact.
+
+    [:material-arrow-right: Chunking guide](guides/chunking.md)
+
+- :material-cloud-download-outline:{ .lg .middle } **Download model**
+
+    ---
+
+    On-demand grammars, cache layout, manifest, and offline or CI workflows.
+
+    [:material-arrow-right: Download model](concepts/download-model.md)
+
+- :material-file-document-outline:{ .lg .middle } **API reference**
+
+    ---
+
+    Full reference for Python, TypeScript, Rust, Go, Java, C#, Ruby, Elixir, PHP, WASM, C FFI, and the CLI.
+
+    [:material-arrow-right: Python API](api/python.md)
+
+</div>
+
+---
+
+### Part of kreuzberg.dev
+
+tree-sitter-language-pack is built by the [kreuzberg.dev](https://kreuzberg.dev) team, the same people behind a family of Rust-core, polyglot-bindings libraries.
+
+<div class="grid cards kreuzberg-ecosystem-grid" markdown>
+
+- :material-file-document-multiple-outline:{ .lg .middle } **[Kreuzberg](https://docs.kreuzberg.dev/)**
+
+    ---
+
+    Document extraction for 90+ formats: PDF, Office, images, HTML, and more.
+
+- :material-robot-outline:{ .lg .middle } **[liter-llm](https://docs.liter-llm.kreuzberg.dev/)**
+
+    ---
+
+    Universal LLM API client: one API surface across many providers, proxy and MCP servers included.
+
+- :material-language-html5:{ .lg .middle } **[html-to-markdown](https://docs.html-to-markdown.kreuzberg.dev/)**
+
+    ---
+
+    Fast HTML to Markdown conversion with a Rust core and matching bindings.
+
+</div>
+
+---
+
+### Getting help
+
+- **Bugs and feature requests** — [Open an issue on GitHub](https://github.com/kreuzberg-dev/tree-sitter-language-pack/issues)
+- **Community chat** — [Join the Discord](https://discord.gg/xt9WY3GnKR)
+- **Contributing** — [Read the contributor guide](contributing.md)

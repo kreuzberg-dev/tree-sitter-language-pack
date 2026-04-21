@@ -1,12 +1,13 @@
 ---
+title: Code Intelligence
 description: "What tree-sitter-language-pack extracts from source code: structure, imports, exports, comments, docstrings, and chunks."
 ---
 
-# Code Intelligence
-
 The `process` function goes beyond raw syntax trees. It runs tree-sitter queries against the parsed AST to extract structured information useful for code analysis, search, documentation, and LLM ingestion.
 
-## The `ProcessConfig`
+---
+
+## ProcessConfig
 
 All intelligence extraction is opt-in via `ProcessConfig`. Enable only what you need:
 
@@ -24,7 +25,7 @@ All intelligence extraction is opt-in via `ProcessConfig`. Enable only what you 
         docstrings=True,   # docstring extraction
         symbols=True,      # all identifiers
         diagnostics=True,  # syntax errors / error nodes
-        chunk_max_size=0,  # 0 = no chunking
+        # chunk_max_size=1000  # uncomment to enable chunking
     )
     ```
 
@@ -64,9 +65,11 @@ All intelligence extraction is opt-in via `ProcessConfig`. Enable only what you 
 
 Use `.all()` (Rust) or `ProcessConfig(language=..., all=True)` (Python) to enable everything at once.
 
+---
+
 ## ProcessResult Fields
 
-### `structure` — Functions, Classes, and Methods
+### `structure` - Functions, Classes, and Methods
 
 A list of top-level code constructs with their names, kinds, ranges, and optionally their docstrings.
 
@@ -77,9 +80,9 @@ for item in result["structure"]:
     print(item["start_line"]) # 3
     print(item["end_line"])   # 6
     print(item["docstring"])  # "Greet a user by name."  (if docstrings=True)
-```text
+```
 
-**Supported kinds** vary by language:
+Supported kinds vary by language:
 
 | Kind | Languages |
 |------|-----------|
@@ -95,7 +98,9 @@ for item in result["structure"]:
 | `type_alias` | TypeScript, Rust |
 | `decorator` | Python, TypeScript |
 
-### `imports` — Import Statements
+---
+
+### `imports` - Import Statements
 
 All import declarations with their source module and imported names.
 
@@ -104,7 +109,9 @@ for imp in result["imports"]:
     print(imp["source"])    # "os"  or  "pathlib"
     print(imp["names"])     # ["path", "getcwd"]  (empty = wildcard or bare import)
     print(imp["start_line"])
-```text
+```
+
+Example output as JSON:
 
 ```json
 [
@@ -112,7 +119,9 @@ for imp in result["imports"]:
   { "source": "pathlib", "names": ["Path"], "start_line": 2 },
   { "source": "./utils", "names": ["readFile", "writeFile"], "start_line": 3 }
 ]
-```text
+```
+
+---
 
 ### `exports` — Exported Symbols
 
@@ -122,12 +131,14 @@ Symbols that are part of the module's public API.
 for exp in result["exports"]:
     print(exp["name"])  # "readFile"
     print(exp["kind"])  # "function" | "class" | "const" | ...
-```text
+```
 
 !!! note
     Export detection is language-specific. For Python, everything defined at module level is considered exported unless prefixed with `_`. For JavaScript/TypeScript, only explicit `export` declarations are included.
 
-### `comments` — Inline Comments
+---
+
+### `comments` - Inline Comments
 
 All comments in the file with their text and location.
 
@@ -136,9 +147,11 @@ for comment in result["comments"]:
     print(comment["text"])       # "// TODO: handle edge case"
     print(comment["start_line"]) # 42
     print(comment["is_block"])   # False
-```text
+```
 
-### `docstrings` — Documentation Strings
+---
+
+### `docstrings` - Documentation Strings
 
 Docstrings are attached to their parent construct in `structure`. When `docstrings=True`, each `structure` item gains a `docstring` field:
 
@@ -146,7 +159,7 @@ Docstrings are attached to their parent construct in `structure`. When `docstrin
 func = result["structure"][0]
 print(func["docstring"])
 # "Read and return the contents of a file.\n\nArgs:\n    path: Path to the file."
-```text
+```
 
 Docstring extraction understands language-specific conventions:
 
@@ -160,16 +173,20 @@ Docstring extraction understands language-specific conventions:
 | Go | `// FuncName ...` comment block above func |
 | Elixir | `@doc "..."` or `@moduledoc "..."` |
 
-### `symbols` — All Identifiers
+---
+
+### `symbols` - All Identifiers
 
 A deduplicated list of all identifiers referenced in the file, useful for search indexing.
 
 ```python
 print(result["symbols"])
 # ["os", "Path", "read_file", "FileManager", "base_dir", "get", ...]
-```text
+```
 
-### `diagnostics` — Syntax Errors
+---
+
+### `diagnostics` - Syntax Errors
 
 Tree-sitter produces partial trees for invalid code, marking error nodes. `diagnostics` surfaces these:
 
@@ -178,12 +195,14 @@ for error in result["diagnostics"]:
     print(error["message"])    # "Unexpected token"
     print(error["start_line"])
     print(error["start_col"])
-```text
+```
 
 !!! tip
     A non-empty `diagnostics` list does not mean the file is unparsable — tree-sitter recovers and continues. Use it to detect broken syntax rather than to gate parsing.
 
-### `chunks` — Syntax-Aware Splits
+---
+
+### `chunks` - Syntax-Aware Splits
 
 When `chunk_max_size > 0`, the `chunks` field contains the file split into token-budget segments. See [Chunking for LLMs](../guides/chunking.md) for full documentation.
 
@@ -194,9 +213,11 @@ for chunk in result["chunks"]:
     print(chunk["end_line"])     # last line of chunk
     print(chunk["token_count"])  # estimated token count
     print(chunk["node_types"])   # ["function_definition", "class_definition"]
-```text
+```
 
-### `metrics` — File-Level Statistics
+---
+
+### `metrics` - File-Level Statistics
 
 Basic metrics about the file:
 
@@ -207,7 +228,9 @@ print(m["code_lines"])        # 95   (non-blank, non-comment lines)
 print(m["comment_lines"])     # 18
 print(m["blank_lines"])       # 7
 print(m["complexity"])        # cyclomatic complexity estimate (if supported)
-```text
+```
+
+---
 
 ## Full Example
 
@@ -286,11 +309,13 @@ m = result["metrics"]
 print(f"\nLines: {m['total_lines']} total, {m['code_lines']} code, {m['comment_lines']} comments")
 ```
 
+---
+
 ## Custom Extraction Queries
 
-The built-in fields above cover common use cases, but many workflows require language-specific patterns that go beyond standard structure or import extraction. The `ProcessConfig.extractions` field lets you define custom tree-sitter query patterns that run alongside the standard analysis passes.
+The built-in fields cover common use cases, but many workflows require language-specific patterns. The `ProcessConfig.extractions` field lets you define custom tree-sitter query patterns that run alongside the standard analysis.
 
-Each extraction is a named pattern with a tree-sitter S-expression query. Results are returned in `ProcessResult.extractions`, keyed by the name you provide. You can control what data each match captures (text, node metadata, or both), limit the number of results, and restrict matches to a byte range.
+Each extraction is a named pattern with a tree-sitter S-expression query. Results are returned in `ProcessResult.extractions`, keyed by the name you provide.
 
 ```python
 config = ProcessConfig(
@@ -309,4 +334,4 @@ for match in result["extractions"]["decorators"]:
     print(match)
 ```
 
-For a full walkthrough of extraction queries, including `child_fields`, `max_results`, `byte_range`, and compiled extraction for repeated use, see the [Extraction Queries guide](../guides/extraction.md).
+For a full walkthrough — including `child_fields`, `max_results`, `byte_range`, and compiled extractions for repeated use — see the [Extraction Queries guide](../guides/extraction.md).

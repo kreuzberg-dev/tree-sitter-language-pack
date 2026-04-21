@@ -10,10 +10,11 @@ Parsers are downloaded on demand and cached locally — the initial package is s
 
 ## Organization
 
-Part of the kreuzberg.dev ecosystem:
-- **Kreuzberg** — Document intelligence: https://github.com/kreuzberg-dev/kreuzberg
-- **html-to-markdown** — HTML to Markdown converter: https://github.com/kreuzberg-dev/html-to-markdown
-- **tree-sitter-language-pack** — Universal code parser (this repo): https://github.com/kreuzberg-dev/tree-sitter-language-pack
+Part of the kreuzberg.dev ecosystem (documentation sites):
+- **Kreuzberg** — Document intelligence: https://docs.kreuzberg.dev/ — repo: https://github.com/kreuzberg-dev/kreuzberg
+- **html-to-markdown** — HTML to Markdown: https://docs.html-to-markdown.kreuzberg.dev/ — repo: https://github.com/kreuzberg-dev/html-to-markdown
+- **liter-llm** — Universal LLM API client: https://docs.liter-llm.kreuzberg.dev/ — repo: https://github.com/kreuzberg-dev/liter-llm
+- **tree-sitter-language-pack** — Universal code parser (this repo): https://docs.tree-sitter-language-pack.kreuzberg.dev — https://github.com/kreuzberg-dev/tree-sitter-language-pack
 
 ## Links
 

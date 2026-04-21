@@ -3,9 +3,11 @@ title: Quick Start
 description: "Parse your first file with tree-sitter-language-pack in under 5 minutes."
 ---
 
-This guide walks from install to parsing code in 5 minutes.
+This guide walks you from install to parsing, code intelligence, and LLM chunking.
 
-## Step 1 — Install
+---
+
+## 1. Install
 
 === "Python"
 
@@ -31,11 +33,17 @@ This guide walks from install to parsing code in 5 minutes.
     brew install kreuzberg-dev/tap/ts-pack
     ```
 
-## Step 2 — Download Parsers
+!!! tip "Other ecosystems"
+    Go, Java, C#, Ruby, Elixir, PHP, and WebAssembly are also supported.
+    See [Installation](installation.md) for the full list.
 
-Parsers are downloaded automatically on first use — but for production, CI, Docker, or offline environments you should **pre-download** them.
+---
 
-### Download specific languages
+## 2. Download Parsers
+
+Parsers download automatically on first use. For **production, CI, Docker, or offline** environments, pre-download them.
+
+### Specific languages
 
 === "CLI"
 
@@ -56,7 +64,7 @@ Parsers are downloaded automatically on first use — but for production, CI, Do
     ```typescript
     import { download } from "@kreuzberg/tree-sitter-language-pack";
 
-    download(["python", "javascript", "rust", "go"]);
+    await download(["python", "javascript", "rust", "go"]);
     ```
 
 === "Rust"
@@ -67,7 +75,7 @@ Parsers are downloaded automatically on first use — but for production, CI, Do
     download(&["python", "javascript", "rust", "go"])?;
     ```
 
-### Download all 305 languages
+### All 306 languages
 
 === "CLI"
 
@@ -88,7 +96,7 @@ Parsers are downloaded automatically on first use — but for production, CI, Do
     ```typescript
     import { downloadAll } from "@kreuzberg/tree-sitter-language-pack";
 
-    downloadAll();
+    await downloadAll();
     ```
 
 === "Rust"
@@ -99,14 +107,14 @@ Parsers are downloaded automatically on first use — but for production, CI, Do
     download_all()?;
     ```
 
-### Download by language group
+### By language group
 
-Groups bundle related languages together: `web`, `systems`, `scripting`, `data`, `jvm`, `functional`.
+Groups bundle related languages: `web`, `systems`, `scripting`, `data`, `jvm`, `functional`.
 
 === "CLI"
 
     ```bash
-    # Download all web languages (HTML, CSS, JS, TS, Vue, Svelte, ...)
+    # Download all web languages (HTML, CSS, JS, TS, Vue, Svelte, …)
     ts-pack download --groups web,data
 
     # See what's cached
@@ -126,7 +134,7 @@ Groups bundle related languages together: `web`, `systems`, `scripting`, `data`,
     ```typescript
     import { init } from "@kreuzberg/tree-sitter-language-pack";
 
-    init({ groups: ["web", "data"] });
+    await init({ groups: ["web", "data"] });
     ```
 
 === "Rust"
@@ -143,7 +151,7 @@ Groups bundle related languages together: `web`, `systems`, `scripting`, `data`,
 
 ### Docker and CI
 
-Pre-download parsers during your Docker build or CI setup to avoid runtime network calls:
+Pre-download parsers during your build to avoid runtime network calls:
 
 ```dockerfile title="Dockerfile"
 FROM python:3.12-slim
@@ -161,7 +169,7 @@ RUN python -c "from tree_sitter_language_pack import download_all; download_all(
 
 ### Configuration file
 
-Create a `language-pack.toml` to declare which languages your project needs:
+Declare which languages your project needs in a `language-pack.toml`:
 
 ```toml title="language-pack.toml"
 languages = ["python", "javascript", "rust", "go"]
@@ -182,16 +190,21 @@ Then download everything declared in the config:
 
     ```python
     from tree_sitter_language_pack import init
+
     # Reads language-pack.toml from current directory
     init()
     ```
 
-!!! tip "Cache location"
-    Parsers are cached in `~/.cache/tree-sitter-language-pack/` (Linux/macOS) or `%LOCALAPPDATA%\tree-sitter-language-pack\` (Windows). Override with `TSLP_CACHE_DIR` environment variable, the `cache_dir` field in `language-pack.toml`, or the programmatic API. See [Download Model](../concepts/download-model.md) for full details.
+!!! info "Cache location"
+    Parsers cache to `~/.cache/tree-sitter-language-pack/` on Linux/macOS and `%LOCALAPPDATA%\tree-sitter-language-pack\` on Windows.
+    Override with `cache_dir` in `language-pack.toml` or the programmatic API.
+    See [Download Model](../concepts/download-model.md) for full details.
 
-## Step 3 — Parse Code
+---
 
-With a parser in hand, build a concrete syntax tree from source code.
+## 3. Parse Code
+
+Build a concrete syntax tree from source code.
 
 === "Python"
 
@@ -212,7 +225,7 @@ With a parser in hand, build a concrete syntax tree from source code.
 
     print(root.type)           # module
     print(root.child_count)    # 2
-    print(root.sexp()[:120])   # S-expression of the tree
+    print(root.sexp()[:120])   # S-expression preview
     ```
 
 === "Node.js"
@@ -266,13 +279,15 @@ With a parser in hand, build a concrete syntax tree from source code.
     # Output as JSON
     ts-pack parse src/main.py --format json
 
-    # Parse inline code
+    # Parse inline code via stdin
     echo "def hello(): pass" | ts-pack parse --language python
     ```
 
-## Step 4 — Extract Code Intelligence
+---
 
-Go beyond the raw syntax tree. Extract functions, classes, imports, and more with `process`.
+## 4. Extract Code Intelligence
+
+Go beyond the raw syntax tree. Extract functions, classes, imports, docstrings, and more with `process`.
 
 === "Python"
 
@@ -304,8 +319,8 @@ Go beyond the raw syntax tree. Extract functions, classes, imports, and more wit
     )
     result = process(source, config)
 
-    print(f"Imports:  {[i['name'] for i in result['imports']]}")
-    print(f"Symbols:  {[s['name'] for s in result['structure']]}")
+    print(f"Imports:   {[i['name'] for i in result['imports']]}")
+    print(f"Symbols:   {[s['name'] for s in result['structure']]}")
     print(f"Docstring: {result['structure'][0]['docstring']}")
     ```
 
@@ -381,14 +396,16 @@ Go beyond the raw syntax tree. Extract functions, classes, imports, and more wit
 === "CLI"
 
     ```bash
-    # Run full code intelligence on a file
+    # Full code intelligence on a file
     ts-pack process src/main.py --structure --imports --docstrings
 
-    # Output as JSON for piping
+    # JSON output for piping
     ts-pack process src/main.py --all --format json | jq '.structure[].name'
     ```
 
-## Step 5 — Run Extraction Queries
+---
+
+## 5. Run Extraction Queries
 
 Use `extract` to run custom tree-sitter queries and get structured results with captured text and metadata.
 
@@ -414,15 +431,18 @@ Use `extract` to run custom tree-sitter queries and get structured results with 
             }
         }
     })
+
     for match in result["results"]["functions"]["matches"]:
         print(match["captures"][0]["text"])
     # greet
     # farewell
     ```
 
-## Step 6 — Chunk for LLMs
+---
 
-Split code at natural boundaries so language models receive coherent, complete units.
+## 7. Chunk for LLMs
+
+Split code at natural boundaries so language models receive coherent, complete units which is ideal for embedding pipelines and context windows.
 
 === "Python"
 
@@ -440,7 +460,7 @@ Split code at natural boundaries so language models receive coherent, complete u
     result = process(source, config)
 
     for i, chunk in enumerate(result["chunks"]):
-        print(f"Chunk {i}: {chunk['start_line']}-{chunk['end_line']} "
+        print(f"Chunk {i}: lines {chunk['start_line']}-{chunk['end_line']} "
               f"({chunk['token_count']} tokens)")
     ```
 
@@ -471,37 +491,11 @@ Split code at natural boundaries so language models receive coherent, complete u
       | jq '.chunks[] | {start: .start_line, end: .end_line, tokens: .token_count}'
     ```
 
-## What's Next
+---
 
-<div class="grid cards" markdown>
+You now have the full workflow. You can now install, download, parse, extract intelligence, run queries, and chunk for LLMs.
+Dive deeper with the following guides:
 
-- :material-book-open-outline: **Concepts**
-
-    ---
-
-    Understand the architecture, download model, and what code intelligence extracts.
-
-    [:material-arrow-right: Architecture](../concepts/architecture.md) ·
-    [:material-arrow-right: Download Model](../concepts/download-model.md) ·
-    [:material-arrow-right: Code Intelligence](../concepts/code-intelligence.md)
-
-- :material-wrench-outline: **Guides**
-
-    ---
-
-    Deep dives on specific features and real-world use cases.
-
-    [:material-arrow-right: Chunking for LLMs](../guides/chunking.md) ·
-    [:material-arrow-right: CLI Reference](../guides/cli.md)
-
-- :material-api: **API Reference**
-
-    ---
-
-    Full API documentation for every language binding.
-
-    [:material-arrow-right: Python](../api/python.md) ·
-    [:material-arrow-right: Node.js](../api/typescript.md) ·
-    [:material-arrow-right: Rust](../api/rust.md)
-
-</div>
+- [:material-arrow-right: Parsing guide](../guides/parsing.md) — syntax trees, error handling, and incremental parsing
+- [:material-arrow-right: Configuration](../guides/configuration.md) — `language-pack.toml` and advanced options
+- [:material-arrow-right: API Reference](../api/python.md) — full API docs for every binding

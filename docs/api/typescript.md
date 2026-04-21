@@ -88,7 +88,7 @@ Returns the total number of available languages.
 ```typescript
 import { languageCount } from "@kreuzberg/tree-sitter-language-pack";
 
-const count = languageCount(); // 305
+const count = languageCount(); // 306
 ```
 
 ### `detectLanguage(path: string): string | null`

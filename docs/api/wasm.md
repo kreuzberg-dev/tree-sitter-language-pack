@@ -43,6 +43,19 @@ const result = tsp.process("def hello(): pass", { language: "python" });
 console.log("Structure items:", result.structure.length);
 ```
 
+## Included languages
+
+The WASM build statically compiles a fixed set of languages. The set is determined at build time by `TSLP_LANGUAGES`. To see exactly what's in a published package:
+
+```javascript
+import * as tsp from "@kreuzberg/tree-sitter-language-pack-wasm";
+console.log(tsp.availableLanguages());
+```
+
+The CI test suite runs with: `python`, `rust`, `javascript`, `typescript`, `go`, `html`, `css`, `json`.
+
+For all 306 parsers, use the native bindings (Python, Node.js, Rust, etc.) which download parsers on demand.
+
 ## Language Discovery
 
 ### `availableLanguages(): string[]`
@@ -423,13 +436,13 @@ The following functions exist for API parity but are stubs. WASM cannot perform 
 
 ## Language Support
 
-The WASM package includes a curated subset of languages optimized for browser and edge runtime use cases. Compiling all 305 supported languages into a single WASM binary exceeds the memory limits of standard build environments. Native bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP) include all 305 languages.
+The WASM package includes a curated subset of languages optimized for browser and edge runtime use cases. Compiling all 306 supported languages into a single WASM binary exceeds the memory limits of standard build environments. Native bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP) include all 306 languages.
 
 Use `availableLanguages()` at runtime to get the exact list of included languages.
 
 ## Limitations
 
-1. **Language subset**: Not all 305 languages are included. For the full set, use native bindings.
+1. **Language subset**: Not all 306 languages are included. For the full set, use native bindings.
 2. **No download API**: Grammars are pre-bundled. Download functions throw errors.
 3. **Single-threaded**: Run CPU-intensive parsing in Web Workers.
 4. **No file I/O**: Read files into memory before parsing.

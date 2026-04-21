@@ -1,9 +1,9 @@
 ---
 title: Supported Languages
-description: "All 305 languages supported by tree-sitter-language-pack."
+description: "All 306 languages supported by tree-sitter-language-pack."
 ---
 
-tree-sitter-language-pack supports **305 languages**. All parsers are available for download on demand via `ts-pack download <language>` or automatically on first use.
+tree-sitter-language-pack supports **306 languages**. Parsers download on demand via `ts-pack download <language>` or automatically on first use.
 
 ## Language List
 
@@ -187,7 +187,49 @@ tree-sitter-language-pack supports **305 languages**. All parsers are available 
 | Yuck | `yuck` | [Aylur/tree-sitter-yuck](https://github.com/Aylur/tree-sitter-yuck) |
 | Zig | `zig` | [maxxnino/tree-sitter-zig](https://github.com/maxxnino/tree-sitter-zig) |
 
-## Checking Language Availability
+## Language aliases
+
+Some common alternative names resolve to the canonical grammar name:
+
+| Alias | Resolves to |
+|-------|-------------|
+| `shell` | `bash` |
+| `makefile` | `make` |
+| `lisp` | `commonlisp` |
+| `gradle` | `groovy` |
+| `bazel` | `starlark` |
+| `ignorefile` | `gitignore` |
+
+Aliases work anywhere a language name is accepted: API calls, CLI arguments, config files.
+
+## Language groups
+
+Groups let you download a related set of parsers in one command:
+
+```bash
+ts-pack download --groups web,systems
+```
+
+Available groups: `web`, `systems`, `scripting`, `data`, `jvm`, `functional`.
+
+Group membership is defined in the release manifest. To see which languages a group includes, check [the release manifest](https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases) for your version.
+
+## Ambiguous extensions
+
+Some extensions map to more than one language. `detect_language_from_extension()` returns one default; `extension_ambiguity()` shows the full set:
+
+| Extension | Default | Alternatives |
+|-----------|---------|--------------|
+| `.h` | `c` | `cpp`, `objc` |
+| `.m` | `objc` | `matlab` |
+| `.pl` | `perl` | `prolog` |
+| `.sv`, `.svh` | `systemverilog` | `verilog` |
+| `.v` | `v` | `verilog` |
+| `.gd` | `gdscript` | `gap` |
+| `.mod` | `gomod` | `fortran` |
+| `.conf` | `nginx` | `hocon` |
+
+## Checking language availability
 
 === "Python"
 
@@ -196,7 +238,7 @@ tree-sitter-language-pack supports **305 languages**. All parsers are available 
 
     print(has_language("python"))      # True
     print(has_language("brainfuck"))   # False
-    print(language_count())            # 305
+    print(language_count())            # 306
 
     for lang in sorted(available_languages()):
         print(lang)
@@ -208,7 +250,7 @@ tree-sitter-language-pack supports **305 languages**. All parsers are available 
     import { hasLanguage, availableLanguages, languageCount } from "@kreuzberg/tree-sitter-language-pack";
 
     console.log(hasLanguage("python"));     // true
-    console.log(languageCount());           // 305
+    console.log(languageCount());           // 306
 
     for (const lang of availableLanguages().sort()) {
       console.log(lang);
@@ -219,10 +261,10 @@ tree-sitter-language-pack supports **305 languages**. All parsers are available 
 
     ```bash
     ts-pack list
-    ts-pack list | wc -l   # 305
+    ts-pack list | wc -l   # 306
     ```
 
-## Requesting a Language
+## Requesting a language
 
 Missing a language? [Open an issue](https://github.com/kreuzberg-dev/tree-sitter-language-pack/issues/new) or see the [Contributing guide](contributing.md) to add it yourself. Adding a language requires:
 

@@ -1,13 +1,15 @@
 ---
-title: Extraction Queries
-description: "Run custom tree-sitter queries against parsed code and retrieve structured results with text, node metadata, and child fields."
+title: Extraction queries
+description: "Run custom tree-sitter queries against parsed code and get structured results with text, position, and child fields."
 ---
 
-Extraction queries run arbitrary [tree-sitter S-expression queries](https://tree-sitter.github.io/tree-sitter/using-parsers/queries/1-syntax.html) against parsed source code and return structured results. Each match includes captured text, node metadata (type, position, byte offsets), and optionally the text of named child fields.
+Extraction queries let you run arbitrary [tree-sitter S-expression queries](https://tree-sitter.github.io/tree-sitter/using-parsers/queries/1-syntax.html) against source code. Each match returns captured text, node metadata, and optionally the text of named child fields.
 
-Use `extract()` when you need custom pattern matching beyond what `process()` provides. Use `process()` with its built-in analysis features (structure, imports, exports, etc.) for standard code intelligence. The two can also be combined: `ProcessConfig.extractions` runs extraction patterns alongside the standard analysis pass.
+Use `extract()` when the built-in fields in `process()` don't cover your use case — finding all calls to a specific function, listing decorator names, extracting test method names matching a pattern. The two can also run together: `ProcessConfig.extractions` runs custom patterns alongside the standard analysis pass.
 
-## Basic Usage
+## Basic usage
+
+The simplest case: find all function names.
 
 === "Python"
 
@@ -20,20 +22,22 @@ Use `extract()` when you need custom pattern matching beyond what `process()` pr
         "language": "python",
         "patterns": {
             "functions": {
-                "query": "(function_definition name: (identifier) @fn_name) @fn_def",
+                "query": "(function_definition name: (identifier) @fn_name)",
             }
         }
     })
 
     for match in result["functions"]["matches"]:
         for capture in match["captures"]:
-            print(capture["name"], capture["text"])
+            print(capture["text"])
+    # hello
+    # world
     ```
 
 === "Node.js"
 
     ```typescript
-    import { extract } from "@anthropic/tree-sitter-language-pack";
+    import { extract } from "@kreuzberg/tree-sitter-language-pack";
 
     const source = "def hello(): pass\ndef world(): pass\n";
 
@@ -41,14 +45,14 @@ Use `extract()` when you need custom pattern matching beyond what `process()` pr
       language: "python",
       patterns: {
         functions: {
-          query: "(function_definition name: (identifier) @fn_name) @fn_def",
+          query: "(function_definition name: (identifier) @fn_name)",
         },
       },
     });
 
     for (const match of result.functions.matches) {
       for (const capture of match.captures) {
-        console.log(capture.name, capture.text);
+        console.log(capture.text);
       }
     }
     ```
@@ -56,179 +60,79 @@ Use `extract()` when you need custom pattern matching beyond what `process()` pr
 === "Rust"
 
     ```rust
-    use tree_sitter_language_pack::{
-        ExtractionConfig, ExtractionPattern, extract_patterns,
-    };
+    use tree_sitter_language_pack::{ExtractionConfig, ExtractionPattern, extract_patterns};
     use ahash::AHashMap;
 
     let mut patterns = AHashMap::new();
     patterns.insert("functions".to_string(), ExtractionPattern {
-        query: "(function_definition name: (identifier) @fn_name) @fn_def"
-            .to_string(),
-        capture_output: Default::default(),
-        child_fields: Vec::new(),
-        max_results: None,
-        byte_range: None,
+        query: "(function_definition name: (identifier) @fn_name)".to_string(),
+        ..Default::default()
     });
-
-    let config = ExtractionConfig {
-        language: "python".to_string(),
-        patterns,
-    };
 
     let result = extract_patterns(
         "def hello(): pass\ndef world(): pass\n",
-        &config,
-    )
-    .unwrap();
-    let fns = &result.results["functions"];
-    assert_eq!(fns.total_count, 2);
+        &ExtractionConfig { language: "python".to_string(), patterns },
+    )?;
+
+    assert_eq!(result.results["functions"].total_count, 2);
     ```
 
-## Configuration
+## Extracting child fields
 
-### ExtractionConfig
-
-| Field      | Type                             | Description                                                      |
-|------------|----------------------------------|------------------------------------------------------------------|
-| `language` | `str`                            | Language name (e.g., `"python"`, `"typescript"`, `"rust"`)       |
-| `patterns` | `dict[str, ExtractionPattern]`   | Named patterns to run. Keys become the keys in the result object |
-
-### ExtractionPattern
-
-| Field            | Type                          | Default    | Description                                                    |
-|------------------|-------------------------------|------------|----------------------------------------------------------------|
-| `query`          | `str`                         | required   | Tree-sitter S-expression query                                 |
-| `capture_output` | `"Text"` / `"Node"` / `"Full"` | `"Full"` | Controls what data is included per capture (see below)         |
-| `child_fields`   | `list[str]`                   | `[]`       | Named child fields to extract from each captured node          |
-| `max_results`    | `int` or `null`               | `null`     | Maximum number of matches to return; `null` means unlimited    |
-| `byte_range`     | `[start, end]` or `null`      | `null`     | Restrict matches to a `(start, end)` byte range in the source |
-
-## Capture Output Modes
-
-The `capture_output` field controls what data each `CaptureResult` contains:
-
-| Mode   | `text` field | `node` field | Use case                              |
-|--------|:------------:|:------------:|---------------------------------------|
-| `Text` | present      | `null`       | When you only need matched text       |
-| `Node` | `null`       | present      | When you only need position/type info |
-| `Full` | present      | present      | When you need both (default)          |
-
-The `node` field is a `NodeInfo` object with `type`, `start_byte`, `end_byte`, `start_point` (row/column), and `end_point`.
-
-=== "Python"
-
-    ```python
-    result = extract(source, {
-        "language": "python",
-        "patterns": {
-            "names": {
-                "query": "(function_definition name: (identifier) @fn_name)",
-                "capture_output": "Text",
-            }
-        }
-    })
-
-    capture = result["names"]["matches"][0]["captures"][0]
-    assert capture["text"] == "hello"
-    assert capture["node"] is None
-    ```
-
-=== "Node.js"
-
-    ```typescript
-    const result = extract(source, {
-      language: "python",
-      patterns: {
-        names: {
-          query: "(function_definition name: (identifier) @fn_name)",
-          captureOutput: "Text",
-        },
-      },
-    });
-
-    const capture = result.names.matches[0].captures[0];
-    console.log(capture.text); // "hello"
-    console.log(capture.node); // null
-    ```
-
-=== "Rust"
-
-    ```rust
-    use tree_sitter_language_pack::CaptureOutput;
-
-    let pattern = ExtractionPattern {
-        query: "(function_definition name: (identifier) @fn_name)".to_string(),
-        capture_output: CaptureOutput::Text,
-        child_fields: Vec::new(),
-        max_results: None,
-        byte_range: None,
-    };
-    ```
-
-## Child Fields
-
-Use `child_fields` to extract the text of named children from each captured node. Field names correspond to tree-sitter field names in the grammar (e.g., `name`, `parameters`, `body`, `return_type`).
-
-=== "Python"
-
-    ```python
-    result = extract("def greet(name): pass\n", {
-        "language": "python",
-        "patterns": {
-            "functions": {
-                "query": "(function_definition) @fn_def",
-                "child_fields": ["name", "parameters"],
-            }
-        }
-    })
-
-    capture = result["functions"]["matches"][0]["captures"][0]
-    print(capture["child_fields"]["name"])        # "greet"
-    print(capture["child_fields"]["parameters"])  # "(name)"
-    ```
-
-=== "Rust"
-
-    ```rust
-    let pattern = ExtractionPattern {
-        query: "(function_definition) @fn_def".to_string(),
-        capture_output: CaptureOutput::Full,
-        child_fields: vec!["name".to_string(), "parameters".to_string()],
-        max_results: None,
-        byte_range: None,
-    };
-    ```
-
-If a requested child field does not exist on a given node, its value is `None` / `null`.
-
-## Byte Range
-
-Restrict extraction to a portion of the source by setting `byte_range` to a `(start, end)` tuple. Only matches whose root node falls within the range are returned.
+When you capture a parent node, `child_fields` pulls the text of its named children without needing to write extra captures:
 
 ```python
-source = "def a(): pass\ndef b(): pass\ndef c(): pass\n"
-
-result = extract(source, {
+result = extract("def greet(name): pass\n", {
     "language": "python",
     "patterns": {
-        "fns": {
-            "query": "(function_definition name: (identifier) @fn_name)",
-            "byte_range": [14, 28],
+        "functions": {
+            "query": "(function_definition) @fn_def",
+            "child_fields": ["name", "parameters"],
         }
     }
 })
 
-assert len(result["fns"]["matches"]) == 1
-assert result["fns"]["matches"][0]["captures"][0]["text"] == "b"
+capture = result["functions"]["matches"][0]["captures"][0]
+print(capture["child_fields"]["name"])        # "greet"
+print(capture["child_fields"]["parameters"])  # "(name)"
 ```
 
-## Result Truncation
+Field names depend on the grammar. Run `ts-pack parse file.py` to see the sexp with field labels, or check the grammar's `node-types.json`.
 
-When `max_results` is set, the returned `matches` list is capped at that number. The `total_count` field always reflects the true number of matches in the source, so you can detect truncation:
+## Capture output modes
+
+`capture_output` controls how much data each match returns:
+
+| Mode | `text` | `node` | Use when |
+|------|--------|--------|----------|
+| `"Text"` (default for most cases) | present | null | You only need the matched text |
+| `"Node"` | null | present | You only need position/type info |
+| `"Full"` | present | present | You need both |
+
+The `node` field contains `type`, `start_byte`, `end_byte`, `start_point`, and `end_point`.
 
 ```python
-result = extract(source_with_many_functions, {
+result = extract(source, {
+    "language": "python",
+    "patterns": {
+        "names": {
+            "query": "(function_definition name: (identifier) @fn_name)",
+            "capture_output": "Text",
+        }
+    }
+})
+
+capture = result["names"]["matches"][0]["captures"][0]
+print(capture["text"])  # "hello"
+print(capture["node"])  # None
+```
+
+## Limiting results
+
+`max_results` caps the `matches` list. `total_count` always shows the true match count, so you can detect truncation:
+
+```python
+result = extract(source, {
     "language": "python",
     "patterns": {
         "fns": {
@@ -243,186 +147,125 @@ print(len(pattern["matches"]))  # at most 5
 print(pattern["total_count"])   # actual count, e.g. 42
 ```
 
-## Validation
+## Restricting to a byte range
 
-Use `validate_extraction()` to check query syntax without running extraction. Returns per-pattern diagnostics including capture names, pattern count, warnings, and errors.
+`byte_range` limits extraction to a `[start, end]` byte offset range. Only matches whose root node falls within the range are returned:
 
-=== "Python"
+```python
+source = "def a(): pass\ndef b(): pass\ndef c(): pass\n"
 
-    ```python
-    from tree_sitter_language_pack import validate_extraction
-
-    result = validate_extraction({
-        "language": "python",
-        "patterns": {
-            "good": {
-                "query": "(function_definition name: (identifier) @fn_name)",
-            },
-            "bad": {
-                "query": "((((not valid syntax",
-            }
+result = extract(source, {
+    "language": "python",
+    "patterns": {
+        "fns": {
+            "query": "(function_definition name: (identifier) @fn_name)",
+            "byte_range": [14, 28],
         }
-    })
+    }
+})
 
-    print(result["valid"])  # False
+# Only "b" falls in bytes 14-28
+print(result["fns"]["matches"][0]["captures"][0]["text"])  # "b"
+```
 
-    good = result["patterns"]["good"]
-    print(good["valid"])          # True
-    print(good["capture_names"]) # ["fn_name"]
-    print(good["pattern_count"]) # 1
+## Validating queries
 
-    bad = result["patterns"]["bad"]
-    print(bad["valid"])   # False
-    print(bad["errors"])  # ["<query syntax error>"]
-    ```
+`validate_extraction()` checks query syntax without running extraction. Use it to catch mistakes early:
 
-=== "Node.js"
+```python
+from tree_sitter_language_pack import validate_extraction
 
-    ```typescript
-    import { validateExtraction } from "@anthropic/tree-sitter-language-pack";
-
-    const result = validateExtraction({
-      language: "python",
-      patterns: {
-        fns: {
-          query: "(function_definition name: (identifier) @fn_name)",
+result = validate_extraction({
+    "language": "python",
+    "patterns": {
+        "good": {
+            "query": "(function_definition name: (identifier) @fn_name)",
         },
-      },
-    });
+        "bad": {
+            "query": "((((not valid syntax",
+        }
+    }
+})
 
-    console.log(result.valid);                     // true
-    console.log(result.patterns.fns.captureNames); // ["fn_name"]
-    ```
+print(result["valid"])                    # False
+print(result["patterns"]["good"]["valid"])  # True
+print(result["patterns"]["good"]["capture_names"])  # ["fn_name"]
+print(result["patterns"]["bad"]["errors"])          # ["<syntax error>"]
+```
 
-=== "Rust"
+Each pattern result has:
 
-    ```rust
-    use tree_sitter_language_pack::validate_extraction;
+| Field | Type | Description |
+|-------|------|-------------|
+| `valid` | bool | Whether the query compiled |
+| `capture_names` | list[str] | Capture names in the query |
+| `pattern_count` | int | Number of patterns |
+| `warnings` | list[str] | Non-fatal warnings |
+| `errors` | list[str] | Fatal errors |
 
-    let result = validate_extraction(&config).unwrap();
-    assert!(result.valid);
-    assert!(result.patterns["fns"]
-        .capture_names
-        .contains(&"fn_name".to_string()));
-    ```
+## Combined with process()
 
-The `PatternValidation` struct returned per pattern contains:
+`ProcessConfig.extractions` runs custom patterns alongside the standard analysis pass. Results appear in `result["extractions"]`, keyed by pattern name:
 
-| Field           | Type         | Description                                     |
-|-----------------|--------------|--------------------------------------------------|
-| `valid`         | `bool`       | Whether the query compiled                       |
-| `capture_names` | `list[str]`  | Capture names defined in the query               |
-| `pattern_count` | `int`        | Number of patterns in the query                  |
-| `warnings`      | `list[str]`  | Non-fatal warnings (e.g., empty child field name)|
-| `errors`        | `list[str]`  | Fatal errors (e.g., query syntax errors)         |
+```python
+from tree_sitter_language_pack import process, ProcessConfig
 
-## Compiled Extraction (Rust only)
+result = process(source, ProcessConfig(
+    language="python",
+    structure=True,
+    extractions={
+        "decorators": {
+            "query": "(decorator) @dec",
+            "capture_output": "Text",
+        }
+    }
+))
 
-`CompiledExtraction` pre-compiles query patterns so they can be reused across multiple source inputs without recompilation overhead. This is relevant when processing many files with the same set of patterns.
+print(result["structure"])                              # standard results
+print(result["extractions"]["decorators"]["matches"])   # custom results
+```
+
+## Compiled extraction (Rust)
+
+`CompiledExtraction` pre-compiles queries once for reuse across multiple inputs — useful when processing many files with the same patterns:
 
 ```rust
-use tree_sitter_language_pack::{CompiledExtraction, ExtractionConfig};
+use tree_sitter_language_pack::CompiledExtraction;
 
-let config = ExtractionConfig {
-    language: "python".to_string(),
-    patterns, // AHashMap<String, ExtractionPattern>
-};
+let compiled = CompiledExtraction::compile(&config)?;
 
-let compiled = CompiledExtraction::compile(&config).unwrap();
-
-// Reuse across multiple inputs
-let r1 = compiled.extract("def a(): pass\n").unwrap();
-let r2 = compiled.extract("def x(): pass\ndef y(): pass\n").unwrap();
+// Reuse across many files
+let r1 = compiled.extract("def a(): pass\n")?;
+let r2 = compiled.extract("def x(): pass\ndef y(): pass\n")?;
 
 assert_eq!(r1.results["fns"].total_count, 1);
 assert_eq!(r2.results["fns"].total_count, 2);
 ```
 
-`CompiledExtraction` is `Send + Sync`, so it can be shared across threads. A new `QueryCursor` is created per `extract()` call.
-
-To extract from an already-parsed tree (avoiding a re-parse):
+`CompiledExtraction` is `Send + Sync`. To skip re-parsing when you already have a tree:
 
 ```rust
-let tree = tree_sitter_language_pack::parse_string("python", source.as_bytes())
-    .unwrap();
-let result = compiled
-    .extract_from_tree(&tree, source.as_bytes())
-    .unwrap();
+let tree = parse_string("python", source.as_bytes())?;
+let result = compiled.extract_from_tree(&tree, source.as_bytes())?;
 ```
 
-## Integration with process()
+## Binding support
 
-`ProcessConfig` has an `extractions` field that runs extraction patterns alongside the standard analysis pass. Results appear in `ProcessResult.extractions`, keyed by pattern name.
+| Binding | `extract()` | `validate_extraction()` |
+|---------|:-----------:|:-----------------------:|
+| Python | yes | yes |
+| Node.js | yes | yes |
+| Rust | yes | yes |
+| Ruby | yes | yes |
+| Elixir | yes | yes |
+| PHP | yes | yes |
+| WASM | yes | yes |
+| C FFI | yes | yes |
+| Go | not yet | not yet |
+| C# | not yet | not yet |
+| Java | not yet | not yet |
 
-=== "Python"
+## Next steps
 
-    ```python
-    from tree_sitter_language_pack import process
-
-    result = process(source, {
-        "language": "python",
-        "structure": True,
-        "extractions": {
-            "decorators": {
-                "query": "(decorator) @dec",
-                "capture_output": "Text",
-            }
-        }
-    })
-
-    # Standard analysis results
-    print(result["structure"])
-
-    # Custom extraction results
-    print(result["extractions"]["decorators"]["matches"])
-    ```
-
-=== "Node.js"
-
-    ```typescript
-    import { process } from "@anthropic/tree-sitter-language-pack";
-
-    const result = process(source, {
-      language: "python",
-      structure: true,
-      extractions: {
-        decorators: {
-          query: "(decorator) @dec",
-          captureOutput: "Text",
-        },
-      },
-    });
-    ```
-
-=== "Rust"
-
-    ```rust
-    use tree_sitter_language_pack::{ProcessConfig, ExtractionPattern, CaptureOutput};
-
-    let mut config = ProcessConfig::new("python");
-    let mut extractions = ahash::AHashMap::new();
-    extractions.insert("decorators".to_string(), ExtractionPattern {
-        query: "(decorator) @dec".to_string(),
-        capture_output: CaptureOutput::Text,
-        child_fields: Vec::new(),
-        max_results: None,
-        byte_range: None,
-    });
-    config.extractions = Some(extractions);
-    ```
-
-## Available Bindings
-
-| Binding    | `extract()` | `validate_extraction()` |
-|------------|:-----------:|:-----------------------:|
-| Python     | yes         | yes                     |
-| Node.js    | yes         | yes                     |
-| Rust       | yes         | yes                     |
-| Ruby       | yes         | yes                     |
-| Elixir     | yes         | yes                     |
-| PHP        | yes         | yes                     |
-| WASM       | yes         | yes                     |
-| C FFI      | yes         | yes                     |
-| Go         | not yet     | not yet                 |
-| C#         | not yet     | not yet                 |
-| Java       | not yet     | not yet                 |
+- [Code intelligence](intelligence.md) — built-in extraction for common patterns (structure, imports, exports)
+- [Parsing code](parsing.md) — understanding the syntax tree your queries run against
