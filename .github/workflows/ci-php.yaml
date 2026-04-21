@@ -229,7 +229,7 @@ jobs:
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Generate E2E tests
-        run: cargo run -p e2e-generator -- generate --lang php
+        run: alef e2e generate --lang php
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"

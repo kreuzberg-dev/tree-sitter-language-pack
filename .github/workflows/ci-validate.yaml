@@ -112,7 +112,7 @@ jobs:
         with:
           ruby-version: "3.4"
           bundler-cache: true
-          working-directory: crates/ts-pack-ruby
+          working-directory: packages/ruby
 
       # --- Go ---
       - name: Setup Go
@@ -142,7 +142,7 @@ jobs:
           version-type: strict
 
       - name: Install Elixir dependencies
-        run: cd crates/ts-pack-elixir && mix deps.get
+        run: cd packages/elixir && mix deps.get
 
       # --- C/C++ ---
       - name: Install C/C++ tools
@@ -176,7 +176,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Install alef
-        run: cargo install --git https://github.com/kreuzberg-dev/alef --locked --bin alef
+        run: cargo install --git https://github.com/kreuzberg-dev/alef --tag v0.4.2 --locked --bin alef
         env:
           CARGO_INSTALL_ROOT: ${{ runner.temp }}/alef
 

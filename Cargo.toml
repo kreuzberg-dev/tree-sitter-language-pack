@@ -1,6 +1,8 @@
 [workspace]
 members = ["crates/*", "tools/snippet-runner"]
 exclude = [
+    "crates/tree-sitter-language-pack-ffi",
+    "crates/tree-sitter-language-pack-wasm",
     "crates/ts-pack-elixir",
     "crates/ts-pack-java",
     "crates/ts-pack-node",

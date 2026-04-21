@@ -4,7 +4,7 @@ package tspack
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../crates/ts-pack-core-ffi/include
-#cgo LDFLAGS: -L${SRCDIR}/../../target/release -lts_pack_ffi
+#cgo LDFLAGS: -L${SRCDIR}/../../target/release -lts_pack_core_ffi
 #include "ts_pack.h"
 */
 import "C"

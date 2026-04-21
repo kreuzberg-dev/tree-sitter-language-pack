@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "crates/ts-pack-java/**"
-      - "crates/ts-pack-ffi/**"
+      - "packages/java/**"
+      - "crates/ts-pack-core-ffi/**"
       - "crates/ts-pack-core/**"
       - "Cargo.toml"
       - "Cargo.lock"
@@ -22,8 +22,8 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "crates/ts-pack-java/**"
-      - "crates/ts-pack-ffi/**"
+      - "packages/java/**"
+      - "crates/ts-pack-core-ffi/**"
       - "crates/ts-pack-core/**"
       - "Cargo.toml"
       - "Cargo.lock"
@@ -128,7 +128,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Build FFI library
-        run: cargo build -p ts-pack-ffi --release
+        run: cargo build -p ts-pack-core-ffi --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LINK_MODE: static
@@ -139,8 +139,8 @@ jobs:
         with:
           name: ffi-linux
           path: |
-            target/release/libts_pack_ffi.so
-            crates/ts-pack-ffi/include/
+            target/release/libts_pack_core_ffi.so
+            crates/ts-pack-core-ffi/include/
           retention-days: 1
 
   test-java:
@@ -167,9 +167,9 @@ jobs:
       - name: Restore FFI to expected path
         run: |
           mkdir -p target/release
-          cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
-          mkdir -p crates/ts-pack-ffi/include
-          cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
+          cp ffi-artifacts/target/release/libts_pack_core_ffi.* target/release/ 2>/dev/null || true
+          mkdir -p crates/ts-pack-core-ffi/include
+          cp -r ffi-artifacts/crates/ts-pack-core-ffi/include/* crates/ts-pack-core-ffi/include/ 2>/dev/null || true
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -184,18 +184,18 @@ jobs:
           echo "LD_LIBRARY_PATH=${{ github.workspace }}/target/release:${LD_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
 
       - name: Run Java tests
-        working-directory: crates/ts-pack-java
+        working-directory: packages/java
         run: mvn test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-          TSPACK_LIB_PATH: ${{ github.workspace }}/target/release/libts_pack_ffi.so
+          TSPACK_LIB_PATH: ${{ github.workspace }}/target/release/libts_pack_core_ffi.so
 
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: java-unit-reports
-          path: crates/ts-pack-java/target/surefire-reports
+          path: packages/java/target/surefire-reports
           if-no-files-found: ignore
           retention-days: 7
 
@@ -223,9 +223,9 @@ jobs:
       - name: Restore FFI to expected path
         run: |
           mkdir -p target/release
-          cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
-          mkdir -p crates/ts-pack-ffi/include
-          cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
+          cp ffi-artifacts/target/release/libts_pack_core_ffi.* target/release/ 2>/dev/null || true
+          mkdir -p crates/ts-pack-core-ffi/include
+          cp -r ffi-artifacts/crates/ts-pack-core-ffi/include/* crates/ts-pack-core-ffi/include/ 2>/dev/null || true
 
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1
@@ -242,7 +242,7 @@ jobs:
           cache: "maven"
 
       - name: Build Java jar
-        working-directory: crates/ts-pack-java
+        working-directory: packages/java
         run: mvn package -DskipTests
         env:
           PROJECT_ROOT: ${{ github.workspace }}
@@ -250,7 +250,7 @@ jobs:
           TSLP_LINK_MODE: static
 
       - name: Generate E2E tests
-        run: cargo run -p e2e-generator -- generate --lang java
+        run: alef e2e generate --lang java
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
@@ -265,7 +265,7 @@ jobs:
         run: mvn test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-          TSPACK_LIB_PATH: ${{ github.workspace }}/target/release/libts_pack_ffi.so
+          TSPACK_LIB_PATH: ${{ github.workspace }}/target/release/libts_pack_core_ffi.so
           MAVEN_OPTS: "--enable-native-access=ALL-UNNAMED -Dsun.misc.unsafe.memory.access=allow"
 
       - name: Upload E2E test reports

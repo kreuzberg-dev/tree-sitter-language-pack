@@ -8,7 +8,7 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'crates/ts-pack-core/**'
-      - 'crates/ts-pack-wasm/**'
+      - 'crates/ts-pack-core-wasm/**'
       - 'e2e/wasm/**'
       - 'fixtures/**'
       - '.task/wasm.yml'
@@ -24,7 +24,7 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'crates/ts-pack-core/**'
-      - 'crates/ts-pack-wasm/**'
+      - 'crates/ts-pack-core-wasm/**'
       - 'e2e/wasm/**'
       - 'fixtures/**'
       - '.task/wasm.yml'
@@ -144,7 +144,7 @@ jobs:
       - name: Verify WASM binary exists and check size
         shell: bash
         run: |
-          WASM_FILE="crates/ts-pack-wasm/pkg/ts_pack_wasm_bg.wasm"
+          WASM_FILE="crates/ts-pack-core-wasm/pkg/ts_pack_wasm_bg.wasm"
           if [ ! -f "$WASM_FILE" ]; then
             echo "ERROR: WASM binary not found at $WASM_FILE"
             exit 1
@@ -160,9 +160,9 @@ jobs:
         shell: bash
         run: |
           for FILE in \
-            crates/ts-pack-wasm/pkg/ts_pack_wasm.js \
-            crates/ts-pack-wasm/pkg/ts_pack_wasm.d.ts \
-            crates/ts-pack-wasm/pkg/ts_pack_wasm_bg.wasm; do
+            crates/ts-pack-core-wasm/pkg/ts_pack_wasm.js \
+            crates/ts-pack-core-wasm/pkg/ts_pack_wasm.d.ts \
+            crates/ts-pack-core-wasm/pkg/ts_pack_wasm_bg.wasm; do
             if [ ! -f "$FILE" ]; then
               echo "ERROR: Expected file missing: $FILE"
               exit 1
@@ -175,10 +175,10 @@ jobs:
         with:
           name: wasm-pkg
           path: |
-            crates/ts-pack-wasm/pkg/*.wasm
-            crates/ts-pack-wasm/pkg/*.js
-            crates/ts-pack-wasm/pkg/*.ts
-            crates/ts-pack-wasm/pkg/package.json
+            crates/ts-pack-core-wasm/pkg/*.wasm
+            crates/ts-pack-core-wasm/pkg/*.js
+            crates/ts-pack-core-wasm/pkg/*.ts
+            crates/ts-pack-core-wasm/pkg/package.json
           retention-days: 7
 
   build-wasm-node:
@@ -220,7 +220,7 @@ jobs:
       - name: Verify WASM binary exists
         shell: bash
         run: |
-          WASM_FILE="crates/ts-pack-wasm/pkg/ts_pack_wasm_bg.wasm"
+          WASM_FILE="crates/ts-pack-core-wasm/pkg/ts_pack_wasm_bg.wasm"
           if [ ! -f "$WASM_FILE" ]; then
             echo "ERROR: WASM binary not found at $WASM_FILE"
             exit 1
@@ -233,10 +233,10 @@ jobs:
         with:
           name: wasm-node-pkg
           path: |
-            crates/ts-pack-wasm/pkg/*.wasm
-            crates/ts-pack-wasm/pkg/*.js
-            crates/ts-pack-wasm/pkg/*.ts
-            crates/ts-pack-wasm/pkg/package.json
+            crates/ts-pack-core-wasm/pkg/*.wasm
+            crates/ts-pack-core-wasm/pkg/*.js
+            crates/ts-pack-core-wasm/pkg/*.ts
+            crates/ts-pack-core-wasm/pkg/package.json
           retention-days: 7
 
   e2e-tests:
@@ -253,7 +253,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: wasm-node-pkg
-          path: crates/ts-pack-wasm/pkg/
+          path: crates/ts-pack-core-wasm/pkg/
 
       - name: Setup Node
         uses: actions/setup-node@v6

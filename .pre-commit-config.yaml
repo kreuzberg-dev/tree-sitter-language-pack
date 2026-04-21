@@ -177,7 +177,7 @@ repos:
     hooks:
       - id: clang-format
         args: [--style=file]
-        files: (^crates/ts-pack-ffi/)
+        files: (^crates/ts-pack-core-ffi/)
         exclude: (include/)
       - id: cppcheck
         args:
@@ -186,7 +186,7 @@ repos:
             "--enable=warning,style,performance",
             "--suppress=missingIncludeSystem",
           ]
-        files: (^crates/ts-pack-ffi/)
+        files: (^crates/ts-pack-core-ffi/)
 
   # Go: formatting and linting via Taskfile
   - repo: local

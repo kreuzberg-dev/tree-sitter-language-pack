@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - "packages/csharp/**"
-      - "crates/ts-pack-ffi/**"
+      - "crates/ts-pack-core-ffi/**"
       - "crates/ts-pack-core/**"
       - "Cargo.toml"
       - "Cargo.lock"
@@ -23,7 +23,7 @@ on:
     branches: [main]
     paths:
       - "packages/csharp/**"
-      - "crates/ts-pack-ffi/**"
+      - "crates/ts-pack-core-ffi/**"
       - "crates/ts-pack-core/**"
       - "Cargo.toml"
       - "Cargo.lock"
@@ -133,7 +133,7 @@ jobs:
         uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Build FFI library
-        run: cargo build -p ts-pack-ffi --release
+        run: cargo build -p ts-pack-core-ffi --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LINK_MODE: static
@@ -144,8 +144,8 @@ jobs:
         with:
           name: ffi-linux
           path: |
-            target/release/libts_pack_ffi.so
-            crates/ts-pack-ffi/include/
+            target/release/libts_pack_core_ffi.so
+            crates/ts-pack-core-ffi/include/
           retention-days: 1
 
       - name: Cleanup Rust cache
@@ -186,7 +186,7 @@ jobs:
         uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Build FFI library
-        run: cargo build -p ts-pack-ffi --release
+        run: cargo build -p ts-pack-core-ffi --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
@@ -239,7 +239,7 @@ jobs:
       - name: Restore FFI to expected path
         run: |
           mkdir -p target/release
-          cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
+          cp ffi-artifacts/target/release/libts_pack_core_ffi.* target/release/ 2>/dev/null || true
 
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1
@@ -258,7 +258,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Generate E2E tests
-        run: cargo run -p e2e-generator -- generate --lang csharp
+        run: alef e2e generate --lang csharp
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"

@@ -6,7 +6,7 @@ namespace TreeSitterLanguagePack;
 
 internal static partial class NativeMethods
 {
-    private const string LibName = "ts_pack_ffi";
+    private const string LibName = "ts_pack_core_ffi";
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_tree_free")]
     internal static extern void TreeFree(IntPtr ptr);

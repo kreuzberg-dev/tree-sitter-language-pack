@@ -36,13 +36,13 @@ final class NativeLib {
         String libName;
         String libExt;
         if (osName.contains("mac") || osName.contains("darwin")) {
-            libName = "libts_pack_ffi";
+            libName = "libts_pack_core_ffi";
             libExt = ".dylib";
         } else if (osName.contains("win")) {
-            libName = "ts_pack_ffi";
+            libName = "ts_pack_core_ffi";
             libExt = ".dll";
         } else {
-            libName = "libts_pack_ffi";
+            libName = "libts_pack_core_ffi";
             libExt = ".so";
         }
 
@@ -55,9 +55,9 @@ final class NativeLib {
         }
 
         try {
-            System.loadLibrary("ts_pack_ffi");
+            System.loadLibrary("ts_pack_core_ffi");
         } catch (UnsatisfiedLinkError e) {
-            String msg = "Failed to load ts_pack_ffi native library. Expected resource: " + nativesDir + "/" + libName
+            String msg = "Failed to load ts_pack_core_ffi native library. Expected resource: " + nativesDir + "/" + libName
                     + libExt + " (RID: " + nativesRid + "). "
                     + "Ensure the library is bundled in the JAR under natives/{os-arch}/, "
                     + "or place it on the system library path (java.library.path).";
@@ -91,7 +91,7 @@ final class NativeLib {
     private static Path extractOrReuseNativeDirectory(String nativesDir) throws Exception {
         URL location = NativeLib.class.getProtectionDomain().getCodeSource().getLocation();
         if (location == null) {
-            throw new IllegalStateException("Missing code source location for ts_pack_ffi JAR");
+            throw new IllegalStateException("Missing code source location for ts_pack_core_ffi JAR");
         }
 
         Path codePath = Path.of(location.toURI());
@@ -101,7 +101,7 @@ final class NativeLib {
             if (cachedExtractDir != null && key.equals(cachedExtractKey)) {
                 return cachedExtractDir;
             }
-            Path tempDir = Files.createTempDirectory("ts_pack_ffi_native");
+            Path tempDir = Files.createTempDirectory("ts_pack_core_ffi_native");
             tempDir.toFile().deleteOnExit();
             List<Path> extracted = extractNativeDirectory(codePath, nativesDir, tempDir);
             if (extracted.isEmpty()) {

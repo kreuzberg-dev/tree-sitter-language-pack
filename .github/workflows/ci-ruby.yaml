@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "crates/ts-pack-ruby/**"
+      - "packages/ruby/**"
       - "crates/ts-pack-core/**"
       - "Cargo.toml"
       - "Cargo.lock"
@@ -21,7 +21,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "crates/ts-pack-ruby/**"
+      - "packages/ruby/**"
       - "crates/ts-pack-core/**"
       - "Cargo.toml"
       - "Cargo.lock"
@@ -131,7 +131,7 @@ jobs:
 
       - name: Clippy (ts-pack-ruby)
         if: matrix.ruby-version == '3.4'
-        run: cargo clippy --manifest-path crates/ts-pack-ruby/Cargo.toml -- -D warnings
+        run: cargo clippy --manifest-path packages/ruby/Cargo.toml -- -D warnings
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
@@ -140,22 +140,22 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          working-directory: crates/ts-pack-ruby
+          working-directory: packages/ruby
 
       - name: Install Ruby dependencies
-        working-directory: crates/ts-pack-ruby
+        working-directory: packages/ruby
         run: bundle install
 
       - name: Build native extension
-        working-directory: crates/ts-pack-ruby
+        working-directory: packages/ruby
         run: bundle exec rake compile
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-          CARGO_TARGET_DIR: ${{ github.workspace }}/crates/ts-pack-ruby/target
+          CARGO_TARGET_DIR: ${{ github.workspace }}/packages/ruby/target
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Run RSpec tests
-        working-directory: crates/ts-pack-ruby
+        working-directory: packages/ruby
         run: bundle exec rspec
         env:
           PROJECT_ROOT: ${{ github.workspace }}
@@ -187,20 +187,20 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
-          working-directory: crates/ts-pack-ruby
+          working-directory: packages/ruby
 
       - name: Build native extension
-        working-directory: crates/ts-pack-ruby
+        working-directory: packages/ruby
         run: |
           bundle install
           bundle exec rake compile
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-          CARGO_TARGET_DIR: ${{ github.workspace }}/crates/ts-pack-ruby/target
+          CARGO_TARGET_DIR: ${{ github.workspace }}/packages/ruby/target
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Generate E2E tests
-        run: cargo run -p e2e-generator -- generate --lang ruby
+        run: alef e2e generate --lang ruby
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"

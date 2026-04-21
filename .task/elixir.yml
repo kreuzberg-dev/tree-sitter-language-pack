@@ -3,13 +3,13 @@ version: "3"
 tasks:
   deps:
     desc: Install Elixir dependencies
-    dir: crates/ts-pack-elixir
+    dir: packages/elixir
     cmds:
       - mix deps.get
 
   build:
     desc: Compile Elixir project (includes Rustler NIF)
-    dir: crates/ts-pack-elixir
+    dir: packages/elixir
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
@@ -17,7 +17,7 @@ tasks:
 
   test:
     desc: Run Elixir tests
-    dir: crates/ts-pack-elixir
+    dir: packages/elixir
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
       MIX_ENV: test
@@ -26,19 +26,19 @@ tasks:
 
   format:
     desc: Format Elixir code
-    dir: crates/ts-pack-elixir
+    dir: packages/elixir
     cmds:
       - mix format
 
   format:check:
     desc: Check Elixir formatting (CI)
-    dir: crates/ts-pack-elixir
+    dir: packages/elixir
     cmds:
       - mix format --check-formatted
 
   lint:
     desc: Lint Elixir code (credo, requires NIF built first)
-    dir: crates/ts-pack-elixir
+    dir: packages/elixir
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
@@ -46,7 +46,7 @@ tasks:
 
   lint:check:
     desc: Check Elixir linting without modifications (CI)
-    dir: crates/ts-pack-elixir
+    dir: packages/elixir
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
@@ -54,7 +54,7 @@ tasks:
 
   update:
     desc: Update Elixir dependencies to latest versions
-    dir: crates/ts-pack-elixir
+    dir: packages/elixir
     cmds:
       - echo "Updating Elixir dependencies to latest versions..."
       - cmd: echo "Note - Elixir requires manual mix.exs edits for major version updates"
@@ -65,7 +65,7 @@ tasks:
 
   clean:
     desc: Clean Elixir build artifacts
-    dir: crates/ts-pack-elixir
+    dir: packages/elixir
     cmds:
       - mix clean
 
@@ -74,7 +74,7 @@ tasks:
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - cargo run -p e2e-generator -- generate --lang elixir
+      - alef e2e generate --lang elixir
 
   e2e:test:
     desc: Run Elixir E2E tests

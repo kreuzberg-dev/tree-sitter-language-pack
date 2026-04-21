@@ -10,7 +10,7 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'crates/ts-pack-core/**'
-      - 'crates/ts-pack-ffi/**'
+      - 'crates/ts-pack-core-ffi/**'
       - 'packages/go/**'
       - 'e2e/go/**'
       - 'fixtures/**'
@@ -29,7 +29,7 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'crates/ts-pack-core/**'
-      - 'crates/ts-pack-ffi/**'
+      - 'crates/ts-pack-core-ffi/**'
       - 'packages/go/**'
       - 'e2e/go/**'
       - 'fixtures/**'
@@ -145,9 +145,9 @@ jobs:
         with:
           name: ffi-go-linux
           path: |
-            target/release/libts_pack_ffi.a
-            target/release/libts_pack_ffi.so
-            crates/ts-pack-ffi/include/
+            target/release/libts_pack_core_ffi.a
+            target/release/libts_pack_core_ffi.so
+            crates/ts-pack-core-ffi/include/
           retention-days: 1
 
   test-go:
@@ -175,12 +175,12 @@ jobs:
       - name: Restore FFI to expected paths
         run: |
           mkdir -p target/release
-          cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
-          mkdir -p crates/ts-pack-ffi/include
-          cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
+          cp ffi-artifacts/target/release/libts_pack_core_ffi.* target/release/ 2>/dev/null || true
+          mkdir -p crates/ts-pack-core-ffi/include
+          cp -r ffi-artifacts/crates/ts-pack-core-ffi/include/* crates/ts-pack-core-ffi/include/ 2>/dev/null || true
           # Place in path CGO expects (relative to packages/go/)
-          mkdir -p crates/ts-pack-ffi/target/release
-          cp target/release/libts_pack_ffi.* crates/ts-pack-ffi/target/release/ 2>/dev/null || true
+          mkdir -p crates/ts-pack-core-ffi/target/release
+          cp target/release/libts_pack_core_ffi.* crates/ts-pack-core-ffi/target/release/ 2>/dev/null || true
 
       - name: Verify go.mod placement and module path
         run: |
@@ -236,12 +236,12 @@ jobs:
       - name: Restore FFI to expected paths
         run: |
           mkdir -p target/release
-          cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
-          mkdir -p crates/ts-pack-ffi/include
-          cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
+          cp ffi-artifacts/target/release/libts_pack_core_ffi.* target/release/ 2>/dev/null || true
+          mkdir -p crates/ts-pack-core-ffi/include
+          cp -r ffi-artifacts/crates/ts-pack-core-ffi/include/* crates/ts-pack-core-ffi/include/ 2>/dev/null || true
           # Place in path CGO expects (relative to packages/go/)
-          mkdir -p crates/ts-pack-ffi/target/release
-          cp target/release/libts_pack_ffi.* crates/ts-pack-ffi/target/release/ 2>/dev/null || true
+          mkdir -p crates/ts-pack-core-ffi/target/release
+          cp target/release/libts_pack_core_ffi.* crates/ts-pack-core-ffi/target/release/ 2>/dev/null || true
 
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1

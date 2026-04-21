@@ -1,7 +1,7 @@
 version: "3"
 
 vars:
-  WASM_DIR: "{{.PROJECT_ROOT}}/crates/ts-pack-wasm"
+  WASM_DIR: "{{.PROJECT_ROOT}}/crates/ts-pack-core-wasm"
   # Homebrew LLVM clang supports wasm32 target; system clang on macOS does not
   WASM_CC: '{{.WASM_CC | default "/opt/homebrew/opt/llvm/bin/clang"}}'
   WASM_SYSROOT: '{{.WASM_SYSROOT | default "/opt/homebrew/share/wasi-sysroot"}}'
@@ -59,7 +59,7 @@ tasks:
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - cargo run -p e2e-generator -- generate --lang wasm
+      - alef e2e generate --lang wasm
 
   update:
     desc: Update WASM dependencies

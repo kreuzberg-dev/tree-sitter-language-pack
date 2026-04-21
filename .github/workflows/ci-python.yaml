@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "crates/ts-pack-python/**"
+      - "crates/ts-pack-core-py/**"
       - "crates/ts-pack-core/**"
       - "Cargo.toml"
       - "Cargo.lock"
@@ -23,7 +23,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "crates/ts-pack-python/**"
+      - "crates/ts-pack-core-py/**"
       - "crates/ts-pack-core/**"
       - "Cargo.toml"
       - "Cargo.lock"
@@ -145,7 +145,7 @@ jobs:
 
       - name: Clippy (ts-pack-python)
         if: matrix.platform == 'linux-x86_64'
-        run: cargo clippy -p ts-pack-python -- -D warnings
+        run: cargo clippy -p ts-pack-core-py -- -D warnings
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
@@ -154,7 +154,7 @@ jobs:
         run: pip install maturin
 
       - name: Build wheel
-        run: maturin build --release --manifest-path crates/ts-pack-python/Cargo.toml --out dist
+        run: maturin build --release --manifest-path crates/ts-pack-core-py/Cargo.toml --out dist
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
@@ -240,7 +240,7 @@ jobs:
 
       - name: Generate E2E tests
         shell: bash
-        run: cargo run -p e2e-generator -- generate --lang python
+        run: alef e2e generate --lang python
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
