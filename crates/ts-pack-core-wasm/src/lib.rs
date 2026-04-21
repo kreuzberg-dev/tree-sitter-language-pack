@@ -3955,7 +3955,7 @@ impl From<tree_sitter_language_pack::QueryMatch> for WasmQueryMatch {
     fn from(val: tree_sitter_language_pack::QueryMatch) -> Self {
         Self {
             pattern_index: val.pattern_index,
-            captures: val.captures.iter().map(|i| i.to_string()).collect(),
+            captures: val.captures.iter().map(|(name, info)| format!("{}:{:?}", name, info)).collect(),
         }
     }
 }

@@ -351,6 +351,18 @@ module = "tree_sitter_language_pack"
 result_var = "result"
 args = [{ name = "config", field = "config", type = "json_object" }]
 
+[e2e.calls.get_language]
+function = "get_language"
+module = "tree_sitter_language_pack"
+result_var = "language"
+args = [{ name = "name", field = "language", type = "string" }]
+
+[e2e.calls.get_parser]
+function = "get_parser"
+module = "tree_sitter_language_pack"
+result_var = "parser"
+args = [{ name = "name", field = "language", type = "string" }]
+
 [e2e.packages.rust]
 path = "../../crates/ts-pack-core"
 
