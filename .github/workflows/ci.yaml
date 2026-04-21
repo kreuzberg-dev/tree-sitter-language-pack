@@ -1065,11 +1065,11 @@ jobs:
 
       - name: Build C# bindings
         working-directory: packages/csharp
-        run: dotnet build TreeSitterLanguagePack.sln -c Release
+        run: dotnet build TreeSitterLanguagePack.csproj -c Release
 
       - name: Run C# unit tests
         working-directory: packages/csharp
-        run: dotnet test TreeSitterLanguagePack.sln -c Release --no-build
+        run: dotnet test TreeSitterLanguagePack.csproj -c Release --no-build
 
       - name: Generate C# E2E tests
         run: alef e2e generate --lang csharp

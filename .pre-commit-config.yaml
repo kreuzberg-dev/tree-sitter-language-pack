@@ -117,7 +117,7 @@ repos:
 
   # Markdown: linting
   - repo: https://github.com/rvben/rumdl-pre-commit
-    rev: "v0.1.76"
+    rev: "v0.1.77"
     hooks:
       - id: rumdl-fmt
         exclude: "^.ai-rulez/"
@@ -279,7 +279,7 @@ repos:
 
   # Alef: polyglot binding generation and version sync
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.4.2
+    rev: v0.4.5
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

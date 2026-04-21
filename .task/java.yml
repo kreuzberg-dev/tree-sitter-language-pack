@@ -58,17 +58,19 @@ tasks:
       - mvn com.spotify.fmt:fmt-maven-plugin:check
 
   update:
-    desc: Update Java dependencies and plugins (including linters)
+    desc: Update Java dependencies and plugins (stable releases only)
     dir: packages/java
+    vars:
+      RULES_URI: 'file:///${PWD}/maven-version-rules.xml'
     cmds:
-      - echo "Updating Java dependencies and plugins..."
-      - mvn -DallowSnapshots=false versions:use-latest-releases -DprocessDependencies=true -DprocessParent=false -DgenerateBackupPoms=false
+      - echo "Updating Java dependencies and plugins (stable releases only)..."
+      - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:use-latest-releases -DprocessDependencies=true -DprocessParent=false -DgenerateBackupPoms=false
       - echo "Updating plugin versions in properties..."
-      - mvn -DallowSnapshots=false versions:update-properties -DgenerateBackupPoms=false || true
+      - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:update-properties -DgenerateBackupPoms=false || true
       - echo "Displaying final dependency updates..."
-      - mvn -DallowSnapshots=false versions:display-dependency-updates
+      - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:display-dependency-updates
       - echo "Displaying final plugin updates..."
-      - mvn -DallowSnapshots=false versions:display-plugin-updates
+      - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:display-plugin-updates
 
   clean:
     desc: Clean Java build artifacts

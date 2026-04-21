@@ -17,13 +17,13 @@ tasks:
     deps: [build:ffi]
     dir: packages/csharp
     cmds:
-      - dotnet build TreeSitterLanguagePack.sln -c Release
+      - dotnet build TreeSitterLanguagePack.csproj -c Release
 
   build:ci:
     desc: Build C# package (CI, FFI already built)
     dir: packages/csharp
     cmds:
-      - dotnet build TreeSitterLanguagePack.sln -c Release
+      - dotnet build TreeSitterLanguagePack.csproj -c Release
 
   test:
     desc: Run C# tests (requires FFI built first)
@@ -34,18 +34,18 @@ tasks:
       LD_LIBRARY_PATH: "{{.PROJECT_ROOT}}/target/release:${LD_LIBRARY_PATH:-}"
       DYLD_LIBRARY_PATH: "{{.PROJECT_ROOT}}/target/release:${DYLD_LIBRARY_PATH:-}"
     cmds:
-      - dotnet test TreeSitterLanguagePack.sln -c Release --no-build
+      - dotnet test TreeSitterLanguagePack.csproj -c Release --no-build
 
   test:ci:
     desc: Run C# tests (CI, FFI already available)
     dir: packages/csharp
     cmds:
-      - dotnet test TreeSitterLanguagePack.sln -c Release
+      - dotnet test TreeSitterLanguagePack.csproj -c Release
 
   package:
     desc: Create NuGet package
     deps: [build]
-    dir: packages/csharp/TreeSitterLanguagePack
+    dir: packages/csharp
     cmds:
       - dotnet pack -c Release
 
@@ -53,25 +53,25 @@ tasks:
     desc: Lint C# code
     dir: packages/csharp
     cmds:
-      - dotnet build TreeSitterLanguagePack.sln -c Release -warnaserror
+      - dotnet build TreeSitterLanguagePack.csproj -c Release -warnaserror
 
   format:
     desc: Format C# code
     dir: packages/csharp
     cmds:
-      - dotnet format TreeSitterLanguagePack.sln
+      - dotnet format TreeSitterLanguagePack.csproj
 
   format:check:
     desc: Check C# formatting (CI)
     dir: packages/csharp
     cmds:
-      - dotnet format TreeSitterLanguagePack.sln --verify-no-changes
+      - dotnet format TreeSitterLanguagePack.csproj --verify-no-changes
 
   lint:check:
     desc: Check C# linting without modifications (CI)
     dir: packages/csharp
     cmds:
-      - dotnet build TreeSitterLanguagePack.sln -c Release -warnaserror
+      - dotnet build TreeSitterLanguagePack.csproj -c Release -warnaserror
 
   update:
     desc: Update C# dependencies to latest versions (including major versions)
@@ -79,16 +79,16 @@ tasks:
     cmds:
       - echo "Updating C# dependencies to latest versions..."
       - dotnet tool install --global dotnet-outdated-tool || dotnet tool update --global dotnet-outdated-tool
-      - dotnet outdated TreeSitterLanguagePack.sln --upgrade
+      - dotnet outdated TreeSitterLanguagePack.csproj --upgrade
       - echo "Checking remaining outdated packages..."
-      - dotnet list TreeSitterLanguagePack.sln package --outdated || true
+      - dotnet list TreeSitterLanguagePack.csproj package --outdated || true
 
   clean:
     desc: Clean C# build artifacts
     dir: packages/csharp
     cmds:
-      - dotnet clean TreeSitterLanguagePack.sln -c Release
-      - dotnet clean TreeSitterLanguagePack.sln -c Debug
+      - dotnet clean TreeSitterLanguagePack.csproj -c Release
+      - dotnet clean TreeSitterLanguagePack.csproj -c Debug
 
   e2e:generate:
     desc: Generate C# E2E tests from fixtures
