@@ -277,6 +277,13 @@ repos:
         pass_filenames: false
         require_serial: true
 
+  # Alef: polyglot binding generation and version sync
+  - repo: https://github.com/kreuzberg-dev/alef
+    rev: v0.4.2
+    hooks:
+      - id: alef-verify
+      - id: alef-sync-versions
+
   # Spelling: fast Rust-based spell checker
   - repo: https://github.com/crate-ci/typos
     rev: v1.45.1
