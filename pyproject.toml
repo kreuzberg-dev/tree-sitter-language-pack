@@ -1,7 +1,3 @@
-[build-system]
-build-backend = "maturin"
-requires = ["maturin>=1,<2"]
-
 [project]
 name = "tree-sitter-language-pack"
 version = "1.6.3"
