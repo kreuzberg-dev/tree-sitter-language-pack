@@ -8,7 +8,7 @@ on:
       - 'sources/language_definitions.json'
       - 'crates/ts-pack-core/**'
       - 'e2e/rust/**'
-      - 'tools/e2e-generator/**'
+      - 'fixtures/**'
   pull_request:
     branches: [main]
     paths:
@@ -16,7 +16,7 @@ on:
       - 'sources/language_definitions.json'
       - 'crates/ts-pack-core/**'
       - 'e2e/rust/**'
-      - 'tools/e2e-generator/**'
+      - 'fixtures/**'
   workflow_dispatch:
 
 permissions:

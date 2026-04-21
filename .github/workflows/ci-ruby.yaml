@@ -14,7 +14,8 @@ on:
       - "Taskfile.yml"
       - "e2e/ruby/**"
       - "fixtures/**"
-      - "tools/e2e-generator/**"
+      - "fixtures/**"
+      - "alef.toml"
       - "scripts/ci/ruby/**"
       - ".github/workflows/ci-ruby.yaml"
   pull_request:
@@ -30,7 +31,8 @@ on:
       - "Taskfile.yml"
       - "e2e/ruby/**"
       - "fixtures/**"
-      - "tools/e2e-generator/**"
+      - "fixtures/**"
+      - "alef.toml"
       - "scripts/ci/ruby/**"
       - ".github/workflows/ci-ruby.yaml"
   workflow_run:

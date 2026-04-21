@@ -10,7 +10,10 @@ on:
       - "Cargo.lock"
       - "e2e/python/**"
       - "fixtures/**"
-      - "tools/e2e-generator/**"
+      - 'alef.toml'
+      - "fixtures/**"
+      - 'alef.toml'
+      - "alef.toml"
       - ".github/workflows/ci-python.yaml"
       - ".cargo/config.toml"
       - "rust-toolchain.toml"
@@ -26,7 +29,10 @@ on:
       - "Cargo.lock"
       - "e2e/python/**"
       - "fixtures/**"
-      - "tools/e2e-generator/**"
+      - 'alef.toml'
+      - "fixtures/**"
+      - 'alef.toml'
+      - "alef.toml"
       - ".github/workflows/ci-python.yaml"
       - ".cargo/config.toml"
       - "rust-toolchain.toml"

@@ -9,6 +9,7 @@ on:
       - "tools/**"
       - "scripts/**"
       - "e2e/**"
+      - "fixtures/**"
       - "docs/snippets/**"
       - ".github/workflows/ci-validate.yaml"
       - ".github/actions/**"
@@ -22,6 +23,7 @@ on:
       - "biome.json"
       - ".clang-format"
       - "sources/**"
+      - "alef.toml"
   pull_request:
     branches: [main]
     paths:
@@ -30,6 +32,7 @@ on:
       - "tools/**"
       - "scripts/**"
       - "e2e/**"
+      - "fixtures/**"
       - "docs/snippets/**"
       - ".github/workflows/ci-validate.yaml"
       - ".github/actions/**"
@@ -43,6 +46,7 @@ on:
       - "biome.json"
       - ".clang-format"
       - "sources/**"
+      - "alef.toml"
   workflow_run:
     workflows: ["Publish Release"]
     types: [completed]
@@ -152,29 +156,74 @@ jobs:
 
       # --- Prek ---
       - name: Run prek hooks
-        uses: j178/prek-action@v1
+        uses: j178/prek-action@v2
         with:
           extra-args: --all-files
 
-  readme-check:
-    name: README validation
-    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack'
+  alef-check:
+    name: Alef validation (bindings, docs, README, version sync)
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Python
-        uses: actions/setup-python@v6
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          python-version: "3.14"
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
+      - name: Install alef
+        run: cargo install --git https://github.com/kreuzberg-dev/alef --locked --bin alef
+        env:
+          CARGO_INSTALL_ROOT: ${{ runner.temp }}/alef
 
-      - name: Check README generation
-        run: uv run scripts/generate_readme.py --validate
+      - name: Add alef to PATH
+        run: echo "${{ runner.temp }}/alef/bin" >> "$GITHUB_PATH"
+
+      - name: Verify binding API parity
+        run: alef verify
+
+      - name: Check README freshness
+        run: |
+          alef readme
+          git diff --exit-code -- packages/*/README.md crates/*/README.md || {
+            echo "::error::READMEs are out of date. Run 'alef readme' and commit."
+            exit 1
+          }
+
+      - name: Check API docs freshness
+        run: |
+          alef docs
+          git diff --exit-code -- docs/reference/ || {
+            echo "::error::API docs are out of date. Run 'alef docs' and commit."
+            exit 1
+          }
+
+      - name: Check version sync
+        run: |
+          alef sync-versions
+          git diff --exit-code -- packages/ crates/ || {
+            echo "::error::Versions are out of sync. Run 'alef sync-versions' and commit."
+            exit 1
+          }
+
+  snippet-check:
+    name: Documentation snippet validation
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Build snippet-runner
         run: cargo build --release -p snippet-runner
