@@ -181,6 +181,8 @@ pub fn get_parser(name: &str) -> Result<tree_sitter::Parser, Error> {
 /// }
 /// ```
 pub fn available_languages() -> Vec<String> {
+    #[cfg(feature = "download")]
+    let _ = ensure_cache_registered();
     REGISTRY.available_languages()
 }
 
@@ -199,6 +201,8 @@ pub fn available_languages() -> Vec<String> {
 /// assert!(!has_language("nonexistent_language"));
 /// ```
 pub fn has_language(name: &str) -> bool {
+    #[cfg(feature = "download")]
+    let _ = ensure_cache_registered();
     REGISTRY.has_language(name)
 }
 
@@ -216,6 +220,8 @@ pub fn has_language(name: &str) -> bool {
 /// println!("{} languages available", count);
 /// ```
 pub fn language_count() -> usize {
+    #[cfg(feature = "download")]
+    let _ = ensure_cache_registered();
     REGISTRY.language_count()
 }
 
