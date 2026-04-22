@@ -1,7 +1,7 @@
 default_install_hook_types:
   - pre-commit
   - commit-msg
-exclude: ^e2e/|vendor/|node_modules/|target/|parsers/|crates/.*/deps/|crates/.*/tmp/|_build/
+exclude: ^e2e/|^test_apps/|vendor/|node_modules/|target/|parsers/|crates/.*/deps/|crates/.*/tmp/|_build/
 
 repos:
   # Commit message linting

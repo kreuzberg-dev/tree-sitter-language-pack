@@ -7,8 +7,8 @@ on:
       - "crates/ts-pack-core/**"
       - "crates/ts-pack-cli/**"
       - "sources/language_definitions.json"
-      - "tests/test_apps/fixtures/all_grammars.json"
-      - "tests/test_apps/cli/**"
+      - "test_apps/fixtures/all_grammars.json"
+      - "test_apps/cli/**"
       - "docker/**"
       - ".dockerignore"
       - ".github/workflows/ci-docker.yaml"
@@ -20,8 +20,8 @@ on:
       - "crates/ts-pack-core/**"
       - "crates/ts-pack-cli/**"
       - "sources/language_definitions.json"
-      - "tests/test_apps/fixtures/all_grammars.json"
-      - "tests/test_apps/cli/**"
+      - "test_apps/fixtures/all_grammars.json"
+      - "test_apps/cli/**"
       - "docker/**"
       - ".dockerignore"
       - ".github/workflows/ci-docker.yaml"
@@ -93,7 +93,7 @@ jobs:
       - name: Test all grammars (198 languages)
         run: |
           docker run --rm \
-            -v "${{ github.workspace }}/tests/test_apps:/tests" \
+            -v "${{ github.workspace }}/test_apps:/tests" \
             --entrypoint "" \
             ts-pack:test \
             sh -c "apk add --no-cache python3 bash >/dev/null 2>&1 && TS_PACK_BIN=ts-pack bash /tests/cli/test_all_grammars.sh"

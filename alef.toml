@@ -168,37 +168,37 @@ banner_url = "https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8
 extra_paths = ["crates/ts-pack-node/package.json", "crates/ts-pack-node/npm/*/package.json"]
 
 [[sync.text_replacements]]
-path = "tests/test_apps/node/package.json"
+path = "test_apps/node/package.json"
 search = '"@kreuzberg/tree-sitter-language-pack": "[^"]*"'
 replace = '"@kreuzberg/tree-sitter-language-pack": "{version}"'
 
 [[sync.text_replacements]]
-path = "tests/test_apps/wasm/package.json"
+path = "test_apps/wasm/package.json"
 search = '"@kreuzberg/tree-sitter-language-pack-wasm": "[^"]*"'
 replace = '"@kreuzberg/tree-sitter-language-pack-wasm": "{version}"'
 
 [[sync.text_replacements]]
-path = "tests/test_apps/java/pom.xml"
+path = "test_apps/java/pom.xml"
 search = "<version>{version}</version>"
 replace = "<version>{version}</version>"
 
 [[sync.text_replacements]]
-path = "tests/test_apps/csharp/TestApp.csproj"
+path = "test_apps/csharp/TestApp.csproj"
 search = 'Include="TreeSitterLanguagePack" Version="[^"]*"'
 replace = 'Include="TreeSitterLanguagePack" Version="{version}"'
 
 [[sync.text_replacements]]
-path = "tests/test_apps/go/go.mod"
+path = "test_apps/go/go.mod"
 search = 'kreuzberg-dev/tree-sitter-language-pack/packages/go v[^\s]*'
 replace = 'kreuzberg-dev/tree-sitter-language-pack/packages/go v{version}'
 
 [[sync.text_replacements]]
-path = "tests/test_apps/rust/Cargo.toml"
+path = "test_apps/rust/Cargo.toml"
 search = 'tree-sitter-language-pack = \{ version = "[^"]*"'
 replace = 'tree-sitter-language-pack = { version = "{version}"'
 
 [[sync.text_replacements]]
-path = "tests/test_apps/ruby/Gemfile"
+path = "test_apps/ruby/Gemfile"
 search = "gem 'tree_sitter_language_pack', '[^']*'"
 replace = "gem 'tree_sitter_language_pack', '{version}'"
 
@@ -380,3 +380,32 @@ version = "v0.0.0"
 python = "ruff check --fix {dir} && ruff format {dir}"
 go = "gofmt -w {dir}"
 rust = "cargo fmt --manifest-path {dir}/Cargo.toml"
+
+# Registry-mode test apps (standalone, use published packages)
+[e2e.registry]
+output = "test_apps"
+
+[e2e.registry.packages.rust]
+name = "tree-sitter-language-pack"
+
+[e2e.registry.packages.python]
+name = "tree-sitter-language-pack"
+
+[e2e.registry.packages.node]
+name = "@kreuzberg/tree-sitter-language-pack"
+
+[e2e.registry.packages.go]
+module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
+
+[e2e.registry.packages.java]
+group_id = "dev.kreuzberg.treesitterlanguagepack"
+artifact_id = "tree-sitter-language-pack"
+
+[e2e.registry.packages.csharp]
+name = "TreeSitterLanguagePack"
+
+[e2e.registry.packages.ruby]
+name = "tree_sitter_language_pack"
+
+[e2e.registry.packages.wasm]
+name = "@kreuzberg/tree-sitter-language-pack-wasm"

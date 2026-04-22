@@ -39,6 +39,6 @@
 	"references": [
 		{ "path": "./crates/ts-pack-node" },
 		{ "path": "./crates/ts-pack-wasm" },
-		{ "path": "./tests/test_apps/node" }
+		{ "path": "./test_apps/node" }
 	]
 }

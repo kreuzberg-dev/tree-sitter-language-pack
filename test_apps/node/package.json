@@ -1,0 +1,13 @@
+{
+	"name": "@kreuzberg/tree-sitter-language-pack-e2e-typescript",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"test": "vitest run"
+	},
+	"devDependencies": {
+		"@kreuzberg/tree-sitter-language-pack": "1.6.3",
+		"vitest": "^3.0.0"
+	}
+}

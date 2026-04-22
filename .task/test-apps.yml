@@ -19,41 +19,41 @@ tasks:
 
   smoke:rust:
     desc: Run Rust test_app smoke test
-    dir: tests/test_apps/rust
+    dir: test_apps/rust
     cmds:
       - cargo run
 
   smoke:python:
     desc: Run Python test_app smoke test
-    dir: tests/test_apps/python
+    dir: test_apps/python
     cmds:
       - uv sync
       - uv run pytest smoke_test.py -v
 
   smoke:node:
     desc: Run Node.js test_app smoke test
-    dir: tests/test_apps/node
+    dir: test_apps/node
     cmds:
       - pnpm install
       - pnpm run test:smoke
 
   smoke:wasm:
     desc: Run WASM test_app smoke test
-    dir: tests/test_apps/wasm
+    dir: test_apps/wasm
     cmds:
       - pnpm install
       - pnpm run test:smoke
 
   smoke:ruby:
     desc: Run Ruby test_app smoke test
-    dir: tests/test_apps/ruby
+    dir: test_apps/ruby
     cmds:
       - bundle install
       - bundle exec rspec smoke_test.rb
 
   smoke:go:
     desc: Run Go test_app smoke test
-    dir: tests/test_apps/go
+    dir: test_apps/go
     cmds:
       - go test -tags tspack_dev -v -run "TestBasicFixtures|TestParseValidation|TestErrorHandling|TestDownloadAPI"
 
@@ -63,11 +63,11 @@ tasks:
       TSPACK_LIB_PATH: "{{.PROJECT_ROOT}}/target/release/libts_pack_ffi.dylib"
     cmds:
       - mvn -f {{.PROJECT_ROOT}}/crates/ts-pack-java/pom.xml install -DskipTests -q
-      - cmd: mvn -f {{.PROJECT_ROOT}}/tests/test_apps/java/pom.xml test -Dtest=SmokeTest
+      - cmd: mvn -f {{.PROJECT_ROOT}}/test_apps/java/pom.xml test -Dtest=SmokeTest
 
   smoke:elixir:
     desc: Run Elixir test_app smoke test
-    dir: tests/test_apps/elixir
+    dir: test_apps/elixir
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
       TSLP_BUILD: "1"
@@ -78,14 +78,14 @@ tasks:
 
   smoke:php:
     desc: Run PHP test_app smoke test
-    dir: tests/test_apps/php
+    dir: test_apps/php
     cmds:
       - composer install
       - php -d "extension={{.PROJECT_ROOT}}/target/release/libts_pack_php.dylib" vendor/bin/phpunit SmokeTest.php
 
   smoke:csharp:
     desc: Run C# test_app smoke test
-    dir: tests/test_apps/csharp
+    dir: test_apps/csharp
     env:
       TSPACK_FFI_DIR: "{{.PROJECT_ROOT}}/target/release"
     cmds:
@@ -94,7 +94,7 @@ tasks:
 
   smoke:c:
     desc: Run C test_app smoke test
-    dir: tests/test_apps/c
+    dir: test_apps/c
     cmds:
       - cmake -B build -DCMAKE_PREFIX_PATH=${TS_PACK_FFI_PREFIX:-/usr/local}
       - cmake --build build
@@ -102,7 +102,7 @@ tasks:
 
   smoke:homebrew:
     desc: Run Homebrew CLI smoke test
-    dir: tests/test_apps/homebrew
+    dir: test_apps/homebrew
     env:
       TS_PACK_BIN: "{{.TS_PACK_BIN | default (printf \"%s/target/release/ts-pack\" .PROJECT_ROOT)}}"
     cmds:
@@ -118,28 +118,28 @@ tasks:
 
   comprehensive:python:
     desc: Run Python test_app comprehensive tests
-    dir: tests/test_apps/python
+    dir: test_apps/python
     cmds:
       - uv sync
       - uv run pytest comprehensive_test.py -v
 
   comprehensive:node:
     desc: Run Node.js test_app comprehensive tests
-    dir: tests/test_apps/node
+    dir: test_apps/node
     cmds:
       - pnpm install
       - pnpm run test:comprehensive
 
   comprehensive:ruby:
     desc: Run Ruby test_app comprehensive tests
-    dir: tests/test_apps/ruby
+    dir: test_apps/ruby
     cmds:
       - bundle install
       - bundle exec rspec comprehensive_test.rb
 
   comprehensive:go:
     desc: Run Go test_app comprehensive tests
-    dir: tests/test_apps/go
+    dir: test_apps/go
     cmds:
       - go test -tags tspack_dev -v -run TestProcessFixtures
       - go test -tags tspack_dev -v -run TestChunkingFixtures
