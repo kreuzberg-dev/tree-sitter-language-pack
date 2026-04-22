@@ -277,7 +277,8 @@ jobs:
       - name: Check API docs freshness
         run: |
           alef docs
-          git diff --exit-code -- docs/reference/ || {
+          # Ignore whitespace-only diffs (markdown formatter may add/remove blank lines)
+          git diff --ignore-blank-lines --exit-code -- docs/reference/ || {
             echo "::error::API docs are out of date. Run 'alef docs' and commit."
             exit 1
           }
