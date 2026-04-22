@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["anyio"]
+# dependencies = ["anyio", "gitpython"]
 # ///
 from __future__ import annotations
 
