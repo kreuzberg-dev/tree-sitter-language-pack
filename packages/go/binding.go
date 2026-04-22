@@ -10,21 +10,21 @@ package tspack
 import "C"
 
 import (
-    "encoding/json"
-    "errors"
-    "fmt"
-    "unsafe"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"unsafe"
 )
 
 // lastError retrieves the last error from the FFI layer.
 func lastError() error {
-    code := int32(C.ts_pack_last_error_code())
-    if code == 0 {
-        return nil
-    }
-    ctx := C.ts_pack_last_error_context()
-    message := C.GoString(ctx)
-    return fmt.Errorf("[%d] %s", code, message)
+	code := int32(C.ts_pack_last_error_code())
+	if code == 0 {
+		return nil
+	}
+	ctx := C.ts_pack_last_error_context()
+	message := C.GoString(ctx)
+	return fmt.Errorf("[%d] %s", code, message)
 }
 
 var (
@@ -52,12 +52,12 @@ func (e *Error) Error() string { return e.Message }
 type CaptureOutput string
 
 const (
-    // Capture only the matched text.
-    CaptureOutputText CaptureOutput = "text"
-    // Capture only the `NodeInfo`.
-    CaptureOutputNode CaptureOutput = "node"
-    // Capture both text and `NodeInfo` (default).
-    CaptureOutputFull CaptureOutput = "full"
+	// Capture only the matched text.
+	CaptureOutputText CaptureOutput = "text"
+	// Capture only the `NodeInfo`.
+	CaptureOutputNode CaptureOutput = "node"
+	// Capture both text and `NodeInfo` (default).
+	CaptureOutputFull CaptureOutput = "full"
 )
 
 
@@ -78,9 +78,9 @@ type StructureKind struct {
 type CommentKind string
 
 const (
-    CommentKindLine CommentKind = "line"
-    CommentKindBlock CommentKind = "block"
-    CommentKindDoc CommentKind = "doc"
+	CommentKindLine CommentKind = "line"
+	CommentKindBlock CommentKind = "block"
+	CommentKindDoc CommentKind = "doc"
 )
 
 
@@ -99,9 +99,9 @@ type DocstringFormat struct {
 type ExportKind string
 
 const (
-    ExportKindNamed ExportKind = "named"
-    ExportKindDefault ExportKind = "default"
-    ExportKindReExport ExportKind = "re_export"
+	ExportKindNamed ExportKind = "named"
+	ExportKindDefault ExportKind = "default"
+	ExportKindReExport ExportKind = "re_export"
 )
 
 
@@ -121,25 +121,25 @@ type SymbolKind struct {
 type DiagnosticSeverity string
 
 const (
-    DiagnosticSeverityError DiagnosticSeverity = "error"
-    DiagnosticSeverityWarning DiagnosticSeverity = "warning"
-    DiagnosticSeverityInfo DiagnosticSeverity = "info"
+	DiagnosticSeverityError DiagnosticSeverity = "error"
+	DiagnosticSeverityWarning DiagnosticSeverity = "warning"
+	DiagnosticSeverityInfo DiagnosticSeverity = "info"
 )
 
 
 // Defines a single extraction pattern and its configuration.
 type ExtractionPattern struct {
-    // The tree-sitter query string (S-expression).
-    Query string `json:"query"`
-    // What to include in each capture result.
-    CaptureOutput CaptureOutput `json:"capture_output,omitempty"`
-    // Field names to extract from child nodes of each capture.
-    // Maps a label to a tree-sitter field name used with `child_by_field_name`.
-    ChildFields []string `json:"child_fields,omitempty"`
-    // Maximum number of matches to return. `None` means unlimited.
-    MaxResults *uint `json:"max_results,omitempty"`
-    // Restrict matches to a byte range `(start, end)`.
-    ByteRange *string `json:"byte_range,omitempty"`
+	// The tree-sitter query string (S-expression).
+	Query string `json:"query"`
+	// What to include in each capture result.
+	CaptureOutput CaptureOutput `json:"capture_output,omitempty"`
+	// Field names to extract from child nodes of each capture.
+	// Maps a label to a tree-sitter field name used with `child_by_field_name`.
+	ChildFields []string `json:"child_fields,omitempty"`
+	// Maximum number of matches to return. `None` means unlimited.
+	MaxResults *uint `json:"max_results,omitempty"`
+	// Restrict matches to a byte range `(start, end)`.
+	ByteRange *string `json:"byte_range,omitempty"`
 }
 
 
@@ -148,51 +148,51 @@ type ExtractionPatternOption func(*ExtractionPattern)
 
 // WithExtractionPatternQuery sets the query field.
 func WithExtractionPatternQuery(v string) ExtractionPatternOption {
-    return func(c *ExtractionPattern) { c.Query = v }
+	return func(c *ExtractionPattern) { c.Query = v }
 }
 
 // WithExtractionPatternCaptureOutput sets the capture_output field.
 func WithExtractionPatternCaptureOutput(v CaptureOutput) ExtractionPatternOption {
-    return func(c *ExtractionPattern) { c.CaptureOutput = v }
+	return func(c *ExtractionPattern) { c.CaptureOutput = v }
 }
 
 // WithExtractionPatternChildFields sets the child_fields field.
 func WithExtractionPatternChildFields(v []string) ExtractionPatternOption {
-    return func(c *ExtractionPattern) { c.ChildFields = v }
+	return func(c *ExtractionPattern) { c.ChildFields = v }
 }
 
 // WithExtractionPatternMaxResults sets the max_results field.
 func WithExtractionPatternMaxResults(v uint) ExtractionPatternOption {
-    return func(c *ExtractionPattern) { c.MaxResults = &v }
+	return func(c *ExtractionPattern) { c.MaxResults = &v }
 }
 
 // WithExtractionPatternByteRange sets the byte_range field.
 func WithExtractionPatternByteRange(v string) ExtractionPatternOption {
-    return func(c *ExtractionPattern) { c.ByteRange = &v }
+	return func(c *ExtractionPattern) { c.ByteRange = &v }
 }
 
 // NewExtractionPattern creates a ExtractionPattern with optional parameters.
 func NewExtractionPattern(opts ...ExtractionPatternOption) *ExtractionPattern {
-    c := &ExtractionPattern {
-        Query: "",
-        CaptureOutput: "",
-        ChildFields: nil,
-        MaxResults: nil,
-        ByteRange: nil,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &ExtractionPattern {
+		Query: "",
+		CaptureOutput: "",
+		ChildFields: nil,
+		MaxResults: nil,
+		ByteRange: nil,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // Configuration for an extraction run against a single language.
 type ExtractionConfig struct {
-    // The language name (e.g., `"python"`).
-    Language string `json:"language"`
-    // Named patterns to run. Keys become the keys in `ExtractionResult::results`.
-    Patterns string `json:"patterns"`
+	// The language name (e.g., `"python"`).
+	Language string `json:"language"`
+	// Named patterns to run. Keys become the keys in `ExtractionResult::results`.
+	Patterns string `json:"patterns"`
 }
 
 
@@ -201,39 +201,39 @@ type ExtractionConfigOption func(*ExtractionConfig)
 
 // WithExtractionConfigLanguage sets the language field.
 func WithExtractionConfigLanguage(v string) ExtractionConfigOption {
-    return func(c *ExtractionConfig) { c.Language = v }
+	return func(c *ExtractionConfig) { c.Language = v }
 }
 
 // WithExtractionConfigPatterns sets the patterns field.
 func WithExtractionConfigPatterns(v string) ExtractionConfigOption {
-    return func(c *ExtractionConfig) { c.Patterns = v }
+	return func(c *ExtractionConfig) { c.Patterns = v }
 }
 
 // NewExtractionConfig creates a ExtractionConfig with optional parameters.
 func NewExtractionConfig(opts ...ExtractionConfigOption) *ExtractionConfig {
-    c := &ExtractionConfig {
-        Language: "",
-        Patterns: "",
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &ExtractionConfig {
+		Language: "",
+		Patterns: "",
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // A single captured node within a match.
 type CaptureResult struct {
-    // The capture name from the query (e.g., `"fn_name"`).
-    Name string `json:"name"`
-    // The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`.
-    Node *NodeInfo `json:"node,omitempty"`
-    // The matched source text, present when `CaptureOutput` is `Text` or `Full`.
-    Text *string `json:"text,omitempty"`
-    // Values of requested child fields, keyed by field name.
-    ChildFields string `json:"child_fields"`
-    // Byte offset where this capture starts in the source.
-    StartByte uint `json:"start_byte"`
+	// The capture name from the query (e.g., `"fn_name"`).
+	Name string `json:"name"`
+	// The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`.
+	Node *NodeInfo `json:"node,omitempty"`
+	// The matched source text, present when `CaptureOutput` is `Text` or `Full`.
+	Text *string `json:"text,omitempty"`
+	// Values of requested child fields, keyed by field name.
+	ChildFields string `json:"child_fields"`
+	// Byte offset where this capture starts in the source.
+	StartByte uint `json:"start_byte"`
 }
 
 
@@ -242,51 +242,51 @@ type CaptureResultOption func(*CaptureResult)
 
 // WithCaptureResultName sets the name field.
 func WithCaptureResultName(v string) CaptureResultOption {
-    return func(c *CaptureResult) { c.Name = v }
+	return func(c *CaptureResult) { c.Name = v }
 }
 
 // WithCaptureResultNode sets the node field.
 func WithCaptureResultNode(v NodeInfo) CaptureResultOption {
-    return func(c *CaptureResult) { c.Node = &v }
+	return func(c *CaptureResult) { c.Node = &v }
 }
 
 // WithCaptureResultText sets the text field.
 func WithCaptureResultText(v string) CaptureResultOption {
-    return func(c *CaptureResult) { c.Text = &v }
+	return func(c *CaptureResult) { c.Text = &v }
 }
 
 // WithCaptureResultChildFields sets the child_fields field.
 func WithCaptureResultChildFields(v string) CaptureResultOption {
-    return func(c *CaptureResult) { c.ChildFields = v }
+	return func(c *CaptureResult) { c.ChildFields = v }
 }
 
 // WithCaptureResultStartByte sets the start_byte field.
 func WithCaptureResultStartByte(v uint) CaptureResultOption {
-    return func(c *CaptureResult) { c.StartByte = v }
+	return func(c *CaptureResult) { c.StartByte = v }
 }
 
 // NewCaptureResult creates a CaptureResult with optional parameters.
 func NewCaptureResult(opts ...CaptureResultOption) *CaptureResult {
-    c := &CaptureResult {
-        Name: "",
-        Node: nil,
-        Text: nil,
-        ChildFields: "",
-        StartByte: 0,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &CaptureResult {
+		Name: "",
+		Node: nil,
+		Text: nil,
+		ChildFields: "",
+		StartByte: 0,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // A single query match containing one or more captures.
 type MatchResult struct {
-    // The pattern index within the query that produced this match.
-    PatternIndex uint `json:"pattern_index"`
-    // The captures for this match.
-    Captures []CaptureResult `json:"captures,omitempty"`
+	// The pattern index within the query that produced this match.
+	PatternIndex uint `json:"pattern_index"`
+	// The captures for this match.
+	Captures []CaptureResult `json:"captures,omitempty"`
 }
 
 
@@ -295,33 +295,33 @@ type MatchResultOption func(*MatchResult)
 
 // WithMatchResultPatternIndex sets the pattern_index field.
 func WithMatchResultPatternIndex(v uint) MatchResultOption {
-    return func(c *MatchResult) { c.PatternIndex = v }
+	return func(c *MatchResult) { c.PatternIndex = v }
 }
 
 // WithMatchResultCaptures sets the captures field.
 func WithMatchResultCaptures(v []CaptureResult) MatchResultOption {
-    return func(c *MatchResult) { c.Captures = v }
+	return func(c *MatchResult) { c.Captures = v }
 }
 
 // NewMatchResult creates a MatchResult with optional parameters.
 func NewMatchResult(opts ...MatchResultOption) *MatchResult {
-    c := &MatchResult {
-        PatternIndex: 0,
-        Captures: nil,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &MatchResult {
+		PatternIndex: 0,
+		Captures: nil,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // Results for a single named pattern.
 type PatternResult struct {
-    // The individual matches.
-    Matches []MatchResult `json:"matches,omitempty"`
-    // Total number of matches before `max_results` truncation.
-    TotalCount uint `json:"total_count"`
+	// The individual matches.
+	Matches []MatchResult `json:"matches,omitempty"`
+	// Total number of matches before `max_results` truncation.
+	TotalCount uint `json:"total_count"`
 }
 
 
@@ -330,33 +330,33 @@ type PatternResultOption func(*PatternResult)
 
 // WithPatternResultMatches sets the matches field.
 func WithPatternResultMatches(v []MatchResult) PatternResultOption {
-    return func(c *PatternResult) { c.Matches = v }
+	return func(c *PatternResult) { c.Matches = v }
 }
 
 // WithPatternResultTotalCount sets the total_count field.
 func WithPatternResultTotalCount(v uint) PatternResultOption {
-    return func(c *PatternResult) { c.TotalCount = v }
+	return func(c *PatternResult) { c.TotalCount = v }
 }
 
 // NewPatternResult creates a PatternResult with optional parameters.
 func NewPatternResult(opts ...PatternResultOption) *PatternResult {
-    c := &PatternResult {
-        Matches: nil,
-        TotalCount: 0,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &PatternResult {
+		Matches: nil,
+		TotalCount: 0,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // Complete extraction results for all patterns.
 type ExtractionResult struct {
-    // The language that was used.
-    Language string `json:"language"`
-    // Results keyed by pattern name.
-    Results string `json:"results"`
+	// The language that was used.
+	Language string `json:"language"`
+	// Results keyed by pattern name.
+	Results string `json:"results"`
 }
 
 
@@ -365,39 +365,39 @@ type ExtractionResultOption func(*ExtractionResult)
 
 // WithExtractionResultLanguage sets the language field.
 func WithExtractionResultLanguage(v string) ExtractionResultOption {
-    return func(c *ExtractionResult) { c.Language = v }
+	return func(c *ExtractionResult) { c.Language = v }
 }
 
 // WithExtractionResultResults sets the results field.
 func WithExtractionResultResults(v string) ExtractionResultOption {
-    return func(c *ExtractionResult) { c.Results = v }
+	return func(c *ExtractionResult) { c.Results = v }
 }
 
 // NewExtractionResult creates a ExtractionResult with optional parameters.
 func NewExtractionResult(opts ...ExtractionResultOption) *ExtractionResult {
-    c := &ExtractionResult {
-        Language: "",
-        Results: "",
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &ExtractionResult {
+		Language: "",
+		Results: "",
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // Validation information for a single pattern.
 type PatternValidation struct {
-    // Whether the pattern compiled successfully.
-    Valid bool `json:"valid"`
-    // Names of captures defined in the query.
-    CaptureNames []string `json:"capture_names,omitempty"`
-    // Number of patterns in the query.
-    PatternCount uint `json:"pattern_count"`
-    // Non-fatal warnings (e.g., unused captures).
-    Warnings []string `json:"warnings,omitempty"`
-    // Fatal errors (e.g., query syntax errors).
-    Errors []string `json:"errors,omitempty"`
+	// Whether the pattern compiled successfully.
+	Valid bool `json:"valid"`
+	// Names of captures defined in the query.
+	CaptureNames []string `json:"capture_names,omitempty"`
+	// Number of patterns in the query.
+	PatternCount uint `json:"pattern_count"`
+	// Non-fatal warnings (e.g., unused captures).
+	Warnings []string `json:"warnings,omitempty"`
+	// Fatal errors (e.g., query syntax errors).
+	Errors []string `json:"errors,omitempty"`
 }
 
 
@@ -406,51 +406,51 @@ type PatternValidationOption func(*PatternValidation)
 
 // WithPatternValidationValid sets the valid field.
 func WithPatternValidationValid(v bool) PatternValidationOption {
-    return func(c *PatternValidation) { c.Valid = v }
+	return func(c *PatternValidation) { c.Valid = v }
 }
 
 // WithPatternValidationCaptureNames sets the capture_names field.
 func WithPatternValidationCaptureNames(v []string) PatternValidationOption {
-    return func(c *PatternValidation) { c.CaptureNames = v }
+	return func(c *PatternValidation) { c.CaptureNames = v }
 }
 
 // WithPatternValidationPatternCount sets the pattern_count field.
 func WithPatternValidationPatternCount(v uint) PatternValidationOption {
-    return func(c *PatternValidation) { c.PatternCount = v }
+	return func(c *PatternValidation) { c.PatternCount = v }
 }
 
 // WithPatternValidationWarnings sets the warnings field.
 func WithPatternValidationWarnings(v []string) PatternValidationOption {
-    return func(c *PatternValidation) { c.Warnings = v }
+	return func(c *PatternValidation) { c.Warnings = v }
 }
 
 // WithPatternValidationErrors sets the errors field.
 func WithPatternValidationErrors(v []string) PatternValidationOption {
-    return func(c *PatternValidation) { c.Errors = v }
+	return func(c *PatternValidation) { c.Errors = v }
 }
 
 // NewPatternValidation creates a PatternValidation with optional parameters.
 func NewPatternValidation(opts ...PatternValidationOption) *PatternValidation {
-    c := &PatternValidation {
-        Valid: false,
-        CaptureNames: nil,
-        PatternCount: 0,
-        Warnings: nil,
-        Errors: nil,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &PatternValidation {
+		Valid: false,
+		CaptureNames: nil,
+		PatternCount: 0,
+		Warnings: nil,
+		Errors: nil,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // Validation results for an entire extraction config.
 type ValidationResult struct {
-    // Whether all patterns are valid.
-    Valid bool `json:"valid"`
-    // Per-pattern validation details.
-    Patterns string `json:"patterns"`
+	// Whether all patterns are valid.
+	Valid bool `json:"valid"`
+	// Per-pattern validation details.
+	Patterns string `json:"patterns"`
 }
 
 
@@ -459,24 +459,24 @@ type ValidationResultOption func(*ValidationResult)
 
 // WithValidationResultValid sets the valid field.
 func WithValidationResultValid(v bool) ValidationResultOption {
-    return func(c *ValidationResult) { c.Valid = v }
+	return func(c *ValidationResult) { c.Valid = v }
 }
 
 // WithValidationResultPatterns sets the patterns field.
 func WithValidationResultPatterns(v string) ValidationResultOption {
-    return func(c *ValidationResult) { c.Patterns = v }
+	return func(c *ValidationResult) { c.Patterns = v }
 }
 
 // NewValidationResult creates a ValidationResult with optional parameters.
 func NewValidationResult(opts ...ValidationResultOption) *ValidationResult {
-    c := &ValidationResult {
-        Valid: false,
-        Patterns: "",
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &ValidationResult {
+		Valid: false,
+		Patterns: "",
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
@@ -485,12 +485,12 @@ func NewValidationResult(opts ...ValidationResultOption) *ValidationResult {
 // Represents both byte offsets (for slicing) and human-readable line/column
 // positions (for display and diagnostics).
 type Span struct {
-    StartByte uint `json:"start_byte"`
-    EndByte uint `json:"end_byte"`
-    StartLine uint `json:"start_line"`
-    StartColumn uint `json:"start_column"`
-    EndLine uint `json:"end_line"`
-    EndColumn uint `json:"end_column"`
+	StartByte uint `json:"start_byte"`
+	EndByte uint `json:"end_byte"`
+	StartLine uint `json:"start_line"`
+	StartColumn uint `json:"start_column"`
+	EndLine uint `json:"end_line"`
+	EndColumn uint `json:"end_column"`
 }
 
 
@@ -499,48 +499,48 @@ type SpanOption func(*Span)
 
 // WithSpanStartByte sets the start_byte field.
 func WithSpanStartByte(v uint) SpanOption {
-    return func(c *Span) { c.StartByte = v }
+	return func(c *Span) { c.StartByte = v }
 }
 
 // WithSpanEndByte sets the end_byte field.
 func WithSpanEndByte(v uint) SpanOption {
-    return func(c *Span) { c.EndByte = v }
+	return func(c *Span) { c.EndByte = v }
 }
 
 // WithSpanStartLine sets the start_line field.
 func WithSpanStartLine(v uint) SpanOption {
-    return func(c *Span) { c.StartLine = v }
+	return func(c *Span) { c.StartLine = v }
 }
 
 // WithSpanStartColumn sets the start_column field.
 func WithSpanStartColumn(v uint) SpanOption {
-    return func(c *Span) { c.StartColumn = v }
+	return func(c *Span) { c.StartColumn = v }
 }
 
 // WithSpanEndLine sets the end_line field.
 func WithSpanEndLine(v uint) SpanOption {
-    return func(c *Span) { c.EndLine = v }
+	return func(c *Span) { c.EndLine = v }
 }
 
 // WithSpanEndColumn sets the end_column field.
 func WithSpanEndColumn(v uint) SpanOption {
-    return func(c *Span) { c.EndColumn = v }
+	return func(c *Span) { c.EndColumn = v }
 }
 
 // NewSpan creates a Span with optional parameters.
 func NewSpan(opts ...SpanOption) *Span {
-    c := &Span {
-        StartByte: 0,
-        EndByte: 0,
-        StartLine: 0,
-        StartColumn: 0,
-        EndLine: 0,
-        EndColumn: 0,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &Span {
+		StartByte: 0,
+		EndByte: 0,
+		StartLine: 0,
+		StartColumn: 0,
+		EndLine: 0,
+		EndColumn: 0,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
@@ -563,18 +563,18 @@ func NewSpan(opts ...SpanOption) *Span {
 // - `diagnostics` - Parse errors (when `config.diagnostics = true`)
 // - `chunks` - Chunked code segments (when `config.chunk_max_size` is set)
 type ProcessResult struct {
-    Language string `json:"language"`
-    Metrics FileMetrics `json:"metrics"`
-    Structure []StructureItem `json:"structure,omitempty"`
-    Imports []ImportInfo `json:"imports,omitempty"`
-    Exports []ExportInfo `json:"exports,omitempty"`
-    Comments []CommentInfo `json:"comments,omitempty"`
-    Docstrings []DocstringInfo `json:"docstrings,omitempty"`
-    Symbols []SymbolInfo `json:"symbols,omitempty"`
-    Diagnostics []Diagnostic `json:"diagnostics,omitempty"`
-    Chunks []CodeChunk `json:"chunks,omitempty"`
-    // Results of custom extraction patterns (when `config.extractions` is set).
-    Extractions string `json:"extractions"`
+	Language string `json:"language"`
+	Metrics FileMetrics `json:"metrics"`
+	Structure []StructureItem `json:"structure,omitempty"`
+	Imports []ImportInfo `json:"imports,omitempty"`
+	Exports []ExportInfo `json:"exports,omitempty"`
+	Comments []CommentInfo `json:"comments,omitempty"`
+	Docstrings []DocstringInfo `json:"docstrings,omitempty"`
+	Symbols []SymbolInfo `json:"symbols,omitempty"`
+	Diagnostics []Diagnostic `json:"diagnostics,omitempty"`
+	Chunks []CodeChunk `json:"chunks,omitempty"`
+	// Results of custom extraction patterns (when `config.extractions` is set).
+	Extractions string `json:"extractions"`
 }
 
 
@@ -583,91 +583,91 @@ type ProcessResultOption func(*ProcessResult)
 
 // WithProcessResultLanguage sets the language field.
 func WithProcessResultLanguage(v string) ProcessResultOption {
-    return func(c *ProcessResult) { c.Language = v }
+	return func(c *ProcessResult) { c.Language = v }
 }
 
 // WithProcessResultMetrics sets the metrics field.
 func WithProcessResultMetrics(v FileMetrics) ProcessResultOption {
-    return func(c *ProcessResult) { c.Metrics = v }
+	return func(c *ProcessResult) { c.Metrics = v }
 }
 
 // WithProcessResultStructure sets the structure field.
 func WithProcessResultStructure(v []StructureItem) ProcessResultOption {
-    return func(c *ProcessResult) { c.Structure = v }
+	return func(c *ProcessResult) { c.Structure = v }
 }
 
 // WithProcessResultImports sets the imports field.
 func WithProcessResultImports(v []ImportInfo) ProcessResultOption {
-    return func(c *ProcessResult) { c.Imports = v }
+	return func(c *ProcessResult) { c.Imports = v }
 }
 
 // WithProcessResultExports sets the exports field.
 func WithProcessResultExports(v []ExportInfo) ProcessResultOption {
-    return func(c *ProcessResult) { c.Exports = v }
+	return func(c *ProcessResult) { c.Exports = v }
 }
 
 // WithProcessResultComments sets the comments field.
 func WithProcessResultComments(v []CommentInfo) ProcessResultOption {
-    return func(c *ProcessResult) { c.Comments = v }
+	return func(c *ProcessResult) { c.Comments = v }
 }
 
 // WithProcessResultDocstrings sets the docstrings field.
 func WithProcessResultDocstrings(v []DocstringInfo) ProcessResultOption {
-    return func(c *ProcessResult) { c.Docstrings = v }
+	return func(c *ProcessResult) { c.Docstrings = v }
 }
 
 // WithProcessResultSymbols sets the symbols field.
 func WithProcessResultSymbols(v []SymbolInfo) ProcessResultOption {
-    return func(c *ProcessResult) { c.Symbols = v }
+	return func(c *ProcessResult) { c.Symbols = v }
 }
 
 // WithProcessResultDiagnostics sets the diagnostics field.
 func WithProcessResultDiagnostics(v []Diagnostic) ProcessResultOption {
-    return func(c *ProcessResult) { c.Diagnostics = v }
+	return func(c *ProcessResult) { c.Diagnostics = v }
 }
 
 // WithProcessResultChunks sets the chunks field.
 func WithProcessResultChunks(v []CodeChunk) ProcessResultOption {
-    return func(c *ProcessResult) { c.Chunks = v }
+	return func(c *ProcessResult) { c.Chunks = v }
 }
 
 // WithProcessResultExtractions sets the extractions field.
 func WithProcessResultExtractions(v string) ProcessResultOption {
-    return func(c *ProcessResult) { c.Extractions = v }
+	return func(c *ProcessResult) { c.Extractions = v }
 }
 
 // NewProcessResult creates a ProcessResult with optional parameters.
 func NewProcessResult(opts ...ProcessResultOption) *ProcessResult {
-    c := &ProcessResult {
-        Language: "",
-        Metrics: FileMetrics{},
-        Structure: nil,
-        Imports: nil,
-        Exports: nil,
-        Comments: nil,
-        Docstrings: nil,
-        Symbols: nil,
-        Diagnostics: nil,
-        Chunks: nil,
-        Extractions: "",
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &ProcessResult {
+		Language: "",
+		Metrics: FileMetrics{},
+		Structure: nil,
+		Imports: nil,
+		Exports: nil,
+		Comments: nil,
+		Docstrings: nil,
+		Symbols: nil,
+		Diagnostics: nil,
+		Chunks: nil,
+		Extractions: "",
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // Aggregate metrics for a source file.
 type FileMetrics struct {
-    TotalLines uint `json:"total_lines"`
-    CodeLines uint `json:"code_lines"`
-    CommentLines uint `json:"comment_lines"`
-    BlankLines uint `json:"blank_lines"`
-    TotalBytes uint `json:"total_bytes"`
-    NodeCount uint `json:"node_count"`
-    ErrorCount uint `json:"error_count"`
-    MaxDepth uint `json:"max_depth"`
+	TotalLines uint `json:"total_lines"`
+	CodeLines uint `json:"code_lines"`
+	CommentLines uint `json:"comment_lines"`
+	BlankLines uint `json:"blank_lines"`
+	TotalBytes uint `json:"total_bytes"`
+	NodeCount uint `json:"node_count"`
+	ErrorCount uint `json:"error_count"`
+	MaxDepth uint `json:"max_depth"`
 }
 
 
@@ -676,74 +676,74 @@ type FileMetricsOption func(*FileMetrics)
 
 // WithFileMetricsTotalLines sets the total_lines field.
 func WithFileMetricsTotalLines(v uint) FileMetricsOption {
-    return func(c *FileMetrics) { c.TotalLines = v }
+	return func(c *FileMetrics) { c.TotalLines = v }
 }
 
 // WithFileMetricsCodeLines sets the code_lines field.
 func WithFileMetricsCodeLines(v uint) FileMetricsOption {
-    return func(c *FileMetrics) { c.CodeLines = v }
+	return func(c *FileMetrics) { c.CodeLines = v }
 }
 
 // WithFileMetricsCommentLines sets the comment_lines field.
 func WithFileMetricsCommentLines(v uint) FileMetricsOption {
-    return func(c *FileMetrics) { c.CommentLines = v }
+	return func(c *FileMetrics) { c.CommentLines = v }
 }
 
 // WithFileMetricsBlankLines sets the blank_lines field.
 func WithFileMetricsBlankLines(v uint) FileMetricsOption {
-    return func(c *FileMetrics) { c.BlankLines = v }
+	return func(c *FileMetrics) { c.BlankLines = v }
 }
 
 // WithFileMetricsTotalBytes sets the total_bytes field.
 func WithFileMetricsTotalBytes(v uint) FileMetricsOption {
-    return func(c *FileMetrics) { c.TotalBytes = v }
+	return func(c *FileMetrics) { c.TotalBytes = v }
 }
 
 // WithFileMetricsNodeCount sets the node_count field.
 func WithFileMetricsNodeCount(v uint) FileMetricsOption {
-    return func(c *FileMetrics) { c.NodeCount = v }
+	return func(c *FileMetrics) { c.NodeCount = v }
 }
 
 // WithFileMetricsErrorCount sets the error_count field.
 func WithFileMetricsErrorCount(v uint) FileMetricsOption {
-    return func(c *FileMetrics) { c.ErrorCount = v }
+	return func(c *FileMetrics) { c.ErrorCount = v }
 }
 
 // WithFileMetricsMaxDepth sets the max_depth field.
 func WithFileMetricsMaxDepth(v uint) FileMetricsOption {
-    return func(c *FileMetrics) { c.MaxDepth = v }
+	return func(c *FileMetrics) { c.MaxDepth = v }
 }
 
 // NewFileMetrics creates a FileMetrics with optional parameters.
 func NewFileMetrics(opts ...FileMetricsOption) *FileMetrics {
-    c := &FileMetrics {
-        TotalLines: 0,
-        CodeLines: 0,
-        CommentLines: 0,
-        BlankLines: 0,
-        TotalBytes: 0,
-        NodeCount: 0,
-        ErrorCount: 0,
-        MaxDepth: 0,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &FileMetrics {
+		TotalLines: 0,
+		CodeLines: 0,
+		CommentLines: 0,
+		BlankLines: 0,
+		TotalBytes: 0,
+		NodeCount: 0,
+		ErrorCount: 0,
+		MaxDepth: 0,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // A structural item (function, class, struct, etc.) in source code.
 type StructureItem struct {
-    Kind StructureKind `json:"kind"`
-    Name *string `json:"name,omitempty"`
-    Visibility *string `json:"visibility,omitempty"`
-    Span Span `json:"span"`
-    Children []StructureItem `json:"children,omitempty"`
-    Decorators []string `json:"decorators,omitempty"`
-    DocComment *string `json:"doc_comment,omitempty"`
-    Signature *string `json:"signature,omitempty"`
-    BodySpan *Span `json:"body_span,omitempty"`
+	Kind StructureKind `json:"kind"`
+	Name *string `json:"name,omitempty"`
+	Visibility *string `json:"visibility,omitempty"`
+	Span Span `json:"span"`
+	Children []StructureItem `json:"children,omitempty"`
+	Decorators []string `json:"decorators,omitempty"`
+	DocComment *string `json:"doc_comment,omitempty"`
+	Signature *string `json:"signature,omitempty"`
+	BodySpan *Span `json:"body_span,omitempty"`
 }
 
 
@@ -752,75 +752,75 @@ type StructureItemOption func(*StructureItem)
 
 // WithStructureItemKind sets the kind field.
 func WithStructureItemKind(v StructureKind) StructureItemOption {
-    return func(c *StructureItem) { c.Kind = v }
+	return func(c *StructureItem) { c.Kind = v }
 }
 
 // WithStructureItemName sets the name field.
 func WithStructureItemName(v string) StructureItemOption {
-    return func(c *StructureItem) { c.Name = &v }
+	return func(c *StructureItem) { c.Name = &v }
 }
 
 // WithStructureItemVisibility sets the visibility field.
 func WithStructureItemVisibility(v string) StructureItemOption {
-    return func(c *StructureItem) { c.Visibility = &v }
+	return func(c *StructureItem) { c.Visibility = &v }
 }
 
 // WithStructureItemSpan sets the span field.
 func WithStructureItemSpan(v Span) StructureItemOption {
-    return func(c *StructureItem) { c.Span = v }
+	return func(c *StructureItem) { c.Span = v }
 }
 
 // WithStructureItemChildren sets the children field.
 func WithStructureItemChildren(v []StructureItem) StructureItemOption {
-    return func(c *StructureItem) { c.Children = v }
+	return func(c *StructureItem) { c.Children = v }
 }
 
 // WithStructureItemDecorators sets the decorators field.
 func WithStructureItemDecorators(v []string) StructureItemOption {
-    return func(c *StructureItem) { c.Decorators = v }
+	return func(c *StructureItem) { c.Decorators = v }
 }
 
 // WithStructureItemDocComment sets the doc_comment field.
 func WithStructureItemDocComment(v string) StructureItemOption {
-    return func(c *StructureItem) { c.DocComment = &v }
+	return func(c *StructureItem) { c.DocComment = &v }
 }
 
 // WithStructureItemSignature sets the signature field.
 func WithStructureItemSignature(v string) StructureItemOption {
-    return func(c *StructureItem) { c.Signature = &v }
+	return func(c *StructureItem) { c.Signature = &v }
 }
 
 // WithStructureItemBodySpan sets the body_span field.
 func WithStructureItemBodySpan(v Span) StructureItemOption {
-    return func(c *StructureItem) { c.BodySpan = &v }
+	return func(c *StructureItem) { c.BodySpan = &v }
 }
 
 // NewStructureItem creates a StructureItem with optional parameters.
 func NewStructureItem(opts ...StructureItemOption) *StructureItem {
-    c := &StructureItem {
-        Kind: StructureKind{},
-        Name: nil,
-        Visibility: nil,
-        Span: Span{},
-        Children: nil,
-        Decorators: nil,
-        DocComment: nil,
-        Signature: nil,
-        BodySpan: nil,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &StructureItem {
+		Kind: StructureKind{},
+		Name: nil,
+		Visibility: nil,
+		Span: Span{},
+		Children: nil,
+		Decorators: nil,
+		DocComment: nil,
+		Signature: nil,
+		BodySpan: nil,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // A comment extracted from source code.
 type CommentInfo struct {
-    Text string `json:"text"`
-    Kind CommentKind `json:"kind,omitempty"`
-    Span Span `json:"span"`
-    AssociatedNode *string `json:"associated_node,omitempty"`
+	Text string `json:"text"`
+	Kind CommentKind `json:"kind,omitempty"`
+	Span Span `json:"span"`
+	AssociatedNode *string `json:"associated_node,omitempty"`
 }
 
 
@@ -829,46 +829,46 @@ type CommentInfoOption func(*CommentInfo)
 
 // WithCommentInfoText sets the text field.
 func WithCommentInfoText(v string) CommentInfoOption {
-    return func(c *CommentInfo) { c.Text = v }
+	return func(c *CommentInfo) { c.Text = v }
 }
 
 // WithCommentInfoKind sets the kind field.
 func WithCommentInfoKind(v CommentKind) CommentInfoOption {
-    return func(c *CommentInfo) { c.Kind = v }
+	return func(c *CommentInfo) { c.Kind = v }
 }
 
 // WithCommentInfoSpan sets the span field.
 func WithCommentInfoSpan(v Span) CommentInfoOption {
-    return func(c *CommentInfo) { c.Span = v }
+	return func(c *CommentInfo) { c.Span = v }
 }
 
 // WithCommentInfoAssociatedNode sets the associated_node field.
 func WithCommentInfoAssociatedNode(v string) CommentInfoOption {
-    return func(c *CommentInfo) { c.AssociatedNode = &v }
+	return func(c *CommentInfo) { c.AssociatedNode = &v }
 }
 
 // NewCommentInfo creates a CommentInfo with optional parameters.
 func NewCommentInfo(opts ...CommentInfoOption) *CommentInfo {
-    c := &CommentInfo {
-        Text: "",
-        Kind: "",
-        Span: Span{},
-        AssociatedNode: nil,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &CommentInfo {
+		Text: "",
+		Kind: "",
+		Span: Span{},
+		AssociatedNode: nil,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // A docstring extracted from source code.
 type DocstringInfo struct {
-    Text string `json:"text"`
-    Format DocstringFormat `json:"format"`
-    Span Span `json:"span"`
-    AssociatedItem *string `json:"associated_item,omitempty"`
-    ParsedSections []DocSection `json:"parsed_sections,omitempty"`
+	Text string `json:"text"`
+	Format DocstringFormat `json:"format"`
+	Span Span `json:"span"`
+	AssociatedItem *string `json:"associated_item,omitempty"`
+	ParsedSections []DocSection `json:"parsed_sections,omitempty"`
 }
 
 
@@ -877,50 +877,50 @@ type DocstringInfoOption func(*DocstringInfo)
 
 // WithDocstringInfoText sets the text field.
 func WithDocstringInfoText(v string) DocstringInfoOption {
-    return func(c *DocstringInfo) { c.Text = v }
+	return func(c *DocstringInfo) { c.Text = v }
 }
 
 // WithDocstringInfoFormat sets the format field.
 func WithDocstringInfoFormat(v DocstringFormat) DocstringInfoOption {
-    return func(c *DocstringInfo) { c.Format = v }
+	return func(c *DocstringInfo) { c.Format = v }
 }
 
 // WithDocstringInfoSpan sets the span field.
 func WithDocstringInfoSpan(v Span) DocstringInfoOption {
-    return func(c *DocstringInfo) { c.Span = v }
+	return func(c *DocstringInfo) { c.Span = v }
 }
 
 // WithDocstringInfoAssociatedItem sets the associated_item field.
 func WithDocstringInfoAssociatedItem(v string) DocstringInfoOption {
-    return func(c *DocstringInfo) { c.AssociatedItem = &v }
+	return func(c *DocstringInfo) { c.AssociatedItem = &v }
 }
 
 // WithDocstringInfoParsedSections sets the parsed_sections field.
 func WithDocstringInfoParsedSections(v []DocSection) DocstringInfoOption {
-    return func(c *DocstringInfo) { c.ParsedSections = v }
+	return func(c *DocstringInfo) { c.ParsedSections = v }
 }
 
 // NewDocstringInfo creates a DocstringInfo with optional parameters.
 func NewDocstringInfo(opts ...DocstringInfoOption) *DocstringInfo {
-    c := &DocstringInfo {
-        Text: "",
-        Format: DocstringFormat{},
-        Span: Span{},
-        AssociatedItem: nil,
-        ParsedSections: nil,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &DocstringInfo {
+		Text: "",
+		Format: DocstringFormat{},
+		Span: Span{},
+		AssociatedItem: nil,
+		ParsedSections: nil,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // A section within a docstring (e.g., Args, Returns, Raises).
 type DocSection struct {
-    Kind string `json:"kind"`
-    Name *string `json:"name,omitempty"`
-    Description string `json:"description"`
+	Kind string `json:"kind"`
+	Name *string `json:"name,omitempty"`
+	Description string `json:"description"`
 }
 
 
@@ -929,40 +929,40 @@ type DocSectionOption func(*DocSection)
 
 // WithDocSectionKind sets the kind field.
 func WithDocSectionKind(v string) DocSectionOption {
-    return func(c *DocSection) { c.Kind = v }
+	return func(c *DocSection) { c.Kind = v }
 }
 
 // WithDocSectionName sets the name field.
 func WithDocSectionName(v string) DocSectionOption {
-    return func(c *DocSection) { c.Name = &v }
+	return func(c *DocSection) { c.Name = &v }
 }
 
 // WithDocSectionDescription sets the description field.
 func WithDocSectionDescription(v string) DocSectionOption {
-    return func(c *DocSection) { c.Description = v }
+	return func(c *DocSection) { c.Description = v }
 }
 
 // NewDocSection creates a DocSection with optional parameters.
 func NewDocSection(opts ...DocSectionOption) *DocSection {
-    c := &DocSection {
-        Kind: "",
-        Name: nil,
-        Description: "",
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &DocSection {
+		Kind: "",
+		Name: nil,
+		Description: "",
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // An import statement extracted from source code.
 type ImportInfo struct {
-    Source string `json:"source"`
-    Items []string `json:"items,omitempty"`
-    Alias *string `json:"alias,omitempty"`
-    IsWildcard bool `json:"is_wildcard"`
-    Span Span `json:"span"`
+	Source string `json:"source"`
+	Items []string `json:"items,omitempty"`
+	Alias *string `json:"alias,omitempty"`
+	IsWildcard bool `json:"is_wildcard"`
+	Span Span `json:"span"`
 }
 
 
@@ -971,50 +971,50 @@ type ImportInfoOption func(*ImportInfo)
 
 // WithImportInfoSource sets the source field.
 func WithImportInfoSource(v string) ImportInfoOption {
-    return func(c *ImportInfo) { c.Source = v }
+	return func(c *ImportInfo) { c.Source = v }
 }
 
 // WithImportInfoItems sets the items field.
 func WithImportInfoItems(v []string) ImportInfoOption {
-    return func(c *ImportInfo) { c.Items = v }
+	return func(c *ImportInfo) { c.Items = v }
 }
 
 // WithImportInfoAlias sets the alias field.
 func WithImportInfoAlias(v string) ImportInfoOption {
-    return func(c *ImportInfo) { c.Alias = &v }
+	return func(c *ImportInfo) { c.Alias = &v }
 }
 
 // WithImportInfoIsWildcard sets the is_wildcard field.
 func WithImportInfoIsWildcard(v bool) ImportInfoOption {
-    return func(c *ImportInfo) { c.IsWildcard = v }
+	return func(c *ImportInfo) { c.IsWildcard = v }
 }
 
 // WithImportInfoSpan sets the span field.
 func WithImportInfoSpan(v Span) ImportInfoOption {
-    return func(c *ImportInfo) { c.Span = v }
+	return func(c *ImportInfo) { c.Span = v }
 }
 
 // NewImportInfo creates a ImportInfo with optional parameters.
 func NewImportInfo(opts ...ImportInfoOption) *ImportInfo {
-    c := &ImportInfo {
-        Source: "",
-        Items: nil,
-        Alias: nil,
-        IsWildcard: false,
-        Span: Span{},
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &ImportInfo {
+		Source: "",
+		Items: nil,
+		Alias: nil,
+		IsWildcard: false,
+		Span: Span{},
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // An export statement extracted from source code.
 type ExportInfo struct {
-    Name string `json:"name"`
-    Kind ExportKind `json:"kind,omitempty"`
-    Span Span `json:"span"`
+	Name string `json:"name"`
+	Kind ExportKind `json:"kind,omitempty"`
+	Span Span `json:"span"`
 }
 
 
@@ -1023,40 +1023,40 @@ type ExportInfoOption func(*ExportInfo)
 
 // WithExportInfoName sets the name field.
 func WithExportInfoName(v string) ExportInfoOption {
-    return func(c *ExportInfo) { c.Name = v }
+	return func(c *ExportInfo) { c.Name = v }
 }
 
 // WithExportInfoKind sets the kind field.
 func WithExportInfoKind(v ExportKind) ExportInfoOption {
-    return func(c *ExportInfo) { c.Kind = v }
+	return func(c *ExportInfo) { c.Kind = v }
 }
 
 // WithExportInfoSpan sets the span field.
 func WithExportInfoSpan(v Span) ExportInfoOption {
-    return func(c *ExportInfo) { c.Span = v }
+	return func(c *ExportInfo) { c.Span = v }
 }
 
 // NewExportInfo creates a ExportInfo with optional parameters.
 func NewExportInfo(opts ...ExportInfoOption) *ExportInfo {
-    c := &ExportInfo {
-        Name: "",
-        Kind: "",
-        Span: Span{},
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &ExportInfo {
+		Name: "",
+		Kind: "",
+		Span: Span{},
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // A symbol (variable, function, type, etc.) extracted from source code.
 type SymbolInfo struct {
-    Name string `json:"name"`
-    Kind SymbolKind `json:"kind"`
-    Span Span `json:"span"`
-    TypeAnnotation *string `json:"type_annotation,omitempty"`
-    Doc *string `json:"doc,omitempty"`
+	Name string `json:"name"`
+	Kind SymbolKind `json:"kind"`
+	Span Span `json:"span"`
+	TypeAnnotation *string `json:"type_annotation,omitempty"`
+	Doc *string `json:"doc,omitempty"`
 }
 
 
@@ -1065,50 +1065,50 @@ type SymbolInfoOption func(*SymbolInfo)
 
 // WithSymbolInfoName sets the name field.
 func WithSymbolInfoName(v string) SymbolInfoOption {
-    return func(c *SymbolInfo) { c.Name = v }
+	return func(c *SymbolInfo) { c.Name = v }
 }
 
 // WithSymbolInfoKind sets the kind field.
 func WithSymbolInfoKind(v SymbolKind) SymbolInfoOption {
-    return func(c *SymbolInfo) { c.Kind = v }
+	return func(c *SymbolInfo) { c.Kind = v }
 }
 
 // WithSymbolInfoSpan sets the span field.
 func WithSymbolInfoSpan(v Span) SymbolInfoOption {
-    return func(c *SymbolInfo) { c.Span = v }
+	return func(c *SymbolInfo) { c.Span = v }
 }
 
 // WithSymbolInfoTypeAnnotation sets the type_annotation field.
 func WithSymbolInfoTypeAnnotation(v string) SymbolInfoOption {
-    return func(c *SymbolInfo) { c.TypeAnnotation = &v }
+	return func(c *SymbolInfo) { c.TypeAnnotation = &v }
 }
 
 // WithSymbolInfoDoc sets the doc field.
 func WithSymbolInfoDoc(v string) SymbolInfoOption {
-    return func(c *SymbolInfo) { c.Doc = &v }
+	return func(c *SymbolInfo) { c.Doc = &v }
 }
 
 // NewSymbolInfo creates a SymbolInfo with optional parameters.
 func NewSymbolInfo(opts ...SymbolInfoOption) *SymbolInfo {
-    c := &SymbolInfo {
-        Name: "",
-        Kind: SymbolKind{},
-        Span: Span{},
-        TypeAnnotation: nil,
-        Doc: nil,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &SymbolInfo {
+		Name: "",
+		Kind: SymbolKind{},
+		Span: Span{},
+		TypeAnnotation: nil,
+		Doc: nil,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // A diagnostic (syntax error, missing node, etc.) from parsing.
 type Diagnostic struct {
-    Message string `json:"message"`
-    Severity DiagnosticSeverity `json:"severity,omitempty"`
-    Span Span `json:"span"`
+	Message string `json:"message"`
+	Severity DiagnosticSeverity `json:"severity,omitempty"`
+	Span Span `json:"span"`
 }
 
 
@@ -1117,41 +1117,41 @@ type DiagnosticOption func(*Diagnostic)
 
 // WithDiagnosticMessage sets the message field.
 func WithDiagnosticMessage(v string) DiagnosticOption {
-    return func(c *Diagnostic) { c.Message = v }
+	return func(c *Diagnostic) { c.Message = v }
 }
 
 // WithDiagnosticSeverity sets the severity field.
 func WithDiagnosticSeverity(v DiagnosticSeverity) DiagnosticOption {
-    return func(c *Diagnostic) { c.Severity = v }
+	return func(c *Diagnostic) { c.Severity = v }
 }
 
 // WithDiagnosticSpan sets the span field.
 func WithDiagnosticSpan(v Span) DiagnosticOption {
-    return func(c *Diagnostic) { c.Span = v }
+	return func(c *Diagnostic) { c.Span = v }
 }
 
 // NewDiagnostic creates a Diagnostic with optional parameters.
 func NewDiagnostic(opts ...DiagnosticOption) *Diagnostic {
-    c := &Diagnostic {
-        Message: "",
-        Severity: "",
-        Span: Span{},
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &Diagnostic {
+		Message: "",
+		Severity: "",
+		Span: Span{},
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // A chunk of source code with rich metadata.
 type CodeChunk struct {
-    Content string `json:"content"`
-    StartByte uint `json:"start_byte"`
-    EndByte uint `json:"end_byte"`
-    StartLine uint `json:"start_line"`
-    EndLine uint `json:"end_line"`
-    Metadata ChunkContext `json:"metadata"`
+	Content string `json:"content"`
+	StartByte uint `json:"start_byte"`
+	EndByte uint `json:"end_byte"`
+	StartLine uint `json:"start_line"`
+	EndLine uint `json:"end_line"`
+	Metadata ChunkContext `json:"metadata"`
 }
 
 
@@ -1160,62 +1160,62 @@ type CodeChunkOption func(*CodeChunk)
 
 // WithCodeChunkContent sets the content field.
 func WithCodeChunkContent(v string) CodeChunkOption {
-    return func(c *CodeChunk) { c.Content = v }
+	return func(c *CodeChunk) { c.Content = v }
 }
 
 // WithCodeChunkStartByte sets the start_byte field.
 func WithCodeChunkStartByte(v uint) CodeChunkOption {
-    return func(c *CodeChunk) { c.StartByte = v }
+	return func(c *CodeChunk) { c.StartByte = v }
 }
 
 // WithCodeChunkEndByte sets the end_byte field.
 func WithCodeChunkEndByte(v uint) CodeChunkOption {
-    return func(c *CodeChunk) { c.EndByte = v }
+	return func(c *CodeChunk) { c.EndByte = v }
 }
 
 // WithCodeChunkStartLine sets the start_line field.
 func WithCodeChunkStartLine(v uint) CodeChunkOption {
-    return func(c *CodeChunk) { c.StartLine = v }
+	return func(c *CodeChunk) { c.StartLine = v }
 }
 
 // WithCodeChunkEndLine sets the end_line field.
 func WithCodeChunkEndLine(v uint) CodeChunkOption {
-    return func(c *CodeChunk) { c.EndLine = v }
+	return func(c *CodeChunk) { c.EndLine = v }
 }
 
 // WithCodeChunkMetadata sets the metadata field.
 func WithCodeChunkMetadata(v ChunkContext) CodeChunkOption {
-    return func(c *CodeChunk) { c.Metadata = v }
+	return func(c *CodeChunk) { c.Metadata = v }
 }
 
 // NewCodeChunk creates a CodeChunk with optional parameters.
 func NewCodeChunk(opts ...CodeChunkOption) *CodeChunk {
-    c := &CodeChunk {
-        Content: "",
-        StartByte: 0,
-        EndByte: 0,
-        StartLine: 0,
-        EndLine: 0,
-        Metadata: ChunkContext{},
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &CodeChunk {
+		Content: "",
+		StartByte: 0,
+		EndByte: 0,
+		StartLine: 0,
+		EndLine: 0,
+		Metadata: ChunkContext{},
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // Metadata for a single chunk of source code.
 type ChunkContext struct {
-    Language string `json:"language"`
-    ChunkIndex uint `json:"chunk_index"`
-    TotalChunks uint `json:"total_chunks"`
-    NodeTypes []string `json:"node_types,omitempty"`
-    ContextPath []string `json:"context_path,omitempty"`
-    SymbolsDefined []string `json:"symbols_defined,omitempty"`
-    Comments []CommentInfo `json:"comments,omitempty"`
-    Docstrings []DocstringInfo `json:"docstrings,omitempty"`
-    HasErrorNodes bool `json:"has_error_nodes"`
+	Language string `json:"language"`
+	ChunkIndex uint `json:"chunk_index"`
+	TotalChunks uint `json:"total_chunks"`
+	NodeTypes []string `json:"node_types,omitempty"`
+	ContextPath []string `json:"context_path,omitempty"`
+	SymbolsDefined []string `json:"symbols_defined,omitempty"`
+	Comments []CommentInfo `json:"comments,omitempty"`
+	Docstrings []DocstringInfo `json:"docstrings,omitempty"`
+	HasErrorNodes bool `json:"has_error_nodes"`
 }
 
 
@@ -1224,66 +1224,66 @@ type ChunkContextOption func(*ChunkContext)
 
 // WithChunkContextLanguage sets the language field.
 func WithChunkContextLanguage(v string) ChunkContextOption {
-    return func(c *ChunkContext) { c.Language = v }
+	return func(c *ChunkContext) { c.Language = v }
 }
 
 // WithChunkContextChunkIndex sets the chunk_index field.
 func WithChunkContextChunkIndex(v uint) ChunkContextOption {
-    return func(c *ChunkContext) { c.ChunkIndex = v }
+	return func(c *ChunkContext) { c.ChunkIndex = v }
 }
 
 // WithChunkContextTotalChunks sets the total_chunks field.
 func WithChunkContextTotalChunks(v uint) ChunkContextOption {
-    return func(c *ChunkContext) { c.TotalChunks = v }
+	return func(c *ChunkContext) { c.TotalChunks = v }
 }
 
 // WithChunkContextNodeTypes sets the node_types field.
 func WithChunkContextNodeTypes(v []string) ChunkContextOption {
-    return func(c *ChunkContext) { c.NodeTypes = v }
+	return func(c *ChunkContext) { c.NodeTypes = v }
 }
 
 // WithChunkContextContextPath sets the context_path field.
 func WithChunkContextContextPath(v []string) ChunkContextOption {
-    return func(c *ChunkContext) { c.ContextPath = v }
+	return func(c *ChunkContext) { c.ContextPath = v }
 }
 
 // WithChunkContextSymbolsDefined sets the symbols_defined field.
 func WithChunkContextSymbolsDefined(v []string) ChunkContextOption {
-    return func(c *ChunkContext) { c.SymbolsDefined = v }
+	return func(c *ChunkContext) { c.SymbolsDefined = v }
 }
 
 // WithChunkContextComments sets the comments field.
 func WithChunkContextComments(v []CommentInfo) ChunkContextOption {
-    return func(c *ChunkContext) { c.Comments = v }
+	return func(c *ChunkContext) { c.Comments = v }
 }
 
 // WithChunkContextDocstrings sets the docstrings field.
 func WithChunkContextDocstrings(v []DocstringInfo) ChunkContextOption {
-    return func(c *ChunkContext) { c.Docstrings = v }
+	return func(c *ChunkContext) { c.Docstrings = v }
 }
 
 // WithChunkContextHasErrorNodes sets the has_error_nodes field.
 func WithChunkContextHasErrorNodes(v bool) ChunkContextOption {
-    return func(c *ChunkContext) { c.HasErrorNodes = v }
+	return func(c *ChunkContext) { c.HasErrorNodes = v }
 }
 
 // NewChunkContext creates a ChunkContext with optional parameters.
 func NewChunkContext(opts ...ChunkContextOption) *ChunkContext {
-    c := &ChunkContext {
-        Language: "",
-        ChunkIndex: 0,
-        TotalChunks: 0,
-        NodeTypes: nil,
-        ContextPath: nil,
-        SymbolsDefined: nil,
-        Comments: nil,
-        Docstrings: nil,
-        HasErrorNodes: false,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &ChunkContext {
+		Language: "",
+		ChunkIndex: 0,
+		TotalChunks: 0,
+		NodeTypes: nil,
+		ContextPath: nil,
+		SymbolsDefined: nil,
+		Comments: nil,
+		Docstrings: nil,
+		HasErrorNodes: false,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
@@ -1293,28 +1293,28 @@ func NewChunkContext(opts ...ChunkContextOption) *ChunkContext {
 // This is an owned type that can be passed across FFI boundaries, unlike
 // `tree_sitter::Node` which borrows from the tree.
 type NodeInfo struct {
-    // The grammar type name (e.g., "function_definition", "identifier").
-    Kind string `json:"kind"`
-    // Whether this is a named node (vs anonymous like punctuation).
-    IsNamed bool `json:"is_named"`
-    // Start byte offset in source.
-    StartByte uint `json:"start_byte"`
-    // End byte offset in source.
-    EndByte uint `json:"end_byte"`
-    // Start row (zero-indexed).
-    StartRow uint `json:"start_row"`
-    // Start column (zero-indexed).
-    StartCol uint `json:"start_col"`
-    // End row (zero-indexed).
-    EndRow uint `json:"end_row"`
-    // End column (zero-indexed).
-    EndCol uint `json:"end_col"`
-    // Number of named children.
-    NamedChildCount uint `json:"named_child_count"`
-    // Whether this node is an ERROR node.
-    IsError bool `json:"is_error"`
-    // Whether this node is a MISSING node.
-    IsMissing bool `json:"is_missing"`
+	// The grammar type name (e.g., "function_definition", "identifier").
+	Kind string `json:"kind"`
+	// Whether this is a named node (vs anonymous like punctuation).
+	IsNamed bool `json:"is_named"`
+	// Start byte offset in source.
+	StartByte uint `json:"start_byte"`
+	// End byte offset in source.
+	EndByte uint `json:"end_byte"`
+	// Start row (zero-indexed).
+	StartRow uint `json:"start_row"`
+	// Start column (zero-indexed).
+	StartCol uint `json:"start_col"`
+	// End row (zero-indexed).
+	EndRow uint `json:"end_row"`
+	// End column (zero-indexed).
+	EndCol uint `json:"end_col"`
+	// Number of named children.
+	NamedChildCount uint `json:"named_child_count"`
+	// Whether this node is an ERROR node.
+	IsError bool `json:"is_error"`
+	// Whether this node is a MISSING node.
+	IsMissing bool `json:"is_missing"`
 }
 
 
@@ -1323,78 +1323,78 @@ type NodeInfoOption func(*NodeInfo)
 
 // WithNodeInfoKind sets the kind field.
 func WithNodeInfoKind(v string) NodeInfoOption {
-    return func(c *NodeInfo) { c.Kind = v }
+	return func(c *NodeInfo) { c.Kind = v }
 }
 
 // WithNodeInfoIsNamed sets the is_named field.
 func WithNodeInfoIsNamed(v bool) NodeInfoOption {
-    return func(c *NodeInfo) { c.IsNamed = v }
+	return func(c *NodeInfo) { c.IsNamed = v }
 }
 
 // WithNodeInfoStartByte sets the start_byte field.
 func WithNodeInfoStartByte(v uint) NodeInfoOption {
-    return func(c *NodeInfo) { c.StartByte = v }
+	return func(c *NodeInfo) { c.StartByte = v }
 }
 
 // WithNodeInfoEndByte sets the end_byte field.
 func WithNodeInfoEndByte(v uint) NodeInfoOption {
-    return func(c *NodeInfo) { c.EndByte = v }
+	return func(c *NodeInfo) { c.EndByte = v }
 }
 
 // WithNodeInfoStartRow sets the start_row field.
 func WithNodeInfoStartRow(v uint) NodeInfoOption {
-    return func(c *NodeInfo) { c.StartRow = v }
+	return func(c *NodeInfo) { c.StartRow = v }
 }
 
 // WithNodeInfoStartCol sets the start_col field.
 func WithNodeInfoStartCol(v uint) NodeInfoOption {
-    return func(c *NodeInfo) { c.StartCol = v }
+	return func(c *NodeInfo) { c.StartCol = v }
 }
 
 // WithNodeInfoEndRow sets the end_row field.
 func WithNodeInfoEndRow(v uint) NodeInfoOption {
-    return func(c *NodeInfo) { c.EndRow = v }
+	return func(c *NodeInfo) { c.EndRow = v }
 }
 
 // WithNodeInfoEndCol sets the end_col field.
 func WithNodeInfoEndCol(v uint) NodeInfoOption {
-    return func(c *NodeInfo) { c.EndCol = v }
+	return func(c *NodeInfo) { c.EndCol = v }
 }
 
 // WithNodeInfoNamedChildCount sets the named_child_count field.
 func WithNodeInfoNamedChildCount(v uint) NodeInfoOption {
-    return func(c *NodeInfo) { c.NamedChildCount = v }
+	return func(c *NodeInfo) { c.NamedChildCount = v }
 }
 
 // WithNodeInfoIsError sets the is_error field.
 func WithNodeInfoIsError(v bool) NodeInfoOption {
-    return func(c *NodeInfo) { c.IsError = v }
+	return func(c *NodeInfo) { c.IsError = v }
 }
 
 // WithNodeInfoIsMissing sets the is_missing field.
 func WithNodeInfoIsMissing(v bool) NodeInfoOption {
-    return func(c *NodeInfo) { c.IsMissing = v }
+	return func(c *NodeInfo) { c.IsMissing = v }
 }
 
 // NewNodeInfo creates a NodeInfo with optional parameters.
 func NewNodeInfo(opts ...NodeInfoOption) *NodeInfo {
-    c := &NodeInfo {
-        Kind: "",
-        IsNamed: false,
-        StartByte: 0,
-        EndByte: 0,
-        StartRow: 0,
-        StartCol: 0,
-        EndRow: 0,
-        EndCol: 0,
-        NamedChildCount: 0,
-        IsError: false,
-        IsMissing: false,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &NodeInfo {
+		Kind: "",
+		IsNamed: false,
+		StartByte: 0,
+		EndByte: 0,
+		StartRow: 0,
+		StartCol: 0,
+		EndRow: 0,
+		EndCol: 0,
+		NamedChildCount: 0,
+		IsError: false,
+		IsMissing: false,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
@@ -1416,16 +1416,16 @@ func NewNodeInfo(opts ...NodeInfoOption) *NodeInfo {
 // };
 // ```
 type PackConfig struct {
-    // Override default cache directory.
-    //
-    // Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
-    CacheDir *string `json:"cache_dir,omitempty"`
-    // Languages to pre-download on init.
-    //
-    // Each entry is a language name (e.g. `"python"`, `"rust"`).
-    Languages *[]string `json:"languages,omitempty"`
-    // Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).
-    Groups *[]string `json:"groups,omitempty"`
+	// Override default cache directory.
+	//
+	// Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
+	CacheDir *string `json:"cache_dir,omitempty"`
+	// Languages to pre-download on init.
+	//
+	// Each entry is a language name (e.g. `"python"`, `"rust"`).
+	Languages *[]string `json:"languages,omitempty"`
+	// Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).
+	Groups *[]string `json:"groups,omitempty"`
 }
 
 
@@ -1434,30 +1434,30 @@ type PackConfigOption func(*PackConfig)
 
 // WithPackConfigCacheDir sets the cache_dir field.
 func WithPackConfigCacheDir(v string) PackConfigOption {
-    return func(c *PackConfig) { c.CacheDir = &v }
+	return func(c *PackConfig) { c.CacheDir = &v }
 }
 
 // WithPackConfigLanguages sets the languages field.
 func WithPackConfigLanguages(v []string) PackConfigOption {
-    return func(c *PackConfig) { c.Languages = &v }
+	return func(c *PackConfig) { c.Languages = &v }
 }
 
 // WithPackConfigGroups sets the groups field.
 func WithPackConfigGroups(v []string) PackConfigOption {
-    return func(c *PackConfig) { c.Groups = &v }
+	return func(c *PackConfig) { c.Groups = &v }
 }
 
 // NewPackConfig creates a PackConfig with optional parameters.
 func NewPackConfig(opts ...PackConfigOption) *PackConfig {
-    c := &PackConfig {
-        CacheDir: nil,
-        Languages: nil,
-        Groups: nil,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &PackConfig {
+		CacheDir: nil,
+		Languages: nil,
+		Groups: nil,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
@@ -1480,27 +1480,27 @@ func NewPackConfig(opts ...PackConfigOption) *PackConfig {
 // let config = ProcessConfig::new("python").all();
 // ```
 type ProcessConfig struct {
-    // Language name (required).
-    Language string `json:"language"`
-    // Extract structural items (functions, classes, etc.). Default: true.
-    Structure *bool `json:"structure,omitempty"`
-    // Extract import statements. Default: true.
-    Imports *bool `json:"imports,omitempty"`
-    // Extract export statements. Default: true.
-    Exports *bool `json:"exports,omitempty"`
-    // Extract comments. Default: false.
-    Comments bool `json:"comments"`
-    // Extract docstrings. Default: false.
-    Docstrings bool `json:"docstrings"`
-    // Extract symbol definitions. Default: false.
-    Symbols bool `json:"symbols"`
-    // Include parse diagnostics. Default: false.
-    Diagnostics bool `json:"diagnostics"`
-    // Maximum chunk size in bytes. `None` disables chunking.
-    ChunkMaxSize *uint `json:"chunk_max_size,omitempty"`
-    // Custom extraction patterns to run against the parsed tree.
-    // Keys become the keys in `ProcessResult::extractions`.
-    Extractions *string `json:"extractions,omitempty"`
+	// Language name (required).
+	Language string `json:"language"`
+	// Extract structural items (functions, classes, etc.). Default: true.
+	Structure *bool `json:"structure,omitempty"`
+	// Extract import statements. Default: true.
+	Imports *bool `json:"imports,omitempty"`
+	// Extract export statements. Default: true.
+	Exports *bool `json:"exports,omitempty"`
+	// Extract comments. Default: false.
+	Comments bool `json:"comments"`
+	// Extract docstrings. Default: false.
+	Docstrings bool `json:"docstrings"`
+	// Extract symbol definitions. Default: false.
+	Symbols bool `json:"symbols"`
+	// Include parse diagnostics. Default: false.
+	Diagnostics bool `json:"diagnostics"`
+	// Maximum chunk size in bytes. `None` disables chunking.
+	ChunkMaxSize *uint `json:"chunk_max_size,omitempty"`
+	// Custom extraction patterns to run against the parsed tree.
+	// Keys become the keys in `ProcessResult::extractions`.
+	Extractions *string `json:"extractions,omitempty"`
 }
 
 
@@ -1509,81 +1509,81 @@ type ProcessConfigOption func(*ProcessConfig)
 
 // WithProcessConfigLanguage sets the language field.
 func WithProcessConfigLanguage(v string) ProcessConfigOption {
-    return func(c *ProcessConfig) { c.Language = v }
+	return func(c *ProcessConfig) { c.Language = v }
 }
 
 // WithProcessConfigStructure sets the structure field.
 func WithProcessConfigStructure(v bool) ProcessConfigOption {
-    return func(c *ProcessConfig) { c.Structure = &v }
+	return func(c *ProcessConfig) { c.Structure = &v }
 }
 
 // WithProcessConfigImports sets the imports field.
 func WithProcessConfigImports(v bool) ProcessConfigOption {
-    return func(c *ProcessConfig) { c.Imports = &v }
+	return func(c *ProcessConfig) { c.Imports = &v }
 }
 
 // WithProcessConfigExports sets the exports field.
 func WithProcessConfigExports(v bool) ProcessConfigOption {
-    return func(c *ProcessConfig) { c.Exports = &v }
+	return func(c *ProcessConfig) { c.Exports = &v }
 }
 
 // WithProcessConfigComments sets the comments field.
 func WithProcessConfigComments(v bool) ProcessConfigOption {
-    return func(c *ProcessConfig) { c.Comments = v }
+	return func(c *ProcessConfig) { c.Comments = v }
 }
 
 // WithProcessConfigDocstrings sets the docstrings field.
 func WithProcessConfigDocstrings(v bool) ProcessConfigOption {
-    return func(c *ProcessConfig) { c.Docstrings = v }
+	return func(c *ProcessConfig) { c.Docstrings = v }
 }
 
 // WithProcessConfigSymbols sets the symbols field.
 func WithProcessConfigSymbols(v bool) ProcessConfigOption {
-    return func(c *ProcessConfig) { c.Symbols = v }
+	return func(c *ProcessConfig) { c.Symbols = v }
 }
 
 // WithProcessConfigDiagnostics sets the diagnostics field.
 func WithProcessConfigDiagnostics(v bool) ProcessConfigOption {
-    return func(c *ProcessConfig) { c.Diagnostics = v }
+	return func(c *ProcessConfig) { c.Diagnostics = v }
 }
 
 // WithProcessConfigChunkMaxSize sets the chunk_max_size field.
 func WithProcessConfigChunkMaxSize(v uint) ProcessConfigOption {
-    return func(c *ProcessConfig) { c.ChunkMaxSize = &v }
+	return func(c *ProcessConfig) { c.ChunkMaxSize = &v }
 }
 
 // WithProcessConfigExtractions sets the extractions field.
 func WithProcessConfigExtractions(v string) ProcessConfigOption {
-    return func(c *ProcessConfig) { c.Extractions = &v }
+	return func(c *ProcessConfig) { c.Extractions = &v }
 }
 
 // NewProcessConfig creates a ProcessConfig with optional parameters.
 func NewProcessConfig(opts ...ProcessConfigOption) *ProcessConfig {
-    c := &ProcessConfig {
-        Language: "",
-        Structure: nil,
-        Imports: nil,
-        Exports: nil,
-        Comments: false,
-        Docstrings: false,
-        Symbols: false,
-        Diagnostics: false,
-        ChunkMaxSize: nil,
-        Extractions: nil,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &ProcessConfig {
+		Language: "",
+		Structure: nil,
+		Imports: nil,
+		Exports: nil,
+		Comments: false,
+		Docstrings: false,
+		Symbols: false,
+		Diagnostics: false,
+		ChunkMaxSize: nil,
+		Extractions: nil,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
 // A single match from a tree-sitter query, with captured nodes.
 type QueryMatch struct {
-    // The pattern index that matched (position in the query string).
-    PatternIndex uint `json:"pattern_index"`
-    // Captures: list of (capture_name, node_info) pairs.
-    Captures []string `json:"captures,omitempty"`
+	// The pattern index that matched (position in the query string).
+	PatternIndex uint `json:"pattern_index"`
+	// Captures: list of (capture_name, node_info) pairs.
+	Captures []string `json:"captures,omitempty"`
 }
 
 
@@ -1592,24 +1592,24 @@ type QueryMatchOption func(*QueryMatch)
 
 // WithQueryMatchPatternIndex sets the pattern_index field.
 func WithQueryMatchPatternIndex(v uint) QueryMatchOption {
-    return func(c *QueryMatch) { c.PatternIndex = v }
+	return func(c *QueryMatch) { c.PatternIndex = v }
 }
 
 // WithQueryMatchCaptures sets the captures field.
 func WithQueryMatchCaptures(v []string) QueryMatchOption {
-    return func(c *QueryMatch) { c.Captures = v }
+	return func(c *QueryMatch) { c.Captures = v }
 }
 
 // NewQueryMatch creates a QueryMatch with optional parameters.
 func NewQueryMatch(opts ...QueryMatchOption) *QueryMatch {
-    c := &QueryMatch {
-        PatternIndex: 0,
-        Captures: nil,
-    }
-    for _, opt := range opts {
-        opt(c)
-    }
-    return c
+	c := &QueryMatch {
+		PatternIndex: 0,
+		Captures: nil,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 
@@ -1634,95 +1634,95 @@ func NewQueryMatch(opts ...QueryMatchOption) *QueryMatch {
 // println!("Structure: {:?}", result.structure);
 // ```
 type LanguageRegistry struct {
-    ptr unsafe.Pointer
+	ptr unsafe.Pointer
 }
 
 // Free releases the resources held by this handle.
 func (h *LanguageRegistry) Free() {
-    if h.ptr != nil {
-        C.ts_pack_language_registry_free((*C.TS_PACKLanguageRegistry)(h.ptr))
-        h.ptr = nil
-    }
+	if h.ptr != nil {
+		C.ts_pack_language_registry_free((*C.TS_PACKLanguageRegistry)(h.ptr))
+		h.ptr = nil
+	}
 }
 
 
 // Manifest describing available parser downloads for a specific version.
 type ParserManifest struct {
-    Version string `json:"version"`
-    Platforms map[string]PlatformBundle `json:"platforms,omitempty"`
-    Languages map[string]LanguageInfo `json:"languages,omitempty"`
-    Groups map[string][]string `json:"groups,omitempty"`
+	Version string `json:"version"`
+	Platforms map[string]PlatformBundle `json:"platforms,omitempty"`
+	Languages map[string]LanguageInfo `json:"languages,omitempty"`
+	Groups map[string][]string `json:"groups,omitempty"`
 }
 
 
 // PlatformBundle is a type.
 type PlatformBundle struct {
-    Url string `json:"url"`
-    Sha256 string `json:"sha256"`
-    Size uint64 `json:"size"`
+	Url string `json:"url"`
+	Sha256 string `json:"sha256"`
+	Size uint64 `json:"size"`
 }
 
 
 // LanguageInfo is a type.
 type LanguageInfo struct {
-    Group string `json:"group"`
-    Size uint64 `json:"size"`
+	Group string `json:"group"`
+	Size uint64 `json:"size"`
 }
 
 
 // Manages downloading and caching of pre-built parser shared libraries.
 type DownloadManager struct {
-    ptr unsafe.Pointer
+	ptr unsafe.Pointer
 }
 
 // Free releases the resources held by this handle.
 func (h *DownloadManager) Free() {
-    if h.ptr != nil {
-        C.ts_pack_download_manager_free((*C.TS_PACKDownloadManager)(h.ptr))
-        h.ptr = nil
-    }
+	if h.ptr != nil {
+		C.ts_pack_download_manager_free((*C.TS_PACKDownloadManager)(h.ptr))
+		h.ptr = nil
+	}
 }
 
 
 // Language is an opaque handle type.
 type Language struct {
-    ptr unsafe.Pointer
+	ptr unsafe.Pointer
 }
 
 // Free releases the resources held by this handle.
 func (h *Language) Free() {
-    if h.ptr != nil {
-        C.ts_pack_language_free((*C.TS_PACKLanguage)(h.ptr))
-        h.ptr = nil
-    }
+	if h.ptr != nil {
+		C.ts_pack_language_free((*C.TS_PACKLanguage)(h.ptr))
+		h.ptr = nil
+	}
 }
 
 
 // Parser is an opaque handle type.
 type Parser struct {
-    ptr unsafe.Pointer
+	ptr unsafe.Pointer
 }
 
 // Free releases the resources held by this handle.
 func (h *Parser) Free() {
-    if h.ptr != nil {
-        C.ts_pack_parser_free((*C.TS_PACKParser)(h.ptr))
-        h.ptr = nil
-    }
+	if h.ptr != nil {
+		C.ts_pack_parser_free((*C.TS_PACKParser)(h.ptr))
+		h.ptr = nil
+	}
 }
 
 
 // Tree is an opaque handle type.
 type Tree struct {
-    ptr unsafe.Pointer
+	ptr unsafe.Pointer
 }
 
 // Free releases the resources held by this handle.
 func (h *Tree) Free() {
-    if h.ptr != nil {
-        C.ts_pack_tree_free((*C.TS_PACKTree)(h.ptr))
-        h.ptr = nil
-    }
+	if h.ptr != nil {
+		C.ts_pack_tree_free((*C.TS_PACKTree)(h.ptr))
+		h.ptr = nil
+	}
 }
 
 
@@ -1737,11 +1737,11 @@ func (h *Tree) Free() {
 // assert_eq!(detect_language_from_extension("xyz"), None);
 // ```
 func DetectLanguageFromExtension(ext string) *string {
-    cExt := C.CString(ext)
-    defer C.free(unsafe.Pointer(cExt))
+	cExt := C.CString(ext)
+	defer C.free(unsafe.Pointer(cExt))
 
-    ptr := C.ts_pack_detect_language_from_extension(cExt)
-    return func() *string { v := C.GoString(ptr); return &v }()
+	ptr := C.ts_pack_detect_language_from_extension(cExt)
+	return func() *string { v := C.GoString(ptr); return &v }()
 }
 
 
@@ -1757,11 +1757,11 @@ func DetectLanguageFromExtension(ext string) *string {
 // assert_eq!(detect_language_from_path("Makefile"), None);
 // ```
 func DetectLanguageFromPath(path string) *string {
-    cPath := C.CString(path)
-    defer C.free(unsafe.Pointer(cPath))
+	cPath := C.CString(path)
+	defer C.free(unsafe.Pointer(cPath))
 
-    ptr := C.ts_pack_detect_language_from_path(cPath)
-    return func() *string { v := C.GoString(ptr); return &v }()
+	ptr := C.ts_pack_detect_language_from_path(cPath)
+	return func() *string { v := C.GoString(ptr); return &v }()
 }
 
 
@@ -1788,21 +1788,21 @@ func DetectLanguageFromPath(path string) *string {
 // assert_eq!(detect_language_from_content("no shebang here"), None);
 // ```
 func DetectLanguageFromContent(content string) *string {
-    cContent := C.CString(content)
-    defer C.free(unsafe.Pointer(cContent))
+	cContent := C.CString(content)
+	defer C.free(unsafe.Pointer(cContent))
 
-    ptr := C.ts_pack_detect_language_from_content(cContent)
-    return func() *string { v := C.GoString(ptr); return &v }()
+	ptr := C.ts_pack_detect_language_from_content(cContent)
+	return func() *string { v := C.GoString(ptr); return &v }()
 }
 
 
 // Get a `NodeInfo` snapshot of the root node.
 func RootNodeInfo(tree *Tree) *NodeInfo {
-    cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
+	cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
 
-    ptr := C.ts_pack_root_node_info(cTree)
-    defer C.ts_pack_node_info_free(ptr)
-    return func() *NodeInfo {
+	ptr := C.ts_pack_root_node_info(cTree)
+	defer C.ts_pack_node_info_free(ptr)
+	return func() *NodeInfo {
 	jsonPtr := C.ts_pack_node_info_to_json(ptr)
 	if jsonPtr == nil { return nil }
 	defer C.ts_pack_free_string(jsonPtr)
@@ -1817,13 +1817,13 @@ func RootNodeInfo(tree *Tree) *NodeInfo {
 //
 // Performs a depth-first traversal. Returns an empty vec if no matches.
 func FindNodesByType(tree *Tree, node_type string) *[]NodeInfo {
-    cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
+	cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
 
-    cNodeType := C.CString(node_type)
-    defer C.free(unsafe.Pointer(cNodeType))
+	cNodeType := C.CString(node_type)
+	defer C.free(unsafe.Pointer(cNodeType))
 
-    ptr := C.ts_pack_find_nodes_by_type(cTree, cNodeType)
-    return func() *[]NodeInfo {
+	ptr := C.ts_pack_find_nodes_by_type(cTree, cNodeType)
+	return func() *[]NodeInfo {
 	if ptr == nil { return nil }
 	defer C.ts_pack_free_string(ptr)
 	var result []NodeInfo
@@ -1838,10 +1838,10 @@ func FindNodesByType(tree *Tree, node_type string) *[]NodeInfo {
 // Useful for understanding the top-level structure of a file
 // (e.g., list of function definitions, class declarations, imports).
 func NamedChildrenInfo(tree *Tree) *[]NodeInfo {
-    cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
+	cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
 
-    ptr := C.ts_pack_named_children_info(cTree)
-    return func() *[]NodeInfo {
+	ptr := C.ts_pack_named_children_info(cTree)
+	return func() *[]NodeInfo {
 	if ptr == nil { return nil }
 	defer C.ts_pack_free_string(ptr)
 	var result []NodeInfo
@@ -1864,20 +1864,20 @@ func NamedChildrenInfo(tree *Tree) *[]NodeInfo {
 // assert_eq!(tree.root_node().kind(), "module");
 // ```
 func ParseString(language string, source []byte) (*Tree, error) {
-    cLanguage := C.CString(language)
-    defer C.free(unsafe.Pointer(cLanguage))
+	cLanguage := C.CString(language)
+	defer C.free(unsafe.Pointer(cLanguage))
 
-    cSource := (*C.uint8_t)(unsafe.Pointer(&source[0]))
-    cSourceLen := C.uintptr_t(len(source))
+	cSource := (*C.uint8_t)(unsafe.Pointer(&source[0]))
+	cSourceLen := C.uintptr_t(len(source))
 
-    ptr := C.ts_pack_parse_string(cLanguage, cSource, cSourceLen)
-    if err := lastError(); err != nil {
-        if ptr != nil {
-            C.ts_pack_tree_free(ptr)
-        }
-        return nil, err
-    }
-    return &Tree{ptr: unsafe.Pointer(ptr)}, nil
+	ptr := C.ts_pack_parse_string(cLanguage, cSource, cSourceLen)
+	if err := lastError(); err != nil {
+		if ptr != nil {
+			C.ts_pack_tree_free(ptr)
+		}
+		return nil, err
+	}
+	return &Tree{ptr: unsafe.Pointer(ptr)}, nil
 }
 
 
@@ -1885,13 +1885,13 @@ func ParseString(language string, source []byte) (*Tree, error) {
 //
 // Performs a depth-first traversal using `TreeCursor`.
 func TreeContainsNodeType(tree *Tree, node_type string) *bool {
-    cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
+	cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
 
-    cNodeType := C.CString(node_type)
-    defer C.free(unsafe.Pointer(cNodeType))
+	cNodeType := C.CString(node_type)
+	defer C.free(unsafe.Pointer(cNodeType))
 
-    ptr := C.ts_pack_tree_contains_node_type(cTree, cNodeType)
-    return func() *bool { v := ptr != 0; return &v }()
+	ptr := C.ts_pack_tree_contains_node_type(cTree, cNodeType)
+	return func() *bool { v := ptr != 0; return &v }()
 }
 
 
@@ -1899,10 +1899,10 @@ func TreeContainsNodeType(tree *Tree, node_type string) *bool {
 //
 // Useful for determining if the parse was clean or had syntax errors.
 func TreeHasErrorNodes(tree *Tree) *bool {
-    cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
+	cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
 
-    ptr := C.ts_pack_tree_has_error_nodes(cTree)
-    return func() *bool { v := ptr != 0; return &v }()
+	ptr := C.ts_pack_tree_has_error_nodes(cTree)
+	return func() *bool { v := ptr != 0; return &v }()
 }
 
 
@@ -1911,11 +1911,11 @@ func TreeHasErrorNodes(tree *Tree) *bool {
 // This is the standard tree-sitter debug format, useful for logging,
 // snapshot testing, and debugging grammars.
 func TreeToSexp(tree *Tree) *string {
-    cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
+	cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
 
-    ptr := C.ts_pack_tree_to_sexp(cTree)
-    defer C.ts_pack_free_string(ptr)
-    return func() *string { v := C.GoString(ptr); return &v }()
+	ptr := C.ts_pack_tree_to_sexp(cTree)
+	defer C.ts_pack_free_string(ptr)
+	return func() *string { v := C.GoString(ptr); return &v }()
 }
 
 
@@ -1923,10 +1923,10 @@ func TreeToSexp(tree *Tree) *string {
 //
 // Returns 0 for a clean parse.
 func TreeErrorCount(tree *Tree) *uint {
-    cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
+	cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
 
-    ptr := C.ts_pack_tree_error_count(cTree)
-    return func() *uint { v := uint(ptr); return &v }()
+	ptr := C.ts_pack_tree_error_count(cTree)
+	return func() *uint { v := uint(ptr); return &v }()
 }
 
 
@@ -1947,11 +1947,11 @@ func TreeErrorCount(tree *Tree) *uint {
 // assert!(missing.is_none());
 // ```
 func GetHighlightsQuery(language string) *string {
-    cLanguage := C.CString(language)
-    defer C.free(unsafe.Pointer(cLanguage))
+	cLanguage := C.CString(language)
+	defer C.free(unsafe.Pointer(cLanguage))
 
-    ptr := C.ts_pack_get_highlights_query(cLanguage)
-    return func() *string { v := C.GoString(ptr); return &v }()
+	ptr := C.ts_pack_get_highlights_query(cLanguage)
+	return func() *string { v := C.GoString(ptr); return &v }()
 }
 
 
@@ -1971,11 +1971,11 @@ func GetHighlightsQuery(language string) *string {
 // assert!(missing.is_none());
 // ```
 func GetInjectionsQuery(language string) *string {
-    cLanguage := C.CString(language)
-    defer C.free(unsafe.Pointer(cLanguage))
+	cLanguage := C.CString(language)
+	defer C.free(unsafe.Pointer(cLanguage))
 
-    ptr := C.ts_pack_get_injections_query(cLanguage)
-    return func() *string { v := C.GoString(ptr); return &v }()
+	ptr := C.ts_pack_get_injections_query(cLanguage)
+	return func() *string { v := C.GoString(ptr); return &v }()
 }
 
 
@@ -1995,11 +1995,11 @@ func GetInjectionsQuery(language string) *string {
 // assert!(missing.is_none());
 // ```
 func GetLocalsQuery(language string) *string {
-    cLanguage := C.CString(language)
-    defer C.free(unsafe.Pointer(cLanguage))
+	cLanguage := C.CString(language)
+	defer C.free(unsafe.Pointer(cLanguage))
 
-    ptr := C.ts_pack_get_locals_query(cLanguage)
-    return func() *string { v := C.GoString(ptr); return &v }()
+	ptr := C.ts_pack_get_locals_query(cLanguage)
+	return func() *string { v := C.GoString(ptr); return &v }()
 }
 
 
@@ -2032,22 +2032,22 @@ func GetLocalsQuery(language string) *string {
 // assert!(!matches.is_empty());
 // ```
 func RunQuery(tree *Tree, language string, query_source string, source []byte) (*[]QueryMatch, error) {
-    cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
+	cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
 
-    cLanguage := C.CString(language)
-    defer C.free(unsafe.Pointer(cLanguage))
+	cLanguage := C.CString(language)
+	defer C.free(unsafe.Pointer(cLanguage))
 
-    cQuerySource := C.CString(query_source)
-    defer C.free(unsafe.Pointer(cQuerySource))
+	cQuerySource := C.CString(query_source)
+	defer C.free(unsafe.Pointer(cQuerySource))
 
-    cSource := (*C.uint8_t)(unsafe.Pointer(&source[0]))
-    cSourceLen := C.uintptr_t(len(source))
+	cSource := (*C.uint8_t)(unsafe.Pointer(&source[0]))
+	cSourceLen := C.uintptr_t(len(source))
 
-    ptr := C.ts_pack_run_query(cTree, cLanguage, cQuerySource, cSource, cSourceLen)
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return func() *[]QueryMatch {
+	ptr := C.ts_pack_run_query(cTree, cLanguage, cQuerySource, cSource, cSourceLen)
+	if err := lastError(); err != nil {
+		return nil, err
+	}
+	return func() *[]QueryMatch {
 	if ptr == nil { return nil }
 	defer C.ts_pack_free_string(ptr)
 	var result []QueryMatch
@@ -2081,17 +2081,17 @@ func RunQuery(tree *Tree, language string, query_source string, source []byte) (
 // assert_eq!(tree.root_node().kind(), "module");
 // ```
 func GetLanguage(name string) (*Language, error) {
-    cName := C.CString(name)
-    defer C.free(unsafe.Pointer(cName))
+	cName := C.CString(name)
+	defer C.free(unsafe.Pointer(cName))
 
-    ptr := C.ts_pack_get_language(cName)
-    if err := lastError(); err != nil {
-        if ptr != nil {
-            C.ts_pack_language_free(ptr)
-        }
-        return nil, err
-    }
-    return &Language{ptr: unsafe.Pointer(ptr)}, nil
+	ptr := C.ts_pack_get_language(cName)
+	if err := lastError(); err != nil {
+		if ptr != nil {
+			C.ts_pack_language_free(ptr)
+		}
+		return nil, err
+	}
+	return &Language{ptr: unsafe.Pointer(ptr)}, nil
 }
 
 
@@ -2115,17 +2115,17 @@ func GetLanguage(name string) (*Language, error) {
 // assert!(!tree.root_node().has_error());
 // ```
 func GetParser(name string) (*Parser, error) {
-    cName := C.CString(name)
-    defer C.free(unsafe.Pointer(cName))
+	cName := C.CString(name)
+	defer C.free(unsafe.Pointer(cName))
 
-    ptr := C.ts_pack_get_parser(cName)
-    if err := lastError(); err != nil {
-        if ptr != nil {
-            C.ts_pack_parser_free(ptr)
-        }
-        return nil, err
-    }
-    return &Parser{ptr: unsafe.Pointer(ptr)}, nil
+	ptr := C.ts_pack_get_parser(cName)
+	if err := lastError(); err != nil {
+		if ptr != nil {
+			C.ts_pack_parser_free(ptr)
+		}
+		return nil, err
+	}
+	return &Parser{ptr: unsafe.Pointer(ptr)}, nil
 }
 
 
@@ -2145,8 +2145,8 @@ func GetParser(name string) (*Parser, error) {
 // }
 // ```
 func AvailableLanguages() *[]string {
-    ptr := C.ts_pack_available_languages()
-    return func() *[]string {
+	ptr := C.ts_pack_available_languages()
+	return func() *[]string {
 	if ptr == nil { return nil }
 	defer C.ts_pack_free_string(ptr)
 	var result []string
@@ -2171,11 +2171,11 @@ func AvailableLanguages() *[]string {
 // assert!(!has_language("nonexistent_language"));
 // ```
 func HasLanguage(name string) *bool {
-    cName := C.CString(name)
-    defer C.free(unsafe.Pointer(cName))
+	cName := C.CString(name)
+	defer C.free(unsafe.Pointer(cName))
 
-    ptr := C.ts_pack_has_language(cName)
-    return func() *bool { v := ptr != 0; return &v }()
+	ptr := C.ts_pack_has_language(cName)
+	return func() *bool { v := ptr != 0; return &v }()
 }
 
 
@@ -2193,8 +2193,8 @@ func HasLanguage(name string) *bool {
 // println!("{} languages available", count);
 // ```
 func LanguageCount() *uint {
-    ptr := C.ts_pack_language_count()
-    return func() *uint { v := uint(ptr); return &v }()
+	ptr := C.ts_pack_language_count()
+	return func() *uint { v := uint(ptr); return &v }()
 }
 
 
@@ -2220,27 +2220,27 @@ func LanguageCount() *uint {
 // println!("Structures: {}", result.structure.len());
 // ```
 func Process(source string, config ProcessConfig) (*ProcessResult, error) {
-    cSource := C.CString(source)
-    defer C.free(unsafe.Pointer(cSource))
+	cSource := C.CString(source)
+	defer C.free(unsafe.Pointer(cSource))
 
-    jsonBytescConfig, err := json.Marshal(config)
-    if err != nil {
-        return nil, fmt.Errorf("failed to marshal: %w", err)
-    }
-    tmpStrcConfig := C.CString(string(jsonBytescConfig))
-    cConfig := C.ts_pack_process_config_from_json(tmpStrcConfig)
-    C.free(unsafe.Pointer(tmpStrcConfig))
-    defer C.ts_pack_process_config_free(cConfig)
+	jsonBytescConfig, err := json.Marshal(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal: %w", err)
+	}
+	tmpStrcConfig := C.CString(string(jsonBytescConfig))
+	cConfig := C.ts_pack_process_config_from_json(tmpStrcConfig)
+	C.free(unsafe.Pointer(tmpStrcConfig))
+	defer C.ts_pack_process_config_free(cConfig)
 
-    ptr := C.ts_pack_process(cSource, cConfig)
-    if err := lastError(); err != nil {
-        if ptr != nil {
-            C.ts_pack_process_result_free(ptr)
-        }
-        return nil, err
-    }
-    defer C.ts_pack_process_result_free(ptr)
-    return func() *ProcessResult {
+	ptr := C.ts_pack_process(cSource, cConfig)
+	if err := lastError(); err != nil {
+		if ptr != nil {
+			C.ts_pack_process_result_free(ptr)
+		}
+		return nil, err
+	}
+	defer C.ts_pack_process_result_free(ptr)
+	return func() *ProcessResult {
 	jsonPtr := C.ts_pack_process_result_to_json(ptr)
 	if jsonPtr == nil { return nil }
 	defer C.ts_pack_free_string(jsonPtr)
@@ -2278,27 +2278,27 @@ func Process(source string, config ProcessConfig) (*ProcessResult, error) {
 // let result = extract_patterns("def hello(): pass", &config).unwrap();
 // ```
 func ExtractPatterns(source string, config ExtractionConfig) (*ExtractionResult, error) {
-    cSource := C.CString(source)
-    defer C.free(unsafe.Pointer(cSource))
+	cSource := C.CString(source)
+	defer C.free(unsafe.Pointer(cSource))
 
-    jsonBytescConfig, err := json.Marshal(config)
-    if err != nil {
-        return nil, fmt.Errorf("failed to marshal: %w", err)
-    }
-    tmpStrcConfig := C.CString(string(jsonBytescConfig))
-    cConfig := C.ts_pack_extraction_config_from_json(tmpStrcConfig)
-    C.free(unsafe.Pointer(tmpStrcConfig))
-    defer C.ts_pack_extraction_config_free(cConfig)
+	jsonBytescConfig, err := json.Marshal(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal: %w", err)
+	}
+	tmpStrcConfig := C.CString(string(jsonBytescConfig))
+	cConfig := C.ts_pack_extraction_config_from_json(tmpStrcConfig)
+	C.free(unsafe.Pointer(tmpStrcConfig))
+	defer C.ts_pack_extraction_config_free(cConfig)
 
-    ptr := C.ts_pack_extract_patterns(cSource, cConfig)
-    if err := lastError(); err != nil {
-        if ptr != nil {
-            C.ts_pack_extraction_result_free(ptr)
-        }
-        return nil, err
-    }
-    defer C.ts_pack_extraction_result_free(ptr)
-    return func() *ExtractionResult {
+	ptr := C.ts_pack_extract_patterns(cSource, cConfig)
+	if err := lastError(); err != nil {
+		if ptr != nil {
+			C.ts_pack_extraction_result_free(ptr)
+		}
+		return nil, err
+	}
+	defer C.ts_pack_extraction_result_free(ptr)
+	return func() *ExtractionResult {
 	jsonPtr := C.ts_pack_extraction_result_to_json(ptr)
 	if jsonPtr == nil { return nil }
 	defer C.ts_pack_free_string(jsonPtr)
@@ -2317,24 +2317,24 @@ func ExtractPatterns(source string, config ExtractionConfig) (*ExtractionResult,
 //
 // Returns an error if the language cannot be loaded.
 func ValidateExtraction(config ExtractionConfig) (*ValidationResult, error) {
-    jsonBytescConfig, err := json.Marshal(config)
-    if err != nil {
-        return nil, fmt.Errorf("failed to marshal: %w", err)
-    }
-    tmpStrcConfig := C.CString(string(jsonBytescConfig))
-    cConfig := C.ts_pack_extraction_config_from_json(tmpStrcConfig)
-    C.free(unsafe.Pointer(tmpStrcConfig))
-    defer C.ts_pack_extraction_config_free(cConfig)
+	jsonBytescConfig, err := json.Marshal(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal: %w", err)
+	}
+	tmpStrcConfig := C.CString(string(jsonBytescConfig))
+	cConfig := C.ts_pack_extraction_config_from_json(tmpStrcConfig)
+	C.free(unsafe.Pointer(tmpStrcConfig))
+	defer C.ts_pack_extraction_config_free(cConfig)
 
-    ptr := C.ts_pack_validate_extraction(cConfig)
-    if err := lastError(); err != nil {
-        if ptr != nil {
-            C.ts_pack_validation_result_free(ptr)
-        }
-        return nil, err
-    }
-    defer C.ts_pack_validation_result_free(ptr)
-    return func() *ValidationResult {
+	ptr := C.ts_pack_validate_extraction(cConfig)
+	if err := lastError(); err != nil {
+		if ptr != nil {
+			C.ts_pack_validation_result_free(ptr)
+		}
+		return nil, err
+	}
+	defer C.ts_pack_validation_result_free(ptr)
+	return func() *ValidationResult {
 	jsonPtr := C.ts_pack_validation_result_to_json(ptr)
 	if jsonPtr == nil { return nil }
 	defer C.ts_pack_free_string(jsonPtr)
@@ -2368,17 +2368,17 @@ func ValidateExtraction(config ExtractionConfig) (*ValidationResult, error) {
 // init(&config).unwrap();
 // ```
 func Init(config PackConfig) error {
-    jsonBytescConfig, err := json.Marshal(config)
-    if err != nil {
-        return fmt.Errorf("failed to marshal: %w", err)
-    }
-    tmpStrcConfig := C.CString(string(jsonBytescConfig))
-    cConfig := C.ts_pack_pack_config_from_json(tmpStrcConfig)
-    C.free(unsafe.Pointer(tmpStrcConfig))
-    defer C.ts_pack_pack_config_free(cConfig)
+	jsonBytescConfig, err := json.Marshal(config)
+	if err != nil {
+		return fmt.Errorf("failed to marshal: %w", err)
+	}
+	tmpStrcConfig := C.CString(string(jsonBytescConfig))
+	cConfig := C.ts_pack_pack_config_from_json(tmpStrcConfig)
+	C.free(unsafe.Pointer(tmpStrcConfig))
+	defer C.ts_pack_pack_config_free(cConfig)
 
-    C.ts_pack_init(cConfig)
-    return lastError()
+	C.ts_pack_init(cConfig)
+	return lastError()
 }
 
 
@@ -2407,17 +2407,17 @@ func Init(config PackConfig) error {
 // configure(&config).unwrap();
 // ```
 func Configure(config PackConfig) error {
-    jsonBytescConfig, err := json.Marshal(config)
-    if err != nil {
-        return fmt.Errorf("failed to marshal: %w", err)
-    }
-    tmpStrcConfig := C.CString(string(jsonBytescConfig))
-    cConfig := C.ts_pack_pack_config_from_json(tmpStrcConfig)
-    C.free(unsafe.Pointer(tmpStrcConfig))
-    defer C.ts_pack_pack_config_free(cConfig)
+	jsonBytescConfig, err := json.Marshal(config)
+	if err != nil {
+		return fmt.Errorf("failed to marshal: %w", err)
+	}
+	tmpStrcConfig := C.CString(string(jsonBytescConfig))
+	cConfig := C.ts_pack_pack_config_from_json(tmpStrcConfig)
+	C.free(unsafe.Pointer(tmpStrcConfig))
+	defer C.ts_pack_pack_config_free(cConfig)
 
-    C.ts_pack_configure(cConfig)
-    return lastError()
+	C.ts_pack_configure(cConfig)
+	return lastError()
 }
 
 
@@ -2440,18 +2440,18 @@ func Configure(config PackConfig) error {
 // println!("Downloaded {} new languages", count);
 // ```
 func Download(names []string) (*uint, error) {
-    jsonBytescNames, err := json.Marshal(names)
-    if err != nil {
-        return nil, fmt.Errorf("failed to marshal: %w", err)
-    }
-    cNames := C.CString(string(jsonBytescNames))
-    defer C.free(unsafe.Pointer(cNames))
+	jsonBytescNames, err := json.Marshal(names)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal: %w", err)
+	}
+	cNames := C.CString(string(jsonBytescNames))
+	defer C.free(unsafe.Pointer(cNames))
 
-    ptr := C.ts_pack_download(cNames)
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return func() *uint { v := uint(ptr); return &v }(), nil
+	ptr := C.ts_pack_download(cNames)
+	if err := lastError(); err != nil {
+		return nil, err
+	}
+	return func() *uint { v := uint(ptr); return &v }(), nil
 }
 
 
@@ -2472,11 +2472,11 @@ func Download(names []string) (*uint, error) {
 // println!("Downloaded {} languages", count);
 // ```
 func DownloadAll() (*uint, error) {
-    ptr := C.ts_pack_download_all()
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return func() *uint { v := uint(ptr); return &v }(), nil
+	ptr := C.ts_pack_download_all()
+	if err := lastError(); err != nil {
+		return nil, err
+	}
+	return func() *uint { v := uint(ptr); return &v }(), nil
 }
 
 
@@ -2499,11 +2499,11 @@ func DownloadAll() (*uint, error) {
 // println!("{} languages available for download", langs.len());
 // ```
 func ManifestLanguages() (*[]string, error) {
-    ptr := C.ts_pack_manifest_languages()
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return func() *[]string {
+	ptr := C.ts_pack_manifest_languages()
+	if err := lastError(); err != nil {
+		return nil, err
+	}
+	return func() *[]string {
 	if ptr == nil { return nil }
 	defer C.ts_pack_free_string(ptr)
 	var result []string
@@ -2527,8 +2527,8 @@ func ManifestLanguages() (*[]string, error) {
 // println!("{} languages already cached", langs.len());
 // ```
 func DownloadedLanguages() *[]string {
-    ptr := C.ts_pack_downloaded_languages()
-    return func() *[]string {
+	ptr := C.ts_pack_downloaded_languages()
+	return func() *[]string {
 	if ptr == nil { return nil }
 	defer C.ts_pack_free_string(ptr)
 	var result []string
@@ -2556,8 +2556,8 @@ func DownloadedLanguages() *[]string {
 // println!("Cache cleared");
 // ```
 func CleanCache() error {
-    C.ts_pack_clean_cache()
-    return lastError()
+	C.ts_pack_clean_cache()
+	return lastError()
 }
 
 
@@ -2579,15 +2579,15 @@ func CleanCache() error {
 // println!("Cache directory: {}", dir.display());
 // ```
 func CacheDir() (*string, error) {
-    ptr := C.ts_pack_cache_dir()
-    if err := lastError(); err != nil {
-        if ptr != nil {
-            C.ts_pack_free_string(ptr)
-        }
-        return nil, err
-    }
-    defer C.ts_pack_free_string(ptr)
-    return func() *string { v := C.GoString(ptr); return &v }(), nil
+	ptr := C.ts_pack_cache_dir()
+	if err := lastError(); err != nil {
+		if ptr != nil {
+			C.ts_pack_free_string(ptr)
+		}
+		return nil, err
+	}
+	defer C.ts_pack_free_string(ptr)
+	return func() *string { v := C.GoString(ptr); return &v }(), nil
 }
 
 
@@ -2609,8 +2609,8 @@ func CacheDir() (*string, error) {
 // }
 // ```
 func PackConfigDiscover() *PackConfig {
-    ptr := C.ts_pack_pack_config_discover()
-    return func() *PackConfig {
+	ptr := C.ts_pack_pack_config_discover()
+	return func() *PackConfig {
 	jsonPtr := C.ts_pack_pack_config_to_json(ptr)
 	if jsonPtr == nil { return nil }
 	defer C.ts_pack_free_string(jsonPtr)
@@ -2623,19 +2623,19 @@ func PackConfigDiscover() *PackConfig {
 
 // Enable chunking with the given maximum chunk size in bytes.
 func (r *ProcessConfig) WithChunking(max_size uint) (*ProcessConfig, error) {
-    cMaxSize := C.size_t(uint(max_size))
+	cMaxSize := C.size_t(uint(max_size))
 
-    jsonBytesRecv, err := json.Marshal(r)
-    if err != nil {
-        return nil, fmt.Errorf("failed to marshal receiver: %w", err)
-    }
-    tmpStrRecv := C.CString(string(jsonBytesRecv))
-    cRecv := C.ts_pack_process_config_from_json(tmpStrRecv)
-    C.free(unsafe.Pointer(tmpStrRecv))
-    defer C.ts_pack_process_config_free(cRecv)
-    ptr := C.ts_pack_process_config_with_chunking (cRecv, cMaxSize)
-    defer C.ts_pack_process_config_free(ptr)
-    return func() *ProcessConfig {
+	jsonBytesRecv, err := json.Marshal(r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal receiver: %w", err)
+	}
+	tmpStrRecv := C.CString(string(jsonBytesRecv))
+	cRecv := C.ts_pack_process_config_from_json(tmpStrRecv)
+	C.free(unsafe.Pointer(tmpStrRecv))
+	defer C.ts_pack_process_config_free(cRecv)
+	ptr := C.ts_pack_process_config_with_chunking (cRecv, cMaxSize)
+	defer C.ts_pack_process_config_free(ptr)
+	return func() *ProcessConfig {
 	jsonPtr := C.ts_pack_process_config_to_json(ptr)
 	if jsonPtr == nil { return nil }
 	defer C.ts_pack_free_string(jsonPtr)
@@ -2648,17 +2648,17 @@ func (r *ProcessConfig) WithChunking(max_size uint) (*ProcessConfig, error) {
 
 // Enable all analysis features.
 func (r *ProcessConfig) All() (*ProcessConfig, error) {
-    jsonBytesRecv, err := json.Marshal(r)
-    if err != nil {
-        return nil, fmt.Errorf("failed to marshal receiver: %w", err)
-    }
-    tmpStrRecv := C.CString(string(jsonBytesRecv))
-    cRecv := C.ts_pack_process_config_from_json(tmpStrRecv)
-    C.free(unsafe.Pointer(tmpStrRecv))
-    defer C.ts_pack_process_config_free(cRecv)
-    ptr := C.ts_pack_process_config_all (cRecv)
-    defer C.ts_pack_process_config_free(ptr)
-    return func() *ProcessConfig {
+	jsonBytesRecv, err := json.Marshal(r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal receiver: %w", err)
+	}
+	tmpStrRecv := C.CString(string(jsonBytesRecv))
+	cRecv := C.ts_pack_process_config_from_json(tmpStrRecv)
+	C.free(unsafe.Pointer(tmpStrRecv))
+	defer C.ts_pack_process_config_free(cRecv)
+	ptr := C.ts_pack_process_config_all (cRecv)
+	defer C.ts_pack_process_config_free(ptr)
+	return func() *ProcessConfig {
 	jsonPtr := C.ts_pack_process_config_to_json(ptr)
 	if jsonPtr == nil { return nil }
 	defer C.ts_pack_free_string(jsonPtr)
@@ -2671,17 +2671,17 @@ func (r *ProcessConfig) All() (*ProcessConfig, error) {
 
 // Disable all analysis features (only metrics computed).
 func (r *ProcessConfig) Minimal() (*ProcessConfig, error) {
-    jsonBytesRecv, err := json.Marshal(r)
-    if err != nil {
-        return nil, fmt.Errorf("failed to marshal receiver: %w", err)
-    }
-    tmpStrRecv := C.CString(string(jsonBytesRecv))
-    cRecv := C.ts_pack_process_config_from_json(tmpStrRecv)
-    C.free(unsafe.Pointer(tmpStrRecv))
-    defer C.ts_pack_process_config_free(cRecv)
-    ptr := C.ts_pack_process_config_minimal (cRecv)
-    defer C.ts_pack_process_config_free(ptr)
-    return func() *ProcessConfig {
+	jsonBytesRecv, err := json.Marshal(r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal receiver: %w", err)
+	}
+	tmpStrRecv := C.CString(string(jsonBytesRecv))
+	cRecv := C.ts_pack_process_config_from_json(tmpStrRecv)
+	C.free(unsafe.Pointer(tmpStrRecv))
+	defer C.ts_pack_process_config_free(cRecv)
+	ptr := C.ts_pack_process_config_minimal (cRecv)
+	defer C.ts_pack_process_config_free(ptr)
+	return func() *ProcessConfig {
 	jsonPtr := C.ts_pack_process_config_to_json(ptr)
 	if jsonPtr == nil { return nil }
 	defer C.ts_pack_free_string(jsonPtr)
@@ -2702,10 +2702,10 @@ func (r *ProcessConfig) Minimal() (*ProcessConfig, error) {
 // mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
 // immutable while the directory list is updated.
 func (r *LanguageRegistry) AddExtraLibsDir(dir string) {
-    cDir := C.CString(dir)
-    defer C.free(unsafe.Pointer(cDir))
+	cDir := C.CString(dir)
+	defer C.free(unsafe.Pointer(cDir))
 
-    C.ts_pack_language_registry_add_extra_libs_dir ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cDir)
+	C.ts_pack_language_registry_add_extra_libs_dir ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cDir)
 }
 
 
@@ -2720,14 +2720,14 @@ func (r *LanguageRegistry) AddExtraLibsDir(dir string) {
 // Returns [`Error::LanguageNotFound`] if the name (after alias resolution)
 // does not match any known grammar.
 func (r *LanguageRegistry) GetLanguage(name string) (*Language, error) {
-    cName := C.CString(name)
-    defer C.free(unsafe.Pointer(cName))
+	cName := C.CString(name)
+	defer C.free(unsafe.Pointer(cName))
 
-    ptr := C.ts_pack_language_registry_get_language ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cName)
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    return &Language{ptr: unsafe.Pointer(ptr)}, nil
+	ptr := C.ts_pack_language_registry_get_language ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cName)
+	if err := lastError(); err != nil {
+		return nil, err
+	}
+	return &Language{ptr: unsafe.Pointer(ptr)}, nil
 }
 
 
@@ -2736,8 +2736,8 @@ func (r *LanguageRegistry) GetLanguage(name string) (*Language, error) {
 // Includes statically compiled languages, dynamically loadable languages
 // (if the `dynamic-loading` feature is enabled), and all configured aliases.
 func (r *LanguageRegistry) AvailableLanguages() *[]string {
-    ptr := C.ts_pack_language_registry_available_languages ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)))
-    return func() *[]string {
+	ptr := C.ts_pack_language_registry_available_languages ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)))
+	return func() *[]string {
 	if ptr == nil { return nil }
 	defer C.ts_pack_free_string(ptr)
 	var result []string
@@ -2752,41 +2752,41 @@ func (r *LanguageRegistry) AvailableLanguages() *[]string {
 // Returns `true` if the language can be loaded, either from the static
 // table or from a dynamic library on disk.
 func (r *LanguageRegistry) HasLanguage(name string) *bool {
-    cName := C.CString(name)
-    defer C.free(unsafe.Pointer(cName))
+	cName := C.CString(name)
+	defer C.free(unsafe.Pointer(cName))
 
-    ptr := C.ts_pack_language_registry_has_language ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cName)
-    return func() *bool { v := ptr != 0; return &v }()
+	ptr := C.ts_pack_language_registry_has_language ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cName)
+	return func() *bool { v := ptr != 0; return &v }()
 }
 
 
 // Return the total number of available languages (including aliases).
 func (r *LanguageRegistry) LanguageCount() *uint {
-    ptr := C.ts_pack_language_registry_language_count ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)))
-    return func() *uint { v := uint(ptr); return &v }()
+	ptr := C.ts_pack_language_registry_language_count ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)))
+	return func() *uint { v := uint(ptr); return &v }()
 }
 
 
 // Parse source code and extract file intelligence based on config in a single pass.
 func (r *LanguageRegistry) Process(source string, config ProcessConfig) (*ProcessResult, error) {
-    cSource := C.CString(source)
-    defer C.free(unsafe.Pointer(cSource))
+	cSource := C.CString(source)
+	defer C.free(unsafe.Pointer(cSource))
 
-    jsonBytescConfig, err := json.Marshal(config)
-    if err != nil {
-        return nil, fmt.Errorf("failed to marshal: %w", err)
-    }
-    tmpStrcConfig := C.CString(string(jsonBytescConfig))
-    cConfig := C.ts_pack_process_config_from_json(tmpStrcConfig)
-    C.free(unsafe.Pointer(tmpStrcConfig))
-    defer C.ts_pack_process_config_free(cConfig)
+	jsonBytescConfig, err := json.Marshal(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal: %w", err)
+	}
+	tmpStrcConfig := C.CString(string(jsonBytescConfig))
+	cConfig := C.ts_pack_process_config_from_json(tmpStrcConfig)
+	C.free(unsafe.Pointer(tmpStrcConfig))
+	defer C.ts_pack_process_config_free(cConfig)
 
-    ptr := C.ts_pack_language_registry_process ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cSource, cConfig)
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    defer C.ts_pack_process_result_free(ptr)
-    return func() *ProcessResult {
+	ptr := C.ts_pack_language_registry_process ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cSource, cConfig)
+	if err := lastError(); err != nil {
+		return nil, err
+	}
+	defer C.ts_pack_process_result_free(ptr)
+	return func() *ProcessResult {
 	jsonPtr := C.ts_pack_process_result_to_json(ptr)
 	if jsonPtr == nil { return nil }
 	defer C.ts_pack_free_string(jsonPtr)
@@ -2799,33 +2799,33 @@ func (r *LanguageRegistry) Process(source string, config ProcessConfig) (*Proces
 
 // Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
 func DownloadManagerDefaultCacheDir(version string) (*string, error) {
-    cVersion := C.CString(version)
-    defer C.free(unsafe.Pointer(cVersion))
+	cVersion := C.CString(version)
+	defer C.free(unsafe.Pointer(cVersion))
 
-    ptr := C.ts_pack_download_manager_default_cache_dir (cVersion)
-    if err := lastError(); err != nil {
-        if ptr != nil {
-            C.ts_pack_free_string(ptr)
-        }
-        return nil, err
-    }
-    defer C.ts_pack_free_string(ptr)
-    return func() *string { v := C.GoString(ptr); return &v }(), nil
+	ptr := C.ts_pack_download_manager_default_cache_dir (cVersion)
+	if err := lastError(); err != nil {
+		if ptr != nil {
+			C.ts_pack_free_string(ptr)
+		}
+		return nil, err
+	}
+	defer C.ts_pack_free_string(ptr)
+	return func() *string { v := C.GoString(ptr); return &v }(), nil
 }
 
 
 // Return the path to the libs cache directory.
 func (r *DownloadManager) CacheDir() *string {
-    ptr := C.ts_pack_download_manager_cache_dir ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
-    defer C.ts_pack_free_string(ptr)
-    return func() *string { v := C.GoString(ptr); return &v }()
+	ptr := C.ts_pack_download_manager_cache_dir ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
+	defer C.ts_pack_free_string(ptr)
+	return func() *string { v := C.GoString(ptr); return &v }()
 }
 
 
 // List languages that are already downloaded and cached.
 func (r *DownloadManager) InstalledLanguages() *[]string {
-    ptr := C.ts_pack_download_manager_installed_languages ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
-    return func() *[]string {
+	ptr := C.ts_pack_download_manager_installed_languages ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
+	return func() *[]string {
 	if ptr == nil { return nil }
 	defer C.ts_pack_free_string(ptr)
 	var result []string
@@ -2838,47 +2838,47 @@ func (r *DownloadManager) InstalledLanguages() *[]string {
 // Ensure the specified languages are available in the cache.
 // Downloads the platform bundle if any requested languages are missing.
 func (r *DownloadManager) EnsureLanguages(names []string) error {
-    jsonBytescNames, err := json.Marshal(names)
-    if err != nil {
-        return fmt.Errorf("failed to marshal: %w", err)
-    }
-    cNames := C.CString(string(jsonBytescNames))
-    defer C.free(unsafe.Pointer(cNames))
+	jsonBytescNames, err := json.Marshal(names)
+	if err != nil {
+		return fmt.Errorf("failed to marshal: %w", err)
+	}
+	cNames := C.CString(string(jsonBytescNames))
+	defer C.free(unsafe.Pointer(cNames))
 
-    C.ts_pack_download_manager_ensure_languages ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)), cNames)
-    return lastError()
+	C.ts_pack_download_manager_ensure_languages ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)), cNames)
+	return lastError()
 }
 
 
 // Ensure all languages in a named group are available.
 func (r *DownloadManager) EnsureGroup(group string) error {
-    cGroup := C.CString(group)
-    defer C.free(unsafe.Pointer(cGroup))
+	cGroup := C.CString(group)
+	defer C.free(unsafe.Pointer(cGroup))
 
-    C.ts_pack_download_manager_ensure_group ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)), cGroup)
-    return lastError()
+	C.ts_pack_download_manager_ensure_group ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)), cGroup)
+	return lastError()
 }
 
 
 // Get the expected path for a language's shared library in the cache.
 func (r *DownloadManager) LibPath(name string) *string {
-    cName := C.CString(name)
-    defer C.free(unsafe.Pointer(cName))
+	cName := C.CString(name)
+	defer C.free(unsafe.Pointer(cName))
 
-    ptr := C.ts_pack_download_manager_lib_path ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)), cName)
-    defer C.ts_pack_free_string(ptr)
-    return func() *string { v := C.GoString(ptr); return &v }()
+	ptr := C.ts_pack_download_manager_lib_path ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)), cName)
+	defer C.ts_pack_free_string(ptr)
+	return func() *string { v := C.GoString(ptr); return &v }()
 }
 
 
 // Fetch the parser manifest from GitHub Releases.
 func (r *DownloadManager) FetchManifest() (*ParserManifest, error) {
-    ptr := C.ts_pack_download_manager_fetch_manifest ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
-    if err := lastError(); err != nil {
-        return nil, err
-    }
-    defer C.ts_pack_parser_manifest_free(ptr)
-    return func() *ParserManifest {
+	ptr := C.ts_pack_download_manager_fetch_manifest ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
+	if err := lastError(); err != nil {
+		return nil, err
+	}
+	defer C.ts_pack_parser_manifest_free(ptr)
+	return func() *ParserManifest {
 	jsonPtr := C.ts_pack_parser_manifest_to_json(ptr)
 	if jsonPtr == nil { return nil }
 	defer C.ts_pack_free_string(jsonPtr)
@@ -2891,6 +2891,6 @@ func (r *DownloadManager) FetchManifest() (*ParserManifest, error) {
 
 // Remove all cached parser libraries.
 func (r *DownloadManager) CleanCache() error {
-    C.ts_pack_download_manager_clean_cache ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
-    return lastError()
+	C.ts_pack_download_manager_clean_cache ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
+	return lastError()
 }

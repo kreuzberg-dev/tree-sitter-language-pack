@@ -313,7 +313,7 @@ impl Span {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[pyclass(frozen, from_py_object)]
 #[allow(clippy::similar_names)]
 pub struct ProcessResult {
@@ -322,6 +322,7 @@ pub struct ProcessResult {
     #[pyo3(get)]
     pub metrics: FileMetrics,
     #[pyo3(get)]
+    #[serde(skip)]
     pub structure: Vec<StructureItem>,
     #[pyo3(get)]
     pub imports: Vec<ImportInfo>,
@@ -330,12 +331,15 @@ pub struct ProcessResult {
     #[pyo3(get)]
     pub comments: Vec<CommentInfo>,
     #[pyo3(get)]
+    #[serde(skip)]
     pub docstrings: Vec<DocstringInfo>,
     #[pyo3(get)]
+    #[serde(skip)]
     pub symbols: Vec<SymbolInfo>,
     #[pyo3(get)]
     pub diagnostics: Vec<Diagnostic>,
     #[pyo3(get)]
+    #[serde(skip)]
     pub chunks: Vec<CodeChunk>,
     /// Results of custom extraction patterns (when `config.extractions` is set).
     #[pyo3(get)]
@@ -427,10 +431,11 @@ impl FileMetrics {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[pyclass(frozen, from_py_object)]
 pub struct StructureItem {
     #[pyo3(get)]
+    #[serde(skip)]
     pub kind: StructureKind,
     #[pyo3(get)]
     pub name: Option<String>,
@@ -439,6 +444,7 @@ pub struct StructureItem {
     #[pyo3(get)]
     pub span: Span,
     #[pyo3(get)]
+    #[serde(skip)]
     pub children: Vec<StructureItem>,
     #[pyo3(get)]
     pub decorators: Vec<String>,
@@ -514,12 +520,13 @@ impl CommentInfo {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[pyclass(frozen, from_py_object)]
 pub struct DocstringInfo {
     #[pyo3(get)]
     pub text: String,
     #[pyo3(get)]
+    #[serde(skip)]
     pub format: DocstringFormat,
     #[pyo3(get)]
     pub span: Span,
@@ -638,12 +645,13 @@ impl ExportInfo {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[pyclass(frozen, from_py_object)]
 pub struct SymbolInfo {
     #[pyo3(get)]
     pub name: String,
     #[pyo3(get)]
+    #[serde(skip)]
     pub kind: SymbolKind,
     #[pyo3(get)]
     pub span: Span,
@@ -700,7 +708,7 @@ impl Diagnostic {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[pyclass(frozen, from_py_object)]
 pub struct CodeChunk {
     #[pyo3(get)]
@@ -714,6 +722,7 @@ pub struct CodeChunk {
     #[pyo3(get)]
     pub end_line: usize,
     #[pyo3(get)]
+    #[serde(skip)]
     pub metadata: ChunkContext,
 }
 
@@ -741,7 +750,7 @@ impl CodeChunk {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 #[pyclass(frozen, from_py_object)]
 pub struct ChunkContext {
     #[pyo3(get)]
@@ -759,6 +768,7 @@ pub struct ChunkContext {
     #[pyo3(get)]
     pub comments: Vec<CommentInfo>,
     #[pyo3(get)]
+    #[serde(skip)]
     pub docstrings: Vec<DocstringInfo>,
     #[pyo3(get)]
     pub has_error_nodes: bool,
