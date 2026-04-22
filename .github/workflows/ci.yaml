@@ -170,7 +170,6 @@ jobs:
         with:
           ruby-version: "3.4"
           bundler-cache: true
-          working-directory: packages/ruby
 
       # --- Go ---
       - name: Setup Go
@@ -1120,7 +1119,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
-          working-directory: packages/ruby
 
       - name: Install Ruby dependencies
         working-directory: packages/ruby
