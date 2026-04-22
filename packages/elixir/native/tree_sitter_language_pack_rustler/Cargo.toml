@@ -1,6 +1,6 @@
 [package]
 name = "tree_sitter_language_pack_rustler"
-version = "1.6.3"
+version = "1.7.0"
 edition = "2024"
 license = "MIT"
 description = "Pre-compiled tree-sitter grammars for 305 programming languages"
@@ -14,9 +14,9 @@ crate-type = ["cdylib"]
 [dependencies]
 tree-sitter-language-pack = { path = "../../../../crates/ts-pack-core", features = ["download", "serde", "config"] }
 rustler = "0.37"
-serde = { version = "1", features = ["derive"] }
+serde = { version = "1.7.0", features = ["derive"] }
 serde_json = "1"
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1.7.0", features = ["full"] }
 
 [package.metadata.cargo-machete]
 ignored = ["tokio"]

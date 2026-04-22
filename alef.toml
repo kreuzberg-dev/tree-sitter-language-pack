@@ -118,7 +118,7 @@ package_name = "@kreuzberg/tree-sitter-language-pack"
 [ffi]
 prefix = "ts_pack"
 header_name = "ts_pack.h"
-lib_name = "ts_pack_ffi"
+lib_name = "ts_pack_core_ffi"
 
 [go]
 module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
@@ -204,6 +204,16 @@ replace = 'tree-sitter-language-pack = { version = "{version}"'
 path = "test_apps/ruby/Gemfile"
 search = "gem 'tree_sitter_language_pack', '[^']*'"
 replace = "gem 'tree_sitter_language_pack', '{version}'"
+
+[[sync.text_replacements]]
+path = "packages/elixir/native/tree_sitter_language_pack_rustler/Cargo.toml"
+search = 'version = "[^"]*"'
+replace = 'version = "{version}"'
+
+[[sync.text_replacements]]
+path = "packages/elixir/native/tree_sitter_language_pack_nif/Cargo.toml"
+search = 'version = "[^"]*"'
+replace = 'version = "{version}"'
 
 [test.python]
 command = "task python:test"
