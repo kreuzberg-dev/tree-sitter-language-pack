@@ -6,7 +6,16 @@
     clippy::let_unit_value,
     clippy::needless_borrow,
     clippy::map_identity,
-    clippy::just_underscores_and_digits
+    clippy::just_underscores_and_digits,
+    clippy::unused_unit
+)]
+#![allow(
+    clippy::unnecessary_cast,
+    clippy::unused_unit,
+    clippy::unwrap_or_default,
+    clippy::derivable_impls,
+    clippy::needless_borrows_for_generic_args,
+    clippy::unnecessary_fallible_conversions
 )]
 
 use rustler::ResourceArc;
@@ -819,44 +828,8 @@ pub fn detect_language_from_path(path: String) -> Option<String> {
 }
 
 #[rustler::nif]
-pub fn extension_ambiguity(ext: String) -> Option<String> {
-    None
-}
-
-#[rustler::nif]
 pub fn detect_language_from_content(content: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_content(&content)
-}
-
-#[rustler::nif]
-pub fn validate_extraction(config: Option<String>) -> Result<ValidationResult, String> {
-    let config_core: Option<tree_sitter_language_pack::ExtractionConfig> = config
-        .map(|s| serde_json::from_str::<tree_sitter_language_pack::ExtractionConfig>(&s))
-        .transpose()
-        .map_err(|e| e.to_string())?;
-    let result =
-        tree_sitter_language_pack::extract::validate_extraction(config_core.as_ref().unwrap_or(&Default::default()))
-            .map_err(|e| e.to_string())?;
-    Ok(result.into())
-}
-
-#[rustler::nif]
-pub fn process(
-    source: String,
-    config: Option<String>,
-    registry: ResourceArc<LanguageRegistry>,
-) -> Result<ProcessResult, String> {
-    let config_core: Option<tree_sitter_language_pack::ProcessConfig> = config
-        .map(|s| serde_json::from_str::<tree_sitter_language_pack::ProcessConfig>(&s))
-        .transpose()
-        .map_err(|e| e.to_string())?;
-    let result = tree_sitter_language_pack::intel::process(
-        &source,
-        config_core.as_ref().unwrap_or(&Default::default()),
-        &registry.inner,
-    )
-    .map_err(|e| e.to_string())?;
-    Ok(result.into())
 }
 
 #[rustler::nif]
@@ -936,11 +909,6 @@ pub fn run_query(
 }
 
 #[rustler::nif]
-pub fn split_code(source: String, tree: ResourceArc<Tree>, max_chunk_size: usize) -> Vec<String> {
-    Vec::new()
-}
-
-#[rustler::nif]
 pub fn get_language(name: String) -> Result<ResourceArc<Language>, String> {
     let result = tree_sitter_language_pack::get_language(&name).map_err(|e| e.to_string())?;
     Ok(ResourceArc::new(Language {
@@ -972,6 +940,17 @@ pub fn language_count() -> usize {
 }
 
 #[rustler::nif]
+pub fn process(source: String, config: Option<String>) -> Result<ProcessResult, String> {
+    let config_core: Option<tree_sitter_language_pack::ProcessConfig> = config
+        .map(|s| serde_json::from_str::<tree_sitter_language_pack::ProcessConfig>(&s))
+        .transpose()
+        .map_err(|e| e.to_string())?;
+    let result = tree_sitter_language_pack::process(&source, config_core.as_ref().unwrap_or(&Default::default()))
+        .map_err(|e| e.to_string())?;
+    Ok(result.into())
+}
+
+#[rustler::nif]
 pub fn extract_patterns(source: String, config: Option<String>) -> Result<ExtractionResult, String> {
     let config_core: Option<tree_sitter_language_pack::ExtractionConfig> = config
         .map(|s| serde_json::from_str::<tree_sitter_language_pack::ExtractionConfig>(&s))
@@ -980,6 +959,17 @@ pub fn extract_patterns(source: String, config: Option<String>) -> Result<Extrac
     let result =
         tree_sitter_language_pack::extract_patterns(&source, config_core.as_ref().unwrap_or(&Default::default()))
             .map_err(|e| e.to_string())?;
+    Ok(result.into())
+}
+
+#[rustler::nif]
+pub fn validate_extraction(config: Option<String>) -> Result<ValidationResult, String> {
+    let config_core: Option<tree_sitter_language_pack::ExtractionConfig> = config
+        .map(|s| serde_json::from_str::<tree_sitter_language_pack::ExtractionConfig>(&s))
+        .transpose()
+        .map_err(|e| e.to_string())?;
+    let result = tree_sitter_language_pack::validate_extraction(config_core.as_ref().unwrap_or(&Default::default()))
+        .map_err(|e| e.to_string())?;
     Ok(result.into())
 }
 
@@ -1007,7 +997,8 @@ pub fn configure(config: Option<String>) -> Result<(), String> {
 
 #[rustler::nif]
 pub fn download(names: Vec<String>) -> Result<usize, String> {
-    Err(String::from("Not implemented: download"))
+    let result = tree_sitter_language_pack::download(&names).map_err(|e| e.to_string())?;
+    Ok(result)
 }
 
 #[rustler::nif]
@@ -1777,7 +1768,7 @@ impl From<tree_sitter_language_pack::QueryMatch> for QueryMatch {
     fn from(val: tree_sitter_language_pack::QueryMatch) -> Self {
         Self {
             pattern_index: val.pattern_index,
-            captures: val.captures.iter().map(|i| i.to_string()).collect(),
+            captures: val.captures.iter().map(|i| format!("{:?}", i)).collect(),
         }
     }
 }

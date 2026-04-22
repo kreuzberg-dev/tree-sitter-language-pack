@@ -32,50 +32,53 @@
 //! - [`error`] - Error types
 
 pub mod error;
-pub mod extensions;
-pub mod extract;
-pub mod intel;
+pub(crate) mod extensions;
+pub(crate) mod extract;
+pub(crate) mod intel;
 #[cfg(feature = "serde")]
-pub mod json_utils;
-pub mod node;
+pub(crate) mod json_utils;
+pub(crate) mod node;
 pub mod pack_config;
-pub mod parse;
+pub(crate) mod parse;
 pub mod process_config;
-pub mod queries;
-pub mod query;
+pub(crate) mod queries;
+pub(crate) mod query;
 pub mod registry;
-pub mod text_splitter;
+pub(crate) mod text_splitter;
 
 #[cfg(feature = "config")]
-pub mod config;
+pub(crate) mod config;
 #[cfg(feature = "config")]
-pub mod definitions;
+pub(crate) mod definitions;
 #[cfg(feature = "download")]
 pub mod download;
 
+// ── Public API re-exports ────────────────────────────────────────────────────
+// Only items that are part of the polyglot binding surface are re-exported here.
+// Internal helpers, tuple-returning functions, and implementation details stay
+// behind pub(crate) modules.
+
 pub use error::Error;
-#[cfg(feature = "serde")]
-pub use extensions::extension_ambiguity_json;
-pub use extensions::{
-    detect_language_from_content, detect_language_from_extension, detect_language_from_path, extension_ambiguity,
-};
+pub use extensions::{detect_language_from_content, detect_language_from_extension, detect_language_from_path};
 pub use extract::{
-    CaptureOutput, CaptureResult, CompiledExtraction, ExtractionConfig, ExtractionPattern, ExtractionResult,
-    MatchResult, PatternResult, PatternValidation, ValidationResult,
+    CaptureOutput, CaptureResult, ExtractionConfig, ExtractionPattern, ExtractionResult, MatchResult, PatternResult,
+    PatternValidation, ValidationResult,
 };
+// Re-exported for benchmarks only — not part of the polyglot binding surface.
+#[doc(hidden)]
+pub use extract::CompiledExtraction;
 pub use intel::types::{
     ChunkContext, CodeChunk, CommentInfo, CommentKind, Diagnostic, DiagnosticSeverity, DocSection, DocstringFormat,
     DocstringInfo, ExportInfo, ExportKind, FileMetrics, ImportInfo, ProcessResult, Span, StructureItem, StructureKind,
     SymbolInfo, SymbolKind,
 };
-pub use node::{NodeInfo, extract_text, find_nodes_by_type, named_children_info, node_info_from_node, root_node_info};
+pub use node::{NodeInfo, find_nodes_by_type, named_children_info, root_node_info};
 pub use pack_config::PackConfig;
 pub use parse::{parse_string, tree_contains_node_type, tree_error_count, tree_has_error_nodes, tree_to_sexp};
 pub use process_config::ProcessConfig;
 pub use queries::{get_highlights_query, get_injections_query, get_locals_query};
 pub use query::{QueryMatch, run_query};
 pub use registry::LanguageRegistry;
-pub use text_splitter::split_code;
 pub use tree_sitter::{Language, Parser, Tree};
 
 #[cfg(feature = "download")]

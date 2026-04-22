@@ -48,3 +48,10 @@ criterion = { workspace = true }
 [[bench]]
 name = "benchmarks"
 harness = false
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+duplicated_attributes = "allow"
+
+[lints.rust]
+unsafe_code = "allow"

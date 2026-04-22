@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from ._native import (
         ExtractionResult,
         Language,
-        LanguageRegistry,
         NodeInfo,
         PackConfig,
         Parser,
@@ -22,16 +21,6 @@ if TYPE_CHECKING:
         ValidationResult,
     )
     from .options import ExtractionConfig
-
-
-def _to_rust_extraction_config(value: ExtractionConfig | None) -> _rust.ExtractionConfig | None:
-    """Convert Python ExtractionConfig to Rust binding type."""
-    if value is None:
-        return None
-    return _rust.ExtractionConfig(
-        language=value.language,
-        patterns=value.patterns,
-    )
 
 
 def _to_rust_process_config(value: ProcessConfig | None) -> _rust.ProcessConfig | None:
@@ -52,11 +41,14 @@ def _to_rust_process_config(value: ProcessConfig | None) -> _rust.ProcessConfig 
     )
 
 
-def _to_rust_language_registry(value: LanguageRegistry | None) -> _rust.LanguageRegistry | None:
-    """Convert Python LanguageRegistry to Rust binding type."""
+def _to_rust_extraction_config(value: ExtractionConfig | None) -> _rust.ExtractionConfig | None:
+    """Convert Python ExtractionConfig to Rust binding type."""
     if value is None:
         return None
-    return _rust.LanguageRegistry()
+    return _rust.ExtractionConfig(
+        language=value.language,
+        patterns=value.patterns,
+    )
 
 
 def _to_rust_pack_config(value: PackConfig | None) -> _rust.PackConfig | None:
@@ -80,27 +72,9 @@ def detect_language_from_path(path: str) -> str | None:
     return _rust.detect_language_from_path(path)
 
 
-def extension_ambiguity(ext: str) -> str | None:
-    """Check if a file extension is ambiguous — i.e. it could reasonably belong to."""
-    return _rust.extension_ambiguity(ext)
-
-
 def detect_language_from_content(content: str) -> str | None:
     """Detect language name from file content using the shebang line (`#!`)."""
     return _rust.detect_language_from_content(content)
-
-
-def validate_extraction(config: ExtractionConfig) -> ValidationResult:
-    """Validate an extraction config without running it."""
-    _rust_config = _to_rust_extraction_config(config)
-    return _rust.validate_extraction(_rust_config)
-
-
-def process(source: str, config: ProcessConfig, registry: LanguageRegistry) -> ProcessResult:
-    """Process source code: parse once, extract intelligence based on config, and return it."""
-    _rust_config = _to_rust_process_config(config)
-    _rust_registry = _to_rust_language_registry(registry)
-    return _rust.process(source, _rust_config, _rust_registry)
 
 
 def root_node_info(tree: Tree) -> NodeInfo:
@@ -163,11 +137,6 @@ def run_query(tree: Tree, language: str, query_source: str, source: bytes) -> li
     return _rust.run_query(tree, language, query_source, source)
 
 
-def split_code(source: str, tree: Tree, max_chunk_size: int) -> list[str]:
-    """Split source code into chunks using tree-sitter AST structure for intelligent boundaries."""
-    return _rust.split_code(source, tree, max_chunk_size)
-
-
 def get_language(name: str) -> Language:
     """Get a tree-sitter [`Language`] by name using the global registry."""
     return _rust.get_language(name)
@@ -193,22 +162,34 @@ def language_count() -> int:
     return _rust.language_count()
 
 
+def process(source: str, config: ProcessConfig) -> ProcessResult:
+    """Process source code and extract file intelligence using the global registry."""
+    _rust_config = _to_rust_process_config(config)
+    return _rust.process(source, _rust_config)  # type: ignore[arg-type]
+
+
 def extract_patterns(source: str, config: ExtractionConfig) -> ExtractionResult:
     """Run extraction patterns against source code."""
     _rust_config = _to_rust_extraction_config(config)
-    return _rust.extract_patterns(source, _rust_config)
+    return _rust.extract_patterns(source, _rust_config)  # type: ignore[arg-type]
+
+
+def validate_extraction(config: ExtractionConfig) -> ValidationResult:
+    """Validate extraction patterns without running them."""
+    _rust_config = _to_rust_extraction_config(config)
+    return _rust.validate_extraction(_rust_config)  # type: ignore[arg-type]
 
 
 def init(config: PackConfig) -> None:
     """Initialize the language pack with the given configuration."""
     _rust_config = _to_rust_pack_config(config)
-    return _rust.init(_rust_config)
+    return _rust.init(_rust_config)  # type: ignore[arg-type]
 
 
 def configure(config: PackConfig) -> None:
     """Apply download configuration without downloading anything."""
     _rust_config = _to_rust_pack_config(config)
-    return _rust.configure(_rust_config)
+    return _rust.configure(_rust_config)  # type: ignore[arg-type]
 
 
 def download(names: list[str]) -> int:

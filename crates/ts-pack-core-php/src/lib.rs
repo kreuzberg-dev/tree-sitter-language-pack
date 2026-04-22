@@ -6,6 +6,14 @@
     clippy::map_identity,
     clippy::just_underscores_and_digits
 )]
+#![allow(
+    clippy::unnecessary_cast,
+    clippy::unused_unit,
+    clippy::unwrap_or_default,
+    clippy::derivable_impls,
+    clippy::needless_borrows_for_generic_args,
+    clippy::unnecessary_fallible_conversions
+)]
 
 use ext_php_rs::prelude::*;
 use std::collections::HashMap;
@@ -936,7 +944,7 @@ pub struct LanguageRegistry {
 
 #[php_impl]
 impl LanguageRegistry {
-    pub fn add_extra_libs_dir(&self, dir: String) -> () {
+    pub fn add_extra_libs_dir(&self, dir: String) {
         self.inner.add_extra_libs_dir(std::path::PathBuf::from(dir))
     }
 
@@ -1225,26 +1233,8 @@ impl TreeSitterLanguagePackApi {
         tree_sitter_language_pack::detect_language_from_path(&path).map(Into::into)
     }
 
-    pub fn extension_ambiguity(ext: String) -> Option<String> {
-        tree_sitter_language_pack::extension_ambiguity(&ext).map(|(name, _)| name.to_string())
-    }
-
     pub fn detect_language_from_content(content: String) -> Option<String> {
         tree_sitter_language_pack::detect_language_from_content(&content).map(Into::into)
-    }
-
-    pub fn validate_extraction(config: &ExtractionConfig) -> PhpResult<ValidationResult> {
-        let config_core: tree_sitter_language_pack::ExtractionConfig = config.clone().into();
-        let result = tree_sitter_language_pack::extract::validate_extraction(&config_core)
-            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
-        Ok(result.into())
-    }
-
-    pub fn process(source: String, config: &ProcessConfig, registry: &LanguageRegistry) -> PhpResult<ProcessResult> {
-        let config_core: tree_sitter_language_pack::ProcessConfig = config.clone().into();
-        let result = tree_sitter_language_pack::intel::process(&source, &config_core, &registry.inner)
-            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
-        Ok(result.into())
     }
 
     pub fn root_node_info(tree: &Tree) -> NodeInfo {
@@ -1312,13 +1302,6 @@ impl TreeSitterLanguagePackApi {
         Ok(result.into_iter().map(Into::into).collect())
     }
 
-    pub fn split_code(source: String, tree: &Tree, max_chunk_size: i64) -> Vec<String> {
-        tree_sitter_language_pack::split_code(&source, &tree.inner, max_chunk_size as usize)
-            .into_iter()
-            .map(|(start, end)| source[start..end].to_string())
-            .collect()
-    }
-
     pub fn get_language(name: String) -> PhpResult<Language> {
         let result = tree_sitter_language_pack::get_language(&name)
             .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
@@ -1347,22 +1330,46 @@ impl TreeSitterLanguagePackApi {
         tree_sitter_language_pack::language_count() as i64
     }
 
+    pub fn process(source: String, config: &ProcessConfig) -> PhpResult<ProcessResult> {
+        let config_json = serde_json::to_string(&config).map_err(|e| format!("{e}"))?;
+        let config_core: tree_sitter_language_pack::ProcessConfig =
+            serde_json::from_str(&config_json).map_err(|e| format!("{e}"))?;
+        let result = tree_sitter_language_pack::process(&source, &config_core)
+            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
+        Ok(result.into())
+    }
+
     pub fn extract_patterns(source: String, config: &ExtractionConfig) -> PhpResult<ExtractionResult> {
-        let config_core: tree_sitter_language_pack::ExtractionConfig = config.clone().into();
+        let config_json = serde_json::to_string(&config).map_err(|e| format!("{e}"))?;
+        let config_core: tree_sitter_language_pack::ExtractionConfig =
+            serde_json::from_str(&config_json).map_err(|e| format!("{e}"))?;
         let result = tree_sitter_language_pack::extract_patterns(&source, &config_core)
             .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
         Ok(result.into())
     }
 
+    pub fn validate_extraction(config: &ExtractionConfig) -> PhpResult<ValidationResult> {
+        let config_json = serde_json::to_string(&config).map_err(|e| format!("{e}"))?;
+        let config_core: tree_sitter_language_pack::ExtractionConfig =
+            serde_json::from_str(&config_json).map_err(|e| format!("{e}"))?;
+        let result = tree_sitter_language_pack::validate_extraction(&config_core)
+            .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
+        Ok(result.into())
+    }
+
     pub fn init(config: &PackConfig) -> PhpResult<()> {
-        let config_core: tree_sitter_language_pack::PackConfig = config.clone().into();
+        let config_json = serde_json::to_string(&config).map_err(|e| format!("{e}"))?;
+        let config_core: tree_sitter_language_pack::PackConfig =
+            serde_json::from_str(&config_json).map_err(|e| format!("{e}"))?;
         let result = tree_sitter_language_pack::init(&config_core)
             .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
         Ok(result)
     }
 
     pub fn configure(config: &PackConfig) -> PhpResult<()> {
-        let config_core: tree_sitter_language_pack::PackConfig = config.clone().into();
+        let config_json = serde_json::to_string(&config).map_err(|e| format!("{e}"))?;
+        let config_core: tree_sitter_language_pack::PackConfig =
+            serde_json::from_str(&config_json).map_err(|e| format!("{e}"))?;
         let result = tree_sitter_language_pack::configure(&config_core)
             .map_err(|e| ext_php_rs::exception::PhpException::default(e.to_string()))?;
         Ok(result)
@@ -1917,7 +1924,7 @@ impl From<tree_sitter_language_pack::QueryMatch> for QueryMatch {
     fn from(val: tree_sitter_language_pack::QueryMatch) -> Self {
         Self {
             pattern_index: val.pattern_index as i64,
-            captures: val.captures.iter().map(|(name, info)| format!("{}:{:?}", name, info)).collect(),
+            captures: val.captures.iter().map(|i| format!("{:?}", i)).collect(),
         }
     }
 }

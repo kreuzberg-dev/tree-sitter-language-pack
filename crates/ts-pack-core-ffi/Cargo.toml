@@ -9,6 +9,9 @@ keywords = ["tree-sitter", "parser", "syntax", "language-pack"]
 categories = ["text-processing"]
 repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
 
+[package.metadata.cargo-machete]
+ignored = ["tokio"]
+
 [lib]
 crate-type = ["cdylib", "staticlib"]
 
@@ -22,3 +25,10 @@ tree-sitter-language-pack = { path = "../ts-pack-core", features = ["download", 
 
 [build-dependencies]
 cbindgen = "0.29"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+duplicated_attributes = "allow"
+
+[lints.rust]
+unsafe_code = "allow"

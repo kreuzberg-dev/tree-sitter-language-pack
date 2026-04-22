@@ -2,10 +2,7 @@
 	"id": "locals_query_python",
 	"description": "get_locals_query returns non-empty for python",
 	"category": "query",
-	"tags": [
-		"query",
-		"locals"
-	],
+	"tags": ["query", "locals"],
 	"call": "locals",
 	"input": {
 		"language": "python"
@@ -16,9 +13,7 @@
 		}
 	],
 	"skip": {
-		"languages": [
-			"rust"
-		],
+		"languages": ["rust"],
 		"reason": "Query files not bundled in limited TSLP_LANGUAGES builds"
 	}
 }

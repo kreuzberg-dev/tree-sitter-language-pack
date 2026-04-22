@@ -8,6 +8,14 @@
     clippy::redundant_locals,
     dropping_references
 )]
+#![allow(
+    clippy::unnecessary_cast,
+    clippy::unused_unit,
+    clippy::unwrap_or_default,
+    clippy::derivable_impls,
+    clippy::needless_borrows_for_generic_args,
+    clippy::unnecessary_fallible_conversions
+)]
 
 use std::cell::RefCell;
 use std::ffi::{c_char, CStr, CString};
@@ -4008,7 +4016,7 @@ pub unsafe extern "C" fn ts_pack_language_registry_language_count(
     }
     // SAFETY: null check above guarantees this is a valid pointer.
     let obj = unsafe { &*this };
-    
+
     obj.language_count()
 }
 
@@ -5209,35 +5217,6 @@ pub unsafe extern "C" fn ts_pack_detect_language_from_path(path: *const std::ffi
     }
 }
 
-/// Check if a file extension is ambiguous — i.e. it could reasonably belong to
-/// multiple languages.
-///
-/// Returns `Some((assigned_language, alternatives))` if the extension is known
-/// to be ambiguous, where `assigned_language` is what [`detect_language_from_extension`]
-/// returns and `alternatives` lists other languages it could also belong to.
-///
-/// Returns `None` if the extension is unambiguous or unrecognized.
-///
-/// ```
-/// use tree_sitter_language_pack::extension_ambiguity;
-/// // .m is assigned to objc but could also be matlab
-/// if let Some((assigned, alternatives)) = extension_ambiguity("m") {
-///     assert_eq!(assigned, "objc");
-///     assert!(alternatives.contains(&"matlab"));
-/// }
-/// // .py is unambiguous
-/// assert!(extension_ambiguity("py").is_none());
-/// ```
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_extension_ambiguity(_ext: *const std::ffi::c_char) -> *mut std::ffi::c_char {
-    clear_last_error();
-    set_last_error(99, "Not implemented: extension_ambiguity");
-    std::ptr::null_mut()
-}
-
 /// Detect language name from file content using the shebang line (`#!`).
 ///
 /// Inspects only the first line of `content`. If it begins with `#!`, the
@@ -5286,79 +5265,6 @@ pub unsafe extern "C" fn ts_pack_detect_language_from_content(
             Err(_) => std::ptr::null_mut(),
         },
         None => std::ptr::null_mut(),
-    }
-}
-
-/// Validate an extraction config without running it.
-///
-/// Checks that the language exists and all query patterns compile. Returns
-/// detailed diagnostics per pattern.
-///
-/// # Errors
-///
-/// Returns an error if the language cannot be loaded.
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_validate_extraction(
-    config: *const tree_sitter_language_pack::ExtractionConfig,
-) -> *mut tree_sitter_language_pack::ValidationResult {
-    clear_last_error();
-    if config.is_null() {
-        set_last_error(1, "Null pointer passed for parameter 'config'");
-        return std::ptr::null_mut();
-    }
-    let config_rs = unsafe { &*config };
-    let result = tree_sitter_language_pack::extract::validate_extraction(&config_rs);
-    match result {
-        Ok(val) => Box::into_raw(Box::new(val)),
-        Err(e) => {
-            set_last_error(2, &e.to_string());
-            std::ptr::null_mut()
-        }
-    }
-}
-
-/// Process source code: parse once, extract intelligence based on config, and return it.
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_process(
-    source: *const std::ffi::c_char,
-    config: *const tree_sitter_language_pack::ProcessConfig,
-    registry: *const tree_sitter_language_pack::LanguageRegistry,
-) -> *mut tree_sitter_language_pack::ProcessResult {
-    clear_last_error();
-    if source.is_null() {
-        set_last_error(1, "Null pointer passed for parameter 'source'");
-        return std::ptr::null_mut();
-    }
-    let source_rs = match unsafe { CStr::from_ptr(source) }.to_str() {
-        Ok(s) => s.to_string(),
-        Err(_) => {
-            set_last_error(1, "Invalid UTF-8 in parameter 'source'");
-            return std::ptr::null_mut();
-        }
-    };
-    if config.is_null() {
-        set_last_error(1, "Null pointer passed for parameter 'config'");
-        return std::ptr::null_mut();
-    }
-    let config_rs = unsafe { &*config };
-    if registry.is_null() {
-        set_last_error(1, "Null pointer passed for parameter 'registry'");
-        return std::ptr::null_mut();
-    }
-    let registry_rs = unsafe { &*registry };
-    let result = tree_sitter_language_pack::intel::process(&source_rs, &config_rs, &registry_rs);
-    match result {
-        Ok(val) => Box::into_raw(Box::new(val)),
-        Err(e) => {
-            set_last_error(2, &e.to_string());
-            std::ptr::null_mut()
-        }
     }
 }
 
@@ -5454,7 +5360,7 @@ pub unsafe extern "C" fn ts_pack_named_children_info(
 /// # Examples
 ///
 /// ```no_run
-/// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
+/// let tree = tree_sitter_language_pack::parse_string("python", b"def hello(): pass").unwrap();
 /// assert_eq!(tree.root_node().kind(), "module");
 /// ```
 /// # Safety
@@ -5587,7 +5493,7 @@ pub unsafe extern "C" fn ts_pack_tree_error_count(tree: *const tree_sitter_langu
         return 0;
     }
     let tree_rs = unsafe { &*tree };
-    
+
     tree_sitter_language_pack::tree_error_count(&tree_rs)
 }
 
@@ -5737,8 +5643,8 @@ pub unsafe extern "C" fn ts_pack_get_locals_query(language: *const std::ffi::c_c
 /// # Examples
 ///
 /// ```no_run
-/// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
-/// let matches = tree_sitter_language_pack::query::run_query(
+/// let tree = tree_sitter_language_pack::parse_string("python", b"def hello(): pass").unwrap();
+/// let matches = tree_sitter_language_pack::run_query(
 ///     &tree,
 ///     "python",
 ///     "(function_definition name: (identifier) @fn_name)",
@@ -5804,47 +5710,6 @@ pub unsafe extern "C" fn ts_pack_run_query(
             std::ptr::null_mut()
         }
     }
-}
-
-/// Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
-/// Returns a list of `(start_byte, end_byte)` ranges.
-///
-/// The algorithm works by:
-/// 1. Walking the tree-sitter AST to collect all nodes with their depth.
-/// 2. Using depth as a semantic level: shallower nodes (functions, classes) are
-///    preferred split boundaries over deeper nodes (statements, expressions).
-/// 3. Greedily merging adjacent sections at the best semantic level that keeps
-///    each chunk under `max_chunk_size` bytes.
-/// 4. When no AST node boundary fits, falling back to line boundaries and
-///    ultimately to raw byte splits.
-///
-/// The function never splits in the middle of a token/leaf node when an AST
-/// boundary is available.
-///
-/// # Arguments
-///
-/// * `source` - The full source code string.
-/// * `tree`   - A tree-sitter `Tree` previously parsed from `source`.
-/// * `max_chunk_size` - Maximum size in bytes for each chunk.
-///
-/// # Returns
-///
-/// A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
-/// entire source. Ranges are non-overlapping, contiguous, and each range is
-/// at most `max_chunk_size` bytes (except when a single indivisible token
-/// exceeds that limit).
-/// # Safety
-/// Caller must ensure all pointer arguments are valid or null.
-/// Returned pointers must be freed with the appropriate free function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_split_code(
-    _source: *const std::ffi::c_char,
-    _tree: *const tree_sitter_language_pack::Tree,
-    _max_chunk_size: usize,
-) -> *mut std::ffi::c_char {
-    clear_last_error();
-    set_last_error(99, "Not implemented: split_code");
-    std::ptr::null_mut()
 }
 
 /// Get a tree-sitter [`Language`] by name using the global registry.
@@ -6034,8 +5899,64 @@ pub unsafe extern "C" fn ts_pack_has_language(name: *const std::ffi::c_char) -> 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_language_count() -> usize {
     clear_last_error();
-    
+
     tree_sitter_language_pack::language_count()
+}
+
+/// Process source code and extract file intelligence using the global registry.
+///
+/// Parses the source with tree-sitter and extracts metrics, structure, imports,
+/// exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+/// the flags set in [`ProcessConfig`].
+///
+/// # Errors
+///
+/// Returns an error if the language is not found or parsing fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::{ProcessConfig, process};
+///
+/// let config = ProcessConfig::new("python").all();
+/// let result = process("def hello(): pass", &config).unwrap();
+/// println!("Language: {}", result.language);
+/// println!("Lines: {}", result.metrics.total_lines);
+/// println!("Structures: {}", result.structure.len());
+/// ```
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_process(
+    source: *const std::ffi::c_char,
+    config: *const tree_sitter_language_pack::ProcessConfig,
+) -> *mut tree_sitter_language_pack::ProcessResult {
+    clear_last_error();
+    if source.is_null() {
+        set_last_error(1, "Null pointer passed for parameter 'source'");
+        return std::ptr::null_mut();
+    }
+    let source_rs = match unsafe { CStr::from_ptr(source) }.to_str() {
+        Ok(s) => s.to_string(),
+        Err(_) => {
+            set_last_error(1, "Invalid UTF-8 in parameter 'source'");
+            return std::ptr::null_mut();
+        }
+    };
+    if config.is_null() {
+        set_last_error(1, "Null pointer passed for parameter 'config'");
+        return std::ptr::null_mut();
+    }
+    let config_rs = unsafe { &*config };
+    let result = tree_sitter_language_pack::process(&source_rs, &config_rs);
+    match result {
+        Ok(val) => Box::into_raw(Box::new(val)),
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
 }
 
 /// Run extraction patterns against source code.
@@ -6090,6 +6011,36 @@ pub unsafe extern "C" fn ts_pack_extract_patterns(
     }
     let config_rs = unsafe { &*config };
     let result = tree_sitter_language_pack::extract_patterns(&source_rs, &config_rs);
+    match result {
+        Ok(val) => Box::into_raw(Box::new(val)),
+        Err(e) => {
+            set_last_error(2, &e.to_string());
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Validate extraction patterns without running them.
+///
+/// Convenience wrapper around [`extract::validate_extraction`].
+///
+/// # Errors
+///
+/// Returns an error if the language cannot be loaded.
+/// # Safety
+/// Caller must ensure all pointer arguments are valid or null.
+/// Returned pointers must be freed with the appropriate free function.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_validate_extraction(
+    config: *const tree_sitter_language_pack::ExtractionConfig,
+) -> *mut tree_sitter_language_pack::ValidationResult {
+    clear_last_error();
+    if config.is_null() {
+        set_last_error(1, "Null pointer passed for parameter 'config'");
+        return std::ptr::null_mut();
+    }
+    let config_rs = unsafe { &*config };
+    let result = tree_sitter_language_pack::validate_extraction(&config_rs);
     match result {
         Ok(val) => Box::into_raw(Box::new(val)),
         Err(e) => {

@@ -42,32 +42,6 @@ public final class TreeSitterLanguagePack {
     }
 
     /**
-     * Check if a file extension is ambiguous — i.e. it could reasonably belong to
-     * multiple languages.
-     *
-     * Returns `Some((assigned_language, alternatives))` if the extension is known
-     * to be ambiguous, where `assigned_language` is what [`detect_language_from_extension`]
-     * returns and `alternatives` lists other languages it could also belong to.
-     *
-     * Returns `None` if the extension is unambiguous or unrecognized.
-     *
-     * ```
-     * use tree_sitter_language_pack::extension_ambiguity;
-     * // .m is assigned to objc but could also be matlab
-     * if let Some((assigned, alternatives)) = extension_ambiguity("m") {
-     *     assert_eq!(assigned, "objc");
-     *     assert!(alternatives.contains(&"matlab"));
-     * }
-     * // .py is unambiguous
-     * assert!(extension_ambiguity("py").is_none());
-     * ```
-     */
-    public static String extensionAmbiguity(String ext) throws TreeSitterLanguagePackRsException {
-        java.util.Objects.requireNonNull(ext, "ext must not be null");
-        return TreeSitterLanguagePackRs.extensionAmbiguity(ext);
-    }
-
-    /**
      * Detect language name from file content using the shebang line (`#!`).
      *
      * Inspects only the first line of `content`. If it begins with `#!`, the
@@ -94,31 +68,6 @@ public final class TreeSitterLanguagePack {
     public static String detectLanguageFromContent(String content) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(content, "content must not be null");
         return TreeSitterLanguagePackRs.detectLanguageFromContent(content);
-    }
-
-    /**
-     * Validate an extraction config without running it.
-     *
-     * Checks that the language exists and all query patterns compile. Returns
-     * detailed diagnostics per pattern.
-     *
-     * # Errors
-     *
-     * Returns an error if the language cannot be loaded.
-     */
-    public static ValidationResult validateExtraction(ExtractionConfig config) throws TreeSitterLanguagePackRsException {
-        java.util.Objects.requireNonNull(config, "config must not be null");
-        return TreeSitterLanguagePackRs.validateExtraction(config);
-    }
-
-    /**
-     * Process source code: parse once, extract intelligence based on config, and return it.
-     */
-    public static ProcessResult process(String source, ProcessConfig config, LanguageRegistry registry) throws TreeSitterLanguagePackRsException {
-        java.util.Objects.requireNonNull(source, "source must not be null");
-        java.util.Objects.requireNonNull(config, "config must not be null");
-        java.util.Objects.requireNonNull(registry, "registry must not be null");
-        return TreeSitterLanguagePackRs.process(source, config, registry);
     }
 
     /**
@@ -161,7 +110,7 @@ public final class TreeSitterLanguagePack {
      * # Examples
      *
      * ```no_run
-     * let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
+     * let tree = tree_sitter_language_pack::parse_string("python", b"def hello(): pass").unwrap();
      * assert_eq!(tree.root_node().kind(), "module");
      * ```
      */
@@ -300,8 +249,8 @@ public final class TreeSitterLanguagePack {
      * # Examples
      *
      * ```no_run
-     * let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
-     * let matches = tree_sitter_language_pack::query::run_query(
+     * let tree = tree_sitter_language_pack::parse_string("python", b"def hello(): pass").unwrap();
+     * let matches = tree_sitter_language_pack::run_query(
      *     &tree,
      *     "python",
      *     "(function_definition name: (identifier) @fn_name)",
@@ -316,42 +265,6 @@ public final class TreeSitterLanguagePack {
         java.util.Objects.requireNonNull(querySource, "querySource must not be null");
         java.util.Objects.requireNonNull(source, "source must not be null");
         return TreeSitterLanguagePackRs.runQuery(tree, language, querySource, source);
-    }
-
-    /**
-     * Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
-     * Returns a list of `(start_byte, end_byte)` ranges.
-     *
-     * The algorithm works by:
-     * 1. Walking the tree-sitter AST to collect all nodes with their depth.
-     * 2. Using depth as a semantic level: shallower nodes (functions, classes) are
-     *    preferred split boundaries over deeper nodes (statements, expressions).
-     * 3. Greedily merging adjacent sections at the best semantic level that keeps
-     *    each chunk under `max_chunk_size` bytes.
-     * 4. When no AST node boundary fits, falling back to line boundaries and
-     *    ultimately to raw byte splits.
-     *
-     * The function never splits in the middle of a token/leaf node when an AST
-     * boundary is available.
-     *
-     * # Arguments
-     *
-     * * `source` - The full source code string.
-     * * `tree`   - A tree-sitter `Tree` previously parsed from `source`.
-     * * `max_chunk_size` - Maximum size in bytes for each chunk.
-     *
-     * # Returns
-     *
-     * A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
-     * entire source. Ranges are non-overlapping, contiguous, and each range is
-     * at most `max_chunk_size` bytes (except when a single indivisible token
-     * exceeds that limit).
-     */
-    public static List<String> splitCode(String source, Tree tree, long maxChunkSize) throws TreeSitterLanguagePackRsException {
-        java.util.Objects.requireNonNull(source, "source must not be null");
-        java.util.Objects.requireNonNull(tree, "tree must not be null");
-        java.util.Objects.requireNonNull(maxChunkSize, "maxChunkSize must not be null");
-        return TreeSitterLanguagePackRs.splitCode(source, tree, maxChunkSize);
     }
 
     /**
@@ -472,6 +385,35 @@ public final class TreeSitterLanguagePack {
     }
 
     /**
+     * Process source code and extract file intelligence using the global registry.
+     *
+     * Parses the source with tree-sitter and extracts metrics, structure, imports,
+     * exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+     * the flags set in [`ProcessConfig`].
+     *
+     * # Errors
+     *
+     * Returns an error if the language is not found or parsing fails.
+     *
+     * # Example
+     *
+     * ```no_run
+     * use tree_sitter_language_pack::{ProcessConfig, process};
+     *
+     * let config = ProcessConfig::new("python").all();
+     * let result = process("def hello(): pass", &config).unwrap();
+     * println!("Language: {}", result.language);
+     * println!("Lines: {}", result.metrics.total_lines);
+     * println!("Structures: {}", result.structure.len());
+     * ```
+     */
+    public static ProcessResult process(String source, ProcessConfig config) throws TreeSitterLanguagePackRsException {
+        java.util.Objects.requireNonNull(source, "source must not be null");
+        java.util.Objects.requireNonNull(config, "config must not be null");
+        return TreeSitterLanguagePackRs.process(source, config);
+    }
+
+    /**
      * Run extraction patterns against source code.
      *
      * Convenience wrapper around [`extract::extract`].
@@ -503,6 +445,20 @@ public final class TreeSitterLanguagePack {
         java.util.Objects.requireNonNull(source, "source must not be null");
         java.util.Objects.requireNonNull(config, "config must not be null");
         return TreeSitterLanguagePackRs.extractPatterns(source, config);
+    }
+
+    /**
+     * Validate extraction patterns without running them.
+     *
+     * Convenience wrapper around [`extract::validate_extraction`].
+     *
+     * # Errors
+     *
+     * Returns an error if the language cannot be loaded.
+     */
+    public static ValidationResult validateExtraction(ExtractionConfig config) throws TreeSitterLanguagePackRsException {
+        java.util.Objects.requireNonNull(config, "config must not be null");
+        return TreeSitterLanguagePackRs.validateExtraction(config);
     }
 
     /**

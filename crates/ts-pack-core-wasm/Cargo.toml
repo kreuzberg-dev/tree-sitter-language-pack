@@ -23,3 +23,10 @@ serde-wasm-bindgen = "0.6"
 tree-sitter-language-pack = { path = "../ts-pack-core", features = ["download", "serde", "config"] }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+duplicated_attributes = "allow"
+
+[lints.rust]
+unsafe_code = "allow"

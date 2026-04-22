@@ -20,3 +20,6 @@ tree-sitter-language-pack = { path = "../ts-pack-core", features = ["download", 
 
 [build-dependencies]
 napi-build = "2"
+
+[lints]
+workspace = true

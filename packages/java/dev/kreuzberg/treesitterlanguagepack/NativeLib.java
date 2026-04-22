@@ -36,13 +36,13 @@ final class NativeLib {
         String libName;
         String libExt;
         if (osName.contains("mac") || osName.contains("darwin")) {
-            libName = "libts_pack_core_ffi";
+            libName = "libts_pack_ffi";
             libExt = ".dylib";
         } else if (osName.contains("win")) {
-            libName = "ts_pack_core_ffi";
+            libName = "ts_pack_ffi";
             libExt = ".dll";
         } else {
-            libName = "libts_pack_core_ffi";
+            libName = "libts_pack_ffi";
             libExt = ".so";
         }
 
@@ -55,9 +55,9 @@ final class NativeLib {
         }
 
         try {
-            System.loadLibrary("ts_pack_core_ffi");
+            System.loadLibrary("ts_pack_ffi");
         } catch (UnsatisfiedLinkError e) {
-            String msg = "Failed to load ts_pack_core_ffi native library. Expected resource: " + nativesDir + "/" + libName
+            String msg = "Failed to load ts_pack_ffi native library. Expected resource: " + nativesDir + "/" + libName
                     + libExt + " (RID: " + nativesRid + "). "
                     + "Ensure the library is bundled in the JAR under natives/{os-arch}/, "
                     + "or place it on the system library path (java.library.path).";
@@ -91,7 +91,7 @@ final class NativeLib {
     private static Path extractOrReuseNativeDirectory(String nativesDir) throws Exception {
         URL location = NativeLib.class.getProtectionDomain().getCodeSource().getLocation();
         if (location == null) {
-            throw new IllegalStateException("Missing code source location for ts_pack_core_ffi JAR");
+            throw new IllegalStateException("Missing code source location for ts_pack_ffi JAR");
         }
 
         Path codePath = Path.of(location.toURI());
@@ -101,7 +101,7 @@ final class NativeLib {
             if (cachedExtractDir != null && key.equals(cachedExtractKey)) {
                 return cachedExtractDir;
             }
-            Path tempDir = Files.createTempDirectory("ts_pack_core_ffi_native");
+            Path tempDir = Files.createTempDirectory("ts_pack_ffi_native");
             tempDir.toFile().deleteOnExit();
             List<Path> extracted = extractNativeDirectory(codePath, nativesDir, tempDir);
             if (extracted.isEmpty()) {
@@ -210,21 +210,9 @@ final class NativeLib {
         LIB.find("ts_pack_detect_language_from_path").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
     );
-    static final MethodHandle TS_PACK_EXTENSION_AMBIGUITY = LINKER.downcallHandle(
-        LIB.find("ts_pack_extension_ambiguity").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
     static final MethodHandle TS_PACK_DETECT_LANGUAGE_FROM_CONTENT = LINKER.downcallHandle(
         LIB.find("ts_pack_detect_language_from_content").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-    static final MethodHandle TS_PACK_VALIDATE_EXTRACTION = LINKER.downcallHandle(
-        LIB.find("ts_pack_validate_extraction").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-    static final MethodHandle TS_PACK_PROCESS = LINKER.downcallHandle(
-        LIB.find("ts_pack_process").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
     );
     static final MethodHandle TS_PACK_ROOT_NODE_INFO = LINKER.downcallHandle(
         LIB.find("ts_pack_root_node_info").orElseThrow(),
@@ -274,10 +262,6 @@ final class NativeLib {
         LIB.find("ts_pack_run_query").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
     );
-    static final MethodHandle TS_PACK_SPLIT_CODE = LINKER.downcallHandle(
-        LIB.find("ts_pack_split_code").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG)
-    );
     static final MethodHandle TS_PACK_GET_LANGUAGE = LINKER.downcallHandle(
         LIB.find("ts_pack_get_language").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
@@ -298,9 +282,17 @@ final class NativeLib {
         LIB.find("ts_pack_language_count").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.JAVA_LONG)
     );
+    static final MethodHandle TS_PACK_PROCESS = LINKER.downcallHandle(
+        LIB.find("ts_pack_process").orElseThrow(),
+        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+    );
     static final MethodHandle TS_PACK_EXTRACT_PATTERNS = LINKER.downcallHandle(
         LIB.find("ts_pack_extract_patterns").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+    );
+    static final MethodHandle TS_PACK_VALIDATE_EXTRACTION = LINKER.downcallHandle(
+        LIB.find("ts_pack_validate_extraction").orElseThrow(),
+        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
     );
     static final MethodHandle TS_PACK_INIT = LINKER.downcallHandle(
         LIB.find("ts_pack_init").orElseThrow(),
@@ -348,26 +340,6 @@ final class NativeLib {
         FunctionDescriptor.of(ValueLayout.ADDRESS)
     );
 
-    static final MethodHandle TS_PACK_VALIDATION_RESULT_TO_JSON = LINKER.downcallHandle(
-        LIB.find("ts_pack_validation_result_to_json").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-
-    static final MethodHandle TS_PACK_VALIDATION_RESULT_FREE = LINKER.downcallHandle(
-        LIB.find("ts_pack_validation_result_free").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
-    );
-
-    static final MethodHandle TS_PACK_PROCESS_RESULT_TO_JSON = LINKER.downcallHandle(
-        LIB.find("ts_pack_process_result_to_json").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-
-    static final MethodHandle TS_PACK_PROCESS_RESULT_FREE = LINKER.downcallHandle(
-        LIB.find("ts_pack_process_result_free").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
-    );
-
     static final MethodHandle TS_PACK_NODE_INFO_TO_JSON = LINKER.downcallHandle(
         LIB.find("ts_pack_node_info_to_json").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
@@ -393,6 +365,16 @@ final class NativeLib {
         FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
     );
 
+    static final MethodHandle TS_PACK_PROCESS_RESULT_TO_JSON = LINKER.downcallHandle(
+        LIB.find("ts_pack_process_result_to_json").orElseThrow(),
+        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+    );
+
+    static final MethodHandle TS_PACK_PROCESS_RESULT_FREE = LINKER.downcallHandle(
+        LIB.find("ts_pack_process_result_free").orElseThrow(),
+        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
+    );
+
     static final MethodHandle TS_PACK_EXTRACTION_RESULT_TO_JSON = LINKER.downcallHandle(
         LIB.find("ts_pack_extraction_result_to_json").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
@@ -403,13 +385,13 @@ final class NativeLib {
         FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
     );
 
-    static final MethodHandle TS_PACK_EXTRACTION_CONFIG_FROM_JSON = LINKER.downcallHandle(
-        LIB.find("ts_pack_extraction_config_from_json").orElseThrow(),
+    static final MethodHandle TS_PACK_VALIDATION_RESULT_TO_JSON = LINKER.downcallHandle(
+        LIB.find("ts_pack_validation_result_to_json").orElseThrow(),
         FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
     );
 
-    static final MethodHandle TS_PACK_EXTRACTION_CONFIG_FREE = LINKER.downcallHandle(
-        LIB.find("ts_pack_extraction_config_free").orElseThrow(),
+    static final MethodHandle TS_PACK_VALIDATION_RESULT_FREE = LINKER.downcallHandle(
+        LIB.find("ts_pack_validation_result_free").orElseThrow(),
         FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
     );
 
@@ -420,6 +402,16 @@ final class NativeLib {
 
     static final MethodHandle TS_PACK_PROCESS_CONFIG_FREE = LINKER.downcallHandle(
         LIB.find("ts_pack_process_config_free").orElseThrow(),
+        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
+    );
+
+    static final MethodHandle TS_PACK_EXTRACTION_CONFIG_FROM_JSON = LINKER.downcallHandle(
+        LIB.find("ts_pack_extraction_config_from_json").orElseThrow(),
+        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+    );
+
+    static final MethodHandle TS_PACK_EXTRACTION_CONFIG_FREE = LINKER.downcallHandle(
+        LIB.find("ts_pack_extraction_config_free").orElseThrow(),
         FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
     );
 

@@ -108,6 +108,7 @@ Inspects only the first line of `content`. If it begins with `#!`, the
 interpreter name is extracted and mapped to a language name.
 
 Handles common patterns:
+
 - `#!/usr/bin/env python3` → `"python"`
 - `#!/bin/bash` → `"bash"`
 - `#!/usr/bin/env node` → `"javascript"`
@@ -610,6 +611,7 @@ def self.get_locals_query(language)
 Execute a tree-sitter query pattern against a parsed tree.
 
 The `query_source` is an S-expression pattern like:
+
 ```text
 (function_definition name: (identifier) @name)
 ```
@@ -644,6 +646,7 @@ Split source code into chunks using tree-sitter AST structure for intelligent bo
 Returns a list of `(start_byte, end_byte)` ranges.
 
 The algorithm works by:
+
 1. Walking the tree-sitter AST to collect all nodes with their depth.
 2. Using depth as a semantic level: shallower nodes (functions, classes) are
    preferred split boundaries over deeper nodes (statements, expressions).
@@ -1075,7 +1078,7 @@ A single captured node within a match.
 | `name` | `String` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `NodeInfo?` | `nil` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `String?` | `nil` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `child_fields` | `AHashMap` | — | Values of requested child fields, keyed by field name. |
+| `child_fields` | `Hash{String=>String?}` | `{}` | Values of requested child fields, keyed by field name. |
 | `start_byte` | `Integer` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1139,14 +1142,6 @@ don't need to be recompiled for every call. A `QueryCursor` is reused across
 patterns within a single extraction call, making this type `Send + Sync`.
 
 ##### Methods
-
-###### fmt()
-
-**Signature:**
-
-```ruby
-def fmt(f)
-```
 
 ###### compile()
 
@@ -1416,7 +1411,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language name (e.g., `"python"`). |
-| `patterns` | `AHashMap` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `Hash{String=>ExtractionPattern}` | `{}` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1443,7 +1438,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language that was used. |
-| `results` | `AHashMap` | — | Results keyed by pattern name. |
+| `results` | `Hash{String=>PatternResult}` | `{}` | Results keyed by pattern name. |
 
 
 ---
@@ -1816,7 +1811,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `Boolean` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `Boolean` | `false` | Include parse diagnostics. Default: false. |
 | `chunk_max_size` | `Integer?` | `nil` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `AHashMap?` | `nil` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `extractions` | `Hash{String=>ExtractionPattern}?` | `nil` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
@@ -1881,7 +1876,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `Array<SymbolInfo>` | `[]` | Symbols |
 | `diagnostics` | `Array<Diagnostic>` | `[]` | Diagnostics |
 | `chunks` | `Array<CodeChunk>` | `[]` | Text chunks for chunking/embedding |
-| `extractions` | `AHashMap` | — | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `Hash{String=>PatternResult}` | `{}` | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1963,7 +1958,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `Boolean` | — | Whether all patterns are valid. |
-| `patterns` | `AHashMap` | — | Per-pattern validation details. |
+| `patterns` | `Hash{String=>PatternValidation}` | `{}` | Per-pattern validation details. |
 
 
 ---
@@ -2121,4 +2116,3 @@ features are enabled.
 
 
 ---
-

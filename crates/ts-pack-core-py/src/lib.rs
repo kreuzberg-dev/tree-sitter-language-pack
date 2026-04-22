@@ -11,7 +11,16 @@
     clippy::unused_unit,
     clippy::let_unit_value,
     clippy::needless_borrow,
-    clippy::too_many_arguments
+    clippy::too_many_arguments,
+    clippy::map_identity
+)]
+#![allow(
+    clippy::unnecessary_cast,
+    clippy::unused_unit,
+    clippy::unwrap_or_default,
+    clippy::derivable_impls,
+    clippy::needless_borrows_for_generic_args,
+    clippy::unnecessary_fallible_conversions
 )]
 
 use pyo3::prelude::*;
@@ -307,7 +316,7 @@ impl Span {
     }
 }
 
-#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default)]
 #[pyclass(frozen, from_py_object)]
 #[allow(clippy::similar_names)]
 pub struct ProcessResult {
@@ -421,7 +430,7 @@ impl FileMetrics {
     }
 }
 
-#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default)]
 #[pyclass(frozen, from_py_object)]
 pub struct StructureItem {
     #[pyo3(get)]
@@ -508,7 +517,7 @@ impl CommentInfo {
     }
 }
 
-#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default)]
 #[pyclass(frozen, from_py_object)]
 pub struct DocstringInfo {
     #[pyo3(get)]
@@ -632,7 +641,7 @@ impl ExportInfo {
     }
 }
 
-#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default)]
 #[pyclass(frozen, from_py_object)]
 pub struct SymbolInfo {
     #[pyo3(get)]
@@ -694,7 +703,7 @@ impl Diagnostic {
     }
 }
 
-#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default)]
 #[pyclass(frozen, from_py_object)]
 pub struct CodeChunk {
     #[pyo3(get)]
@@ -735,7 +744,7 @@ impl CodeChunk {
     }
 }
 
-#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default)]
 #[pyclass(frozen, from_py_object)]
 pub struct ChunkContext {
     #[pyo3(get)]
@@ -1517,42 +1526,9 @@ pub fn detect_language_from_path(path: String) -> Option<String> {
 }
 
 #[pyfunction]
-#[pyo3(signature = (ext))]
-pub fn extension_ambiguity(ext: String) -> Option<String> {
-    let _ = ext;
-    None
-}
-
-#[pyfunction]
 #[pyo3(signature = (content))]
 pub fn detect_language_from_content(content: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_content(&content).map(Into::into)
-}
-
-#[allow(clippy::missing_errors_doc)]
-#[pyfunction]
-#[pyo3(signature = (config))]
-pub fn validate_extraction(config: ExtractionConfig) -> PyResult<ValidationResult> {
-    let config_json =
-        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    let config_core: tree_sitter_language_pack::ExtractionConfig =
-        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    tree_sitter_language_pack::extract::validate_extraction(&config_core)
-        .map(|val| ValidationResult::from(val))
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
-}
-
-#[allow(clippy::missing_errors_doc)]
-#[pyfunction]
-#[pyo3(signature = (source, config, registry))]
-pub fn process(source: String, config: ProcessConfig, registry: LanguageRegistry) -> PyResult<ProcessResult> {
-    let config_json =
-        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    let config_core: tree_sitter_language_pack::ProcessConfig =
-        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
-    tree_sitter_language_pack::intel::process(&source, &config_core, &registry.inner)
-        .map(|val| ProcessResult::from(val))
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
 #[pyfunction]
@@ -1603,7 +1579,7 @@ pub fn tree_has_error_nodes(tree: Tree) -> bool {
 #[pyfunction]
 #[pyo3(signature = (tree))]
 pub fn tree_to_sexp(tree: Tree) -> String {
-    tree_sitter_language_pack::tree_to_sexp(&tree.inner).into()
+    tree_sitter_language_pack::tree_to_sexp(&tree.inner)
 }
 
 #[pyfunction]
@@ -1639,13 +1615,6 @@ pub fn run_query(tree: Tree, language: String, query_source: String, source: Vec
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
-#[pyfunction]
-#[pyo3(signature = (source, tree, max_chunk_size))]
-pub fn split_code(source: String, tree: Tree, max_chunk_size: usize) -> Vec<String> {
-    let _ = (source, tree, max_chunk_size);
-    Vec::new()
-}
-
 #[allow(clippy::missing_errors_doc)]
 #[pyfunction]
 #[pyo3(signature = (name))]
@@ -1667,10 +1636,7 @@ pub fn get_parser(name: String) -> PyResult<Parser> {
 #[pyfunction]
 #[pyo3(signature = ())]
 pub fn available_languages() -> Vec<String> {
-    tree_sitter_language_pack::available_languages()
-        .into_iter()
-        .map(Into::into)
-        .collect()
+    tree_sitter_language_pack::available_languages().into_iter().collect()
 }
 
 #[pyfunction]
@@ -1688,13 +1654,39 @@ pub fn language_count() -> usize {
 #[allow(clippy::missing_errors_doc)]
 #[pyfunction]
 #[pyo3(signature = (source, config))]
+pub fn process(source: String, config: ProcessConfig) -> PyResult<ProcessResult> {
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ProcessConfig =
+        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    tree_sitter_language_pack::process(&source, &config_core)
+        .map(ProcessResult::from)
+        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+}
+
+#[allow(clippy::missing_errors_doc)]
+#[pyfunction]
+#[pyo3(signature = (source, config))]
 pub fn extract_patterns(source: String, config: ExtractionConfig) -> PyResult<ExtractionResult> {
     let config_json =
         serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
     let config_core: tree_sitter_language_pack::ExtractionConfig =
         serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
     tree_sitter_language_pack::extract_patterns(&source, &config_core)
-        .map(|val| ExtractionResult::from(val))
+        .map(ExtractionResult::from)
+        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+}
+
+#[allow(clippy::missing_errors_doc)]
+#[pyfunction]
+#[pyo3(signature = (config))]
+pub fn validate_extraction(config: ExtractionConfig) -> PyResult<ValidationResult> {
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ExtractionConfig =
+        serde_json::from_str(&config_json).map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
+    tree_sitter_language_pack::validate_extraction(&config_core)
+        .map(ValidationResult::from)
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
@@ -1745,17 +1737,14 @@ pub fn download_all() -> PyResult<usize> {
 #[pyo3(signature = ())]
 pub fn manifest_languages() -> PyResult<Vec<String>> {
     tree_sitter_language_pack::manifest_languages()
-        .map(|val| val.into_iter().map(Into::into).collect())
+        .map(|val| val.into_iter().collect())
         .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
 }
 
 #[pyfunction]
 #[pyo3(signature = ())]
 pub fn downloaded_languages() -> Vec<String> {
-    tree_sitter_language_pack::downloaded_languages()
-        .into_iter()
-        .map(Into::into)
-        .collect()
+    tree_sitter_language_pack::downloaded_languages().into_iter().collect()
 }
 
 #[allow(clippy::missing_errors_doc)]
@@ -1787,21 +1776,21 @@ pyo3::create_exception!(_native, InvalidRangeError, pyo3::exceptions::PyExceptio
 pyo3::create_exception!(_native, IoError, pyo3::exceptions::PyException);
 pyo3::create_exception!(_native, Error, pyo3::exceptions::PyException);
 
-/// Convert a `tree_sitter_language_pack::error::Error` error to a Python exception.
-fn error_to_py_err(e: tree_sitter_language_pack::error::Error) -> pyo3::PyErr {
+/// Convert a `tree_sitter_language_pack::Error` error to a Python exception.
+fn error_to_py_err(e: tree_sitter_language_pack::Error) -> pyo3::PyErr {
     let msg = e.to_string();
     #[allow(unreachable_patterns)]
     match &e {
-        tree_sitter_language_pack::error::Error::LanguageNotFound(..) => LanguageNotFoundError::new_err(msg),
-        tree_sitter_language_pack::error::Error::DynamicLoad(..) => DynamicLoadError::new_err(msg),
-        tree_sitter_language_pack::error::Error::NullLanguagePointer(..) => NullLanguagePointerError::new_err(msg),
-        tree_sitter_language_pack::error::Error::ParserSetup(..) => ParserSetupError::new_err(msg),
-        tree_sitter_language_pack::error::Error::LockPoisoned(..) => LockPoisonedError::new_err(msg),
-        tree_sitter_language_pack::error::Error::Config(..) => ConfigError::new_err(msg),
-        tree_sitter_language_pack::error::Error::ParseFailed => ParseFailedError::new_err(msg),
-        tree_sitter_language_pack::error::Error::QueryError(..) => QueryError::new_err(msg),
-        tree_sitter_language_pack::error::Error::InvalidRange(..) => InvalidRangeError::new_err(msg),
-        tree_sitter_language_pack::error::Error::Io(..) => IoError::new_err(msg),
+        tree_sitter_language_pack::Error::LanguageNotFound(..) => LanguageNotFoundError::new_err(msg),
+        tree_sitter_language_pack::Error::DynamicLoad(..) => DynamicLoadError::new_err(msg),
+        tree_sitter_language_pack::Error::NullLanguagePointer(..) => NullLanguagePointerError::new_err(msg),
+        tree_sitter_language_pack::Error::ParserSetup(..) => ParserSetupError::new_err(msg),
+        tree_sitter_language_pack::Error::LockPoisoned(..) => LockPoisonedError::new_err(msg),
+        tree_sitter_language_pack::Error::Config(..) => ConfigError::new_err(msg),
+        tree_sitter_language_pack::Error::ParseFailed => ParseFailedError::new_err(msg),
+        tree_sitter_language_pack::Error::QueryError(..) => QueryError::new_err(msg),
+        tree_sitter_language_pack::Error::InvalidRange(..) => InvalidRangeError::new_err(msg),
+        tree_sitter_language_pack::Error::Io(..) => IoError::new_err(msg),
         _ => Error::new_err(msg),
     }
 }
@@ -2353,7 +2342,7 @@ impl From<tree_sitter_language_pack::QueryMatch> for QueryMatch {
     fn from(val: tree_sitter_language_pack::QueryMatch) -> Self {
         Self {
             pattern_index: val.pattern_index,
-            captures: val.captures.iter().map(|(name, info)| format!("{}:{:?}", name, info)).collect(),
+            captures: val.captures.iter().map(|i| format!("{:?}", i)).collect(),
         }
     }
 }
@@ -2532,10 +2521,7 @@ pub fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<DiagnosticSeverity>()?;
     m.add_function(wrap_pyfunction!(detect_language_from_extension, m)?)?;
     m.add_function(wrap_pyfunction!(detect_language_from_path, m)?)?;
-    m.add_function(wrap_pyfunction!(extension_ambiguity, m)?)?;
     m.add_function(wrap_pyfunction!(detect_language_from_content, m)?)?;
-    m.add_function(wrap_pyfunction!(validate_extraction, m)?)?;
-    m.add_function(wrap_pyfunction!(process, m)?)?;
     m.add_function(wrap_pyfunction!(root_node_info, m)?)?;
     m.add_function(wrap_pyfunction!(find_nodes_by_type, m)?)?;
     m.add_function(wrap_pyfunction!(named_children_info, m)?)?;
@@ -2548,13 +2534,14 @@ pub fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_injections_query, m)?)?;
     m.add_function(wrap_pyfunction!(get_locals_query, m)?)?;
     m.add_function(wrap_pyfunction!(run_query, m)?)?;
-    m.add_function(wrap_pyfunction!(split_code, m)?)?;
     m.add_function(wrap_pyfunction!(get_language, m)?)?;
     m.add_function(wrap_pyfunction!(get_parser, m)?)?;
     m.add_function(wrap_pyfunction!(available_languages, m)?)?;
     m.add_function(wrap_pyfunction!(has_language, m)?)?;
     m.add_function(wrap_pyfunction!(language_count, m)?)?;
+    m.add_function(wrap_pyfunction!(process, m)?)?;
     m.add_function(wrap_pyfunction!(extract_patterns, m)?)?;
+    m.add_function(wrap_pyfunction!(validate_extraction, m)?)?;
     m.add_function(wrap_pyfunction!(init, m)?)?;
     m.add_function(wrap_pyfunction!(configure, m)?)?;
     m.add_function(wrap_pyfunction!(download, m)?)?;

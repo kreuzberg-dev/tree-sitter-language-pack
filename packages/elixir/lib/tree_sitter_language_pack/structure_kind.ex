@@ -14,5 +14,5 @@ defmodule TreeSitterLanguagePack.StructureKind do
   @type trait :: :trait
   @type impl :: :impl
   @type namespace :: :namespace
-  @type other :: %{type: :other, 0: term()}
+  @type other :: %{type: :other, value_0: term()}
 end

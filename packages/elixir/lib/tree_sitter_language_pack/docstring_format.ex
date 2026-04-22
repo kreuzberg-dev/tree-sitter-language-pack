@@ -9,5 +9,5 @@ defmodule TreeSitterLanguagePack.DocstringFormat do
   @type rustdoc :: :rustdoc
   @type go_doc :: :go_doc
   @type java_doc :: :java_doc
-  @type other :: %{type: :other, 0: term()}
+  @type other :: %{type: :other, value_0: term()}
 end

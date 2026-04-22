@@ -48,35 +48,6 @@ final class TreeSitterLanguagePack
     }
 
     /**
-     * Check if a file extension is ambiguous — i.e. it could reasonably belong to
-     * multiple languages.
-     *
-     * Returns `Some((assigned_language, alternatives))` if the extension is known
-     * to be ambiguous, where `assigned_language` is what [`detect_language_from_extension`]
-     * returns and `alternatives` lists other languages it could also belong to.
-     *
-     * Returns `None` if the extension is unambiguous or unrecognized.
-     *
-     * ```
-     * use tree_sitter_language_pack::extension_ambiguity;
-     * // .m is assigned to objc but could also be matlab
-     * if let Some((assigned, alternatives)) = extension_ambiguity("m") {
-     *     assert_eq!(assigned, "objc");
-     *     assert!(alternatives.contains(&"matlab"));
-     * }
-     * // .py is unambiguous
-     * assert!(extension_ambiguity("py").is_none());
-     * ```
-     *
-     * @param string $ext
-     * @return ?string
-     */
-    public static function extensionAmbiguity(string $ext): ?string
-    {
-        return \Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi::extensionAmbiguity($ext); // delegate to native extension class
-    }
-
-    /**
      * Detect language name from file content using the shebang line (`#!`).
      *
      * Inspects only the first line of `content`. If it begins with `#!`, the
@@ -106,39 +77,6 @@ final class TreeSitterLanguagePack
     public static function detectLanguageFromContent(string $content): ?string
     {
         return \Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi::detectLanguageFromContent($content); // delegate to native extension class
-    }
-
-    /**
-     * Validate an extraction config without running it.
-     *
-     * Checks that the language exists and all query patterns compile. Returns
-     * detailed diagnostics per pattern.
-     *
-     * # Errors
-     *
-     * Returns an error if the language cannot be loaded.
-     *
-     * @param ExtractionConfig $config
-     * @return ValidationResult
-     * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
-     */
-    public static function validateExtraction(ExtractionConfig $config): ValidationResult
-    {
-        return \Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi::validateExtraction($config); // delegate to native extension class
-    }
-
-    /**
-     * Process source code: parse once, extract intelligence based on config, and return it.
-     *
-     * @param string $source
-     * @param ProcessConfig $config
-     * @param LanguageRegistry $registry
-     * @return ProcessResult
-     * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
-     */
-    public static function process(string $source, ProcessConfig $config, LanguageRegistry $registry): ProcessResult
-    {
-        return \Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi::process($source, $config, $registry); // delegate to native extension class
     }
 
     /**
@@ -190,7 +128,7 @@ final class TreeSitterLanguagePack
      * # Examples
      *
      * ```no_run
-     * let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
+     * let tree = tree_sitter_language_pack::parse_string("python", b"def hello(): pass").unwrap();
      * assert_eq!(tree.root_node().kind(), "module");
      * ```
      *
@@ -354,8 +292,8 @@ final class TreeSitterLanguagePack
      * # Examples
      *
      * ```no_run
-     * let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
-     * let matches = tree_sitter_language_pack::query::run_query(
+     * let tree = tree_sitter_language_pack::parse_string("python", b"def hello(): pass").unwrap();
+     * let matches = tree_sitter_language_pack::run_query(
      *     &tree,
      *     "python",
      *     "(function_definition name: (identifier) @fn_name)",
@@ -374,45 +312,6 @@ final class TreeSitterLanguagePack
     public static function runQuery(Tree $tree, string $language, string $query_source, string $source): array
     {
         return \Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi::runQuery($tree, $language, $query_source, $source); // delegate to native extension class
-    }
-
-    /**
-     * Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
-     * Returns a list of `(start_byte, end_byte)` ranges.
-     *
-     * The algorithm works by:
-     * 1. Walking the tree-sitter AST to collect all nodes with their depth.
-     * 2. Using depth as a semantic level: shallower nodes (functions, classes) are
-     *    preferred split boundaries over deeper nodes (statements, expressions).
-     * 3. Greedily merging adjacent sections at the best semantic level that keeps
-     *    each chunk under `max_chunk_size` bytes.
-     * 4. When no AST node boundary fits, falling back to line boundaries and
-     *    ultimately to raw byte splits.
-     *
-     * The function never splits in the middle of a token/leaf node when an AST
-     * boundary is available.
-     *
-     * # Arguments
-     *
-     * * `source` - The full source code string.
-     * * `tree`   - A tree-sitter `Tree` previously parsed from `source`.
-     * * `max_chunk_size` - Maximum size in bytes for each chunk.
-     *
-     * # Returns
-     *
-     * A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
-     * entire source. Ranges are non-overlapping, contiguous, and each range is
-     * at most `max_chunk_size` bytes (except when a single indivisible token
-     * exceeds that limit).
-     *
-     * @param string $source
-     * @param Tree $tree
-     * @param int $max_chunk_size
-     * @return array<string>
-     */
-    public static function splitCode(string $source, Tree $tree, int $max_chunk_size): array
-    {
-        return \Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi::splitCode($source, $tree, $max_chunk_size); // delegate to native extension class
     }
 
     /**
@@ -550,6 +449,39 @@ final class TreeSitterLanguagePack
     }
 
     /**
+     * Process source code and extract file intelligence using the global registry.
+     *
+     * Parses the source with tree-sitter and extracts metrics, structure, imports,
+     * exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+     * the flags set in [`ProcessConfig`].
+     *
+     * # Errors
+     *
+     * Returns an error if the language is not found or parsing fails.
+     *
+     * # Example
+     *
+     * ```no_run
+     * use tree_sitter_language_pack::{ProcessConfig, process};
+     *
+     * let config = ProcessConfig::new("python").all();
+     * let result = process("def hello(): pass", &config).unwrap();
+     * println!("Language: {}", result.language);
+     * println!("Lines: {}", result.metrics.total_lines);
+     * println!("Structures: {}", result.structure.len());
+     * ```
+     *
+     * @param string $source
+     * @param ProcessConfig $config
+     * @return ProcessResult
+     * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
+     */
+    public static function process(string $source, ProcessConfig $config): ProcessResult
+    {
+        return \Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi::process($source, $config); // delegate to native extension class
+    }
+
+    /**
      * Run extraction patterns against source code.
      *
      * Convenience wrapper around [`extract::extract`].
@@ -585,6 +517,24 @@ final class TreeSitterLanguagePack
     public static function extractPatterns(string $source, ExtractionConfig $config): ExtractionResult
     {
         return \Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi::extractPatterns($source, $config); // delegate to native extension class
+    }
+
+    /**
+     * Validate extraction patterns without running them.
+     *
+     * Convenience wrapper around [`extract::validate_extraction`].
+     *
+     * # Errors
+     *
+     * Returns an error if the language cannot be loaded.
+     *
+     * @param ExtractionConfig $config
+     * @return ValidationResult
+     * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
+     */
+    public static function validateExtraction(ExtractionConfig $config): ValidationResult
+    {
+        return \Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi::validateExtraction($config); // delegate to native extension class
     }
 
     /**

@@ -5,8 +5,12 @@ name = "tree-sitter-language-pack"
 core_import = "tree_sitter_language_pack"
 sources = ["crates/ts-pack-core/src/lib.rs"]
 version_from = "Cargo.toml"
+
+[[crate.source_crates]]
+name = "tree-sitter-language-pack"
+sources = ["crates/ts-pack-core/src/lib.rs"]
 workspace_root = "."
-features = ["serde", "config"]
+features = ["serde", "config", "download"]
 
 [include]
 types = [
@@ -41,6 +45,7 @@ types = [
     "CaptureOutput",
     "NodeInfo",
     "QueryMatch",
+    "CaptureResult",
     "Error",
     "LanguageRegistry",
     "DownloadManager",
@@ -55,7 +60,6 @@ functions = [
     "detect_language_from_path",
     "detect_language_from_extension",
     "detect_language_from_content",
-    "extension_ambiguity",
     "get_highlights_query",
     "get_injections_query",
     "get_locals_query",
@@ -70,7 +74,6 @@ functions = [
     "named_children_info",
     "root_node_info",
     "run_query",
-    "split_code",
     "init",
     "configure",
     "download",
@@ -305,12 +308,6 @@ function = "available_languages"
 module = "tree_sitter_language_pack"
 result_var = "result"
 args = []
-
-[e2e.calls.ambiguity]
-function = "extension_ambiguity"
-module = "tree_sitter_language_pack"
-result_var = "result"
-args = [{ name = "ext", field = "extension", type = "string" }]
 
 [e2e.calls.highlights]
 function = "get_highlights_query"

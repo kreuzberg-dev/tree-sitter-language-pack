@@ -75,11 +75,7 @@ repos:
             "--allow-staged",
             "--workspace",
             "--exclude",
-            "ts-pack-ruby",
-            "--exclude",
-            "ts-pack-php",
-            "--exclude",
-            "ts-pack-wasm",
+            "ts-pack-core-wasm",
             "--all-targets",
             "--",
             "-D",
@@ -279,7 +275,7 @@ repos:
 
   # Alef: polyglot binding generation and version sync
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.4.5
+    rev: v0.5.1
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

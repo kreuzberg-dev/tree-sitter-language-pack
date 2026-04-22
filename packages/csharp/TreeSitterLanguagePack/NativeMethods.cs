@@ -6,10 +6,7 @@ namespace TreeSitterLanguagePack;
 
 internal static partial class NativeMethods
 {
-    private const string LibName = "ts_pack_core_ffi";
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_tree_free")]
-    internal static extern void TreeFree(IntPtr ptr);
+    private const string LibName = "ts_pack_ffi";
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_extraction_config_from_json")]
     internal static extern IntPtr ExtractionConfigFromJson([MarshalAs(UnmanagedType.LPStr)] string json);
@@ -17,26 +14,47 @@ internal static partial class NativeMethods
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_extraction_config_free")]
     internal static extern void ExtractionConfigFree(IntPtr ptr);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_process_config_from_json")]
-    internal static extern IntPtr ProcessConfigFromJson([MarshalAs(UnmanagedType.LPStr)] string json);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_process_config_free")]
-    internal static extern void ProcessConfigFree(IntPtr ptr);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_language_registry_free")]
-    internal static extern void LanguageRegistryFree(IntPtr ptr);
-
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_pack_config_from_json")]
     internal static extern IntPtr PackConfigFromJson([MarshalAs(UnmanagedType.LPStr)] string json);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_pack_config_free")]
     internal static extern void PackConfigFree(IntPtr ptr);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_validation_result_to_json")]
-    internal static extern IntPtr ValidationResultToJson(IntPtr ptr);
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_process_config_from_json")]
+    internal static extern IntPtr ProcessConfigFromJson([MarshalAs(UnmanagedType.LPStr)] string json);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_validation_result_free")]
-    internal static extern void ValidationResultFree(IntPtr ptr);
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_process_config_free")]
+    internal static extern void ProcessConfigFree(IntPtr ptr);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_tree_free")]
+    internal static extern void TreeFree(IntPtr ptr);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_download_manager_free")]
+    internal static extern void DownloadManagerFree(IntPtr ptr);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_extraction_result_to_json")]
+    internal static extern IntPtr ExtractionResultToJson(IntPtr ptr);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_extraction_result_free")]
+    internal static extern void ExtractionResultFree(IntPtr ptr);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_language_free")]
+    internal static extern void LanguageFree(IntPtr ptr);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_language_registry_free")]
+    internal static extern void LanguageRegistryFree(IntPtr ptr);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_node_info_to_json")]
+    internal static extern IntPtr NodeInfoToJson(IntPtr ptr);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_node_info_free")]
+    internal static extern void NodeInfoFree(IntPtr ptr);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_pack_config_to_json")]
+    internal static extern IntPtr PackConfigToJson(IntPtr ptr);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_parser_free")]
+    internal static extern void ParserFree(IntPtr ptr);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_parser_manifest_to_json")]
     internal static extern IntPtr ParserManifestToJson(IntPtr ptr);
@@ -47,35 +65,17 @@ internal static partial class NativeMethods
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_process_config_to_json")]
     internal static extern IntPtr ProcessConfigToJson(IntPtr ptr);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_pack_config_to_json")]
-    internal static extern IntPtr PackConfigToJson(IntPtr ptr);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_node_info_to_json")]
-    internal static extern IntPtr NodeInfoToJson(IntPtr ptr);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_node_info_free")]
-    internal static extern void NodeInfoFree(IntPtr ptr);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_extraction_result_to_json")]
-    internal static extern IntPtr ExtractionResultToJson(IntPtr ptr);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_extraction_result_free")]
-    internal static extern void ExtractionResultFree(IntPtr ptr);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_parser_free")]
-    internal static extern void ParserFree(IntPtr ptr);
-
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_process_result_to_json")]
     internal static extern IntPtr ProcessResultToJson(IntPtr ptr);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_process_result_free")]
     internal static extern void ProcessResultFree(IntPtr ptr);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_language_free")]
-    internal static extern void LanguageFree(IntPtr ptr);
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_validation_result_to_json")]
+    internal static extern IntPtr ValidationResultToJson(IntPtr ptr);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_download_manager_free")]
-    internal static extern void DownloadManagerFree(IntPtr ptr);
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_validation_result_free")]
+    internal static extern void ValidationResultFree(IntPtr ptr);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_detect_language_from_extension")]
     internal static extern IntPtr DetectLanguageFromExtension(
@@ -87,26 +87,9 @@ internal static partial class NativeMethods
         [MarshalAs(UnmanagedType.LPStr)] string path
     );
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_extension_ambiguity")]
-    internal static extern IntPtr ExtensionAmbiguity(
-        [MarshalAs(UnmanagedType.LPStr)] string ext
-    );
-
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_detect_language_from_content")]
     internal static extern IntPtr DetectLanguageFromContent(
         [MarshalAs(UnmanagedType.LPStr)] string content
-    );
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_validate_extraction")]
-    internal static extern IntPtr ValidateExtraction(
-        IntPtr config
-    );
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_process")]
-    internal static extern IntPtr Process(
-        [MarshalAs(UnmanagedType.LPStr)] string source,
-        IntPtr config,
-        IntPtr registry
     );
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_root_node_info")]
@@ -175,13 +158,6 @@ internal static partial class NativeMethods
         IntPtr source
     );
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_split_code")]
-    internal static extern IntPtr SplitCode(
-        [MarshalAs(UnmanagedType.LPStr)] string source,
-        IntPtr tree,
-        ulong maxChunkSize
-    );
-
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_get_language")]
     internal static extern IntPtr GetLanguage(
         [MarshalAs(UnmanagedType.LPStr)] string name
@@ -203,9 +179,20 @@ internal static partial class NativeMethods
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_language_count")]
     internal static extern ulong LanguageCount();
 
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_process")]
+    internal static extern IntPtr Process(
+        [MarshalAs(UnmanagedType.LPStr)] string source,
+        IntPtr config
+    );
+
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_extract_patterns")]
     internal static extern IntPtr ExtractPatterns(
         [MarshalAs(UnmanagedType.LPStr)] string source,
+        IntPtr config
+    );
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ts_pack_validate_extraction")]
+    internal static extern IntPtr ValidateExtraction(
         IntPtr config
     );
 

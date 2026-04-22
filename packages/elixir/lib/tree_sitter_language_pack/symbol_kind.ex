@@ -12,5 +12,5 @@ defmodule TreeSitterLanguagePack.SymbolKind do
   @type interface :: :interface
   @type enum :: :enum
   @type module :: :module
-  @type other :: %{type: :other, 0: term()}
+  @type other :: %{type: :other, value_0: term()}
 end

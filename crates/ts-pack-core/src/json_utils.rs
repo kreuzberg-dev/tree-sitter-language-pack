@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use serde_json::Value;
 
 /// Recursively convert snake_case keys in a JSON Value to camelCase.

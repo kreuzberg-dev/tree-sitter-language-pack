@@ -49,8 +49,8 @@ pub struct QueryMatch {
 /// # Examples
 ///
 /// ```no_run
-/// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
-/// let matches = tree_sitter_language_pack::query::run_query(
+/// let tree = tree_sitter_language_pack::parse_string("python", b"def hello(): pass").unwrap();
+/// let matches = tree_sitter_language_pack::run_query(
 ///     &tree,
 ///     "python",
 ///     "(function_definition name: (identifier) @fn_name)",

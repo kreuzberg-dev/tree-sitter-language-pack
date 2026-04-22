@@ -108,6 +108,7 @@ Inspects only the first line of `content`. If it begins with `#!`, the
 interpreter name is extracted and mapped to a language name.
 
 Handles common patterns:
+
 - `#!/usr/bin/env python3` → `"python"`
 - `#!/bin/bash` → `"bash"`
 - `#!/usr/bin/env node` → `"javascript"`
@@ -610,6 +611,7 @@ def get_locals_query(language: str) -> str | None
 Execute a tree-sitter query pattern against a parsed tree.
 
 The `query_source` is an S-expression pattern like:
+
 ```text
 (function_definition name: (identifier) @name)
 ```
@@ -644,6 +646,7 @@ Split source code into chunks using tree-sitter AST structure for intelligent bo
 Returns a list of `(start_byte, end_byte)` ranges.
 
 The algorithm works by:
+
 1. Walking the tree-sitter AST to collect all nodes with their depth.
 2. Using depth as a semantic level: shallower nodes (functions, classes) are
    preferred split boundaries over deeper nodes (statements, expressions).
@@ -1075,7 +1078,7 @@ A single captured node within a match.
 | `name` | `str` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `NodeInfo | None` | `None` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `str | None` | `None` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `child_fields` | `AHashMap` | — | Values of requested child fields, keyed by field name. |
+| `child_fields` | `dict[str, str | None]` | `{}` | Values of requested child fields, keyed by field name. |
 | `start_byte` | `int` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1140,14 +1143,6 @@ patterns within a single extraction call, making this type `Send + Sync`.
 
 ##### Methods
 
-###### fmt()
-
-**Signature:**
-
-```python
-def fmt(self, f: Formatter) -> Unknown
-```
-
 ###### compile()
 
 Compile an extraction config for repeated use.
@@ -1178,7 +1173,7 @@ Returns an error if any query pattern is invalid.
 
 ```python
 @staticmethod
-def compile_with_language(language: Language, language_name: str, extraction_patterns: AHashMap) -> CompiledExtraction
+def compile_with_language(language: Language, language_name: str, extraction_patterns: dict[str, ExtractionPattern]) -> CompiledExtraction
 ```
 
 ###### extract()
@@ -1423,7 +1418,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `str` | — | The language name (e.g., `"python"`). |
-| `patterns` | `AHashMap` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `dict[str, ExtractionPattern]` | `{}` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1450,7 +1445,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `str` | — | The language that was used. |
-| `results` | `AHashMap` | — | Results keyed by pattern name. |
+| `results` | `dict[str, PatternResult]` | `{}` | Results keyed by pattern name. |
 
 
 ---
@@ -1827,7 +1822,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `bool` | `False` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `False` | Include parse diagnostics. Default: false. |
 | `chunk_max_size` | `int | None` | `None` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `AHashMap | None` | `None` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `extractions` | `dict[str, ExtractionPattern] | None` | `None` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
@@ -1893,7 +1888,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `list[SymbolInfo]` | `[]` | Symbols |
 | `diagnostics` | `list[Diagnostic]` | `[]` | Diagnostics |
 | `chunks` | `list[CodeChunk]` | `[]` | Text chunks for chunking/embedding |
-| `extractions` | `AHashMap` | — | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `dict[str, PatternResult]` | `{}` | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1975,7 +1970,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `bool` | — | Whether all patterns are valid. |
-| `patterns` | `AHashMap` | — | Per-pattern validation details. |
+| `patterns` | `dict[str, PatternValidation]` | `{}` | Per-pattern validation details. |
 
 
 ---
@@ -2135,4 +2130,3 @@ features are enabled.
 
 
 ---
-

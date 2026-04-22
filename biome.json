@@ -96,6 +96,16 @@
 					}
 				}
 			}
+		},
+		{
+			"includes": ["crates/ts-pack-core-node/index.d.ts"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noMisleadingInstantiator": "off"
+					}
+				}
+			}
 		}
 	]
 }

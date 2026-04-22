@@ -9,17 +9,15 @@ defmodule TreeSitterLanguagePack.Native do
       "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v#{Mix.Project.config()[:version]}",
     version: Mix.Project.config()[:version],
     force_build:
-      System.get_env("TREE_SITTER_LANGUAGE_PACK_BUILD") in ["1", "true"] or Mix.env() in [:test, :dev],
+      System.get_env("TREE_SITTER_LANGUAGE_PACK_BUILD") in ["1", "true"] or
+        Mix.env() in [:test, :dev],
     targets:
       ~w(aarch64-apple-darwin aarch64-unknown-linux-gnu x86_64-unknown-linux-gnu x86_64-pc-windows-gnu),
     nif_versions: ["2.16", "2.17"]
 
   def detect_language_from_extension(_ext), do: :erlang.nif_error(:nif_not_loaded)
   def detect_language_from_path(_path), do: :erlang.nif_error(:nif_not_loaded)
-  def extension_ambiguity(_ext), do: :erlang.nif_error(:nif_not_loaded)
   def detect_language_from_content(_content), do: :erlang.nif_error(:nif_not_loaded)
-  def validate_extraction(_config), do: :erlang.nif_error(:nif_not_loaded)
-  def process(_source, _config, _registry), do: :erlang.nif_error(:nif_not_loaded)
   def root_node_info(_tree), do: :erlang.nif_error(:nif_not_loaded)
   def find_nodes_by_type(_tree, _node_type), do: :erlang.nif_error(:nif_not_loaded)
   def named_children_info(_tree), do: :erlang.nif_error(:nif_not_loaded)
@@ -32,13 +30,14 @@ defmodule TreeSitterLanguagePack.Native do
   def get_injections_query(_language), do: :erlang.nif_error(:nif_not_loaded)
   def get_locals_query(_language), do: :erlang.nif_error(:nif_not_loaded)
   def run_query(_tree, _language, _query_source, _source), do: :erlang.nif_error(:nif_not_loaded)
-  def split_code(_source, _tree, _max_chunk_size), do: :erlang.nif_error(:nif_not_loaded)
   def get_language(_name), do: :erlang.nif_error(:nif_not_loaded)
   def get_parser(_name), do: :erlang.nif_error(:nif_not_loaded)
   def available_languages, do: :erlang.nif_error(:nif_not_loaded)
   def has_language(_name), do: :erlang.nif_error(:nif_not_loaded)
   def language_count, do: :erlang.nif_error(:nif_not_loaded)
+  def process(_source, _config), do: :erlang.nif_error(:nif_not_loaded)
   def extract_patterns(_source, _config), do: :erlang.nif_error(:nif_not_loaded)
+  def validate_extraction(_config), do: :erlang.nif_error(:nif_not_loaded)
   def init(_config), do: :erlang.nif_error(:nif_not_loaded)
   def configure(_config), do: :erlang.nif_error(:nif_not_loaded)
   def download(_names), do: :erlang.nif_error(:nif_not_loaded)

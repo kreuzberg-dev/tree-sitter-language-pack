@@ -3,6 +3,8 @@
 //! Mappings are auto-generated from `sources/language_definitions.json` by `build.rs`.
 //! To add or modify extension mappings, edit that JSON file and rebuild.
 
+#![allow(dead_code)]
+
 use memchr::memchr;
 
 /// Detect language name from a file extension (without leading dot).
@@ -44,18 +46,7 @@ pub fn detect_language_from_path(path: &str) -> Option<&'static str> {
 /// returns and `alternatives` lists other languages it could also belong to.
 ///
 /// Returns `None` if the extension is unambiguous or unrecognized.
-///
-/// ```
-/// use tree_sitter_language_pack::extension_ambiguity;
-/// // .m is assigned to objc but could also be matlab
-/// if let Some((assigned, alternatives)) = extension_ambiguity("m") {
-///     assert_eq!(assigned, "objc");
-///     assert!(alternatives.contains(&"matlab"));
-/// }
-/// // .py is unambiguous
-/// assert!(extension_ambiguity("py").is_none());
-/// ```
-pub fn extension_ambiguity(ext: &str) -> Option<(&'static str, &'static [&'static str])> {
+pub(crate) fn extension_ambiguity(ext: &str) -> Option<(&'static str, &'static [&'static str])> {
     let mut buf = [0u8; 32];
     let ext_lower = if ext.len() <= buf.len() && ext.is_ascii() {
         for (i, b) in ext.bytes().enumerate() {

@@ -4,7 +4,7 @@ package tspack
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../crates/ts-pack-core-ffi/include
-#cgo LDFLAGS: -L${SRCDIR}/../../target/release -lts_pack_core_ffi
+#cgo LDFLAGS: -L${SRCDIR}/../../target/release -lts_pack_ffi
 #include "ts_pack.h"
 */
 import "C"
@@ -1736,7 +1736,7 @@ func (h *Tree) Free() {
 // assert_eq!(detect_language_from_extension("RS"), Some("rust"));
 // assert_eq!(detect_language_from_extension("xyz"), None);
 // ```
-func DetectLanguageFromExtension(ext string) **string {
+func DetectLanguageFromExtension(ext string) *string {
     cExt := C.CString(ext)
     defer C.free(unsafe.Pointer(cExt))
 
@@ -1756,39 +1756,11 @@ func DetectLanguageFromExtension(ext string) **string {
 // assert_eq!(detect_language_from_path("README.md"), Some("markdown"));
 // assert_eq!(detect_language_from_path("Makefile"), None);
 // ```
-func DetectLanguageFromPath(path string) **string {
+func DetectLanguageFromPath(path string) *string {
     cPath := C.CString(path)
     defer C.free(unsafe.Pointer(cPath))
 
     ptr := C.ts_pack_detect_language_from_path(cPath)
-    return func() *string { v := C.GoString(ptr); return &v }()
-}
-
-
-// Check if a file extension is ambiguous — i.e. it could reasonably belong to
-// multiple languages.
-//
-// Returns `Some((assigned_language, alternatives))` if the extension is known
-// to be ambiguous, where `assigned_language` is what [`detect_language_from_extension`]
-// returns and `alternatives` lists other languages it could also belong to.
-//
-// Returns `None` if the extension is unambiguous or unrecognized.
-//
-// ```
-// use tree_sitter_language_pack::extension_ambiguity;
-// // .m is assigned to objc but could also be matlab
-// if let Some((assigned, alternatives)) = extension_ambiguity("m") {
-// assert_eq!(assigned, "objc");
-// assert!(alternatives.contains(&"matlab"));
-// }
-// // .py is unambiguous
-// assert!(extension_ambiguity("py").is_none());
-// ```
-func ExtensionAmbiguity(ext string) **string {
-    cExt := C.CString(ext)
-    defer C.free(unsafe.Pointer(cExt))
-
-    ptr := C.ts_pack_extension_ambiguity(cExt)
     return func() *string { v := C.GoString(ptr); return &v }()
 }
 
@@ -1815,84 +1787,12 @@ func ExtensionAmbiguity(ext string) **string {
 // assert_eq!(detect_language_from_content("#!/bin/bash\necho hi"), Some("bash"));
 // assert_eq!(detect_language_from_content("no shebang here"), None);
 // ```
-func DetectLanguageFromContent(content string) **string {
+func DetectLanguageFromContent(content string) *string {
     cContent := C.CString(content)
     defer C.free(unsafe.Pointer(cContent))
 
     ptr := C.ts_pack_detect_language_from_content(cContent)
     return func() *string { v := C.GoString(ptr); return &v }()
-}
-
-
-// Validate an extraction config without running it.
-//
-// Checks that the language exists and all query patterns compile. Returns
-// detailed diagnostics per pattern.
-//
-// # Errors
-//
-// Returns an error if the language cannot be loaded.
-func ValidateExtraction(config ExtractionConfig) (*ValidationResult, error) {
-    jsonBytescConfig, err := json.Marshal(config)
-    if err != nil {
-        return nil, fmt.Errorf("failed to marshal: %w", err)
-    }
-    tmpStrcConfig := C.CString(string(jsonBytescConfig))
-    cConfig := C.ts_pack_extraction_config_from_json(tmpStrcConfig)
-    C.free(unsafe.Pointer(tmpStrcConfig))
-    defer C.ts_pack_extraction_config_free(cConfig)
-
-    ptr := C.ts_pack_validate_extraction(cConfig)
-    if err := lastError(); err != nil {
-        if ptr != nil {
-            C.ts_pack_validation_result_free(ptr)
-        }
-        return nil, err
-    }
-    defer C.ts_pack_validation_result_free(ptr)
-    return func() *ValidationResult {
-	jsonPtr := C.ts_pack_validation_result_to_json(ptr)
-	if jsonPtr == nil { return nil }
-	defer C.ts_pack_free_string(jsonPtr)
-	var result ValidationResult
-	if err := json.Unmarshal([]byte(C.GoString(jsonPtr)), &result); err != nil { return nil }
-	return &result
-}(), nil
-}
-
-
-// Process source code: parse once, extract intelligence based on config, and return it.
-func Process(source string, config ProcessConfig, registry *LanguageRegistry) (*ProcessResult, error) {
-    cSource := C.CString(source)
-    defer C.free(unsafe.Pointer(cSource))
-
-    jsonBytescConfig, err := json.Marshal(config)
-    if err != nil {
-        return nil, fmt.Errorf("failed to marshal: %w", err)
-    }
-    tmpStrcConfig := C.CString(string(jsonBytescConfig))
-    cConfig := C.ts_pack_process_config_from_json(tmpStrcConfig)
-    C.free(unsafe.Pointer(tmpStrcConfig))
-    defer C.ts_pack_process_config_free(cConfig)
-
-    cRegistry := (*C.TS_PACKLanguageRegistry)(unsafe.Pointer(registry.ptr))
-
-    ptr := C.ts_pack_process(cSource, cConfig, cRegistry)
-    if err := lastError(); err != nil {
-        if ptr != nil {
-            C.ts_pack_process_result_free(ptr)
-        }
-        return nil, err
-    }
-    defer C.ts_pack_process_result_free(ptr)
-    return func() *ProcessResult {
-	jsonPtr := C.ts_pack_process_result_to_json(ptr)
-	if jsonPtr == nil { return nil }
-	defer C.ts_pack_free_string(jsonPtr)
-	var result ProcessResult
-	if err := json.Unmarshal([]byte(C.GoString(jsonPtr)), &result); err != nil { return nil }
-	return &result
-}(), nil
 }
 
 
@@ -1960,16 +1860,17 @@ func NamedChildrenInfo(tree *Tree) *[]NodeInfo {
 // # Examples
 //
 // ```no_run
-// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
+// let tree = tree_sitter_language_pack::parse_string("python", b"def hello(): pass").unwrap();
 // assert_eq!(tree.root_node().kind(), "module");
 // ```
 func ParseString(language string, source []byte) (*Tree, error) {
     cLanguage := C.CString(language)
     defer C.free(unsafe.Pointer(cLanguage))
 
-    cSource := (*C.uchar)(unsafe.Pointer(&source[0]))
+    cSource := (*C.uint8_t)(unsafe.Pointer(&source[0]))
+    cSourceLen := C.uintptr_t(len(source))
 
-    ptr := C.ts_pack_parse_string(cLanguage, cSource)
+    ptr := C.ts_pack_parse_string(cLanguage, cSource, cSourceLen)
     if err := lastError(); err != nil {
         if ptr != nil {
             C.ts_pack_tree_free(ptr)
@@ -2045,7 +1946,7 @@ func TreeErrorCount(tree *Tree) *uint {
 // let missing = get_highlights_query("nonexistent_lang");
 // assert!(missing.is_none());
 // ```
-func GetHighlightsQuery(language string) **string {
+func GetHighlightsQuery(language string) *string {
     cLanguage := C.CString(language)
     defer C.free(unsafe.Pointer(cLanguage))
 
@@ -2069,7 +1970,7 @@ func GetHighlightsQuery(language string) **string {
 // let missing = get_injections_query("nonexistent_lang");
 // assert!(missing.is_none());
 // ```
-func GetInjectionsQuery(language string) **string {
+func GetInjectionsQuery(language string) *string {
     cLanguage := C.CString(language)
     defer C.free(unsafe.Pointer(cLanguage))
 
@@ -2093,7 +1994,7 @@ func GetInjectionsQuery(language string) **string {
 // let missing = get_locals_query("nonexistent_lang");
 // assert!(missing.is_none());
 // ```
-func GetLocalsQuery(language string) **string {
+func GetLocalsQuery(language string) *string {
     cLanguage := C.CString(language)
     defer C.free(unsafe.Pointer(cLanguage))
 
@@ -2121,8 +2022,8 @@ func GetLocalsQuery(language string) **string {
 // # Examples
 //
 // ```no_run
-// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
-// let matches = tree_sitter_language_pack::query::run_query(
+// let tree = tree_sitter_language_pack::parse_string("python", b"def hello(): pass").unwrap();
+// let matches = tree_sitter_language_pack::run_query(
 // &tree,
 // "python",
 // "(function_definition name: (identifier) @fn_name)",
@@ -2139,9 +2040,10 @@ func RunQuery(tree *Tree, language string, query_source string, source []byte) (
     cQuerySource := C.CString(query_source)
     defer C.free(unsafe.Pointer(cQuerySource))
 
-    cSource := (*C.uchar)(unsafe.Pointer(&source[0]))
+    cSource := (*C.uint8_t)(unsafe.Pointer(&source[0]))
+    cSourceLen := C.uintptr_t(len(source))
 
-    ptr := C.ts_pack_run_query(cTree, cLanguage, cQuerySource, cSource)
+    ptr := C.ts_pack_run_query(cTree, cLanguage, cQuerySource, cSource, cSourceLen)
     if err := lastError(); err != nil {
         return nil, err
     }
@@ -2152,50 +2054,6 @@ func RunQuery(tree *Tree, language string, query_source string, source []byte) (
 	if err := json.Unmarshal([]byte(C.GoString(ptr)), &result); err != nil { return nil }
 	return &result
 }(), nil
-}
-
-
-// Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
-// Returns a list of `(start_byte, end_byte)` ranges.
-//
-// The algorithm works by:
-// 1. Walking the tree-sitter AST to collect all nodes with their depth.
-// 2. Using depth as a semantic level: shallower nodes (functions, classes) are
-// preferred split boundaries over deeper nodes (statements, expressions).
-// 3. Greedily merging adjacent sections at the best semantic level that keeps
-// each chunk under `max_chunk_size` bytes.
-// 4. When no AST node boundary fits, falling back to line boundaries and
-// ultimately to raw byte splits.
-//
-// The function never splits in the middle of a token/leaf node when an AST
-// boundary is available.
-//
-// # Arguments
-//
-// * `source` - The full source code string.
-// * `tree`   - A tree-sitter `Tree` previously parsed from `source`.
-// * `max_chunk_size` - Maximum size in bytes for each chunk.
-//
-// # Returns
-//
-// A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
-// entire source. Ranges are non-overlapping, contiguous, and each range is
-// at most `max_chunk_size` bytes (except when a single indivisible token
-// exceeds that limit).
-func SplitCode(source string, tree *Tree, max_chunk_size uint) *[]string {
-    cSource := C.CString(source)
-    defer C.free(unsafe.Pointer(cSource))
-
-    cTree := (*C.TS_PACKTree)(unsafe.Pointer(tree.ptr))
-
-    ptr := C.ts_pack_split_code(cSource, cTree, cMaxChunkSize)
-    return func() *[]string {
-	if ptr == nil { return nil }
-	defer C.ts_pack_free_string(ptr)
-	var result []string
-	if err := json.Unmarshal([]byte(C.GoString(ptr)), &result); err != nil { return nil }
-	return &result
-}()
 }
 
 
@@ -2340,6 +2198,59 @@ func LanguageCount() *uint {
 }
 
 
+// Process source code and extract file intelligence using the global registry.
+//
+// Parses the source with tree-sitter and extracts metrics, structure, imports,
+// exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+// the flags set in [`ProcessConfig`].
+//
+// # Errors
+//
+// Returns an error if the language is not found or parsing fails.
+//
+// # Example
+//
+// ```no_run
+// use tree_sitter_language_pack::{ProcessConfig, process};
+//
+// let config = ProcessConfig::new("python").all();
+// let result = process("def hello(): pass", &config).unwrap();
+// println!("Language: {}", result.language);
+// println!("Lines: {}", result.metrics.total_lines);
+// println!("Structures: {}", result.structure.len());
+// ```
+func Process(source string, config ProcessConfig) (*ProcessResult, error) {
+    cSource := C.CString(source)
+    defer C.free(unsafe.Pointer(cSource))
+
+    jsonBytescConfig, err := json.Marshal(config)
+    if err != nil {
+        return nil, fmt.Errorf("failed to marshal: %w", err)
+    }
+    tmpStrcConfig := C.CString(string(jsonBytescConfig))
+    cConfig := C.ts_pack_process_config_from_json(tmpStrcConfig)
+    C.free(unsafe.Pointer(tmpStrcConfig))
+    defer C.ts_pack_process_config_free(cConfig)
+
+    ptr := C.ts_pack_process(cSource, cConfig)
+    if err := lastError(); err != nil {
+        if ptr != nil {
+            C.ts_pack_process_result_free(ptr)
+        }
+        return nil, err
+    }
+    defer C.ts_pack_process_result_free(ptr)
+    return func() *ProcessResult {
+	jsonPtr := C.ts_pack_process_result_to_json(ptr)
+	if jsonPtr == nil { return nil }
+	defer C.ts_pack_free_string(jsonPtr)
+	var result ProcessResult
+	if err := json.Unmarshal([]byte(C.GoString(jsonPtr)), &result); err != nil { return nil }
+	return &result
+}(), nil
+}
+
+
 // Run extraction patterns against source code.
 //
 // Convenience wrapper around [`extract::extract`].
@@ -2392,6 +2303,42 @@ func ExtractPatterns(source string, config ExtractionConfig) (*ExtractionResult,
 	if jsonPtr == nil { return nil }
 	defer C.ts_pack_free_string(jsonPtr)
 	var result ExtractionResult
+	if err := json.Unmarshal([]byte(C.GoString(jsonPtr)), &result); err != nil { return nil }
+	return &result
+}(), nil
+}
+
+
+// Validate extraction patterns without running them.
+//
+// Convenience wrapper around [`extract::validate_extraction`].
+//
+// # Errors
+//
+// Returns an error if the language cannot be loaded.
+func ValidateExtraction(config ExtractionConfig) (*ValidationResult, error) {
+    jsonBytescConfig, err := json.Marshal(config)
+    if err != nil {
+        return nil, fmt.Errorf("failed to marshal: %w", err)
+    }
+    tmpStrcConfig := C.CString(string(jsonBytescConfig))
+    cConfig := C.ts_pack_extraction_config_from_json(tmpStrcConfig)
+    C.free(unsafe.Pointer(tmpStrcConfig))
+    defer C.ts_pack_extraction_config_free(cConfig)
+
+    ptr := C.ts_pack_validate_extraction(cConfig)
+    if err := lastError(); err != nil {
+        if ptr != nil {
+            C.ts_pack_validation_result_free(ptr)
+        }
+        return nil, err
+    }
+    defer C.ts_pack_validation_result_free(ptr)
+    return func() *ValidationResult {
+	jsonPtr := C.ts_pack_validation_result_to_json(ptr)
+	if jsonPtr == nil { return nil }
+	defer C.ts_pack_free_string(jsonPtr)
+	var result ValidationResult
 	if err := json.Unmarshal([]byte(C.GoString(jsonPtr)), &result); err != nil { return nil }
 	return &result
 }(), nil
@@ -2661,7 +2608,7 @@ func CacheDir() (*string, error) {
 // println!("Found config with {:?} languages", config.languages);
 // }
 // ```
-func PackConfigDiscover() **PackConfig {
+func PackConfigDiscover() *PackConfig {
     ptr := C.ts_pack_pack_config_discover()
     return func() *PackConfig {
 	jsonPtr := C.ts_pack_pack_config_to_json(ptr)
@@ -2676,6 +2623,8 @@ func PackConfigDiscover() **PackConfig {
 
 // Enable chunking with the given maximum chunk size in bytes.
 func (r *ProcessConfig) WithChunking(max_size uint) (*ProcessConfig, error) {
+    cMaxSize := C.size_t(uint(max_size))
+
     jsonBytesRecv, err := json.Marshal(r)
     if err != nil {
         return nil, fmt.Errorf("failed to marshal receiver: %w", err)

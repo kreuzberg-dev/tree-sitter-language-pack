@@ -108,6 +108,7 @@ Inspects only the first line of `content`. If it begins with `#!`, the
 interpreter name is extracted and mapped to a language name.
 
 Handles common patterns:
+
 - `#!/usr/bin/env python3` → `"python"`
 - `#!/bin/bash` → `"bash"`
 - `#!/usr/bin/env node` → `"javascript"`
@@ -610,6 +611,7 @@ public static Optional<String> getLocalsQuery(String language)
 Execute a tree-sitter query pattern against a parsed tree.
 
 The `query_source` is an S-expression pattern like:
+
 ```text
 (function_definition name: (identifier) @name)
 ```
@@ -644,6 +646,7 @@ Split source code into chunks using tree-sitter AST structure for intelligent bo
 Returns a list of `(start_byte, end_byte)` ranges.
 
 The algorithm works by:
+
 1. Walking the tree-sitter AST to collect all nodes with their depth.
 2. Using depth as a semantic level: shallower nodes (functions, classes) are
    preferred split boundaries over deeper nodes (statements, expressions).
@@ -1075,7 +1078,7 @@ A single captured node within a match.
 | `name` | `String` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `Optional<NodeInfo>` | `null` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `Optional<String>` | `null` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `childFields` | `AHashMap` | — | Values of requested child fields, keyed by field name. |
+| `childFields` | `Map<String, Optional<String>>` | `Collections.emptyMap()` | Values of requested child fields, keyed by field name. |
 | `startByte` | `long` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1140,14 +1143,6 @@ patterns within a single extraction call, making this type `Send + Sync`.
 
 ##### Methods
 
-###### fmt()
-
-**Signature:**
-
-```java
-public Unknown fmt(Formatter f)
-```
-
 ###### compile()
 
 Compile an extraction config for repeated use.
@@ -1176,7 +1171,7 @@ Returns an error if any query pattern is invalid.
 **Signature:**
 
 ```java
-public static CompiledExtraction compileWithLanguage(Language language, String languageName, AHashMap extractionPatterns) throws Error
+public static CompiledExtraction compileWithLanguage(Language language, String languageName, Map<String, ExtractionPattern> extractionPatterns) throws Error
 ```
 
 ###### extract()
@@ -1416,7 +1411,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language name (e.g., `"python"`). |
-| `patterns` | `AHashMap` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `Map<String, ExtractionPattern>` | `Collections.emptyMap()` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1443,7 +1438,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language that was used. |
-| `results` | `AHashMap` | — | Results keyed by pattern name. |
+| `results` | `Map<String, PatternResult>` | `Collections.emptyMap()` | Results keyed by pattern name. |
 
 
 ---
@@ -1816,7 +1811,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `boolean` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `boolean` | `false` | Include parse diagnostics. Default: false. |
 | `chunkMaxSize` | `Optional<long>` | `null` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `Optional<AHashMap>` | `null` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `extractions` | `Optional<Map<String, ExtractionPattern>>` | `null` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
@@ -1881,7 +1876,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `List<SymbolInfo>` | `Collections.emptyList()` | Symbols |
 | `diagnostics` | `List<Diagnostic>` | `Collections.emptyList()` | Diagnostics |
 | `chunks` | `List<CodeChunk>` | `Collections.emptyList()` | Text chunks for chunking/embedding |
-| `extractions` | `AHashMap` | — | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `Map<String, PatternResult>` | `Collections.emptyMap()` | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1963,7 +1958,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `boolean` | — | Whether all patterns are valid. |
-| `patterns` | `AHashMap` | — | Per-pattern validation details. |
+| `patterns` | `Map<String, PatternValidation>` | `Collections.emptyMap()` | Per-pattern validation details. |
 
 
 ---
@@ -2121,4 +2116,3 @@ features are enabled.
 
 
 ---
-

@@ -1009,10 +1009,7 @@ class TreeSitterLanguagePackApi
 {
     public static function detectLanguageFromExtension(string $ext): ?string { }
     public static function detectLanguageFromPath(string $path): ?string { }
-    public static function extensionAmbiguity(string $ext): ?string { }
     public static function detectLanguageFromContent(string $content): ?string { }
-    public static function validateExtraction(\Tree\Sitter\Language\Pack\ExtractionConfig $config): \Tree\Sitter\Language\Pack\ValidationResult { }
-    public static function process(string $source, \Tree\Sitter\Language\Pack\ProcessConfig $config, \Tree\Sitter\Language\Pack\LanguageRegistry $registry): \Tree\Sitter\Language\Pack\ProcessResult { }
     public static function rootNodeInfo(\Tree\Sitter\Language\Pack\Tree $tree): \Tree\Sitter\Language\Pack\NodeInfo { }
     public static function findNodesByType(\Tree\Sitter\Language\Pack\Tree $tree, string $node_type): array { }
     public static function namedChildrenInfo(\Tree\Sitter\Language\Pack\Tree $tree): array { }
@@ -1025,13 +1022,14 @@ class TreeSitterLanguagePackApi
     public static function getInjectionsQuery(string $language): ?string { }
     public static function getLocalsQuery(string $language): ?string { }
     public static function runQuery(\Tree\Sitter\Language\Pack\Tree $tree, string $language, string $query_source, string $source): array { }
-    public static function splitCode(string $source, \Tree\Sitter\Language\Pack\Tree $tree, int $max_chunk_size): array { }
     public static function getLanguage(string $name): \Tree\Sitter\Language\Pack\Language { }
     public static function getParser(string $name): \Tree\Sitter\Language\Pack\Parser { }
     public static function availableLanguages(): array { }
     public static function hasLanguage(string $name): bool { }
     public static function languageCount(): int { }
+    public static function process(string $source, \Tree\Sitter\Language\Pack\ProcessConfig $config): \Tree\Sitter\Language\Pack\ProcessResult { }
     public static function extractPatterns(string $source, \Tree\Sitter\Language\Pack\ExtractionConfig $config): \Tree\Sitter\Language\Pack\ExtractionResult { }
+    public static function validateExtraction(\Tree\Sitter\Language\Pack\ExtractionConfig $config): \Tree\Sitter\Language\Pack\ValidationResult { }
     public static function init(\Tree\Sitter\Language\Pack\PackConfig $config): void { }
     public static function configure(\Tree\Sitter\Language\Pack\PackConfig $config): void { }
     /**

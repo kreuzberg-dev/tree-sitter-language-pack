@@ -8,6 +8,14 @@
     clippy::map_identity,
     clippy::just_underscores_and_digits
 )]
+#![allow(
+    clippy::unnecessary_cast,
+    clippy::unused_unit,
+    clippy::unwrap_or_default,
+    clippy::derivable_impls,
+    clippy::needless_borrows_for_generic_args,
+    clippy::unnecessary_fallible_conversions
+)]
 
 use napi::*;
 use napi_derive::napi;
@@ -661,39 +669,9 @@ pub fn detect_language_from_path(path: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_path(&path).map(Into::into)
 }
 
-#[napi(js_name = "extensionAmbiguity")]
-pub fn extension_ambiguity(ext: String) -> Option<String> {
-    let _ = ext;
-    None
-}
-
 #[napi(js_name = "detectLanguageFromContent")]
 pub fn detect_language_from_content(content: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_content(&content).map(Into::into)
-}
-
-#[allow(clippy::missing_errors_doc)]
-#[napi(js_name = "validateExtraction")]
-pub fn validate_extraction(config: JsExtractionConfig) -> Result<JsValidationResult> {
-    let config_json =
-        serde_json::to_string(&config).map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
-    let config_core: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json)
-        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
-    tree_sitter_language_pack::extract::validate_extraction(&config_core)
-        .map(|val| val.into())
-        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
-}
-
-#[allow(clippy::missing_errors_doc)]
-#[napi]
-pub fn process(source: String, config: JsProcessConfig, registry: &JsLanguageRegistry) -> Result<JsProcessResult> {
-    let config_json =
-        serde_json::to_string(&config).map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
-    let config_core: tree_sitter_language_pack::ProcessConfig = serde_json::from_str(&config_json)
-        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
-    tree_sitter_language_pack::intel::process(&source, &config_core, &registry.inner)
-        .map(|val| val.into())
-        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
 }
 
 #[napi(js_name = "rootNodeInfo")]
@@ -768,12 +746,6 @@ pub fn run_query(tree: &JsTree, language: String, query_source: String, source: 
         .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
 }
 
-#[napi(js_name = "splitCode")]
-pub fn split_code(source: String, tree: &JsTree, max_chunk_size: i64) -> Vec<String> {
-    let _ = (source, tree, max_chunk_size);
-    Vec::new()
-}
-
 #[allow(clippy::missing_errors_doc)]
 #[napi(js_name = "getLanguage")]
 pub fn get_language(name: String) -> Result<JsLanguage> {
@@ -806,6 +778,18 @@ pub fn language_count() -> i64 {
 }
 
 #[allow(clippy::missing_errors_doc)]
+#[napi]
+pub fn process(source: String, config: JsProcessConfig) -> Result<JsProcessResult> {
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ProcessConfig = serde_json::from_str(&config_json)
+        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+    tree_sitter_language_pack::process(&source, &config_core)
+        .map(|val| val.into())
+        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
+}
+
+#[allow(clippy::missing_errors_doc)]
 #[napi(js_name = "extractPatterns")]
 pub fn extract_patterns(source: String, config: JsExtractionConfig) -> Result<JsExtractionResult> {
     let config_json =
@@ -813,6 +797,18 @@ pub fn extract_patterns(source: String, config: JsExtractionConfig) -> Result<Js
     let config_core: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json)
         .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
     tree_sitter_language_pack::extract_patterns(&source, &config_core)
+        .map(|val| val.into())
+        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
+}
+
+#[allow(clippy::missing_errors_doc)]
+#[napi(js_name = "validateExtraction")]
+pub fn validate_extraction(config: JsExtractionConfig) -> Result<JsValidationResult> {
+    let config_json =
+        serde_json::to_string(&config).map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+    let config_core: tree_sitter_language_pack::ExtractionConfig = serde_json::from_str(&config_json)
+        .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))?;
+    tree_sitter_language_pack::validate_extraction(&config_core)
         .map(|val| val.into())
         .map_err(|e| napi::Error::new(napi::Status::GenericFailure, e.to_string()))
 }
@@ -1467,7 +1463,7 @@ impl From<tree_sitter_language_pack::QueryMatch> for JsQueryMatch {
     fn from(val: tree_sitter_language_pack::QueryMatch) -> Self {
         Self {
             pattern_index: Some(val.pattern_index as i64),
-            captures: Some(val.captures.iter().map(|(name, info)| format!("{}:{:?}", name, info)).collect()),
+            captures: Some(val.captures.iter().map(|i| format!("{:?}", i)).collect()),
         }
     }
 }

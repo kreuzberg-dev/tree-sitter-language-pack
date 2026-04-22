@@ -108,6 +108,7 @@ Inspects only the first line of `content`. If it begins with `#!`, the
 interpreter name is extracted and mapped to a language name.
 
 Handles common patterns:
+
 - `#!/usr/bin/env python3` → `"python"`
 - `#!/bin/bash` → `"bash"`
 - `#!/usr/bin/env node` → `"javascript"`
@@ -610,6 +611,7 @@ const char** ts_pack_get_locals_query(const char* language);
 Execute a tree-sitter query pattern against a parsed tree.
 
 The `query_source` is an S-expression pattern like:
+
 ```text
 (function_definition name: (identifier) @name)
 ```
@@ -644,6 +646,7 @@ Split source code into chunks using tree-sitter AST structure for intelligent bo
 Returns a list of `(start_byte, end_byte)` ranges.
 
 The algorithm works by:
+
 1. Walking the tree-sitter AST to collect all nodes with their depth.
 2. Using depth as a semantic level: shallower nodes (functions, classes) are
    preferred split boundaries over deeper nodes (statements, expressions).
@@ -1075,7 +1078,7 @@ A single captured node within a match.
 | `name` | `const char*` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `TsPackNodeInfo*` | `NULL` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `const char**` | `NULL` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `child_fields` | `TsPackAHashMap` | — | Values of requested child fields, keyed by field name. |
+| `child_fields` | `void*` | `NULL` | Values of requested child fields, keyed by field name. |
 | `start_byte` | `uintptr_t` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1140,14 +1143,6 @@ patterns within a single extraction call, making this type `Send + Sync`.
 
 ##### Methods
 
-###### ts_pack_fmt()
-
-**Signature:**
-
-```c
-TsPackUnknown ts_pack_fmt(TsPackFormatter f);
-```
-
 ###### ts_pack_compile()
 
 Compile an extraction config for repeated use.
@@ -1176,7 +1171,7 @@ Returns an error if any query pattern is invalid.
 **Signature:**
 
 ```c
-TsPackCompiledExtraction ts_pack_compile_with_language(TsPackLanguage language, const char* language_name, TsPackAHashMap extraction_patterns);
+TsPackCompiledExtraction ts_pack_compile_with_language(TsPackLanguage language, const char* language_name, void* extraction_patterns);
 ```
 
 ###### ts_pack_extract()
@@ -1416,7 +1411,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `const char*` | — | The language name (e.g., `"python"`). |
-| `patterns` | `TsPackAHashMap` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `void*` | `NULL` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1443,7 +1438,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `const char*` | — | The language that was used. |
-| `results` | `TsPackAHashMap` | — | Results keyed by pattern name. |
+| `results` | `void*` | `NULL` | Results keyed by pattern name. |
 
 
 ---
@@ -1816,7 +1811,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
 | `chunk_max_size` | `uintptr_t*` | `NULL` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `TsPackAHashMap*` | `NULL` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `extractions` | `void**` | `NULL` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
@@ -1881,7 +1876,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `TsPackSymbolInfo*` | `NULL` | Symbols |
 | `diagnostics` | `TsPackDiagnostic*` | `NULL` | Diagnostics |
 | `chunks` | `TsPackCodeChunk*` | `NULL` | Text chunks for chunking/embedding |
-| `extractions` | `TsPackAHashMap` | — | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `void*` | `NULL` | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1963,7 +1958,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `bool` | — | Whether all patterns are valid. |
-| `patterns` | `TsPackAHashMap` | — | Per-pattern validation details. |
+| `patterns` | `void*` | `NULL` | Per-pattern validation details. |
 
 
 ---
@@ -2121,4 +2116,3 @@ features are enabled.
 
 
 ---
-

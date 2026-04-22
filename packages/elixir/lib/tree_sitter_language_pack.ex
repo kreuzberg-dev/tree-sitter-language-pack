@@ -14,28 +14,10 @@ defmodule TreeSitterLanguagePack do
     TreeSitterLanguagePack.Native.detect_language_from_path(path)
   end
 
-  @doc "Check if a file extension is ambiguous — i.e. it could reasonably belong to"
-  @spec extension_ambiguity(String.t()) :: String.t() | nil
-  def extension_ambiguity(ext) do
-    TreeSitterLanguagePack.Native.extension_ambiguity(ext)
-  end
-
   @doc "Detect language name from file content using the shebang line (`#!`)."
   @spec detect_language_from_content(String.t()) :: String.t() | nil
   def detect_language_from_content(content) do
     TreeSitterLanguagePack.Native.detect_language_from_content(content)
-  end
-
-  @doc "Validate an extraction config without running it."
-  @spec validate_extraction(String.t() | nil) :: {:ok, String.t() | nil} | {:error, String.t()}
-  def validate_extraction(config) do
-    TreeSitterLanguagePack.Native.validate_extraction(config)
-  end
-
-  @doc "Process source code: parse once, extract intelligence based on config, and return it."
-  @spec process(String.t(), String.t() | nil, reference()) :: {:ok, String.t() | nil} | {:error, String.t()}
-  def process(source, config, registry) do
-    TreeSitterLanguagePack.Native.process(source, config, registry)
   end
 
   @doc "Get a `NodeInfo` snapshot of the root node."
@@ -105,15 +87,14 @@ defmodule TreeSitterLanguagePack do
   end
 
   @doc "Execute a tree-sitter query pattern against a parsed tree."
-  @spec run_query(reference(), String.t(), String.t(), binary()) :: {:ok, [String.t() | nil]} | {:error, String.t()}
+  @spec run_query(
+          reference(),
+          String.t(),
+          String.t(),
+          binary()
+        ) :: {:ok, [String.t() | nil]} | {:error, String.t()}
   def run_query(tree, language, query_source, source) do
     TreeSitterLanguagePack.Native.run_query(tree, language, query_source, source)
-  end
-
-  @doc "Split source code into chunks using tree-sitter AST structure for intelligent boundaries."
-  @spec split_code(String.t(), reference(), non_neg_integer()) :: [String.t()]
-  def split_code(source, tree, max_chunk_size) do
-    TreeSitterLanguagePack.Native.split_code(source, tree, max_chunk_size)
   end
 
   @doc "Get a tree-sitter [`Language`] by name using the global registry."
@@ -146,10 +127,25 @@ defmodule TreeSitterLanguagePack do
     TreeSitterLanguagePack.Native.language_count()
   end
 
+  @doc "Process source code and extract file intelligence using the global registry."
+  @spec process(String.t(), String.t() | nil) :: {:ok, String.t() | nil} | {:error, String.t()}
+  def process(source, config) do
+    TreeSitterLanguagePack.Native.process(source, config)
+  end
+
   @doc "Run extraction patterns against source code."
-  @spec extract_patterns(String.t(), String.t() | nil) :: {:ok, String.t() | nil} | {:error, String.t()}
+  @spec extract_patterns(
+          String.t(),
+          String.t() | nil
+        ) :: {:ok, String.t() | nil} | {:error, String.t()}
   def extract_patterns(source, config) do
     TreeSitterLanguagePack.Native.extract_patterns(source, config)
+  end
+
+  @doc "Validate extraction patterns without running them."
+  @spec validate_extraction(String.t() | nil) :: {:ok, String.t() | nil} | {:error, String.t()}
+  def validate_extraction(config) do
+    TreeSitterLanguagePack.Native.validate_extraction(config)
   end
 
   @doc "Initialize the language pack with the given configuration."
@@ -249,7 +245,10 @@ defmodule TreeSitterLanguagePack do
   end
 
   @doc "Get a tree-sitter [`Language`] by name."
-  @spec languageregistry_get_language(map(), String.t()) :: {:ok, reference()} | {:error, String.t()}
+  @spec languageregistry_get_language(
+          map(),
+          String.t()
+        ) :: {:ok, reference()} | {:error, String.t()}
   def languageregistry_get_language(obj, name) do
     TreeSitterLanguagePack.Native.languageregistry_get_language(obj, name)
   end
@@ -273,7 +272,11 @@ defmodule TreeSitterLanguagePack do
   end
 
   @doc "Parse source code and extract file intelligence based on config in a single pass."
-  @spec languageregistry_process(map(), String.t(), String.t() | nil) :: {:ok, String.t() | nil} | {:error, String.t()}
+  @spec languageregistry_process(
+          map(),
+          String.t(),
+          String.t() | nil
+        ) :: {:ok, String.t() | nil} | {:error, String.t()}
   def languageregistry_process(obj, source, config) do
     TreeSitterLanguagePack.Native.languageregistry_process(obj, source, config)
   end
