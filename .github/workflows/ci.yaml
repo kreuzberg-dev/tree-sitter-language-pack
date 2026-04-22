@@ -253,7 +253,7 @@ jobs:
           TSLP_LINK_MODE: static
 
       - name: Install alef
-        run: cargo install --git https://github.com/kreuzberg-dev/alef --tag v0.5.2 --locked --bin alef
+        run: cargo install --git https://github.com/kreuzberg-dev/alef --tag v0.5.3 --locked --bin alef
         env:
           CARGO_INSTALL_ROOT: ${{ runner.temp }}/alef
 
