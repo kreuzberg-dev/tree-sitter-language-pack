@@ -2,7 +2,7 @@
 title: "Rust API Reference"
 ---
 
-## Rust API Reference <span class="version-badge">v1.6.3</span>
+## Rust API Reference <span class="version-badge">v1.7.0</span>
 
 ### Functions
 
@@ -53,53 +53,6 @@ pub fn detect_language_from_path(path: &str) -> Option<String>
 
 ---
 
-#### extension_ambiguity()
-
-Check if a file extension is ambiguous — i.e. it could reasonably belong to
-multiple languages.
-
-Returns `Some((assigned_language, alternatives))` if the extension is known
-to be ambiguous, where `assigned_language` is what `detect_language_from_extension`
-returns and `alternatives` lists other languages it could also belong to.
-
-Returns `None` if the extension is unambiguous or unrecognized.
-
-**Signature:**
-
-```rust
-pub fn extension_ambiguity(ext: &str) -> Option<(&'staticstr, &'static[&'staticstr])>
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ext` | `String` | Yes | The ext |
-
-**Returns:** `Option<(&'staticstr, &'static[&'staticstr])>`
-
-
----
-
-#### extension_ambiguity_json()
-
-**Signature:**
-
-```rust
-pub fn extension_ambiguity_json(ext: &str) -> Option<String>
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ext` | `String` | Yes | The ext |
-
-**Returns:** `Option<String>`
-
-
----
-
 #### detect_language_from_content()
 
 Detect language name from file content using the shebang line (`#!`).
@@ -132,213 +85,6 @@ pub fn detect_language_from_content(content: &str) -> Option<String>
 | `content` | `String` | Yes | The content to process |
 
 **Returns:** `Option<String>`
-
-
----
-
-#### extract()
-
-Run extraction patterns against source code, parsing and querying in one step.
-
-This is the simplest entry point. For repeated extractions with the same
-config, prefer `CompiledExtraction.compile` to avoid recompiling queries.
-
-**Errors:**
-
-Returns an error if the language is not found, parsing fails, or a query
-pattern is invalid.
-
-**Signature:**
-
-```rust
-pub fn extract(source: &str, config: ExtractionConfig) -> Result<ExtractionResult, Error>
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The source |
-| `config` | `ExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `ExtractionResult`
-
-**Errors:** Returns `Err(Error)`.
-
-
----
-
-#### validate_extraction()
-
-Validate an extraction config without running it.
-
-Checks that the language exists and all query patterns compile. Returns
-detailed diagnostics per pattern.
-
-**Errors:**
-
-Returns an error if the language cannot be loaded.
-
-**Signature:**
-
-```rust
-pub fn validate_extraction(config: ExtractionConfig) -> Result<ValidationResult, Error>
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `config` | `ExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `ValidationResult`
-
-**Errors:** Returns `Err(Error)`.
-
-
----
-
-#### chunk_source()
-
-Chunk source code and produce rich metadata per chunk.
-
-Uses the vendored text-splitter algorithm for AST-aware splitting,
-then overlays rich metadata on each resulting chunk.
-
-**Signature:**
-
-```rust
-pub fn chunk_source(source: &str, language: &str, max_chunk_size: usize, lang: Language, tree: Tree) -> Vec<CodeChunk>
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The source |
-| `language` | `String` | Yes | The language |
-| `max_chunk_size` | `usize` | Yes | The max chunk size |
-| `lang` | `Language` | Yes | The language |
-| `tree` | `Tree` | Yes | The tree |
-
-**Returns:** `Vec<CodeChunk>`
-
-
----
-
-#### extract_intelligence()
-
-Extract all intelligence from a parsed source file.
-
-**Signature:**
-
-```rust
-pub fn extract_intelligence(source: &str, language: &str, tree: Tree) -> ProcessResult
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The source |
-| `language` | `String` | Yes | The language |
-| `tree` | `Tree` | Yes | The tree |
-
-**Returns:** `ProcessResult`
-
-
----
-
-#### process()
-
-Process source code: parse once, extract intelligence based on config, and return it.
-
-**Signature:**
-
-```rust
-pub fn process(source: &str, config: ProcessConfig, registry: LanguageRegistry) -> Result<ProcessResult, Error>
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The source |
-| `config` | `ProcessConfig` | Yes | The configuration options |
-| `registry` | `LanguageRegistry` | Yes | The language registry |
-
-**Returns:** `ProcessResult`
-
-**Errors:** Returns `Err(Error)`.
-
-
----
-
-#### snake_to_camel()
-
-Recursively convert snake_case keys in a JSON Value to camelCase.
-
-Used by language bindings (Node.js, WASM, Go, Java, C#) to provide
-camelCase APIs while the Rust core uses snake_case.
-
-**Signature:**
-
-```rust
-pub fn snake_to_camel(val: Value) -> Value
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `val` | `Value` | Yes | The value |
-
-**Returns:** `Value`
-
-
----
-
-#### camel_to_snake()
-
-Recursively convert camelCase keys in a JSON Value to snake_case.
-
-Used by WASM bindings to accept camelCase config from JavaScript
-while the Rust core expects snake_case.
-
-**Signature:**
-
-```rust
-pub fn camel_to_snake(val: Value) -> Value
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `val` | `Value` | Yes | The value |
-
-**Returns:** `Value`
-
-
----
-
-#### node_info_from_node()
-
-Extract a `NodeInfo` from a tree-sitter `Node`.
-
-**Signature:**
-
-```rust
-pub fn node_info_from_node(node: Node) -> NodeInfo
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `node` | `Node` | Yes | The node |
-
-**Returns:** `NodeInfo`
 
 
 ---
@@ -640,71 +386,6 @@ pub fn run_query(tree: Tree, language: &str, query_source: &str, source: &[u8]) 
 
 ---
 
-#### split_code()
-
-Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
-Returns a list of `(start_byte, end_byte)` ranges.
-
-The algorithm works by:
-
-1. Walking the tree-sitter AST to collect all nodes with their depth.
-2. Using depth as a semantic level: shallower nodes (functions, classes) are
-   preferred split boundaries over deeper nodes (statements, expressions).
-3. Greedily merging adjacent sections at the best semantic level that keeps
-   each chunk under `max_chunk_size` bytes.
-4. When no AST node boundary fits, falling back to line boundaries and
-   ultimately to raw byte splits.
-
-The function never splits in the middle of a token/leaf node when an AST
-boundary is available.
-
-**Returns:**
-
-A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
-entire source. Ranges are non-overlapping, contiguous, and each range is
-at most `max_chunk_size` bytes (except when a single indivisible token
-exceeds that limit).
-
-**Signature:**
-
-```rust
-pub fn split_code(source: &str, tree: Tree, max_chunk_size: usize) -> Vec<(usize, usize)>
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The full source code string. |
-| `tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
-| `max_chunk_size` | `usize` | Yes | Maximum size in bytes for each chunk. |
-
-**Returns:** `Vec<(usize, usize)>`
-
-
----
-
-#### load_definitions()
-
-**Signature:**
-
-```rust
-pub fn load_definitions(json: &str) -> Result<LanguageDefinitions, Error>
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `json` | `String` | Yes | The json |
-
-**Returns:** `LanguageDefinitions`
-
-**Errors:** Returns `Err(Error)`.
-
-
----
-
 #### get_language()
 
 Get a tree-sitter `Language` by name using the global registry.
@@ -828,6 +509,38 @@ pub fn language_count() -> usize
 
 ---
 
+#### process()
+
+Process source code and extract file intelligence using the global registry.
+
+Parses the source with tree-sitter and extracts metrics, structure, imports,
+exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+the flags set in `ProcessConfig`.
+
+**Errors:**
+
+Returns an error if the language is not found or parsing fails.
+
+**Signature:**
+
+```rust
+pub fn process(source: &str, config: ProcessConfig) -> Result<ProcessResult, Error>
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `source` | `String` | Yes | The source |
+| `config` | `ProcessConfig` | Yes | The configuration options |
+
+**Returns:** `ProcessResult`
+
+**Errors:** Returns `Err(Error)`.
+
+
+---
+
 #### extract_patterns()
 
 Run extraction patterns against source code.
@@ -853,6 +566,35 @@ pub fn extract_patterns(source: &str, config: ExtractionConfig) -> Result<Extrac
 | `config` | `ExtractionConfig` | Yes | The configuration options |
 
 **Returns:** `ExtractionResult`
+
+**Errors:** Returns `Err(Error)`.
+
+
+---
+
+#### validate_extraction()
+
+Validate extraction patterns without running them.
+
+Convenience wrapper around `extract.validate_extraction`.
+
+**Errors:**
+
+Returns an error if the language cannot be loaded.
+
+**Signature:**
+
+```rust
+pub fn validate_extraction(config: ExtractionConfig) -> Result<ValidationResult, Error>
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `config` | `ExtractionConfig` | Yes | The configuration options |
+
+**Returns:** `ValidationResult`
 
 **Errors:** Returns `Err(Error)`.
 
@@ -1078,7 +820,7 @@ A single captured node within a match.
 | `name` | `String` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `Option<NodeInfo>` | `Default::default()` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `Option<String>` | `Default::default()` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `child_fields` | `HashMap<String, Option<String>>` | `HashMap::new()` | Values of requested child fields, keyed by field name. |
+| `child_fields` | `String` | — | Values of requested child fields, keyed by field name. |
 | `start_byte` | `usize` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1129,113 +871,6 @@ A comment extracted from source code.
 | `kind` | `CommentKind` | `CommentKind::Line` | Kind (comment kind) |
 | `span` | `Span` | — | Span (span) |
 | `associated_node` | `Option<String>` | `Default::default()` | Associated node |
-
-
----
-
-#### CompiledExtraction
-
-A pre-compiled extraction that can be reused across multiple source inputs.
-
-Stores compiled `tree_sitter.Query` objects and their capture names so they
-don't need to be recompiled for every call. A `QueryCursor` is reused across
-patterns within a single extraction call, making this type `Send + Sync`.
-
-##### Methods
-
-###### compile()
-
-Compile an extraction config for repeated use.
-
-**Errors:**
-
-Returns an error if the language is not found or any query pattern is invalid.
-
-**Signature:**
-
-```rust
-pub fn compile(config: ExtractionConfig) -> CompiledExtraction
-```
-
-###### compile_with_language()
-
-Compile extraction patterns using a pre-loaded `tree_sitter.Language`.
-
-This avoids a redundant language registry lookup when the caller already
-has the language (e.g., from an earlier parse step).
-
-**Errors:**
-
-Returns an error if any query pattern is invalid.
-
-**Signature:**
-
-```rust
-pub fn compile_with_language(language: Language, language_name: String, extraction_patterns: HashMap<String, ExtractionPattern>) -> CompiledExtraction
-```
-
-###### extract()
-
-Extract from source code, parsing it first.
-
-Uses the thread-local parser cache to avoid creating a new parser on
-every call.
-
-**Errors:**
-
-Returns an error if parsing fails.
-
-**Signature:**
-
-```rust
-pub fn extract(&self, source: String) -> ExtractionResult
-```
-
-###### extract_from_tree()
-
-Extract from an already-parsed tree.
-
-**Errors:**
-
-Returns an error if query execution fails.
-
-**Signature:**
-
-```rust
-pub fn extract_from_tree(&self, tree: Tree, source: Vec<u8>) -> ExtractionResult
-```
-
-
----
-
-#### Config
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `language_pack` | `LanguagePackConfig` | — | Language pack (language pack config) |
-| `languages` | `LanguagesConfig` | — | Languages (languages config) |
-
-##### Methods
-
-###### load()
-
-**Signature:**
-
-```rust
-pub fn load(path: PathBuf) -> Config
-```
-
-###### discover()
-
-Discover config file from standard locations.
-Returns Ok(Some(config)) if found and parsed, Ok(None) if not found,
-and Err if found but failed to parse.
-
-**Signature:**
-
-```rust
-pub fn discover() -> Option<Config>
-```
 
 
 ---
@@ -1294,7 +929,7 @@ Create a new download manager for the given version.
 **Signature:**
 
 ```rust
-pub fn new(version: String) -> DownloadManager
+pub fn new(version: &str) -> DownloadManager
 ```
 
 ###### with_cache_dir()
@@ -1304,7 +939,7 @@ Create a download manager with a custom cache directory.
 **Signature:**
 
 ```rust
-pub fn with_cache_dir(version: String, cache_dir: PathBuf) -> DownloadManager
+pub fn with_cache_dir(version: &str, cache_dir: PathBuf) -> DownloadManager
 ```
 
 ###### default_cache_dir()
@@ -1314,7 +949,7 @@ Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
 **Signature:**
 
 ```rust
-pub fn default_cache_dir(version: String) -> PathBuf
+pub fn default_cache_dir(version: &str) -> PathBuf
 ```
 
 ###### cache_dir()
@@ -1355,7 +990,7 @@ Ensure all languages in a named group are available.
 **Signature:**
 
 ```rust
-pub fn ensure_group(&self, group: String)
+pub fn ensure_group(&self, group: &str)
 ```
 
 ###### lib_path()
@@ -1365,7 +1000,7 @@ Get the expected path for a language's shared library in the cache.
 **Signature:**
 
 ```rust
-pub fn lib_path(&self, name: String) -> PathBuf
+pub fn lib_path(&self, name: &str) -> PathBuf
 ```
 
 ###### fetch_manifest()
@@ -1411,7 +1046,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language name (e.g., `"python"`). |
-| `patterns` | `HashMap<String, ExtractionPattern>` | `HashMap::new()` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `String` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1426,7 +1061,7 @@ Defines a single extraction pattern and its configuration.
 | `capture_output` | `CaptureOutput` | `CaptureOutput::Full` | What to include in each capture result. |
 | `child_fields` | `Vec<String>` | `vec![]` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `max_results` | `Option<usize>` | `Default::default()` | Maximum number of matches to return. `None` means unlimited. |
-| `byte_range` | `Option<(usize, usize)>` | `Default::default()` | Restrict matches to a byte range `(start, end)`. |
+| `byte_range` | `Option<String>` | `Default::default()` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1438,7 +1073,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language that was used. |
-| `results` | `HashMap<String, PatternResult>` | `HashMap::new()` | Results keyed by pattern name. |
+| `results` | `String` | — | Results keyed by pattern name. |
 
 
 ---
@@ -1454,8 +1089,8 @@ Aggregate metrics for a source file.
 | `comment_lines` | `usize` | — | Comment lines |
 | `blank_lines` | `usize` | — | Blank lines |
 | `total_bytes` | `usize` | — | Total bytes |
-| `node_count` | `usize` | — | Number of node |
-| `error_count` | `usize` | — | Number of error |
+| `node_count` | `usize` | — | Number of nodes |
+| `error_count` | `usize` | — | Number of errors |
 | `max_depth` | `usize` | — | Maximum depth |
 
 
@@ -1481,44 +1116,12 @@ An import statement extracted from source code.
 
 ---
 
-#### LanguageDefinition
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `repo` | `String` | — | Repo |
-| `rev` | `Option<String>` | `None` | Rev |
-| `branch` | `Option<String>` | `None` | Branch |
-| `directory` | `Option<String>` | `None` | Directory |
-| `generate` | `Option<bool>` | `None` | Generate |
-| `abi_version` | `Option<u32>` | `None` | Abi version |
-| `extensions` | `Vec<String>` | — | Extensions |
-| `c_symbol` | `Option<String>` | `None` | Override for the C symbol name when it differs from the language name. |
-| `ambiguous` | `HashMap<String, Vec<String>>` | — | Known ambiguous extensions mapped to the other languages they could belong to. Key: extension, Value: list of alternative language names. Example: `{"m": ["matlab"]}` on the `objc` definition means `.m` could also be MATLAB. |
-
-
----
-
-#### LanguageDefinitions
-
-
----
-
 #### LanguageInfo
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `group` | `String` | — | Group |
 | `size` | `u64` | — | Size in bytes |
-
-
----
-
-#### LanguagePackConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `cache_dir` | `Option<String>` | `Default::default()` | Cache dir |
-| `definitions` | `Option<String>` | `Default::default()` | Definitions |
 
 
 ---
@@ -1581,7 +1184,7 @@ does not match any known grammar.
 **Signature:**
 
 ```rust
-pub fn get_language(&self, name: String) -> Language
+pub fn get_language(&self, name: &str) -> Language
 ```
 
 ###### available_languages()
@@ -1607,7 +1210,7 @@ table or from a dynamic library on disk.
 **Signature:**
 
 ```rust
-pub fn has_language(&self, name: String) -> bool
+pub fn has_language(&self, name: &str) -> bool
 ```
 
 ###### language_count()
@@ -1627,7 +1230,7 @@ Parse source code and extract file intelligence based on config in a single pass
 **Signature:**
 
 ```rust
-pub fn process(&self, source: String, config: ProcessConfig) -> ProcessResult
+pub fn process(&self, source: &str, config: ProcessConfig) -> ProcessResult
 ```
 
 ###### default()
@@ -1637,16 +1240,6 @@ pub fn process(&self, source: String, config: ProcessConfig) -> ProcessResult
 ```rust
 pub fn default() -> LanguageRegistry
 ```
-
-
----
-
-#### LanguagesConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `include` | `Vec<String>` | `vec![]` | Include |
-| `exclude` | `Vec<String>` | `vec![]` | Exclude |
 
 
 ---
@@ -1673,7 +1266,7 @@ This is an owned type that can be passed across FFI boundaries, unlike
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `Str` | — | The grammar type name (e.g., "function_definition", "identifier"). |
+| `kind` | `String` | — | The grammar type name (e.g., "function_definition", "identifier"). |
 | `is_named` | `bool` | — | Whether this is a named node (vs anonymous like punctuation). |
 | `start_byte` | `usize` | — | Start byte offset in source. |
 | `end_byte` | `usize` | — | End byte offset in source. |
@@ -1802,7 +1395,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `Str` | — | Language name (required). |
+| `language` | `String` | — | Language name (required). |
 | `structure` | `bool` | `true` | Extract structural items (functions, classes, etc.). Default: true. |
 | `imports` | `bool` | `true` | Extract import statements. Default: true. |
 | `exports` | `bool` | `true` | Extract export statements. Default: true. |
@@ -1811,7 +1404,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
 | `chunk_max_size` | `Option<usize>` | `None` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `Option<HashMap<String, ExtractionPattern>>` | `None` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `extractions` | `Option<String>` | `None` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
@@ -1876,7 +1469,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `Vec<SymbolInfo>` | `vec![]` | Symbols |
 | `diagnostics` | `Vec<Diagnostic>` | `vec![]` | Diagnostics |
 | `chunks` | `Vec<CodeChunk>` | `vec![]` | Text chunks for chunking/embedding |
-| `extractions` | `HashMap<String, PatternResult>` | `HashMap::new()` | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `String` | — | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1888,7 +1481,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `pattern_index` | `usize` | — | The pattern index that matched (position in the query string). |
-| `captures` | `Vec<(Cow<'static, str>, NodeInfo)>` | `vec![]` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `Vec<String>` | `vec![]` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---
@@ -1958,7 +1551,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `bool` | — | Whether all patterns are valid. |
-| `patterns` | `HashMap<String, PatternValidation>` | `HashMap::new()` | Per-pattern validation details. |
+| `patterns` | `String` | — | Per-pattern validation details. |
 
 
 ---

@@ -2,7 +2,7 @@
 title: "Go API Reference"
 ---
 
-## Go API Reference <span class="version-badge">v1.6.3</span>
+## Go API Reference <span class="version-badge">v1.7.0</span>
 
 ### Functions
 
@@ -53,53 +53,6 @@ func DetectLanguageFromPath(path string) *string
 
 ---
 
-#### ExtensionAmbiguity()
-
-Check if a file extension is ambiguous — i.e. it could reasonably belong to
-multiple languages.
-
-Returns `Some((assigned_language, alternatives))` if the extension is known
-to be ambiguous, where `assigned_language` is what `detect_language_from_extension`
-returns and `alternatives` lists other languages it could also belong to.
-
-Returns `nil` if the extension is unambiguous or unrecognized.
-
-**Signature:**
-
-```go
-func ExtensionAmbiguity(ext string) *(string, []string)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Ext` | `string` | Yes | The ext |
-
-**Returns:** `*(string, []string)`
-
-
----
-
-#### ExtensionAmbiguityJson()
-
-**Signature:**
-
-```go
-func ExtensionAmbiguityJson(ext string) *string
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Ext` | `string` | Yes | The ext |
-
-**Returns:** `*string`
-
-
----
-
 #### DetectLanguageFromContent()
 
 Detect language name from file content using the shebang line (`#!`).
@@ -132,213 +85,6 @@ func DetectLanguageFromContent(content string) *string
 | `Content` | `string` | Yes | The content to process |
 
 **Returns:** `*string`
-
-
----
-
-#### Extract()
-
-Run extraction patterns against source code, parsing and querying in one step.
-
-This is the simplest entry point. For repeated extractions with the same
-config, prefer `CompiledExtraction.compile` to avoid recompiling queries.
-
-**Errors:**
-
-Returns an error if the language is not found, parsing fails, or a query
-pattern is invalid.
-
-**Signature:**
-
-```go
-func Extract(source string, config ExtractionConfig) (ExtractionResult, error)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Source` | `string` | Yes | The source |
-| `Config` | `ExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `ExtractionResult`
-
-**Errors:** Returns `error`.
-
-
----
-
-#### ValidateExtraction()
-
-Validate an extraction config without running it.
-
-Checks that the language exists and all query patterns compile. Returns
-detailed diagnostics per pattern.
-
-**Errors:**
-
-Returns an error if the language cannot be loaded.
-
-**Signature:**
-
-```go
-func ValidateExtraction(config ExtractionConfig) (ValidationResult, error)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Config` | `ExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `ValidationResult`
-
-**Errors:** Returns `error`.
-
-
----
-
-#### ChunkSource()
-
-Chunk source code and produce rich metadata per chunk.
-
-Uses the vendored text-splitter algorithm for AST-aware splitting,
-then overlays rich metadata on each resulting chunk.
-
-**Signature:**
-
-```go
-func ChunkSource(source string, language string, maxChunkSize int, lang Language, tree Tree) []CodeChunk
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Source` | `string` | Yes | The source |
-| `Language` | `string` | Yes | The language |
-| `MaxChunkSize` | `int` | Yes | The max chunk size |
-| `Lang` | `Language` | Yes | The language |
-| `Tree` | `Tree` | Yes | The tree |
-
-**Returns:** `[]CodeChunk`
-
-
----
-
-#### ExtractIntelligence()
-
-Extract all intelligence from a parsed source file.
-
-**Signature:**
-
-```go
-func ExtractIntelligence(source string, language string, tree Tree) ProcessResult
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Source` | `string` | Yes | The source |
-| `Language` | `string` | Yes | The language |
-| `Tree` | `Tree` | Yes | The tree |
-
-**Returns:** `ProcessResult`
-
-
----
-
-#### Process()
-
-Process source code: parse once, extract intelligence based on config, and return it.
-
-**Signature:**
-
-```go
-func Process(source string, config ProcessConfig, registry LanguageRegistry) (ProcessResult, error)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Source` | `string` | Yes | The source |
-| `Config` | `ProcessConfig` | Yes | The configuration options |
-| `Registry` | `LanguageRegistry` | Yes | The language registry |
-
-**Returns:** `ProcessResult`
-
-**Errors:** Returns `error`.
-
-
----
-
-#### SnakeToCamel()
-
-Recursively convert snake_case keys in a JSON Value to camelCase.
-
-Used by language bindings (Node.js, WASM, Go, Java, C#) to provide
-camelCase APIs while the Rust core uses snake_case.
-
-**Signature:**
-
-```go
-func SnakeToCamel(val Value) Value
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Val` | `Value` | Yes | The value |
-
-**Returns:** `Value`
-
-
----
-
-#### CamelToSnake()
-
-Recursively convert camelCase keys in a JSON Value to snake_case.
-
-Used by WASM bindings to accept camelCase config from JavaScript
-while the Rust core expects snake_case.
-
-**Signature:**
-
-```go
-func CamelToSnake(val Value) Value
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Val` | `Value` | Yes | The value |
-
-**Returns:** `Value`
-
-
----
-
-#### NodeInfoFromNode()
-
-Extract a `NodeInfo` from a tree-sitter `Node`.
-
-**Signature:**
-
-```go
-func NodeInfoFromNode(node Node) NodeInfo
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Node` | `Node` | Yes | The node |
-
-**Returns:** `NodeInfo`
 
 
 ---
@@ -640,71 +386,6 @@ func RunQuery(tree Tree, language string, querySource string, source []byte) ([]
 
 ---
 
-#### SplitCode()
-
-Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
-Returns a list of `(start_byte, end_byte)` ranges.
-
-The algorithm works by:
-
-1. Walking the tree-sitter AST to collect all nodes with their depth.
-2. Using depth as a semantic level: shallower nodes (functions, classes) are
-   preferred split boundaries over deeper nodes (statements, expressions).
-3. Greedily merging adjacent sections at the best semantic level that keeps
-   each chunk under `max_chunk_size` bytes.
-4. When no AST node boundary fits, falling back to line boundaries and
-   ultimately to raw byte splits.
-
-The function never splits in the middle of a token/leaf node when an AST
-boundary is available.
-
-**Returns:**
-
-A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
-entire source. Ranges are non-overlapping, contiguous, and each range is
-at most `max_chunk_size` bytes (except when a single indivisible token
-exceeds that limit).
-
-**Signature:**
-
-```go
-func SplitCode(source string, tree Tree, maxChunkSize int) [](int, int)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Source` | `string` | Yes | The full source code string. |
-| `Tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
-| `MaxChunkSize` | `int` | Yes | Maximum size in bytes for each chunk. |
-
-**Returns:** `[](int, int)`
-
-
----
-
-#### LoadDefinitions()
-
-**Signature:**
-
-```go
-func LoadDefinitions(json string) (LanguageDefinitions, error)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Json` | `string` | Yes | The json |
-
-**Returns:** `LanguageDefinitions`
-
-**Errors:** Returns `error`.
-
-
----
-
 #### GetLanguage()
 
 Get a tree-sitter `Language` by name using the global registry.
@@ -828,6 +509,38 @@ func LanguageCount() int
 
 ---
 
+#### Process()
+
+Process source code and extract file intelligence using the global registry.
+
+Parses the source with tree-sitter and extracts metrics, structure, imports,
+exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+the flags set in `ProcessConfig`.
+
+**Errors:**
+
+Returns an error if the language is not found or parsing fails.
+
+**Signature:**
+
+```go
+func Process(source string, config ProcessConfig) (ProcessResult, error)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Source` | `string` | Yes | The source |
+| `Config` | `ProcessConfig` | Yes | The configuration options |
+
+**Returns:** `ProcessResult`
+
+**Errors:** Returns `error`.
+
+
+---
+
 #### ExtractPatterns()
 
 Run extraction patterns against source code.
@@ -853,6 +566,35 @@ func ExtractPatterns(source string, config ExtractionConfig) (ExtractionResult, 
 | `Config` | `ExtractionConfig` | Yes | The configuration options |
 
 **Returns:** `ExtractionResult`
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### ValidateExtraction()
+
+Validate extraction patterns without running them.
+
+Convenience wrapper around `extract.validate_extraction`.
+
+**Errors:**
+
+Returns an error if the language cannot be loaded.
+
+**Signature:**
+
+```go
+func ValidateExtraction(config ExtractionConfig) (ValidationResult, error)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Config` | `ExtractionConfig` | Yes | The configuration options |
+
+**Returns:** `ValidationResult`
 
 **Errors:** Returns `error`.
 
@@ -1078,7 +820,7 @@ A single captured node within a match.
 | `Name` | `string` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `Node` | `*NodeInfo` | `nil` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `Text` | `*string` | `nil` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `ChildFields` | `map[string]*string` | `nil` | Values of requested child fields, keyed by field name. |
+| `ChildFields` | `string` | — | Values of requested child fields, keyed by field name. |
 | `StartByte` | `int` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1129,113 +871,6 @@ A comment extracted from source code.
 | `Kind` | `CommentKind` | `CommentKind.Line` | Kind (comment kind) |
 | `Span` | `Span` | — | Span (span) |
 | `AssociatedNode` | `*string` | `nil` | Associated node |
-
-
----
-
-#### CompiledExtraction
-
-A pre-compiled extraction that can be reused across multiple source inputs.
-
-Stores compiled `tree_sitter.Query` objects and their capture names so they
-don't need to be recompiled for every call. A `QueryCursor` is reused across
-patterns within a single extraction call, making this type `Send + Sync`.
-
-##### Methods
-
-###### Compile()
-
-Compile an extraction config for repeated use.
-
-**Errors:**
-
-Returns an error if the language is not found or any query pattern is invalid.
-
-**Signature:**
-
-```go
-func (o *CompiledExtraction) Compile(config ExtractionConfig) (CompiledExtraction, error)
-```
-
-###### CompileWithLanguage()
-
-Compile extraction patterns using a pre-loaded `tree_sitter.Language`.
-
-This avoids a redundant language registry lookup when the caller already
-has the language (e.g., from an earlier parse step).
-
-**Errors:**
-
-Returns an error if any query pattern is invalid.
-
-**Signature:**
-
-```go
-func (o *CompiledExtraction) CompileWithLanguage(language Language, languageName string, extractionPatterns map[string]ExtractionPattern) (CompiledExtraction, error)
-```
-
-###### Extract()
-
-Extract from source code, parsing it first.
-
-Uses the thread-local parser cache to avoid creating a new parser on
-every call.
-
-**Errors:**
-
-Returns an error if parsing fails.
-
-**Signature:**
-
-```go
-func (o *CompiledExtraction) Extract(source string) (ExtractionResult, error)
-```
-
-###### ExtractFromTree()
-
-Extract from an already-parsed tree.
-
-**Errors:**
-
-Returns an error if query execution fails.
-
-**Signature:**
-
-```go
-func (o *CompiledExtraction) ExtractFromTree(tree Tree, source []byte) (ExtractionResult, error)
-```
-
-
----
-
-#### Config
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `LanguagePack` | `LanguagePackConfig` | — | Language pack (language pack config) |
-| `Languages` | `LanguagesConfig` | — | Languages (languages config) |
-
-##### Methods
-
-###### Load()
-
-**Signature:**
-
-```go
-func (o *Config) Load(path string) (Config, error)
-```
-
-###### Discover()
-
-Discover config file from standard locations.
-Returns Ok(Some(config)) if found and parsed, Ok(None) if not found,
-and Err if found but failed to parse.
-
-**Signature:**
-
-```go
-func (o *Config) Discover() (*Config, error)
-```
 
 
 ---
@@ -1411,7 +1046,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Language` | `string` | — | The language name (e.g., `"python"`). |
-| `Patterns` | `map[string]ExtractionPattern` | `nil` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `Patterns` | `string` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1425,8 +1060,8 @@ Defines a single extraction pattern and its configuration.
 | `Query` | `string` | — | The tree-sitter query string (S-expression). |
 | `CaptureOutput` | `CaptureOutput` | `CaptureOutput.Full` | What to include in each capture result. |
 | `ChildFields` | `[]string` | `nil` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
-| `MaxResults` | `*int` | `nil` | Maximum number of matches to return. `None` means unlimited. |
-| `ByteRange` | `*(int, int)` | `nil` | Restrict matches to a byte range `(start, end)`. |
+| `MaxResults` | `*int` | `nil` | Maximum number of matches to return. `nil` means unlimited. |
+| `ByteRange` | `*string` | `nil` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1438,7 +1073,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Language` | `string` | — | The language that was used. |
-| `Results` | `map[string]PatternResult` | `nil` | Results keyed by pattern name. |
+| `Results` | `string` | — | Results keyed by pattern name. |
 
 
 ---
@@ -1454,8 +1089,8 @@ Aggregate metrics for a source file.
 | `CommentLines` | `int` | — | Comment lines |
 | `BlankLines` | `int` | — | Blank lines |
 | `TotalBytes` | `int` | — | Total bytes |
-| `NodeCount` | `int` | — | Number of node |
-| `ErrorCount` | `int` | — | Number of error |
+| `NodeCount` | `int` | — | Number of nodes |
+| `ErrorCount` | `int` | — | Number of errors |
 | `MaxDepth` | `int` | — | Maximum depth |
 
 
@@ -1481,44 +1116,12 @@ An import statement extracted from source code.
 
 ---
 
-#### LanguageDefinition
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Repo` | `string` | — | Repo |
-| `Rev` | `*string` | `nil` | Rev |
-| `Branch` | `*string` | `nil` | Branch |
-| `Directory` | `*string` | `nil` | Directory |
-| `Generate` | `*bool` | `nil` | Generate |
-| `AbiVersion` | `*uint32` | `nil` | Abi version |
-| `Extensions` | `[]string` | — | Extensions |
-| `CSymbol` | `*string` | `nil` | Override for the C symbol name when it differs from the language name. |
-| `Ambiguous` | `map[string][]string` | — | Known ambiguous extensions mapped to the other languages they could belong to. Key: extension, Value: list of alternative language names. Example: `{"m": ["matlab"]}` on the `objc` definition means `.m` could also be MATLAB. |
-
-
----
-
-#### LanguageDefinitions
-
-
----
-
 #### LanguageInfo
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Group` | `string` | — | Group |
 | `Size` | `uint64` | — | Size in bytes |
-
-
----
-
-#### LanguagePackConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `CacheDir` | `*string` | `nil` | Cache dir |
-| `Definitions` | `*string` | `nil` | Definitions |
 
 
 ---
@@ -1641,16 +1244,6 @@ func (o *LanguageRegistry) Default() LanguageRegistry
 
 ---
 
-#### LanguagesConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Include` | `[]string` | `nil` | Include |
-| `Exclude` | `[]string` | `nil` | Exclude |
-
-
----
-
 #### MatchResult
 
 A single query match containing one or more captures.
@@ -1673,7 +1266,7 @@ This is an owned type that can be passed across FFI boundaries, unlike
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `Kind` | `Str` | — | The grammar type name (e.g., "function_definition", "identifier"). |
+| `Kind` | `string` | — | The grammar type name (e.g., "function_definition", "identifier"). |
 | `IsNamed` | `bool` | — | Whether this is a named node (vs anonymous like punctuation). |
 | `StartByte` | `int` | — | Start byte offset in source. |
 | `EndByte` | `int` | — | End byte offset in source. |
@@ -1802,7 +1395,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `Language` | `Str` | — | Language name (required). |
+| `Language` | `string` | — | Language name (required). |
 | `Structure` | `bool` | `true` | Extract structural items (functions, classes, etc.). Default: true. |
 | `Imports` | `bool` | `true` | Extract import statements. Default: true. |
 | `Exports` | `bool` | `true` | Extract export statements. Default: true. |
@@ -1810,8 +1403,8 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `Docstrings` | `bool` | `false` | Extract docstrings. Default: false. |
 | `Symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `Diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
-| `ChunkMaxSize` | `*int` | `nil` | Maximum chunk size in bytes. `None` disables chunking. |
-| `Extractions` | `*map[string]ExtractionPattern` | `nil` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `ChunkMaxSize` | `*int` | `nil` | Maximum chunk size in bytes. `nil` disables chunking. |
+| `Extractions` | `*string` | `nil` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
@@ -1876,7 +1469,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `Symbols` | `[]SymbolInfo` | `nil` | Symbols |
 | `Diagnostics` | `[]Diagnostic` | `nil` | Diagnostics |
 | `Chunks` | `[]CodeChunk` | `nil` | Text chunks for chunking/embedding |
-| `Extractions` | `map[string]PatternResult` | `nil` | Results of custom extraction patterns (when `config.extractions` is set). |
+| `Extractions` | `string` | — | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1888,7 +1481,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `PatternIndex` | `int` | — | The pattern index that matched (position in the query string). |
-| `Captures` | `[](CowStatic, Str, NodeInfo)` | `nil` | Captures: list of (capture_name, node_info) pairs. |
+| `Captures` | `[]string` | `nil` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---
@@ -1958,7 +1551,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Valid` | `bool` | — | Whether all patterns are valid. |
-| `Patterns` | `map[string]PatternValidation` | `nil` | Per-pattern validation details. |
+| `Patterns` | `string` | — | Per-pattern validation details. |
 
 
 ---

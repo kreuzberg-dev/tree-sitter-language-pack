@@ -2,7 +2,7 @@
 title: "Java API Reference"
 ---
 
-## Java API Reference <span class="version-badge">v1.6.3</span>
+## Java API Reference <span class="version-badge">v1.7.0</span>
 
 ### Functions
 
@@ -53,53 +53,6 @@ public static Optional<String> detectLanguageFromPath(String path)
 
 ---
 
-#### extensionAmbiguity()
-
-Check if a file extension is ambiguous — i.e. it could reasonably belong to
-multiple languages.
-
-Returns `Some((assigned_language, alternatives))` if the extension is known
-to be ambiguous, where `assigned_language` is what `detect_language_from_extension`
-returns and `alternatives` lists other languages it could also belong to.
-
-Returns `null` if the extension is unambiguous or unrecognized.
-
-**Signature:**
-
-```java
-public static Optional<Tuple<String, List<String>>> extensionAmbiguity(String ext)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ext` | `String` | Yes | The ext |
-
-**Returns:** `Optional<Tuple<String, List<String>>>`
-
-
----
-
-#### extensionAmbiguityJson()
-
-**Signature:**
-
-```java
-public static Optional<String> extensionAmbiguityJson(String ext)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ext` | `String` | Yes | The ext |
-
-**Returns:** `Optional<String>`
-
-
----
-
 #### detectLanguageFromContent()
 
 Detect language name from file content using the shebang line (`#!`).
@@ -132,213 +85,6 @@ public static Optional<String> detectLanguageFromContent(String content)
 | `content` | `String` | Yes | The content to process |
 
 **Returns:** `Optional<String>`
-
-
----
-
-#### extract()
-
-Run extraction patterns against source code, parsing and querying in one step.
-
-This is the simplest entry point. For repeated extractions with the same
-config, prefer `CompiledExtraction.compile` to avoid recompiling queries.
-
-**Errors:**
-
-Returns an error if the language is not found, parsing fails, or a query
-pattern is invalid.
-
-**Signature:**
-
-```java
-public static ExtractionResult extract(String source, ExtractionConfig config) throws Error
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The source |
-| `config` | `ExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `ExtractionResult`
-
-**Errors:** Throws `ErrorException`.
-
-
----
-
-#### validateExtraction()
-
-Validate an extraction config without running it.
-
-Checks that the language exists and all query patterns compile. Returns
-detailed diagnostics per pattern.
-
-**Errors:**
-
-Returns an error if the language cannot be loaded.
-
-**Signature:**
-
-```java
-public static ValidationResult validateExtraction(ExtractionConfig config) throws Error
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `config` | `ExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `ValidationResult`
-
-**Errors:** Throws `ErrorException`.
-
-
----
-
-#### chunkSource()
-
-Chunk source code and produce rich metadata per chunk.
-
-Uses the vendored text-splitter algorithm for AST-aware splitting,
-then overlays rich metadata on each resulting chunk.
-
-**Signature:**
-
-```java
-public static List<CodeChunk> chunkSource(String source, String language, long maxChunkSize, Language lang, Tree tree)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The source |
-| `language` | `String` | Yes | The language |
-| `maxChunkSize` | `long` | Yes | The max chunk size |
-| `lang` | `Language` | Yes | The language |
-| `tree` | `Tree` | Yes | The tree |
-
-**Returns:** `List<CodeChunk>`
-
-
----
-
-#### extractIntelligence()
-
-Extract all intelligence from a parsed source file.
-
-**Signature:**
-
-```java
-public static ProcessResult extractIntelligence(String source, String language, Tree tree)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The source |
-| `language` | `String` | Yes | The language |
-| `tree` | `Tree` | Yes | The tree |
-
-**Returns:** `ProcessResult`
-
-
----
-
-#### process()
-
-Process source code: parse once, extract intelligence based on config, and return it.
-
-**Signature:**
-
-```java
-public static ProcessResult process(String source, ProcessConfig config, LanguageRegistry registry) throws Error
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The source |
-| `config` | `ProcessConfig` | Yes | The configuration options |
-| `registry` | `LanguageRegistry` | Yes | The language registry |
-
-**Returns:** `ProcessResult`
-
-**Errors:** Throws `ErrorException`.
-
-
----
-
-#### snakeToCamel()
-
-Recursively convert snake_case keys in a JSON Value to camelCase.
-
-Used by language bindings (Node.js, WASM, Go, Java, C#) to provide
-camelCase APIs while the Rust core uses snake_case.
-
-**Signature:**
-
-```java
-public static Value snakeToCamel(Value val)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `val` | `Value` | Yes | The value |
-
-**Returns:** `Value`
-
-
----
-
-#### camelToSnake()
-
-Recursively convert camelCase keys in a JSON Value to snake_case.
-
-Used by WASM bindings to accept camelCase config from JavaScript
-while the Rust core expects snake_case.
-
-**Signature:**
-
-```java
-public static Value camelToSnake(Value val)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `val` | `Value` | Yes | The value |
-
-**Returns:** `Value`
-
-
----
-
-#### nodeInfoFromNode()
-
-Extract a `NodeInfo` from a tree-sitter `Node`.
-
-**Signature:**
-
-```java
-public static NodeInfo nodeInfoFromNode(Node node)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `node` | `Node` | Yes | The node |
-
-**Returns:** `NodeInfo`
 
 
 ---
@@ -640,71 +386,6 @@ public static List<QueryMatch> runQuery(Tree tree, String language, String query
 
 ---
 
-#### splitCode()
-
-Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
-Returns a list of `(start_byte, end_byte)` ranges.
-
-The algorithm works by:
-
-1. Walking the tree-sitter AST to collect all nodes with their depth.
-2. Using depth as a semantic level: shallower nodes (functions, classes) are
-   preferred split boundaries over deeper nodes (statements, expressions).
-3. Greedily merging adjacent sections at the best semantic level that keeps
-   each chunk under `max_chunk_size` bytes.
-4. When no AST node boundary fits, falling back to line boundaries and
-   ultimately to raw byte splits.
-
-The function never splits in the middle of a token/leaf node when an AST
-boundary is available.
-
-**Returns:**
-
-A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
-entire source. Ranges are non-overlapping, contiguous, and each range is
-at most `max_chunk_size` bytes (except when a single indivisible token
-exceeds that limit).
-
-**Signature:**
-
-```java
-public static List<Tuple<long, long>> splitCode(String source, Tree tree, long maxChunkSize)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The full source code string. |
-| `tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
-| `maxChunkSize` | `long` | Yes | Maximum size in bytes for each chunk. |
-
-**Returns:** `List<Tuple<long, long>>`
-
-
----
-
-#### loadDefinitions()
-
-**Signature:**
-
-```java
-public static LanguageDefinitions loadDefinitions(String json) throws Error
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `json` | `String` | Yes | The json |
-
-**Returns:** `LanguageDefinitions`
-
-**Errors:** Throws `ErrorException`.
-
-
----
-
 #### getLanguage()
 
 Get a tree-sitter `Language` by name using the global registry.
@@ -828,6 +509,38 @@ public static long languageCount()
 
 ---
 
+#### process()
+
+Process source code and extract file intelligence using the global registry.
+
+Parses the source with tree-sitter and extracts metrics, structure, imports,
+exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+the flags set in `ProcessConfig`.
+
+**Errors:**
+
+Returns an error if the language is not found or parsing fails.
+
+**Signature:**
+
+```java
+public static ProcessResult process(String source, ProcessConfig config) throws Error
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `source` | `String` | Yes | The source |
+| `config` | `ProcessConfig` | Yes | The configuration options |
+
+**Returns:** `ProcessResult`
+
+**Errors:** Throws `ErrorException`.
+
+
+---
+
 #### extractPatterns()
 
 Run extraction patterns against source code.
@@ -853,6 +566,35 @@ public static ExtractionResult extractPatterns(String source, ExtractionConfig c
 | `config` | `ExtractionConfig` | Yes | The configuration options |
 
 **Returns:** `ExtractionResult`
+
+**Errors:** Throws `ErrorException`.
+
+
+---
+
+#### validateExtraction()
+
+Validate extraction patterns without running them.
+
+Convenience wrapper around `extract.validate_extraction`.
+
+**Errors:**
+
+Returns an error if the language cannot be loaded.
+
+**Signature:**
+
+```java
+public static ValidationResult validateExtraction(ExtractionConfig config) throws Error
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `config` | `ExtractionConfig` | Yes | The configuration options |
+
+**Returns:** `ValidationResult`
 
 **Errors:** Throws `ErrorException`.
 
@@ -1078,7 +820,7 @@ A single captured node within a match.
 | `name` | `String` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `Optional<NodeInfo>` | `null` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `Optional<String>` | `null` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `childFields` | `Map<String, Optional<String>>` | `Collections.emptyMap()` | Values of requested child fields, keyed by field name. |
+| `childFields` | `String` | — | Values of requested child fields, keyed by field name. |
 | `startByte` | `long` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1129,113 +871,6 @@ A comment extracted from source code.
 | `kind` | `CommentKind` | `CommentKind.LINE` | Kind (comment kind) |
 | `span` | `Span` | — | Span (span) |
 | `associatedNode` | `Optional<String>` | `null` | Associated node |
-
-
----
-
-#### CompiledExtraction
-
-A pre-compiled extraction that can be reused across multiple source inputs.
-
-Stores compiled `tree_sitter.Query` objects and their capture names so they
-don't need to be recompiled for every call. A `QueryCursor` is reused across
-patterns within a single extraction call, making this type `Send + Sync`.
-
-##### Methods
-
-###### compile()
-
-Compile an extraction config for repeated use.
-
-**Errors:**
-
-Returns an error if the language is not found or any query pattern is invalid.
-
-**Signature:**
-
-```java
-public static CompiledExtraction compile(ExtractionConfig config) throws Error
-```
-
-###### compileWithLanguage()
-
-Compile extraction patterns using a pre-loaded `tree_sitter.Language`.
-
-This avoids a redundant language registry lookup when the caller already
-has the language (e.g., from an earlier parse step).
-
-**Errors:**
-
-Returns an error if any query pattern is invalid.
-
-**Signature:**
-
-```java
-public static CompiledExtraction compileWithLanguage(Language language, String languageName, Map<String, ExtractionPattern> extractionPatterns) throws Error
-```
-
-###### extract()
-
-Extract from source code, parsing it first.
-
-Uses the thread-local parser cache to avoid creating a new parser on
-every call.
-
-**Errors:**
-
-Returns an error if parsing fails.
-
-**Signature:**
-
-```java
-public ExtractionResult extract(String source) throws Error
-```
-
-###### extractFromTree()
-
-Extract from an already-parsed tree.
-
-**Errors:**
-
-Returns an error if query execution fails.
-
-**Signature:**
-
-```java
-public ExtractionResult extractFromTree(Tree tree, byte[] source) throws Error
-```
-
-
----
-
-#### Config
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `languagePack` | `LanguagePackConfig` | — | Language pack (language pack config) |
-| `languages` | `LanguagesConfig` | — | Languages (languages config) |
-
-##### Methods
-
-###### load()
-
-**Signature:**
-
-```java
-public static Config load(String path) throws Error
-```
-
-###### discover()
-
-Discover config file from standard locations.
-Returns Ok(Some(config)) if found and parsed, Ok(None) if not found,
-and Err if found but failed to parse.
-
-**Signature:**
-
-```java
-public static Optional<Config> discover() throws Error
-```
 
 
 ---
@@ -1411,7 +1046,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language name (e.g., `"python"`). |
-| `patterns` | `Map<String, ExtractionPattern>` | `Collections.emptyMap()` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `String` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1425,8 +1060,8 @@ Defines a single extraction pattern and its configuration.
 | `query` | `String` | — | The tree-sitter query string (S-expression). |
 | `captureOutput` | `CaptureOutput` | `CaptureOutput.FULL` | What to include in each capture result. |
 | `childFields` | `List<String>` | `Collections.emptyList()` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
-| `maxResults` | `Optional<long>` | `null` | Maximum number of matches to return. `None` means unlimited. |
-| `byteRange` | `Optional<Tuple<long, long>>` | `null` | Restrict matches to a byte range `(start, end)`. |
+| `maxResults` | `Optional<Long>` | `null` | Maximum number of matches to return. `null` means unlimited. |
+| `byteRange` | `Optional<String>` | `null` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1438,7 +1073,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language that was used. |
-| `results` | `Map<String, PatternResult>` | `Collections.emptyMap()` | Results keyed by pattern name. |
+| `results` | `String` | — | Results keyed by pattern name. |
 
 
 ---
@@ -1454,8 +1089,8 @@ Aggregate metrics for a source file.
 | `commentLines` | `long` | — | Comment lines |
 | `blankLines` | `long` | — | Blank lines |
 | `totalBytes` | `long` | — | Total bytes |
-| `nodeCount` | `long` | — | Number of node |
-| `errorCount` | `long` | — | Number of error |
+| `nodeCount` | `long` | — | Number of nodes |
+| `errorCount` | `long` | — | Number of errors |
 | `maxDepth` | `long` | — | Maximum depth |
 
 
@@ -1481,44 +1116,12 @@ An import statement extracted from source code.
 
 ---
 
-#### LanguageDefinition
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `repo` | `String` | — | Repo |
-| `rev` | `Optional<String>` | `null` | Rev |
-| `branch` | `Optional<String>` | `null` | Branch |
-| `directory` | `Optional<String>` | `null` | Directory |
-| `generate` | `Optional<boolean>` | `null` | Generate |
-| `abiVersion` | `Optional<int>` | `null` | Abi version |
-| `extensions` | `List<String>` | — | Extensions |
-| `cSymbol` | `Optional<String>` | `null` | Override for the C symbol name when it differs from the language name. |
-| `ambiguous` | `Map<String, List<String>>` | — | Known ambiguous extensions mapped to the other languages they could belong to. Key: extension, Value: list of alternative language names. Example: `{"m": ["matlab"]}` on the `objc` definition means `.m` could also be MATLAB. |
-
-
----
-
-#### LanguageDefinitions
-
-
----
-
 #### LanguageInfo
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `group` | `String` | — | Group |
 | `size` | `long` | — | Size in bytes |
-
-
----
-
-#### LanguagePackConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `cacheDir` | `Optional<String>` | `null` | Cache dir |
-| `definitions` | `Optional<String>` | `null` | Definitions |
 
 
 ---
@@ -1641,16 +1244,6 @@ public static LanguageRegistry defaultOptions()
 
 ---
 
-#### LanguagesConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `include` | `List<String>` | `Collections.emptyList()` | Include |
-| `exclude` | `List<String>` | `Collections.emptyList()` | Exclude |
-
-
----
-
 #### MatchResult
 
 A single query match containing one or more captures.
@@ -1673,7 +1266,7 @@ This is an owned type that can be passed across FFI boundaries, unlike
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `Str` | — | The grammar type name (e.g., "function_definition", "identifier"). |
+| `kind` | `String` | — | The grammar type name (e.g., "function_definition", "identifier"). |
 | `isNamed` | `boolean` | — | Whether this is a named node (vs anonymous like punctuation). |
 | `startByte` | `long` | — | Start byte offset in source. |
 | `endByte` | `long` | — | End byte offset in source. |
@@ -1802,7 +1395,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `Str` | — | Language name (required). |
+| `language` | `String` | — | Language name (required). |
 | `structure` | `boolean` | `true` | Extract structural items (functions, classes, etc.). Default: true. |
 | `imports` | `boolean` | `true` | Extract import statements. Default: true. |
 | `exports` | `boolean` | `true` | Extract export statements. Default: true. |
@@ -1810,8 +1403,8 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `docstrings` | `boolean` | `false` | Extract docstrings. Default: false. |
 | `symbols` | `boolean` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `boolean` | `false` | Include parse diagnostics. Default: false. |
-| `chunkMaxSize` | `Optional<long>` | `null` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `Optional<Map<String, ExtractionPattern>>` | `null` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `chunkMaxSize` | `Optional<Long>` | `null` | Maximum chunk size in bytes. `null` disables chunking. |
+| `extractions` | `Optional<String>` | `null` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
@@ -1876,7 +1469,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `List<SymbolInfo>` | `Collections.emptyList()` | Symbols |
 | `diagnostics` | `List<Diagnostic>` | `Collections.emptyList()` | Diagnostics |
 | `chunks` | `List<CodeChunk>` | `Collections.emptyList()` | Text chunks for chunking/embedding |
-| `extractions` | `Map<String, PatternResult>` | `Collections.emptyMap()` | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `String` | — | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1888,7 +1481,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `patternIndex` | `long` | — | The pattern index that matched (position in the query string). |
-| `captures` | `List<Tuple<CowStatic, Str, NodeInfo>>` | `Collections.emptyList()` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `List<String>` | `Collections.emptyList()` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---
@@ -1958,7 +1551,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `boolean` | — | Whether all patterns are valid. |
-| `patterns` | `Map<String, PatternValidation>` | `Collections.emptyMap()` | Per-pattern validation details. |
+| `patterns` | `String` | — | Per-pattern validation details. |
 
 
 ---

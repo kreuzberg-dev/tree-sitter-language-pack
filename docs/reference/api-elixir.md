@@ -2,7 +2,7 @@
 title: "Elixir API Reference"
 ---
 
-## Elixir API Reference <span class="version-badge">v1.6.3</span>
+## Elixir API Reference <span class="version-badge">v1.7.0</span>
 
 ### Functions
 
@@ -55,55 +55,6 @@ def detect_language_from_path(path)
 
 ---
 
-#### extension_ambiguity()
-
-Check if a file extension is ambiguous — i.e. it could reasonably belong to
-multiple languages.
-
-Returns `Some((assigned_language, alternatives))` if the extension is known
-to be ambiguous, where `assigned_language` is what `detect_language_from_extension`
-returns and `alternatives` lists other languages it could also belong to.
-
-Returns `nil` if the extension is unambiguous or unrecognized.
-
-**Signature:**
-
-```elixir
-@spec extension_ambiguity(ext) :: {:ok, term()} | {:error, term()}
-def extension_ambiguity(ext)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ext` | `String.t()` | Yes | The ext |
-
-**Returns:** `{String.t(), list(String.t())} | nil`
-
-
----
-
-#### extension_ambiguity_json()
-
-**Signature:**
-
-```elixir
-@spec extension_ambiguity_json(ext) :: {:ok, term()} | {:error, term()}
-def extension_ambiguity_json(ext)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ext` | `String.t()` | Yes | The ext |
-
-**Returns:** `String.t() | nil`
-
-
----
-
 #### detect_language_from_content()
 
 Detect language name from file content using the shebang line (`#!`).
@@ -137,221 +88,6 @@ def detect_language_from_content(content)
 | `content` | `String.t()` | Yes | The content to process |
 
 **Returns:** `String.t() | nil`
-
-
----
-
-#### extract()
-
-Run extraction patterns against source code, parsing and querying in one step.
-
-This is the simplest entry point. For repeated extractions with the same
-config, prefer `CompiledExtraction.compile` to avoid recompiling queries.
-
-**Errors:**
-
-Returns an error if the language is not found, parsing fails, or a query
-pattern is invalid.
-
-**Signature:**
-
-```elixir
-@spec extract(source, config) :: {:ok, term()} | {:error, term()}
-def extract(source, config)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String.t()` | Yes | The source |
-| `config` | `ExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `ExtractionResult`
-
-**Errors:** Returns `{:error, reason}`
-
-
----
-
-#### validate_extraction()
-
-Validate an extraction config without running it.
-
-Checks that the language exists and all query patterns compile. Returns
-detailed diagnostics per pattern.
-
-**Errors:**
-
-Returns an error if the language cannot be loaded.
-
-**Signature:**
-
-```elixir
-@spec validate_extraction(config) :: {:ok, term()} | {:error, term()}
-def validate_extraction(config)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `config` | `ExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `ValidationResult`
-
-**Errors:** Returns `{:error, reason}`
-
-
----
-
-#### chunk_source()
-
-Chunk source code and produce rich metadata per chunk.
-
-Uses the vendored text-splitter algorithm for AST-aware splitting,
-then overlays rich metadata on each resulting chunk.
-
-**Signature:**
-
-```elixir
-@spec chunk_source(source, language, max_chunk_size, lang, tree) :: {:ok, term()} | {:error, term()}
-def chunk_source(source, language, max_chunk_size, lang, tree)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String.t()` | Yes | The source |
-| `language` | `String.t()` | Yes | The language |
-| `max_chunk_size` | `integer()` | Yes | The max chunk size |
-| `lang` | `Language` | Yes | The language |
-| `tree` | `Tree` | Yes | The tree |
-
-**Returns:** `list(CodeChunk)`
-
-
----
-
-#### extract_intelligence()
-
-Extract all intelligence from a parsed source file.
-
-**Signature:**
-
-```elixir
-@spec extract_intelligence(source, language, tree) :: {:ok, term()} | {:error, term()}
-def extract_intelligence(source, language, tree)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String.t()` | Yes | The source |
-| `language` | `String.t()` | Yes | The language |
-| `tree` | `Tree` | Yes | The tree |
-
-**Returns:** `ProcessResult`
-
-
----
-
-#### process()
-
-Process source code: parse once, extract intelligence based on config, and return it.
-
-**Signature:**
-
-```elixir
-@spec process(source, config, registry) :: {:ok, term()} | {:error, term()}
-def process(source, config, registry)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String.t()` | Yes | The source |
-| `config` | `ProcessConfig` | Yes | The configuration options |
-| `registry` | `LanguageRegistry` | Yes | The language registry |
-
-**Returns:** `ProcessResult`
-
-**Errors:** Returns `{:error, reason}`
-
-
----
-
-#### snake_to_camel()
-
-Recursively convert snake_case keys in a JSON Value to camelCase.
-
-Used by language bindings (Node.js, WASM, Go, Java, C#) to provide
-camelCase APIs while the Rust core uses snake_case.
-
-**Signature:**
-
-```elixir
-@spec snake_to_camel(val) :: {:ok, term()} | {:error, term()}
-def snake_to_camel(val)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `val` | `Value` | Yes | The value |
-
-**Returns:** `Value`
-
-
----
-
-#### camel_to_snake()
-
-Recursively convert camelCase keys in a JSON Value to snake_case.
-
-Used by WASM bindings to accept camelCase config from JavaScript
-while the Rust core expects snake_case.
-
-**Signature:**
-
-```elixir
-@spec camel_to_snake(val) :: {:ok, term()} | {:error, term()}
-def camel_to_snake(val)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `val` | `Value` | Yes | The value |
-
-**Returns:** `Value`
-
-
----
-
-#### node_info_from_node()
-
-Extract a `NodeInfo` from a tree-sitter `Node`.
-
-**Signature:**
-
-```elixir
-@spec node_info_from_node(node) :: {:ok, term()} | {:error, term()}
-def node_info_from_node(node)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `node` | `Node` | Yes | The node |
-
-**Returns:** `NodeInfo`
 
 
 ---
@@ -665,73 +401,6 @@ def run_query(tree, language, query_source, source)
 
 ---
 
-#### split_code()
-
-Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
-Returns a list of `(start_byte, end_byte)` ranges.
-
-The algorithm works by:
-
-1. Walking the tree-sitter AST to collect all nodes with their depth.
-2. Using depth as a semantic level: shallower nodes (functions, classes) are
-   preferred split boundaries over deeper nodes (statements, expressions).
-3. Greedily merging adjacent sections at the best semantic level that keeps
-   each chunk under `max_chunk_size` bytes.
-4. When no AST node boundary fits, falling back to line boundaries and
-   ultimately to raw byte splits.
-
-The function never splits in the middle of a token/leaf node when an AST
-boundary is available.
-
-**Returns:**
-
-A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
-entire source. Ranges are non-overlapping, contiguous, and each range is
-at most `max_chunk_size` bytes (except when a single indivisible token
-exceeds that limit).
-
-**Signature:**
-
-```elixir
-@spec split_code(source, tree, max_chunk_size) :: {:ok, term()} | {:error, term()}
-def split_code(source, tree, max_chunk_size)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String.t()` | Yes | The full source code string. |
-| `tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
-| `max_chunk_size` | `integer()` | Yes | Maximum size in bytes for each chunk. |
-
-**Returns:** `list({integer(), integer()})`
-
-
----
-
-#### load_definitions()
-
-**Signature:**
-
-```elixir
-@spec load_definitions(json) :: {:ok, term()} | {:error, term()}
-def load_definitions(json)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `json` | `String.t()` | Yes | The json |
-
-**Returns:** `LanguageDefinitions`
-
-**Errors:** Returns `{:error, reason}`
-
-
----
-
 #### get_language()
 
 Get a tree-sitter `Language` by name using the global registry.
@@ -860,6 +529,39 @@ def language_count()
 
 ---
 
+#### process()
+
+Process source code and extract file intelligence using the global registry.
+
+Parses the source with tree-sitter and extracts metrics, structure, imports,
+exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+the flags set in `ProcessConfig`.
+
+**Errors:**
+
+Returns an error if the language is not found or parsing fails.
+
+**Signature:**
+
+```elixir
+@spec process(source, config) :: {:ok, term()} | {:error, term()}
+def process(source, config)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `source` | `String.t()` | Yes | The source |
+| `config` | `ProcessConfig` | Yes | The configuration options |
+
+**Returns:** `ProcessResult`
+
+**Errors:** Returns `{:error, reason}`
+
+
+---
+
 #### extract_patterns()
 
 Run extraction patterns against source code.
@@ -886,6 +588,36 @@ def extract_patterns(source, config)
 | `config` | `ExtractionConfig` | Yes | The configuration options |
 
 **Returns:** `ExtractionResult`
+
+**Errors:** Returns `{:error, reason}`
+
+
+---
+
+#### validate_extraction()
+
+Validate extraction patterns without running them.
+
+Convenience wrapper around `extract.validate_extraction`.
+
+**Errors:**
+
+Returns an error if the language cannot be loaded.
+
+**Signature:**
+
+```elixir
+@spec validate_extraction(config) :: {:ok, term()} | {:error, term()}
+def validate_extraction(config)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `config` | `ExtractionConfig` | Yes | The configuration options |
+
+**Returns:** `ValidationResult`
 
 **Errors:** Returns `{:error, reason}`
 
@@ -1119,7 +851,7 @@ A single captured node within a match.
 | `name` | `String.t()` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `NodeInfo | nil` | `nil` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `String.t() | nil` | `nil` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `child_fields` | `map()` | `%{}` | Values of requested child fields, keyed by field name. |
+| `child_fields` | `String.t()` | — | Values of requested child fields, keyed by field name. |
 | `start_byte` | `integer()` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1170,113 +902,6 @@ A comment extracted from source code.
 | `kind` | `CommentKind` | `:line` | Kind (comment kind) |
 | `span` | `Span` | — | Span (span) |
 | `associated_node` | `String.t() | nil` | `nil` | Associated node |
-
-
----
-
-#### CompiledExtraction
-
-A pre-compiled extraction that can be reused across multiple source inputs.
-
-Stores compiled `tree_sitter.Query` objects and their capture names so they
-don't need to be recompiled for every call. A `QueryCursor` is reused across
-patterns within a single extraction call, making this type `Send + Sync`.
-
-##### Functions
-
-###### compile()
-
-Compile an extraction config for repeated use.
-
-**Errors:**
-
-Returns an error if the language is not found or any query pattern is invalid.
-
-**Signature:**
-
-```elixir
-def compile(config)
-```
-
-###### compile_with_language()
-
-Compile extraction patterns using a pre-loaded `tree_sitter.Language`.
-
-This avoids a redundant language registry lookup when the caller already
-has the language (e.g., from an earlier parse step).
-
-**Errors:**
-
-Returns an error if any query pattern is invalid.
-
-**Signature:**
-
-```elixir
-def compile_with_language(language, language_name, extraction_patterns)
-```
-
-###### extract()
-
-Extract from source code, parsing it first.
-
-Uses the thread-local parser cache to avoid creating a new parser on
-every call.
-
-**Errors:**
-
-Returns an error if parsing fails.
-
-**Signature:**
-
-```elixir
-def extract(source)
-```
-
-###### extract_from_tree()
-
-Extract from an already-parsed tree.
-
-**Errors:**
-
-Returns an error if query execution fails.
-
-**Signature:**
-
-```elixir
-def extract_from_tree(tree, source)
-```
-
-
----
-
-#### Config
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `language_pack` | `LanguagePackConfig` | — | Language pack (language pack config) |
-| `languages` | `LanguagesConfig` | — | Languages (languages config) |
-
-##### Functions
-
-###### load()
-
-**Signature:**
-
-```elixir
-def load(path)
-```
-
-###### discover()
-
-Discover config file from standard locations.
-Returns Ok(Some(config)) if found and parsed, Ok(None) if not found,
-and Err if found but failed to parse.
-
-**Signature:**
-
-```elixir
-def discover()
-```
 
 
 ---
@@ -1452,7 +1077,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String.t()` | — | The language name (e.g., `"python"`). |
-| `patterns` | `map()` | `%{}` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `String.t()` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1466,8 +1091,8 @@ Defines a single extraction pattern and its configuration.
 | `query` | `String.t()` | — | The tree-sitter query string (S-expression). |
 | `capture_output` | `CaptureOutput` | `:full` | What to include in each capture result. |
 | `child_fields` | `list(String.t())` | `[]` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
-| `max_results` | `integer() | nil` | `nil` | Maximum number of matches to return. `None` means unlimited. |
-| `byte_range` | `{integer(), integer()} | nil` | `nil` | Restrict matches to a byte range `(start, end)`. |
+| `max_results` | `integer() | nil` | `nil` | Maximum number of matches to return. `nil` means unlimited. |
+| `byte_range` | `String.t() | nil` | `nil` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1479,7 +1104,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String.t()` | — | The language that was used. |
-| `results` | `map()` | `%{}` | Results keyed by pattern name. |
+| `results` | `String.t()` | — | Results keyed by pattern name. |
 
 
 ---
@@ -1495,8 +1120,8 @@ Aggregate metrics for a source file.
 | `comment_lines` | `integer()` | — | Comment lines |
 | `blank_lines` | `integer()` | — | Blank lines |
 | `total_bytes` | `integer()` | — | Total bytes |
-| `node_count` | `integer()` | — | Number of node |
-| `error_count` | `integer()` | — | Number of error |
+| `node_count` | `integer()` | — | Number of nodes |
+| `error_count` | `integer()` | — | Number of errors |
 | `max_depth` | `integer()` | — | Maximum depth |
 
 
@@ -1522,44 +1147,12 @@ An import statement extracted from source code.
 
 ---
 
-#### LanguageDefinition
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `repo` | `String.t()` | — | Repo |
-| `rev` | `String.t() | nil` | `nil` | Rev |
-| `branch` | `String.t() | nil` | `nil` | Branch |
-| `directory` | `String.t() | nil` | `nil` | Directory |
-| `generate` | `boolean() | nil` | `nil` | Generate |
-| `abi_version` | `integer() | nil` | `nil` | Abi version |
-| `extensions` | `list(String.t())` | — | Extensions |
-| `c_symbol` | `String.t() | nil` | `nil` | Override for the C symbol name when it differs from the language name. |
-| `ambiguous` | `map()` | — | Known ambiguous extensions mapped to the other languages they could belong to. Key: extension, Value: list of alternative language names. Example: `{"m": ["matlab"]}` on the `objc` definition means `.m` could also be MATLAB. |
-
-
----
-
-#### LanguageDefinitions
-
-
----
-
 #### LanguageInfo
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `group` | `String.t()` | — | Group |
 | `size` | `integer()` | — | Size in bytes |
-
-
----
-
-#### LanguagePackConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `cache_dir` | `String.t() | nil` | `nil` | Cache dir |
-| `definitions` | `String.t() | nil` | `nil` | Definitions |
 
 
 ---
@@ -1682,16 +1275,6 @@ def default()
 
 ---
 
-#### LanguagesConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `include` | `list(String.t())` | `[]` | Include |
-| `exclude` | `list(String.t())` | `[]` | Exclude |
-
-
----
-
 #### MatchResult
 
 A single query match containing one or more captures.
@@ -1714,7 +1297,7 @@ This is an owned type that can be passed across FFI boundaries, unlike
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `Str` | — | The grammar type name (e.g., "function_definition", "identifier"). |
+| `kind` | `String.t()` | — | The grammar type name (e.g., "function_definition", "identifier"). |
 | `is_named` | `boolean()` | — | Whether this is a named node (vs anonymous like punctuation). |
 | `start_byte` | `integer()` | — | Start byte offset in source. |
 | `end_byte` | `integer()` | — | End byte offset in source. |
@@ -1843,7 +1426,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `Str` | — | Language name (required). |
+| `language` | `String.t()` | — | Language name (required). |
 | `structure` | `boolean()` | `true` | Extract structural items (functions, classes, etc.). Default: true. |
 | `imports` | `boolean()` | `true` | Extract import statements. Default: true. |
 | `exports` | `boolean()` | `true` | Extract export statements. Default: true. |
@@ -1851,8 +1434,8 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `docstrings` | `boolean()` | `false` | Extract docstrings. Default: false. |
 | `symbols` | `boolean()` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `boolean()` | `false` | Include parse diagnostics. Default: false. |
-| `chunk_max_size` | `integer() | nil` | `nil` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `map() | nil` | `nil` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `chunk_max_size` | `integer() | nil` | `nil` | Maximum chunk size in bytes. `nil` disables chunking. |
+| `extractions` | `String.t() | nil` | `nil` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Functions
 
@@ -1917,7 +1500,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `list(SymbolInfo)` | `[]` | Symbols |
 | `diagnostics` | `list(Diagnostic)` | `[]` | Diagnostics |
 | `chunks` | `list(CodeChunk)` | `[]` | Text chunks for chunking/embedding |
-| `extractions` | `map()` | `%{}` | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `String.t()` | — | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1929,7 +1512,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `pattern_index` | `integer()` | — | The pattern index that matched (position in the query string). |
-| `captures` | `list({CowStatic, Str, NodeInfo})` | `[]` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `list(String.t())` | `[]` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---
@@ -1999,7 +1582,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `boolean()` | — | Whether all patterns are valid. |
-| `patterns` | `map()` | `%{}` | Per-pattern validation details. |
+| `patterns` | `String.t()` | — | Per-pattern validation details. |
 
 
 ---

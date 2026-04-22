@@ -17,7 +17,7 @@ A single captured node within a match.
 | `name` | `String` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `Option<NodeInfo>` | `Default::default()` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `Option<String>` | `Default::default()` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `child_fields` | `HashMap<String, Option<String>>` | `HashMap::new()` | Values of requested child fields, keyed by field name. |
+| `child_fields` | `String` | — | Values of requested child fields, keyed by field name. |
 | `start_byte` | `usize` | — | Byte offset where this capture starts in the source. |
 
 ---
@@ -51,7 +51,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language that was used. |
-| `results` | `HashMap<String, PatternResult>` | `HashMap::new()` | Results keyed by pattern name. |
+| `results` | `String` | — | Results keyed by pattern name. |
 
 ---
 
@@ -62,7 +62,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `bool` | — | Whether all patterns are valid. |
-| `patterns` | `HashMap<String, PatternValidation>` | `HashMap::new()` | Per-pattern validation details. |
+| `patterns` | `String` | — | Per-pattern validation details. |
 
 ---
 
@@ -86,7 +86,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `Vec<SymbolInfo>` | `vec![]` | Symbols |
 | `diagnostics` | `Vec<Diagnostic>` | `vec![]` | Diagnostics |
 | `chunks` | `Vec<CodeChunk>` | `vec![]` | Text chunks for chunking/embedding |
-| `extractions` | `HashMap<String, PatternResult>` | `HashMap::new()` | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `String` | — | Results of custom extraction patterns (when `config.extractions` is set). |
 
 ---
 
@@ -104,7 +104,7 @@ Defines a single extraction pattern and its configuration.
 | `capture_output` | `CaptureOutput` | `CaptureOutput::Full` | What to include in each capture result. |
 | `child_fields` | `Vec<String>` | `vec![]` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `max_results` | `Option<usize>` | `Default::default()` | Maximum number of matches to return. `None` means unlimited. |
-| `byte_range` | `Option<(usize, usize)>` | `Default::default()` | Restrict matches to a byte range `(start, end)`. |
+| `byte_range` | `Option<String>` | `Default::default()` | Restrict matches to a byte range `(start, end)`. |
 
 ---
 
@@ -115,7 +115,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language name (e.g., `"python"`). |
-| `patterns` | `HashMap<String, ExtractionPattern>` | `HashMap::new()` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `String` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 ---
 
@@ -162,8 +162,8 @@ Aggregate metrics for a source file.
 | `comment_lines` | `usize` | — | Comment lines |
 | `blank_lines` | `usize` | — | Blank lines |
 | `total_bytes` | `usize` | — | Total bytes |
-| `node_count` | `usize` | — | Number of node |
-| `error_count` | `usize` | — | Number of error |
+| `node_count` | `usize` | — | Number of nodes |
+| `error_count` | `usize` | — | Number of errors |
 | `max_depth` | `usize` | — | Maximum depth |
 
 ---
@@ -320,7 +320,7 @@ This is an owned type that can be passed across FFI boundaries, unlike
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `str` | — | The grammar type name (e.g., "function_definition", "identifier"). |
+| `kind` | `String` | — | The grammar type name (e.g., "function_definition", "identifier"). |
 | `is_named` | `bool` | — | Whether this is a named node (vs anonymous like punctuation). |
 | `start_byte` | `usize` | — | Start byte offset in source. |
 | `end_byte` | `usize` | — | End byte offset in source. |
@@ -358,7 +358,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `str` | — | Language name (required). |
+| `language` | `String` | — | Language name (required). |
 | `structure` | `bool` | `true` | Extract structural items (functions, classes, etc.). Default: true. |
 | `imports` | `bool` | `true` | Extract import statements. Default: true. |
 | `exports` | `bool` | `true` | Extract export statements. Default: true. |
@@ -367,7 +367,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
 | `chunk_max_size` | `Option<usize>` | `None` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `HashMap<String, ExtractionPattern>` | `None` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `extractions` | `Option<String>` | `None` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ---
 
@@ -378,7 +378,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `pattern_index` | `usize` | — | The pattern index that matched (position in the query string). |
-| `captures` | `Vec<(Cow<'static,str>, NodeInfo)>` | `vec![]` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `Vec<String>` | `vec![]` | Captures: list of (capture_name, node_info) pairs. |
 
 ---
 
@@ -395,68 +395,7 @@ global instance via the module-level convenience functions
 
 ---
 
-#### Config
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `language_pack` | `LanguagePackConfig` | — | Language pack (language pack config) |
-| `languages` | `LanguagesConfig` | — | Languages (languages config) |
-
----
-
-#### LanguagePackConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `cache_dir` | `Option<String>` | `Default::default()` | Cache dir |
-| `definitions` | `Option<String>` | `Default::default()` | Definitions |
-
----
-
-#### LanguagesConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `include` | `Vec<String>` | `vec![]` | Include |
-| `exclude` | `Vec<String>` | `vec![]` | Exclude |
-
----
-
 ### Other Types
-
-#### CompiledExtraction
-
-A pre-compiled extraction that can be reused across multiple source inputs.
-
-Stores compiled `tree_sitter.Query` objects and their capture names so they
-don't need to be recompiled for every call. A `QueryCursor` is reused across
-patterns within a single extraction call, making this type `Send + Sync`.
-
-*Opaque type — fields are not directly accessible.*
-
----
-
-#### LanguageDefinition
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `repo` | `String` | — | Repo |
-| `rev` | `Option<String>` | `None` | Rev |
-| `branch` | `Option<String>` | `None` | Branch |
-| `directory` | `Option<String>` | `None` | Directory |
-| `generate` | `Option<bool>` | `None` | Generate |
-| `abi_version` | `Option<u32>` | `None` | Abi version |
-| `extensions` | `Vec<String>` | — | Extensions |
-| `c_symbol` | `Option<String>` | `None` | Override for the C symbol name when it differs from the language name. |
-| `ambiguous` | `HashMap<String, Vec<String>>` | — | Known ambiguous extensions mapped to the other languages they could belong to. Key: extension, Value: list of alternative language names. Example: `{"m": ["matlab"]}` on the `objc` definition means `.m` could also be MATLAB. |
-
----
-
-#### LanguageDefinitions
-
-*Opaque type — fields are not directly accessible.*
-
----
 
 #### ParserManifest
 

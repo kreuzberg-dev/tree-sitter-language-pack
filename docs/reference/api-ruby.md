@@ -2,7 +2,7 @@
 title: "Ruby API Reference"
 ---
 
-## Ruby API Reference <span class="version-badge">v1.6.3</span>
+## Ruby API Reference <span class="version-badge">v1.7.0</span>
 
 ### Functions
 
@@ -53,53 +53,6 @@ def self.detect_language_from_path(path)
 
 ---
 
-#### extension_ambiguity()
-
-Check if a file extension is ambiguous — i.e. it could reasonably belong to
-multiple languages.
-
-Returns `Some((assigned_language, alternatives))` if the extension is known
-to be ambiguous, where `assigned_language` is what `detect_language_from_extension`
-returns and `alternatives` lists other languages it could also belong to.
-
-Returns `nil` if the extension is unambiguous or unrecognized.
-
-**Signature:**
-
-```ruby
-def self.extension_ambiguity(ext)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ext` | `String` | Yes | The ext |
-
-**Returns:** `[String, Array<String>]?`
-
-
----
-
-#### extension_ambiguity_json()
-
-**Signature:**
-
-```ruby
-def self.extension_ambiguity_json(ext)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ext` | `String` | Yes | The ext |
-
-**Returns:** `String?`
-
-
----
-
 #### detect_language_from_content()
 
 Detect language name from file content using the shebang line (`#!`).
@@ -132,213 +85,6 @@ def self.detect_language_from_content(content)
 | `content` | `String` | Yes | The content to process |
 
 **Returns:** `String?`
-
-
----
-
-#### extract()
-
-Run extraction patterns against source code, parsing and querying in one step.
-
-This is the simplest entry point. For repeated extractions with the same
-config, prefer `CompiledExtraction.compile` to avoid recompiling queries.
-
-**Errors:**
-
-Returns an error if the language is not found, parsing fails, or a query
-pattern is invalid.
-
-**Signature:**
-
-```ruby
-def self.extract(source, config)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The source |
-| `config` | `ExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `ExtractionResult`
-
-**Errors:** Raises `Error`.
-
-
----
-
-#### validate_extraction()
-
-Validate an extraction config without running it.
-
-Checks that the language exists and all query patterns compile. Returns
-detailed diagnostics per pattern.
-
-**Errors:**
-
-Returns an error if the language cannot be loaded.
-
-**Signature:**
-
-```ruby
-def self.validate_extraction(config)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `config` | `ExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `ValidationResult`
-
-**Errors:** Raises `Error`.
-
-
----
-
-#### chunk_source()
-
-Chunk source code and produce rich metadata per chunk.
-
-Uses the vendored text-splitter algorithm for AST-aware splitting,
-then overlays rich metadata on each resulting chunk.
-
-**Signature:**
-
-```ruby
-def self.chunk_source(source, language, max_chunk_size, lang, tree)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The source |
-| `language` | `String` | Yes | The language |
-| `max_chunk_size` | `Integer` | Yes | The max chunk size |
-| `lang` | `Language` | Yes | The language |
-| `tree` | `Tree` | Yes | The tree |
-
-**Returns:** `Array<CodeChunk>`
-
-
----
-
-#### extract_intelligence()
-
-Extract all intelligence from a parsed source file.
-
-**Signature:**
-
-```ruby
-def self.extract_intelligence(source, language, tree)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The source |
-| `language` | `String` | Yes | The language |
-| `tree` | `Tree` | Yes | The tree |
-
-**Returns:** `ProcessResult`
-
-
----
-
-#### process()
-
-Process source code: parse once, extract intelligence based on config, and return it.
-
-**Signature:**
-
-```ruby
-def self.process(source, config, registry)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The source |
-| `config` | `ProcessConfig` | Yes | The configuration options |
-| `registry` | `LanguageRegistry` | Yes | The language registry |
-
-**Returns:** `ProcessResult`
-
-**Errors:** Raises `Error`.
-
-
----
-
-#### snake_to_camel()
-
-Recursively convert snake_case keys in a JSON Value to camelCase.
-
-Used by language bindings (Node.js, WASM, Go, Java, C#) to provide
-camelCase APIs while the Rust core uses snake_case.
-
-**Signature:**
-
-```ruby
-def self.snake_to_camel(val)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `val` | `Value` | Yes | The value |
-
-**Returns:** `Value`
-
-
----
-
-#### camel_to_snake()
-
-Recursively convert camelCase keys in a JSON Value to snake_case.
-
-Used by WASM bindings to accept camelCase config from JavaScript
-while the Rust core expects snake_case.
-
-**Signature:**
-
-```ruby
-def self.camel_to_snake(val)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `val` | `Value` | Yes | The value |
-
-**Returns:** `Value`
-
-
----
-
-#### node_info_from_node()
-
-Extract a `NodeInfo` from a tree-sitter `Node`.
-
-**Signature:**
-
-```ruby
-def self.node_info_from_node(node)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `node` | `Node` | Yes | The node |
-
-**Returns:** `NodeInfo`
 
 
 ---
@@ -640,71 +386,6 @@ def self.run_query(tree, language, query_source, source)
 
 ---
 
-#### split_code()
-
-Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
-Returns a list of `(start_byte, end_byte)` ranges.
-
-The algorithm works by:
-
-1. Walking the tree-sitter AST to collect all nodes with their depth.
-2. Using depth as a semantic level: shallower nodes (functions, classes) are
-   preferred split boundaries over deeper nodes (statements, expressions).
-3. Greedily merging adjacent sections at the best semantic level that keeps
-   each chunk under `max_chunk_size` bytes.
-4. When no AST node boundary fits, falling back to line boundaries and
-   ultimately to raw byte splits.
-
-The function never splits in the middle of a token/leaf node when an AST
-boundary is available.
-
-**Returns:**
-
-A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
-entire source. Ranges are non-overlapping, contiguous, and each range is
-at most `max_chunk_size` bytes (except when a single indivisible token
-exceeds that limit).
-
-**Signature:**
-
-```ruby
-def self.split_code(source, tree, max_chunk_size)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `String` | Yes | The full source code string. |
-| `tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
-| `max_chunk_size` | `Integer` | Yes | Maximum size in bytes for each chunk. |
-
-**Returns:** `Array<[Integer, Integer]>`
-
-
----
-
-#### load_definitions()
-
-**Signature:**
-
-```ruby
-def self.load_definitions(json)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `json` | `String` | Yes | The json |
-
-**Returns:** `LanguageDefinitions`
-
-**Errors:** Raises `Error`.
-
-
----
-
 #### get_language()
 
 Get a tree-sitter `Language` by name using the global registry.
@@ -828,6 +509,38 @@ def self.language_count()
 
 ---
 
+#### process()
+
+Process source code and extract file intelligence using the global registry.
+
+Parses the source with tree-sitter and extracts metrics, structure, imports,
+exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+the flags set in `ProcessConfig`.
+
+**Errors:**
+
+Returns an error if the language is not found or parsing fails.
+
+**Signature:**
+
+```ruby
+def self.process(source, config)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `source` | `String` | Yes | The source |
+| `config` | `ProcessConfig` | Yes | The configuration options |
+
+**Returns:** `ProcessResult`
+
+**Errors:** Raises `Error`.
+
+
+---
+
 #### extract_patterns()
 
 Run extraction patterns against source code.
@@ -853,6 +566,35 @@ def self.extract_patterns(source, config)
 | `config` | `ExtractionConfig` | Yes | The configuration options |
 
 **Returns:** `ExtractionResult`
+
+**Errors:** Raises `Error`.
+
+
+---
+
+#### validate_extraction()
+
+Validate extraction patterns without running them.
+
+Convenience wrapper around `extract.validate_extraction`.
+
+**Errors:**
+
+Returns an error if the language cannot be loaded.
+
+**Signature:**
+
+```ruby
+def self.validate_extraction(config)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `config` | `ExtractionConfig` | Yes | The configuration options |
+
+**Returns:** `ValidationResult`
 
 **Errors:** Raises `Error`.
 
@@ -1078,7 +820,7 @@ A single captured node within a match.
 | `name` | `String` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `NodeInfo?` | `nil` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `String?` | `nil` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `child_fields` | `Hash{String=>String?}` | `{}` | Values of requested child fields, keyed by field name. |
+| `child_fields` | `String` | — | Values of requested child fields, keyed by field name. |
 | `start_byte` | `Integer` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1129,113 +871,6 @@ A comment extracted from source code.
 | `kind` | `CommentKind` | `:line` | Kind (comment kind) |
 | `span` | `Span` | — | Span (span) |
 | `associated_node` | `String?` | `nil` | Associated node |
-
-
----
-
-#### CompiledExtraction
-
-A pre-compiled extraction that can be reused across multiple source inputs.
-
-Stores compiled `tree_sitter.Query` objects and their capture names so they
-don't need to be recompiled for every call. A `QueryCursor` is reused across
-patterns within a single extraction call, making this type `Send + Sync`.
-
-##### Methods
-
-###### compile()
-
-Compile an extraction config for repeated use.
-
-**Errors:**
-
-Returns an error if the language is not found or any query pattern is invalid.
-
-**Signature:**
-
-```ruby
-def self.compile(config)
-```
-
-###### compile_with_language()
-
-Compile extraction patterns using a pre-loaded `tree_sitter.Language`.
-
-This avoids a redundant language registry lookup when the caller already
-has the language (e.g., from an earlier parse step).
-
-**Errors:**
-
-Returns an error if any query pattern is invalid.
-
-**Signature:**
-
-```ruby
-def self.compile_with_language(language, language_name, extraction_patterns)
-```
-
-###### extract()
-
-Extract from source code, parsing it first.
-
-Uses the thread-local parser cache to avoid creating a new parser on
-every call.
-
-**Errors:**
-
-Returns an error if parsing fails.
-
-**Signature:**
-
-```ruby
-def extract(source)
-```
-
-###### extract_from_tree()
-
-Extract from an already-parsed tree.
-
-**Errors:**
-
-Returns an error if query execution fails.
-
-**Signature:**
-
-```ruby
-def extract_from_tree(tree, source)
-```
-
-
----
-
-#### Config
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `language_pack` | `LanguagePackConfig` | — | Language pack (language pack config) |
-| `languages` | `LanguagesConfig` | — | Languages (languages config) |
-
-##### Methods
-
-###### load()
-
-**Signature:**
-
-```ruby
-def self.load(path)
-```
-
-###### discover()
-
-Discover config file from standard locations.
-Returns Ok(Some(config)) if found and parsed, Ok(None) if not found,
-and Err if found but failed to parse.
-
-**Signature:**
-
-```ruby
-def self.discover()
-```
 
 
 ---
@@ -1411,7 +1046,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language name (e.g., `"python"`). |
-| `patterns` | `Hash{String=>ExtractionPattern}` | `{}` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `String` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1425,8 +1060,8 @@ Defines a single extraction pattern and its configuration.
 | `query` | `String` | — | The tree-sitter query string (S-expression). |
 | `capture_output` | `CaptureOutput` | `:full` | What to include in each capture result. |
 | `child_fields` | `Array<String>` | `[]` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
-| `max_results` | `Integer?` | `nil` | Maximum number of matches to return. `None` means unlimited. |
-| `byte_range` | `[Integer, Integer]?` | `nil` | Restrict matches to a byte range `(start, end)`. |
+| `max_results` | `Integer?` | `nil` | Maximum number of matches to return. `nil` means unlimited. |
+| `byte_range` | `String?` | `nil` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1438,7 +1073,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language that was used. |
-| `results` | `Hash{String=>PatternResult}` | `{}` | Results keyed by pattern name. |
+| `results` | `String` | — | Results keyed by pattern name. |
 
 
 ---
@@ -1454,8 +1089,8 @@ Aggregate metrics for a source file.
 | `comment_lines` | `Integer` | — | Comment lines |
 | `blank_lines` | `Integer` | — | Blank lines |
 | `total_bytes` | `Integer` | — | Total bytes |
-| `node_count` | `Integer` | — | Number of node |
-| `error_count` | `Integer` | — | Number of error |
+| `node_count` | `Integer` | — | Number of nodes |
+| `error_count` | `Integer` | — | Number of errors |
 | `max_depth` | `Integer` | — | Maximum depth |
 
 
@@ -1481,44 +1116,12 @@ An import statement extracted from source code.
 
 ---
 
-#### LanguageDefinition
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `repo` | `String` | — | Repo |
-| `rev` | `String?` | `nil` | Rev |
-| `branch` | `String?` | `nil` | Branch |
-| `directory` | `String?` | `nil` | Directory |
-| `generate` | `Boolean?` | `nil` | Generate |
-| `abi_version` | `Integer?` | `nil` | Abi version |
-| `extensions` | `Array<String>` | — | Extensions |
-| `c_symbol` | `String?` | `nil` | Override for the C symbol name when it differs from the language name. |
-| `ambiguous` | `Hash{String=>Array<String>}` | — | Known ambiguous extensions mapped to the other languages they could belong to. Key: extension, Value: list of alternative language names. Example: `{"m": ["matlab"]}` on the `objc` definition means `.m` could also be MATLAB. |
-
-
----
-
-#### LanguageDefinitions
-
-
----
-
 #### LanguageInfo
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `group` | `String` | — | Group |
 | `size` | `Integer` | — | Size in bytes |
-
-
----
-
-#### LanguagePackConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `cache_dir` | `String?` | `nil` | Cache dir |
-| `definitions` | `String?` | `nil` | Definitions |
 
 
 ---
@@ -1641,16 +1244,6 @@ def self.default()
 
 ---
 
-#### LanguagesConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `include` | `Array<String>` | `[]` | Include |
-| `exclude` | `Array<String>` | `[]` | Exclude |
-
-
----
-
 #### MatchResult
 
 A single query match containing one or more captures.
@@ -1673,7 +1266,7 @@ This is an owned type that can be passed across FFI boundaries, unlike
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `Str` | — | The grammar type name (e.g., "function_definition", "identifier"). |
+| `kind` | `String` | — | The grammar type name (e.g., "function_definition", "identifier"). |
 | `is_named` | `Boolean` | — | Whether this is a named node (vs anonymous like punctuation). |
 | `start_byte` | `Integer` | — | Start byte offset in source. |
 | `end_byte` | `Integer` | — | End byte offset in source. |
@@ -1802,7 +1395,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `Str` | — | Language name (required). |
+| `language` | `String` | — | Language name (required). |
 | `structure` | `Boolean` | `true` | Extract structural items (functions, classes, etc.). Default: true. |
 | `imports` | `Boolean` | `true` | Extract import statements. Default: true. |
 | `exports` | `Boolean` | `true` | Extract export statements. Default: true. |
@@ -1810,8 +1403,8 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `docstrings` | `Boolean` | `false` | Extract docstrings. Default: false. |
 | `symbols` | `Boolean` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `Boolean` | `false` | Include parse diagnostics. Default: false. |
-| `chunk_max_size` | `Integer?` | `nil` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `Hash{String=>ExtractionPattern}?` | `nil` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `chunk_max_size` | `Integer?` | `nil` | Maximum chunk size in bytes. `nil` disables chunking. |
+| `extractions` | `String?` | `nil` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
@@ -1876,7 +1469,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `Array<SymbolInfo>` | `[]` | Symbols |
 | `diagnostics` | `Array<Diagnostic>` | `[]` | Diagnostics |
 | `chunks` | `Array<CodeChunk>` | `[]` | Text chunks for chunking/embedding |
-| `extractions` | `Hash{String=>PatternResult}` | `{}` | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `String` | — | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1888,7 +1481,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `pattern_index` | `Integer` | — | The pattern index that matched (position in the query string). |
-| `captures` | `Array<[CowStatic, Str, NodeInfo]>` | `[]` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `Array<String>` | `[]` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---
@@ -1958,7 +1551,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `Boolean` | — | Whether all patterns are valid. |
-| `patterns` | `Hash{String=>PatternValidation}` | `{}` | Per-pattern validation details. |
+| `patterns` | `String` | — | Per-pattern validation details. |
 
 
 ---

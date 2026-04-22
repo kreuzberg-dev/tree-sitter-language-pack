@@ -2,7 +2,7 @@
 title: "Python API Reference"
 ---
 
-## Python API Reference <span class="version-badge">v1.6.3</span>
+## Python API Reference <span class="version-badge">v1.7.0</span>
 
 ### Functions
 
@@ -53,53 +53,6 @@ def detect_language_from_path(path: str) -> str | None
 
 ---
 
-#### extension_ambiguity()
-
-Check if a file extension is ambiguous — i.e. it could reasonably belong to
-multiple languages.
-
-Returns `Some((assigned_language, alternatives))` if the extension is known
-to be ambiguous, where `assigned_language` is what `detect_language_from_extension`
-returns and `alternatives` lists other languages it could also belong to.
-
-Returns `None` if the extension is unambiguous or unrecognized.
-
-**Signature:**
-
-```python
-def extension_ambiguity(ext: str) -> tuple[str, list[str]] | None
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ext` | `str` | Yes | The ext |
-
-**Returns:** `tuple[str, list[str]] | None`
-
-
----
-
-#### extension_ambiguity_json()
-
-**Signature:**
-
-```python
-def extension_ambiguity_json(ext: str) -> str | None
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ext` | `str` | Yes | The ext |
-
-**Returns:** `str | None`
-
-
----
-
 #### detect_language_from_content()
 
 Detect language name from file content using the shebang line (`#!`).
@@ -132,213 +85,6 @@ def detect_language_from_content(content: str) -> str | None
 | `content` | `str` | Yes | The content to process |
 
 **Returns:** `str | None`
-
-
----
-
-#### extract()
-
-Run extraction patterns against source code, parsing and querying in one step.
-
-This is the simplest entry point. For repeated extractions with the same
-config, prefer `CompiledExtraction.compile` to avoid recompiling queries.
-
-**Errors:**
-
-Returns an error if the language is not found, parsing fails, or a query
-pattern is invalid.
-
-**Signature:**
-
-```python
-def extract(source: str, config: ExtractionConfig) -> ExtractionResult
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `str` | Yes | The source |
-| `config` | `ExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `ExtractionResult`
-
-**Errors:** Raises `Error`.
-
-
----
-
-#### validate_extraction()
-
-Validate an extraction config without running it.
-
-Checks that the language exists and all query patterns compile. Returns
-detailed diagnostics per pattern.
-
-**Errors:**
-
-Returns an error if the language cannot be loaded.
-
-**Signature:**
-
-```python
-def validate_extraction(config: ExtractionConfig) -> ValidationResult
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `config` | `ExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `ValidationResult`
-
-**Errors:** Raises `Error`.
-
-
----
-
-#### chunk_source()
-
-Chunk source code and produce rich metadata per chunk.
-
-Uses the vendored text-splitter algorithm for AST-aware splitting,
-then overlays rich metadata on each resulting chunk.
-
-**Signature:**
-
-```python
-def chunk_source(source: str, language: str, max_chunk_size: int, lang: Language, tree: Tree) -> list[CodeChunk]
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `str` | Yes | The source |
-| `language` | `str` | Yes | The language |
-| `max_chunk_size` | `int` | Yes | The max chunk size |
-| `lang` | `Language` | Yes | The language |
-| `tree` | `Tree` | Yes | The tree |
-
-**Returns:** `list[CodeChunk]`
-
-
----
-
-#### extract_intelligence()
-
-Extract all intelligence from a parsed source file.
-
-**Signature:**
-
-```python
-def extract_intelligence(source: str, language: str, tree: Tree) -> ProcessResult
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `str` | Yes | The source |
-| `language` | `str` | Yes | The language |
-| `tree` | `Tree` | Yes | The tree |
-
-**Returns:** `ProcessResult`
-
-
----
-
-#### process()
-
-Process source code: parse once, extract intelligence based on config, and return it.
-
-**Signature:**
-
-```python
-def process(source: str, config: ProcessConfig, registry: LanguageRegistry) -> ProcessResult
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `str` | Yes | The source |
-| `config` | `ProcessConfig` | Yes | The configuration options |
-| `registry` | `LanguageRegistry` | Yes | The language registry |
-
-**Returns:** `ProcessResult`
-
-**Errors:** Raises `Error`.
-
-
----
-
-#### snake_to_camel()
-
-Recursively convert snake_case keys in a JSON Value to camelCase.
-
-Used by language bindings (Node.js, WASM, Go, Java, C#) to provide
-camelCase APIs while the Rust core uses snake_case.
-
-**Signature:**
-
-```python
-def snake_to_camel(val: Value) -> Value
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `val` | `Value` | Yes | The value |
-
-**Returns:** `Value`
-
-
----
-
-#### camel_to_snake()
-
-Recursively convert camelCase keys in a JSON Value to snake_case.
-
-Used by WASM bindings to accept camelCase config from JavaScript
-while the Rust core expects snake_case.
-
-**Signature:**
-
-```python
-def camel_to_snake(val: Value) -> Value
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `val` | `Value` | Yes | The value |
-
-**Returns:** `Value`
-
-
----
-
-#### node_info_from_node()
-
-Extract a `NodeInfo` from a tree-sitter `Node`.
-
-**Signature:**
-
-```python
-def node_info_from_node(node: Node) -> NodeInfo
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `node` | `Node` | Yes | The node |
-
-**Returns:** `NodeInfo`
 
 
 ---
@@ -640,71 +386,6 @@ def run_query(tree: Tree, language: str, query_source: str, source: bytes) -> li
 
 ---
 
-#### split_code()
-
-Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
-Returns a list of `(start_byte, end_byte)` ranges.
-
-The algorithm works by:
-
-1. Walking the tree-sitter AST to collect all nodes with their depth.
-2. Using depth as a semantic level: shallower nodes (functions, classes) are
-   preferred split boundaries over deeper nodes (statements, expressions).
-3. Greedily merging adjacent sections at the best semantic level that keeps
-   each chunk under `max_chunk_size` bytes.
-4. When no AST node boundary fits, falling back to line boundaries and
-   ultimately to raw byte splits.
-
-The function never splits in the middle of a token/leaf node when an AST
-boundary is available.
-
-**Returns:**
-
-A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
-entire source. Ranges are non-overlapping, contiguous, and each range is
-at most `max_chunk_size` bytes (except when a single indivisible token
-exceeds that limit).
-
-**Signature:**
-
-```python
-def split_code(source: str, tree: Tree, max_chunk_size: int) -> list[tuple[int, int]]
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `str` | Yes | The full source code string. |
-| `tree` | `Tree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
-| `max_chunk_size` | `int` | Yes | Maximum size in bytes for each chunk. |
-
-**Returns:** `list[tuple[int, int]]`
-
-
----
-
-#### load_definitions()
-
-**Signature:**
-
-```python
-def load_definitions(json: str) -> LanguageDefinitions
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `json` | `str` | Yes | The json |
-
-**Returns:** `LanguageDefinitions`
-
-**Errors:** Raises `Error`.
-
-
----
-
 #### get_language()
 
 Get a tree-sitter `Language` by name using the global registry.
@@ -828,6 +509,38 @@ def language_count() -> int
 
 ---
 
+#### process()
+
+Process source code and extract file intelligence using the global registry.
+
+Parses the source with tree-sitter and extracts metrics, structure, imports,
+exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+the flags set in `ProcessConfig`.
+
+**Errors:**
+
+Returns an error if the language is not found or parsing fails.
+
+**Signature:**
+
+```python
+def process(source: str, config: ProcessConfig) -> ProcessResult
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `source` | `str` | Yes | The source |
+| `config` | `ProcessConfig` | Yes | The configuration options |
+
+**Returns:** `ProcessResult`
+
+**Errors:** Raises `Error`.
+
+
+---
+
 #### extract_patterns()
 
 Run extraction patterns against source code.
@@ -853,6 +566,35 @@ def extract_patterns(source: str, config: ExtractionConfig) -> ExtractionResult
 | `config` | `ExtractionConfig` | Yes | The configuration options |
 
 **Returns:** `ExtractionResult`
+
+**Errors:** Raises `Error`.
+
+
+---
+
+#### validate_extraction()
+
+Validate extraction patterns without running them.
+
+Convenience wrapper around `extract.validate_extraction`.
+
+**Errors:**
+
+Returns an error if the language cannot be loaded.
+
+**Signature:**
+
+```python
+def validate_extraction(config: ExtractionConfig) -> ValidationResult
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `config` | `ExtractionConfig` | Yes | The configuration options |
+
+**Returns:** `ValidationResult`
 
 **Errors:** Raises `Error`.
 
@@ -1078,7 +820,7 @@ A single captured node within a match.
 | `name` | `str` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `NodeInfo | None` | `None` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `str | None` | `None` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `child_fields` | `dict[str, str | None]` | `{}` | Values of requested child fields, keyed by field name. |
+| `child_fields` | `str` | — | Values of requested child fields, keyed by field name. |
 | `start_byte` | `int` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1129,117 +871,6 @@ A comment extracted from source code.
 | `kind` | `CommentKind` | `CommentKind.LINE` | Kind (comment kind) |
 | `span` | `Span` | — | Span (span) |
 | `associated_node` | `str | None` | `None` | Associated node |
-
-
----
-
-#### CompiledExtraction
-
-A pre-compiled extraction that can be reused across multiple source inputs.
-
-Stores compiled `tree_sitter.Query` objects and their capture names so they
-don't need to be recompiled for every call. A `QueryCursor` is reused across
-patterns within a single extraction call, making this type `Send + Sync`.
-
-##### Methods
-
-###### compile()
-
-Compile an extraction config for repeated use.
-
-**Errors:**
-
-Returns an error if the language is not found or any query pattern is invalid.
-
-**Signature:**
-
-```python
-@staticmethod
-def compile(config: ExtractionConfig) -> CompiledExtraction
-```
-
-###### compile_with_language()
-
-Compile extraction patterns using a pre-loaded `tree_sitter.Language`.
-
-This avoids a redundant language registry lookup when the caller already
-has the language (e.g., from an earlier parse step).
-
-**Errors:**
-
-Returns an error if any query pattern is invalid.
-
-**Signature:**
-
-```python
-@staticmethod
-def compile_with_language(language: Language, language_name: str, extraction_patterns: dict[str, ExtractionPattern]) -> CompiledExtraction
-```
-
-###### extract()
-
-Extract from source code, parsing it first.
-
-Uses the thread-local parser cache to avoid creating a new parser on
-every call.
-
-**Errors:**
-
-Returns an error if parsing fails.
-
-**Signature:**
-
-```python
-def extract(self, source: str) -> ExtractionResult
-```
-
-###### extract_from_tree()
-
-Extract from an already-parsed tree.
-
-**Errors:**
-
-Returns an error if query execution fails.
-
-**Signature:**
-
-```python
-def extract_from_tree(self, tree: Tree, source: bytes) -> ExtractionResult
-```
-
-
----
-
-#### Config
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `language_pack` | `LanguagePackConfig` | — | Language pack (language pack config) |
-| `languages` | `LanguagesConfig` | — | Languages (languages config) |
-
-##### Methods
-
-###### load()
-
-**Signature:**
-
-```python
-@staticmethod
-def load(path: str) -> Config
-```
-
-###### discover()
-
-Discover config file from standard locations.
-Returns Ok(Some(config)) if found and parsed, Ok(None) if not found,
-and Err if found but failed to parse.
-
-**Signature:**
-
-```python
-@staticmethod
-def discover() -> Config | None
-```
 
 
 ---
@@ -1418,7 +1049,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `str` | — | The language name (e.g., `"python"`). |
-| `patterns` | `dict[str, ExtractionPattern]` | `{}` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `str` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1433,7 +1064,7 @@ Defines a single extraction pattern and its configuration.
 | `capture_output` | `CaptureOutput` | `CaptureOutput.FULL` | What to include in each capture result. |
 | `child_fields` | `list[str]` | `[]` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `max_results` | `int | None` | `None` | Maximum number of matches to return. `None` means unlimited. |
-| `byte_range` | `tuple[int, int] | None` | `None` | Restrict matches to a byte range `(start, end)`. |
+| `byte_range` | `str | None` | `None` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1445,7 +1076,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `str` | — | The language that was used. |
-| `results` | `dict[str, PatternResult]` | `{}` | Results keyed by pattern name. |
+| `results` | `str` | — | Results keyed by pattern name. |
 
 
 ---
@@ -1461,8 +1092,8 @@ Aggregate metrics for a source file.
 | `comment_lines` | `int` | — | Comment lines |
 | `blank_lines` | `int` | — | Blank lines |
 | `total_bytes` | `int` | — | Total bytes |
-| `node_count` | `int` | — | Number of node |
-| `error_count` | `int` | — | Number of error |
+| `node_count` | `int` | — | Number of nodes |
+| `error_count` | `int` | — | Number of errors |
 | `max_depth` | `int` | — | Maximum depth |
 
 
@@ -1488,44 +1119,12 @@ An import statement extracted from source code.
 
 ---
 
-#### LanguageDefinition
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `repo` | `str` | — | Repo |
-| `rev` | `str | None` | `None` | Rev |
-| `branch` | `str | None` | `None` | Branch |
-| `directory` | `str | None` | `None` | Directory |
-| `generate` | `bool | None` | `None` | Generate |
-| `abi_version` | `int | None` | `None` | Abi version |
-| `extensions` | `list[str]` | — | Extensions |
-| `c_symbol` | `str | None` | `None` | Override for the C symbol name when it differs from the language name. |
-| `ambiguous` | `dict[str, list[str]]` | — | Known ambiguous extensions mapped to the other languages they could belong to. Key: extension, Value: list of alternative language names. Example: `{"m": ["matlab"]}` on the `objc` definition means `.m` could also be MATLAB. |
-
-
----
-
-#### LanguageDefinitions
-
-
----
-
 #### LanguageInfo
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `group` | `str` | — | Group |
 | `size` | `int` | — | Size in bytes |
-
-
----
-
-#### LanguagePackConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `cache_dir` | `str | None` | `None` | Cache dir |
-| `definitions` | `str | None` | `None` | Definitions |
 
 
 ---
@@ -1650,16 +1249,6 @@ def default() -> LanguageRegistry
 
 ---
 
-#### LanguagesConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `include` | `list[str]` | `[]` | Include |
-| `exclude` | `list[str]` | `[]` | Exclude |
-
-
----
-
 #### MatchResult
 
 A single query match containing one or more captures.
@@ -1682,7 +1271,7 @@ This is an owned type that can be passed across FFI boundaries, unlike
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `Str` | — | The grammar type name (e.g., "function_definition", "identifier"). |
+| `kind` | `str` | — | The grammar type name (e.g., "function_definition", "identifier"). |
 | `is_named` | `bool` | — | Whether this is a named node (vs anonymous like punctuation). |
 | `start_byte` | `int` | — | Start byte offset in source. |
 | `end_byte` | `int` | — | End byte offset in source. |
@@ -1813,7 +1402,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `Str` | — | Language name (required). |
+| `language` | `str` | — | Language name (required). |
 | `structure` | `bool` | `True` | Extract structural items (functions, classes, etc.). Default: true. |
 | `imports` | `bool` | `True` | Extract import statements. Default: true. |
 | `exports` | `bool` | `True` | Extract export statements. Default: true. |
@@ -1822,7 +1411,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `bool` | `False` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `False` | Include parse diagnostics. Default: false. |
 | `chunk_max_size` | `int | None` | `None` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `dict[str, ExtractionPattern] | None` | `None` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `extractions` | `str | None` | `None` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
@@ -1888,7 +1477,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `list[SymbolInfo]` | `[]` | Symbols |
 | `diagnostics` | `list[Diagnostic]` | `[]` | Diagnostics |
 | `chunks` | `list[CodeChunk]` | `[]` | Text chunks for chunking/embedding |
-| `extractions` | `dict[str, PatternResult]` | `{}` | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `str` | — | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1900,7 +1489,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `pattern_index` | `int` | — | The pattern index that matched (position in the query string). |
-| `captures` | `list[tuple[CowStatic, Str, NodeInfo]]` | `[]` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `list[str]` | `[]` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---
@@ -1970,7 +1559,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `bool` | — | Whether all patterns are valid. |
-| `patterns` | `dict[str, PatternValidation]` | `{}` | Per-pattern validation details. |
+| `patterns` | `str` | — | Per-pattern validation details. |
 
 
 ---

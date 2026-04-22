@@ -2,7 +2,7 @@
 title: "C API Reference"
 ---
 
-## C API Reference <span class="version-badge">v1.6.3</span>
+## C API Reference <span class="version-badge">v1.7.0</span>
 
 ### Functions
 
@@ -53,53 +53,6 @@ const char** ts_pack_detect_language_from_path(const char* path);
 
 ---
 
-#### ts_pack_extension_ambiguity()
-
-Check if a file extension is ambiguous — i.e. it could reasonably belong to
-multiple languages.
-
-Returns `Some((assigned_language, alternatives))` if the extension is known
-to be ambiguous, where `assigned_language` is what `detect_language_from_extension`
-returns and `alternatives` lists other languages it could also belong to.
-
-Returns `NULL` if the extension is unambiguous or unrecognized.
-
-**Signature:**
-
-```c
-void** ts_pack_extension_ambiguity(const char* ext);
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ext` | `const char*` | Yes | The ext |
-
-**Returns:** `void**`
-
-
----
-
-#### ts_pack_extension_ambiguity_json()
-
-**Signature:**
-
-```c
-const char** ts_pack_extension_ambiguity_json(const char* ext);
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ext` | `const char*` | Yes | The ext |
-
-**Returns:** `const char**`
-
-
----
-
 #### ts_pack_detect_language_from_content()
 
 Detect language name from file content using the shebang line (`#!`).
@@ -132,213 +85,6 @@ const char** ts_pack_detect_language_from_content(const char* content);
 | `content` | `const char*` | Yes | The content to process |
 
 **Returns:** `const char**`
-
-
----
-
-#### ts_pack_extract()
-
-Run extraction patterns against source code, parsing and querying in one step.
-
-This is the simplest entry point. For repeated extractions with the same
-config, prefer `CompiledExtraction.compile` to avoid recompiling queries.
-
-**Errors:**
-
-Returns an error if the language is not found, parsing fails, or a query
-pattern is invalid.
-
-**Signature:**
-
-```c
-TsPackExtractionResult* ts_pack_extract(const char* source, TsPackExtractionConfig config);
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `const char*` | Yes | The source |
-| `config` | `TsPackExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `TsPackExtractionResult`
-
-**Errors:** Returns `NULL` on error.
-
-
----
-
-#### ts_pack_validate_extraction()
-
-Validate an extraction config without running it.
-
-Checks that the language exists and all query patterns compile. Returns
-detailed diagnostics per pattern.
-
-**Errors:**
-
-Returns an error if the language cannot be loaded.
-
-**Signature:**
-
-```c
-TsPackValidationResult* ts_pack_validate_extraction(TsPackExtractionConfig config);
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `config` | `TsPackExtractionConfig` | Yes | The configuration options |
-
-**Returns:** `TsPackValidationResult`
-
-**Errors:** Returns `NULL` on error.
-
-
----
-
-#### ts_pack_chunk_source()
-
-Chunk source code and produce rich metadata per chunk.
-
-Uses the vendored text-splitter algorithm for AST-aware splitting,
-then overlays rich metadata on each resulting chunk.
-
-**Signature:**
-
-```c
-TsPackCodeChunk* ts_pack_chunk_source(const char* source, const char* language, uintptr_t max_chunk_size, TsPackLanguage lang, TsPackTree tree);
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `const char*` | Yes | The source |
-| `language` | `const char*` | Yes | The language |
-| `max_chunk_size` | `uintptr_t` | Yes | The max chunk size |
-| `lang` | `TsPackLanguage` | Yes | The language |
-| `tree` | `TsPackTree` | Yes | The tree |
-
-**Returns:** `TsPackCodeChunk*`
-
-
----
-
-#### ts_pack_extract_intelligence()
-
-Extract all intelligence from a parsed source file.
-
-**Signature:**
-
-```c
-TsPackProcessResult* ts_pack_extract_intelligence(const char* source, const char* language, TsPackTree tree);
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `const char*` | Yes | The source |
-| `language` | `const char*` | Yes | The language |
-| `tree` | `TsPackTree` | Yes | The tree |
-
-**Returns:** `TsPackProcessResult`
-
-
----
-
-#### ts_pack_process()
-
-Process source code: parse once, extract intelligence based on config, and return it.
-
-**Signature:**
-
-```c
-TsPackProcessResult* ts_pack_process(const char* source, TsPackProcessConfig config, TsPackLanguageRegistry registry);
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `const char*` | Yes | The source |
-| `config` | `TsPackProcessConfig` | Yes | The configuration options |
-| `registry` | `TsPackLanguageRegistry` | Yes | The language registry |
-
-**Returns:** `TsPackProcessResult`
-
-**Errors:** Returns `NULL` on error.
-
-
----
-
-#### ts_pack_snake_to_camel()
-
-Recursively convert snake_case keys in a JSON Value to camelCase.
-
-Used by language bindings (Node.js, WASM, Go, Java, C#) to provide
-camelCase APIs while the Rust core uses snake_case.
-
-**Signature:**
-
-```c
-TsPackValue* ts_pack_snake_to_camel(TsPackValue val);
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `val` | `TsPackValue` | Yes | The value |
-
-**Returns:** `TsPackValue`
-
-
----
-
-#### ts_pack_camel_to_snake()
-
-Recursively convert camelCase keys in a JSON Value to snake_case.
-
-Used by WASM bindings to accept camelCase config from JavaScript
-while the Rust core expects snake_case.
-
-**Signature:**
-
-```c
-TsPackValue* ts_pack_camel_to_snake(TsPackValue val);
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `val` | `TsPackValue` | Yes | The value |
-
-**Returns:** `TsPackValue`
-
-
----
-
-#### ts_pack_node_info_from_node()
-
-Extract a `NodeInfo` from a tree-sitter `Node`.
-
-**Signature:**
-
-```c
-TsPackNodeInfo* ts_pack_node_info_from_node(TsPackNode node);
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `node` | `TsPackNode` | Yes | The node |
-
-**Returns:** `TsPackNodeInfo`
 
 
 ---
@@ -640,71 +386,6 @@ TsPackQueryMatch* ts_pack_run_query(TsPackTree tree, const char* language, const
 
 ---
 
-#### ts_pack_split_code()
-
-Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
-Returns a list of `(start_byte, end_byte)` ranges.
-
-The algorithm works by:
-
-1. Walking the tree-sitter AST to collect all nodes with their depth.
-2. Using depth as a semantic level: shallower nodes (functions, classes) are
-   preferred split boundaries over deeper nodes (statements, expressions).
-3. Greedily merging adjacent sections at the best semantic level that keeps
-   each chunk under `max_chunk_size` bytes.
-4. When no AST node boundary fits, falling back to line boundaries and
-   ultimately to raw byte splits.
-
-The function never splits in the middle of a token/leaf node when an AST
-boundary is available.
-
-**Returns:**
-
-A `Vec<(usize, usize)>` of `(start_byte, end_byte)` ranges covering the
-entire source. Ranges are non-overlapping, contiguous, and each range is
-at most `max_chunk_size` bytes (except when a single indivisible token
-exceeds that limit).
-
-**Signature:**
-
-```c
-void** ts_pack_split_code(const char* source, TsPackTree tree, uintptr_t max_chunk_size);
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `source` | `const char*` | Yes | The full source code string. |
-| `tree` | `TsPackTree` | Yes | A tree-sitter `Tree` previously parsed from `source`. |
-| `max_chunk_size` | `uintptr_t` | Yes | Maximum size in bytes for each chunk. |
-
-**Returns:** `void**`
-
-
----
-
-#### ts_pack_load_definitions()
-
-**Signature:**
-
-```c
-TsPackLanguageDefinitions* ts_pack_load_definitions(const char* json);
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `json` | `const char*` | Yes | The json |
-
-**Returns:** `TsPackLanguageDefinitions`
-
-**Errors:** Returns `NULL` on error.
-
-
----
-
 #### ts_pack_get_language()
 
 Get a tree-sitter `Language` by name using the global registry.
@@ -828,6 +509,38 @@ uintptr_t ts_pack_language_count();
 
 ---
 
+#### ts_pack_process()
+
+Process source code and extract file intelligence using the global registry.
+
+Parses the source with tree-sitter and extracts metrics, structure, imports,
+exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+the flags set in `ProcessConfig`.
+
+**Errors:**
+
+Returns an error if the language is not found or parsing fails.
+
+**Signature:**
+
+```c
+TsPackProcessResult* ts_pack_process(const char* source, TsPackProcessConfig config);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `source` | `const char*` | Yes | The source |
+| `config` | `TsPackProcessConfig` | Yes | The configuration options |
+
+**Returns:** `TsPackProcessResult`
+
+**Errors:** Returns `NULL` on error.
+
+
+---
+
 #### ts_pack_extract_patterns()
 
 Run extraction patterns against source code.
@@ -853,6 +566,35 @@ TsPackExtractionResult* ts_pack_extract_patterns(const char* source, TsPackExtra
 | `config` | `TsPackExtractionConfig` | Yes | The configuration options |
 
 **Returns:** `TsPackExtractionResult`
+
+**Errors:** Returns `NULL` on error.
+
+
+---
+
+#### ts_pack_validate_extraction()
+
+Validate extraction patterns without running them.
+
+Convenience wrapper around `extract.validate_extraction`.
+
+**Errors:**
+
+Returns an error if the language cannot be loaded.
+
+**Signature:**
+
+```c
+TsPackValidationResult* ts_pack_validate_extraction(TsPackExtractionConfig config);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `config` | `TsPackExtractionConfig` | Yes | The configuration options |
+
+**Returns:** `TsPackValidationResult`
 
 **Errors:** Returns `NULL` on error.
 
@@ -1078,7 +820,7 @@ A single captured node within a match.
 | `name` | `const char*` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `TsPackNodeInfo*` | `NULL` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `const char**` | `NULL` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `child_fields` | `void*` | `NULL` | Values of requested child fields, keyed by field name. |
+| `child_fields` | `const char*` | — | Values of requested child fields, keyed by field name. |
 | `start_byte` | `uintptr_t` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1129,113 +871,6 @@ A comment extracted from source code.
 | `kind` | `TsPackCommentKind` | `TS_PACK_TS_PACK_LINE` | Kind (comment kind) |
 | `span` | `TsPackSpan` | — | Span (span) |
 | `associated_node` | `const char**` | `NULL` | Associated node |
-
-
----
-
-#### TsPackCompiledExtraction
-
-A pre-compiled extraction that can be reused across multiple source inputs.
-
-Stores compiled `tree_sitter.Query` objects and their capture names so they
-don't need to be recompiled for every call. A `QueryCursor` is reused across
-patterns within a single extraction call, making this type `Send + Sync`.
-
-##### Methods
-
-###### ts_pack_compile()
-
-Compile an extraction config for repeated use.
-
-**Errors:**
-
-Returns an error if the language is not found or any query pattern is invalid.
-
-**Signature:**
-
-```c
-TsPackCompiledExtraction ts_pack_compile(TsPackExtractionConfig config);
-```
-
-###### ts_pack_compile_with_language()
-
-Compile extraction patterns using a pre-loaded `tree_sitter.Language`.
-
-This avoids a redundant language registry lookup when the caller already
-has the language (e.g., from an earlier parse step).
-
-**Errors:**
-
-Returns an error if any query pattern is invalid.
-
-**Signature:**
-
-```c
-TsPackCompiledExtraction ts_pack_compile_with_language(TsPackLanguage language, const char* language_name, void* extraction_patterns);
-```
-
-###### ts_pack_extract()
-
-Extract from source code, parsing it first.
-
-Uses the thread-local parser cache to avoid creating a new parser on
-every call.
-
-**Errors:**
-
-Returns an error if parsing fails.
-
-**Signature:**
-
-```c
-TsPackExtractionResult ts_pack_extract(const char* source);
-```
-
-###### ts_pack_extract_from_tree()
-
-Extract from an already-parsed tree.
-
-**Errors:**
-
-Returns an error if query execution fails.
-
-**Signature:**
-
-```c
-TsPackExtractionResult ts_pack_extract_from_tree(TsPackTree tree, const uint8_t* source);
-```
-
-
----
-
-#### TsPackConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `language_pack` | `TsPackLanguagePackConfig` | — | Language pack (language pack config) |
-| `languages` | `TsPackLanguagesConfig` | — | Languages (languages config) |
-
-##### Methods
-
-###### ts_pack_load()
-
-**Signature:**
-
-```c
-TsPackConfig ts_pack_load(const char* path);
-```
-
-###### ts_pack_discover()
-
-Discover config file from standard locations.
-Returns Ok(Some(config)) if found and parsed, Ok(None) if not found,
-and Err if found but failed to parse.
-
-**Signature:**
-
-```c
-TsPackConfig* ts_pack_discover();
-```
 
 
 ---
@@ -1411,7 +1046,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `const char*` | — | The language name (e.g., `"python"`). |
-| `patterns` | `void*` | `NULL` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `const char*` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1425,8 +1060,8 @@ Defines a single extraction pattern and its configuration.
 | `query` | `const char*` | — | The tree-sitter query string (S-expression). |
 | `capture_output` | `TsPackCaptureOutput` | `TS_PACK_TS_PACK_FULL` | What to include in each capture result. |
 | `child_fields` | `const char**` | `NULL` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
-| `max_results` | `uintptr_t*` | `NULL` | Maximum number of matches to return. `None` means unlimited. |
-| `byte_range` | `void**` | `NULL` | Restrict matches to a byte range `(start, end)`. |
+| `max_results` | `uintptr_t*` | `NULL` | Maximum number of matches to return. `NULL` means unlimited. |
+| `byte_range` | `const char**` | `NULL` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1438,7 +1073,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `const char*` | — | The language that was used. |
-| `results` | `void*` | `NULL` | Results keyed by pattern name. |
+| `results` | `const char*` | — | Results keyed by pattern name. |
 
 
 ---
@@ -1454,8 +1089,8 @@ Aggregate metrics for a source file.
 | `comment_lines` | `uintptr_t` | — | Comment lines |
 | `blank_lines` | `uintptr_t` | — | Blank lines |
 | `total_bytes` | `uintptr_t` | — | Total bytes |
-| `node_count` | `uintptr_t` | — | Number of node |
-| `error_count` | `uintptr_t` | — | Number of error |
+| `node_count` | `uintptr_t` | — | Number of nodes |
+| `error_count` | `uintptr_t` | — | Number of errors |
 | `max_depth` | `uintptr_t` | — | Maximum depth |
 
 
@@ -1481,44 +1116,12 @@ An import statement extracted from source code.
 
 ---
 
-#### TsPackLanguageDefinition
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `repo` | `const char*` | — | Repo |
-| `rev` | `const char**` | `NULL` | Rev |
-| `branch` | `const char**` | `NULL` | Branch |
-| `directory` | `const char**` | `NULL` | Directory |
-| `generate` | `bool*` | `NULL` | Generate |
-| `abi_version` | `uint32_t*` | `NULL` | Abi version |
-| `extensions` | `const char**` | — | Extensions |
-| `c_symbol` | `const char**` | `NULL` | Override for the C symbol name when it differs from the language name. |
-| `ambiguous` | `void*` | — | Known ambiguous extensions mapped to the other languages they could belong to. Key: extension, Value: list of alternative language names. Example: `{"m": ["matlab"]}` on the `objc` definition means `.m` could also be MATLAB. |
-
-
----
-
-#### TsPackLanguageDefinitions
-
-
----
-
 #### TsPackLanguageInfo
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `group` | `const char*` | — | Group |
 | `size` | `uint64_t` | — | Size in bytes |
-
-
----
-
-#### TsPackLanguagePackConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `cache_dir` | `const char**` | `NULL` | Cache dir |
-| `definitions` | `const char**` | `NULL` | Definitions |
 
 
 ---
@@ -1641,16 +1244,6 @@ TsPackLanguageRegistry ts_pack_default();
 
 ---
 
-#### TsPackLanguagesConfig
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `include` | `const char**` | `NULL` | Include |
-| `exclude` | `const char**` | `NULL` | Exclude |
-
-
----
-
 #### TsPackMatchResult
 
 A single query match containing one or more captures.
@@ -1673,7 +1266,7 @@ This is an owned type that can be passed across FFI boundaries, unlike
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `TsPackStr` | — | The grammar type name (e.g., "function_definition", "identifier"). |
+| `kind` | `const char*` | — | The grammar type name (e.g., "function_definition", "identifier"). |
 | `is_named` | `bool` | — | Whether this is a named node (vs anonymous like punctuation). |
 | `start_byte` | `uintptr_t` | — | Start byte offset in source. |
 | `end_byte` | `uintptr_t` | — | End byte offset in source. |
@@ -1802,7 +1395,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `TsPackStr` | — | Language name (required). |
+| `language` | `const char*` | — | Language name (required). |
 | `structure` | `bool` | `true` | Extract structural items (functions, classes, etc.). Default: true. |
 | `imports` | `bool` | `true` | Extract import statements. Default: true. |
 | `exports` | `bool` | `true` | Extract export statements. Default: true. |
@@ -1810,8 +1403,8 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `docstrings` | `bool` | `false` | Extract docstrings. Default: false. |
 | `symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
-| `chunk_max_size` | `uintptr_t*` | `NULL` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `void**` | `NULL` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `chunk_max_size` | `uintptr_t*` | `NULL` | Maximum chunk size in bytes. `NULL` disables chunking. |
+| `extractions` | `const char**` | `NULL` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
@@ -1876,7 +1469,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `TsPackSymbolInfo*` | `NULL` | Symbols |
 | `diagnostics` | `TsPackDiagnostic*` | `NULL` | Diagnostics |
 | `chunks` | `TsPackCodeChunk*` | `NULL` | Text chunks for chunking/embedding |
-| `extractions` | `void*` | `NULL` | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `const char*` | — | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1888,7 +1481,7 @@ A single match from a tree-sitter query, with captured nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `pattern_index` | `uintptr_t` | — | The pattern index that matched (position in the query string). |
-| `captures` | `void**` | `NULL` | Captures: list of (capture_name, node_info) pairs. |
+| `captures` | `const char**` | `NULL` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---
@@ -1958,7 +1551,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `bool` | — | Whether all patterns are valid. |
-| `patterns` | `void*` | `NULL` | Per-pattern validation details. |
+| `patterns` | `const char*` | — | Per-pattern validation details. |
 
 
 ---
