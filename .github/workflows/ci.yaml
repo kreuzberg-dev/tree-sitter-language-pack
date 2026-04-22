@@ -422,6 +422,9 @@ jobs:
       - name: Run workspace tests
         run: cargo test --workspace --exclude ts-pack-core-wasm
 
+      - name: Install alef
+        run: cargo install --git https://github.com/kreuzberg-dev/alef --tag v0.5.3 --locked --bin alef
+
       - name: Generate E2E tests
         run: task rust:e2e:generate
 
@@ -588,6 +591,9 @@ jobs:
         run: |
           wheel_file=$(find dist -name '*.whl' -print -quit)
           pip install "$wheel_file" tree-sitter pytest
+
+      - name: Install alef
+        run: cargo install --git https://github.com/kreuzberg-dev/alef --tag v0.5.3 --locked --bin alef
 
       - name: Generate E2E tests
         run: alef e2e generate --lang python
@@ -984,6 +990,9 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
+      - name: Install alef
+        run: cargo install --git https://github.com/kreuzberg-dev/alef --tag v0.5.3 --locked --bin alef
+
       - name: Build Java jar
         working-directory: packages/java
         run: mvn package -DskipTests
@@ -1074,6 +1083,9 @@ jobs:
         working-directory: packages/csharp
         run: dotnet test TreeSitterLanguagePack.csproj -c Release --no-build
 
+      - name: Install alef (for E2E generate)
+        run: cargo install --git https://github.com/kreuzberg-dev/alef --tag v0.5.3 --locked --bin alef
+
       - name: Generate C# E2E tests
         run: alef e2e generate --lang csharp
 
@@ -1137,6 +1149,9 @@ jobs:
       - name: Run RSpec tests
         working-directory: packages/ruby
         run: bundle exec rspec
+
+      - name: Install alef (for E2E generate)
+        run: cargo install --git https://github.com/kreuzberg-dev/alef --tag v0.5.3 --locked --bin alef
 
       - name: Generate Ruby E2E tests
         run: alef e2e generate --lang ruby
@@ -1219,6 +1234,10 @@ jobs:
 
       - name: Build PHP extension
         run: cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml
+
+      - name: Install alef (for E2E generate)
+        if: matrix.os == 'ubuntu-latest'
+        run: cargo install --git https://github.com/kreuzberg-dev/alef --tag v0.5.3 --locked --bin alef
 
       - name: Generate PHP E2E tests
         if: matrix.os == 'ubuntu-latest'
