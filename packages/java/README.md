@@ -10,7 +10,7 @@ Add to your `pom.xml`:
 <dependency>
     <groupId>dev.kreuzberg.treesitterlanguagepack</groupId>
     <artifactId>tree-sitter-language-pack</artifactId>
-    <version>1.6.3</version>
+    <version>1.7.0</version>
 </dependency>
 ```
 
