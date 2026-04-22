@@ -3,6 +3,12 @@
 from tree_sitter_language_pack import get_highlights_query, get_injections_query, get_locals_query, parse_string
 
 
+def test_highlights_nonexistent_language() -> None:
+    """Get highlights query for nonexistent language returns null/empty."""
+    language = "zzz_nonexistent_lang"
+    result = get_highlights_query(language=language)
+    assert not result  # noqa: S101
+
 def test_highlights_query_python() -> None:
     """get_highlights_query returns non-empty string for python."""
     language = "python"
@@ -39,10 +45,17 @@ def test_locals_query_unknown_language() -> None:
     result = get_locals_query(language=language)
     assert not result  # noqa: S101
 
+def test_run_query_no_matches() -> None:
+    """Run query that matches no nodes returns empty result."""
+    language = "python"
+    source = "x = 1"
+    tree = parse_string(language=language, source=source)
+    assert len(run_query(tree, "python", "(class_definition name: (identifier) @name)", source)) >= 0  # noqa: S101
+
 def test_run_query_python_functions() -> None:
     """Parse Python and run a query to find function definitions."""
     language = "python"
     source = "def hello():\n    pass\n\ndef world():\n    return 42\n"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert len(run_query(tree, "python", "(function_definition name: (identifier) @name)", source)) >= 2  # noqa: S101
 

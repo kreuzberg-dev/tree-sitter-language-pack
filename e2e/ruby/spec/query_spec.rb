@@ -5,6 +5,11 @@ require 'tree_sitter_language_pack'
 require 'json'
 
 RSpec.describe 'query' do
+  it 'highlights_nonexistent_language: Get highlights query for nonexistent language returns null/empty' do
+    result = TreeSitterLanguagePack.process('', nil)
+    expect(result.nil? || result.empty?).to be(true)
+  end
+
   it 'highlights_query_python: get_highlights_query returns non-empty string for python' do
     result = TreeSitterLanguagePack.process('', nil)
     expect(result).not_to be_empty
@@ -33,6 +38,11 @@ RSpec.describe 'query' do
   it 'locals_query_unknown_language: get_locals_query returns empty for unknown language' do
     result = TreeSitterLanguagePack.process('', nil)
     expect(result.nil? || result.empty?).to be(true)
+  end
+
+  it 'run_query_no_matches: Run query that matches no nodes returns empty result' do
+    result = TreeSitterLanguagePack.process('x = 1', nil)
+    # TODO: unsupported assertion type: method_result
   end
 
   it 'run_query_python_functions: Parse Python and run a query to find function definitions' do

@@ -9,9 +9,50 @@ import (
 	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
+func Test_ErrorDetectContentEmpty(t *testing.T) {
+	// Detect language from empty content returns null
+	result, err := tspack.Process("", nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	if len(result) != 0 {
+		t.Errorf("expected empty value, got %v", result)
+	}
+}
+
+func Test_ErrorDetectExtensionEmpty(t *testing.T) {
+	// Detect language from empty extension returns null
+	result, err := tspack.Process("", nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	if len(result) != 0 {
+		t.Errorf("expected empty value, got %v", result)
+	}
+}
+
+func Test_ErrorDetectPathEmpty(t *testing.T) {
+	// Detect language from empty path returns null
+	result, err := tspack.Process("", nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	if len(result) != 0 {
+		t.Errorf("expected empty value, got %v", result)
+	}
+}
+
 func Test_ErrorEmptyLanguageName(t *testing.T) {
 	// Parsing with empty language name should error
 	_, err := tspack.Process(`hello`, nil)
+	if err == nil {
+		t.Errorf("expected an error, but call succeeded")
+	}
+}
+
+func Test_ErrorExtractUnknownLanguage(t *testing.T) {
+	// Extract patterns with unknown language returns error
+	_, err := tspack.Process(`x = 1`, `{"language":"nonexistent_language_xyz","patterns":{}}`)
 	if err == nil {
 		t.Errorf("expected an error, but call succeeded")
 	}
@@ -40,6 +81,26 @@ func Test_ErrorHandlingUnknownLanguage(t *testing.T) {
 	if err == nil {
 		t.Errorf("expected an error, but call succeeded")
 	}
+}
+
+func Test_ErrorProcessEmptySource(t *testing.T) {
+	// Process empty source code succeeds with zero metrics
+	result, err := tspack.Process(``, `{"language":"python"}`)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	if result.Metrics.TotalLines != 0 {
+		t.Errorf("equals mismatch: got %v", result.Metrics.TotalLines)
+	}
+}
+
+func Test_ErrorRunQueryInvalidSyntax(t *testing.T) {
+	// Run query with invalid S-expression syntax produces error
+	result, err := tspack.Process(`x = 1`, nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_ParseEmptyLanguage(t *testing.T) {

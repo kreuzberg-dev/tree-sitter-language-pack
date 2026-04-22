@@ -13,6 +13,14 @@ public class QueryTests
     private static readonly JsonSerializerOptions ConfigOptions = new() { Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) }, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault };
 
     [Fact]
+    public void Test_HighlightsNonexistentLanguage()
+    {
+        // Get highlights query for nonexistent language returns null/empty
+        var result = TreeSitterLanguagePackLib.Process("", null);
+        Assert.True(string.IsNullOrEmpty(result?.ToString()));
+    }
+
+    [Fact]
     public void Test_HighlightsQueryPython()
     {
         // get_highlights_query returns non-empty string for python
@@ -58,6 +66,14 @@ public class QueryTests
         // get_locals_query returns empty for unknown language
         var result = TreeSitterLanguagePackLib.Process("", null);
         Assert.True(string.IsNullOrEmpty(result?.ToString()));
+    }
+
+    [Fact]
+    public void Test_RunQueryNoMatches()
+    {
+        // Run query that matches no nodes returns empty result
+        var result = TreeSitterLanguagePackLib.Process("x = 1", null);
+        // TODO: unsupported assertion type: method_result
     }
 
     [Fact]

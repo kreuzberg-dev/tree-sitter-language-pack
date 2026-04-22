@@ -3,9 +3,30 @@ import { describe, it, expect } from 'vitest';
 import { process } from '@kreuzberg/tree-sitter-language-pack';
 
 describe('error-handling', () => {
+  it('error_detect_content_empty: Detect language from empty content returns null', () => {
+    const result = process("", null);
+    expect(result).toHaveLength(0);
+  });
+
+  it('error_detect_extension_empty: Detect language from empty extension returns null', () => {
+    const result = process("", null);
+    expect(result).toHaveLength(0);
+  });
+
+  it('error_detect_path_empty: Detect language from empty path returns null', () => {
+    const result = process("", null);
+    expect(result).toHaveLength(0);
+  });
+
   it('error_empty_language_name: Parsing with empty language name should error', async () => {
     await expect(async () => {
       await process("hello", null);
+    }).rejects.toThrow();
+  });
+
+  it('error_extract_unknown_language: Extract patterns with unknown language returns error', async () => {
+    await expect(async () => {
+      await process("x = 1", { language: "nonexistent_language_xyz", patterns: {  } });
     }).rejects.toThrow();
   });
 
@@ -22,6 +43,16 @@ describe('error-handling', () => {
     await expect(async () => {
       await process("", null);
     }).rejects.toThrow();
+  });
+
+  it('error_process_empty_source: Process empty source code succeeds with zero metrics', () => {
+    const result = process("", { language: "python" });
+    expect(result.metrics.totalLines).toBe(0);
+  });
+
+  it('error_run_query_invalid_syntax: Run query with invalid S-expression syntax produces error', () => {
+    const result = process("x = 1", null);
+    // TODO: unsupported assertion type: method_result
   });
 
   it('parse_empty_language: parse_string() returns error with empty language name', async () => {

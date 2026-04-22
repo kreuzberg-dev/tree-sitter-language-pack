@@ -11,6 +11,13 @@ use Tree\Sitter\Language\Pack\TreeSitterLanguagePack;
 /** E2e tests for category: query. */
 final class QueryTest extends TestCase
 {
+    /** Get highlights query for nonexistent language returns null/empty */
+    public function test_highlights_nonexistent_language(): void
+    {
+        $result = TreeSitterLanguagePack::get_highlights_query("zzz_nonexistent_lang");
+        $this->assertEmpty($result);
+    }
+
     /** get_highlights_query returns non-empty string for python */
     public function test_highlights_query_python(): void
     {
@@ -51,6 +58,13 @@ final class QueryTest extends TestCase
     {
         $result = TreeSitterLanguagePack::get_locals_query("nonexistent_xyz");
         $this->assertEmpty($result);
+    }
+
+    /** Run query that matches no nodes returns empty result */
+    public function test_run_query_no_matches(): void
+    {
+        $tree = TreeSitterLanguagePack::parse_string("python", "x = 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     /** Parse Python and run a query to find function definitions */

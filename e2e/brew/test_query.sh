@@ -3,6 +3,13 @@
 # E2e tests for category: query
 set -euo pipefail
 
+test_highlights_nonexistent_language() {
+    # Get highlights query for nonexistent language returns null/empty
+    local output
+    output=$(tree_sitter_language_pack process)
+
+}
+
 test_highlights_query_python() {
     # get_highlights_query returns non-empty string for python
     local output
@@ -45,6 +52,14 @@ test_locals_query_unknown_language() {
 
 }
 
+test_run_query_no_matches() {
+    # Run query that matches no nodes returns empty result
+    local output
+    output=$(tree_sitter_language_pack process)
+
+    # TODO: unsupported assertion type: method_result
+}
+
 test_run_query_python_functions() {
     # Parse Python and run a query to find function definitions
     local output
@@ -54,11 +69,13 @@ test_run_query_python_functions() {
 }
 
 run_tests_query() {
+    run_test test_highlights_nonexistent_language
     run_test test_highlights_query_python
     run_test test_highlights_query_unknown_language
     run_test test_injections_query_javascript
     run_test test_injections_query_unknown_language
     run_test test_locals_query_python
     run_test test_locals_query_unknown_language
+    run_test test_run_query_no_matches
     run_test test_run_query_python_functions
 }

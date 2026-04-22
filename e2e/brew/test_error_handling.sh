@@ -3,8 +3,37 @@
 # E2e tests for category: error-handling
 set -euo pipefail
 
+test_error_detect_content_empty() {
+    # Detect language from empty content returns null
+    local output
+    output=$(tree_sitter_language_pack process)
+
+}
+
+test_error_detect_extension_empty() {
+    # Detect language from empty extension returns null
+    local output
+    output=$(tree_sitter_language_pack process)
+
+}
+
+test_error_detect_path_empty() {
+    # Detect language from empty path returns null
+    local output
+    output=$(tree_sitter_language_pack process)
+
+}
+
 test_error_empty_language_name() {
     # Parsing with empty language name should error
+    if tree_sitter_language_pack process >/dev/null 2>&1; then
+        echo 'FAIL [error]: expected command to fail but it succeeded' >&2
+        return 1
+    fi
+}
+
+test_error_extract_unknown_language() {
+    # Extract patterns with unknown language returns error
     if tree_sitter_language_pack process >/dev/null 2>&1; then
         echo 'FAIL [error]: expected command to fail but it succeeded' >&2
         return 1
@@ -34,6 +63,24 @@ test_error_handling_unknown_language() {
     fi
 }
 
+test_error_process_empty_source() {
+    # Process empty source code succeeds with zero metrics
+    local output
+    output=$(tree_sitter_language_pack process)
+
+    local val_metrics_total_lines
+    val_metrics_total_lines=$(echo "$output" | jq -r '.metrics.total_lines')
+    assert_equals "$val_metrics_total_lines" '0' 'metrics.total_lines'
+}
+
+test_error_run_query_invalid_syntax() {
+    # Run query with invalid S-expression syntax produces error
+    local output
+    output=$(tree_sitter_language_pack process)
+
+    # TODO: unsupported assertion type: method_result
+}
+
 test_parse_empty_language() {
     # parse_string() returns error with empty language name
     if tree_sitter_language_pack process >/dev/null 2>&1; then
@@ -51,10 +98,16 @@ test_process_unknown_language() {
 }
 
 run_tests_error_handling() {
+    run_test test_error_detect_content_empty
+    run_test test_error_detect_extension_empty
+    run_test test_error_detect_path_empty
     run_test test_error_empty_language_name
+    run_test test_error_extract_unknown_language
     run_test test_error_handling_empty_source
     run_test test_error_handling_invalid_syntax
     run_test test_error_handling_unknown_language
+    run_test test_error_process_empty_source
+    run_test test_error_run_query_invalid_syntax
     run_test test_parse_empty_language
     run_test test_process_unknown_language
 }

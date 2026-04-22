@@ -11,11 +11,39 @@ use Tree\Sitter\Language\Pack\TreeSitterLanguagePack;
 /** E2e tests for category: error-handling. */
 final class ErrorHandlingTest extends TestCase
 {
+    /** Detect language from empty content returns null */
+    public function test_error_detect_content_empty(): void
+    {
+        $result = TreeSitterLanguagePack::detect_language_from_content("");
+        $this->assertEmpty($result);
+    }
+
+    /** Detect language from empty extension returns null */
+    public function test_error_detect_extension_empty(): void
+    {
+        $result = TreeSitterLanguagePack::detect_language_from_extension("");
+        $this->assertEmpty($result);
+    }
+
+    /** Detect language from empty path returns null */
+    public function test_error_detect_path_empty(): void
+    {
+        $result = TreeSitterLanguagePack::detect_language_from_path("");
+        $this->assertEmpty($result);
+    }
+
     /** Parsing with empty language name should error */
     public function test_error_empty_language_name(): void
     {
         $this->expectException(\Exception::class);
         TreeSitterLanguagePack::parse_string("", "hello");
+    }
+
+    /** Extract patterns with unknown language returns error */
+    public function test_error_extract_unknown_language(): void
+    {
+        $this->expectException(\Exception::class);
+        TreeSitterLanguagePack::extract_patterns("x = 1", ["language" => "nonexistent_language_xyz", "patterns" => []]);
     }
 
     /** Parsing an empty string should still produce a tree. */
@@ -37,6 +65,20 @@ final class ErrorHandlingTest extends TestCase
     {
         $this->expectException(\Exception::class);
         TreeSitterLanguagePack::parse_string("nonexistent_xyz", "");
+    }
+
+    /** Process empty source code succeeds with zero metrics */
+    public function test_error_process_empty_source(): void
+    {
+        $result = TreeSitterLanguagePack::process("", ["language" => "python"]);
+        $this->assertEquals(0, $result->metrics->total_lines);
+    }
+
+    /** Run query with invalid S-expression syntax produces error */
+    public function test_error_run_query_invalid_syntax(): void
+    {
+        $tree = TreeSitterLanguagePack::parse_string("python", "x = 1");
+        // TODO: unsupported assertion type: method_result
     }
 
     /** parse_string() returns error with empty language name */

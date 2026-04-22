@@ -8,14 +8,14 @@ def test_parsing_go_function() -> None:
     language = "go"
     source = "package main\nfunc main() {}"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert tree_contains_node_type(tree, "function_declaration")  # noqa: S101
 
 def test_parsing_html_element() -> None:
     """Parse an HTML element and assert node type."""
     language = "html"
     source = "<div>hello</div>"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert tree_contains_node_type(tree, "element")  # noqa: S101
 
 def test_parsing_javascript_class() -> None:
     """Parse a JavaScript class declaration."""
@@ -23,28 +23,28 @@ def test_parsing_javascript_class() -> None:
     source = "class Foo { bar() {} }"
     tree = parse_string(language=language, source=source)
     assert tree.root_child_count >= 1  # noqa: S101
-    # TODO: unsupported assertion type: method_result
+    assert tree_contains_node_type(tree, "class_declaration")  # noqa: S101
 
 def test_parsing_javascript_variable() -> None:
     """Parse a JavaScript variable declaration and assert node type."""
     language = "javascript"
     source = "const x = 1;"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert tree_contains_node_type(tree, "lexical_declaration")  # noqa: S101
 
 def test_parsing_python_function() -> None:
     """Parse a Python function definition and assert node type."""
     language = "python"
     source = "def hello(): pass"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert tree_contains_node_type(tree, "function_definition")  # noqa: S101
 
 def test_parsing_rust_function() -> None:
     """Parse a Rust function definition and assert node type."""
     language = "rust"
     source = "fn main() {}"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert tree_contains_node_type(tree, "function_item")  # noqa: S101
 
 def test_parsing_rust_struct() -> None:
     """Parse a Rust struct definition."""

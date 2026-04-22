@@ -3,9 +3,36 @@
 defmodule E2e.ErrorHandlingTest do
   use ExUnit.Case, async: true
 
+  describe "error_detect_content_empty" do
+    test "Detect language from empty content returns null" do
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      assert is_nil(result) or String.trim(result) == ""
+    end
+  end
+
+  describe "error_detect_extension_empty" do
+    test "Detect language from empty extension returns null" do
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      assert is_nil(result) or String.trim(result) == ""
+    end
+  end
+
+  describe "error_detect_path_empty" do
+    test "Detect language from empty path returns null" do
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      assert is_nil(result) or String.trim(result) == ""
+    end
+  end
+
   describe "error_empty_language_name" do
     test "Parsing with empty language name should error" do
       assert {:error, _} = TreeSitterLanguagePack.process("hello", nil)
+    end
+  end
+
+  describe "error_extract_unknown_language" do
+    test "Extract patterns with unknown language returns error" do
+      assert {:error, _} = TreeSitterLanguagePack.process("x = 1", %{"language" => "nonexistent_language_xyz", "patterns" => %{}})
     end
   end
 
@@ -25,6 +52,20 @@ defmodule E2e.ErrorHandlingTest do
   describe "error_handling_unknown_language" do
     test "Loading a nonexistent language should produce an error." do
       assert {:error, _} = TreeSitterLanguagePack.process("", nil)
+    end
+  end
+
+  describe "error_process_empty_source" do
+    test "Process empty source code succeeds with zero metrics" do
+      {:ok, result} = TreeSitterLanguagePack.process("", %{"language" => "python"})
+      assert result.metrics.total_lines == 0
+    end
+  end
+
+  describe "error_run_query_invalid_syntax" do
+    test "Run query with invalid S-expression syntax produces error" do
+      {:ok, result} = TreeSitterLanguagePack.process("x = 1", nil)
+      # TODO: unsupported assertion type: method_result
     end
   end
 

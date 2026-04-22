@@ -7,9 +7,36 @@ import static org.junit.jupiter.api.Assertions.*;
 /** E2e tests for category: error-handling. */
 class ErrorHandlingTest {
     @Test
+    void testErrorDetectContentEmpty() throws Exception {
+        // Detect language from empty content returns null
+        var result = TreeSitterLanguagePack.process("", null);
+        assertTrue(result.isEmpty(), "expected empty value");
+    }
+
+    @Test
+    void testErrorDetectExtensionEmpty() throws Exception {
+        // Detect language from empty extension returns null
+        var result = TreeSitterLanguagePack.process("", null);
+        assertTrue(result.isEmpty(), "expected empty value");
+    }
+
+    @Test
+    void testErrorDetectPathEmpty() throws Exception {
+        // Detect language from empty path returns null
+        var result = TreeSitterLanguagePack.process("", null);
+        assertTrue(result.isEmpty(), "expected empty value");
+    }
+
+    @Test
     void testErrorEmptyLanguageName() throws Exception {
         // Parsing with empty language name should error
         assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("hello", null));
+    }
+
+    @Test
+    void testErrorExtractUnknownLanguage() throws Exception {
+        // Extract patterns with unknown language returns error
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("x = 1", "{\"language\":\"nonexistent_language_xyz\",\"patterns\":{}}"));
     }
 
     @Test
@@ -29,6 +56,20 @@ class ErrorHandlingTest {
     void testErrorHandlingUnknownLanguage() throws Exception {
         // Loading a nonexistent language should produce an error.
         assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("", null));
+    }
+
+    @Test
+    void testErrorProcessEmptySource() throws Exception {
+        // Process empty source code succeeds with zero metrics
+        var result = TreeSitterLanguagePack.process("", "{\"language\":\"python\"}");
+        assertEquals(0, result.metrics().totalLines());
+    }
+
+    @Test
+    void testErrorRunQueryInvalidSyntax() throws Exception {
+        // Run query with invalid S-expression syntax produces error
+        var result = TreeSitterLanguagePack.process("x = 1", null);
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test

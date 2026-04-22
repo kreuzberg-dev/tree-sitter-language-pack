@@ -5,8 +5,27 @@ require 'tree_sitter_language_pack'
 require 'json'
 
 RSpec.describe 'error-handling' do
+  it 'error_detect_content_empty: Detect language from empty content returns null' do
+    result = TreeSitterLanguagePack.process('', nil)
+    expect(result.nil? || result.empty?).to be(true)
+  end
+
+  it 'error_detect_extension_empty: Detect language from empty extension returns null' do
+    result = TreeSitterLanguagePack.process('', nil)
+    expect(result.nil? || result.empty?).to be(true)
+  end
+
+  it 'error_detect_path_empty: Detect language from empty path returns null' do
+    result = TreeSitterLanguagePack.process('', nil)
+    expect(result.nil? || result.empty?).to be(true)
+  end
+
   it 'error_empty_language_name: Parsing with empty language name should error' do
     expect { TreeSitterLanguagePack.process('hello', nil) }.to raise_error
+  end
+
+  it 'error_extract_unknown_language: Extract patterns with unknown language returns error' do
+    expect { TreeSitterLanguagePack.process('x = 1', { 'language' => 'nonexistent_language_xyz', 'patterns' => {  } }) }.to raise_error
   end
 
   it 'error_handling_empty_source: Parsing an empty string should still produce a tree.' do
@@ -21,6 +40,16 @@ RSpec.describe 'error-handling' do
 
   it 'error_handling_unknown_language: Loading a nonexistent language should produce an error.' do
     expect { TreeSitterLanguagePack.process('', nil) }.to raise_error
+  end
+
+  it 'error_process_empty_source: Process empty source code succeeds with zero metrics' do
+    result = TreeSitterLanguagePack.process('', { 'language' => 'python' })
+    expect(result.metrics.total_lines).to eq(0)
+  end
+
+  it 'error_run_query_invalid_syntax: Run query with invalid S-expression syntax produces error' do
+    result = TreeSitterLanguagePack.process('x = 1', nil)
+    # TODO: unsupported assertion type: method_result
   end
 
   it 'parse_empty_language: parse_string() returns error with empty language name' do

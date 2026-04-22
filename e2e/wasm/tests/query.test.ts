@@ -3,6 +3,11 @@ import { describe, it, expect } from 'vitest';
 import { process } from 'tree_sitter_language_pack';
 
 describe('query', () => {
+  it('highlights_nonexistent_language: Get highlights query for nonexistent language returns null/empty', () => {
+    const result = process('', null);
+    expect(result.trim()).toHaveLength(0);
+  });
+
   it('highlights_query_python: get_highlights_query returns non-empty string for python', () => {
     const result = process('', null);
     expect(result.length).toBeGreaterThan(0);
@@ -31,6 +36,11 @@ describe('query', () => {
   it('locals_query_unknown_language: get_locals_query returns empty for unknown language', () => {
     const result = process('', null);
     expect(result.trim()).toHaveLength(0);
+  });
+
+  it('run_query_no_matches: Run query that matches no nodes returns empty result', () => {
+    const result = process("x = 1", null);
+    // TODO: unsupported assertion type: method_result
   });
 
   it('run_query_python_functions: Parse Python and run a query to find function definitions', () => {

@@ -9,6 +9,17 @@ import (
 	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
+func Test_HighlightsNonexistentLanguage(t *testing.T) {
+	// Get highlights query for nonexistent language returns null/empty
+	result, err := tspack.Process("", nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	if len(result) != 0 {
+		t.Errorf("expected empty value, got %v", result)
+	}
+}
+
 func Test_HighlightsQueryPython(t *testing.T) {
 	// get_highlights_query returns non-empty string for python
 	result, err := tspack.Process("", nil)
@@ -73,6 +84,15 @@ func Test_LocalsQueryUnknownLanguage(t *testing.T) {
 	if len(result) != 0 {
 		t.Errorf("expected empty value, got %v", result)
 	}
+}
+
+func Test_RunQueryNoMatches(t *testing.T) {
+	// Run query that matches no nodes returns empty result
+	result, err := tspack.Process(`x = 1`, nil)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	// TODO: unsupported assertion type: method_result
 }
 
 func Test_RunQueryPythonFunctions(t *testing.T) {

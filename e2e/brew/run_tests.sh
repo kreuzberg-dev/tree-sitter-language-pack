@@ -89,6 +89,8 @@ assert_not_contains() {
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# shellcheck source=test_download.sh
+source "$SCRIPT_DIR/test_download.sh"
 # shellcheck source=test_error_handling.sh
 source "$SCRIPT_DIR/test_error_handling.sh"
 # shellcheck source=test_extraction.sh
@@ -120,6 +122,8 @@ run_test() {
 }
 
 # Run all generated test functions.
+# Category: download
+run_tests_download
 # Category: error_handling
 run_tests_error_handling
 # Category: extraction

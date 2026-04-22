@@ -7,8 +7,24 @@ int main(void) {
     int failed = 0;
 
     /* Category: error-handling */
+    printf("  Running test_error_detect_content_empty...");
+    test_error_detect_content_empty();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_error_detect_extension_empty...");
+    test_error_detect_extension_empty();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_error_detect_path_empty...");
+    test_error_detect_path_empty();
+    printf(" PASSED\n");
+    passed++;
     printf("  Running test_error_empty_language_name...");
     test_error_empty_language_name();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_error_extract_unknown_language...");
+    test_error_extract_unknown_language();
     printf(" PASSED\n");
     passed++;
     printf("  Running test_error_handling_empty_source...");
@@ -21,6 +37,14 @@ int main(void) {
     passed++;
     printf("  Running test_error_handling_unknown_language...");
     test_error_handling_unknown_language();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_error_process_empty_source...");
+    test_error_process_empty_source();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_error_run_query_invalid_syntax...");
+    test_error_run_query_invalid_syntax();
     printf(" PASSED\n");
     passed++;
     printf("  Running test_parse_empty_language...");
@@ -221,6 +245,10 @@ int main(void) {
     passed++;
 
     /* Category: query */
+    printf("  Running test_highlights_nonexistent_language...");
+    test_highlights_nonexistent_language();
+    printf(" PASSED\n");
+    passed++;
     printf("  Running test_highlights_query_python...");
     test_highlights_query_python();
     printf(" PASSED\n");
@@ -243,6 +271,10 @@ int main(void) {
     passed++;
     printf("  Running test_locals_query_unknown_language...");
     test_locals_query_unknown_language();
+    printf(" PASSED\n");
+    passed++;
+    printf("  Running test_run_query_no_matches...");
+    test_run_query_no_matches();
     printf(" PASSED\n");
     passed++;
     printf("  Running test_run_query_python_functions...");

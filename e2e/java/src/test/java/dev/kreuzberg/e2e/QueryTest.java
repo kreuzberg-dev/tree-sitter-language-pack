@@ -7,6 +7,13 @@ import static org.junit.jupiter.api.Assertions.*;
 /** E2e tests for category: query. */
 class QueryTest {
     @Test
+    void testHighlightsNonexistentLanguage() throws Exception {
+        // Get highlights query for nonexistent language returns null/empty
+        var result = TreeSitterLanguagePack.process("", null);
+        assertTrue(result.isEmpty(), "expected empty value");
+    }
+
+    @Test
     void testHighlightsQueryPython() throws Exception {
         // get_highlights_query returns non-empty string for python
         var result = TreeSitterLanguagePack.process("", null);
@@ -46,6 +53,13 @@ class QueryTest {
         // get_locals_query returns empty for unknown language
         var result = TreeSitterLanguagePack.process("", null);
         assertTrue(result.isEmpty(), "expected empty value");
+    }
+
+    @Test
+    void testRunQueryNoMatches() throws Exception {
+        // Run query that matches no nodes returns empty result
+        var result = TreeSitterLanguagePack.process("x = 1", null);
+        // TODO: unsupported assertion type: method_result
     }
 
     @Test

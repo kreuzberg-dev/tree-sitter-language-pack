@@ -4,6 +4,14 @@
 use tree_sitter_language_pack::{get_highlights_query, get_injections_query, get_locals_query, parse_string};
 
 #[test]
+fn test_highlights_nonexistent_language() {
+    // Get highlights query for nonexistent language returns null/empty
+    let language = r#"zzz_nonexistent_lang"#;
+    let result = get_highlights_query(&language).expect("should succeed");
+    assert!(result.is_none(), "expected empty value");
+}
+
+#[test]
 fn test_highlights_query_unknown_language() {
     // get_highlights_query returns None for unknown language
     let language = r#"nonexistent_language_xyz"#;
@@ -25,6 +33,25 @@ fn test_locals_query_unknown_language() {
     let language = r#"nonexistent_xyz"#;
     let result = get_locals_query(&language);
     assert!(result.is_none(), "expected empty value");
+}
+
+#[test]
+fn test_run_query_no_matches() {
+    // Run query that matches no nodes returns empty result
+    let language = r#"python"#;
+    let source = r#"x = 1"#;
+    let tree = parse_string(&language, source.as_bytes()).expect("should succeed");
+    assert!(
+        !tree_sitter_language_pack::run_query(
+            &tree,
+            "python",
+            r#"(class_definition name: (identifier) @name)"#,
+            source.as_bytes()
+        )
+        .unwrap()
+        .is_empty(),
+        "expected >= 0"
+    );
 }
 
 #[test]

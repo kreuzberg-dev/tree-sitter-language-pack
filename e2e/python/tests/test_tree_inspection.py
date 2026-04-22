@@ -8,82 +8,82 @@ def test_split_code_python() -> None:
     language = "python"
     source = "def foo():\n    pass\n\ndef bar():\n    pass\n\ndef baz():\n    pass\n"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert len(find_nodes_by_type(tree, "function_definition")) >= 3  # noqa: S101
 
 def test_tree_error_count_broken() -> None:
     """Parse broken Python code and verify error count >= 1."""
     language = "python"
     source = "def (broken syntax @@@ !!!"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert tree_has_error_nodes(tree) is True  # noqa: S101
 
 def test_tree_error_count_multiple() -> None:
     """parse_string() with multiple syntax errors counts all error nodes."""
     language = "python"
     source = "def (\ndef (\n"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert tree.tree_error_count() >= 2  # noqa: S101
 
 def test_tree_error_count_valid() -> None:
     """Parse valid Python code and verify zero error count."""
     language = "python"
     source = "x = 1\ny = 2\n"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert tree_error_count(tree) == 0  # noqa: S101
 
 def test_tree_find_nodes_no_match() -> None:
     """Parse Python with no class definitions and verify find_nodes_by_type returns 0."""
     language = "python"
     source = "x = 1\n"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert find_nodes_by_type(tree, "class_definition") == 0  # noqa: S101
 
 def test_tree_find_nodes_two_functions() -> None:
     """Parse Python with 2 functions and verify find_nodes_by_type count."""
     language = "python"
     source = "def foo():\n    pass\n\ndef bar():\n    pass\n"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert len(find_nodes_by_type(tree, "function_definition")) >= 2  # noqa: S101
 
 def test_tree_has_error_nodes_broken_syntax() -> None:
     """tree_has_error_nodes returns true for syntactically broken code."""
     language = "python"
     source = "def broken(\n    x = \n"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert tree_has_error_nodes(tree)  # noqa: S101
 
 def test_tree_has_error_nodes_valid_code() -> None:
     """tree_has_error_nodes returns false for valid Python code."""
     language = "python"
     source = "def greet(name):\n    return f'Hello {name}'\n"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert not tree_has_error_nodes(tree)  # noqa: S101
 
 def test_tree_named_children_class_and_function() -> None:
     """Parse Python with class and function, verify named children count."""
     language = "python"
     source = "class Foo:\n    pass\n\ndef bar():\n    pass\n"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert tree.root_node().named_child_count() >= 2  # noqa: S101
 
 def test_tree_root_node_info_javascript() -> None:
     """Parse JavaScript source and verify root node type is program."""
     language = "javascript"
     source = "const x = 1;\n"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert tree.root_node().kind() == "program"  # noqa: S101
 
 def test_tree_root_node_info_python() -> None:
     """Parse Python source and verify root node info."""
     language = "python"
     source = "def hello():\n    pass\n"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert tree.root_node().kind() == "module"  # noqa: S101
 
 def test_tree_to_sexp_python() -> None:
     """Parse Python and verify tree_to_sexp returns valid S-expression containing module."""
     language = "python"
     source = "x = 1\n"
     tree = parse_string(language=language, source=source)
-    # TODO: unsupported assertion type: method_result
+    assert "module" in tree_to_sexp(tree)  # noqa: S101
 

@@ -373,6 +373,54 @@ module = "tree_sitter_language_pack"
 result_var = "parser"
 args = [{ name = "name", field = "language", type = "string" }]
 
+[e2e.calls.init_pack]
+function = "init"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [{ name = "config", field = "config", type = "json_object" }]
+
+[e2e.calls.configure_pack]
+function = "configure"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [{ name = "config", field = "config", type = "json_object" }]
+
+[e2e.calls.download_languages]
+function = "download"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = [{ name = "names", field = "languages", type = "json_object" }]
+
+[e2e.calls.download_all_languages]
+function = "download_all"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = []
+
+[e2e.calls.manifest_languages]
+function = "manifest_languages"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = []
+
+[e2e.calls.downloaded_languages]
+function = "downloaded_languages"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = []
+
+[e2e.calls.clean_cache]
+function = "clean_cache"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = []
+
+[e2e.calls.cache_dir]
+function = "cache_dir"
+module = "tree_sitter_language_pack"
+result_var = "result"
+args = []
+
 [e2e.packages.rust]
 path = "../../crates/ts-pack-core"
 

@@ -3,6 +3,13 @@
 defmodule E2e.QueryTest do
   use ExUnit.Case, async: true
 
+  describe "highlights_nonexistent_language" do
+    test "Get highlights query for nonexistent language returns null/empty" do
+      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      assert is_nil(result) or String.trim(result) == ""
+    end
+  end
+
   describe "highlights_query_python" do
     test "get_highlights_query returns non-empty string for python" do
       {:ok, result} = TreeSitterLanguagePack.process("", nil)
@@ -42,6 +49,13 @@ defmodule E2e.QueryTest do
     test "get_locals_query returns empty for unknown language" do
       {:ok, result} = TreeSitterLanguagePack.process("", nil)
       assert is_nil(result) or String.trim(result) == ""
+    end
+  end
+
+  describe "run_query_no_matches" do
+    test "Run query that matches no nodes returns empty result" do
+      {:ok, result} = TreeSitterLanguagePack.process("x = 1", nil)
+      # TODO: unsupported assertion type: method_result
     end
   end
 

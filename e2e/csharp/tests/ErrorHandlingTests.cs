@@ -13,10 +13,41 @@ public class ErrorHandlingTests
     private static readonly JsonSerializerOptions ConfigOptions = new() { Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) }, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault };
 
     [Fact]
+    public void Test_ErrorDetectContentEmpty()
+    {
+        // Detect language from empty content returns null
+        var result = TreeSitterLanguagePackLib.Process("", null);
+        Assert.True(string.IsNullOrEmpty(result?.ToString()));
+    }
+
+    [Fact]
+    public void Test_ErrorDetectExtensionEmpty()
+    {
+        // Detect language from empty extension returns null
+        var result = TreeSitterLanguagePackLib.Process("", null);
+        Assert.True(string.IsNullOrEmpty(result?.ToString()));
+    }
+
+    [Fact]
+    public void Test_ErrorDetectPathEmpty()
+    {
+        // Detect language from empty path returns null
+        var result = TreeSitterLanguagePackLib.Process("", null);
+        Assert.True(string.IsNullOrEmpty(result?.ToString()));
+    }
+
+    [Fact]
     public void Test_ErrorEmptyLanguageName()
     {
         // Parsing with empty language name should error
         Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("hello", null));
+    }
+
+    [Fact]
+    public void Test_ErrorExtractUnknownLanguage()
+    {
+        // Extract patterns with unknown language returns error
+        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("x = 1", "{\"language\":\"nonexistent_language_xyz\",\"patterns\":{}}"));
     }
 
     [Fact]
@@ -39,6 +70,22 @@ public class ErrorHandlingTests
     {
         // Loading a nonexistent language should produce an error.
         Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("", null));
+    }
+
+    [Fact]
+    public void Test_ErrorProcessEmptySource()
+    {
+        // Process empty source code succeeds with zero metrics
+        var result = TreeSitterLanguagePackLib.Process("", "{\"language\":\"python\"}");
+        Assert.Equal(0, result.Metrics.TotalLines);
+    }
+
+    [Fact]
+    public void Test_ErrorRunQueryInvalidSyntax()
+    {
+        // Run query with invalid S-expression syntax produces error
+        var result = TreeSitterLanguagePackLib.Process("x = 1", null);
+        // TODO: unsupported assertion type: method_result
     }
 
     [Fact]
