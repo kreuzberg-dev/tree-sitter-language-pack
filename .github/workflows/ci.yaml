@@ -167,6 +167,7 @@ jobs:
       # --- Ruby ---
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
+        continue-on-error: true
         with:
           ruby-version: "3.4"
           bundler-cache: true
