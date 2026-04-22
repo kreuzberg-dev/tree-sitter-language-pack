@@ -10,7 +10,7 @@ describe('process', () => {
   });
 
   it('process_javascript_exports_detail: JavaScript with exports, verify export count', () => {
-    const result = process("export function greet(name) {\n  return \`Hello \${name}\`;\n}\n\nexport const VERSION = '1.0';\n", { language: "javascript" });
+    const result = process("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", { language: "javascript" });
     expect(result.language.trim()).toBe("javascript");
     expect(result.exports.length).toBeGreaterThanOrEqual(1);
   });

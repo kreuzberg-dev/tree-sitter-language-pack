@@ -14,21 +14,21 @@ final class LanguageDetectionTest extends TestCase
     /** The .h extension is ambiguous (could be C, C++, or Objective-C) */
     public function test_ambiguity_h_extension(): void
     {
-        $result = TreeSitterLanguagePack::extension_ambiguity("h");
+        $result = TreeSitterLanguagePack::process("", null);
         $this->assertNotEmpty($result);
     }
 
     /** The .py extension is NOT ambiguous (only maps to python) */
     public function test_ambiguity_py_extension(): void
     {
-        $result = TreeSitterLanguagePack::extension_ambiguity("py");
+        $result = TreeSitterLanguagePack::process("", null);
         $this->assertEmpty($result);
     }
 
     /** Unknown extension returns empty (no ambiguity data) */
     public function test_ambiguity_unknown_extension(): void
     {
-        $result = TreeSitterLanguagePack::extension_ambiguity("zzzzz_nonexistent");
+        $result = TreeSitterLanguagePack::process("", null);
         $this->assertEmpty($result);
     }
 

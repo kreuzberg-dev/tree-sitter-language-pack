@@ -10,7 +10,7 @@ requires-python = ">=3.10"
 dependencies = ["tree-sitter-language-pack", "pytest>=7.4", "pytest-asyncio>=0.23", "pytest-timeout>=2.1"]
 
 [tool.uv.sources]
-tree-sitter-language-pack = { path = "../../packages/python", editable = true }
+tree-sitter-language-pack = { workspace = true }
 
 [tool.setuptools]
 packages = []

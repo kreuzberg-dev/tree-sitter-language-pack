@@ -4,26 +4,29 @@ from tree_sitter_language_pack import (
     detect_language_from_content,
     detect_language_from_extension,
     detect_language_from_path,
-    extension_ambiguity,
+    process,
 )
 
 
 def test_ambiguity_h_extension() -> None:
     """The .h extension is ambiguous (could be C, C++, or Objective-C)."""
-    ext = "h"
-    result = extension_ambiguity(ext=ext)
+    source = ""
+    config = None
+    result = process(source=source, config=config)
     assert result  # noqa: S101
 
 def test_ambiguity_py_extension() -> None:
     """The .py extension is NOT ambiguous (only maps to python)."""
-    ext = "py"
-    result = extension_ambiguity(ext=ext)
+    source = ""
+    config = None
+    result = process(source=source, config=config)
     assert not result  # noqa: S101
 
 def test_ambiguity_unknown_extension() -> None:
     """Unknown extension returns empty (no ambiguity data)."""
-    ext = "zzzzz_nonexistent"
-    result = extension_ambiguity(ext=ext)
+    source = ""
+    config = None
+    result = process(source=source, config=config)
     assert not result  # noqa: S101
 
 def test_detect_content_bash_shebang() -> None:

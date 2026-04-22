@@ -869,7 +869,7 @@ describe('smoke', () => {
   });
 
   it('smoke_ninja: Smoke test: load ninja and parse a simple snippet', () => {
-    const result = process("rule cc\n  command = cc \$in -o \$out", null);
+    const result = process("rule cc\n  command = cc $in -o $out", null);
     // TODO: unsupported assertion type: method_result
   });
 
@@ -1179,7 +1179,7 @@ describe('smoke', () => {
   });
 
   it('smoke_scss: Smoke test: load scss and parse a simple snippet', () => {
-    const result = process("\$color: red;\nbody { color: \$color; }", null);
+    const result = process("$color: red;\nbody { color: $color; }", null);
     // TODO: unsupported assertion type: method_result
   });
 
