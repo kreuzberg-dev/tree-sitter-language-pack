@@ -6,9 +6,7 @@
     clippy::let_unit_value,
     clippy::needless_borrow,
     clippy::redundant_locals,
-    dropping_references
-)]
-#![allow(
+    dropping_references,
     clippy::unnecessary_cast,
     clippy::unused_unit,
     clippy::unwrap_or_default,

@@ -139,6 +139,9 @@ env_shims = ["iswspace", "iswalnum", "towupper", "iswalpha"]
 [ruby]
 gem_name = "tree_sitter_language_pack"
 
+[ruby.stubs]
+output = "packages/ruby/sig"
+
 [php]
 extension_name = "tree_sitter_language_pack"
 

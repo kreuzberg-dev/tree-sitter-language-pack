@@ -4,7 +4,7 @@ defmodule Tree_sitter_language_pack.MixProject do
   def project do
     [
       app: :tree_sitter_language_pack,
-      version: "1.6.3",
+      version: "1.7.0",
       elixir: "~> 1.14",
       rustler_crates: [tree_sitter_language_pack_rustler: [mode: :release]],
       description: "Pre-compiled tree-sitter grammars for 305 programming languages",

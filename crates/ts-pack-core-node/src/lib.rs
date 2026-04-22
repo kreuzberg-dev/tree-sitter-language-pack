@@ -6,9 +6,7 @@
     clippy::let_unit_value,
     clippy::needless_borrow,
     clippy::map_identity,
-    clippy::just_underscores_and_digits
-)]
-#![allow(
+    clippy::just_underscores_and_digits,
     clippy::unnecessary_cast,
     clippy::unused_unit,
     clippy::unwrap_or_default,

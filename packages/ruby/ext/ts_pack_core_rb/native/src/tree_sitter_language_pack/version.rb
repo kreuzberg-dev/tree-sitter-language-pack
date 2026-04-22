@@ -2,5 +2,5 @@
 # frozen_string_literal: true
 
 module Tree_sitter_language_pack
-  VERSION = "1.6.3"
+  VERSION = "1.7.0"
 end

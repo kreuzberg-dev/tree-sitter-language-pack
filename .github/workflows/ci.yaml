@@ -113,7 +113,7 @@ jobs:
       - name: Clone vendors
         run: |
           mkdir -p parsers
-          uv run --no-sync scripts/clone_vendors.py
+          uv run --script scripts/clone_vendors.py
 
       - name: Upload parsers
         uses: actions/upload-artifact@v7

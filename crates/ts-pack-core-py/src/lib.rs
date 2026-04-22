@@ -12,11 +12,8 @@
     clippy::let_unit_value,
     clippy::needless_borrow,
     clippy::too_many_arguments,
-    clippy::map_identity
-)]
-#![allow(
+    clippy::map_identity,
     clippy::unnecessary_cast,
-    clippy::unused_unit,
     clippy::unwrap_or_default,
     clippy::derivable_impls,
     clippy::needless_borrows_for_generic_args,
