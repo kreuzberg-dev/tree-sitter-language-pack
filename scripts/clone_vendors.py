@@ -1,9 +1,7 @@
 # /// script
-# requires-python = ">=3.10"
+# requires-python = ">=3.14"
 # dependencies = ["anyio", "gitpython"]
 # ///
-from __future__ import annotations
-
 import asyncio
 import hashlib
 import os
@@ -14,12 +12,12 @@ from functools import partial
 from json import dumps, loads
 from pathlib import Path
 from shutil import move, rmtree, which
+from typing import NotRequired, TypedDict
 
 from anyio import Path as AsyncPath
 from anyio import run_process
 from anyio.to_thread import run_sync
 from git import Repo
-from typing_extensions import NotRequired, TypedDict
 
 # ---------------------------------------------------------------------------
 # Configuration via environment variables
