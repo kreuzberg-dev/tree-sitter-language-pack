@@ -1061,7 +1061,7 @@ Defines a single extraction pattern and its configuration.
 | `captureOutput` | `CaptureOutput` | `CaptureOutput.FULL` | What to include in each capture result. |
 | `childFields` | `List<String>` | `Collections.emptyList()` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `maxResults` | `Optional<Long>` | `null` | Maximum number of matches to return. `null` means unlimited. |
-| `byteRange` | `Optional<String>` | `null` | Restrict matches to a byte range `(start, end)`. |
+| `byteRange` | `Optional<List<Long>>` | `Collections.emptyList()` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---

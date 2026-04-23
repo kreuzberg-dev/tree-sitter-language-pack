@@ -189,7 +189,7 @@ jobs:
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
           if [ -f packages/elixir/mix.exs ]; then
-            MIX_VERSION=$(grep '@version' packages/elixir/mix.exs | head -1 | sed 's/.*"\(.*\)".*/\1/')
+            MIX_VERSION=$(grep 'version:' packages/elixir/mix.exs | head -1 | sed 's/.*"\(.*\)".*/\1/')
             if [[ "$MIX_VERSION" != "$VERSION" ]]; then
               echo "::error::mix.exs version ($MIX_VERSION) does not match tag version ($VERSION)"
               exit 1

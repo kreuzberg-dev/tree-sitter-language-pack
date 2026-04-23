@@ -1061,7 +1061,7 @@ Defines a single extraction pattern and its configuration.
 | `capture_output` | `TsPackCaptureOutput` | `TS_PACK_TS_PACK_FULL` | What to include in each capture result. |
 | `child_fields` | `const char**` | `NULL` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `max_results` | `uintptr_t*` | `NULL` | Maximum number of matches to return. `NULL` means unlimited. |
-| `byte_range` | `const char**` | `NULL` | Restrict matches to a byte range `(start, end)`. |
+| `byte_range` | `uintptr_t**` | `NULL` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---

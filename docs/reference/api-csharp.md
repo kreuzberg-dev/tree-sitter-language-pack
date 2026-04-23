@@ -1,8 +1,8 @@
 ---
-title: "Go API Reference"
+title: "C# API Reference"
 ---
 
-## Go API Reference <span class="version-badge">v1.7.0</span>
+## C# API Reference <span class="version-badge">v1.7.0</span>
 
 ### Functions
 
@@ -10,12 +10,12 @@ title: "Go API Reference"
 
 Detect language name from a file extension (without leading dot).
 
-Returns `nil` for unrecognized extensions. The match is case-insensitive.
+Returns `null` for unrecognized extensions. The match is case-insensitive.
 
 **Signature:**
 
-```go
-func DetectLanguageFromExtension(ext string) *string
+```csharp
+public static string? DetectLanguageFromExtension(string ext)
 ```
 
 **Parameters:**
@@ -24,7 +24,7 @@ func DetectLanguageFromExtension(ext string) *string
 |------|------|----------|-------------|
 | `Ext` | `string` | Yes | The ext |
 
-**Returns:** `*string`
+**Returns:** `string?`
 
 
 ---
@@ -33,13 +33,13 @@ func DetectLanguageFromExtension(ext string) *string
 
 Detect language name from a file path.
 
-Extracts the file extension and looks it up. Returns `nil` if the
+Extracts the file extension and looks it up. Returns `null` if the
 path has no extension or the extension is not recognized.
 
 **Signature:**
 
-```go
-func DetectLanguageFromPath(path string) *string
+```csharp
+public static string? DetectLanguageFromPath(string path)
 ```
 
 **Parameters:**
@@ -48,7 +48,7 @@ func DetectLanguageFromPath(path string) *string
 |------|------|----------|-------------|
 | `Path` | `string` | Yes | Path to the file |
 
-**Returns:** `*string`
+**Returns:** `string?`
 
 
 ---
@@ -69,13 +69,13 @@ Handles common patterns:
 The `-S` flag accepted by some `env` implementations is skipped automatically.
 Version suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.
 
-Returns `nil` when content does not start with `#!`, the shebang is
+Returns `null` when content does not start with `#!`, the shebang is
 malformed, or the interpreter is not recognised.
 
 **Signature:**
 
-```go
-func DetectLanguageFromContent(content string) *string
+```csharp
+public static string? DetectLanguageFromContent(string content)
 ```
 
 **Parameters:**
@@ -84,7 +84,7 @@ func DetectLanguageFromContent(content string) *string
 |------|------|----------|-------------|
 | `Content` | `string` | Yes | The content to process |
 
-**Returns:** `*string`
+**Returns:** `string?`
 
 
 ---
@@ -95,8 +95,8 @@ Get a `NodeInfo` snapshot of the root node.
 
 **Signature:**
 
-```go
-func RootNodeInfo(tree Tree) NodeInfo
+```csharp
+public static NodeInfo RootNodeInfo(Tree tree)
 ```
 
 **Parameters:**
@@ -118,8 +118,8 @@ Performs a depth-first traversal. Returns an empty vec if no matches.
 
 **Signature:**
 
-```go
-func FindNodesByType(tree Tree, nodeType string) []NodeInfo
+```csharp
+public static List<NodeInfo> FindNodesByType(Tree tree, string nodeType)
 ```
 
 **Parameters:**
@@ -129,7 +129,7 @@ func FindNodesByType(tree Tree, nodeType string) []NodeInfo
 | `Tree` | `Tree` | Yes | The tree |
 | `NodeType` | `string` | Yes | The node type |
 
-**Returns:** `[]NodeInfo`
+**Returns:** `List<NodeInfo>`
 
 
 ---
@@ -143,8 +143,8 @@ Useful for understanding the top-level structure of a file
 
 **Signature:**
 
-```go
-func NamedChildrenInfo(tree Tree) []NodeInfo
+```csharp
+public static List<NodeInfo> NamedChildrenInfo(Tree tree)
 ```
 
 **Parameters:**
@@ -153,7 +153,7 @@ func NamedChildrenInfo(tree Tree) []NodeInfo
 |------|------|----------|-------------|
 | `Tree` | `Tree` | Yes | The tree |
 
-**Returns:** `[]NodeInfo`
+**Returns:** `List<NodeInfo>`
 
 
 ---
@@ -168,8 +168,8 @@ re-creating the parser.
 
 **Signature:**
 
-```go
-func ParseString(language string, source []byte) (Tree, error)
+```csharp
+public static Tree ParseString(string language, byte[] source)
 ```
 
 **Parameters:**
@@ -177,11 +177,11 @@ func ParseString(language string, source []byte) (Tree, error)
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `Language` | `string` | Yes | The language |
-| `Source` | `[]byte` | Yes | The source |
+| `Source` | `byte[]` | Yes | The source |
 
 **Returns:** `Tree`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -194,8 +194,8 @@ Performs a depth-first traversal using `TreeCursor`.
 
 **Signature:**
 
-```go
-func TreeContainsNodeType(tree Tree, nodeType string) bool
+```csharp
+public static bool TreeContainsNodeType(Tree tree, string nodeType)
 ```
 
 **Parameters:**
@@ -218,8 +218,8 @@ Useful for determining if the parse was clean or had syntax errors.
 
 **Signature:**
 
-```go
-func TreeHasErrorNodes(tree Tree) bool
+```csharp
+public static bool TreeHasErrorNodes(Tree tree)
 ```
 
 **Parameters:**
@@ -242,8 +242,8 @@ snapshot testing, and debugging grammars.
 
 **Signature:**
 
-```go
-func TreeToSexp(tree Tree) string
+```csharp
+public static string TreeToSexp(Tree tree)
 ```
 
 **Parameters:**
@@ -265,8 +265,8 @@ Returns 0 for a clean parse.
 
 **Signature:**
 
-```go
-func TreeErrorCount(tree Tree) int
+```csharp
+public static nuint TreeErrorCount(Tree tree)
 ```
 
 **Parameters:**
@@ -275,7 +275,7 @@ func TreeErrorCount(tree Tree) int
 |------|------|----------|-------------|
 | `Tree` | `Tree` | Yes | The tree |
 
-**Returns:** `int`
+**Returns:** `nuint`
 
 
 ---
@@ -284,13 +284,13 @@ func TreeErrorCount(tree Tree) int
 
 Get the highlights query for a language, if bundled.
 
-Returns the contents of `highlights.scm` as a static string, or `nil`
+Returns the contents of `highlights.scm` as a static string, or `null`
 if no highlights query is bundled for this language.
 
 **Signature:**
 
-```go
-func GetHighlightsQuery(language string) *string
+```csharp
+public static string? GetHighlightsQuery(string language)
 ```
 
 **Parameters:**
@@ -299,7 +299,7 @@ func GetHighlightsQuery(language string) *string
 |------|------|----------|-------------|
 | `Language` | `string` | Yes | The language |
 
-**Returns:** `*string`
+**Returns:** `string?`
 
 
 ---
@@ -308,13 +308,13 @@ func GetHighlightsQuery(language string) *string
 
 Get the injections query for a language, if bundled.
 
-Returns the contents of `injections.scm` as a static string, or `nil`
+Returns the contents of `injections.scm` as a static string, or `null`
 if no injections query is bundled for this language.
 
 **Signature:**
 
-```go
-func GetInjectionsQuery(language string) *string
+```csharp
+public static string? GetInjectionsQuery(string language)
 ```
 
 **Parameters:**
@@ -323,7 +323,7 @@ func GetInjectionsQuery(language string) *string
 |------|------|----------|-------------|
 | `Language` | `string` | Yes | The language |
 
-**Returns:** `*string`
+**Returns:** `string?`
 
 
 ---
@@ -332,13 +332,13 @@ func GetInjectionsQuery(language string) *string
 
 Get the locals query for a language, if bundled.
 
-Returns the contents of `locals.scm` as a static string, or `nil`
+Returns the contents of `locals.scm` as a static string, or `null`
 if no locals query is bundled for this language.
 
 **Signature:**
 
-```go
-func GetLocalsQuery(language string) *string
+```csharp
+public static string? GetLocalsQuery(string language)
 ```
 
 **Parameters:**
@@ -347,7 +347,7 @@ func GetLocalsQuery(language string) *string
 |------|------|----------|-------------|
 | `Language` | `string` | Yes | The language |
 
-**Returns:** `*string`
+**Returns:** `string?`
 
 
 ---
@@ -366,8 +366,8 @@ Returns all matches with their captured nodes.
 
 **Signature:**
 
-```go
-func RunQuery(tree Tree, language string, querySource string, source []byte) ([]QueryMatch, error)
+```csharp
+public static List<QueryMatch> RunQuery(Tree tree, string language, string querySource, byte[] source)
 ```
 
 **Parameters:**
@@ -377,11 +377,11 @@ func RunQuery(tree Tree, language string, querySource string, source []byte) ([]
 | `Tree` | `Tree` | Yes | The parsed syntax tree to query. |
 | `Language` | `string` | Yes | Language name (used to compile the query pattern). |
 | `QuerySource` | `string` | Yes | The tree-sitter query pattern string. |
-| `Source` | `[]byte` | Yes | The original source code bytes (needed for capture resolution). |
+| `Source` | `byte[]` | Yes | The original source code bytes (needed for capture resolution). |
 
-**Returns:** `[]QueryMatch`
+**Returns:** `List<QueryMatch>`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -401,8 +401,8 @@ or `Error.Download` if auto-download fails.
 
 **Signature:**
 
-```go
-func GetLanguage(name string) (Language, error)
+```csharp
+public static Language GetLanguage(string name)
 ```
 
 **Parameters:**
@@ -413,7 +413,7 @@ func GetLanguage(name string) (Language, error)
 
 **Returns:** `Language`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -432,8 +432,8 @@ Returns `Error.LanguageNotFound` if the language is not recognized, or
 
 **Signature:**
 
-```go
-func GetParser(name string) (Parser, error)
+```csharp
+public static Parser GetParser(string name)
 ```
 
 **Parameters:**
@@ -444,7 +444,7 @@ func GetParser(name string) (Parser, error)
 
 **Returns:** `Parser`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -458,11 +458,11 @@ plus any configured aliases.
 
 **Signature:**
 
-```go
-func AvailableLanguages() []string
+```csharp
+public static List<string> AvailableLanguages()
 ```
 
-**Returns:** `[]string`
+**Returns:** `List<string>`
 
 
 ---
@@ -476,8 +476,8 @@ dynamically available, or a known alias for one of these).
 
 **Signature:**
 
-```go
-func HasLanguage(name string) bool
+```csharp
+public static bool HasLanguage(string name)
 ```
 
 **Parameters:**
@@ -500,11 +500,11 @@ and aliases.
 
 **Signature:**
 
-```go
-func LanguageCount() int
+```csharp
+public static nuint LanguageCount()
 ```
 
-**Returns:** `int`
+**Returns:** `nuint`
 
 
 ---
@@ -523,8 +523,8 @@ Returns an error if the language is not found or parsing fails.
 
 **Signature:**
 
-```go
-func Process(source string, config ProcessConfig) (ProcessResult, error)
+```csharp
+public static ProcessResult Process(string source, ProcessConfig config)
 ```
 
 **Parameters:**
@@ -536,7 +536,7 @@ func Process(source string, config ProcessConfig) (ProcessResult, error)
 
 **Returns:** `ProcessResult`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -554,8 +554,8 @@ pattern is invalid.
 
 **Signature:**
 
-```go
-func ExtractPatterns(source string, config ExtractionConfig) (ExtractionResult, error)
+```csharp
+public static ExtractionResult ExtractPatterns(string source, ExtractionConfig config)
 ```
 
 **Parameters:**
@@ -567,7 +567,7 @@ func ExtractPatterns(source string, config ExtractionConfig) (ExtractionResult, 
 
 **Returns:** `ExtractionResult`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -584,8 +584,8 @@ Returns an error if the language cannot be loaded.
 
 **Signature:**
 
-```go
-func ValidateExtraction(config ExtractionConfig) (ValidationResult, error)
+```csharp
+public static ValidationResult ValidateExtraction(ExtractionConfig config)
 ```
 
 **Parameters:**
@@ -596,7 +596,7 @@ func ValidateExtraction(config ExtractionConfig) (ValidationResult, error)
 
 **Returns:** `ValidationResult`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -615,8 +615,8 @@ Returns an error if configuration cannot be applied or if downloads fail.
 
 **Signature:**
 
-```go
-func Init(config PackConfig) error
+```csharp
+public static void Init(PackConfig config)
 ```
 
 **Parameters:**
@@ -625,9 +625,9 @@ func Init(config PackConfig) error
 |------|------|----------|-------------|
 | `Config` | `PackConfig` | Yes | The configuration options |
 
-**Returns:** ``
+**Returns:** `void`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -647,8 +647,8 @@ Returns an error if the lock cannot be acquired.
 
 **Signature:**
 
-```go
-func Configure(config PackConfig) error
+```csharp
+public static void Configure(PackConfig config)
 ```
 
 **Parameters:**
@@ -657,9 +657,9 @@ func Configure(config PackConfig) error
 |------|------|----------|-------------|
 | `Config` | `PackConfig` | Yes | The configuration options |
 
-**Returns:** ``
+**Returns:** `void`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -678,19 +678,19 @@ the download fails.
 
 **Signature:**
 
-```go
-func Download(names []string) (int, error)
+```csharp
+public static nuint Download(List<string> names)
 ```
 
 **Parameters:**
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `Names` | `[]string` | Yes | The names |
+| `Names` | `List<string>` | Yes | The names |
 
-**Returns:** `int`
+**Returns:** `nuint`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -707,13 +707,13 @@ Returns an error if the manifest cannot be fetched or a download fails.
 
 **Signature:**
 
-```go
-func DownloadAll() (int, error)
+```csharp
+public static nuint DownloadAll()
 ```
 
-**Returns:** `int`
+**Returns:** `nuint`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -732,13 +732,13 @@ Returns an error if the manifest cannot be fetched.
 
 **Signature:**
 
-```go
-func ManifestLanguages() ([]string, error)
+```csharp
+public static List<string> ManifestLanguages()
 ```
 
-**Returns:** `[]string`
+**Returns:** `List<string>`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -752,11 +752,11 @@ cache directory does not exist or cannot be read.
 
 **Signature:**
 
-```go
-func DownloadedLanguages() []string
+```csharp
+public static List<string> DownloadedLanguages()
 ```
 
-**Returns:** `[]string`
+**Returns:** `List<string>`
 
 
 ---
@@ -774,13 +774,13 @@ Returns an error if the cache directory cannot be removed.
 
 **Signature:**
 
-```go
-func CleanCache() error
+```csharp
+public static void CleanCache()
 ```
 
-**Returns:** ``
+**Returns:** `void`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -798,13 +798,13 @@ Returns an error if the system cache directory cannot be determined.
 
 **Signature:**
 
-```go
-func CacheDir() (string, error)
+```csharp
+public static string CacheDir()
 ```
 
 **Returns:** `string`
 
-**Errors:** Returns `error`.
+**Errors:** Throws `Error`.
 
 
 ---
@@ -818,10 +818,10 @@ A single captured node within a match.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Name` | `string` | — | The capture name from the query (e.g., `"fn_name"`). |
-| `Node` | `*NodeInfo` | `nil` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
-| `Text` | `*string` | `nil` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
+| `Node` | `NodeInfo?` | `null` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
+| `Text` | `string?` | `null` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
 | `ChildFields` | `string` | — | Values of requested child fields, keyed by field name. |
-| `StartByte` | `int` | — | Byte offset where this capture starts in the source. |
+| `StartByte` | `nuint` | — | Byte offset where this capture starts in the source. |
 
 
 ---
@@ -833,13 +833,13 @@ Metadata for a single chunk of source code.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Language` | `string` | — | Language |
-| `ChunkIndex` | `int` | — | Chunk index |
-| `TotalChunks` | `int` | — | Total chunks |
-| `NodeTypes` | `[]string` | `nil` | Node types |
-| `ContextPath` | `[]string` | `nil` | Context path |
-| `SymbolsDefined` | `[]string` | `nil` | Symbols defined |
-| `Comments` | `[]CommentInfo` | `nil` | Comments |
-| `Docstrings` | `[]DocstringInfo` | `nil` | Docstrings |
+| `ChunkIndex` | `nuint` | — | Chunk index |
+| `TotalChunks` | `nuint` | — | Total chunks |
+| `NodeTypes` | `List<string>` | `new List<string>()` | Node types |
+| `ContextPath` | `List<string>` | `new List<string>()` | Context path |
+| `SymbolsDefined` | `List<string>` | `new List<string>()` | Symbols defined |
+| `Comments` | `List<CommentInfo>` | `new List<CommentInfo>()` | Comments |
+| `Docstrings` | `List<DocstringInfo>` | `new List<DocstringInfo>()` | Docstrings |
 | `HasErrorNodes` | `bool` | — | Whether error nodes |
 
 
@@ -852,10 +852,10 @@ A chunk of source code with rich metadata.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Content` | `string` | — | The extracted text content |
-| `StartByte` | `int` | — | Start byte |
-| `EndByte` | `int` | — | End byte |
-| `StartLine` | `int` | — | Start line |
-| `EndLine` | `int` | — | End line |
+| `StartByte` | `nuint` | — | Start byte |
+| `EndByte` | `nuint` | — | End byte |
+| `StartLine` | `nuint` | — | Start line |
+| `EndLine` | `nuint` | — | End line |
 | `Metadata` | `ChunkContext` | — | Document metadata |
 
 
@@ -870,7 +870,7 @@ A comment extracted from source code.
 | `Text` | `string` | — | Text |
 | `Kind` | `CommentKind` | `CommentKind.Line` | Kind (comment kind) |
 | `Span` | `Span` | — | Span (span) |
-| `AssociatedNode` | `*string` | `nil` | Associated node |
+| `AssociatedNode` | `string?` | `null` | Associated node |
 
 
 ---
@@ -895,7 +895,7 @@ A section within a docstring (e.g., Args, Returns, Raises).
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Kind` | `string` | — | Kind |
-| `Name` | `*string` | `nil` | The name |
+| `Name` | `string?` | `null` | The name |
 | `Description` | `string` | — | Human-readable description |
 
 
@@ -910,8 +910,8 @@ A docstring extracted from source code.
 | `Text` | `string` | — | Text |
 | `Format` | `DocstringFormat` | `DocstringFormat.PythonTripleQuote` | Format (docstring format) |
 | `Span` | `Span` | — | Span (span) |
-| `AssociatedItem` | `*string` | `nil` | Associated item |
-| `ParsedSections` | `[]DocSection` | `nil` | Parsed sections |
+| `AssociatedItem` | `string?` | `null` | Associated item |
+| `ParsedSections` | `List<DocSection>` | `new List<DocSection>()` | Parsed sections |
 
 
 ---
@@ -928,8 +928,8 @@ Create a new download manager for the given version.
 
 **Signature:**
 
-```go
-func (o *DownloadManager) New(version string) (DownloadManager, error)
+```csharp
+public DownloadManager New(string version)
 ```
 
 ###### WithCacheDir()
@@ -938,8 +938,8 @@ Create a download manager with a custom cache directory.
 
 **Signature:**
 
-```go
-func (o *DownloadManager) WithCacheDir(version string, cacheDir string) DownloadManager
+```csharp
+public DownloadManager WithCacheDir(string version, string cacheDir)
 ```
 
 ###### DefaultCacheDir()
@@ -948,8 +948,8 @@ Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
 
 **Signature:**
 
-```go
-func (o *DownloadManager) DefaultCacheDir(version string) (string, error)
+```csharp
+public string DefaultCacheDir(string version)
 ```
 
 ###### CacheDir()
@@ -958,8 +958,8 @@ Return the path to the libs cache directory.
 
 **Signature:**
 
-```go
-func (o *DownloadManager) CacheDir() string
+```csharp
+public string CacheDir()
 ```
 
 ###### InstalledLanguages()
@@ -968,8 +968,8 @@ List languages that are already downloaded and cached.
 
 **Signature:**
 
-```go
-func (o *DownloadManager) InstalledLanguages() []string
+```csharp
+public List<string> InstalledLanguages()
 ```
 
 ###### EnsureLanguages()
@@ -979,8 +979,8 @@ Downloads the platform bundle if any requested languages are missing.
 
 **Signature:**
 
-```go
-func (o *DownloadManager) EnsureLanguages(names []string) error
+```csharp
+public void EnsureLanguages(List<string> names)
 ```
 
 ###### EnsureGroup()
@@ -989,8 +989,8 @@ Ensure all languages in a named group are available.
 
 **Signature:**
 
-```go
-func (o *DownloadManager) EnsureGroup(group string) error
+```csharp
+public void EnsureGroup(string group)
 ```
 
 ###### LibPath()
@@ -999,8 +999,8 @@ Get the expected path for a language's shared library in the cache.
 
 **Signature:**
 
-```go
-func (o *DownloadManager) LibPath(name string) string
+```csharp
+public string LibPath(string name)
 ```
 
 ###### FetchManifest()
@@ -1009,8 +1009,8 @@ Fetch the parser manifest from GitHub Releases.
 
 **Signature:**
 
-```go
-func (o *DownloadManager) FetchManifest() (ParserManifest, error)
+```csharp
+public ParserManifest FetchManifest()
 ```
 
 ###### CleanCache()
@@ -1019,8 +1019,8 @@ Remove all cached parser libraries.
 
 **Signature:**
 
-```go
-func (o *DownloadManager) CleanCache() error
+```csharp
+public void CleanCache()
 ```
 
 
@@ -1059,9 +1059,9 @@ Defines a single extraction pattern and its configuration.
 |-------|------|---------|-------------|
 | `Query` | `string` | — | The tree-sitter query string (S-expression). |
 | `CaptureOutput` | `CaptureOutput` | `CaptureOutput.Full` | What to include in each capture result. |
-| `ChildFields` | `[]string` | `nil` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
-| `MaxResults` | `*int` | `nil` | Maximum number of matches to return. `nil` means unlimited. |
-| `ByteRange` | `*[]int` | `nil` | Restrict matches to a byte range `(start, end)`. |
+| `ChildFields` | `List<string>` | `new List<string>()` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
+| `MaxResults` | `nuint?` | `null` | Maximum number of matches to return. `null` means unlimited. |
+| `ByteRange` | `List<nuint>?` | `new List<nuint>()` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
@@ -1084,14 +1084,14 @@ Aggregate metrics for a source file.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `TotalLines` | `int` | — | Total lines |
-| `CodeLines` | `int` | — | Code lines |
-| `CommentLines` | `int` | — | Comment lines |
-| `BlankLines` | `int` | — | Blank lines |
-| `TotalBytes` | `int` | — | Total bytes |
-| `NodeCount` | `int` | — | Number of nodes |
-| `ErrorCount` | `int` | — | Number of errors |
-| `MaxDepth` | `int` | — | Maximum depth |
+| `TotalLines` | `nuint` | — | Total lines |
+| `CodeLines` | `nuint` | — | Code lines |
+| `CommentLines` | `nuint` | — | Comment lines |
+| `BlankLines` | `nuint` | — | Blank lines |
+| `TotalBytes` | `nuint` | — | Total bytes |
+| `NodeCount` | `nuint` | — | Number of nodes |
+| `ErrorCount` | `nuint` | — | Number of errors |
+| `MaxDepth` | `nuint` | — | Maximum depth |
 
 
 ---
@@ -1103,8 +1103,8 @@ An import statement extracted from source code.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Source` | `string` | — | Source |
-| `Items` | `[]string` | `nil` | Items |
-| `Alias` | `*string` | `nil` | Alias |
+| `Items` | `List<string>` | `new List<string>()` | Items |
+| `Alias` | `string?` | `null` | Alias |
 | `IsWildcard` | `bool` | — | Whether wildcard |
 | `Span` | `Span` | — | Span (span) |
 
@@ -1121,7 +1121,7 @@ An import statement extracted from source code.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Group` | `string` | — | Group |
-| `Size` | `uint64` | — | Size in bytes |
+| `Size` | `ulong` | — | Size in bytes |
 
 
 ---
@@ -1146,8 +1146,8 @@ dynamic grammar shared libraries are stored in a non-standard location.
 
 **Signature:**
 
-```go
-func (o *LanguageRegistry) WithLibsDir(libsDir string) LanguageRegistry
+```csharp
+public LanguageRegistry WithLibsDir(string libsDir)
 ```
 
 ###### AddExtraLibsDir()
@@ -1164,8 +1164,8 @@ immutable while the directory list is updated.
 
 **Signature:**
 
-```go
-func (o *LanguageRegistry) AddExtraLibsDir(dir string)
+```csharp
+public void AddExtraLibsDir(string dir)
 ```
 
 ###### GetLanguage()
@@ -1183,8 +1183,8 @@ does not match any known grammar.
 
 **Signature:**
 
-```go
-func (o *LanguageRegistry) GetLanguage(name string) (Language, error)
+```csharp
+public Language GetLanguage(string name)
 ```
 
 ###### AvailableLanguages()
@@ -1196,8 +1196,8 @@ Includes statically compiled languages, dynamically loadable languages
 
 **Signature:**
 
-```go
-func (o *LanguageRegistry) AvailableLanguages() []string
+```csharp
+public List<string> AvailableLanguages()
 ```
 
 ###### HasLanguage()
@@ -1209,8 +1209,8 @@ table or from a dynamic library on disk.
 
 **Signature:**
 
-```go
-func (o *LanguageRegistry) HasLanguage(name string) bool
+```csharp
+public bool HasLanguage(string name)
 ```
 
 ###### LanguageCount()
@@ -1219,8 +1219,8 @@ Return the total number of available languages (including aliases).
 
 **Signature:**
 
-```go
-func (o *LanguageRegistry) LanguageCount() int
+```csharp
+public nuint LanguageCount()
 ```
 
 ###### Process()
@@ -1229,16 +1229,16 @@ Parse source code and extract file intelligence based on config in a single pass
 
 **Signature:**
 
-```go
-func (o *LanguageRegistry) Process(source string, config ProcessConfig) (ProcessResult, error)
+```csharp
+public ProcessResult Process(string source, ProcessConfig config)
 ```
 
-###### Default()
+###### CreateDefault()
 
 **Signature:**
 
-```go
-func (o *LanguageRegistry) Default() LanguageRegistry
+```csharp
+public LanguageRegistry CreateDefault()
 ```
 
 
@@ -1250,8 +1250,8 @@ A single query match containing one or more captures.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `PatternIndex` | `int` | — | The pattern index within the query that produced this match. |
-| `Captures` | `[]CaptureResult` | `nil` | The captures for this match. |
+| `PatternIndex` | `nuint` | — | The pattern index within the query that produced this match. |
+| `Captures` | `List<CaptureResult>` | `new List<CaptureResult>()` | The captures for this match. |
 
 
 ---
@@ -1268,13 +1268,13 @@ This is an owned type that can be passed across FFI boundaries, unlike
 |-------|------|---------|-------------|
 | `Kind` | `string` | — | The grammar type name (e.g., "function_definition", "identifier"). |
 | `IsNamed` | `bool` | — | Whether this is a named node (vs anonymous like punctuation). |
-| `StartByte` | `int` | — | Start byte offset in source. |
-| `EndByte` | `int` | — | End byte offset in source. |
-| `StartRow` | `int` | — | Start row (zero-indexed). |
-| `StartCol` | `int` | — | Start column (zero-indexed). |
-| `EndRow` | `int` | — | End row (zero-indexed). |
-| `EndCol` | `int` | — | End column (zero-indexed). |
-| `NamedChildCount` | `int` | — | Number of named children. |
+| `StartByte` | `nuint` | — | Start byte offset in source. |
+| `EndByte` | `nuint` | — | End byte offset in source. |
+| `StartRow` | `nuint` | — | Start row (zero-indexed). |
+| `StartCol` | `nuint` | — | Start column (zero-indexed). |
+| `EndRow` | `nuint` | — | End row (zero-indexed). |
+| `EndCol` | `nuint` | — | End column (zero-indexed). |
+| `NamedChildCount` | `nuint` | — | Number of named children. |
 | `IsError` | `bool` | — | Whether this node is an ERROR node. |
 | `IsMissing` | `bool` | — | Whether this node is a MISSING node. |
 
@@ -1291,9 +1291,9 @@ or passed as a dict/object from language bindings.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `CacheDir` | `*string` | `nil` | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
-| `Languages` | `*[]string` | `nil` | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`). |
-| `Groups` | `*[]string` | `nil` | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). |
+| `CacheDir` | `string?` | `null` | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
+| `Languages` | `List<string>?` | `new List<string>()` | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`). |
+| `Groups` | `List<string>?` | `new List<string>()` | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). |
 
 ##### Methods
 
@@ -1307,8 +1307,8 @@ Returns an error if the file cannot be read or the TOML is invalid.
 
 **Signature:**
 
-```go
-func (o *PackConfig) FromTomlFile(path string) (PackConfig, error)
+```csharp
+public PackConfig FromTomlFile(string path)
 ```
 
 ###### Discover()
@@ -1319,12 +1319,12 @@ Discover configuration by searching for `language-pack.toml` in:
 2. `$XDG_CONFIG_HOME/tree-sitter-language-pack/config.toml`
 3. `~/.config/tree-sitter-language-pack/config.toml`
 
-Returns `nil` if no configuration file is found.
+Returns `null` if no configuration file is found.
 
 **Signature:**
 
-```go
-func (o *PackConfig) Discover() *PackConfig
+```csharp
+public PackConfig? Discover()
 ```
 
 
@@ -1342,9 +1342,9 @@ Manifest describing available parser downloads for a specific version.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Version` | `string` | — | Version string |
-| `Platforms` | `map[string]PlatformBundle` | — | Platforms |
-| `Languages` | `map[string]LanguageInfo` | — | Languages |
-| `Groups` | `map[string][]string` | — | Groups |
+| `Platforms` | `Dictionary<string, PlatformBundle>` | — | Platforms |
+| `Languages` | `Dictionary<string, LanguageInfo>` | — | Languages |
+| `Groups` | `Dictionary<string, List<string>>` | — | Groups |
 
 
 ---
@@ -1355,8 +1355,8 @@ Results for a single named pattern.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `Matches` | `[]MatchResult` | `nil` | The individual matches. |
-| `TotalCount` | `int` | — | Total number of matches before `max_results` truncation. |
+| `Matches` | `List<MatchResult>` | `new List<MatchResult>()` | The individual matches. |
+| `TotalCount` | `nuint` | — | Total number of matches before `max_results` truncation. |
 
 
 ---
@@ -1368,10 +1368,10 @@ Validation information for a single pattern.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Valid` | `bool` | — | Whether the pattern compiled successfully. |
-| `CaptureNames` | `[]string` | `nil` | Names of captures defined in the query. |
-| `PatternCount` | `int` | — | Number of patterns in the query. |
-| `Warnings` | `[]string` | `nil` | Non-fatal warnings (e.g., unused captures). |
-| `Errors` | `[]string` | `nil` | Fatal errors (e.g., query syntax errors). |
+| `CaptureNames` | `List<string>` | `new List<string>()` | Names of captures defined in the query. |
+| `PatternCount` | `nuint` | — | Number of patterns in the query. |
+| `Warnings` | `List<string>` | `new List<string>()` | Non-fatal warnings (e.g., unused captures). |
+| `Errors` | `List<string>` | `new List<string>()` | Fatal errors (e.g., query syntax errors). |
 
 
 ---
@@ -1382,7 +1382,7 @@ Validation information for a single pattern.
 |-------|------|---------|-------------|
 | `Url` | `string` | — | Url |
 | `Sha256` | `string` | — | Sha256 |
-| `Size` | `uint64` | — | Size in bytes |
+| `Size` | `ulong` | — | Size in bytes |
 
 
 ---
@@ -1403,17 +1403,17 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `Docstrings` | `bool` | `false` | Extract docstrings. Default: false. |
 | `Symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `Diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
-| `ChunkMaxSize` | `*int` | `nil` | Maximum chunk size in bytes. `nil` disables chunking. |
-| `Extractions` | `*string` | `nil` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `ChunkMaxSize` | `nuint?` | `null` | Maximum chunk size in bytes. `null` disables chunking. |
+| `Extractions` | `string?` | `null` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
-###### Default()
+###### CreateDefault()
 
 **Signature:**
 
-```go
-func (o *ProcessConfig) Default() ProcessConfig
+```csharp
+public ProcessConfig CreateDefault()
 ```
 
 ###### WithChunking()
@@ -1422,8 +1422,8 @@ Enable chunking with the given maximum chunk size in bytes.
 
 **Signature:**
 
-```go
-func (o *ProcessConfig) WithChunking(maxSize int) ProcessConfig
+```csharp
+public ProcessConfig WithChunking(nuint maxSize)
 ```
 
 ###### All()
@@ -1432,8 +1432,8 @@ Enable all analysis features.
 
 **Signature:**
 
-```go
-func (o *ProcessConfig) All() ProcessConfig
+```csharp
+public ProcessConfig All()
 ```
 
 ###### Minimal()
@@ -1442,8 +1442,8 @@ Disable all analysis features (only metrics computed).
 
 **Signature:**
 
-```go
-func (o *ProcessConfig) Minimal() ProcessConfig
+```csharp
+public ProcessConfig Minimal()
 ```
 
 
@@ -1461,14 +1461,14 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 |-------|------|---------|-------------|
 | `Language` | `string` | — | Language |
 | `Metrics` | `FileMetrics` | — | Metrics (file metrics) |
-| `Structure` | `[]StructureItem` | `nil` | Structure |
-| `Imports` | `[]ImportInfo` | `nil` | Imports |
-| `Exports` | `[]ExportInfo` | `nil` | Exports |
-| `Comments` | `[]CommentInfo` | `nil` | Comments |
-| `Docstrings` | `[]DocstringInfo` | `nil` | Docstrings |
-| `Symbols` | `[]SymbolInfo` | `nil` | Symbols |
-| `Diagnostics` | `[]Diagnostic` | `nil` | Diagnostics |
-| `Chunks` | `[]CodeChunk` | `nil` | Text chunks for chunking/embedding |
+| `Structure` | `List<StructureItem>` | `new List<StructureItem>()` | Structure |
+| `Imports` | `List<ImportInfo>` | `new List<ImportInfo>()` | Imports |
+| `Exports` | `List<ExportInfo>` | `new List<ExportInfo>()` | Exports |
+| `Comments` | `List<CommentInfo>` | `new List<CommentInfo>()` | Comments |
+| `Docstrings` | `List<DocstringInfo>` | `new List<DocstringInfo>()` | Docstrings |
+| `Symbols` | `List<SymbolInfo>` | `new List<SymbolInfo>()` | Symbols |
+| `Diagnostics` | `List<Diagnostic>` | `new List<Diagnostic>()` | Diagnostics |
+| `Chunks` | `List<CodeChunk>` | `new List<CodeChunk>()` | Text chunks for chunking/embedding |
 | `Extractions` | `string` | — | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
@@ -1480,8 +1480,8 @@ A single match from a tree-sitter query, with captured nodes.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `PatternIndex` | `int` | — | The pattern index that matched (position in the query string). |
-| `Captures` | `[]string` | `nil` | Captures: list of (capture_name, node_info) pairs. |
+| `PatternIndex` | `nuint` | — | The pattern index that matched (position in the query string). |
+| `Captures` | `List<string>` | `new List<string>()` | Captures: list of (capture_name, node_info) pairs. |
 
 
 ---
@@ -1495,12 +1495,12 @@ positions (for display and diagnostics).
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `StartByte` | `int` | — | Start byte |
-| `EndByte` | `int` | — | End byte |
-| `StartLine` | `int` | — | Start line |
-| `StartColumn` | `int` | — | Start column |
-| `EndLine` | `int` | — | End line |
-| `EndColumn` | `int` | — | End column |
+| `StartByte` | `nuint` | — | Start byte |
+| `EndByte` | `nuint` | — | End byte |
+| `StartLine` | `nuint` | — | Start line |
+| `StartColumn` | `nuint` | — | Start column |
+| `EndLine` | `nuint` | — | End line |
+| `EndColumn` | `nuint` | — | End column |
 
 
 ---
@@ -1512,14 +1512,14 @@ A structural item (function, class, struct, etc.) in source code.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Kind` | `StructureKind` | `StructureKind.Function` | Kind (structure kind) |
-| `Name` | `*string` | `nil` | The name |
-| `Visibility` | `*string` | `nil` | Visibility |
+| `Name` | `string?` | `null` | The name |
+| `Visibility` | `string?` | `null` | Visibility |
 | `Span` | `Span` | — | Span (span) |
-| `Children` | `[]StructureItem` | `nil` | Children |
-| `Decorators` | `[]string` | `nil` | Decorators |
-| `DocComment` | `*string` | `nil` | Doc comment |
-| `Signature` | `*string` | `nil` | Signature |
-| `BodySpan` | `*Span` | `nil` | Body span (span) |
+| `Children` | `List<StructureItem>` | `new List<StructureItem>()` | Children |
+| `Decorators` | `List<string>` | `new List<string>()` | Decorators |
+| `DocComment` | `string?` | `null` | Doc comment |
+| `Signature` | `string?` | `null` | Signature |
+| `BodySpan` | `Span?` | `null` | Body span (span) |
 
 
 ---
@@ -1533,8 +1533,8 @@ A symbol (variable, function, type, etc.) extracted from source code.
 | `Name` | `string` | — | The name |
 | `Kind` | `SymbolKind` | `SymbolKind.Variable` | Kind (symbol kind) |
 | `Span` | `Span` | — | Span (span) |
-| `TypeAnnotation` | `*string` | `nil` | Type annotation |
-| `Doc` | `*string` | `nil` | Doc |
+| `TypeAnnotation` | `string?` | `null` | Type annotation |
+| `Doc` | `string?` | `null` | Doc |
 
 
 ---

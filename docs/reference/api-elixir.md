@@ -1092,7 +1092,7 @@ Defines a single extraction pattern and its configuration.
 | `capture_output` | `CaptureOutput` | `:full` | What to include in each capture result. |
 | `child_fields` | `list(String.t())` | `[]` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `max_results` | `integer() | nil` | `nil` | Maximum number of matches to return. `nil` means unlimited. |
-| `byte_range` | `String.t() | nil` | `nil` | Restrict matches to a byte range `(start, end)`. |
+| `byte_range` | `list(integer()) | nil` | `[]` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
