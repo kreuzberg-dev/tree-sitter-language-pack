@@ -168,7 +168,10 @@ discord_url = "https://discord.gg/xt9WY3GnKR"
 banner_url = "https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8"
 
 [sync]
-extra_paths = ["crates/ts-pack-node/package.json", "crates/ts-pack-node/npm/*/package.json"]
+extra_paths = [
+    "crates/ts-pack-core-node/package.json",
+    "crates/ts-pack-core-node/npm/*/package.json",
+]
 
 [[sync.text_replacements]]
 path = "test_apps/node/package.json"
