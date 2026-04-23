@@ -6,40 +6,40 @@ require 'json'
 
 RSpec.describe 'registry' do
   it 'get_language_python: get_language(\'python\') returns a valid Language object' do
-    result = TreeSitterLanguagePack.process('', nil)
-    expect(result).not_to be_nil
+    language = TreeSitterLanguagePack.get_language('python')
+    expect(language).not_to be_nil
   end
 
   it 'get_language_unknown: get_language(\'nonexistent_xyz\') returns an error for unknown language' do
-    expect { TreeSitterLanguagePack.process('', nil) }.to raise_error
+    expect { TreeSitterLanguagePack.get_language('nonexistent_xyz') }.to raise_error
   end
 
   it 'get_parser_python: get_parser(\'python\') returns a valid Parser object' do
-    result = TreeSitterLanguagePack.process('', nil)
-    expect(result).not_to be_nil
+    parser = TreeSitterLanguagePack.get_parser('python')
+    expect(parser).not_to be_nil
   end
 
   it 'get_parser_unknown: get_parser(\'nonexistent_xyz\') returns an error for unknown language' do
-    expect { TreeSitterLanguagePack.process('', nil) }.to raise_error
+    expect { TreeSitterLanguagePack.get_parser('nonexistent_xyz') }.to raise_error
   end
 
   it 'registry_has_language_false: has_language(\'nonexistent\') should return false' do
-    result = TreeSitterLanguagePack.process('', nil)
-    # TODO: unsupported assertion type: is_false
+    result = TreeSitterLanguagePack.has_language('nonexistent')
+    expect(result).to be false
   end
 
   it 'registry_has_language_true: has_language(\'python\') should return true' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.has_language('python')
     expect(result).to be true
   end
 
   it 'registry_language_count: language_count returns a value greater than 300' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.language_count({  })
     expect(result).to be >= 300
   end
 
   it 'registry_list_languages: available_languages should return a non-empty list' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.available_languages(nil)
     expect(result).not_to be_empty
   end
 end

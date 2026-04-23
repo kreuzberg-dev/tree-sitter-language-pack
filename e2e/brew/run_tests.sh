@@ -79,6 +79,14 @@ assert_less_than() {
     fi
 }
 
+assert_less_than_or_equal() {
+    local actual="$1" expected="$2" label="$3"
+    if [ "$actual" -gt "$expected" ]; then
+        echo "FAIL [$label]: expected $actual <= $expected" >&2
+        return 1
+    fi
+}
+
 assert_not_contains() {
     local actual="$1" expected="$2" label="$3"
     if [[ "$actual" == *"$expected"* ]]; then

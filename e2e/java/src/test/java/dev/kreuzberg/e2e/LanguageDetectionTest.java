@@ -30,140 +30,140 @@ class LanguageDetectionTest {
     @Test
     void testDetectContentBashShebang() throws Exception {
         // detect_language_from_content recognizes #!/bin/bash shebang
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_content("#!/bin/bash\necho hi");
         assertEquals("bash", result.trim());
     }
 
     @Test
     void testDetectContentNoShebang() throws Exception {
         // detect_language_from_content returns None when no shebang present
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_content("no shebang here");
         assertTrue(result.isEmpty(), "expected empty value");
     }
 
     @Test
     void testDetectContentPythonShebang() throws Exception {
         // detect_language_from_content recognizes #!/usr/bin/env python3 shebang
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_content("#!/usr/bin/env python3\npass");
         assertEquals("python", result.trim());
     }
 
     @Test
     void testDetectExtCpp() throws Exception {
         // detect_language_from_extension recognizes .cpp as cpp
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_extension("cpp");
         assertEquals("cpp", result.trim());
     }
 
     @Test
     void testDetectExtGo() throws Exception {
         // detect_language_from_extension recognizes .go as go
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_extension("go");
         assertEquals("go", result.trim());
     }
 
     @Test
     void testDetectExtJava() throws Exception {
         // detect_language_from_extension recognizes .java as java
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_extension("java");
         assertEquals("java", result.trim());
     }
 
     @Test
     void testDetectExtJavascript() throws Exception {
         // detect_language_from_extension recognizes .js as javascript
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_extension("js");
         assertEquals("javascript", result.trim());
     }
 
     @Test
     void testDetectExtPhp() throws Exception {
         // detect_language_from_extension recognizes .php as php
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_extension("php");
         assertEquals("php", result.trim());
     }
 
     @Test
     void testDetectExtPython() throws Exception {
         // detect_language_from_extension recognizes .py as python
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_extension("py");
         assertEquals("python", result.trim());
     }
 
     @Test
     void testDetectExtRuby() throws Exception {
         // detect_language_from_extension recognizes .rb as ruby
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_extension("rb");
         assertEquals("ruby", result.trim());
     }
 
     @Test
     void testDetectExtRust() throws Exception {
         // detect_language_from_extension recognizes .rs as rust
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_extension("rs");
         assertEquals("rust", result.trim());
     }
 
     @Test
     void testDetectExtTypescript() throws Exception {
         // detect_language_from_extension recognizes .ts as typescript
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_extension("ts");
         assertEquals("typescript", result.trim());
     }
 
     @Test
     void testDetectExtUnknown() throws Exception {
         // detect_language_from_extension returns None for unknown extension .xyz
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_extension("xyz");
         assertTrue(result.isEmpty(), "expected empty value");
     }
 
     @Test
     void testDetectPathDotfile() throws Exception {
         // detect_language_from_path returns None for dotfile .gitignore (no standard extension)
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_path(".gitignore");
         assertTrue(result.isEmpty(), "expected empty value");
     }
 
     @Test
     void testDetectPathGoNested() throws Exception {
         // detect_language_from_path extracts extension from nested path lib/server.go
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_path("lib/server.go");
         assertEquals("go", result.trim());
     }
 
     @Test
     void testDetectPathJavaRoot() throws Exception {
         // detect_language_from_path recognizes Main.java in root directory
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_path("Main.java");
         assertEquals("java", result.trim());
     }
 
     @Test
     void testDetectPathJsRoot() throws Exception {
         // detect_language_from_path recognizes app.js in root directory
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_path("app.js");
         assertEquals("javascript", result.trim());
     }
 
     @Test
     void testDetectPathNested() throws Exception {
         // detect_language_from_path extracts extension from nested path src/main.py
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_path("src/main.py");
         assertEquals("python", result.trim());
     }
 
     @Test
     void testDetectPathNoExtension() throws Exception {
         // detect_language_from_path returns None for extensionless file Makefile
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_path("Makefile");
         assertTrue(result.isEmpty(), "expected empty value");
     }
 
     @Test
     void testDetectPathRustSrc() throws Exception {
         // detect_language_from_path extracts extension from nested path src/main.rs
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_path("src/main.rs");
         assertEquals("rust", result.trim());
     }
 

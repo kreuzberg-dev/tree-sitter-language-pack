@@ -16,2447 +16,2447 @@ public class SmokeTests
     public void Test_SmokeAbl()
     {
         // Smoke test: load abl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("abl", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeActionscript()
     {
         // Smoke test: load actionscript and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("var x:int = 1;", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("actionscript", "var x:int = 1;");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeAda()
     {
         // Smoke test: load ada and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("procedure Main is begin null; end Main;", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ada", "procedure Main is begin null; end Main;");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeAgda()
     {
         // Smoke test: load agda and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("module Main where", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("agda", "module Main where");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeAl()
     {
         // Smoke test: load al and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("al", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeAngular()
     {
         // Smoke test: load angular and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("angular", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeApex()
     {
         // Smoke test: load apex and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("public class Main {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("apex", "public class Main {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeArduino()
     {
         // Smoke test: load arduino and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("void setup() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("arduino", "void setup() {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeAsciidoc()
     {
         // Smoke test: load asciidoc and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("= Title\n\nParagraph.", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("asciidoc", "= Title\n\nParagraph.");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeAsm()
     {
         // Smoke test: load asm and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("mov eax, 1", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("asm", "mov eax, 1");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeAstro()
     {
         // Smoke test: load astro and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("---\n---\n<p>hello</p>", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("astro", "---\n---\n<p>hello</p>");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeAwk()
     {
         // Smoke test: load awk and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("BEGIN { print \"hello\" }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("awk", "BEGIN { print \"hello\" }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeBash()
     {
         // Smoke test: load bash and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("echo hello", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("bash", "echo hello");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeBass()
     {
         // Smoke test: load bass and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("bass", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeBatch()
     {
         // Smoke test: load batch and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("@echo off\necho hello", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("batch", "@echo off\necho hello");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeBeancount()
     {
         // Smoke test: load beancount and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("2024-01-01 open Assets:Bank USD", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("beancount", "2024-01-01 open Assets:Bank USD");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeBibtex()
     {
         // Smoke test: load bibtex and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("@article{key, title={A}}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("bibtex", "@article{key, title={A}}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeBicep()
     {
         // Smoke test: load bicep and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("param name string", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("bicep", "param name string");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeBitbake()
     {
         // Smoke test: load bitbake and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("DESCRIPTION = \"hello\"", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("bitbake", "DESCRIPTION = \"hello\"");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeBlade()
     {
         // Smoke test: load blade and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("blade", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeBrightscript()
     {
         // Smoke test: load brightscript and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("brightscript", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeBsl()
     {
         // Smoke test: load bsl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("Procedure Main() EndProcedure", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("bsl", "Procedure Main() EndProcedure");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeC()
     {
         // Smoke test: load c and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("int main() { return 0; }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("c", "int main() { return 0; }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeC3()
     {
         // Smoke test: load c3 and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("c3", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCaddy()
     {
         // Smoke test: load caddy and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process(":8080 {\n\trespond \"Hello\"\n}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("caddy", ":8080 {\n\trespond \"Hello\"\n}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCairo()
     {
         // Smoke test: load cairo and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("fn main() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cairo", "fn main() {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCapnp()
     {
         // Smoke test: load capnp and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("@0xabcdef1234567890;", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("capnp", "@0xabcdef1234567890;");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCedar()
     {
         // Smoke test: load cedar and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("permit(principal, action, resource);", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cedar", "permit(principal, action, resource);");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCedarschema()
     {
         // Smoke test: load cedarschema and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("entity User;", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cedarschema", "entity User;");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCel()
     {
         // Smoke test: load cel and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cel", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCfml()
     {
         // Smoke test: load cfml and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cfml", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeChatito()
     {
         // Smoke test: load chatito and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("%[greeting]\n    hello", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("chatito", "%[greeting]\n    hello");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeChuck()
     {
         // Smoke test: load chuck and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("chuck", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCircom()
     {
         // Smoke test: load circom and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("circom", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeClarity()
     {
         // Smoke test: load clarity and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("(define-public (hello) (ok true))", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("clarity", "(define-public (hello) (ok true))");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeClojure()
     {
         // Smoke test: load clojure and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("(def x 1)", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("clojure", "(def x 1)");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCmake()
     {
         // Smoke test: load cmake and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("cmake_minimum_required(VERSION 3.0)", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cmake", "cmake_minimum_required(VERSION 3.0)");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCobol()
     {
         // Smoke test: load cobol and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cobol", "       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeComment()
     {
         // Smoke test: load comment and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("TODO: fix this", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("comment", "TODO: fix this");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCommonlisp()
     {
         // Smoke test: load commonlisp and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("(defun hello () (print \"hello\"))", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("commonlisp", "(defun hello () (print \"hello\"))");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCooklang()
     {
         // Smoke test: load cooklang and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cooklang", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCorn()
     {
         // Smoke test: load corn and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("{ key = \"value\" }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("corn", "{ key = \"value\" }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCpon()
     {
         // Smoke test: load cpon and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("{\"key\": 1}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cpon", "{\"key\": 1}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCpp()
     {
         // Smoke test: load cpp and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("int main() { return 0; }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cpp", "int main() { return 0; }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCrystal()
     {
         // Smoke test: load crystal and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("crystal", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCsharp()
     {
         // Smoke test: load csharp and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("class Main {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("csharp", "class Main {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCss()
     {
         // Smoke test: load css and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("body { color: red; }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("css", "body { color: red; }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCst()
     {
         // Smoke test: load cst and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cst", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCsv()
     {
         // Smoke test: load csv and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("a,b,c\n1,2,3", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("csv", "a,b,c\n1,2,3");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCuda()
     {
         // Smoke test: load cuda and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("__global__ void kernel() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cuda", "__global__ void kernel() {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCue()
     {
         // Smoke test: load cue and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cue", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeCylc()
     {
         // Smoke test: load cylc and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("cylc", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeD()
     {
         // Smoke test: load d and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("void main() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("d", "void main() {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeDart()
     {
         // Smoke test: load dart and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("void main() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("dart", "void main() {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeDesktop()
     {
         // Smoke test: load desktop and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("desktop", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeDevicetree()
     {
         // Smoke test: load devicetree and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("/dts-v1/;\n/ { };", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("devicetree", "/dts-v1/;\n/ { };");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeDhall()
     {
         // Smoke test: load dhall and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("dhall", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeDiff()
     {
         // Smoke test: load diff and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("diff", "--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeDjot()
     {
         // Smoke test: load djot and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("djot", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeDockerfile()
     {
         // Smoke test: load dockerfile and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("FROM alpine", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("dockerfile", "FROM alpine");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeDot()
     {
         // Smoke test: load dot and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("digraph G { A -> B; }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("dot", "digraph G { A -> B; }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeDoxygen()
     {
         // Smoke test: load doxygen and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("/** @brief A function */", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("doxygen", "/** @brief A function */");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeDtd()
     {
         // Smoke test: load dtd and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("<!ELEMENT note (body)>", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("dtd", "<!ELEMENT note (body)>");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeEarthfile()
     {
         // Smoke test: load earthfile and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("earthfile", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeEbnf()
     {
         // Smoke test: load ebnf and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ebnf", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeEditorconfig()
     {
         // Smoke test: load editorconfig and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("editorconfig", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeEds()
     {
         // Smoke test: load eds and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("eds", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeEex()
     {
         // Smoke test: load eex and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("eex", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeElisp()
     {
         // Smoke test: load elisp and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("(defun hello () (message \"hello\"))", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("elisp", "(defun hello () (message \"hello\"))");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeElixir()
     {
         // Smoke test: load elixir and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("IO.puts(\"hello\")", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("elixir", "IO.puts(\"hello\")");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeElm()
     {
         // Smoke test: load elm and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("module Main exposing (..)", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("elm", "module Main exposing (..)");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeElsa()
     {
         // Smoke test: load elsa and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("elsa", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeElvish()
     {
         // Smoke test: load elvish and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("elvish", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeEmbeddedtemplate()
     {
         // Smoke test: load embeddedtemplate and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("<%= value %>", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("embeddedtemplate", "<%= value %>");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeEnforce()
     {
         // Smoke test: load enforce and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("enforce", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeErlang()
     {
         // Smoke test: load erlang and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("main() -> ok.", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("erlang", "main() -> ok.");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeFacility()
     {
         // Smoke test: load facility and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("facility", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeFaust()
     {
         // Smoke test: load faust and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("faust", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeFennel()
     {
         // Smoke test: load fennel and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("(fn hello [] (print :hello))", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("fennel", "(fn hello [] (print :hello))");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeFidl()
     {
         // Smoke test: load fidl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("fidl", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeFirrtl()
     {
         // Smoke test: load firrtl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("circuit Main :", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("firrtl", "circuit Main :");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeFish()
     {
         // Smoke test: load fish and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("echo hello", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("fish", "echo hello");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeFoam()
     {
         // Smoke test: load foam and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("foam", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeForth()
     {
         // Smoke test: load forth and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("forth", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeFortran()
     {
         // Smoke test: load fortran and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("program main\nend program main", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("fortran", "program main\nend program main");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeFsharp()
     {
         // Smoke test: load fsharp and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("let x = 1", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("fsharp", "let x = 1");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeFsharpSignature()
     {
         // Smoke test: load fsharp_signature and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("val x: int", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("fsharp_signature", "val x: int");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeFunc()
     {
         // Smoke test: load func and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("() recv_internal() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("func", "() recv_internal() {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGap()
     {
         // Smoke test: load gap and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gap", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGdscript()
     {
         // Smoke test: load gdscript and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("extends Node\nfunc _ready():\n\tpass", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gdscript", "extends Node\nfunc _ready():\n\tpass");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGdshader()
     {
         // Smoke test: load gdshader and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gdshader", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGitConfig()
     {
         // Smoke test: load git_config and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("git_config", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGitRebase()
     {
         // Smoke test: load git_rebase and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("git_rebase", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGitattributes()
     {
         // Smoke test: load gitattributes and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("*.txt text", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gitattributes", "*.txt text");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGitcommit()
     {
         // Smoke test: load gitcommit and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("feat: add feature\n\nBody text", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gitcommit", "feat: add feature\n\nBody text");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGitignore()
     {
         // Smoke test: load gitignore and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("*.o\n*.log", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gitignore", "*.o\n*.log");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGleam()
     {
         // Smoke test: load gleam and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("pub fn main() { }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gleam", "pub fn main() { }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGlimmer()
     {
         // Smoke test: load glimmer and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("glimmer", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGlsl()
     {
         // Smoke test: load glsl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("void main() { gl_Position = vec4(0.0); }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("glsl", "void main() { gl_Position = vec4(0.0); }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGn()
     {
         // Smoke test: load gn and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("group(\"hello\") {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gn", "group(\"hello\") {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGnuplot()
     {
         // Smoke test: load gnuplot and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gnuplot", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGo()
     {
         // Smoke test: load go and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("package main", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("go", "package main");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGodotResource()
     {
         // Smoke test: load godot_resource and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("godot_resource", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGomod()
     {
         // Smoke test: load gomod and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("module example.com/hello\n\ngo 1.21", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gomod", "module example.com/hello\n\ngo 1.21");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGosum()
     {
         // Smoke test: load gosum and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("example.com/pkg v1.0.0 h1:abc=", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gosum", "example.com/pkg v1.0.0 h1:abc=");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGotmpl()
     {
         // Smoke test: load gotmpl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gotmpl", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGowork()
     {
         // Smoke test: load gowork and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gowork", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGpg()
     {
         // Smoke test: load gpg and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gpg", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGraphql()
     {
         // Smoke test: load graphql and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("type Query { hello: String }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("graphql", "type Query { hello: String }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGren()
     {
         // Smoke test: load gren and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("module Main exposing (..)", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gren", "module Main exposing (..)");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGroovy()
     {
         // Smoke test: load groovy and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("def x = 1", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("groovy", "def x = 1");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeGstlaunch()
     {
         // Smoke test: load gstlaunch and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("fakesrc ! fakesink", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("gstlaunch", "fakesrc ! fakesink");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHack()
     {
         // Smoke test: load hack and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("<?hh\nfunction main(): void {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("hack", "<?hh\nfunction main(): void {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHare()
     {
         // Smoke test: load hare and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("export fn main() void = void;", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("hare", "export fn main() void = void;");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHaskell()
     {
         // Smoke test: load haskell and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("main = putStrLn \"hello\"", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("haskell", "main = putStrLn \"hello\"");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHaxe()
     {
         // Smoke test: load haxe and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("class Main { static function main() {} }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("haxe", "class Main { static function main() {} }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHcl()
     {
         // Smoke test: load hcl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("variable \"name\" { type = string }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("hcl", "variable \"name\" { type = string }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHeex()
     {
         // Smoke test: load heex and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("<%= @greeting %>", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("heex", "<%= @greeting %>");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHjson()
     {
         // Smoke test: load hjson and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("hjson", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHlsl()
     {
         // Smoke test: load hlsl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("float4 main() : SV_Target { return 0; }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("hlsl", "float4 main() : SV_Target { return 0; }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHocon()
     {
         // Smoke test: load hocon and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("hocon", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHoon()
     {
         // Smoke test: load hoon and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("hoon", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHtml()
     {
         // Smoke test: load html and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("<p>hello</p>", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("html", "<p>hello</p>");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHtmldjango()
     {
         // Smoke test: load htmldjango and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("htmldjango", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHttp()
     {
         // Smoke test: load http and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("http", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHurl()
     {
         // Smoke test: load hurl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("hurl", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeHyprlang()
     {
         // Smoke test: load hyprlang and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("general { border_size = 1 }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("hyprlang", "general { border_size = 1 }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeIdris()
     {
         // Smoke test: load idris and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("module Main", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("idris", "module Main");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeIni()
     {
         // Smoke test: load ini and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("[section]\nkey = value", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ini", "[section]\nkey = value");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeIspc()
     {
         // Smoke test: load ispc and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("export void main() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ispc", "export void main() {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJai()
     {
         // Smoke test: load jai and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("jai", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJanet()
     {
         // Smoke test: load janet and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("(print \"hello\")", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("janet", "(print \"hello\")");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJava()
     {
         // Smoke test: load java and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("class Main {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("java", "class Main {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJavadoc()
     {
         // Smoke test: load javadoc and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("javadoc", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJavascript()
     {
         // Smoke test: load javascript and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("console.log('hello');", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("javascript", "console.log('hello');");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJinja2()
     {
         // Smoke test: load jinja2 and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("{{ variable }}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("jinja2", "{{ variable }}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJq()
     {
         // Smoke test: load jq and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process(".[] | select(.key)", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("jq", ".[] | select(.key)");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJsdoc()
     {
         // Smoke test: load jsdoc and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("/** @param {string} name */", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("jsdoc", "/** @param {string} name */");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJson()
     {
         // Smoke test: load json and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("{\"key\": \"value\"}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("json", "{\"key\": \"value\"}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJson5()
     {
         // Smoke test: load json5 and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("json5", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJsonnet()
     {
         // Smoke test: load jsonnet and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("{ key: 'value' }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("jsonnet", "{ key: 'value' }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJulia()
     {
         // Smoke test: load julia and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("function main() end", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("julia", "function main() end");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeJust()
     {
         // Smoke test: load just and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("just", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeKcl()
     {
         // Smoke test: load kcl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("kcl", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeKconfig()
     {
         // Smoke test: load kconfig and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("config FOO\n\tbool \"Enable foo\"", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("kconfig", "config FOO\n\tbool \"Enable foo\"");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeKdl()
     {
         // Smoke test: load kdl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("node \"value\"", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("kdl", "node \"value\"");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeKotlin()
     {
         // Smoke test: load kotlin and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("fun main() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("kotlin", "fun main() {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeLatex()
     {
         // Smoke test: load latex and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("latex", "\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeLean()
     {
         // Smoke test: load lean and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("def main : IO Unit := pure ()", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("lean", "def main : IO Unit := pure ()");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeLedger()
     {
         // Smoke test: load ledger and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ledger", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeLess()
     {
         // Smoke test: load less and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("less", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeLinkerscript()
     {
         // Smoke test: load linkerscript and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("SECTIONS { .text : { *(.text) } }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("linkerscript", "SECTIONS { .text : { *(.text) } }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeLiquid()
     {
         // Smoke test: load liquid and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("liquid", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeLlvm()
     {
         // Smoke test: load llvm and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("define i32 @main() { ret i32 0 }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("llvm", "define i32 @main() { ret i32 0 }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeLua()
     {
         // Smoke test: load lua and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("print('hello')", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("lua", "print('hello')");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeLuadoc()
     {
         // Smoke test: load luadoc and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("---@param name string", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("luadoc", "---@param name string");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeLuap()
     {
         // Smoke test: load luap and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("[a-z]+", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("luap", "[a-z]+");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeLuau()
     {
         // Smoke test: load luau and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("local x: number = 1", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("luau", "local x: number = 1");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeMagik()
     {
         // Smoke test: load magik and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("_method object.hello\n_endmethod", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("magik", "_method object.hello\n_endmethod");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeMake()
     {
         // Smoke test: load make and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("all:\n\techo hello", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("make", "all:\n\techo hello");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeMarkdown()
     {
         // Smoke test: load markdown and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("# Hello\n\nWorld", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("markdown", "# Hello\n\nWorld");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeMarkdownInline()
     {
         // Smoke test: load markdown_inline and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("**bold** and *italic*", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("markdown_inline", "**bold** and *italic*");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeMatlab()
     {
         // Smoke test: load matlab and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("function y = hello(x)\ny = x;\nend", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("matlab", "function y = hello(x)\ny = x;\nend");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeMermaid()
     {
         // Smoke test: load mermaid and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("graph TD\nA --> B", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("mermaid", "graph TD\nA --> B");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeMeson()
     {
         // Smoke test: load meson and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("project('hello', 'c')", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("meson", "project('hello', 'c')");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeMlir()
     {
         // Smoke test: load mlir and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("mlir", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeMojo()
     {
         // Smoke test: load mojo and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("mojo", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeMove()
     {
         // Smoke test: load move and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("move", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeNasm()
     {
         // Smoke test: load nasm and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("nasm", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeNetlinx()
     {
         // Smoke test: load netlinx and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("PROGRAM_NAME='hello'", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("netlinx", "PROGRAM_NAME='hello'");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeNginx()
     {
         // Smoke test: load nginx and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("nginx", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeNickel()
     {
         // Smoke test: load nickel and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("nickel", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeNim()
     {
         // Smoke test: load nim and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("echo \"hello\"", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("nim", "echo \"hello\"");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeNinja()
     {
         // Smoke test: load ninja and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("rule cc\n  command = cc $in -o $out", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ninja", "rule cc\n  command = cc $in -o $out");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeNix()
     {
         // Smoke test: load nix and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("{ pkgs ? import <nixpkgs> {} }: pkgs.hello", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("nix", "{ pkgs ? import <nixpkgs> {} }: pkgs.hello");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeNorg()
     {
         // Smoke test: load norg and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("norg", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeNorgMeta()
     {
         // Smoke test: load norg_meta and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("norg_meta", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeNqc()
     {
         // Smoke test: load nqc and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("task main() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("nqc", "task main() {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeNushell()
     {
         // Smoke test: load nushell and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("nushell", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeObjc()
     {
         // Smoke test: load objc and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("@interface Main @end", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("objc", "@interface Main @end");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeOcaml()
     {
         // Smoke test: load ocaml and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("let () = print_endline \"hello\"", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ocaml", "let () = print_endline \"hello\"");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeOcamlInterface()
     {
         // Smoke test: load ocaml_interface and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("val x : int", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ocaml_interface", "val x : int");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeOcamllex()
     {
         // Smoke test: load ocamllex and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ocamllex", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeOdin()
     {
         // Smoke test: load odin and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("package main", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("odin", "package main");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeOpenscad()
     {
         // Smoke test: load openscad and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("openscad", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeOrg()
     {
         // Smoke test: load org and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("* Hello\nWorld", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("org", "* Hello\nWorld");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePascal()
     {
         // Smoke test: load pascal and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("program Hello; begin end.", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("pascal", "program Hello; begin end.");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePem()
     {
         // Smoke test: load pem and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("pem", "-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePerl()
     {
         // Smoke test: load perl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("print 'hello';", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("perl", "print 'hello';");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePgn()
     {
         // Smoke test: load pgn and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("1. e4 e5 *", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("pgn", "1. e4 e5 *");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePhp()
     {
         // Smoke test: load php and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("<?php echo 'hello'; ?>", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("php", "<?php echo 'hello'; ?>");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePhpdoc()
     {
         // Smoke test: load phpdoc and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("phpdoc", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePkl()
     {
         // Smoke test: load pkl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("name = \"hello\"", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("pkl", "name = \"hello\"");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePo()
     {
         // Smoke test: load po and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("msgid \"hello\"\nmsgstr \"world\"", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("po", "msgid \"hello\"\nmsgstr \"world\"");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePoeFilter()
     {
         // Smoke test: load poe_filter and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("poe_filter", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePony()
     {
         // Smoke test: load pony and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("actor Main\n  new create(env: Env) => None", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("pony", "actor Main\n  new create(env: Env) => None");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePostscript()
     {
         // Smoke test: load postscript and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("/hello { (Hello) show } def", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("postscript", "/hello { (Hello) show } def");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePowershell()
     {
         // Smoke test: load powershell and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("Write-Host 'hello'", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("powershell", "Write-Host 'hello'");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePrintf()
     {
         // Smoke test: load printf and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("%d %s", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("printf", "%d %s");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePrisma()
     {
         // Smoke test: load prisma and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("model User { id Int @id }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("prisma", "model User { id Int @id }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeProlog()
     {
         // Smoke test: load prolog and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("hello :- write('hello'), nl.", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("prolog", "hello :- write('hello'), nl.");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePromql()
     {
         // Smoke test: load promql and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("promql", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeProperties()
     {
         // Smoke test: load properties and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("key=value", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("properties", "key=value");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeProto()
     {
         // Smoke test: load proto and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("syntax = \"proto3\";", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("proto", "syntax = \"proto3\";");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePrql()
     {
         // Smoke test: load prql and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("prql", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePsv()
     {
         // Smoke test: load psv and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("a|b|c\n1|2|3", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("psv", "a|b|c\n1|2|3");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePug()
     {
         // Smoke test: load pug and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("pug", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePuppet()
     {
         // Smoke test: load puppet and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("notify { 'hello': }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("puppet", "notify { 'hello': }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePurescript()
     {
         // Smoke test: load purescript and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("module Main where", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("purescript", "module Main where");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePymanifest()
     {
         // Smoke test: load pymanifest and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("include *.txt", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("pymanifest", "include *.txt");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokePython()
     {
         // Smoke test: load python and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("print('hello')", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("python", "print('hello')");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeQl()
     {
         // Smoke test: load ql and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ql", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeQmldir()
     {
         // Smoke test: load qmldir and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("module Example", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("qmldir", "module Example");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeQmljs()
     {
         // Smoke test: load qmljs and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("import QtQuick 2.0\nItem {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("qmljs", "import QtQuick 2.0\nItem {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeQuery()
     {
         // Smoke test: load query and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("(identifier) @name", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("query", "(identifier) @name");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeR()
     {
         // Smoke test: load r and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("print('hello')", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("r", "print('hello')");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRacket()
     {
         // Smoke test: load racket and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("#lang racket\n(define x 1)", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("racket", "#lang racket\n(define x 1)");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRasi()
     {
         // Smoke test: load rasi and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("rasi", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRazor()
     {
         // Smoke test: load razor and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("razor", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRbs()
     {
         // Smoke test: load rbs and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("rbs", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRe2c()
     {
         // Smoke test: load re2c and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("/*!re2c\n  [a-z]+ { return; }\n*/", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("re2c", "/*!re2c\n  [a-z]+ { return; }\n*/");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeReadline()
     {
         // Smoke test: load readline and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("set editing-mode vi", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("readline", "set editing-mode vi");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRegex()
     {
         // Smoke test: load regex and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("regex", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRego()
     {
         // Smoke test: load rego and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("package main\ndefault allow = false", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("rego", "package main\ndefault allow = false");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRequirements()
     {
         // Smoke test: load requirements and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("flask>=2.0", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("requirements", "flask>=2.0");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRescript()
     {
         // Smoke test: load rescript and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("let x = 1", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("rescript", "let x = 1");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRobot()
     {
         // Smoke test: load robot and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("robot", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRoc()
     {
         // Smoke test: load roc and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("roc", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRon()
     {
         // Smoke test: load ron and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("(key: \"value\")", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ron", "(key: \"value\")");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRst()
     {
         // Smoke test: load rst and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("Hello\n=====\n\nWorld", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("rst", "Hello\n=====\n\nWorld");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRtf()
     {
         // Smoke test: load rtf and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("{\\rtf1 hello}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("rtf", "{\\rtf1 hello}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRuby()
     {
         // Smoke test: load ruby and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("puts 'hello'", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ruby", "puts 'hello'");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeRust()
     {
         // Smoke test: load rust and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("fn main() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("rust", "fn main() {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeScala()
     {
         // Smoke test: load scala and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("object Main", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("scala", "object Main");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeScheme()
     {
         // Smoke test: load scheme and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("(define x 1)", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("scheme", "(define x 1)");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeScss()
     {
         // Smoke test: load scss and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("$color: red;\nbody { color: $color; }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("scss", "$color: red;\nbody { color: $color; }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSlang()
     {
         // Smoke test: load slang and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("slang", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSmali()
     {
         // Smoke test: load smali and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process(".class public LMain;\n.super Ljava/lang/Object;", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("smali", ".class public LMain;\n.super Ljava/lang/Object;");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSmalltalk()
     {
         // Smoke test: load smalltalk and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("smalltalk", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSmithy()
     {
         // Smoke test: load smithy and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("namespace example\nstring MyString", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("smithy", "namespace example\nstring MyString");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSml()
     {
         // Smoke test: load sml and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("sml", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSnakemake()
     {
         // Smoke test: load snakemake and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("snakemake", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSolidity()
     {
         // Smoke test: load solidity and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("pragma solidity ^0.8.0;\ncontract Main {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("solidity", "pragma solidity ^0.8.0;\ncontract Main {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSouffle()
     {
         // Smoke test: load souffle and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("souffle", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSourcepawn()
     {
         // Smoke test: load sourcepawn and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("sourcepawn", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSparql()
     {
         // Smoke test: load sparql and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("SELECT ?s WHERE { ?s ?p ?o }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("sparql", "SELECT ?s WHERE { ?s ?p ?o }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSql()
     {
         // Smoke test: load sql and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("SELECT 1;", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("sql", "SELECT 1;");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSqlBigquery()
     {
         // Smoke test: load sql_bigquery and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("sql_bigquery", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSquirrel()
     {
         // Smoke test: load squirrel and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("function main() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("squirrel", "function main() {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSshConfig()
     {
         // Smoke test: load ssh_config and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("Host example\n  HostName example.com", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ssh_config", "Host example\n  HostName example.com");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeStan()
     {
         // Smoke test: load stan and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("stan", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeStarlark()
     {
         // Smoke test: load starlark and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("def hello(): pass", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("starlark", "def hello(): pass");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSuperhtml()
     {
         // Smoke test: load superhtml and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("superhtml", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSvelte()
     {
         // Smoke test: load svelte and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("<script>let x = 1;</script>", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("svelte", "<script>let x = 1;</script>");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSway()
     {
         // Smoke test: load sway and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("sway", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSwift()
     {
         // Smoke test: load swift and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("print(\"hello\")", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("swift", "print(\"hello\")");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeSystemverilog()
     {
         // Smoke test: load systemverilog and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("systemverilog", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTablegen()
     {
         // Smoke test: load tablegen and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("def Hello : Base {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("tablegen", "def Hello : Base {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTact()
     {
         // Smoke test: load tact and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("tact", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTcl()
     {
         // Smoke test: load tcl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("puts hello", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("tcl", "puts hello");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTeal()
     {
         // Smoke test: load teal and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("teal", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTempl()
     {
         // Smoke test: load templ and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("templ", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTera()
     {
         // Smoke test: load tera and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("tera", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTerraform()
     {
         // Smoke test: load terraform and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("resource \"null_resource\" \"main\" {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("terraform", "resource \"null_resource\" \"main\" {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTest()
     {
         // Smoke test: load test and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("===========\nTest\n===========\n---\n(node)", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("test", "===========\nTest\n===========\n---\n(node)");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTextproto()
     {
         // Smoke test: load textproto and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("key: \"value\"", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("textproto", "key: \"value\"");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeThrift()
     {
         // Smoke test: load thrift and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("service HelloService {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("thrift", "service HelloService {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTlaplus()
     {
         // Smoke test: load tlaplus and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("---- MODULE Main ----\n====", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("tlaplus", "---- MODULE Main ----\n====");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTmux()
     {
         // Smoke test: load tmux and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("tmux", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTodotxt()
     {
         // Smoke test: load todotxt and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("todotxt", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeToml()
     {
         // Smoke test: load toml and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("key = \"value\"", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("toml", "key = \"value\"");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTsv()
     {
         // Smoke test: load tsv and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("a\tb\tc\n1\t2\t3", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("tsv", "a\tb\tc\n1\t2\t3");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTsx()
     {
         // Smoke test: load tsx and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("const App = () => <div />;", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("tsx", "const App = () => <div />;");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTurtle()
     {
         // Smoke test: load turtle and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("turtle", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTwig()
     {
         // Smoke test: load twig and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("{{ variable }}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("twig", "{{ variable }}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTypescript()
     {
         // Smoke test: load typescript and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("const x: number = 42;", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("typescript", "const x: number = 42;");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTypespec()
     {
         // Smoke test: load typespec and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("typespec", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTyposcript()
     {
         // Smoke test: load typoscript and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("typoscript", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeTypst()
     {
         // Smoke test: load typst and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("#let x = 1", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("typst", "#let x = 1");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeUdev()
     {
         // Smoke test: load udev and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("ACTION==\"add\", KERNEL==\"sd*\"", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("udev", "ACTION==\"add\", KERNEL==\"sd*\"");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeUngrammar()
     {
         // Smoke test: load ungrammar and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("Root = Item*\nItem = 'token'", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ungrammar", "Root = Item*\nItem = 'token'");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeUxntal()
     {
         // Smoke test: load uxntal and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("|0100 LIT 01", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("uxntal", "|0100 LIT 01");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeV()
     {
         // Smoke test: load v and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("fn main() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("v", "fn main() {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeVb()
     {
         // Smoke test: load vb and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("Module Main\nEnd Module", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("vb", "Module Main\nEnd Module");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeVerilog()
     {
         // Smoke test: load verilog and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("module main; endmodule", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("verilog", "module main; endmodule");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeVhdl()
     {
         // Smoke test: load vhdl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("entity main is end main;", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("vhdl", "entity main is end main;");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeVhs()
     {
         // Smoke test: load vhs and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("vhs", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeVim()
     {
         // Smoke test: load vim and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("echo 'hello'", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("vim", "echo 'hello'");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeVimdoc()
     {
         // Smoke test: load vimdoc and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("vimdoc", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeVrl()
     {
         // Smoke test: load vrl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("vrl", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeVue()
     {
         // Smoke test: load vue and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("<template><div>hello</div></template>", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("vue", "<template><div>hello</div></template>");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeWast()
     {
         // Smoke test: load wast and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("(module)", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("wast", "(module)");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeWat()
     {
         // Smoke test: load wat and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("(module)", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("wat", "(module)");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeWgsl()
     {
         // Smoke test: load wgsl and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("wgsl", "@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeWgslBevy()
     {
         // Smoke test: load wgsl_bevy and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("wgsl_bevy", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeWit()
     {
         // Smoke test: load wit and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("package example:pkg;", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("wit", "package example:pkg;");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeWolfram()
     {
         // Smoke test: load wolfram and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("wolfram", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeX86asm()
     {
         // Smoke test: load x86asm and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("x86asm", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeXcompose()
     {
         // Smoke test: load xcompose and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("<Multi_key> <a> : \"a\"", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("xcompose", "<Multi_key> <a> : \"a\"");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeXml()
     {
         // Smoke test: load xml and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("<?xml version=\"1.0\"?>\n<root>hello</root>", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("xml", "<?xml version=\"1.0\"?>\n<root>hello</root>");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeYaml()
     {
         // Smoke test: load yaml and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("key: value", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("yaml", "key: value");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeYuck()
     {
         // Smoke test: load yuck and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("(defwidget main [] (label :text \"hi\"))", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("yuck", "(defwidget main [] (label :text \"hi\"))");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeZig()
     {
         // Smoke test: load zig and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("pub fn main() void {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("zig", "pub fn main() void {}");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeZiggy()
     {
         // Smoke test: load ziggy and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ziggy", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeZiggySchema()
     {
         // Smoke test: load ziggy_schema and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("x", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("ziggy_schema", "x");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 
     [Fact]
     public void Test_SmokeZsh()
     {
         // Smoke test: load zsh and parse a simple snippet
-        var result = TreeSitterLanguagePackLib.Process("echo hello", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("zsh", "echo hello");
+        Assert.True(tree.RootNode.ChildCount >= 1, "expected >= 1");
     }
 }

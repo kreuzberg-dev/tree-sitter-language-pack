@@ -2,38 +2,38 @@
 # E2e tests for category: download
 
 test_that("download_all_languages: Download all language parsers and verify count is positive", {
-  result <- process()
+  result <- download_all(list())
   expect_true(result > 0)
 })
 
 test_that("download_cache_dir: Get the cache directory path and verify it is non-empty", {
-  result <- process()
+  result <- cache_dir(list())
   expect_true(if (is.character(result)) nchar(result) > 0 else length(result) > 0)
 })
 
 test_that("download_clean_cache: Clean the parser cache directory", {
-  result <- process()
+  result <- clean_cache(list())
 })
 
 test_that("download_configure_custom_dir: Configure language pack with a custom cache directory", {
-  result <- process(config = list("cache_dir" = "/tmp/tslp_test_cache"))
+  result <- configure(config = list("cache_dir" = "/tmp/tslp_test_cache"))
 })
 
 test_that("download_downloaded_empty: List downloaded languages (may be empty before any downloads)", {
-  result <- process()
+  result <- downloaded_languages(list())
 })
 
 test_that("download_init_default: Initialize language pack with default config", {
-  result <- process(config = list())
+  result <- init(config = list())
 })
 
 test_that("download_manifest_languages: List manifest languages and verify python is included", {
-  result <- process()
+  result <- manifest_languages(list())
   expect_true(if (is.character(result)) nchar(result) > 0 else length(result) > 0)
   expect_true(grepl("python", result, fixed = TRUE))
 })
 
 test_that("download_single_language: Download a single language parser and verify count", {
-  result <- process()
+  result <- download(names = c("python"))
   expect_true(result >= 1)
 })

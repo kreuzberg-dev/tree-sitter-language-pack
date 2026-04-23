@@ -8,7 +8,9 @@ test_smoke_abl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_actionscript() {
@@ -16,7 +18,9 @@ test_smoke_actionscript() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ada() {
@@ -24,7 +28,9 @@ test_smoke_ada() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_agda() {
@@ -32,7 +38,9 @@ test_smoke_agda() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_al() {
@@ -40,7 +48,9 @@ test_smoke_al() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_angular() {
@@ -48,7 +58,9 @@ test_smoke_angular() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_apex() {
@@ -56,7 +68,9 @@ test_smoke_apex() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_arduino() {
@@ -64,7 +78,9 @@ test_smoke_arduino() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_asciidoc() {
@@ -72,7 +88,9 @@ test_smoke_asciidoc() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_asm() {
@@ -80,7 +98,9 @@ test_smoke_asm() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_astro() {
@@ -88,7 +108,9 @@ test_smoke_astro() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_awk() {
@@ -96,7 +118,9 @@ test_smoke_awk() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_bash() {
@@ -104,7 +128,9 @@ test_smoke_bash() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_bass() {
@@ -112,7 +138,9 @@ test_smoke_bass() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_batch() {
@@ -120,7 +148,9 @@ test_smoke_batch() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_beancount() {
@@ -128,7 +158,9 @@ test_smoke_beancount() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_bibtex() {
@@ -136,7 +168,9 @@ test_smoke_bibtex() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_bicep() {
@@ -144,7 +178,9 @@ test_smoke_bicep() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_bitbake() {
@@ -152,7 +188,9 @@ test_smoke_bitbake() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_blade() {
@@ -160,7 +198,9 @@ test_smoke_blade() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_brightscript() {
@@ -168,7 +208,9 @@ test_smoke_brightscript() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_bsl() {
@@ -176,7 +218,9 @@ test_smoke_bsl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_c() {
@@ -184,7 +228,9 @@ test_smoke_c() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_c3() {
@@ -192,7 +238,9 @@ test_smoke_c3() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_caddy() {
@@ -200,7 +248,9 @@ test_smoke_caddy() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cairo() {
@@ -208,7 +258,9 @@ test_smoke_cairo() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_capnp() {
@@ -216,7 +268,9 @@ test_smoke_capnp() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cedar() {
@@ -224,7 +278,9 @@ test_smoke_cedar() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cedarschema() {
@@ -232,7 +288,9 @@ test_smoke_cedarschema() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cel() {
@@ -240,7 +298,9 @@ test_smoke_cel() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cfml() {
@@ -248,7 +308,9 @@ test_smoke_cfml() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_chatito() {
@@ -256,7 +318,9 @@ test_smoke_chatito() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_chuck() {
@@ -264,7 +328,9 @@ test_smoke_chuck() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_circom() {
@@ -272,7 +338,9 @@ test_smoke_circom() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_clarity() {
@@ -280,7 +348,9 @@ test_smoke_clarity() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_clojure() {
@@ -288,7 +358,9 @@ test_smoke_clojure() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cmake() {
@@ -296,7 +368,9 @@ test_smoke_cmake() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cobol() {
@@ -304,7 +378,9 @@ test_smoke_cobol() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_comment() {
@@ -312,7 +388,9 @@ test_smoke_comment() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_commonlisp() {
@@ -320,7 +398,9 @@ test_smoke_commonlisp() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cooklang() {
@@ -328,7 +408,9 @@ test_smoke_cooklang() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_corn() {
@@ -336,7 +418,9 @@ test_smoke_corn() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cpon() {
@@ -344,7 +428,9 @@ test_smoke_cpon() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cpp() {
@@ -352,7 +438,9 @@ test_smoke_cpp() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_crystal() {
@@ -360,7 +448,9 @@ test_smoke_crystal() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_csharp() {
@@ -368,7 +458,9 @@ test_smoke_csharp() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_css() {
@@ -376,7 +468,9 @@ test_smoke_css() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cst() {
@@ -384,7 +478,9 @@ test_smoke_cst() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_csv() {
@@ -392,7 +488,9 @@ test_smoke_csv() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cuda() {
@@ -400,7 +498,9 @@ test_smoke_cuda() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cue() {
@@ -408,7 +508,9 @@ test_smoke_cue() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_cylc() {
@@ -416,7 +518,9 @@ test_smoke_cylc() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_d() {
@@ -424,7 +528,9 @@ test_smoke_d() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_dart() {
@@ -432,7 +538,9 @@ test_smoke_dart() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_desktop() {
@@ -440,7 +548,9 @@ test_smoke_desktop() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_devicetree() {
@@ -448,7 +558,9 @@ test_smoke_devicetree() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_dhall() {
@@ -456,7 +568,9 @@ test_smoke_dhall() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_diff() {
@@ -464,7 +578,9 @@ test_smoke_diff() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_djot() {
@@ -472,7 +588,9 @@ test_smoke_djot() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_dockerfile() {
@@ -480,7 +598,9 @@ test_smoke_dockerfile() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_dot() {
@@ -488,7 +608,9 @@ test_smoke_dot() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_doxygen() {
@@ -496,7 +618,9 @@ test_smoke_doxygen() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_dtd() {
@@ -504,7 +628,9 @@ test_smoke_dtd() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_earthfile() {
@@ -512,7 +638,9 @@ test_smoke_earthfile() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ebnf() {
@@ -520,7 +648,9 @@ test_smoke_ebnf() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_editorconfig() {
@@ -528,7 +658,9 @@ test_smoke_editorconfig() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_eds() {
@@ -536,7 +668,9 @@ test_smoke_eds() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_eex() {
@@ -544,7 +678,9 @@ test_smoke_eex() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_elisp() {
@@ -552,7 +688,9 @@ test_smoke_elisp() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_elixir() {
@@ -560,7 +698,9 @@ test_smoke_elixir() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_elm() {
@@ -568,7 +708,9 @@ test_smoke_elm() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_elsa() {
@@ -576,7 +718,9 @@ test_smoke_elsa() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_elvish() {
@@ -584,7 +728,9 @@ test_smoke_elvish() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_embeddedtemplate() {
@@ -592,7 +738,9 @@ test_smoke_embeddedtemplate() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_enforce() {
@@ -600,7 +748,9 @@ test_smoke_enforce() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_erlang() {
@@ -608,7 +758,9 @@ test_smoke_erlang() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_facility() {
@@ -616,7 +768,9 @@ test_smoke_facility() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_faust() {
@@ -624,7 +778,9 @@ test_smoke_faust() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_fennel() {
@@ -632,7 +788,9 @@ test_smoke_fennel() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_fidl() {
@@ -640,7 +798,9 @@ test_smoke_fidl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_firrtl() {
@@ -648,7 +808,9 @@ test_smoke_firrtl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_fish() {
@@ -656,7 +818,9 @@ test_smoke_fish() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_foam() {
@@ -664,7 +828,9 @@ test_smoke_foam() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_forth() {
@@ -672,7 +838,9 @@ test_smoke_forth() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_fortran() {
@@ -680,7 +848,9 @@ test_smoke_fortran() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_fsharp() {
@@ -688,7 +858,9 @@ test_smoke_fsharp() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_fsharp_signature() {
@@ -696,7 +868,9 @@ test_smoke_fsharp_signature() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_func() {
@@ -704,7 +878,9 @@ test_smoke_func() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gap() {
@@ -712,7 +888,9 @@ test_smoke_gap() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gdscript() {
@@ -720,7 +898,9 @@ test_smoke_gdscript() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gdshader() {
@@ -728,7 +908,9 @@ test_smoke_gdshader() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_git_config() {
@@ -736,7 +918,9 @@ test_smoke_git_config() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_git_rebase() {
@@ -744,7 +928,9 @@ test_smoke_git_rebase() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gitattributes() {
@@ -752,7 +938,9 @@ test_smoke_gitattributes() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gitcommit() {
@@ -760,7 +948,9 @@ test_smoke_gitcommit() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gitignore() {
@@ -768,7 +958,9 @@ test_smoke_gitignore() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gleam() {
@@ -776,7 +968,9 @@ test_smoke_gleam() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_glimmer() {
@@ -784,7 +978,9 @@ test_smoke_glimmer() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_glsl() {
@@ -792,7 +988,9 @@ test_smoke_glsl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gn() {
@@ -800,7 +998,9 @@ test_smoke_gn() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gnuplot() {
@@ -808,7 +1008,9 @@ test_smoke_gnuplot() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_go() {
@@ -816,7 +1018,9 @@ test_smoke_go() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_godot_resource() {
@@ -824,7 +1028,9 @@ test_smoke_godot_resource() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gomod() {
@@ -832,7 +1038,9 @@ test_smoke_gomod() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gosum() {
@@ -840,7 +1048,9 @@ test_smoke_gosum() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gotmpl() {
@@ -848,7 +1058,9 @@ test_smoke_gotmpl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gowork() {
@@ -856,7 +1068,9 @@ test_smoke_gowork() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gpg() {
@@ -864,7 +1078,9 @@ test_smoke_gpg() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_graphql() {
@@ -872,7 +1088,9 @@ test_smoke_graphql() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gren() {
@@ -880,7 +1098,9 @@ test_smoke_gren() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_groovy() {
@@ -888,7 +1108,9 @@ test_smoke_groovy() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_gstlaunch() {
@@ -896,7 +1118,9 @@ test_smoke_gstlaunch() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_hack() {
@@ -904,7 +1128,9 @@ test_smoke_hack() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_hare() {
@@ -912,7 +1138,9 @@ test_smoke_hare() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_haskell() {
@@ -920,7 +1148,9 @@ test_smoke_haskell() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_haxe() {
@@ -928,7 +1158,9 @@ test_smoke_haxe() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_hcl() {
@@ -936,7 +1168,9 @@ test_smoke_hcl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_heex() {
@@ -944,7 +1178,9 @@ test_smoke_heex() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_hjson() {
@@ -952,7 +1188,9 @@ test_smoke_hjson() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_hlsl() {
@@ -960,7 +1198,9 @@ test_smoke_hlsl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_hocon() {
@@ -968,7 +1208,9 @@ test_smoke_hocon() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_hoon() {
@@ -976,7 +1218,9 @@ test_smoke_hoon() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_html() {
@@ -984,7 +1228,9 @@ test_smoke_html() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_htmldjango() {
@@ -992,7 +1238,9 @@ test_smoke_htmldjango() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_http() {
@@ -1000,7 +1248,9 @@ test_smoke_http() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_hurl() {
@@ -1008,7 +1258,9 @@ test_smoke_hurl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_hyprlang() {
@@ -1016,7 +1268,9 @@ test_smoke_hyprlang() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_idris() {
@@ -1024,7 +1278,9 @@ test_smoke_idris() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ini() {
@@ -1032,7 +1288,9 @@ test_smoke_ini() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ispc() {
@@ -1040,7 +1298,9 @@ test_smoke_ispc() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_jai() {
@@ -1048,7 +1308,9 @@ test_smoke_jai() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_janet() {
@@ -1056,7 +1318,9 @@ test_smoke_janet() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_java() {
@@ -1064,7 +1328,9 @@ test_smoke_java() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_javadoc() {
@@ -1072,7 +1338,9 @@ test_smoke_javadoc() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_javascript() {
@@ -1080,7 +1348,9 @@ test_smoke_javascript() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_jinja2() {
@@ -1088,7 +1358,9 @@ test_smoke_jinja2() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_jq() {
@@ -1096,7 +1368,9 @@ test_smoke_jq() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_jsdoc() {
@@ -1104,7 +1378,9 @@ test_smoke_jsdoc() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_json() {
@@ -1112,7 +1388,9 @@ test_smoke_json() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_json5() {
@@ -1120,7 +1398,9 @@ test_smoke_json5() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_jsonnet() {
@@ -1128,7 +1408,9 @@ test_smoke_jsonnet() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_julia() {
@@ -1136,7 +1418,9 @@ test_smoke_julia() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_just() {
@@ -1144,7 +1428,9 @@ test_smoke_just() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_kcl() {
@@ -1152,7 +1438,9 @@ test_smoke_kcl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_kconfig() {
@@ -1160,7 +1448,9 @@ test_smoke_kconfig() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_kdl() {
@@ -1168,7 +1458,9 @@ test_smoke_kdl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_kotlin() {
@@ -1176,7 +1468,9 @@ test_smoke_kotlin() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_latex() {
@@ -1184,7 +1478,9 @@ test_smoke_latex() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_lean() {
@@ -1192,7 +1488,9 @@ test_smoke_lean() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ledger() {
@@ -1200,7 +1498,9 @@ test_smoke_ledger() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_less() {
@@ -1208,7 +1508,9 @@ test_smoke_less() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_linkerscript() {
@@ -1216,7 +1518,9 @@ test_smoke_linkerscript() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_liquid() {
@@ -1224,7 +1528,9 @@ test_smoke_liquid() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_llvm() {
@@ -1232,7 +1538,9 @@ test_smoke_llvm() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_lua() {
@@ -1240,7 +1548,9 @@ test_smoke_lua() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_luadoc() {
@@ -1248,7 +1558,9 @@ test_smoke_luadoc() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_luap() {
@@ -1256,7 +1568,9 @@ test_smoke_luap() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_luau() {
@@ -1264,7 +1578,9 @@ test_smoke_luau() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_magik() {
@@ -1272,7 +1588,9 @@ test_smoke_magik() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_make() {
@@ -1280,7 +1598,9 @@ test_smoke_make() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_markdown() {
@@ -1288,7 +1608,9 @@ test_smoke_markdown() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_markdown_inline() {
@@ -1296,7 +1618,9 @@ test_smoke_markdown_inline() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_matlab() {
@@ -1304,7 +1628,9 @@ test_smoke_matlab() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_mermaid() {
@@ -1312,7 +1638,9 @@ test_smoke_mermaid() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_meson() {
@@ -1320,7 +1648,9 @@ test_smoke_meson() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_mlir() {
@@ -1328,7 +1658,9 @@ test_smoke_mlir() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_mojo() {
@@ -1336,7 +1668,9 @@ test_smoke_mojo() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_move() {
@@ -1344,7 +1678,9 @@ test_smoke_move() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_nasm() {
@@ -1352,7 +1688,9 @@ test_smoke_nasm() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_netlinx() {
@@ -1360,7 +1698,9 @@ test_smoke_netlinx() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_nginx() {
@@ -1368,7 +1708,9 @@ test_smoke_nginx() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_nickel() {
@@ -1376,7 +1718,9 @@ test_smoke_nickel() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_nim() {
@@ -1384,7 +1728,9 @@ test_smoke_nim() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ninja() {
@@ -1392,7 +1738,9 @@ test_smoke_ninja() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_nix() {
@@ -1400,7 +1748,9 @@ test_smoke_nix() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_norg() {
@@ -1408,7 +1758,9 @@ test_smoke_norg() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_norg_meta() {
@@ -1416,7 +1768,9 @@ test_smoke_norg_meta() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_nqc() {
@@ -1424,7 +1778,9 @@ test_smoke_nqc() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_nushell() {
@@ -1432,7 +1788,9 @@ test_smoke_nushell() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_objc() {
@@ -1440,7 +1798,9 @@ test_smoke_objc() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ocaml() {
@@ -1448,7 +1808,9 @@ test_smoke_ocaml() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ocaml_interface() {
@@ -1456,7 +1818,9 @@ test_smoke_ocaml_interface() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ocamllex() {
@@ -1464,7 +1828,9 @@ test_smoke_ocamllex() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_odin() {
@@ -1472,7 +1838,9 @@ test_smoke_odin() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_openscad() {
@@ -1480,7 +1848,9 @@ test_smoke_openscad() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_org() {
@@ -1488,7 +1858,9 @@ test_smoke_org() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_pascal() {
@@ -1496,7 +1868,9 @@ test_smoke_pascal() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_pem() {
@@ -1504,7 +1878,9 @@ test_smoke_pem() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_perl() {
@@ -1512,7 +1888,9 @@ test_smoke_perl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_pgn() {
@@ -1520,7 +1898,9 @@ test_smoke_pgn() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_php() {
@@ -1528,7 +1908,9 @@ test_smoke_php() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_phpdoc() {
@@ -1536,7 +1918,9 @@ test_smoke_phpdoc() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_pkl() {
@@ -1544,7 +1928,9 @@ test_smoke_pkl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_po() {
@@ -1552,7 +1938,9 @@ test_smoke_po() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_poe_filter() {
@@ -1560,7 +1948,9 @@ test_smoke_poe_filter() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_pony() {
@@ -1568,7 +1958,9 @@ test_smoke_pony() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_postscript() {
@@ -1576,7 +1968,9 @@ test_smoke_postscript() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_powershell() {
@@ -1584,7 +1978,9 @@ test_smoke_powershell() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_printf() {
@@ -1592,7 +1988,9 @@ test_smoke_printf() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_prisma() {
@@ -1600,7 +1998,9 @@ test_smoke_prisma() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_prolog() {
@@ -1608,7 +2008,9 @@ test_smoke_prolog() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_promql() {
@@ -1616,7 +2018,9 @@ test_smoke_promql() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_properties() {
@@ -1624,7 +2028,9 @@ test_smoke_properties() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_proto() {
@@ -1632,7 +2038,9 @@ test_smoke_proto() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_prql() {
@@ -1640,7 +2048,9 @@ test_smoke_prql() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_psv() {
@@ -1648,7 +2058,9 @@ test_smoke_psv() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_pug() {
@@ -1656,7 +2068,9 @@ test_smoke_pug() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_puppet() {
@@ -1664,7 +2078,9 @@ test_smoke_puppet() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_purescript() {
@@ -1672,7 +2088,9 @@ test_smoke_purescript() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_pymanifest() {
@@ -1680,7 +2098,9 @@ test_smoke_pymanifest() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_python() {
@@ -1688,7 +2108,9 @@ test_smoke_python() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ql() {
@@ -1696,7 +2118,9 @@ test_smoke_ql() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_qmldir() {
@@ -1704,7 +2128,9 @@ test_smoke_qmldir() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_qmljs() {
@@ -1712,7 +2138,9 @@ test_smoke_qmljs() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_query() {
@@ -1720,7 +2148,9 @@ test_smoke_query() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_r() {
@@ -1728,7 +2158,9 @@ test_smoke_r() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_racket() {
@@ -1736,7 +2168,9 @@ test_smoke_racket() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_rasi() {
@@ -1744,7 +2178,9 @@ test_smoke_rasi() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_razor() {
@@ -1752,7 +2188,9 @@ test_smoke_razor() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_rbs() {
@@ -1760,7 +2198,9 @@ test_smoke_rbs() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_re2c() {
@@ -1768,7 +2208,9 @@ test_smoke_re2c() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_readline() {
@@ -1776,7 +2218,9 @@ test_smoke_readline() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_regex() {
@@ -1784,7 +2228,9 @@ test_smoke_regex() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_rego() {
@@ -1792,7 +2238,9 @@ test_smoke_rego() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_requirements() {
@@ -1800,7 +2248,9 @@ test_smoke_requirements() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_rescript() {
@@ -1808,7 +2258,9 @@ test_smoke_rescript() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_robot() {
@@ -1816,7 +2268,9 @@ test_smoke_robot() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_roc() {
@@ -1824,7 +2278,9 @@ test_smoke_roc() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ron() {
@@ -1832,7 +2288,9 @@ test_smoke_ron() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_rst() {
@@ -1840,7 +2298,9 @@ test_smoke_rst() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_rtf() {
@@ -1848,7 +2308,9 @@ test_smoke_rtf() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ruby() {
@@ -1856,7 +2318,9 @@ test_smoke_ruby() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_rust() {
@@ -1864,7 +2328,9 @@ test_smoke_rust() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_scala() {
@@ -1872,7 +2338,9 @@ test_smoke_scala() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_scheme() {
@@ -1880,7 +2348,9 @@ test_smoke_scheme() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_scss() {
@@ -1888,7 +2358,9 @@ test_smoke_scss() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_slang() {
@@ -1896,7 +2368,9 @@ test_smoke_slang() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_smali() {
@@ -1904,7 +2378,9 @@ test_smoke_smali() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_smalltalk() {
@@ -1912,7 +2388,9 @@ test_smoke_smalltalk() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_smithy() {
@@ -1920,7 +2398,9 @@ test_smoke_smithy() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_sml() {
@@ -1928,7 +2408,9 @@ test_smoke_sml() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_snakemake() {
@@ -1936,7 +2418,9 @@ test_smoke_snakemake() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_solidity() {
@@ -1944,7 +2428,9 @@ test_smoke_solidity() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_souffle() {
@@ -1952,7 +2438,9 @@ test_smoke_souffle() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_sourcepawn() {
@@ -1960,7 +2448,9 @@ test_smoke_sourcepawn() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_sparql() {
@@ -1968,7 +2458,9 @@ test_smoke_sparql() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_sql() {
@@ -1976,7 +2468,9 @@ test_smoke_sql() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_sql_bigquery() {
@@ -1984,7 +2478,9 @@ test_smoke_sql_bigquery() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_squirrel() {
@@ -1992,7 +2488,9 @@ test_smoke_squirrel() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ssh_config() {
@@ -2000,7 +2498,9 @@ test_smoke_ssh_config() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_stan() {
@@ -2008,7 +2508,9 @@ test_smoke_stan() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_starlark() {
@@ -2016,7 +2518,9 @@ test_smoke_starlark() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_superhtml() {
@@ -2024,7 +2528,9 @@ test_smoke_superhtml() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_svelte() {
@@ -2032,7 +2538,9 @@ test_smoke_svelte() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_sway() {
@@ -2040,7 +2548,9 @@ test_smoke_sway() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_swift() {
@@ -2048,7 +2558,9 @@ test_smoke_swift() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_systemverilog() {
@@ -2056,7 +2568,9 @@ test_smoke_systemverilog() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_tablegen() {
@@ -2064,7 +2578,9 @@ test_smoke_tablegen() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_tact() {
@@ -2072,7 +2588,9 @@ test_smoke_tact() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_tcl() {
@@ -2080,7 +2598,9 @@ test_smoke_tcl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_teal() {
@@ -2088,7 +2608,9 @@ test_smoke_teal() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_templ() {
@@ -2096,7 +2618,9 @@ test_smoke_templ() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_tera() {
@@ -2104,7 +2628,9 @@ test_smoke_tera() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_terraform() {
@@ -2112,7 +2638,9 @@ test_smoke_terraform() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_test() {
@@ -2120,7 +2648,9 @@ test_smoke_test() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_textproto() {
@@ -2128,7 +2658,9 @@ test_smoke_textproto() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_thrift() {
@@ -2136,7 +2668,9 @@ test_smoke_thrift() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_tlaplus() {
@@ -2144,7 +2678,9 @@ test_smoke_tlaplus() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_tmux() {
@@ -2152,7 +2688,9 @@ test_smoke_tmux() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_todotxt() {
@@ -2160,7 +2698,9 @@ test_smoke_todotxt() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_toml() {
@@ -2168,7 +2708,9 @@ test_smoke_toml() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_tsv() {
@@ -2176,7 +2718,9 @@ test_smoke_tsv() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_tsx() {
@@ -2184,7 +2728,9 @@ test_smoke_tsx() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_turtle() {
@@ -2192,7 +2738,9 @@ test_smoke_turtle() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_twig() {
@@ -2200,7 +2748,9 @@ test_smoke_twig() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_typescript() {
@@ -2208,7 +2758,9 @@ test_smoke_typescript() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_typespec() {
@@ -2216,7 +2768,9 @@ test_smoke_typespec() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_typoscript() {
@@ -2224,7 +2778,9 @@ test_smoke_typoscript() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_typst() {
@@ -2232,7 +2788,9 @@ test_smoke_typst() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_udev() {
@@ -2240,7 +2798,9 @@ test_smoke_udev() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ungrammar() {
@@ -2248,7 +2808,9 @@ test_smoke_ungrammar() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_uxntal() {
@@ -2256,7 +2818,9 @@ test_smoke_uxntal() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_v() {
@@ -2264,7 +2828,9 @@ test_smoke_v() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_vb() {
@@ -2272,7 +2838,9 @@ test_smoke_vb() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_verilog() {
@@ -2280,7 +2848,9 @@ test_smoke_verilog() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_vhdl() {
@@ -2288,7 +2858,9 @@ test_smoke_vhdl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_vhs() {
@@ -2296,7 +2868,9 @@ test_smoke_vhs() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_vim() {
@@ -2304,7 +2878,9 @@ test_smoke_vim() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_vimdoc() {
@@ -2312,7 +2888,9 @@ test_smoke_vimdoc() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_vrl() {
@@ -2320,7 +2898,9 @@ test_smoke_vrl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_vue() {
@@ -2328,7 +2908,9 @@ test_smoke_vue() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_wast() {
@@ -2336,7 +2918,9 @@ test_smoke_wast() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_wat() {
@@ -2344,7 +2928,9 @@ test_smoke_wat() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_wgsl() {
@@ -2352,7 +2938,9 @@ test_smoke_wgsl() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_wgsl_bevy() {
@@ -2360,7 +2948,9 @@ test_smoke_wgsl_bevy() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_wit() {
@@ -2368,7 +2958,9 @@ test_smoke_wit() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_wolfram() {
@@ -2376,7 +2968,9 @@ test_smoke_wolfram() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_x86asm() {
@@ -2384,7 +2978,9 @@ test_smoke_x86asm() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_xcompose() {
@@ -2392,7 +2988,9 @@ test_smoke_xcompose() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_xml() {
@@ -2400,7 +2998,9 @@ test_smoke_xml() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_yaml() {
@@ -2408,7 +3008,9 @@ test_smoke_yaml() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_yuck() {
@@ -2416,7 +3018,9 @@ test_smoke_yuck() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_zig() {
@@ -2424,7 +3028,9 @@ test_smoke_zig() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ziggy() {
@@ -2432,7 +3038,9 @@ test_smoke_ziggy() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_ziggy_schema() {
@@ -2440,7 +3048,9 @@ test_smoke_ziggy_schema() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 test_smoke_zsh() {
@@ -2448,7 +3058,9 @@ test_smoke_zsh() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_child_count
+    method_result_root_child_count=$(tree_sitter_language_pack tree-root-child-count "$output")
+    [ "$method_result_root_child_count" -ge 1 ] || exit 1
 }
 
 run_tests_smoke() {

@@ -57,7 +57,7 @@ final class ErrorHandlingTest extends TestCase
     public function test_error_handling_invalid_syntax(): void
     {
         $tree = TreeSitterLanguagePack::parse_string("javascript", "function function function @@@ %%%");
-        // TODO: unsupported assertion type: method_result
+        $this->assertTrue(TreeSitterLanguagePack::tree_has_error_nodes($tree));
     }
 
     /** Loading a nonexistent language should produce an error. */
@@ -78,7 +78,8 @@ final class ErrorHandlingTest extends TestCase
     public function test_error_run_query_invalid_syntax(): void
     {
         $tree = TreeSitterLanguagePack::parse_string("python", "x = 1");
-        // TODO: unsupported assertion type: method_result
+        $this->expectException(\Exception::class);
+        TreeSitterLanguagePack::run_query($tree, "python", "(((", $source);
     }
 
     /** parse_string() returns error with empty language name */

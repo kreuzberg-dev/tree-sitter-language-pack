@@ -6,43 +6,43 @@ require 'json'
 
 RSpec.describe 'download' do
   it 'download_all_languages: Download all language parsers and verify count is positive' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.download_all({  })
     expect(result).to be > 0
   end
 
   it 'download_cache_dir: Get the cache directory path and verify it is non-empty' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.cache_dir({  })
     expect(result).not_to be_empty
   end
 
   it 'download_clean_cache: Clean the parser cache directory' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.clean_cache({  })
     expect(result).not_to be_nil
   end
 
   it 'download_configure_custom_dir: Configure language pack with a custom cache directory' do
-    result = TreeSitterLanguagePack.process('', { 'cache_dir' => '/tmp/tslp_test_cache' })
+    result = TreeSitterLanguagePack.configure({ 'cache_dir' => '/tmp/tslp_test_cache' })
     expect(result).not_to be_nil
   end
 
   it 'download_downloaded_empty: List downloaded languages (may be empty before any downloads)' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.downloaded_languages({  })
     expect(result).not_to be_nil
   end
 
   it 'download_init_default: Initialize language pack with default config' do
-    result = TreeSitterLanguagePack.process('', {  })
+    result = TreeSitterLanguagePack.init({  })
     expect(result).not_to be_nil
   end
 
   it 'download_manifest_languages: List manifest languages and verify python is included' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.manifest_languages({  })
     expect(result).not_to be_empty
     expect(result.to_s).to include('python')
   end
 
   it 'download_single_language: Download a single language parser and verify count' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.download(['python'])
     expect(result).to be >= 1
   end
 end

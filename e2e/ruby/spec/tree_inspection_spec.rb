@@ -6,62 +6,62 @@ require 'json'
 
 RSpec.describe 'tree-inspection' do
   it 'split_code_python: parse_string() Python code with multiple functions finds all function_definition nodes' do
-    result = TreeSitterLanguagePack.process("def foo():\n    pass\n\ndef bar():\n    pass\n\ndef baz():\n    pass\n", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', "def foo():\n    pass\n\ndef bar():\n    pass\n\ndef baz():\n    pass\n")
+    expect(TreeSitterLanguagePack.find_nodes_by_type(tree, "function_definition").length).to be >= 3
   end
 
   it 'tree_error_count_broken: Parse broken Python code and verify error count >= 1' do
-    result = TreeSitterLanguagePack.process('def (broken syntax @@@ !!!', nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', 'def (broken syntax @@@ !!!')
+    expect(TreeSitterLanguagePack.tree_has_error_nodes(tree)).to be true
   end
 
   it 'tree_error_count_multiple: parse_string() with multiple syntax errors counts all error nodes' do
-    result = TreeSitterLanguagePack.process("def (\ndef (\n", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', "def (\ndef (\n")
+    expect(TreeSitterLanguagePack.tree_error_count(tree)).to be >= 2
   end
 
   it 'tree_error_count_valid: Parse valid Python code and verify zero error count' do
-    result = TreeSitterLanguagePack.process("x = 1\ny = 2\n", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', "x = 1\ny = 2\n")
+    expect(TreeSitterLanguagePack.tree_error_count(tree)).to eq(0)
   end
 
   it 'tree_find_nodes_no_match: Parse Python with no class definitions and verify find_nodes_by_type returns 0' do
-    result = TreeSitterLanguagePack.process("x = 1\n", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', "x = 1\n")
+    expect(TreeSitterLanguagePack.find_nodes_by_type(tree, "class_definition")).to eq(0)
   end
 
   it 'tree_find_nodes_two_functions: Parse Python with 2 functions and verify find_nodes_by_type count' do
-    result = TreeSitterLanguagePack.process("def foo():\n    pass\n\ndef bar():\n    pass\n", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', "def foo():\n    pass\n\ndef bar():\n    pass\n")
+    expect(TreeSitterLanguagePack.find_nodes_by_type(tree, "function_definition").length).to be >= 2
   end
 
   it 'tree_has_error_nodes_broken_syntax: tree_has_error_nodes returns true for syntactically broken code' do
-    result = TreeSitterLanguagePack.process("def broken(\n    x = \n", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', "def broken(\n    x = \n")
+    expect(TreeSitterLanguagePack.tree_has_error_nodes(tree)).to be true
   end
 
   it 'tree_has_error_nodes_valid_code: tree_has_error_nodes returns false for valid Python code' do
-    result = TreeSitterLanguagePack.process("def greet(name):\n    return f'Hello {name}'\n", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', "def greet(name):\n    return f'Hello {name}'\n")
+    expect(TreeSitterLanguagePack.tree_has_error_nodes(tree)).to be false
   end
 
   it 'tree_named_children_class_and_function: Parse Python with class and function, verify named children count' do
-    result = TreeSitterLanguagePack.process("class Foo:\n    pass\n\ndef bar():\n    pass\n", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', "class Foo:\n    pass\n\ndef bar():\n    pass\n")
+    expect(tree.root_node.named_child_count).to be >= 2
   end
 
   it 'tree_root_node_info_javascript: Parse JavaScript source and verify root node type is program' do
-    result = TreeSitterLanguagePack.process("const x = 1;\n", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('javascript', "const x = 1;\n")
+    expect(tree.root_node.type).to eq('program')
   end
 
   it 'tree_root_node_info_python: Parse Python source and verify root node info' do
-    result = TreeSitterLanguagePack.process("def hello():\n    pass\n", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', "def hello():\n    pass\n")
+    expect(tree.root_node.type).to eq('module')
   end
 
   it 'tree_to_sexp_python: Parse Python and verify tree_to_sexp returns valid S-expression containing module' do
-    result = TreeSitterLanguagePack.process("x = 1\n", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', "x = 1\n")
+    expect(TreeSitterLanguagePack.tree_to_sexp(tree)).to include('module')
   end
 end

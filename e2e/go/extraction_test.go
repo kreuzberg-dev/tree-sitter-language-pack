@@ -14,7 +14,7 @@ import (
 
 func Test_ExtractInvalidByteRange(t *testing.T) {
 	// extract_patterns() with out-of-bounds byte_range returns empty results
-	result, err := tspack.Process(`x = 1
+	result, err := tspack.extract_patterns(`x = 1
 `, `{"language":"python","patterns":{"funcs":{"byte_range":[9999,99999],"capture_output":"Full","query":"(expression_statement) @e"}}}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
@@ -24,7 +24,7 @@ func Test_ExtractInvalidByteRange(t *testing.T) {
 
 func Test_ExtractPatternsNoMatches(t *testing.T) {
 	// Extraction query that matches nothing returns empty results
-	result, err := tspack.Process(`x = 1
+	result, err := tspack.extract_patterns(`x = 1
 y = 2
 `, `{"language":"python","patterns":{"classes":{"capture_output":"Full","query":"(class_definition name: (identifier) @name)"}}}`)
 	if err != nil {
@@ -35,7 +35,7 @@ y = 2
 
 func Test_ExtractPatternsPythonFunctions(t *testing.T) {
 	// Extract function definitions from Python source using tree-sitter query
-	result, err := tspack.Process(`def hello():
+	result, err := tspack.extract_patterns(`def hello():
     pass
 
 def world(x):
@@ -52,7 +52,7 @@ def world(x):
 
 func Test_ValidateEmptyPatterns(t *testing.T) {
 	// validate_extraction() with empty patterns returns valid
-	result, err := tspack.Process("", `{"language":"python","patterns":{}}`)
+	result, err := tspack.validate_extraction(`{"language":"python","patterns":{}}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -63,7 +63,7 @@ func Test_ValidateEmptyPatterns(t *testing.T) {
 
 func Test_ValidateExtractionInvalidQuery(t *testing.T) {
 	// Invalid query syntax fails validation
-	_, err := tspack.Process("", `{"language":"python","patterns":{"broken":{"capture_output":"Full","query":"(this_is_not_a_valid_node @x"}}}`)
+	_, err := tspack.validate_extraction(`{"language":"python","patterns":{"broken":{"capture_output":"Full","query":"(this_is_not_a_valid_node @x"}}}`)
 	if err == nil {
 		t.Errorf("expected an error, but call succeeded")
 	}
@@ -71,7 +71,7 @@ func Test_ValidateExtractionInvalidQuery(t *testing.T) {
 
 func Test_ValidateExtractionValidConfig(t *testing.T) {
 	// Valid extraction config passes validation
-	result, err := tspack.Process("", `{"language":"python","patterns":{"functions":{"capture_output":"Full","query":"(function_definition name: (identifier) @name)"}}}`)
+	result, err := tspack.validate_extraction(`{"language":"python","patterns":{"functions":{"capture_output":"Full","query":"(function_definition name: (identifier) @name)"}}}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}

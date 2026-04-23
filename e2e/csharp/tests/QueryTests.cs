@@ -16,7 +16,7 @@ public class QueryTests
     public void Test_HighlightsNonexistentLanguage()
     {
         // Get highlights query for nonexistent language returns null/empty
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.GetHighlightsQuery("zzz_nonexistent_lang");
         Assert.True(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -24,7 +24,7 @@ public class QueryTests
     public void Test_HighlightsQueryPython()
     {
         // get_highlights_query returns non-empty string for python
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.GetHighlightsQuery("python");
         Assert.False(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -32,7 +32,7 @@ public class QueryTests
     public void Test_HighlightsQueryUnknownLanguage()
     {
         // get_highlights_query returns None for unknown language
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.GetHighlightsQuery("nonexistent_language_xyz");
         Assert.True(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -40,7 +40,7 @@ public class QueryTests
     public void Test_InjectionsQueryJavascript()
     {
         // get_injections_query returns non-empty for javascript (has embedded languages)
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.GetInjectionsQuery("javascript");
         Assert.False(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -48,7 +48,7 @@ public class QueryTests
     public void Test_InjectionsQueryUnknownLanguage()
     {
         // get_injections_query returns empty for unknown language
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.GetInjectionsQuery("nonexistent_xyz");
         Assert.True(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -56,7 +56,7 @@ public class QueryTests
     public void Test_LocalsQueryPython()
     {
         // get_locals_query returns non-empty for python
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.GetLocalsQuery("python");
         Assert.False(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -64,7 +64,7 @@ public class QueryTests
     public void Test_LocalsQueryUnknownLanguage()
     {
         // get_locals_query returns empty for unknown language
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.GetLocalsQuery("nonexistent_xyz");
         Assert.True(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -72,15 +72,15 @@ public class QueryTests
     public void Test_RunQueryNoMatches()
     {
         // Run query that matches no nodes returns empty result
-        var result = TreeSitterLanguagePackLib.Process("x = 1", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("python", "x = 1");
+        Assert.True(TreeSitterLanguagePackLib.RunQuery(tree, "python", "(class_definition name: (identifier) @name)", source).Count >= 0, "expected at least 0 elements");
     }
 
     [Fact]
     public void Test_RunQueryPythonFunctions()
     {
         // Parse Python and run a query to find function definitions
-        var result = TreeSitterLanguagePackLib.Process("def hello():\n    pass\n\ndef world():\n    return 42\n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("python", "def hello():\n    pass\n\ndef world():\n    return 42\n");
+        Assert.True(TreeSitterLanguagePackLib.RunQuery(tree, "python", "(function_definition name: (identifier) @name)", source).Count >= 2, "expected at least 2 elements");
     }
 }

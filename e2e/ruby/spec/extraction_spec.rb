@@ -6,32 +6,32 @@ require 'json'
 
 RSpec.describe 'extraction' do
   it 'extract_invalid_byte_range: extract_patterns() with out-of-bounds byte_range returns empty results' do
-    result = TreeSitterLanguagePack.process("x = 1\n", { 'language' => 'python', 'patterns' => { 'funcs' => { 'byte_range' => [9999, 99999], 'capture_output' => 'Full', 'query' => '(expression_statement) @e' } } })
+    result = TreeSitterLanguagePack.extract_patterns("x = 1\n", { 'language' => 'python', 'patterns' => { 'funcs' => { 'byte_range' => [9999, 99999], 'capture_output' => 'Full', 'query' => '(expression_statement) @e' } } })
     expect(result.results.funcs.matches.length).to eq(0)
   end
 
   it 'extract_patterns_no_matches: Extraction query that matches nothing returns empty results' do
-    result = TreeSitterLanguagePack.process("x = 1\ny = 2\n", { 'language' => 'python', 'patterns' => { 'classes' => { 'capture_output' => 'Full', 'query' => '(class_definition name: (identifier) @name)' } } })
+    result = TreeSitterLanguagePack.extract_patterns("x = 1\ny = 2\n", { 'language' => 'python', 'patterns' => { 'classes' => { 'capture_output' => 'Full', 'query' => '(class_definition name: (identifier) @name)' } } })
     expect(result.results.classes.matches.length).to eq(0)
   end
 
   it 'extract_patterns_python_functions: Extract function definitions from Python source using tree-sitter query' do
-    result = TreeSitterLanguagePack.process("def hello():\n    pass\n\ndef world(x):\n    return x * 2\n", { 'language' => 'python', 'patterns' => { 'functions' => { 'capture_output' => 'Full', 'query' => '(function_definition name: (identifier) @name)' } } })
+    result = TreeSitterLanguagePack.extract_patterns("def hello():\n    pass\n\ndef world(x):\n    return x * 2\n", { 'language' => 'python', 'patterns' => { 'functions' => { 'capture_output' => 'Full', 'query' => '(function_definition name: (identifier) @name)' } } })
     expect(result.language).to eq('python')
     expect(result.results.functions.matches.length).to be >= 2
   end
 
   it 'validate_empty_patterns: validate_extraction() with empty patterns returns valid' do
-    result = TreeSitterLanguagePack.process('', { 'language' => 'python', 'patterns' => {  } })
+    result = TreeSitterLanguagePack.validate_extraction({ 'language' => 'python', 'patterns' => {  } })
     expect(result.valid).to be(true)
   end
 
   it 'validate_extraction_invalid_query: Invalid query syntax fails validation' do
-    expect { TreeSitterLanguagePack.process('', { 'language' => 'python', 'patterns' => { 'broken' => { 'capture_output' => 'Full', 'query' => '(this_is_not_a_valid_node @x' } } }) }.to raise_error
+    expect { TreeSitterLanguagePack.validate_extraction({ 'language' => 'python', 'patterns' => { 'broken' => { 'capture_output' => 'Full', 'query' => '(this_is_not_a_valid_node @x' } } }) }.to raise_error
   end
 
   it 'validate_extraction_valid_config: Valid extraction config passes validation' do
-    result = TreeSitterLanguagePack.process('', { 'language' => 'python', 'patterns' => { 'functions' => { 'capture_output' => 'Full', 'query' => '(function_definition name: (identifier) @name)' } } })
+    result = TreeSitterLanguagePack.validate_extraction({ 'language' => 'python', 'patterns' => { 'functions' => { 'capture_output' => 'Full', 'query' => '(function_definition name: (identifier) @name)' } } })
     expect(result.valid).to be(true)
   end
 end

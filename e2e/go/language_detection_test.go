@@ -45,7 +45,8 @@ func Test_AmbiguityUnknownExtension(t *testing.T) {
 
 func Test_DetectContentBashShebang(t *testing.T) {
 	// detect_language_from_content recognizes #!/bin/bash shebang
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_content(`#!/bin/bash
+echo hi`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -56,7 +57,7 @@ func Test_DetectContentBashShebang(t *testing.T) {
 
 func Test_DetectContentNoShebang(t *testing.T) {
 	// detect_language_from_content returns None when no shebang present
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_content(`no shebang here`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -67,7 +68,8 @@ func Test_DetectContentNoShebang(t *testing.T) {
 
 func Test_DetectContentPythonShebang(t *testing.T) {
 	// detect_language_from_content recognizes #!/usr/bin/env python3 shebang
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_content(`#!/usr/bin/env python3
+pass`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -78,7 +80,7 @@ func Test_DetectContentPythonShebang(t *testing.T) {
 
 func Test_DetectExtCpp(t *testing.T) {
 	// detect_language_from_extension recognizes .cpp as cpp
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_extension(`cpp`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -89,7 +91,7 @@ func Test_DetectExtCpp(t *testing.T) {
 
 func Test_DetectExtGo(t *testing.T) {
 	// detect_language_from_extension recognizes .go as go
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_extension(`go`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -100,7 +102,7 @@ func Test_DetectExtGo(t *testing.T) {
 
 func Test_DetectExtJava(t *testing.T) {
 	// detect_language_from_extension recognizes .java as java
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_extension(`java`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -111,7 +113,7 @@ func Test_DetectExtJava(t *testing.T) {
 
 func Test_DetectExtJavascript(t *testing.T) {
 	// detect_language_from_extension recognizes .js as javascript
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_extension(`js`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -122,7 +124,7 @@ func Test_DetectExtJavascript(t *testing.T) {
 
 func Test_DetectExtPhp(t *testing.T) {
 	// detect_language_from_extension recognizes .php as php
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_extension(`php`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -133,7 +135,7 @@ func Test_DetectExtPhp(t *testing.T) {
 
 func Test_DetectExtPython(t *testing.T) {
 	// detect_language_from_extension recognizes .py as python
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_extension(`py`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -144,7 +146,7 @@ func Test_DetectExtPython(t *testing.T) {
 
 func Test_DetectExtRuby(t *testing.T) {
 	// detect_language_from_extension recognizes .rb as ruby
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_extension(`rb`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -155,7 +157,7 @@ func Test_DetectExtRuby(t *testing.T) {
 
 func Test_DetectExtRust(t *testing.T) {
 	// detect_language_from_extension recognizes .rs as rust
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_extension(`rs`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -166,7 +168,7 @@ func Test_DetectExtRust(t *testing.T) {
 
 func Test_DetectExtTypescript(t *testing.T) {
 	// detect_language_from_extension recognizes .ts as typescript
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_extension(`ts`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -177,7 +179,7 @@ func Test_DetectExtTypescript(t *testing.T) {
 
 func Test_DetectExtUnknown(t *testing.T) {
 	// detect_language_from_extension returns None for unknown extension .xyz
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_extension(`xyz`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -188,7 +190,7 @@ func Test_DetectExtUnknown(t *testing.T) {
 
 func Test_DetectPathDotfile(t *testing.T) {
 	// detect_language_from_path returns None for dotfile .gitignore (no standard extension)
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_path(`.gitignore`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -199,7 +201,7 @@ func Test_DetectPathDotfile(t *testing.T) {
 
 func Test_DetectPathGoNested(t *testing.T) {
 	// detect_language_from_path extracts extension from nested path lib/server.go
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_path(`lib/server.go`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -210,7 +212,7 @@ func Test_DetectPathGoNested(t *testing.T) {
 
 func Test_DetectPathJavaRoot(t *testing.T) {
 	// detect_language_from_path recognizes Main.java in root directory
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_path(`Main.java`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -221,7 +223,7 @@ func Test_DetectPathJavaRoot(t *testing.T) {
 
 func Test_DetectPathJsRoot(t *testing.T) {
 	// detect_language_from_path recognizes app.js in root directory
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_path(`app.js`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -232,7 +234,7 @@ func Test_DetectPathJsRoot(t *testing.T) {
 
 func Test_DetectPathNested(t *testing.T) {
 	// detect_language_from_path extracts extension from nested path src/main.py
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_path(`src/main.py`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -243,7 +245,7 @@ func Test_DetectPathNested(t *testing.T) {
 
 func Test_DetectPathNoExtension(t *testing.T) {
 	// detect_language_from_path returns None for extensionless file Makefile
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_path(`Makefile`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -254,7 +256,7 @@ func Test_DetectPathNoExtension(t *testing.T) {
 
 func Test_DetectPathRustSrc(t *testing.T) {
 	// detect_language_from_path extracts extension from nested path src/main.rs
-	result, err := tspack.Process("", nil)
+	result, err := tspack.detect_language_from_path(`src/main.rs`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}

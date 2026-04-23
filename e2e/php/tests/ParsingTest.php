@@ -15,14 +15,14 @@ final class ParsingTest extends TestCase
     public function test_parsing_go_function(): void
     {
         $tree = TreeSitterLanguagePack::parse_string("go", "package main\nfunc main() {}");
-        // TODO: unsupported assertion type: method_result
+        $this->assertTrue(TreeSitterLanguagePack::tree_contains_node_type($tree, "function_declaration"));
     }
 
     /** Parse an HTML element and assert node type */
     public function test_parsing_html_element(): void
     {
         $tree = TreeSitterLanguagePack::parse_string("html", "<div>hello</div>");
-        // TODO: unsupported assertion type: method_result
+        $this->assertTrue(TreeSitterLanguagePack::tree_contains_node_type($tree, "element"));
     }
 
     /** Parse a JavaScript class declaration. */
@@ -30,28 +30,28 @@ final class ParsingTest extends TestCase
     {
         $tree = TreeSitterLanguagePack::parse_string("javascript", "class Foo { bar() {} }");
         $this->assertGreaterThanOrEqual(1, $tree->root_child_count);
-        // TODO: unsupported assertion type: method_result
+        $this->assertTrue(TreeSitterLanguagePack::tree_contains_node_type($tree, "class_declaration"));
     }
 
     /** Parse a JavaScript variable declaration and assert node type */
     public function test_parsing_javascript_variable(): void
     {
         $tree = TreeSitterLanguagePack::parse_string("javascript", "const x = 1;");
-        // TODO: unsupported assertion type: method_result
+        $this->assertTrue(TreeSitterLanguagePack::tree_contains_node_type($tree, "lexical_declaration"));
     }
 
     /** Parse a Python function definition and assert node type */
     public function test_parsing_python_function(): void
     {
         $tree = TreeSitterLanguagePack::parse_string("python", "def hello(): pass");
-        // TODO: unsupported assertion type: method_result
+        $this->assertTrue(TreeSitterLanguagePack::tree_contains_node_type($tree, "function_definition"));
     }
 
     /** Parse a Rust function definition and assert node type */
     public function test_parsing_rust_function(): void
     {
         $tree = TreeSitterLanguagePack::parse_string("rust", "fn main() {}");
-        // TODO: unsupported assertion type: method_result
+        $this->assertTrue(TreeSitterLanguagePack::tree_contains_node_type($tree, "function_item"));
     }
 
     /** Parse a Rust struct definition. */

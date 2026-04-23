@@ -6,12 +6,14 @@ package e2e_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
 func Test_HighlightsNonexistentLanguage(t *testing.T) {
 	// Get highlights query for nonexistent language returns null/empty
-	result, err := tspack.Process("", nil)
+	result, err := tspack.get_highlights_query(`zzz_nonexistent_lang`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -22,7 +24,7 @@ func Test_HighlightsNonexistentLanguage(t *testing.T) {
 
 func Test_HighlightsQueryPython(t *testing.T) {
 	// get_highlights_query returns non-empty string for python
-	result, err := tspack.Process("", nil)
+	result, err := tspack.get_highlights_query(`python`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -33,7 +35,7 @@ func Test_HighlightsQueryPython(t *testing.T) {
 
 func Test_HighlightsQueryUnknownLanguage(t *testing.T) {
 	// get_highlights_query returns None for unknown language
-	result, err := tspack.Process("", nil)
+	result, err := tspack.get_highlights_query(`nonexistent_language_xyz`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -44,7 +46,7 @@ func Test_HighlightsQueryUnknownLanguage(t *testing.T) {
 
 func Test_InjectionsQueryJavascript(t *testing.T) {
 	// get_injections_query returns non-empty for javascript (has embedded languages)
-	result, err := tspack.Process("", nil)
+	result, err := tspack.get_injections_query(`javascript`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -55,7 +57,7 @@ func Test_InjectionsQueryJavascript(t *testing.T) {
 
 func Test_InjectionsQueryUnknownLanguage(t *testing.T) {
 	// get_injections_query returns empty for unknown language
-	result, err := tspack.Process("", nil)
+	result, err := tspack.get_injections_query(`nonexistent_xyz`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -66,7 +68,7 @@ func Test_InjectionsQueryUnknownLanguage(t *testing.T) {
 
 func Test_LocalsQueryPython(t *testing.T) {
 	// get_locals_query returns non-empty for python
-	result, err := tspack.Process("", nil)
+	result, err := tspack.get_locals_query(`python`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -77,7 +79,7 @@ func Test_LocalsQueryPython(t *testing.T) {
 
 func Test_LocalsQueryUnknownLanguage(t *testing.T) {
 	// get_locals_query returns empty for unknown language
-	result, err := tspack.Process("", nil)
+	result, err := tspack.get_locals_query(`nonexistent_xyz`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -88,23 +90,23 @@ func Test_LocalsQueryUnknownLanguage(t *testing.T) {
 
 func Test_RunQueryNoMatches(t *testing.T) {
 	// Run query that matches no nodes returns empty result
-	result, err := tspack.Process(`x = 1`, nil)
+	tree, err := tspack.parse_string(`python`, `x = 1`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	// TODO: unsupported assertion type: method_result
+	assert.GreaterOrEqual(t, len(tspack.RunQuery(tree, `python`, `(class_definition name: (identifier) @name)`, []byte(source))), 0, "expected at least 0 elements")
 }
 
 func Test_RunQueryPythonFunctions(t *testing.T) {
 	// Parse Python and run a query to find function definitions
-	result, err := tspack.Process(`def hello():
+	tree, err := tspack.parse_string(`python`, `def hello():
     pass
 
 def world():
     return 42
-`, nil)
+`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
-	// TODO: unsupported assertion type: method_result
+	assert.GreaterOrEqual(t, len(tspack.RunQuery(tree, `python`, `(function_definition name: (identifier) @name)`, []byte(source))), 2, "expected at least 2 elements")
 }

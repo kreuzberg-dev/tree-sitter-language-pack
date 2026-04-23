@@ -5,45 +5,45 @@ defmodule E2e.DownloadTest do
 
   describe "download_all_languages" do
     test "Download all language parsers and verify count is positive" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.download_all("", nil)
       assert result > 0
     end
   end
 
   describe "download_cache_dir" do
     test "Get the cache directory path and verify it is non-empty" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.cache_dir("", nil)
       assert result != ""
     end
   end
 
   describe "download_clean_cache" do
     test "Clean the parser cache directory" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.clean_cache("", nil)
     end
   end
 
   describe "download_configure_custom_dir" do
     test "Configure language pack with a custom cache directory" do
-      {:ok, result} = TreeSitterLanguagePack.process("", %{"cache_dir" => "/tmp/tslp_test_cache"})
+      {:ok, result} = TreeSitterLanguagePack.configure("", %{"cache_dir" => "/tmp/tslp_test_cache"})
     end
   end
 
   describe "download_downloaded_empty" do
     test "List downloaded languages (may be empty before any downloads)" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.downloaded_languages("", nil)
     end
   end
 
   describe "download_init_default" do
     test "Initialize language pack with default config" do
-      {:ok, result} = TreeSitterLanguagePack.process("", %{})
+      {:ok, result} = TreeSitterLanguagePack.init("", %{})
     end
   end
 
   describe "download_manifest_languages" do
     test "List manifest languages and verify python is included" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.manifest_languages("", nil)
       assert result != ""
       assert String.contains?(to_string(result), "python")
     end
@@ -51,7 +51,7 @@ defmodule E2e.DownloadTest do
 
   describe "download_single_language" do
     test "Download a single language parser and verify count" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.download("", nil)
       assert result >= 1
     end
   end

@@ -6,47 +6,47 @@ require 'json'
 
 RSpec.describe 'query' do
   it 'highlights_nonexistent_language: Get highlights query for nonexistent language returns null/empty' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.get_highlights_query('zzz_nonexistent_lang')
     expect(result.nil? || result.empty?).to be(true)
   end
 
   it 'highlights_query_python: get_highlights_query returns non-empty string for python' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.get_highlights_query('python')
     expect(result).not_to be_empty
   end
 
   it 'highlights_query_unknown_language: get_highlights_query returns None for unknown language' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.get_highlights_query('nonexistent_language_xyz')
     expect(result.nil? || result.empty?).to be(true)
   end
 
   it 'injections_query_javascript: get_injections_query returns non-empty for javascript (has embedded languages)' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.get_injections_query('javascript')
     expect(result).not_to be_empty
   end
 
   it 'injections_query_unknown_language: get_injections_query returns empty for unknown language' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.get_injections_query('nonexistent_xyz')
     expect(result.nil? || result.empty?).to be(true)
   end
 
   it 'locals_query_python: get_locals_query returns non-empty for python' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.get_locals_query('python')
     expect(result).not_to be_empty
   end
 
   it 'locals_query_unknown_language: get_locals_query returns empty for unknown language' do
-    result = TreeSitterLanguagePack.process('', nil)
+    result = TreeSitterLanguagePack.get_locals_query('nonexistent_xyz')
     expect(result.nil? || result.empty?).to be(true)
   end
 
   it 'run_query_no_matches: Run query that matches no nodes returns empty result' do
-    result = TreeSitterLanguagePack.process('x = 1', nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', 'x = 1')
+    expect(TreeSitterLanguagePack.run_query(tree, "python", "(class_definition name: (identifier) @name)", source).length).to be >= 0
   end
 
   it 'run_query_python_functions: Parse Python and run a query to find function definitions' do
-    result = TreeSitterLanguagePack.process("def hello():\n    pass\n\ndef world():\n    return 42\n", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', "def hello():\n    pass\n\ndef world():\n    return 42\n")
+    expect(TreeSitterLanguagePack.run_query(tree, "python", "(function_definition name: (identifier) @name)", source).length).to be >= 2
   end
 end

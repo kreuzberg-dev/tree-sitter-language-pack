@@ -5,21 +5,21 @@ defmodule E2e.ExtractionTest do
 
   describe "extract_invalid_byte_range" do
     test "extract_patterns() with out-of-bounds byte_range returns empty results" do
-      {:ok, result} = TreeSitterLanguagePack.process("x = 1\n", %{"language" => "python", "patterns" => %{"funcs" => %{"byte_range" => [9999, 99999], "capture_output" => "Full", "query" => "(expression_statement) @e"}}})
+      {:ok, result} = TreeSitterLanguagePack.extract_patterns("x = 1\n", %{"language" => "python", "patterns" => %{"funcs" => %{"byte_range" => [9999, 99999], "capture_output" => "Full", "query" => "(expression_statement) @e"}}})
       assert length(result.results.funcs.matches) == 0
     end
   end
 
   describe "extract_patterns_no_matches" do
     test "Extraction query that matches nothing returns empty results" do
-      {:ok, result} = TreeSitterLanguagePack.process("x = 1\ny = 2\n", %{"language" => "python", "patterns" => %{"classes" => %{"capture_output" => "Full", "query" => "(class_definition name: (identifier) @name)"}}})
+      {:ok, result} = TreeSitterLanguagePack.extract_patterns("x = 1\ny = 2\n", %{"language" => "python", "patterns" => %{"classes" => %{"capture_output" => "Full", "query" => "(class_definition name: (identifier) @name)"}}})
       assert length(result.results.classes.matches) == 0
     end
   end
 
   describe "extract_patterns_python_functions" do
     test "Extract function definitions from Python source using tree-sitter query" do
-      {:ok, result} = TreeSitterLanguagePack.process("def hello():\n    pass\n\ndef world(x):\n    return x * 2\n", %{"language" => "python", "patterns" => %{"functions" => %{"capture_output" => "Full", "query" => "(function_definition name: (identifier) @name)"}}})
+      {:ok, result} = TreeSitterLanguagePack.extract_patterns("def hello():\n    pass\n\ndef world(x):\n    return x * 2\n", %{"language" => "python", "patterns" => %{"functions" => %{"capture_output" => "Full", "query" => "(function_definition name: (identifier) @name)"}}})
       assert String.trim(result.language) == "python"
       assert length(result.results.functions.matches) >= 2
     end
@@ -27,20 +27,20 @@ defmodule E2e.ExtractionTest do
 
   describe "validate_empty_patterns" do
     test "validate_extraction() with empty patterns returns valid" do
-      {:ok, result} = TreeSitterLanguagePack.process("", %{"language" => "python", "patterns" => %{}})
+      {:ok, result} = TreeSitterLanguagePack.validate_extraction("", %{"language" => "python", "patterns" => %{}})
       assert result.valid == true
     end
   end
 
   describe "validate_extraction_invalid_query" do
     test "Invalid query syntax fails validation" do
-      assert {:error, _} = TreeSitterLanguagePack.process("", %{"language" => "python", "patterns" => %{"broken" => %{"capture_output" => "Full", "query" => "(this_is_not_a_valid_node @x"}}})
+      assert {:error, _} = TreeSitterLanguagePack.validate_extraction("", %{"language" => "python", "patterns" => %{"broken" => %{"capture_output" => "Full", "query" => "(this_is_not_a_valid_node @x"}}})
     end
   end
 
   describe "validate_extraction_valid_config" do
     test "Valid extraction config passes validation" do
-      {:ok, result} = TreeSitterLanguagePack.process("", %{"language" => "python", "patterns" => %{"functions" => %{"capture_output" => "Full", "query" => "(function_definition name: (identifier) @name)"}}})
+      {:ok, result} = TreeSitterLanguagePack.validate_extraction("", %{"language" => "python", "patterns" => %{"functions" => %{"capture_output" => "Full", "query" => "(function_definition name: (identifier) @name)"}}})
       assert result.valid == true
     end
   end

@@ -12,7 +12,7 @@ import (
 
 func Test_DownloadAllLanguages(t *testing.T) {
 	// Download all language parsers and verify count is positive
-	result, err := tspack.Process("", nil)
+	result, err := tspack.download_all(`{}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -23,7 +23,7 @@ func Test_DownloadAllLanguages(t *testing.T) {
 
 func Test_DownloadCacheDir(t *testing.T) {
 	// Get the cache directory path and verify it is non-empty
-	result, err := tspack.Process("", nil)
+	result, err := tspack.cache_dir(`{}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -34,7 +34,7 @@ func Test_DownloadCacheDir(t *testing.T) {
 
 func Test_DownloadCleanCache(t *testing.T) {
 	// Clean the parser cache directory
-	_, err := tspack.Process("", nil)
+	_, err := tspack.clean_cache(`{}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -42,7 +42,7 @@ func Test_DownloadCleanCache(t *testing.T) {
 
 func Test_DownloadConfigureCustomDir(t *testing.T) {
 	// Configure language pack with a custom cache directory
-	_, err := tspack.Process("", `{"cache_dir":"/tmp/tslp_test_cache"}`)
+	_, err := tspack.configure(`{"cache_dir":"/tmp/tslp_test_cache"}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -50,7 +50,7 @@ func Test_DownloadConfigureCustomDir(t *testing.T) {
 
 func Test_DownloadDownloadedEmpty(t *testing.T) {
 	// List downloaded languages (may be empty before any downloads)
-	_, err := tspack.Process("", nil)
+	_, err := tspack.downloaded_languages(`{}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -58,7 +58,7 @@ func Test_DownloadDownloadedEmpty(t *testing.T) {
 
 func Test_DownloadInitDefault(t *testing.T) {
 	// Initialize language pack with default config
-	_, err := tspack.Process("", `{}`)
+	_, err := tspack.init(`{}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -66,7 +66,7 @@ func Test_DownloadInitDefault(t *testing.T) {
 
 func Test_DownloadManifestLanguages(t *testing.T) {
 	// List manifest languages and verify python is included
-	result, err := tspack.Process("", nil)
+	result, err := tspack.manifest_languages(`{}`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}
@@ -80,7 +80,7 @@ func Test_DownloadManifestLanguages(t *testing.T) {
 
 func Test_DownloadSingleLanguage(t *testing.T) {
 	// Download a single language parser and verify count
-	result, err := tspack.Process("", nil)
+	result, err := tspack.download(`["python"]`)
 	if err != nil {
 		t.Fatalf("call failed: %v", err)
 	}

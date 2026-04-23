@@ -9,53 +9,53 @@ class ErrorHandlingTest {
     @Test
     void testErrorDetectContentEmpty() throws Exception {
         // Detect language from empty content returns null
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_content("");
         assertTrue(result.isEmpty(), "expected empty value");
     }
 
     @Test
     void testErrorDetectExtensionEmpty() throws Exception {
         // Detect language from empty extension returns null
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_extension("");
         assertTrue(result.isEmpty(), "expected empty value");
     }
 
     @Test
     void testErrorDetectPathEmpty() throws Exception {
         // Detect language from empty path returns null
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.detect_language_from_path("");
         assertTrue(result.isEmpty(), "expected empty value");
     }
 
     @Test
     void testErrorEmptyLanguageName() throws Exception {
         // Parsing with empty language name should error
-        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("hello", null));
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.parse_string("", "hello"));
     }
 
     @Test
     void testErrorExtractUnknownLanguage() throws Exception {
         // Extract patterns with unknown language returns error
-        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("x = 1", "{\"language\":\"nonexistent_language_xyz\",\"patterns\":{}}"));
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.extract_patterns("x = 1", "{\"language\":\"nonexistent_language_xyz\",\"patterns\":{}}"));
     }
 
     @Test
     void testErrorHandlingEmptySource() throws Exception {
         // Parsing an empty string should still produce a tree.
-        var result = TreeSitterLanguagePack.process("", null);
+        var tree = TreeSitterLanguagePack.parse_string("javascript", "");
     }
 
     @Test
     void testErrorHandlingInvalidSyntax() throws Exception {
         // Parsing invalid syntax should produce a tree with error nodes.
-        var result = TreeSitterLanguagePack.process("function function function @@@ %%%", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("javascript", "function function function @@@ %%%");
+        assertTrue(TreeSitterLanguagePack.treeHasErrorNodes(tree));
     }
 
     @Test
     void testErrorHandlingUnknownLanguage() throws Exception {
         // Loading a nonexistent language should produce an error.
-        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("", null));
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.parse_string("nonexistent_xyz", ""));
     }
 
     @Test
@@ -68,14 +68,15 @@ class ErrorHandlingTest {
     @Test
     void testErrorRunQueryInvalidSyntax() throws Exception {
         // Run query with invalid S-expression syntax produces error
-        var result = TreeSitterLanguagePack.process("x = 1", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "x = 1");
+        var source = "x = 1".getBytes();
+        assertThrows(Exception.class, () -> { TreeSitterLanguagePack.runQuery(tree, "python", "(((", source); });
     }
 
     @Test
     void testParseEmptyLanguage() throws Exception {
         // parse_string() returns error with empty language name
-        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("x = 1", null));
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.parse_string("", "x = 1"));
     }
 
     @Test

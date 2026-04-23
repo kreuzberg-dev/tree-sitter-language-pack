@@ -16,7 +16,7 @@ public class ExtractionTests
     public void Test_ExtractInvalidByteRange()
     {
         // extract_patterns() with out-of-bounds byte_range returns empty results
-        var result = TreeSitterLanguagePackLib.Process("x = 1\n", "{\"language\":\"python\",\"patterns\":{\"funcs\":{\"byte_range\":[9999,99999],\"capture_output\":\"Full\",\"query\":\"(expression_statement) @e\"}}}");
+        var result = TreeSitterLanguagePackLib.ExtractPatterns("x = 1\n", "{\"language\":\"python\",\"patterns\":{\"funcs\":{\"byte_range\":[9999,99999],\"capture_output\":\"Full\",\"query\":\"(expression_statement) @e\"}}}");
         Assert.Equal(0, result.Results.Funcs.Matches.Count);
     }
 
@@ -24,7 +24,7 @@ public class ExtractionTests
     public void Test_ExtractPatternsNoMatches()
     {
         // Extraction query that matches nothing returns empty results
-        var result = TreeSitterLanguagePackLib.Process("x = 1\ny = 2\n", "{\"language\":\"python\",\"patterns\":{\"classes\":{\"capture_output\":\"Full\",\"query\":\"(class_definition name: (identifier) @name)\"}}}");
+        var result = TreeSitterLanguagePackLib.ExtractPatterns("x = 1\ny = 2\n", "{\"language\":\"python\",\"patterns\":{\"classes\":{\"capture_output\":\"Full\",\"query\":\"(class_definition name: (identifier) @name)\"}}}");
         Assert.Equal(0, result.Results.Classes.Matches.Count);
     }
 
@@ -32,7 +32,7 @@ public class ExtractionTests
     public void Test_ExtractPatternsPythonFunctions()
     {
         // Extract function definitions from Python source using tree-sitter query
-        var result = TreeSitterLanguagePackLib.Process("def hello():\n    pass\n\ndef world(x):\n    return x * 2\n", "{\"language\":\"python\",\"patterns\":{\"functions\":{\"capture_output\":\"Full\",\"query\":\"(function_definition name: (identifier) @name)\"}}}");
+        var result = TreeSitterLanguagePackLib.ExtractPatterns("def hello():\n    pass\n\ndef world(x):\n    return x * 2\n", "{\"language\":\"python\",\"patterns\":{\"functions\":{\"capture_output\":\"Full\",\"query\":\"(function_definition name: (identifier) @name)\"}}}");
         Assert.Equal("python", result.Language.Trim());
         Assert.True(result.Results.Functions.Matches.Count >= 2, "expected at least 2 elements");
     }
@@ -41,7 +41,7 @@ public class ExtractionTests
     public void Test_ValidateEmptyPatterns()
     {
         // validate_extraction() with empty patterns returns valid
-        var result = TreeSitterLanguagePackLib.Process("", "{\"language\":\"python\",\"patterns\":{}}");
+        var result = TreeSitterLanguagePackLib.ValidateExtraction("{\"language\":\"python\",\"patterns\":{}}");
         Assert.Equal(true, result.Valid);
     }
 
@@ -49,14 +49,14 @@ public class ExtractionTests
     public void Test_ValidateExtractionInvalidQuery()
     {
         // Invalid query syntax fails validation
-        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("", "{\"language\":\"python\",\"patterns\":{\"broken\":{\"capture_output\":\"Full\",\"query\":\"(this_is_not_a_valid_node @x\"}}}"));
+        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.ValidateExtraction("{\"language\":\"python\",\"patterns\":{\"broken\":{\"capture_output\":\"Full\",\"query\":\"(this_is_not_a_valid_node @x\"}}}"));
     }
 
     [Fact]
     public void Test_ValidateExtractionValidConfig()
     {
         // Valid extraction config passes validation
-        var result = TreeSitterLanguagePackLib.Process("", "{\"language\":\"python\",\"patterns\":{\"functions\":{\"capture_output\":\"Full\",\"query\":\"(function_definition name: (identifier) @name)\"}}}");
+        var result = TreeSitterLanguagePackLib.ValidateExtraction("{\"language\":\"python\",\"patterns\":{\"functions\":{\"capture_output\":\"Full\",\"query\":\"(function_definition name: (identifier) @name)\"}}}");
         Assert.Equal(true, result.Valid);
     }
 }

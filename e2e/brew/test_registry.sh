@@ -38,7 +38,6 @@ test_registry_has_language_false() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: is_false
 }
 
 test_registry_has_language_true() {

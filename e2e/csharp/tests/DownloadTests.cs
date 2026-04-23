@@ -16,7 +16,7 @@ public class DownloadTests
     public void Test_DownloadAllLanguages()
     {
         // Download all language parsers and verify count is positive
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DownloadAll("{}");
         Assert.True(result > 0, "expected > 0");
     }
 
@@ -24,7 +24,7 @@ public class DownloadTests
     public void Test_DownloadCacheDir()
     {
         // Get the cache directory path and verify it is non-empty
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.CacheDir("{}");
         Assert.False(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -32,35 +32,35 @@ public class DownloadTests
     public void Test_DownloadCleanCache()
     {
         // Clean the parser cache directory
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.CleanCache("{}");
     }
 
     [Fact]
     public void Test_DownloadConfigureCustomDir()
     {
         // Configure language pack with a custom cache directory
-        var result = TreeSitterLanguagePackLib.Process("", "{\"cache_dir\":\"/tmp/tslp_test_cache\"}");
+        var result = TreeSitterLanguagePackLib.Configure("{\"cache_dir\":\"/tmp/tslp_test_cache\"}");
     }
 
     [Fact]
     public void Test_DownloadDownloadedEmpty()
     {
         // List downloaded languages (may be empty before any downloads)
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DownloadedLanguages("{}");
     }
 
     [Fact]
     public void Test_DownloadInitDefault()
     {
         // Initialize language pack with default config
-        var result = TreeSitterLanguagePackLib.Process("", "{}");
+        var result = TreeSitterLanguagePackLib.Init("{}");
     }
 
     [Fact]
     public void Test_DownloadManifestLanguages()
     {
         // List manifest languages and verify python is included
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.ManifestLanguages("{}");
         Assert.False(string.IsNullOrEmpty(result?.ToString()));
         Assert.Contains("python", result.ToString().ToLower());
     }
@@ -69,7 +69,7 @@ public class DownloadTests
     public void Test_DownloadSingleLanguage()
     {
         // Download a single language parser and verify count
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.Download(new[] { "python" });
         Assert.True(result >= 1, "expected >= 1");
     }
 }

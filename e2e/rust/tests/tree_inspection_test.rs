@@ -126,5 +126,9 @@ fn test_tree_to_sexp_python() {
     let source = r#"x = 1
 "#;
     let tree = parse_string(&language, source.as_bytes()).expect("should succeed");
-    // TODO: unsupported method_result check type: contains
+    assert!(
+        tree_sitter_language_pack::tree_to_sexp(&tree).contains(r#"module"#),
+        "expected result to contain {}",
+        r#"module"#
+    );
 }

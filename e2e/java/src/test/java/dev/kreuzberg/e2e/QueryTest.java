@@ -9,64 +9,66 @@ class QueryTest {
     @Test
     void testHighlightsNonexistentLanguage() throws Exception {
         // Get highlights query for nonexistent language returns null/empty
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.get_highlights_query("zzz_nonexistent_lang");
         assertTrue(result.isEmpty(), "expected empty value");
     }
 
     @Test
     void testHighlightsQueryPython() throws Exception {
         // get_highlights_query returns non-empty string for python
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.get_highlights_query("python");
         assertFalse(result.isEmpty(), "expected non-empty value");
     }
 
     @Test
     void testHighlightsQueryUnknownLanguage() throws Exception {
         // get_highlights_query returns None for unknown language
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.get_highlights_query("nonexistent_language_xyz");
         assertTrue(result.isEmpty(), "expected empty value");
     }
 
     @Test
     void testInjectionsQueryJavascript() throws Exception {
         // get_injections_query returns non-empty for javascript (has embedded languages)
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.get_injections_query("javascript");
         assertFalse(result.isEmpty(), "expected non-empty value");
     }
 
     @Test
     void testInjectionsQueryUnknownLanguage() throws Exception {
         // get_injections_query returns empty for unknown language
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.get_injections_query("nonexistent_xyz");
         assertTrue(result.isEmpty(), "expected empty value");
     }
 
     @Test
     void testLocalsQueryPython() throws Exception {
         // get_locals_query returns non-empty for python
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.get_locals_query("python");
         assertFalse(result.isEmpty(), "expected non-empty value");
     }
 
     @Test
     void testLocalsQueryUnknownLanguage() throws Exception {
         // get_locals_query returns empty for unknown language
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.get_locals_query("nonexistent_xyz");
         assertTrue(result.isEmpty(), "expected empty value");
     }
 
     @Test
     void testRunQueryNoMatches() throws Exception {
         // Run query that matches no nodes returns empty result
-        var result = TreeSitterLanguagePack.process("x = 1", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "x = 1");
+        var source = "x = 1".getBytes();
+        assertTrue(TreeSitterLanguagePack.runQuery(tree, "python", "(class_definition name: (identifier) @name)", source).size() >= 0, "expected at least 0 elements");
     }
 
     @Test
     void testRunQueryPythonFunctions() throws Exception {
         // Parse Python and run a query to find function definitions
-        var result = TreeSitterLanguagePack.process("def hello():\n    pass\n\ndef world():\n    return 42\n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "def hello():\n    pass\n\ndef world():\n    return 42\n");
+        var source = "def hello():\n    pass\n\ndef world():\n    return 42\n".getBytes();
+        assertTrue(TreeSitterLanguagePack.runQuery(tree, "python", "(function_definition name: (identifier) @name)", source).size() >= 2, "expected at least 2 elements");
     }
 
 }

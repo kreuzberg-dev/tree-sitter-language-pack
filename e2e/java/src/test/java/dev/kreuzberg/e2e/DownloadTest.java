@@ -9,45 +9,45 @@ class DownloadTest {
     @Test
     void testDownloadAllLanguages() throws Exception {
         // Download all language parsers and verify count is positive
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.download_all("{}");
         assertTrue(result > 0, "expected > 0");
     }
 
     @Test
     void testDownloadCacheDir() throws Exception {
         // Get the cache directory path and verify it is non-empty
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.cache_dir("{}");
         assertFalse(result.isEmpty(), "expected non-empty value");
     }
 
     @Test
     void testDownloadCleanCache() throws Exception {
         // Clean the parser cache directory
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.clean_cache("{}");
     }
 
     @Test
     void testDownloadConfigureCustomDir() throws Exception {
         // Configure language pack with a custom cache directory
-        var result = TreeSitterLanguagePack.process("", "{\"cache_dir\":\"/tmp/tslp_test_cache\"}");
+        var result = TreeSitterLanguagePack.configure("{\"cache_dir\":\"/tmp/tslp_test_cache\"}");
     }
 
     @Test
     void testDownloadDownloadedEmpty() throws Exception {
         // List downloaded languages (may be empty before any downloads)
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.downloaded_languages("{}");
     }
 
     @Test
     void testDownloadInitDefault() throws Exception {
         // Initialize language pack with default config
-        var result = TreeSitterLanguagePack.process("", "{}");
+        var result = TreeSitterLanguagePack.init("{}");
     }
 
     @Test
     void testDownloadManifestLanguages() throws Exception {
         // List manifest languages and verify python is included
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.manifest_languages("{}");
         assertFalse(result.isEmpty(), "expected non-empty value");
         assertTrue(result.contains("python"), "expected to contain: " + "python");
     }
@@ -55,7 +55,7 @@ class DownloadTest {
     @Test
     void testDownloadSingleLanguage() throws Exception {
         // Download a single language parser and verify count
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.download(java.util.List.of("python"));
         assertTrue(result >= 1, "expected >= 1");
     }
 

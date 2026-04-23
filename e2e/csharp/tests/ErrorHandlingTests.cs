@@ -16,7 +16,7 @@ public class ErrorHandlingTests
     public void Test_ErrorDetectContentEmpty()
     {
         // Detect language from empty content returns null
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromContent("");
         Assert.True(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -24,7 +24,7 @@ public class ErrorHandlingTests
     public void Test_ErrorDetectExtensionEmpty()
     {
         // Detect language from empty extension returns null
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromExtension("");
         Assert.True(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -32,7 +32,7 @@ public class ErrorHandlingTests
     public void Test_ErrorDetectPathEmpty()
     {
         // Detect language from empty path returns null
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromPath("");
         Assert.True(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -40,36 +40,36 @@ public class ErrorHandlingTests
     public void Test_ErrorEmptyLanguageName()
     {
         // Parsing with empty language name should error
-        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("hello", null));
+        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.ParseString("", "hello"));
     }
 
     [Fact]
     public void Test_ErrorExtractUnknownLanguage()
     {
         // Extract patterns with unknown language returns error
-        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("x = 1", "{\"language\":\"nonexistent_language_xyz\",\"patterns\":{}}"));
+        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.ExtractPatterns("x = 1", "{\"language\":\"nonexistent_language_xyz\",\"patterns\":{}}"));
     }
 
     [Fact]
     public void Test_ErrorHandlingEmptySource()
     {
         // Parsing an empty string should still produce a tree.
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var tree = TreeSitterLanguagePackLib.ParseString("javascript", "");
     }
 
     [Fact]
     public void Test_ErrorHandlingInvalidSyntax()
     {
         // Parsing invalid syntax should produce a tree with error nodes.
-        var result = TreeSitterLanguagePackLib.Process("function function function @@@ %%%", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("javascript", "function function function @@@ %%%");
+        Assert.True(TreeSitterLanguagePackLib.TreeHasErrorNodes(tree));
     }
 
     [Fact]
     public void Test_ErrorHandlingUnknownLanguage()
     {
         // Loading a nonexistent language should produce an error.
-        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("", null));
+        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.ParseString("nonexistent_xyz", ""));
     }
 
     [Fact]
@@ -84,15 +84,15 @@ public class ErrorHandlingTests
     public void Test_ErrorRunQueryInvalidSyntax()
     {
         // Run query with invalid S-expression syntax produces error
-        var result = TreeSitterLanguagePackLib.Process("x = 1", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePackLib.ParseString("python", "x = 1");
+        Assert.Throws<TreeSitterLanguagePackException>(() => { TreeSitterLanguagePackLib.RunQuery(tree, "python", "(((", source); });
     }
 
     [Fact]
     public void Test_ParseEmptyLanguage()
     {
         // parse_string() returns error with empty language name
-        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.Process("x = 1", null));
+        Assert.Throws<TreeSitterLanguagePackException>(() => TreeSitterLanguagePackLib.ParseString("", "x = 1"));
     }
 
     [Fact]

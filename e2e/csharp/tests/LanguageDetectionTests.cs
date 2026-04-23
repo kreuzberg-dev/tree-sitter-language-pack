@@ -40,7 +40,7 @@ public class LanguageDetectionTests
     public void Test_DetectContentBashShebang()
     {
         // detect_language_from_content recognizes #!/bin/bash shebang
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromContent("#!/bin/bash\necho hi");
         Assert.Equal("bash", result.Trim());
     }
 
@@ -48,7 +48,7 @@ public class LanguageDetectionTests
     public void Test_DetectContentNoShebang()
     {
         // detect_language_from_content returns None when no shebang present
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromContent("no shebang here");
         Assert.True(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -56,7 +56,7 @@ public class LanguageDetectionTests
     public void Test_DetectContentPythonShebang()
     {
         // detect_language_from_content recognizes #!/usr/bin/env python3 shebang
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromContent("#!/usr/bin/env python3\npass");
         Assert.Equal("python", result.Trim());
     }
 
@@ -64,7 +64,7 @@ public class LanguageDetectionTests
     public void Test_DetectExtCpp()
     {
         // detect_language_from_extension recognizes .cpp as cpp
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromExtension("cpp");
         Assert.Equal("cpp", result.Trim());
     }
 
@@ -72,7 +72,7 @@ public class LanguageDetectionTests
     public void Test_DetectExtGo()
     {
         // detect_language_from_extension recognizes .go as go
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromExtension("go");
         Assert.Equal("go", result.Trim());
     }
 
@@ -80,7 +80,7 @@ public class LanguageDetectionTests
     public void Test_DetectExtJava()
     {
         // detect_language_from_extension recognizes .java as java
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromExtension("java");
         Assert.Equal("java", result.Trim());
     }
 
@@ -88,7 +88,7 @@ public class LanguageDetectionTests
     public void Test_DetectExtJavascript()
     {
         // detect_language_from_extension recognizes .js as javascript
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromExtension("js");
         Assert.Equal("javascript", result.Trim());
     }
 
@@ -96,7 +96,7 @@ public class LanguageDetectionTests
     public void Test_DetectExtPhp()
     {
         // detect_language_from_extension recognizes .php as php
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromExtension("php");
         Assert.Equal("php", result.Trim());
     }
 
@@ -104,7 +104,7 @@ public class LanguageDetectionTests
     public void Test_DetectExtPython()
     {
         // detect_language_from_extension recognizes .py as python
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromExtension("py");
         Assert.Equal("python", result.Trim());
     }
 
@@ -112,7 +112,7 @@ public class LanguageDetectionTests
     public void Test_DetectExtRuby()
     {
         // detect_language_from_extension recognizes .rb as ruby
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromExtension("rb");
         Assert.Equal("ruby", result.Trim());
     }
 
@@ -120,7 +120,7 @@ public class LanguageDetectionTests
     public void Test_DetectExtRust()
     {
         // detect_language_from_extension recognizes .rs as rust
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromExtension("rs");
         Assert.Equal("rust", result.Trim());
     }
 
@@ -128,7 +128,7 @@ public class LanguageDetectionTests
     public void Test_DetectExtTypescript()
     {
         // detect_language_from_extension recognizes .ts as typescript
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromExtension("ts");
         Assert.Equal("typescript", result.Trim());
     }
 
@@ -136,7 +136,7 @@ public class LanguageDetectionTests
     public void Test_DetectExtUnknown()
     {
         // detect_language_from_extension returns None for unknown extension .xyz
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromExtension("xyz");
         Assert.True(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -144,7 +144,7 @@ public class LanguageDetectionTests
     public void Test_DetectPathDotfile()
     {
         // detect_language_from_path returns None for dotfile .gitignore (no standard extension)
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromPath(".gitignore");
         Assert.True(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -152,7 +152,7 @@ public class LanguageDetectionTests
     public void Test_DetectPathGoNested()
     {
         // detect_language_from_path extracts extension from nested path lib/server.go
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromPath("lib/server.go");
         Assert.Equal("go", result.Trim());
     }
 
@@ -160,7 +160,7 @@ public class LanguageDetectionTests
     public void Test_DetectPathJavaRoot()
     {
         // detect_language_from_path recognizes Main.java in root directory
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromPath("Main.java");
         Assert.Equal("java", result.Trim());
     }
 
@@ -168,7 +168,7 @@ public class LanguageDetectionTests
     public void Test_DetectPathJsRoot()
     {
         // detect_language_from_path recognizes app.js in root directory
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromPath("app.js");
         Assert.Equal("javascript", result.Trim());
     }
 
@@ -176,7 +176,7 @@ public class LanguageDetectionTests
     public void Test_DetectPathNested()
     {
         // detect_language_from_path extracts extension from nested path src/main.py
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromPath("src/main.py");
         Assert.Equal("python", result.Trim());
     }
 
@@ -184,7 +184,7 @@ public class LanguageDetectionTests
     public void Test_DetectPathNoExtension()
     {
         // detect_language_from_path returns None for extensionless file Makefile
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromPath("Makefile");
         Assert.True(string.IsNullOrEmpty(result?.ToString()));
     }
 
@@ -192,7 +192,7 @@ public class LanguageDetectionTests
     public void Test_DetectPathRustSrc()
     {
         // detect_language_from_path extracts extension from nested path src/main.rs
-        var result = TreeSitterLanguagePackLib.Process("", null);
+        var result = TreeSitterLanguagePackLib.DetectLanguageFromPath("src/main.rs");
         Assert.Equal("rust", result.Trim());
     }
 }

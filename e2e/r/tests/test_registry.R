@@ -2,37 +2,37 @@
 # E2e tests for category: registry
 
 test_that("get_language_python: get_language('python') returns a valid Language object", {
-  result <- process()
+  language <- get_language(name = "python")
 })
 
 test_that("get_language_unknown: get_language('nonexistent_xyz') returns an error for unknown language", {
-  expect_error(process())
+  expect_error(get_language(name = "nonexistent_xyz"))
 })
 
 test_that("get_parser_python: get_parser('python') returns a valid Parser object", {
-  result <- process()
+  parser <- get_parser(name = "python")
 })
 
 test_that("get_parser_unknown: get_parser('nonexistent_xyz') returns an error for unknown language", {
-  expect_error(process())
+  expect_error(get_parser(name = "nonexistent_xyz"))
 })
 
 test_that("registry_has_language_false: has_language('nonexistent') should return false", {
-  result <- process()
-  # TODO: unsupported assertion type: is_false
+  result <- has_language(name = "nonexistent")
+  expect_false(result)
 })
 
 test_that("registry_has_language_true: has_language('python') should return true", {
-  result <- process()
+  result <- has_language(name = "python")
   expect_true(result)
 })
 
 test_that("registry_language_count: language_count returns a value greater than 300", {
-  result <- process()
+  result <- language_count(list())
   expect_true(result >= 300)
 })
 
 test_that("registry_list_languages: available_languages should return a non-empty list", {
-  result <- process()
+  result <- available_languages(NULL)
   expect_true(if (is.character(result)) nchar(result) > 0 else length(result) > 0)
 })

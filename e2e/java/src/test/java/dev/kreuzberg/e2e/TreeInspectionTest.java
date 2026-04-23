@@ -9,85 +9,85 @@ class TreeInspectionTest {
     @Test
     void testSplitCodePython() throws Exception {
         // parse_string() Python code with multiple functions finds all function_definition nodes
-        var result = TreeSitterLanguagePack.process("def foo():\n    pass\n\ndef bar():\n    pass\n\ndef baz():\n    pass\n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "def foo():\n    pass\n\ndef bar():\n    pass\n\ndef baz():\n    pass\n");
+        assertTrue(TreeSitterLanguagePack.findNodesByType(tree, "function_definition").size() >= 3, "expected at least 3 elements");
     }
 
     @Test
     void testTreeErrorCountBroken() throws Exception {
         // Parse broken Python code and verify error count >= 1
-        var result = TreeSitterLanguagePack.process("def (broken syntax @@@ !!!", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "def (broken syntax @@@ !!!");
+        assertTrue(TreeSitterLanguagePack.treeHasErrorNodes(tree));
     }
 
     @Test
     void testTreeErrorCountMultiple() throws Exception {
         // parse_string() with multiple syntax errors counts all error nodes
-        var result = TreeSitterLanguagePack.process("def (\ndef (\n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "def (\ndef (\n");
+        assertTrue(TreeSitterLanguagePack.treeErrorCount(tree) >= 2, "expected >= 2");
     }
 
     @Test
     void testTreeErrorCountValid() throws Exception {
         // Parse valid Python code and verify zero error count
-        var result = TreeSitterLanguagePack.process("x = 1\ny = 2\n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "x = 1\ny = 2\n");
+        assertEquals(0, TreeSitterLanguagePack.treeErrorCount(tree));
     }
 
     @Test
     void testTreeFindNodesNoMatch() throws Exception {
         // Parse Python with no class definitions and verify find_nodes_by_type returns 0
-        var result = TreeSitterLanguagePack.process("x = 1\n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "x = 1\n");
+        assertEquals(0, TreeSitterLanguagePack.findNodesByType(tree, "class_definition"));
     }
 
     @Test
     void testTreeFindNodesTwoFunctions() throws Exception {
         // Parse Python with 2 functions and verify find_nodes_by_type count
-        var result = TreeSitterLanguagePack.process("def foo():\n    pass\n\ndef bar():\n    pass\n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "def foo():\n    pass\n\ndef bar():\n    pass\n");
+        assertTrue(TreeSitterLanguagePack.findNodesByType(tree, "function_definition").size() >= 2, "expected at least 2 elements");
     }
 
     @Test
     void testTreeHasErrorNodesBrokenSyntax() throws Exception {
         // tree_has_error_nodes returns true for syntactically broken code
-        var result = TreeSitterLanguagePack.process("def broken(\n    x = \n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "def broken(\n    x = \n");
+        assertTrue(TreeSitterLanguagePack.treeHasErrorNodes(tree));
     }
 
     @Test
     void testTreeHasErrorNodesValidCode() throws Exception {
         // tree_has_error_nodes returns false for valid Python code
-        var result = TreeSitterLanguagePack.process("def greet(name):\n    return f'Hello {name}'\n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "def greet(name):\n    return f'Hello {name}'\n");
+        assertFalse(TreeSitterLanguagePack.treeHasErrorNodes(tree));
     }
 
     @Test
     void testTreeNamedChildrenClassAndFunction() throws Exception {
         // Parse Python with class and function, verify named children count
-        var result = TreeSitterLanguagePack.process("class Foo:\n    pass\n\ndef bar():\n    pass\n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "class Foo:\n    pass\n\ndef bar():\n    pass\n");
+        assertTrue(tree.rootNode().namedChildCount() >= 2, "expected >= 2");
     }
 
     @Test
     void testTreeRootNodeInfoJavascript() throws Exception {
         // Parse JavaScript source and verify root node type is program
-        var result = TreeSitterLanguagePack.process("const x = 1;\n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("javascript", "const x = 1;\n");
+        assertEquals("program", tree.rootNode().kind());
     }
 
     @Test
     void testTreeRootNodeInfoPython() throws Exception {
         // Parse Python source and verify root node info
-        var result = TreeSitterLanguagePack.process("def hello():\n    pass\n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "def hello():\n    pass\n");
+        assertEquals("module", tree.rootNode().kind());
     }
 
     @Test
     void testTreeToSexpPython() throws Exception {
         // Parse Python and verify tree_to_sexp returns valid S-expression containing module
-        var result = TreeSitterLanguagePack.process("x = 1\n", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "x = 1\n");
+        assertTrue(TreeSitterLanguagePack.treeToSexp(tree).contains("module"), "expected to contain: " + "module");
     }
 
 }

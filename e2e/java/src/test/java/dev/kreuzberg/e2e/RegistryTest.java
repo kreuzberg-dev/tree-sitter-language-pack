@@ -9,52 +9,52 @@ class RegistryTest {
     @Test
     void testGetLanguagePython() throws Exception {
         // get_language('python') returns a valid Language object
-        var result = TreeSitterLanguagePack.process("", null);
+        var language = TreeSitterLanguagePack.get_language("python");
     }
 
     @Test
     void testGetLanguageUnknown() throws Exception {
         // get_language('nonexistent_xyz') returns an error for unknown language
-        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("", null));
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.get_language("nonexistent_xyz"));
     }
 
     @Test
     void testGetParserPython() throws Exception {
         // get_parser('python') returns a valid Parser object
-        var result = TreeSitterLanguagePack.process("", null);
+        var parser = TreeSitterLanguagePack.get_parser("python");
     }
 
     @Test
     void testGetParserUnknown() throws Exception {
         // get_parser('nonexistent_xyz') returns an error for unknown language
-        assertThrows(Exception.class, () -> TreeSitterLanguagePack.process("", null));
+        assertThrows(Exception.class, () -> TreeSitterLanguagePack.get_parser("nonexistent_xyz"));
     }
 
     @Test
     void testRegistryHasLanguageFalse() throws Exception {
         // has_language('nonexistent') should return false
-        var result = TreeSitterLanguagePack.process("", null);
-        // TODO: unsupported assertion type: is_false
+        var result = TreeSitterLanguagePack.has_language("nonexistent");
+        assertFalse(result, "expected false");
     }
 
     @Test
     void testRegistryHasLanguageTrue() throws Exception {
         // has_language('python') should return true
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.has_language("python");
         assertTrue(result, "expected true");
     }
 
     @Test
     void testRegistryLanguageCount() throws Exception {
         // language_count returns a value greater than 300
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.language_count("{}");
         assertTrue(result >= 300, "expected >= 300");
     }
 
     @Test
     void testRegistryListLanguages() throws Exception {
         // available_languages should return a non-empty list
-        var result = TreeSitterLanguagePack.process("", null);
+        var result = TreeSitterLanguagePack.available_languages(null);
         assertFalse(result.isEmpty(), "expected non-empty value");
     }
 

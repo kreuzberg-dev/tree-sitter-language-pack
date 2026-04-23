@@ -5,52 +5,52 @@ defmodule E2e.RegistryTest do
 
   describe "get_language_python" do
     test "get_language('python') returns a valid Language object" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, language} = TreeSitterLanguagePack.get_language("", nil)
     end
   end
 
   describe "get_language_unknown" do
     test "get_language('nonexistent_xyz') returns an error for unknown language" do
-      assert {:error, _} = TreeSitterLanguagePack.process("", nil)
+      assert {:error, _} = TreeSitterLanguagePack.get_language("", nil)
     end
   end
 
   describe "get_parser_python" do
     test "get_parser('python') returns a valid Parser object" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, parser} = TreeSitterLanguagePack.get_parser("", nil)
     end
   end
 
   describe "get_parser_unknown" do
     test "get_parser('nonexistent_xyz') returns an error for unknown language" do
-      assert {:error, _} = TreeSitterLanguagePack.process("", nil)
+      assert {:error, _} = TreeSitterLanguagePack.get_parser("", nil)
     end
   end
 
   describe "registry_has_language_false" do
     test "has_language('nonexistent') should return false" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
-      # TODO: unsupported assertion type: is_false
+      {:ok, result} = TreeSitterLanguagePack.has_language("", nil)
+      assert result == false
     end
   end
 
   describe "registry_has_language_true" do
     test "has_language('python') should return true" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.has_language("", nil)
       assert result == true
     end
   end
 
   describe "registry_language_count" do
     test "language_count returns a value greater than 300" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.language_count("", nil)
       assert result >= 300
     end
   end
 
   describe "registry_list_languages" do
     test "available_languages should return a non-empty list" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.available_languages("", nil)
       assert result != ""
     end
   end

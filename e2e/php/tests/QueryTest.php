@@ -64,13 +64,13 @@ final class QueryTest extends TestCase
     public function test_run_query_no_matches(): void
     {
         $tree = TreeSitterLanguagePack::parse_string("python", "x = 1");
-        // TODO: unsupported assertion type: method_result
+        $this->assertGreaterThanOrEqual(0, count(TreeSitterLanguagePack::run_query($tree, "python", "(class_definition name: (identifier) @name)", $source)));
     }
 
     /** Parse Python and run a query to find function definitions */
     public function test_run_query_python_functions(): void
     {
         $tree = TreeSitterLanguagePack::parse_string("python", "def hello():\n    pass\n\ndef world():\n    return 42\n");
-        // TODO: unsupported assertion type: method_result
+        $this->assertGreaterThanOrEqual(2, count(TreeSitterLanguagePack::run_query($tree, "python", "(function_definition name: (identifier) @name)", $source)));
     }
 }

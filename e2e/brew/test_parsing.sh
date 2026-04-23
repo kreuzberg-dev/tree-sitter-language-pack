@@ -8,7 +8,9 @@ test_parsing_go_function() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_contains_node_type
+    method_result_contains_node_type=$(tree_sitter_language_pack tree-contains-node-type "$output" 'function_declaration')
+    [ "$method_result_contains_node_type" = "true" ] || exit 1
 }
 
 test_parsing_html_element() {
@@ -16,7 +18,9 @@ test_parsing_html_element() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_contains_node_type
+    method_result_contains_node_type=$(tree_sitter_language_pack tree-contains-node-type "$output" 'element')
+    [ "$method_result_contains_node_type" = "true" ] || exit 1
 }
 
 test_parsing_javascript_class() {
@@ -27,7 +31,9 @@ test_parsing_javascript_class() {
     local val_root_child_count
     val_root_child_count=$(echo "$output" | jq -r '.root_child_count')
     assert_greater_than_or_equal "$val_root_child_count" '1' 'root_child_count'
-    # TODO: unsupported assertion type: method_result
+    local method_result_contains_node_type
+    method_result_contains_node_type=$(tree_sitter_language_pack tree-contains-node-type "$output" 'class_declaration')
+    [ "$method_result_contains_node_type" = "true" ] || exit 1
 }
 
 test_parsing_javascript_variable() {
@@ -35,7 +41,9 @@ test_parsing_javascript_variable() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_contains_node_type
+    method_result_contains_node_type=$(tree_sitter_language_pack tree-contains-node-type "$output" 'lexical_declaration')
+    [ "$method_result_contains_node_type" = "true" ] || exit 1
 }
 
 test_parsing_python_function() {
@@ -43,7 +51,9 @@ test_parsing_python_function() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_contains_node_type
+    method_result_contains_node_type=$(tree_sitter_language_pack tree-contains-node-type "$output" 'function_definition')
+    [ "$method_result_contains_node_type" = "true" ] || exit 1
 }
 
 test_parsing_rust_function() {
@@ -51,7 +61,9 @@ test_parsing_rust_function() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_contains_node_type
+    method_result_contains_node_type=$(tree_sitter_language_pack tree-contains-node-type "$output" 'function_item')
+    [ "$method_result_contains_node_type" = "true" ] || exit 1
 }
 
 test_parsing_rust_struct() {

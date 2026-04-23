@@ -26,140 +26,140 @@ defmodule E2e.LanguageDetectionTest do
 
   describe "detect_content_bash_shebang" do
     test "detect_language_from_content recognizes #!/bin/bash shebang" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_content("", nil)
       assert String.trim(result) == "bash"
     end
   end
 
   describe "detect_content_no_shebang" do
     test "detect_language_from_content returns None when no shebang present" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_content("", nil)
       assert is_nil(result) or String.trim(result) == ""
     end
   end
 
   describe "detect_content_python_shebang" do
     test "detect_language_from_content recognizes #!/usr/bin/env python3 shebang" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_content("", nil)
       assert String.trim(result) == "python"
     end
   end
 
   describe "detect_ext_cpp" do
     test "detect_language_from_extension recognizes .cpp as cpp" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_extension("", nil)
       assert String.trim(result) == "cpp"
     end
   end
 
   describe "detect_ext_go" do
     test "detect_language_from_extension recognizes .go as go" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_extension("", nil)
       assert String.trim(result) == "go"
     end
   end
 
   describe "detect_ext_java" do
     test "detect_language_from_extension recognizes .java as java" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_extension("", nil)
       assert String.trim(result) == "java"
     end
   end
 
   describe "detect_ext_javascript" do
     test "detect_language_from_extension recognizes .js as javascript" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_extension("", nil)
       assert String.trim(result) == "javascript"
     end
   end
 
   describe "detect_ext_php" do
     test "detect_language_from_extension recognizes .php as php" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_extension("", nil)
       assert String.trim(result) == "php"
     end
   end
 
   describe "detect_ext_python" do
     test "detect_language_from_extension recognizes .py as python" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_extension("", nil)
       assert String.trim(result) == "python"
     end
   end
 
   describe "detect_ext_ruby" do
     test "detect_language_from_extension recognizes .rb as ruby" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_extension("", nil)
       assert String.trim(result) == "ruby"
     end
   end
 
   describe "detect_ext_rust" do
     test "detect_language_from_extension recognizes .rs as rust" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_extension("", nil)
       assert String.trim(result) == "rust"
     end
   end
 
   describe "detect_ext_typescript" do
     test "detect_language_from_extension recognizes .ts as typescript" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_extension("", nil)
       assert String.trim(result) == "typescript"
     end
   end
 
   describe "detect_ext_unknown" do
     test "detect_language_from_extension returns None for unknown extension .xyz" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_extension("", nil)
       assert is_nil(result) or String.trim(result) == ""
     end
   end
 
   describe "detect_path_dotfile" do
     test "detect_language_from_path returns None for dotfile .gitignore (no standard extension)" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_path("", nil)
       assert is_nil(result) or String.trim(result) == ""
     end
   end
 
   describe "detect_path_go_nested" do
     test "detect_language_from_path extracts extension from nested path lib/server.go" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_path("", nil)
       assert String.trim(result) == "go"
     end
   end
 
   describe "detect_path_java_root" do
     test "detect_language_from_path recognizes Main.java in root directory" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_path("", nil)
       assert String.trim(result) == "java"
     end
   end
 
   describe "detect_path_js_root" do
     test "detect_language_from_path recognizes app.js in root directory" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_path("", nil)
       assert String.trim(result) == "javascript"
     end
   end
 
   describe "detect_path_nested" do
     test "detect_language_from_path extracts extension from nested path src/main.py" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_path("", nil)
       assert String.trim(result) == "python"
     end
   end
 
   describe "detect_path_no_extension" do
     test "detect_language_from_path returns None for extensionless file Makefile" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_path("", nil)
       assert is_nil(result) or String.trim(result) == ""
     end
   end
 
   describe "detect_path_rust_src" do
     test "detect_language_from_path extracts extension from nested path src/main.rs" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.detect_language_from_path("", nil)
       assert String.trim(result) == "rust"
     end
   end

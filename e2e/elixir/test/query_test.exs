@@ -5,64 +5,64 @@ defmodule E2e.QueryTest do
 
   describe "highlights_nonexistent_language" do
     test "Get highlights query for nonexistent language returns null/empty" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.get_highlights_query("", nil)
       assert is_nil(result) or String.trim(result) == ""
     end
   end
 
   describe "highlights_query_python" do
     test "get_highlights_query returns non-empty string for python" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.get_highlights_query("", nil)
       assert result != ""
     end
   end
 
   describe "highlights_query_unknown_language" do
     test "get_highlights_query returns None for unknown language" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.get_highlights_query("", nil)
       assert is_nil(result) or String.trim(result) == ""
     end
   end
 
   describe "injections_query_javascript" do
     test "get_injections_query returns non-empty for javascript (has embedded languages)" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.get_injections_query("", nil)
       assert result != ""
     end
   end
 
   describe "injections_query_unknown_language" do
     test "get_injections_query returns empty for unknown language" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.get_injections_query("", nil)
       assert is_nil(result) or String.trim(result) == ""
     end
   end
 
   describe "locals_query_python" do
     test "get_locals_query returns non-empty for python" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.get_locals_query("", nil)
       assert result != ""
     end
   end
 
   describe "locals_query_unknown_language" do
     test "get_locals_query returns empty for unknown language" do
-      {:ok, result} = TreeSitterLanguagePack.process("", nil)
+      {:ok, result} = TreeSitterLanguagePack.get_locals_query("", nil)
       assert is_nil(result) or String.trim(result) == ""
     end
   end
 
   describe "run_query_no_matches" do
     test "Run query that matches no nodes returns empty result" do
-      {:ok, result} = TreeSitterLanguagePack.process("x = 1", nil)
-      # TODO: unsupported assertion type: method_result
+      {:ok, tree} = TreeSitterLanguagePack.parse_string("x = 1", nil)
+      assert length(TreeSitterLanguagePack.run_query(tree, "python", "(class_definition name: (identifier) @name)", source)) >= 0
     end
   end
 
   describe "run_query_python_functions" do
     test "Parse Python and run a query to find function definitions" do
-      {:ok, result} = TreeSitterLanguagePack.process("def hello():\n    pass\n\ndef world():\n    return 42\n", nil)
-      # TODO: unsupported assertion type: method_result
+      {:ok, tree} = TreeSitterLanguagePack.parse_string("def hello():\n    pass\n\ndef world():\n    return 42\n", nil)
+      assert length(TreeSitterLanguagePack.run_query(tree, "python", "(function_definition name: (identifier) @name)", source)) >= 2
     end
   end
 end

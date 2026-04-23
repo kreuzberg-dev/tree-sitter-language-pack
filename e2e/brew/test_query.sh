@@ -57,7 +57,10 @@ test_run_query_no_matches() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_run_query
+    method_result_run_query=$(tree_sitter_language_pack tree-run-query "$output" 'python' '(class_definition name: (identifier) @name)')
+    local count_from_method_result=$(echo "$method_result_run_query" | jq 'length')
+    [ "$count_from_method_result" -ge 0 ] || exit 1
 }
 
 test_run_query_python_functions() {
@@ -65,7 +68,10 @@ test_run_query_python_functions() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_run_query
+    method_result_run_query=$(tree_sitter_language_pack tree-run-query "$output" 'python' '(function_definition name: (identifier) @name)')
+    local count_from_method_result=$(echo "$method_result_run_query" | jq 'length')
+    [ "$count_from_method_result" -ge 2 ] || exit 1
 }
 
 run_tests_query() {

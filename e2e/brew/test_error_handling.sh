@@ -52,7 +52,9 @@ test_error_handling_invalid_syntax() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_has_error_nodes
+    method_result_has_error_nodes=$(tree_sitter_language_pack tree-has-error-nodes "$output")
+    [ "$method_result_has_error_nodes" = 'true' ] || exit 1
 }
 
 test_error_handling_unknown_language() {
@@ -78,7 +80,10 @@ test_error_run_query_invalid_syntax() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    if tree_sitter_language_pack tree-run-query "$output" 'python' '(((' >/dev/null 2>&1; then
+        echo 'FAIL [method_result]: expected method to raise error but it succeeded' >&2
+        return 1
+    fi
 }
 
 test_parse_empty_language() {

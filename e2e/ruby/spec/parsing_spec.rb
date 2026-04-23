@@ -6,38 +6,38 @@ require 'json'
 
 RSpec.describe 'parsing' do
   it 'parsing_go_function: Parse a Go function declaration and assert node type' do
-    result = TreeSitterLanguagePack.process("package main\nfunc main() {}", nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('go', "package main\nfunc main() {}")
+    expect(TreeSitterLanguagePack.tree_contains_node_type(tree, "function_declaration")).to be true
   end
 
   it 'parsing_html_element: Parse an HTML element and assert node type' do
-    result = TreeSitterLanguagePack.process('<div>hello</div>', nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('html', '<div>hello</div>')
+    expect(TreeSitterLanguagePack.tree_contains_node_type(tree, "element")).to be true
   end
 
   it 'parsing_javascript_class: Parse a JavaScript class declaration.' do
-    result = TreeSitterLanguagePack.process('class Foo { bar() {} }', nil)
-    expect(result.root_child_count).to be >= 1
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('javascript', 'class Foo { bar() {} }')
+    expect(tree.root_child_count).to be >= 1
+    expect(TreeSitterLanguagePack.tree_contains_node_type(tree, "class_declaration")).to be true
   end
 
   it 'parsing_javascript_variable: Parse a JavaScript variable declaration and assert node type' do
-    result = TreeSitterLanguagePack.process('const x = 1;', nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('javascript', 'const x = 1;')
+    expect(TreeSitterLanguagePack.tree_contains_node_type(tree, "lexical_declaration")).to be true
   end
 
   it 'parsing_python_function: Parse a Python function definition and assert node type' do
-    result = TreeSitterLanguagePack.process('def hello(): pass', nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('python', 'def hello(): pass')
+    expect(TreeSitterLanguagePack.tree_contains_node_type(tree, "function_definition")).to be true
   end
 
   it 'parsing_rust_function: Parse a Rust function definition and assert node type' do
-    result = TreeSitterLanguagePack.process('fn main() {}', nil)
-    # TODO: unsupported assertion type: method_result
+    tree = TreeSitterLanguagePack.parse_string('rust', 'fn main() {}')
+    expect(TreeSitterLanguagePack.tree_contains_node_type(tree, "function_item")).to be true
   end
 
   it 'parsing_rust_struct: Parse a Rust struct definition.' do
-    result = TreeSitterLanguagePack.process('struct Point { x: f64, y: f64 }', nil)
-    expect(result.root_child_count).to be >= 1
+    tree = TreeSitterLanguagePack.parse_string('rust', 'struct Point { x: f64, y: f64 }')
+    expect(tree.root_child_count).to be >= 1
   end
 end

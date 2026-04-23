@@ -9,51 +9,51 @@ class ParsingTest {
     @Test
     void testParsingGoFunction() throws Exception {
         // Parse a Go function declaration and assert node type
-        var result = TreeSitterLanguagePack.process("package main\nfunc main() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("go", "package main\nfunc main() {}");
+        assertTrue(TreeSitterLanguagePack.treeContainsNodeType(tree, "function_declaration"));
     }
 
     @Test
     void testParsingHtmlElement() throws Exception {
         // Parse an HTML element and assert node type
-        var result = TreeSitterLanguagePack.process("<div>hello</div>", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("html", "<div>hello</div>");
+        assertTrue(TreeSitterLanguagePack.treeContainsNodeType(tree, "element"));
     }
 
     @Test
     void testParsingJavascriptClass() throws Exception {
         // Parse a JavaScript class declaration.
-        var result = TreeSitterLanguagePack.process("class Foo { bar() {} }", null);
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("javascript", "class Foo { bar() {} }");
+        assertTrue(tree.rootChildCount() >= 1, "expected >= 1");
+        assertTrue(TreeSitterLanguagePack.treeContainsNodeType(tree, "class_declaration"));
     }
 
     @Test
     void testParsingJavascriptVariable() throws Exception {
         // Parse a JavaScript variable declaration and assert node type
-        var result = TreeSitterLanguagePack.process("const x = 1;", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("javascript", "const x = 1;");
+        assertTrue(TreeSitterLanguagePack.treeContainsNodeType(tree, "lexical_declaration"));
     }
 
     @Test
     void testParsingPythonFunction() throws Exception {
         // Parse a Python function definition and assert node type
-        var result = TreeSitterLanguagePack.process("def hello(): pass", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("python", "def hello(): pass");
+        assertTrue(TreeSitterLanguagePack.treeContainsNodeType(tree, "function_definition"));
     }
 
     @Test
     void testParsingRustFunction() throws Exception {
         // Parse a Rust function definition and assert node type
-        var result = TreeSitterLanguagePack.process("fn main() {}", null);
-        // TODO: unsupported assertion type: method_result
+        var tree = TreeSitterLanguagePack.parse_string("rust", "fn main() {}");
+        assertTrue(TreeSitterLanguagePack.treeContainsNodeType(tree, "function_item"));
     }
 
     @Test
     void testParsingRustStruct() throws Exception {
         // Parse a Rust struct definition.
-        var result = TreeSitterLanguagePack.process("struct Point { x: f64, y: f64 }", null);
-        assertTrue(result.rootChildCount() >= 1, "expected >= 1");
+        var tree = TreeSitterLanguagePack.parse_string("rust", "struct Point { x: f64, y: f64 }");
+        assertTrue(tree.rootChildCount() >= 1, "expected >= 1");
     }
 
 }

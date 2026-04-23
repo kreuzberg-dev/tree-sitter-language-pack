@@ -94,7 +94,10 @@ fn test_error_run_query_invalid_syntax() {
     let language = r#"python"#;
     let source = r#"x = 1"#;
     let tree = parse_string(&language, source.as_bytes()).expect("should succeed");
-    // TODO: unsupported method_result check type: is_error
+    assert!(
+        tree_sitter_language_pack::run_query(&tree, "python", r#"((("#, source.as_bytes()).is_err(),
+        "expected method to return error"
+    );
 }
 
 #[test]

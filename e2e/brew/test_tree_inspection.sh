@@ -8,7 +8,10 @@ test_split_code_python() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_find_nodes_by_type
+    method_result_find_nodes_by_type=$(tree_sitter_language_pack tree-find-nodes-by-type "$output" 'function_definition')
+    local count_from_method_result=$(echo "$method_result_find_nodes_by_type" | jq 'length')
+    [ "$count_from_method_result" -ge 3 ] || exit 1
 }
 
 test_tree_error_count_broken() {
@@ -16,7 +19,9 @@ test_tree_error_count_broken() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_has_error_nodes
+    method_result_has_error_nodes=$(tree_sitter_language_pack tree-has-error-nodes "$output")
+    [ "$method_result_has_error_nodes" = 'true' ] || exit 1
 }
 
 test_tree_error_count_multiple() {
@@ -24,7 +29,9 @@ test_tree_error_count_multiple() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_tree_error_count
+    method_result_tree_error_count=$(tree_sitter_language_pack tree-error-count "$output")
+    [ "$method_result_tree_error_count" -ge 2 ] || exit 1
 }
 
 test_tree_error_count_valid() {
@@ -32,7 +39,9 @@ test_tree_error_count_valid() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_error_count
+    method_result_error_count=$(tree_sitter_language_pack tree-error-count "$output")
+    [ "$method_result_error_count" = '0' ] || exit 1
 }
 
 test_tree_find_nodes_no_match() {
@@ -40,7 +49,9 @@ test_tree_find_nodes_no_match() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_find_nodes_by_type
+    method_result_find_nodes_by_type=$(tree_sitter_language_pack tree-find-nodes-by-type "$output" 'class_definition')
+    [ "$method_result_find_nodes_by_type" = '0' ] || exit 1
 }
 
 test_tree_find_nodes_two_functions() {
@@ -48,7 +59,10 @@ test_tree_find_nodes_two_functions() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_find_nodes_by_type
+    method_result_find_nodes_by_type=$(tree_sitter_language_pack tree-find-nodes-by-type "$output" 'function_definition')
+    local count_from_method_result=$(echo "$method_result_find_nodes_by_type" | jq 'length')
+    [ "$count_from_method_result" -ge 2 ] || exit 1
 }
 
 test_tree_has_error_nodes_broken_syntax() {
@@ -56,7 +70,9 @@ test_tree_has_error_nodes_broken_syntax() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_has_error_nodes
+    method_result_has_error_nodes=$(tree_sitter_language_pack tree-has-error-nodes "$output")
+    [ "$method_result_has_error_nodes" = "true" ] || exit 1
 }
 
 test_tree_has_error_nodes_valid_code() {
@@ -64,7 +80,9 @@ test_tree_has_error_nodes_valid_code() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_has_error_nodes
+    method_result_has_error_nodes=$(tree_sitter_language_pack tree-has-error-nodes "$output")
+    [ "$method_result_has_error_nodes" = "false" ] || exit 1
 }
 
 test_tree_named_children_class_and_function() {
@@ -72,7 +90,9 @@ test_tree_named_children_class_and_function() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_named_children_count
+    method_result_named_children_count=$(tree_sitter_language_pack tree-named-children-count "$output")
+    [ "$method_result_named_children_count" -ge 2 ] || exit 1
 }
 
 test_tree_root_node_info_javascript() {
@@ -80,7 +100,9 @@ test_tree_root_node_info_javascript() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_node_type
+    method_result_root_node_type=$(tree_sitter_language_pack tree-root-node-type "$output")
+    [ "$method_result_root_node_type" = 'program' ] || exit 1
 }
 
 test_tree_root_node_info_python() {
@@ -88,7 +110,9 @@ test_tree_root_node_info_python() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_root_node_type
+    method_result_root_node_type=$(tree_sitter_language_pack tree-root-node-type "$output")
+    [ "$method_result_root_node_type" = 'module' ] || exit 1
 }
 
 test_tree_to_sexp_python() {
@@ -96,7 +120,9 @@ test_tree_to_sexp_python() {
     local output
     output=$(tree_sitter_language_pack process)
 
-    # TODO: unsupported assertion type: method_result
+    local method_result_tree_to_sexp
+    method_result_tree_to_sexp=$(tree_sitter_language_pack tree-to-sexp "$output")
+    [[ "$method_result_tree_to_sexp" == *'module'* ]] || exit 1
 }
 
 run_tests_tree_inspection() {

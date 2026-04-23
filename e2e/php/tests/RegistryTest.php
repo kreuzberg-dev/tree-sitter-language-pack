@@ -43,7 +43,7 @@ final class RegistryTest extends TestCase
     public function test_registry_has_language_false(): void
     {
         $result = TreeSitterLanguagePack::has_language("nonexistent");
-        // TODO: unsupported assertion type: is_false
+        $this->assertFalse($result);
     }
 
     /** has_language('python') should return true */
