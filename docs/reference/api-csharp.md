@@ -1061,7 +1061,7 @@ Defines a single extraction pattern and its configuration.
 | `CaptureOutput` | `CaptureOutput` | `CaptureOutput.Full` | What to include in each capture result. |
 | `ChildFields` | `List<string>` | `new List<string>()` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `MaxResults` | `nuint?` | `null` | Maximum number of matches to return. `null` means unlimited. |
-| `ByteRange` | `string?` | `null` | Restrict matches to a byte range `(start, end)`. |
+| `ByteRange` | `List<nuint>?` | `new List<nuint>()` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---

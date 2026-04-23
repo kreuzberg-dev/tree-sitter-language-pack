@@ -104,7 +104,7 @@ Defines a single extraction pattern and its configuration.
 | `capture_output` | `CaptureOutput` | `CaptureOutput::Full` | What to include in each capture result. |
 | `child_fields` | `Vec<String>` | `vec![]` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `max_results` | `Option<usize>` | `Default::default()` | Maximum number of matches to return. `None` means unlimited. |
-| `byte_range` | `Option<String>` | `Default::default()` | Restrict matches to a byte range `(start, end)`. |
+| `byte_range` | `Vec<usize>` | `vec![]` | Restrict matches to a byte range `(start, end)`. |
 
 ---
 

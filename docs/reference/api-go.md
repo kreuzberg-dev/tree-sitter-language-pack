@@ -1061,7 +1061,7 @@ Defines a single extraction pattern and its configuration.
 | `CaptureOutput` | `CaptureOutput` | `CaptureOutput.Full` | What to include in each capture result. |
 | `ChildFields` | `[]string` | `nil` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
 | `MaxResults` | `*int` | `nil` | Maximum number of matches to return. `nil` means unlimited. |
-| `ByteRange` | `*string` | `nil` | Restrict matches to a byte range `(start, end)`. |
+| `ByteRange` | `*[]int` | `nil` | Restrict matches to a byte range `(start, end)`. |
 
 
 ---
