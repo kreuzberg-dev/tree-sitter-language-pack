@@ -304,7 +304,7 @@ Pre-download parsers and cache them between runs:
 
 ```yaml
 - name: Install ts-pack
-  run: cargo install ts-pack
+  run: cargo install ts-pack-cli
 
 - name: Cache parsers
   uses: actions/cache@v4
