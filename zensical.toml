@@ -1,6 +1,6 @@
 [project]
 site_name = "tree-sitter-language-pack"
-site_description = "tree-sitter-language-pack — 306 tree-sitter parsers with code intelligence, chunking, and bindings for Python, Node.js, Rust, Go, Java, C#, Ruby, Elixir, PHP, and WebAssembly."
+site_description = "tree-sitter-language-pack — 306 tree-sitter parsers with code intelligence, chunking, and bindings for Python, Node.js, Rust, Go, Java, Ruby, Elixir, PHP, and WebAssembly."
 site_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
 site_author = "kreuzberg.dev"
 repo_name = "kreuzberg-dev/tree-sitter-language-pack"
@@ -34,7 +34,6 @@ nav = [
         { "Rust" = "reference/api-rust.md" },
         { "Go" = "reference/api-go.md" },
         { "Java" = "reference/api-java.md" },
-        { "C# / .NET" = "reference/api-csharp.md" },
         { "Ruby" = "reference/api-ruby.md" },
         { "Elixir" = "reference/api-elixir.md" },
         { "PHP" = "reference/api-php.md" },
@@ -48,8 +47,6 @@ nav = [
     { "Changelog" = "CHANGELOG.md" },
     { "Contributing" = [
         { "Overview" = "contributing.md" },
-        { "Task Runner" = "contributing/tasks.md" },
-        { "Scripts" = "contributing/scripts.md" },
         { "CI / CD" = "contributing/ci.md" },
     ] },
 ]

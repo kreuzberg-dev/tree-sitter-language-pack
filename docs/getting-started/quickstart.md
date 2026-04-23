@@ -24,7 +24,7 @@ This guide walks you from install to parsing, code intelligence, and LLM chunkin
 === "Rust"
 
     ```bash
-    cargo add ts-pack-core
+    cargo add tree-sitter-language-pack
     ```
 
 === "CLI"
@@ -34,7 +34,7 @@ This guide walks you from install to parsing, code intelligence, and LLM chunkin
     ```
 
 !!! tip "Other ecosystems"
-    Go, Java, C#, Ruby, Elixir, PHP, and WebAssembly are also supported.
+    Go, Java, Ruby, Elixir, PHP, and WebAssembly are also supported.
     See [Installation](installation.md) for the full list.
 
 ---
@@ -249,7 +249,7 @@ Build a concrete syntax tree from source code.
 === "Rust"
 
     ```rust
-    use ts_pack_core::get_parser;
+    use tree_sitter_language_pack::get_parser;
 
     fn main() -> anyhow::Result<()> {
         let mut parser = get_parser("rust")?;
@@ -363,7 +363,7 @@ Go beyond the raw syntax tree. Extract functions, classes, imports, docstrings, 
 === "Rust"
 
     ```rust
-    use ts_pack_core::{process, ProcessConfig};
+    use tree_sitter_language_pack::{process, ProcessConfig};
 
     fn main() -> anyhow::Result<()> {
         let source = r#"
@@ -380,10 +380,10 @@ Go beyond the raw syntax tree. Extract functions, classes, imports, docstrings, 
     }
     "#;
 
-        let config = ProcessConfig::new("rust")
-            .structure(true)
-            .imports(true)
-            .docstrings(true);
+        let mut config = ProcessConfig::new("rust");
+        config.structure = true;
+        config.imports = true;
+        config.docstrings = true;
 
         let result = process(source, &config)?;
 
@@ -400,7 +400,7 @@ Go beyond the raw syntax tree. Extract functions, classes, imports, docstrings, 
     ts-pack process src/main.py --structure --imports --docstrings
 
     # JSON output for piping
-    ts-pack process src/main.py --all --format json | jq '.structure[].name'
+    ts-pack process src/main.py --all | jq '.structure[].name'
     ```
 
 ---
@@ -454,14 +454,14 @@ Split code at natural boundaries so language models receive coherent, complete u
 
     config = ProcessConfig(
         language="python",
-        chunk_max_size=1500,  # max tokens per chunk
+        chunk_max_size=1500,  # max bytes per chunk
         structure=True,
     )
     result = process(source, config)
 
     for i, chunk in enumerate(result["chunks"]):
         print(f"Chunk {i}: lines {chunk['start_line']}-{chunk['end_line']} "
-              f"({chunk['token_count']} tokens)")
+              f"({chunk['end_byte'] - chunk['start_byte']} bytes)")
     ```
 
 === "Node.js"
@@ -479,7 +479,7 @@ Split code at natural boundaries so language models receive coherent, complete u
     });
 
     result.chunks.forEach((chunk, i) => {
-      console.log(`Chunk ${i}: lines ${chunk.startLine}-${chunk.endLine} (${chunk.tokenCount} tokens)`);
+      console.log(`Chunk ${i}: lines ${chunk.startLine}-${chunk.endLine} (${chunk.endByte - chunk.startByte} bytes)`);
     });
     ```
 
@@ -487,8 +487,8 @@ Split code at natural boundaries so language models receive coherent, complete u
 
     ```bash
     # Chunk a file for LLM ingestion
-    ts-pack process large_module.py --chunk-size 1500 --format json \
-      | jq '.chunks[] | {start: .start_line, end: .end_line, tokens: .token_count}'
+    ts-pack process large_module.py --chunk-size 1500 \
+      | jq '.chunks[] | {start: .start_line, end: .end_line, bytes: (.end_byte - .start_byte)}'
     ```
 
 ---
@@ -498,4 +498,4 @@ Dive deeper with the following guides:
 
 - [:material-arrow-right: Parsing guide](../guides/parsing.md) — syntax trees, error handling, and incremental parsing
 - [:material-arrow-right: Configuration](../guides/configuration.md) — `language-pack.toml` and advanced options
-- [:material-arrow-right: API Reference](../api/python.md) — full API docs for every binding
+- [:material-arrow-right: API Reference](../reference/api-python.md) — full API docs for every binding

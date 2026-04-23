@@ -18,7 +18,7 @@ def process_order(order_id: str, quantity: int) -> dict:
     return {"order_id": order_id, "total": price, "status": "pending"}
 ```
 
-Naive chunking at 100 tokens might split after `raise ValueError(...)`, leaving the return statement in the next chunk. Syntax-aware chunking keeps `process_order` together as one unit. Only when a single function exceeds the token budget does the chunker split inside it.
+Naive chunking at 100 bytes might split after `raise ValueError(...)`, leaving the return statement in the next chunk. Syntax-aware chunking keeps `process_order` together as one unit. Only when a single function exceeds the byte budget does the chunker split inside it.
 
 ## Basic usage
 
@@ -34,13 +34,13 @@ Set `chunk_max_size` in `ProcessConfig` to enable chunking:
 
     result = process(source, ProcessConfig(
         language="python",
-        chunk_max_size=1000,   # target tokens per chunk
+        chunk_max_size=1000,   # max bytes per chunk
         structure=True,        # include structure metadata
     ))
 
     for i, chunk in enumerate(result["chunks"]):
         print(f"Chunk {i + 1}: lines {chunk['start_line']}-{chunk['end_line']} "
-              f"({chunk['token_count']} tokens)")
+              f"({chunk['end_byte'] - chunk['start_byte']} bytes)")
     ```
 
 === "Node.js"
@@ -58,32 +58,31 @@ Set `chunk_max_size` in `ProcessConfig` to enable chunking:
     });
 
     result.chunks.forEach((chunk, i) => {
-      console.log(`Chunk ${i + 1}: lines ${chunk.startLine}-${chunk.endLine} (${chunk.tokenCount} tokens)`);
+      console.log(`Chunk ${i + 1}: lines ${chunk.startLine}-${chunk.endLine} (${chunk.endByte - chunk.startByte} bytes)`);
     });
     ```
 
 === "Rust"
 
     ```rust
-    use ts_pack_core::{process, ProcessConfig};
+    use tree_sitter_language_pack::{process, ProcessConfig};
 
-    let config = ProcessConfig::new("rust")
-        .chunk_max_size(1000)
-        .structure(true);
+    let mut config = ProcessConfig::new("rust").with_chunking(1000);
+    config.structure = true;
 
     let result = process(&source, &config)?;
 
     for (i, chunk) in result.chunks.iter().enumerate() {
-        println!("Chunk {}: lines {}-{} ({} tokens)",
-            i + 1, chunk.start_line, chunk.end_line, chunk.token_count);
+        println!("Chunk {}: lines {}-{} ({} bytes)",
+            i + 1, chunk.start_line, chunk.end_line, chunk.end_byte - chunk.start_byte);
     }
     ```
 
 === "CLI"
 
     ```bash
-    ts-pack process src/service.py --chunk-size 1000 --format json \
-      | jq '.chunks[] | {lines: "\(.start_line)-\(.end_line)", tokens: .token_count}'
+    ts-pack process src/service.py --chunk-size 1000 \
+      | jq '.chunks[] | {lines: "\(.start_line)-\(.end_line)", bytes: (.end_byte - .start_byte)}'
     ```
 
 ## Chunk fields
@@ -91,11 +90,11 @@ Set `chunk_max_size` in `ProcessConfig` to enable chunking:
 | Field | Type | Description |
 |-------|------|-------------|
 | `content` | str | Source code text for this chunk |
+| `start_byte` | int | Start byte offset in source |
+| `end_byte` | int | End byte offset in source |
 | `start_line` | int | First line (1-indexed) |
 | `end_line` | int | Last line (1-indexed) |
-| `token_count` | int | Estimated token count (cl100k approximation) |
 | `node_types` | list[str] | Top-level tree-sitter node types in this chunk |
-| `is_partial` | bool | True if a single construct was split across chunks |
 
 ## How it works
 
@@ -107,11 +106,9 @@ The chunker runs three passes:
 
 The result: functions are never split unless they're individually too large, decorators stay with their function, and imports group into a single chunk at the top.
 
-## Token budget
+## Byte budget
 
-`chunk_max_size` is an upper bound, not a fixed size. The chunker may produce smaller chunks when a natural boundary falls before the limit.
-
-Token counting uses the `cl100k_base` approximation (4 characters ≈ 1 token), which closely matches GPT-4, Claude, and Llama-family models.
+`chunk_max_size` is an upper bound in bytes, not a fixed size. The chunker may produce smaller chunks when a natural boundary falls before the limit.
 
 ## Structure metadata with chunks
 
@@ -135,7 +132,7 @@ for chunk in result["chunks"]:
             "start_line": chunk["start_line"],
             "end_line": chunk["end_line"],
             "node_types": chunk["node_types"],
-            "token_count": chunk["token_count"],
+            "size_bytes": chunk["end_byte"] - chunk["start_byte"],
         }
     })
 ```
@@ -187,7 +184,7 @@ def chunk_repository(repo_path: str, chunk_size: int = 800) -> list[dict]:
                     "end_line": chunk["end_line"],
                     "language": language,
                     "node_types": chunk["node_types"],
-                    "token_count": chunk["token_count"],
+                    "size_bytes": chunk["end_byte"] - chunk["start_byte"],
                 })
     return chunks
 

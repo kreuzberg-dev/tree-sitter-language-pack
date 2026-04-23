@@ -74,7 +74,7 @@ You can override it programmatically:
 === "Rust"
 
     ```rust
-    use ts_pack_core::{configure, PackConfig};
+    use tree_sitter_language_pack::{configure, PackConfig};
 
     configure(PackConfig { cache_dir: Some("/custom/path".into()), ..Default::default() })?;
     ```
@@ -147,7 +147,7 @@ For production, CI, or offline environments, download parsers explicitly rather 
 === "Rust"
 
     ```rust
-    use ts_pack_core::{download, download_all, init};
+    use tree_sitter_language_pack::{download, download_all, init};
 
     // Download specific languages
     download(&["python", "javascript", "rust"])?;

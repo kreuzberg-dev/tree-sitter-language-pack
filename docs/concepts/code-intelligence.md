@@ -49,21 +49,14 @@ All intelligence extraction is opt-in via `ProcessConfig`. Enable only what you 
 === "Rust"
 
     ```rust
-    use ts_pack_core::{process, ProcessConfig};
+    use tree_sitter_language_pack::{process, ProcessConfig};
 
-    let config = ProcessConfig::new("rust")
-        .structure(true)
-        .imports(true)
-        .exports(true)
-        .comments(true)
-        .docstrings(true)
-        .symbols(true)
-        .diagnostics(true);
+    let config = ProcessConfig::new("rust").all();
 
     let result = process(source, &config)?;
     ```
 
-Use `.all()` (Rust) or `ProcessConfig(language=..., all=True)` (Python) to enable everything at once.
+Use `.all()` in Rust or `ProcessConfig.all("python")` in Python to enable everything at once.
 
 ---
 
@@ -204,14 +197,15 @@ for error in result["diagnostics"]:
 
 ### `chunks` - Syntax-Aware Splits
 
-When `chunk_max_size > 0`, the `chunks` field contains the file split into token-budget segments. See [Chunking for LLMs](../guides/chunking.md) for full documentation.
+When `chunk_max_size > 0`, the `chunks` field contains the file split into byte-budget segments. See [Chunking for LLMs](../guides/chunking.md) for full documentation.
 
 ```python
 for chunk in result["chunks"]:
     print(chunk["content"])      # the source code text
+    print(chunk["start_byte"])   # start byte offset
+    print(chunk["end_byte"])     # end byte offset
     print(chunk["start_line"])   # first line of chunk
     print(chunk["end_line"])     # last line of chunk
-    print(chunk["token_count"])  # estimated token count
     print(chunk["node_types"])   # ["function_definition", "class_definition"]
 ```
 
@@ -227,7 +221,7 @@ print(m["total_lines"])       # 120
 print(m["code_lines"])        # 95   (non-blank, non-comment lines)
 print(m["comment_lines"])     # 18
 print(m["blank_lines"])       # 7
-print(m["complexity"])        # cyclomatic complexity estimate (if supported)
+print(m["max_depth"])         # maximum nesting depth of the syntax tree
 ```
 
 ---

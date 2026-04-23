@@ -1,11 +1,11 @@
 ---
 title: tree-sitter-language-pack
-description: "tree-sitter-language-pack — 306 tree-sitter parsers with bindings for Python, TypeScript, Rust, Go, Java, C#, Ruby, Elixir, PHP, and WebAssembly."
+description: "tree-sitter-language-pack — 306 tree-sitter parsers with bindings for Python, TypeScript, Rust, Go, Java, Ruby, Elixir, PHP, and WebAssembly."
 ---
 
 ## tree-sitter-language-pack
 
-tree-sitter-language-pack bundles 306 [tree-sitter](https://tree-sitter.github.io/tree-sitter/) grammars behind a single Rust core with native bindings for Python, TypeScript, Rust, Go, Java, C#, Ruby, Elixir, PHP, WebAssembly, and more. Parsers download on demand and cache locally. One API surface for parsing, code intelligence, extraction queries, and syntax-aware chunking for LLM workflows. It ships as libraries per ecosystem plus the `ts-pack` CLI.
+tree-sitter-language-pack bundles 306 [tree-sitter](https://tree-sitter.github.io/tree-sitter/) grammars behind a single Rust core with native bindings for Python, TypeScript, Rust, Go, Java, Ruby, Elixir, PHP, WebAssembly, and more. Parsers download on demand and cache locally. One API surface for parsing, code intelligence, extraction queries, and syntax-aware chunking for LLM workflows. It ships as libraries per ecosystem plus the `ts-pack` CLI.
 
 <div class="hero-badges" markdown>
 [:material-lightning-bolt: Quick Start](getting-started/quickstart.md){ .md-button .md-button--primary }
@@ -64,7 +64,7 @@ tree-sitter-language-pack bundles 306 [tree-sitter](https://tree-sitter.github.i
 
     ---
 
-    Full reference for Python, TypeScript, Rust, Go, Java, C#, Ruby, Elixir, PHP, WASM, C FFI, and the CLI.
+    Full reference for Python, TypeScript, Rust, Go, Java, Ruby, Elixir, PHP, WASM, C FFI, and the CLI.
 
     [:material-arrow-right: Python API](api/python.md)
 

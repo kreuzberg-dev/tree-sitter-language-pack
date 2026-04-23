@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: "Install tree-sitter-language-pack in Python, Node.js, Rust, Go, Java, C#, Ruby, Elixir, PHP, WebAssembly, or via the CLI."
+description: "Install tree-sitter-language-pack in Python, Node.js, Rust, Go, Java, Ruby, Elixir, PHP, WebAssembly, or via the CLI."
 ---
 
 ## Install using the CLI
@@ -44,7 +44,6 @@ tree-sitter-language-pack is available for every major ecosystem. All packages s
 [Rust](#rust){ .lang-pill }
 [Go](#go){ .lang-pill }
 [Java](#java){ .lang-pill }
-[C# / .NET](#c-net){ .lang-pill }
 [Ruby](#ruby){ .lang-pill }
 [Elixir](#elixir){ .lang-pill }
 [PHP](#php){ .lang-pill }
@@ -117,26 +116,26 @@ console.log(tslp.languageCount()); // 306
 
 ### Rust
 
-Requires Rust 1.75+.
+Requires Rust 1.85+.
 
 === "Cargo CLI"
 
     ```bash
-    cargo add ts-pack-core
+    cargo add tree-sitter-language-pack
     ```
 
 === "Cargo.toml"
 
     ```toml
     [dependencies]
-    ts-pack-core = "1"
+    tree-sitter-language-pack = "1"
     ```
 
 Verify:
 
 ```rust
 fn main() {
-    println!("{}", ts_pack_core::language_count()); // 306
+    println!("{}", tree_sitter_language_pack::language_count()); // 306
 }
 ```
 
@@ -168,9 +167,9 @@ Requires JDK 25+ (uses Panama FFM API).
 
     ```xml
     <dependency>
-        <groupId>dev.kreuzberg</groupId>
+        <groupId>dev.kreuzberg.treesitterlanguagepack</groupId>
         <artifactId>tree-sitter-language-pack</artifactId>
-        <version>1.3.0</version>
+        <version>1.7.0</version>
     </dependency>
     ```
 
@@ -178,7 +177,7 @@ Requires JDK 25+ (uses Panama FFM API).
 
     ```kotlin
     dependencies {
-        implementation("dev.kreuzberg:tree-sitter-language-pack:1.3.0")
+        implementation("dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.7.0")
     }
     ```
 
@@ -186,7 +185,7 @@ Requires JDK 25+ (uses Panama FFM API).
 
     ```groovy
     dependencies {
-        implementation 'dev.kreuzberg:tree-sitter-language-pack:1.3.0'
+        implementation 'dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.7.0'
     }
     ```
 
@@ -204,41 +203,9 @@ public class Main {
 
 ---
 
-### C# / .NET
-
-Requires .NET 10+.
-
-=== "dotnet CLI"
-
-    ```bash
-    dotnet add package TreeSitterLanguagePack
-    ```
-
-=== "Package Manager"
-
-    ```powershell
-    Install-Package TreeSitterLanguagePack
-    ```
-
-=== ".csproj"
-
-    ```xml
-    <PackageReference Include="TreeSitterLanguagePack" Version="1.3.0" />
-    ```
-
-Verify:
-
-```csharp
-using TreeSitterLanguagePack;
-
-Console.WriteLine(TsPackClient.LanguageCount()); // 306
-```
-
----
-
 ### Ruby
 
-Requires Ruby 3.4+.
+Requires Ruby 3.2+.
 
 === "gem"
 

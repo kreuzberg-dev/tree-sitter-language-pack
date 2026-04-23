@@ -22,23 +22,20 @@ cd tree-sitter-language-pack
 
 ## Workspace layout
 
-The Cargo workspace has eleven crates:
+The Cargo workspace contains the following crates:
 
 | Crate | Purpose |
 |-------|---------|
 | `crates/ts-pack-core` | Core Rust library (parsers, download, config) |
 | `crates/ts-pack-cli` | `ts-pack` CLI binary |
-| `crates/ts-pack-python` | Python bindings (PyO3/maturin) |
-| `crates/ts-pack-node` | Node.js bindings (NAPI-RS) |
-| `crates/ts-pack-java` | Java bindings (Panama FFI) |
-| `crates/ts-pack-elixir` | Elixir bindings (Rustler NIF) |
-| `crates/ts-pack-ruby` | Ruby bindings |
-| `crates/ts-pack-php` | PHP extension (ext-php-rs) |
-| `crates/ts-pack-ffi` | C-compatible FFI library |
-| `crates/ts-pack-wasm` | WebAssembly bindings |
-| `tools/e2e-generator` | Generates per-binding E2E test code |
+| `crates/ts-pack-core-py` | Python bindings (PyO3/maturin) |
+| `crates/ts-pack-core-node` | Node.js bindings (NAPI-RS) |
+| `crates/ts-pack-core-php` | PHP extension (ext-php-rs) |
+| `crates/ts-pack-core-wasm` | WebAssembly bindings (wasm-bindgen) |
+| `crates/ts-pack-core-ffi` | C-compatible FFI library (cbindgen) |
+| `tools/snippet-runner` | Test suite runner |
 
-Three additional packages live under `packages/`: `csharp/`, `go/`, and `php/`.
+Language-specific packages live under `packages/`: `python/`, `typescript/`, `ruby/`, `elixir/`, `php/`, `go/`, `java/`, `csharp/`, and `wasm/`.
 
 ## Cargo features
 
@@ -157,4 +154,4 @@ cargo test -p tree-sitter-language-pack detect_language_from_extension
 cargo bench -p tree-sitter-language-pack
 ```
 
-See the [task runner reference](../contributing/tasks.md) for per-binding test commands across all eleven ecosystems.
+Run `task --list` to see all available task commands including per-binding test commands.

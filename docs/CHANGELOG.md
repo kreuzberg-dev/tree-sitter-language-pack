@@ -5,9 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-!!! note "Authoritative history"
-    This file records changes starting from the 1.0.0 release candidates. For the full commit history, run `git log` in the repository root. Releases before 1.0.0-rc.9 are not reflected here — that backfill is tracked in [kreuzberg-dev/tree-sitter-language-pack#TODO](https://github.com/kreuzberg-dev/tree-sitter-language-pack/issues).
-
 ## [Unreleased]
 
 ## [1.0.0-rc.13] - 2026-03-19

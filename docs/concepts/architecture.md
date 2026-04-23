@@ -84,17 +84,17 @@ Each binding is a thin crate that:
 
 Binding crates contain no parsing logic, no query definitions, and no chunking code.
 
-| Crate | Framework | Distribution |
-|-------|-----------|--------------|
-| `ts-pack-python` | PyO3 + maturin | PyPI wheels |
-| `ts-pack-node` | NAPI-RS | npm (multi-platform) |
-| `ts-pack-ruby` | Magnus | RubyGems native gem |
-| `ts-pack-elixir` | Rustler NIF | Hex.pm |
-| `ts-pack-php` | ext-php-rs | Packagist |
-| `ts-pack-wasm` | wasm-bindgen | npm (WASM) |
-| `ts-pack-ffi` | cbindgen (C FFI) | GitHub releases |
+| Location | Framework | Distribution |
+|----------|-----------|--------------|
+| `crates/ts-pack-core-py` | PyO3 + maturin | PyPI wheels |
+| `crates/ts-pack-core-node` | NAPI-RS | npm (multi-platform) |
+| `packages/ruby` | Magnus | RubyGems native gem |
+| `packages/elixir` | Rustler NIF | Hex.pm |
+| `crates/ts-pack-core-php` | ext-php-rs | Packagist |
+| `crates/ts-pack-core-wasm` | wasm-bindgen | npm (WASM) |
+| `crates/ts-pack-core-ffi` | cbindgen (C FFI) | GitHub releases |
 | `packages/go` | cgo | Go modules |
-| `crates/ts-pack-java` | Panama FFM | Maven Central |
+| `packages/java` | Panama FFM | Maven Central |
 | `packages/csharp` | P/Invoke | NuGet |
 
 ---
@@ -117,25 +117,28 @@ This keeps installation fast and download sizes minimal. See [Download Model](do
 tree-sitter-language-pack/
 ├── crates/
 │   ├── ts-pack-core/       # Rust core library
-│   ├── ts-pack-python/     # Python (PyO3) binding
-│   ├── ts-pack-node/       # Node.js (NAPI-RS) binding
-│   ├── ts-pack-ruby/       # Ruby (Magnus) binding
-│   ├── ts-pack-elixir/     # Elixir (Rustler) NIF
-│   ├── ts-pack-php/        # PHP (ext-php-rs) extension
-│   ├── ts-pack-wasm/       # WebAssembly (wasm-bindgen) binding
-│   ├── ts-pack-ffi/        # C FFI for Go / Java / C#
-│   ├── ts-pack-java/       # Java (Panama FFM) binding
-│   └── ts-pack-cli/        # CLI binary
+│   ├── ts-pack-cli/        # CLI binary
+│   ├── ts-pack-core-py/    # Python (PyO3) binding
+│   ├── ts-pack-core-node/  # Node.js (NAPI-RS) binding
+│   ├── ts-pack-core-php/   # PHP (ext-php-rs) extension
+│   ├── ts-pack-core-wasm/  # WebAssembly (wasm-bindgen) binding
+│   └── ts-pack-core-ffi/   # C FFI for Go / Java / C#
 ├── packages/
+│   ├── python/             # Python package wrapper
+│   ├── typescript/         # TypeScript / Node.js package
+│   ├── ruby/               # Ruby gem (Magnus NIF)
+│   ├── elixir/             # Elixir package (Rustler NIF)
+│   ├── php/                # PHP Composer package
 │   ├── go/                 # Go module (cgo wrapper)
+│   ├── java/               # Java package (Panama FFM)
 │   ├── csharp/             # C# / .NET package (P/Invoke)
-│   └── php/                # PHP Composer wrapper
+│   └── wasm/               # WebAssembly npm package
 ├── sources/
 │   └── language_definitions.json  # Grammar source registry
 ├── scripts/
 │   └── generate_readme.py  # README sync tooling
 └── tools/
-    └── e2e-generator/      # Test suite generator
+    └── snippet-runner/     # Test suite runner
 ```
 
 ---
@@ -144,5 +147,5 @@ tree-sitter-language-pack/
 
 - **Single source of truth** — All parsing and intelligence logic lives in `ts-pack-core`. Binding crates are pure glue.
 - **On-demand downloads** — Parsers are not shipped in the package. They are fetched and cached per-platform when first needed.
-- **ABI stability** — The C FFI layer (`ts-pack-ffi`) follows strict semantic versioning. Go, Java, and C# bindings depend on a stable C ABI, not Rust internals.
+- **ABI stability** — The C FFI layer (`ts-pack-core-ffi`) follows strict semantic versioning. Go, Java, and C# bindings depend on a stable C ABI, not Rust internals.
 - **Zero duplication** — Query definitions, chunking strategies, and intelligence extraction are each written once in Rust and reused across all 11 language surfaces.

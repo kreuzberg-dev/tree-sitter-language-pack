@@ -7,7 +7,7 @@ description: "Configuring tree-sitter-language-pack — cache directories, pre-d
 Downloaded parser binaries go in the cache directory. The default:
 
 ```text
-~/.cache/tree-sitter-language-pack/v1.0.0/libs/
+~/.cache/tree-sitter-language-pack/<version>/libs/
 ```
 
 You can customize the cache location, pre-download languages on startup, and wire up automatic discovery through a TOML file, the programmatic API, or CLI commands.
@@ -111,7 +111,7 @@ cache_dir = ".cache/tree-sitter"
 === "Rust"
 
     ```rust
-    use ts_pack_core::PackConfig;
+    use tree_sitter_language_pack::PackConfig;
     use std::path::Path;
 
     // Programmatic configuration
@@ -165,7 +165,7 @@ Print the effective cache directory:
 
 ```bash
 ts-pack cache-dir
-# /home/user/.cache/tree-sitter-language-pack/v1.0.0/libs/
+# /home/user/.cache/tree-sitter-language-pack/<version>/libs/
 
 # Use in scripts
 CACHE=$(ts-pack cache-dir)

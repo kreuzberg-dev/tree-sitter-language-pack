@@ -11,7 +11,7 @@ description: "CLI reference for ts-pack — download parsers, parse source code,
 === "Cargo"
 
     ```bash
-    cargo install ts-pack
+    cargo install ts-pack-cli
     ```
 
 === "Homebrew (macOS / Linux)"

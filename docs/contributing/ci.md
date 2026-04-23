@@ -4,50 +4,72 @@ description: "CI/CD workflow reference — what each GitHub Actions workflow doe
 
 # CI/CD reference
 
-The project has 18 GitHub Actions workflows in `.github/workflows/`.
+The project has 8 GitHub Actions workflows in `.github/workflows/`.
 
-## Per-binding CI
+## Overview
 
-Fifteen workflows, one per binding, run on push and pull request when the relevant paths change:
+| Workflow | Purpose | Trigger |
+|----------|---------|---------|
+| `ci.yaml` | Main CI — builds and tests all bindings | push/PR to `main` |
+| `ci-cli.yaml` | CLI-specific tests | push/PR to `main` |
+| `ci-docker.yaml` | Docker image build and tests | push/PR to `main` |
+| `docs.yaml` | Build and deploy documentation | push to `main`, manual |
+| `publish.yaml` | Publish packages to all registries | manual, release |
+| `publish-docker.yaml` | Build and push Docker image | manual, release |
+| `validate-issues.yml` | Validate issue format | issue opened/edited |
+| `validate-pr.yml` | Validate PR format | PR opened/edited/synced |
 
-| Workflow | Binding | Triggered by |
-|----------|---------|--------------|
-| `ci-rust.yaml` | Rust core | `crates/ts-pack-core/**`, `Cargo.toml` |
-| `ci-cli.yaml` | CLI | `crates/ts-pack-cli/**`, `crates/ts-pack-core/**` |
-| `ci-python.yaml` | Python | `crates/ts-pack-python/**` |
-| `ci-node.yaml` | Node.js | `crates/ts-pack-node/**` |
-| `ci-java.yaml` | Java | `crates/ts-pack-java/**` |
-| `ci-elixir.yaml` | Elixir | `crates/ts-pack-elixir/**` |
-| `ci-ruby.yaml` | Ruby | `crates/ts-pack-ruby/**` |
-| `ci-php.yaml` | PHP | `crates/ts-pack-php/**`, `packages/php/**` |
-| `ci-go.yaml` | Go | `packages/go/**` |
-| `ci-csharp.yaml` | C# | `packages/csharp/**` |
-| `ci-wasm.yaml` | WebAssembly | `crates/ts-pack-wasm/**` |
-| `ci-c.yaml` | C FFI | `crates/ts-pack-ffi/**` |
-| `ci-docker.yaml` | Docker | `docker/**` |
-| `ci-all-grammars.yaml` | All grammars | `sources/language_definitions.json`, `crates/ts-pack-core/**` |
-| `ci-validate.yaml` | Cross-cutting | `crates/**`, `packages/**`, `scripts/**`, `e2e/**` |
+---
 
-`ci-all-grammars.yaml` is the most expensive workflow — it compiles and tests every grammar. It only runs on push to `main` or PRs that change the core or language definitions.
+## CI workflows
+
+### `ci.yaml` — main CI
+
+Runs on push to `main` and pull requests when relevant paths change:
+`crates/**`, `packages/**`, `e2e/**`, `sources/**`, `scripts/**`, `docs/snippets/**`, `Cargo.toml`, `Taskfile.yml`.
+
+This is the primary workflow that builds and tests all language bindings.
+
+### `ci-cli.yaml` — CLI
+
+Runs on push to `main` and pull requests when CLI or core paths change:
+`crates/ts-pack-cli/**`, `crates/ts-pack-core/**`, `test_apps/cli/**`.
+
+### `ci-docker.yaml` — Docker
+
+Runs on push to `main` and pull requests when Docker or core paths change:
+`docker/**`, `crates/ts-pack-core/**`, `crates/ts-pack-cli/**`.
+
+---
 
 ## Docs workflow
 
-`docs.yaml` runs on push to `main` when docs files change, and can be triggered manually via `workflow_dispatch`. It builds the Zensical docs site and deploys it.
+`docs.yaml` runs on push to `main` when docs files change, and can be triggered manually via `workflow_dispatch`. It builds the docs site and deploys it.
 
 Triggers on changes to: `docs/**`, `zensical.toml`, `pyproject.toml`, `sources/language_definitions.json`, and `scripts/generate_grammar_table.py`.
 
+---
+
 ## Publishing workflows
 
-Both publish workflows are manual (`workflow_dispatch`) — they don't run automatically.
+Both publish workflows run automatically on a GitHub release event, and can also be triggered manually via `workflow_dispatch`.
 
 ### `publish.yaml` — package releases
 
-Takes a release tag (e.g. `v1.0.0`) and an optional `dry_run` flag. On a real run, it publishes to all registered package registries simultaneously.
+Takes a release tag (e.g. `vX.Y.Z`), an optional `dry_run` flag, and an optional `targets` list (comma-separated, defaults to `all`). On a real run, it publishes to all registered package registries simultaneously.
 
 ### `publish-docker.yaml` — Docker image
 
 Takes a release tag and optional `dry_run`. Builds the multi-arch image (amd64 + arm64) using `docker buildx` and pushes to `ghcr.io`.
 
-## Adding CI for a new binding
+---
 
-When adding a new language binding, copy an existing per-binding workflow (e.g. `ci-python.yaml`) and adjust the `paths` trigger and test command. Keep the path filter tight so the workflow only runs when relevant files change.
+## Validation workflows
+
+### `validate-issues.yml`
+
+Validates the format of newly opened or edited issues using a reusable workflow from `kreuzberg-dev/actions`.
+
+### `validate-pr.yml`
+
+Validates the format of pull requests when opened, edited, or synchronized using a reusable workflow from `kreuzberg-dev/actions`.

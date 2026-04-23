@@ -5,13 +5,7 @@ description: "How to contribute to tree-sitter-language-pack — adding language
 
 Contributions are welcome: adding a grammar, fixing a bug, improving a binding, or writing documentation.
 
-For detailed reference on specific tools, see the subpages:
-
-| Topic | Page |
-|-------|------|
-| All `task …` commands | [Task runner reference](contributing/tasks.md) |
-| Python utility scripts | [Scripts reference](contributing/scripts.md) |
-| GitHub Actions workflows | [CI/CD reference](contributing/ci.md) |
+For CI/CD workflow details, see the [CI/CD reference](contributing/ci.md).
 
 ## Prerequisites
 
@@ -57,7 +51,7 @@ task generate:e2e    # regenerate e2e test suites from fixtures
 task test:e2e        # run e2e tests
 ```
 
-See the [Task runner reference](contributing/tasks.md) for the full list.
+Run `task --list` to see all available tasks.
 
 ## Adding a language
 
@@ -117,7 +111,7 @@ ts-pack parse example.mylang --language mylang
 
 ### 4. Add test fixtures
 
-Add at least one fixture to `tools/e2e-generator/fixtures/`:
+Add at least one fixture to `tools/snippet-runner/`:
 
 ```json
 [
@@ -214,7 +208,7 @@ Keep commits **small and focused**. Each commit should represent one logical cha
 
 - [ ] `task test` passes
 - [ ] `task lint` passes (zero warnings)
-- [ ] New language has fixtures in `tools/e2e-generator/fixtures/`
+- [ ] New language has fixtures in `tools/snippet-runner/`
 - [ ] `task generate:e2e && task test:e2e` passes
 - [ ] `task sync-versions` run if any manifest was bumped
 - [ ] PR description explains the change and links related issues

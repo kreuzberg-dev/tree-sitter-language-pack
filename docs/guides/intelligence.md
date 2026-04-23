@@ -81,12 +81,12 @@ Here's what a typical result looks like:
 === "Rust"
 
     ```rust
-    use ts_pack_core::{process, ProcessConfig};
+    use tree_sitter_language_pack::{process, ProcessConfig};
 
-    let config = ProcessConfig::new("rust")
-        .structure(true)
-        .imports(true)
-        .docstrings(true);
+    let mut config = ProcessConfig::new("rust");
+    config.structure = true;
+    config.imports = true;
+    config.docstrings = true;
 
     let result = process(source, &config)?;
 
@@ -103,7 +103,7 @@ Here's what a typical result looks like:
     ts-pack process src/app.py --structure --docstrings
 
     # All fields, JSON output
-    ts-pack process src/app.py --all --format json | jq '.structure'
+    ts-pack process src/app.py --all | jq '.structure'
     ```
 
 ## ProcessConfig fields
@@ -119,9 +119,9 @@ Pass `language` plus any of these fields:
 | `docstrings` | `False` | Docstrings attached to declarations (requires `structure=True`) |
 | `symbols` | `False` | Deduplicated list of all identifiers, for search indexing |
 | `diagnostics` | `False` | Syntax error nodes from the parse |
-| `chunk_max_size` | `None` | Target token budget per chunk; see [Chunking for LLMs](chunking.md) |
+| `chunk_max_size` | `None` | Maximum chunk size in bytes; see [Chunking for LLMs](chunking.md) |
 
-Enable everything at once: `ProcessConfig(language="python", all=True)`.
+Enable everything at once: `ProcessConfig.all("python")`.
 
 ## Result fields
 
@@ -211,7 +211,7 @@ File-level statistics, independent of the other fields:
 | `code_lines` | int | Non-blank, non-comment lines |
 | `comment_lines` | int | Comment lines |
 | `blank_lines` | int | Empty lines |
-| `complexity` | int \| None | Cyclomatic complexity estimate (language-dependent) |
+| `max_depth` | int | Maximum nesting depth of the syntax tree |
 
 ```python
 result = process(source, ProcessConfig(language="python", metrics=True))
@@ -229,6 +229,6 @@ For patterns that go beyond the built-in fields — finding all calls to a speci
 
 ## Next steps
 
-- [Chunking for LLMs](chunking.md) — split code at natural boundaries for LLM token budgets
+- [Chunking for LLMs](chunking.md) — split code at natural boundaries for LLM ingestion
 - [Extraction queries](extraction.md) — run custom tree-sitter S-expression queries
 - [Parsing code](parsing.md) — raw syntax trees and low-level node traversal
