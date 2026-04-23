@@ -18,7 +18,7 @@ public record ExtractionPattern(
     /** Maximum number of matches to return. {@code None} means unlimited. */
     @JsonProperty("max_results") Optional<Long> maxResults,
     /** Restrict matches to a byte range {@code (start, end)}. */
-    @JsonProperty("byte_range") Optional<String> byteRange
+    @JsonProperty("byte_range") Optional<List<Long>> byteRange
 ) {
     public static ExtractionPatternBuilder builder() {
         return new ExtractionPatternBuilder();

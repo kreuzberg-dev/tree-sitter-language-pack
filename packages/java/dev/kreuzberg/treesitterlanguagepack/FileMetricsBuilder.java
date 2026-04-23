@@ -16,46 +16,55 @@ public class FileMetricsBuilder {
     private long errorCount = 0;
     private long maxDepth = 0;
 
-    public FileMetricsBuilder withTotalLines(long value) {
+    /** Sets the totalLines field. */
+    public FileMetricsBuilder withTotalLines(final long value) {
         this.totalLines = value;
         return this;
     }
 
-    public FileMetricsBuilder withCodeLines(long value) {
+    /** Sets the codeLines field. */
+    public FileMetricsBuilder withCodeLines(final long value) {
         this.codeLines = value;
         return this;
     }
 
-    public FileMetricsBuilder withCommentLines(long value) {
+    /** Sets the commentLines field. */
+    public FileMetricsBuilder withCommentLines(final long value) {
         this.commentLines = value;
         return this;
     }
 
-    public FileMetricsBuilder withBlankLines(long value) {
+    /** Sets the blankLines field. */
+    public FileMetricsBuilder withBlankLines(final long value) {
         this.blankLines = value;
         return this;
     }
 
-    public FileMetricsBuilder withTotalBytes(long value) {
+    /** Sets the totalBytes field. */
+    public FileMetricsBuilder withTotalBytes(final long value) {
         this.totalBytes = value;
         return this;
     }
 
-    public FileMetricsBuilder withNodeCount(long value) {
+    /** Sets the nodeCount field. */
+    public FileMetricsBuilder withNodeCount(final long value) {
         this.nodeCount = value;
         return this;
     }
 
-    public FileMetricsBuilder withErrorCount(long value) {
+    /** Sets the errorCount field. */
+    public FileMetricsBuilder withErrorCount(final long value) {
         this.errorCount = value;
         return this;
     }
 
-    public FileMetricsBuilder withMaxDepth(long value) {
+    /** Sets the maxDepth field. */
+    public FileMetricsBuilder withMaxDepth(final long value) {
         this.maxDepth = value;
         return this;
     }
 
+    /** Builds the FileMetrics instance. */
     public FileMetrics build() {
         return new FileMetrics(
             totalLines,

@@ -14,19 +14,22 @@ public enum ExportKind {
     Default("default"),
     ReExport("reexport");
 
+    /** The string value. */
     private final String value;
 
-    ExportKind(String value) {
+    ExportKind(final String value) {
         this.value = value;
     }
 
+    /** Returns the string value. */
     @JsonValue
     public String getValue() {
         return value;
     }
 
+    /** Creates an instance from a string value. */
     @JsonCreator
-    public static ExportKind fromValue(String value) {
+    public static ExportKind fromValue(final String value) {
         for (ExportKind e : values()) {
             if (e.value.equalsIgnoreCase(value)) {
                 return e;

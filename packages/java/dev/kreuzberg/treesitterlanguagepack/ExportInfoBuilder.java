@@ -11,21 +11,25 @@ public class ExportInfoBuilder {
     private ExportKind kind = null;
     private Span span = null;
 
-    public ExportInfoBuilder withName(String value) {
+    /** Sets the name field. */
+    public ExportInfoBuilder withName(final String value) {
         this.name = value;
         return this;
     }
 
-    public ExportInfoBuilder withKind(ExportKind value) {
+    /** Sets the kind field. */
+    public ExportInfoBuilder withKind(final ExportKind value) {
         this.kind = value;
         return this;
     }
 
-    public ExportInfoBuilder withSpan(Span value) {
+    /** Sets the span field. */
+    public ExportInfoBuilder withSpan(final Span value) {
         this.span = value;
         return this;
     }
 
+    /** Builds the ExportInfo instance. */
     public ExportInfo build() {
         return new ExportInfo(
             name,

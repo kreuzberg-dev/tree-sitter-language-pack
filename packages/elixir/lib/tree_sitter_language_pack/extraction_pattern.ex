@@ -6,5 +6,5 @@ defmodule TreeSitterLanguagePack.ExtractionPattern do
             capture_output: :full,
             child_fields: [],
             max_results: 0,
-            byte_range: ""
+            byte_range: []
 end

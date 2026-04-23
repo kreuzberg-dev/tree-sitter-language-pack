@@ -18,7 +18,7 @@ public final class TreeSitterLanguagePack {
      * assert_eq!(detect_language_from_extension("xyz"), None);
      * ```
      */
-    public static String detectLanguageFromExtension(String ext) throws TreeSitterLanguagePackRsException {
+    public static String detectLanguageFromExtension(final String ext) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(ext, "ext must not be null");
         return TreeSitterLanguagePackRs.detectLanguageFromExtension(ext);
     }
@@ -36,7 +36,7 @@ public final class TreeSitterLanguagePack {
      * assert_eq!(detect_language_from_path("Makefile"), None);
      * ```
      */
-    public static String detectLanguageFromPath(String path) throws TreeSitterLanguagePackRsException {
+    public static String detectLanguageFromPath(final String path) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(path, "path must not be null");
         return TreeSitterLanguagePackRs.detectLanguageFromPath(path);
     }
@@ -65,7 +65,7 @@ public final class TreeSitterLanguagePack {
      * assert_eq!(detect_language_from_content("no shebang here"), None);
      * ```
      */
-    public static String detectLanguageFromContent(String content) throws TreeSitterLanguagePackRsException {
+    public static String detectLanguageFromContent(final String content) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(content, "content must not be null");
         return TreeSitterLanguagePackRs.detectLanguageFromContent(content);
     }
@@ -73,7 +73,7 @@ public final class TreeSitterLanguagePack {
     /**
      * Get a `NodeInfo` snapshot of the root node.
      */
-    public static NodeInfo rootNodeInfo(Tree tree) throws TreeSitterLanguagePackRsException {
+    public static NodeInfo rootNodeInfo(final Tree tree) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(tree, "tree must not be null");
         return TreeSitterLanguagePackRs.rootNodeInfo(tree);
     }
@@ -83,7 +83,7 @@ public final class TreeSitterLanguagePack {
      *
      * Performs a depth-first traversal. Returns an empty vec if no matches.
      */
-    public static List<NodeInfo> findNodesByType(Tree tree, String nodeType) throws TreeSitterLanguagePackRsException {
+    public static List<NodeInfo> findNodesByType(final Tree tree, final String nodeType) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(tree, "tree must not be null");
         java.util.Objects.requireNonNull(nodeType, "nodeType must not be null");
         return TreeSitterLanguagePackRs.findNodesByType(tree, nodeType);
@@ -95,7 +95,7 @@ public final class TreeSitterLanguagePack {
      * Useful for understanding the top-level structure of a file
      * (e.g., list of function definitions, class declarations, imports).
      */
-    public static List<NodeInfo> namedChildrenInfo(Tree tree) throws TreeSitterLanguagePackRsException {
+    public static List<NodeInfo> namedChildrenInfo(final Tree tree) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(tree, "tree must not be null");
         return TreeSitterLanguagePackRs.namedChildrenInfo(tree);
     }
@@ -114,7 +114,7 @@ public final class TreeSitterLanguagePack {
      * assert_eq!(tree.root_node().kind(), "module");
      * ```
      */
-    public static Tree parseString(String language, byte[] source) throws TreeSitterLanguagePackRsException {
+    public static Tree parseString(final String language, final byte[] source) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(language, "language must not be null");
         java.util.Objects.requireNonNull(source, "source must not be null");
         return TreeSitterLanguagePackRs.parseString(language, source);
@@ -125,7 +125,7 @@ public final class TreeSitterLanguagePack {
      *
      * Performs a depth-first traversal using `TreeCursor`.
      */
-    public static boolean treeContainsNodeType(Tree tree, String nodeType) throws TreeSitterLanguagePackRsException {
+    public static boolean treeContainsNodeType(final Tree tree, final String nodeType) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(tree, "tree must not be null");
         java.util.Objects.requireNonNull(nodeType, "nodeType must not be null");
         return TreeSitterLanguagePackRs.treeContainsNodeType(tree, nodeType);
@@ -136,7 +136,7 @@ public final class TreeSitterLanguagePack {
      *
      * Useful for determining if the parse was clean or had syntax errors.
      */
-    public static boolean treeHasErrorNodes(Tree tree) throws TreeSitterLanguagePackRsException {
+    public static boolean treeHasErrorNodes(final Tree tree) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(tree, "tree must not be null");
         return TreeSitterLanguagePackRs.treeHasErrorNodes(tree);
     }
@@ -147,7 +147,7 @@ public final class TreeSitterLanguagePack {
      * This is the standard tree-sitter debug format, useful for logging,
      * snapshot testing, and debugging grammars.
      */
-    public static String treeToSexp(Tree tree) throws TreeSitterLanguagePackRsException {
+    public static String treeToSexp(final Tree tree) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(tree, "tree must not be null");
         return TreeSitterLanguagePackRs.treeToSexp(tree);
     }
@@ -157,7 +157,7 @@ public final class TreeSitterLanguagePack {
      *
      * Returns 0 for a clean parse.
      */
-    public static long treeErrorCount(Tree tree) throws TreeSitterLanguagePackRsException {
+    public static long treeErrorCount(final Tree tree) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(tree, "tree must not be null");
         return TreeSitterLanguagePackRs.treeErrorCount(tree);
     }
@@ -180,7 +180,7 @@ public final class TreeSitterLanguagePack {
      * assert!(missing.is_none());
      * ```
      */
-    public static String getHighlightsQuery(String language) throws TreeSitterLanguagePackRsException {
+    public static String getHighlightsQuery(final String language) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(language, "language must not be null");
         return TreeSitterLanguagePackRs.getHighlightsQuery(language);
     }
@@ -202,7 +202,7 @@ public final class TreeSitterLanguagePack {
      * assert!(missing.is_none());
      * ```
      */
-    public static String getInjectionsQuery(String language) throws TreeSitterLanguagePackRsException {
+    public static String getInjectionsQuery(final String language) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(language, "language must not be null");
         return TreeSitterLanguagePackRs.getInjectionsQuery(language);
     }
@@ -224,7 +224,7 @@ public final class TreeSitterLanguagePack {
      * assert!(missing.is_none());
      * ```
      */
-    public static String getLocalsQuery(String language) throws TreeSitterLanguagePackRsException {
+    public static String getLocalsQuery(final String language) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(language, "language must not be null");
         return TreeSitterLanguagePackRs.getLocalsQuery(language);
     }
@@ -259,7 +259,7 @@ public final class TreeSitterLanguagePack {
      * assert!(!matches.is_empty());
      * ```
      */
-    public static List<QueryMatch> runQuery(Tree tree, String language, String querySource, byte[] source) throws TreeSitterLanguagePackRsException {
+    public static List<QueryMatch> runQuery(final Tree tree, final String language, final String querySource, final byte[] source) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(tree, "tree must not be null");
         java.util.Objects.requireNonNull(language, "language must not be null");
         java.util.Objects.requireNonNull(querySource, "querySource must not be null");
@@ -292,7 +292,7 @@ public final class TreeSitterLanguagePack {
      * assert_eq!(tree.root_node().kind(), "module");
      * ```
      */
-    public static Language getLanguage(String name) throws TreeSitterLanguagePackRsException {
+    public static Language getLanguage(final String name) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(name, "name must not be null");
         return TreeSitterLanguagePackRs.getLanguage(name);
     }
@@ -318,7 +318,7 @@ public final class TreeSitterLanguagePack {
      * assert!(!tree.root_node().has_error());
      * ```
      */
-    public static Parser getParser(String name) throws TreeSitterLanguagePackRsException {
+    public static Parser getParser(final String name) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(name, "name must not be null");
         return TreeSitterLanguagePackRs.getParser(name);
     }
@@ -360,7 +360,7 @@ public final class TreeSitterLanguagePack {
      * assert!(!has_language("nonexistent_language"));
      * ```
      */
-    public static boolean hasLanguage(String name) throws TreeSitterLanguagePackRsException {
+    public static boolean hasLanguage(final String name) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(name, "name must not be null");
         return TreeSitterLanguagePackRs.hasLanguage(name);
     }
@@ -407,7 +407,7 @@ public final class TreeSitterLanguagePack {
      * println!("Structures: {}", result.structure.len());
      * ```
      */
-    public static ProcessResult process(String source, ProcessConfig config) throws TreeSitterLanguagePackRsException {
+    public static ProcessResult process(final String source, final ProcessConfig config) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(source, "source must not be null");
         java.util.Objects.requireNonNull(config, "config must not be null");
         return TreeSitterLanguagePackRs.process(source, config);
@@ -441,7 +441,7 @@ public final class TreeSitterLanguagePack {
      * let result = extract_patterns("def hello(): pass", &config).unwrap();
      * ```
      */
-    public static ExtractionResult extractPatterns(String source, ExtractionConfig config) throws TreeSitterLanguagePackRsException {
+    public static ExtractionResult extractPatterns(final String source, final ExtractionConfig config) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(source, "source must not be null");
         java.util.Objects.requireNonNull(config, "config must not be null");
         return TreeSitterLanguagePackRs.extractPatterns(source, config);
@@ -456,7 +456,7 @@ public final class TreeSitterLanguagePack {
      *
      * Returns an error if the language cannot be loaded.
      */
-    public static ValidationResult validateExtraction(ExtractionConfig config) throws TreeSitterLanguagePackRsException {
+    public static ValidationResult validateExtraction(final ExtractionConfig config) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(config, "config must not be null");
         return TreeSitterLanguagePackRs.validateExtraction(config);
     }
@@ -485,7 +485,7 @@ public final class TreeSitterLanguagePack {
      * init(&config).unwrap();
      * ```
      */
-    public static void init(PackConfig config) throws TreeSitterLanguagePackRsException {
+    public static void init(final PackConfig config) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(config, "config must not be null");
         TreeSitterLanguagePackRs.init(config);
     }
@@ -516,7 +516,7 @@ public final class TreeSitterLanguagePack {
      * configure(&config).unwrap();
      * ```
      */
-    public static void configure(PackConfig config) throws TreeSitterLanguagePackRsException {
+    public static void configure(final PackConfig config) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(config, "config must not be null");
         TreeSitterLanguagePackRs.configure(config);
     }
@@ -541,7 +541,7 @@ public final class TreeSitterLanguagePack {
      * println!("Downloaded {} new languages", count);
      * ```
      */
-    public static long download(List<String> names) throws TreeSitterLanguagePackRsException {
+    public static long download(final List<String> names) throws TreeSitterLanguagePackRsException {
         java.util.Objects.requireNonNull(names, "names must not be null");
         return TreeSitterLanguagePackRs.download(names);
     }

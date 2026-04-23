@@ -10,16 +10,19 @@ public class ValidationResultBuilder {
     private boolean valid = false;
     private String patterns = "";
 
-    public ValidationResultBuilder withValid(boolean value) {
+    /** Sets the valid field. */
+    public ValidationResultBuilder withValid(final boolean value) {
         this.valid = value;
         return this;
     }
 
-    public ValidationResultBuilder withPatterns(String value) {
+    /** Sets the patterns field. */
+    public ValidationResultBuilder withPatterns(final String value) {
         this.patterns = value;
         return this;
     }
 
+    /** Builds the ValidationResult instance. */
     public ValidationResult build() {
         return new ValidationResult(
             valid,

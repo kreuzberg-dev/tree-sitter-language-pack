@@ -2,11 +2,13 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 public class ConfigException extends ErrorException {
-    public ConfigException(String message) {
+    /** Creates a new ConfigException with the given message. */
+    public ConfigException(final String message) {
         super(message);
     }
 
-    public ConfigException(String message, Throwable cause) {
+    /** Creates a new ConfigException with the given message and cause. */
+    public ConfigException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

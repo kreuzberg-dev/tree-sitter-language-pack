@@ -3,6 +3,8 @@
 
 module Tree_sitter_language_pack
 
+  VERSION: String
+
   class ExtractionPattern
     # Defines a single extraction pattern and its configuration.
 
@@ -10,9 +12,9 @@ module Tree_sitter_language_pack
     attr_accessor capture_output: CaptureOutput
     attr_accessor child_fields: Array[String]
     attr_accessor max_results: Integer
-    attr_accessor byte_range: String
+    attr_accessor byte_range: Array[Integer]
 
-    def initialize: (query: String, capture_output: CaptureOutput, child_fields: Array[String], ?max_results: Integer, ?byte_range: String) -> void
+    def initialize: (query: String, capture_output: CaptureOutput, child_fields: Array[String], ?max_results: Integer, ?byte_range: Array[Integer]) -> void
   end
 
   class ExtractionConfig

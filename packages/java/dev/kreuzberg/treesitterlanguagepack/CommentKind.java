@@ -15,19 +15,22 @@ public enum CommentKind {
     Block("block"),
     Doc("doc");
 
+    /** The string value. */
     private final String value;
 
-    CommentKind(String value) {
+    CommentKind(final String value) {
         this.value = value;
     }
 
+    /** Returns the string value. */
     @JsonValue
     public String getValue() {
         return value;
     }
 
+    /** Creates an instance from a string value. */
     @JsonCreator
-    public static CommentKind fromValue(String value) {
+    public static CommentKind fromValue(final String value) {
         for (CommentKind e : values()) {
             if (e.value.equalsIgnoreCase(value)) {
                 return e;

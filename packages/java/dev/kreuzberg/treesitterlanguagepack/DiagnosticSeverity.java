@@ -15,19 +15,22 @@ public enum DiagnosticSeverity {
     Warning("warning"),
     Info("info");
 
+    /** The string value. */
     private final String value;
 
-    DiagnosticSeverity(String value) {
+    DiagnosticSeverity(final String value) {
         this.value = value;
     }
 
+    /** Returns the string value. */
     @JsonValue
     public String getValue() {
         return value;
     }
 
+    /** Creates an instance from a string value. */
     @JsonCreator
-    public static DiagnosticSeverity fromValue(String value) {
+    public static DiagnosticSeverity fromValue(final String value) {
         for (DiagnosticSeverity e : values()) {
             if (e.value.equalsIgnoreCase(value)) {
                 return e;

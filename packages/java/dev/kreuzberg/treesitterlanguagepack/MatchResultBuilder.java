@@ -11,16 +11,19 @@ public class MatchResultBuilder {
     private long patternIndex = 0;
     private List<CaptureResult> captures = List.of();
 
-    public MatchResultBuilder withPatternIndex(long value) {
+    /** Sets the patternIndex field. */
+    public MatchResultBuilder withPatternIndex(final long value) {
         this.patternIndex = value;
         return this;
     }
 
-    public MatchResultBuilder withCaptures(List<CaptureResult> value) {
+    /** Sets the captures field. */
+    public MatchResultBuilder withCaptures(final List<CaptureResult> value) {
         this.captures = value;
         return this;
     }
 
+    /** Builds the MatchResult instance. */
     public MatchResult build() {
         return new MatchResult(
             patternIndex,

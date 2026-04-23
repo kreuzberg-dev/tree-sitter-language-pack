@@ -7,10 +7,10 @@ defmodule TreeSitterLanguagePack.StructureKind do
   @type function :: :function
   @type method :: :method
   @type class :: :class
-  @type struct :: :struct
+  @type struct_variant :: :struct
   @type interface :: :interface
   @type enum :: :enum
-  @type module :: :module
+  @type module_variant :: :module
   @type trait :: :trait
   @type impl :: :impl
   @type namespace :: :namespace

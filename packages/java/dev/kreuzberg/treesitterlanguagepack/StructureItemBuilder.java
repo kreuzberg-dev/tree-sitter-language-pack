@@ -19,51 +19,61 @@ public class StructureItemBuilder {
     private Optional<String> signature = Optional.empty();
     private Optional<Span> bodySpan = Optional.empty();
 
-    public StructureItemBuilder withKind(StructureKind value) {
+    /** Sets the kind field. */
+    public StructureItemBuilder withKind(final StructureKind value) {
         this.kind = value;
         return this;
     }
 
-    public StructureItemBuilder withName(Optional<String> value) {
+    /** Sets the name field. */
+    public StructureItemBuilder withName(final Optional<String> value) {
         this.name = value;
         return this;
     }
 
-    public StructureItemBuilder withVisibility(Optional<String> value) {
+    /** Sets the visibility field. */
+    public StructureItemBuilder withVisibility(final Optional<String> value) {
         this.visibility = value;
         return this;
     }
 
-    public StructureItemBuilder withSpan(Span value) {
+    /** Sets the span field. */
+    public StructureItemBuilder withSpan(final Span value) {
         this.span = value;
         return this;
     }
 
-    public StructureItemBuilder withChildren(List<StructureItem> value) {
+    /** Sets the children field. */
+    public StructureItemBuilder withChildren(final List<StructureItem> value) {
         this.children = value;
         return this;
     }
 
-    public StructureItemBuilder withDecorators(List<String> value) {
+    /** Sets the decorators field. */
+    public StructureItemBuilder withDecorators(final List<String> value) {
         this.decorators = value;
         return this;
     }
 
-    public StructureItemBuilder withDocComment(Optional<String> value) {
+    /** Sets the docComment field. */
+    public StructureItemBuilder withDocComment(final Optional<String> value) {
         this.docComment = value;
         return this;
     }
 
-    public StructureItemBuilder withSignature(Optional<String> value) {
+    /** Sets the signature field. */
+    public StructureItemBuilder withSignature(final Optional<String> value) {
         this.signature = value;
         return this;
     }
 
-    public StructureItemBuilder withBodySpan(Optional<Span> value) {
+    /** Sets the bodySpan field. */
+    public StructureItemBuilder withBodySpan(final Optional<Span> value) {
         this.bodySpan = value;
         return this;
     }
 
+    /** Builds the StructureItem instance. */
     public StructureItem build() {
         return new StructureItem(
             kind,

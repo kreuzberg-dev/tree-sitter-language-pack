@@ -10,16 +10,19 @@ public class ExtractionResultBuilder {
     private String language = "";
     private String results = "";
 
-    public ExtractionResultBuilder withLanguage(String value) {
+    /** Sets the language field. */
+    public ExtractionResultBuilder withLanguage(final String value) {
         this.language = value;
         return this;
     }
 
-    public ExtractionResultBuilder withResults(String value) {
+    /** Sets the results field. */
+    public ExtractionResultBuilder withResults(final String value) {
         this.results = value;
         return this;
     }
 
+    /** Builds the ExtractionResult instance. */
     public ExtractionResult build() {
         return new ExtractionResult(
             language,

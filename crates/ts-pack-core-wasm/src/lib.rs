@@ -44,7 +44,7 @@ pub struct WasmExtractionPattern {
     capture_output: WasmCaptureOutput,
     child_fields: Vec<String>,
     max_results: Option<usize>,
-    byte_range: Option<String>,
+    byte_range: Option<Vec<usize>>,
 }
 
 #[wasm_bindgen]
@@ -55,7 +55,7 @@ impl WasmExtractionPattern {
         capture_output: Option<WasmCaptureOutput>,
         child_fields: Option<Vec<String>>,
         max_results: Option<usize>,
-        byte_range: Option<String>,
+        byte_range: Option<Vec<usize>>,
     ) -> WasmExtractionPattern {
         WasmExtractionPattern {
             query: query.unwrap_or_default(),
@@ -107,12 +107,12 @@ impl WasmExtractionPattern {
     }
 
     #[wasm_bindgen(getter, js_name = "byteRange")]
-    pub fn byte_range(&self) -> Option<String> {
+    pub fn byte_range(&self) -> Option<Vec<usize>> {
         self.byte_range.clone()
     }
 
     #[wasm_bindgen(setter, js_name = "byteRange")]
-    pub fn set_byte_range(&mut self, value: Option<String>) {
+    pub fn set_byte_range(&mut self, value: Option<Vec<usize>>) {
         self.byte_range = value;
     }
 }
@@ -3279,6 +3279,7 @@ pub fn configure(config: JsValue) -> Result<(), JsValue> {
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen]
 pub fn download(names: Vec<String>) -> Result<usize, JsValue> {
+    let names_refs: Vec<&str> = names.iter().map(|s| s.as_str()).collect();
     let result = tree_sitter_language_pack::download(&names_refs).map_err(|e| JsValue::from_str(&e.to_string()))?;
     Ok(result)
 }
@@ -3404,7 +3405,11 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for WasmExtractionPatter
             capture_output: val.capture_output.into(),
             child_fields: val.child_fields,
             max_results: val.max_results,
-            byte_range: val.byte_range.as_ref().map(|v| format!("{v:?}")),
+            byte_range: val
+                .byte_range
+                .as_ref()
+                .and_then(|v| serde_json::to_value(v).ok())
+                .and_then(|v| serde_json::from_value(v).ok()),
         }
     }
 }

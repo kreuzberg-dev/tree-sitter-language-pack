@@ -11,16 +11,19 @@ public class QueryMatchBuilder {
     private long patternIndex = 0;
     private List<String> captures = List.of();
 
-    public QueryMatchBuilder withPatternIndex(long value) {
+    /** Sets the patternIndex field. */
+    public QueryMatchBuilder withPatternIndex(final long value) {
         this.patternIndex = value;
         return this;
     }
 
-    public QueryMatchBuilder withCaptures(List<String> value) {
+    /** Sets the captures field. */
+    public QueryMatchBuilder withCaptures(final List<String> value) {
         this.captures = value;
         return this;
     }
 
+    /** Builds the QueryMatch instance. */
     public QueryMatch build() {
         return new QueryMatch(
             patternIndex,

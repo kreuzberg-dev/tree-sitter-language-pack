@@ -2,11 +2,13 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 public class ParserSetupException extends ErrorException {
-    public ParserSetupException(String message) {
+    /** Creates a new ParserSetupException with the given message. */
+    public ParserSetupException(final String message) {
         super(message);
     }
 
-    public ParserSetupException(String message, Throwable cause) {
+    /** Creates a new ParserSetupException with the given message and cause. */
+    public ParserSetupException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

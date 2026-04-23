@@ -35,7 +35,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.DetectLanguageFromExtension(
             ext
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         var returnValue = JsonSerializer.Deserialize<string?>(json ?? "null", JsonOptions)!;
@@ -62,7 +69,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.DetectLanguageFromPath(
             path
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         var returnValue = JsonSerializer.Deserialize<string?>(json ?? "null", JsonOptions)!;
@@ -100,7 +114,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.DetectLanguageFromContent(
             content
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         var returnValue = JsonSerializer.Deserialize<string?>(json ?? "null", JsonOptions)!;
@@ -117,7 +138,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.RootNodeInfo(
             tree.Handle
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var jsonPtr = NativeMethods.NodeInfoToJson(result);
         var json = Marshal.PtrToStringUTF8(jsonPtr);
         NativeMethods.FreeString(jsonPtr);
@@ -141,7 +169,14 @@ public static class TreeSitterLanguagePackLib
             tree.Handle,
             nodeType
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         var returnValue = JsonSerializer.Deserialize<List<NodeInfo>>(json ?? "null", JsonOptions)!;
@@ -161,7 +196,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.NamedChildrenInfo(
             tree.Handle
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         var returnValue = JsonSerializer.Deserialize<List<NodeInfo>>(json ?? "null", JsonOptions)!;
@@ -192,7 +234,14 @@ public static class TreeSitterLanguagePackLib
             language,
             source
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var returnValue = new Tree(result);
         return returnValue;
     }
@@ -212,7 +261,14 @@ public static class TreeSitterLanguagePackLib
             tree.Handle,
             nodeType
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var returnValue = result != 0;
         return returnValue;
     }
@@ -229,7 +285,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.TreeHasErrorNodes(
             tree.Handle
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var returnValue = result != 0;
         return returnValue;
     }
@@ -247,7 +310,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.TreeToSexp(
             tree.Handle
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var returnValue = Marshal.PtrToStringUTF8(result) ?? string.Empty;
         NativeMethods.FreeString(result);
         return returnValue;
@@ -265,7 +335,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.TreeErrorCount(
             tree.Handle
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var returnValue = result;
         return returnValue;
     }
@@ -295,7 +372,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.GetHighlightsQuery(
             language
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         var returnValue = JsonSerializer.Deserialize<string?>(json ?? "null", JsonOptions)!;
@@ -326,7 +410,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.GetInjectionsQuery(
             language
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         var returnValue = JsonSerializer.Deserialize<string?>(json ?? "null", JsonOptions)!;
@@ -357,7 +448,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.GetLocalsQuery(
             language
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         var returnValue = JsonSerializer.Deserialize<string?>(json ?? "null", JsonOptions)!;
@@ -410,7 +508,14 @@ public static class TreeSitterLanguagePackLib
             querySource,
             source
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         var returnValue = JsonSerializer.Deserialize<List<QueryMatch>>(json ?? "null", JsonOptions)!;
@@ -449,7 +554,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.GetLanguage(
             name
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var returnValue = new Language(result);
         return returnValue;
     }
@@ -482,7 +594,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.GetParser(
             name
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var returnValue = new Parser(result);
         return returnValue;
     }
@@ -507,7 +626,14 @@ public static class TreeSitterLanguagePackLib
     public static List<string> AvailableLanguages()
     {
         var result = NativeMethods.AvailableLanguages();
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         var returnValue = JsonSerializer.Deserialize<List<string>>(json ?? "null", JsonOptions)!;
@@ -537,7 +663,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.HasLanguage(
             name
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var returnValue = result != 0;
         return returnValue;
     }
@@ -560,7 +693,14 @@ public static class TreeSitterLanguagePackLib
     public static ulong LanguageCount()
     {
         var result = NativeMethods.LanguageCount();
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var returnValue = result;
         return returnValue;
     }
@@ -600,7 +740,14 @@ public static class TreeSitterLanguagePackLib
             source,
             configHandle
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var jsonPtr = NativeMethods.ProcessResultToJson(result);
         var json = Marshal.PtrToStringUTF8(jsonPtr);
         NativeMethods.FreeString(jsonPtr);
@@ -650,7 +797,14 @@ public static class TreeSitterLanguagePackLib
             source,
             configHandle
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var jsonPtr = NativeMethods.ExtractionResultToJson(result);
         var json = Marshal.PtrToStringUTF8(jsonPtr);
         NativeMethods.FreeString(jsonPtr);
@@ -678,7 +832,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.ValidateExtraction(
             configHandle
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var jsonPtr = NativeMethods.ValidationResultToJson(result);
         var json = Marshal.PtrToStringUTF8(jsonPtr);
         NativeMethods.FreeString(jsonPtr);
@@ -790,7 +951,14 @@ public static class TreeSitterLanguagePackLib
         var result = NativeMethods.Download(
             namesHandle
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var returnValue = result;
         Marshal.FreeHGlobal(namesHandle);
         return returnValue;
@@ -817,7 +985,14 @@ public static class TreeSitterLanguagePackLib
     public static ulong DownloadAll()
     {
         var result = NativeMethods.DownloadAll();
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var returnValue = result;
         return returnValue;
     }
@@ -845,7 +1020,14 @@ public static class TreeSitterLanguagePackLib
     public static List<string> ManifestLanguages()
     {
         var result = NativeMethods.ManifestLanguages();
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         var returnValue = JsonSerializer.Deserialize<List<string>>(json ?? "null", JsonOptions)!;
@@ -870,7 +1052,14 @@ public static class TreeSitterLanguagePackLib
     public static List<string> DownloadedLanguages()
     {
         var result = NativeMethods.DownloadedLanguages();
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var json = Marshal.PtrToStringUTF8(result);
         NativeMethods.FreeString(result);
         var returnValue = JsonSerializer.Deserialize<List<string>>(json ?? "null", JsonOptions)!;
@@ -923,7 +1112,14 @@ public static class TreeSitterLanguagePackLib
     public static string CacheDir()
     {
         var result = NativeMethods.CacheDir();
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var returnValue = Marshal.PtrToStringUTF8(result) ?? string.Empty;
         NativeMethods.FreeString(result);
         return returnValue;

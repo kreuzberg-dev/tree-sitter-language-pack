@@ -37,61 +37,73 @@ public class ProcessResultBuilder {
     private List<CodeChunk> chunks = List.of();
     private String extractions = "";
 
-    public ProcessResultBuilder withLanguage(String value) {
+    /** Sets the language field. */
+    public ProcessResultBuilder withLanguage(final String value) {
         this.language = value;
         return this;
     }
 
-    public ProcessResultBuilder withMetrics(FileMetrics value) {
+    /** Sets the metrics field. */
+    public ProcessResultBuilder withMetrics(final FileMetrics value) {
         this.metrics = value;
         return this;
     }
 
-    public ProcessResultBuilder withStructure(List<StructureItem> value) {
+    /** Sets the structure field. */
+    public ProcessResultBuilder withStructure(final List<StructureItem> value) {
         this.structure = value;
         return this;
     }
 
-    public ProcessResultBuilder withImports(List<ImportInfo> value) {
+    /** Sets the imports field. */
+    public ProcessResultBuilder withImports(final List<ImportInfo> value) {
         this.imports = value;
         return this;
     }
 
-    public ProcessResultBuilder withExports(List<ExportInfo> value) {
+    /** Sets the exports field. */
+    public ProcessResultBuilder withExports(final List<ExportInfo> value) {
         this.exports = value;
         return this;
     }
 
-    public ProcessResultBuilder withComments(List<CommentInfo> value) {
+    /** Sets the comments field. */
+    public ProcessResultBuilder withComments(final List<CommentInfo> value) {
         this.comments = value;
         return this;
     }
 
-    public ProcessResultBuilder withDocstrings(List<DocstringInfo> value) {
+    /** Sets the docstrings field. */
+    public ProcessResultBuilder withDocstrings(final List<DocstringInfo> value) {
         this.docstrings = value;
         return this;
     }
 
-    public ProcessResultBuilder withSymbols(List<SymbolInfo> value) {
+    /** Sets the symbols field. */
+    public ProcessResultBuilder withSymbols(final List<SymbolInfo> value) {
         this.symbols = value;
         return this;
     }
 
-    public ProcessResultBuilder withDiagnostics(List<Diagnostic> value) {
+    /** Sets the diagnostics field. */
+    public ProcessResultBuilder withDiagnostics(final List<Diagnostic> value) {
         this.diagnostics = value;
         return this;
     }
 
-    public ProcessResultBuilder withChunks(List<CodeChunk> value) {
+    /** Sets the chunks field. */
+    public ProcessResultBuilder withChunks(final List<CodeChunk> value) {
         this.chunks = value;
         return this;
     }
 
-    public ProcessResultBuilder withExtractions(String value) {
+    /** Sets the extractions field. */
+    public ProcessResultBuilder withExtractions(final String value) {
         this.extractions = value;
         return this;
     }
 
+    /** Builds the ProcessResult instance. */
     public ProcessResult build() {
         return new ProcessResult(
             language,

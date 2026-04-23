@@ -29,21 +29,25 @@ public class PackConfigBuilder {
     private Optional<List<String>> languages = Optional.empty();
     private Optional<List<String>> groups = Optional.empty();
 
-    public PackConfigBuilder withCacheDir(Optional<java.nio.file.Path> value) {
+    /** Sets the cacheDir field. */
+    public PackConfigBuilder withCacheDir(final Optional<java.nio.file.Path> value) {
         this.cacheDir = value;
         return this;
     }
 
-    public PackConfigBuilder withLanguages(Optional<List<String>> value) {
+    /** Sets the languages field. */
+    public PackConfigBuilder withLanguages(final Optional<List<String>> value) {
         this.languages = value;
         return this;
     }
 
-    public PackConfigBuilder withGroups(Optional<List<String>> value) {
+    /** Sets the groups field. */
+    public PackConfigBuilder withGroups(final Optional<List<String>> value) {
         this.groups = value;
         return this;
     }
 
+    /** Builds the PackConfig instance. */
     public PackConfig build() {
         return new PackConfig(
             cacheDir,

@@ -8,20 +8,20 @@ class ExtractionPattern:
     capture_output: CaptureOutput
     child_fields: list[str]
     max_results: int | None
-    byte_range: str | None
+    byte_range: list[int] | None
     def __init__(
         self,
-        query: str,
-        capture_output: CaptureOutput | str,
-        child_fields: list[str],
+        query: str | None = None,
+        capture_output: CaptureOutput | str | None = None,
+        child_fields: list[str] | None = None,
         max_results: int | None = None,
-        byte_range: str | None = None,
+        byte_range: list[int] | None = None,
     ) -> None: ...
 
 class ExtractionConfig:
     language: str
     patterns: str
-    def __init__(self, language: str, patterns: str) -> None: ...
+    def __init__(self, language: str | None = None, patterns: str | None = None) -> None: ...
 
 class CaptureResult:
     name: str
@@ -31,27 +31,35 @@ class CaptureResult:
     start_byte: int
     def __init__(
         self,
-        name: str,
-        child_fields: str,
-        start_byte: int,
+        name: str | None = None,
         node: NodeInfo | None = None,
         text: str | None = None,
+        child_fields: str | None = None,
+        start_byte: int | None = None,
     ) -> None: ...
 
 class MatchResult:
     pattern_index: int
     captures: list[CaptureResult]
-    def __init__(self, pattern_index: int, captures: list[CaptureResult]) -> None: ...
+    def __init__(
+        self,
+        pattern_index: int | None = None,
+        captures: list[CaptureResult] | None = None,
+    ) -> None: ...
 
 class PatternResult:
     matches: list[MatchResult]
     total_count: int
-    def __init__(self, matches: list[MatchResult], total_count: int) -> None: ...
+    def __init__(
+        self,
+        matches: list[MatchResult] | None = None,
+        total_count: int | None = None,
+    ) -> None: ...
 
 class ExtractionResult:
     language: str
     results: str
-    def __init__(self, language: str, results: str) -> None: ...
+    def __init__(self, language: str | None = None, results: str | None = None) -> None: ...
 
 class PatternValidation:
     valid: bool
@@ -61,17 +69,17 @@ class PatternValidation:
     errors: list[str]
     def __init__(
         self,
-        valid: bool,
-        capture_names: list[str],
-        pattern_count: int,
-        warnings: list[str],
-        errors: list[str],
+        valid: bool | None = None,
+        capture_names: list[str] | None = None,
+        pattern_count: int | None = None,
+        warnings: list[str] | None = None,
+        errors: list[str] | None = None,
     ) -> None: ...
 
 class ValidationResult:
     valid: bool
     patterns: str
-    def __init__(self, valid: bool, patterns: str) -> None: ...
+    def __init__(self, valid: bool | None = None, patterns: str | None = None) -> None: ...
 
 class Span:
     start_byte: int
@@ -82,12 +90,12 @@ class Span:
     end_column: int
     def __init__(
         self,
-        start_byte: int,
-        end_byte: int,
-        start_line: int,
-        start_column: int,
-        end_line: int,
-        end_column: int,
+        start_byte: int | None = None,
+        end_byte: int | None = None,
+        start_line: int | None = None,
+        start_column: int | None = None,
+        end_line: int | None = None,
+        end_column: int | None = None,
     ) -> None: ...
 
 class ProcessResult:
@@ -104,17 +112,17 @@ class ProcessResult:
     extractions: str
     def __init__(
         self,
-        language: str,
-        metrics: FileMetrics,
-        structure: list[StructureItem],
-        imports: list[ImportInfo],
-        exports: list[ExportInfo],
-        comments: list[CommentInfo],
-        docstrings: list[DocstringInfo],
-        symbols: list[SymbolInfo],
-        diagnostics: list[Diagnostic],
-        chunks: list[CodeChunk],
-        extractions: str,
+        language: str | None = None,
+        metrics: FileMetrics | None = None,
+        structure: list[StructureItem] | None = None,
+        imports: list[ImportInfo] | None = None,
+        exports: list[ExportInfo] | None = None,
+        comments: list[CommentInfo] | None = None,
+        docstrings: list[DocstringInfo] | None = None,
+        symbols: list[SymbolInfo] | None = None,
+        diagnostics: list[Diagnostic] | None = None,
+        chunks: list[CodeChunk] | None = None,
+        extractions: str | None = None,
     ) -> None: ...
 
 class FileMetrics:
@@ -128,14 +136,14 @@ class FileMetrics:
     max_depth: int
     def __init__(
         self,
-        total_lines: int,
-        code_lines: int,
-        comment_lines: int,
-        blank_lines: int,
-        total_bytes: int,
-        node_count: int,
-        error_count: int,
-        max_depth: int,
+        total_lines: int | None = None,
+        code_lines: int | None = None,
+        comment_lines: int | None = None,
+        blank_lines: int | None = None,
+        total_bytes: int | None = None,
+        node_count: int | None = None,
+        error_count: int | None = None,
+        max_depth: int | None = None,
     ) -> None: ...
 
 class StructureItem:
@@ -150,12 +158,12 @@ class StructureItem:
     body_span: Span | None
     def __init__(
         self,
-        kind: StructureKind,
-        span: Span,
-        children: list[StructureItem],
-        decorators: list[str],
+        kind: StructureKind | None = None,
         name: str | None = None,
         visibility: str | None = None,
+        span: Span | None = None,
+        children: list[StructureItem] | None = None,
+        decorators: list[str] | None = None,
         doc_comment: str | None = None,
         signature: str | None = None,
         body_span: Span | None = None,
@@ -168,9 +176,9 @@ class CommentInfo:
     associated_node: str | None
     def __init__(
         self,
-        text: str,
-        kind: CommentKind | str,
-        span: Span,
+        text: str | None = None,
+        kind: CommentKind | str | None = None,
+        span: Span | None = None,
         associated_node: str | None = None,
     ) -> None: ...
 
@@ -182,18 +190,23 @@ class DocstringInfo:
     parsed_sections: list[DocSection]
     def __init__(
         self,
-        text: str,
-        format: DocstringFormat,  # noqa: A002
-        span: Span,
-        parsed_sections: list[DocSection],
+        text: str | None = None,
+        format: DocstringFormat | None = None,  # noqa: A002
+        span: Span | None = None,
         associated_item: str | None = None,
+        parsed_sections: list[DocSection] | None = None,
     ) -> None: ...
 
 class DocSection:
     kind: str
     name: str | None
     description: str
-    def __init__(self, kind: str, description: str, name: str | None = None) -> None: ...
+    def __init__(
+        self,
+        kind: str | None = None,
+        name: str | None = None,
+        description: str | None = None,
+    ) -> None: ...
 
 class ImportInfo:
     source: str
@@ -203,18 +216,23 @@ class ImportInfo:
     span: Span
     def __init__(
         self,
-        source: str,
-        items: list[str],
-        is_wildcard: bool,
-        span: Span,
+        source: str | None = None,
+        items: list[str] | None = None,
         alias: str | None = None,
+        is_wildcard: bool | None = None,
+        span: Span | None = None,
     ) -> None: ...
 
 class ExportInfo:
     name: str
     kind: ExportKind
     span: Span
-    def __init__(self, name: str, kind: ExportKind | str, span: Span) -> None: ...
+    def __init__(
+        self,
+        name: str | None = None,
+        kind: ExportKind | str | None = None,
+        span: Span | None = None,
+    ) -> None: ...
 
 class SymbolInfo:
     name: str
@@ -224,9 +242,9 @@ class SymbolInfo:
     doc: str | None
     def __init__(
         self,
-        name: str,
-        kind: SymbolKind,
-        span: Span,
+        name: str | None = None,
+        kind: SymbolKind | None = None,
+        span: Span | None = None,
         type_annotation: str | None = None,
         doc: str | None = None,
     ) -> None: ...
@@ -235,7 +253,12 @@ class Diagnostic:
     message: str
     severity: DiagnosticSeverity
     span: Span
-    def __init__(self, message: str, severity: DiagnosticSeverity | str, span: Span) -> None: ...
+    def __init__(
+        self,
+        message: str | None = None,
+        severity: DiagnosticSeverity | str | None = None,
+        span: Span | None = None,
+    ) -> None: ...
 
 class CodeChunk:
     content: str
@@ -246,12 +269,12 @@ class CodeChunk:
     metadata: ChunkContext
     def __init__(
         self,
-        content: str,
-        start_byte: int,
-        end_byte: int,
-        start_line: int,
-        end_line: int,
-        metadata: ChunkContext,
+        content: str | None = None,
+        start_byte: int | None = None,
+        end_byte: int | None = None,
+        start_line: int | None = None,
+        end_line: int | None = None,
+        metadata: ChunkContext | None = None,
     ) -> None: ...
 
 class ChunkContext:
@@ -266,15 +289,15 @@ class ChunkContext:
     has_error_nodes: bool
     def __init__(
         self,
-        language: str,
-        chunk_index: int,
-        total_chunks: int,
-        node_types: list[str],
-        context_path: list[str],
-        symbols_defined: list[str],
-        comments: list[CommentInfo],
-        docstrings: list[DocstringInfo],
-        has_error_nodes: bool,
+        language: str | None = None,
+        chunk_index: int | None = None,
+        total_chunks: int | None = None,
+        node_types: list[str] | None = None,
+        context_path: list[str] | None = None,
+        symbols_defined: list[str] | None = None,
+        comments: list[CommentInfo] | None = None,
+        docstrings: list[DocstringInfo] | None = None,
+        has_error_nodes: bool | None = None,
     ) -> None: ...
 
 class NodeInfo:
@@ -291,17 +314,17 @@ class NodeInfo:
     is_missing: bool
     def __init__(
         self,
-        kind: str,
-        is_named: bool,
-        start_byte: int,
-        end_byte: int,
-        start_row: int,
-        start_col: int,
-        end_row: int,
-        end_col: int,
-        named_child_count: int,
-        is_error: bool,
-        is_missing: bool,
+        kind: str | None = None,
+        is_named: bool | None = None,
+        start_byte: int | None = None,
+        end_byte: int | None = None,
+        start_row: int | None = None,
+        start_col: int | None = None,
+        end_row: int | None = None,
+        end_col: int | None = None,
+        named_child_count: int | None = None,
+        is_error: bool | None = None,
+        is_missing: bool | None = None,
     ) -> None: ...
 
 class PackConfig:
@@ -332,14 +355,14 @@ class ProcessConfig:
     extractions: str | None
     def __init__(
         self,
-        language: str,
-        structure: bool,
-        imports: bool,
-        exports: bool,
-        comments: bool,
-        docstrings: bool,
-        symbols: bool,
-        diagnostics: bool,
+        language: str | None = None,
+        structure: bool | None = None,
+        imports: bool | None = None,
+        exports: bool | None = None,
+        comments: bool | None = None,
+        docstrings: bool | None = None,
+        symbols: bool | None = None,
+        diagnostics: bool | None = None,
         chunk_max_size: int | None = None,
         extractions: str | None = None,
     ) -> None: ...
@@ -352,7 +375,11 @@ class ProcessConfig:
 class QueryMatch:
     pattern_index: int
     captures: list[str]
-    def __init__(self, pattern_index: int, captures: list[str]) -> None: ...
+    def __init__(
+        self,
+        pattern_index: int | None = None,
+        captures: list[str] | None = None,
+    ) -> None: ...
 
 class ParserManifest:
     version: str

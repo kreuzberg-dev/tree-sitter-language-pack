@@ -14,31 +14,37 @@ public class SymbolInfoBuilder {
     private Optional<String> typeAnnotation = Optional.empty();
     private Optional<String> doc = Optional.empty();
 
-    public SymbolInfoBuilder withName(String value) {
+    /** Sets the name field. */
+    public SymbolInfoBuilder withName(final String value) {
         this.name = value;
         return this;
     }
 
-    public SymbolInfoBuilder withKind(SymbolKind value) {
+    /** Sets the kind field. */
+    public SymbolInfoBuilder withKind(final SymbolKind value) {
         this.kind = value;
         return this;
     }
 
-    public SymbolInfoBuilder withSpan(Span value) {
+    /** Sets the span field. */
+    public SymbolInfoBuilder withSpan(final Span value) {
         this.span = value;
         return this;
     }
 
-    public SymbolInfoBuilder withTypeAnnotation(Optional<String> value) {
+    /** Sets the typeAnnotation field. */
+    public SymbolInfoBuilder withTypeAnnotation(final Optional<String> value) {
         this.typeAnnotation = value;
         return this;
     }
 
-    public SymbolInfoBuilder withDoc(Optional<String> value) {
+    /** Sets the doc field. */
+    public SymbolInfoBuilder withDoc(final Optional<String> value) {
         this.doc = value;
         return this;
     }
 
+    /** Builds the SymbolInfo instance. */
     public SymbolInfo build() {
         return new SymbolInfo(
             name,

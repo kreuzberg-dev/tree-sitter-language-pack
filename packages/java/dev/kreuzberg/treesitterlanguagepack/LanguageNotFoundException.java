@@ -2,11 +2,13 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 public class LanguageNotFoundException extends ErrorException {
-    public LanguageNotFoundException(String message) {
+    /** Creates a new LanguageNotFoundException with the given message. */
+    public LanguageNotFoundException(final String message) {
         super(message);
     }
 
-    public LanguageNotFoundException(String message, Throwable cause) {
+    /** Creates a new LanguageNotFoundException with the given message and cause. */
+    public LanguageNotFoundException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

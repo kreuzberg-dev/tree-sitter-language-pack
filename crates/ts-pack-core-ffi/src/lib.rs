@@ -57,6 +57,7 @@ pub unsafe extern "C" fn ts_pack_last_error_context() -> *const c_char {
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_free_string(ptr: *mut c_char) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by CString::into_raw; caller ensures no aliases.
         unsafe {
             drop(CString::from_raw(ptr));
         }
@@ -86,6 +87,7 @@ pub unsafe extern "C" fn ts_pack_extraction_pattern_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -115,6 +117,7 @@ pub unsafe extern "C" fn ts_pack_extraction_pattern_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -137,6 +140,7 @@ pub unsafe extern "C" fn ts_pack_extraction_pattern_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_extraction_pattern_free(ptr: *mut tree_sitter_language_pack::ExtractionPattern) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -153,6 +157,7 @@ pub unsafe extern "C" fn ts_pack_extraction_pattern_query(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.query.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -170,6 +175,7 @@ pub unsafe extern "C" fn ts_pack_extraction_pattern_capture_output(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.capture_output.clone()))
 }
@@ -184,6 +190,7 @@ pub unsafe extern "C" fn ts_pack_extraction_pattern_child_fields(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.child_fields) {
         Ok(s) => match CString::new(s) {
@@ -204,6 +211,7 @@ pub unsafe extern "C" fn ts_pack_extraction_pattern_max_results(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.max_results {
         Some(val) => *val,
@@ -224,6 +232,7 @@ pub unsafe extern "C" fn ts_pack_extraction_config_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -253,6 +262,7 @@ pub unsafe extern "C" fn ts_pack_extraction_config_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -275,6 +285,7 @@ pub unsafe extern "C" fn ts_pack_extraction_config_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_extraction_config_free(ptr: *mut tree_sitter_language_pack::ExtractionConfig) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -291,6 +302,7 @@ pub unsafe extern "C" fn ts_pack_extraction_config_language(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.language.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -311,6 +323,7 @@ pub unsafe extern "C" fn ts_pack_capture_result_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -340,6 +353,7 @@ pub unsafe extern "C" fn ts_pack_capture_result_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -362,6 +376,7 @@ pub unsafe extern "C" fn ts_pack_capture_result_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_capture_result_free(ptr: *mut tree_sitter_language_pack::CaptureResult) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -378,6 +393,7 @@ pub unsafe extern "C" fn ts_pack_capture_result_name(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.name.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -395,6 +411,7 @@ pub unsafe extern "C" fn ts_pack_capture_result_node(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.node {
         Some(val) => Box::into_raw(Box::new(val.clone())),
@@ -412,6 +429,7 @@ pub unsafe extern "C" fn ts_pack_capture_result_text(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.text {
         Some(val) => match CString::new(val.to_string()) {
@@ -432,6 +450,7 @@ pub unsafe extern "C" fn ts_pack_capture_result_start_byte(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.start_byte
 }
@@ -449,6 +468,7 @@ pub unsafe extern "C" fn ts_pack_match_result_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -478,6 +498,7 @@ pub unsafe extern "C" fn ts_pack_match_result_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -500,6 +521,7 @@ pub unsafe extern "C" fn ts_pack_match_result_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_match_result_free(ptr: *mut tree_sitter_language_pack::MatchResult) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -516,6 +538,7 @@ pub unsafe extern "C" fn ts_pack_match_result_pattern_index(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.pattern_index
 }
@@ -530,6 +553,7 @@ pub unsafe extern "C" fn ts_pack_match_result_captures(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.captures) {
         Ok(s) => match CString::new(s) {
@@ -553,6 +577,7 @@ pub unsafe extern "C" fn ts_pack_pattern_result_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -582,6 +607,7 @@ pub unsafe extern "C" fn ts_pack_pattern_result_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -604,6 +630,7 @@ pub unsafe extern "C" fn ts_pack_pattern_result_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_pattern_result_free(ptr: *mut tree_sitter_language_pack::PatternResult) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -620,6 +647,7 @@ pub unsafe extern "C" fn ts_pack_pattern_result_matches(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.matches) {
         Ok(s) => match CString::new(s) {
@@ -640,6 +668,7 @@ pub unsafe extern "C" fn ts_pack_pattern_result_total_count(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.total_count
 }
@@ -657,6 +686,7 @@ pub unsafe extern "C" fn ts_pack_extraction_result_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -686,6 +716,7 @@ pub unsafe extern "C" fn ts_pack_extraction_result_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -708,6 +739,7 @@ pub unsafe extern "C" fn ts_pack_extraction_result_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_extraction_result_free(ptr: *mut tree_sitter_language_pack::ExtractionResult) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -724,6 +756,7 @@ pub unsafe extern "C" fn ts_pack_extraction_result_language(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.language.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -744,6 +777,7 @@ pub unsafe extern "C" fn ts_pack_pattern_validation_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -773,6 +807,7 @@ pub unsafe extern "C" fn ts_pack_pattern_validation_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -795,6 +830,7 @@ pub unsafe extern "C" fn ts_pack_pattern_validation_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_pattern_validation_free(ptr: *mut tree_sitter_language_pack::PatternValidation) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -811,6 +847,7 @@ pub unsafe extern "C" fn ts_pack_pattern_validation_valid(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.valid as i32
 }
@@ -825,6 +862,7 @@ pub unsafe extern "C" fn ts_pack_pattern_validation_capture_names(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.capture_names) {
         Ok(s) => match CString::new(s) {
@@ -845,6 +883,7 @@ pub unsafe extern "C" fn ts_pack_pattern_validation_pattern_count(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.pattern_count
 }
@@ -859,6 +898,7 @@ pub unsafe extern "C" fn ts_pack_pattern_validation_warnings(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.warnings) {
         Ok(s) => match CString::new(s) {
@@ -879,6 +919,7 @@ pub unsafe extern "C" fn ts_pack_pattern_validation_errors(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.errors) {
         Ok(s) => match CString::new(s) {
@@ -902,6 +943,7 @@ pub unsafe extern "C" fn ts_pack_validation_result_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -931,6 +973,7 @@ pub unsafe extern "C" fn ts_pack_validation_result_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -953,6 +996,7 @@ pub unsafe extern "C" fn ts_pack_validation_result_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_validation_result_free(ptr: *mut tree_sitter_language_pack::ValidationResult) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -969,6 +1013,7 @@ pub unsafe extern "C" fn ts_pack_validation_result_valid(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.valid as i32
 }
@@ -984,6 +1029,7 @@ pub unsafe extern "C" fn ts_pack_span_from_json(json: *const c_char) -> *mut tre
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -1011,6 +1057,7 @@ pub unsafe extern "C" fn ts_pack_span_to_json(ptr: *const tree_sitter_language_p
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -1033,6 +1080,7 @@ pub unsafe extern "C" fn ts_pack_span_to_json(ptr: *const tree_sitter_language_p
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_span_free(ptr: *mut tree_sitter_language_pack::Span) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -1047,6 +1095,7 @@ pub unsafe extern "C" fn ts_pack_span_start_byte(ptr: *const tree_sitter_languag
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.start_byte
 }
@@ -1059,6 +1108,7 @@ pub unsafe extern "C" fn ts_pack_span_end_byte(ptr: *const tree_sitter_language_
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.end_byte
 }
@@ -1071,6 +1121,7 @@ pub unsafe extern "C" fn ts_pack_span_start_line(ptr: *const tree_sitter_languag
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.start_line
 }
@@ -1083,6 +1134,7 @@ pub unsafe extern "C" fn ts_pack_span_start_column(ptr: *const tree_sitter_langu
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.start_column
 }
@@ -1095,6 +1147,7 @@ pub unsafe extern "C" fn ts_pack_span_end_line(ptr: *const tree_sitter_language_
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.end_line
 }
@@ -1107,6 +1160,7 @@ pub unsafe extern "C" fn ts_pack_span_end_column(ptr: *const tree_sitter_languag
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.end_column
 }
@@ -1124,6 +1178,7 @@ pub unsafe extern "C" fn ts_pack_process_result_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -1153,6 +1208,7 @@ pub unsafe extern "C" fn ts_pack_process_result_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -1175,6 +1231,7 @@ pub unsafe extern "C" fn ts_pack_process_result_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_process_result_free(ptr: *mut tree_sitter_language_pack::ProcessResult) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -1191,6 +1248,7 @@ pub unsafe extern "C" fn ts_pack_process_result_language(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.language.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -1208,6 +1266,7 @@ pub unsafe extern "C" fn ts_pack_process_result_metrics(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.metrics.clone()))
 }
@@ -1222,6 +1281,7 @@ pub unsafe extern "C" fn ts_pack_process_result_structure(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.structure) {
         Ok(s) => match CString::new(s) {
@@ -1242,6 +1302,7 @@ pub unsafe extern "C" fn ts_pack_process_result_imports(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.imports) {
         Ok(s) => match CString::new(s) {
@@ -1262,6 +1323,7 @@ pub unsafe extern "C" fn ts_pack_process_result_exports(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.exports) {
         Ok(s) => match CString::new(s) {
@@ -1282,6 +1344,7 @@ pub unsafe extern "C" fn ts_pack_process_result_comments(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.comments) {
         Ok(s) => match CString::new(s) {
@@ -1302,6 +1365,7 @@ pub unsafe extern "C" fn ts_pack_process_result_docstrings(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.docstrings) {
         Ok(s) => match CString::new(s) {
@@ -1322,6 +1386,7 @@ pub unsafe extern "C" fn ts_pack_process_result_symbols(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.symbols) {
         Ok(s) => match CString::new(s) {
@@ -1342,6 +1407,7 @@ pub unsafe extern "C" fn ts_pack_process_result_diagnostics(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.diagnostics) {
         Ok(s) => match CString::new(s) {
@@ -1362,6 +1428,7 @@ pub unsafe extern "C" fn ts_pack_process_result_chunks(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.chunks) {
         Ok(s) => match CString::new(s) {
@@ -1385,6 +1452,7 @@ pub unsafe extern "C" fn ts_pack_file_metrics_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -1414,6 +1482,7 @@ pub unsafe extern "C" fn ts_pack_file_metrics_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -1436,6 +1505,7 @@ pub unsafe extern "C" fn ts_pack_file_metrics_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_file_metrics_free(ptr: *mut tree_sitter_language_pack::FileMetrics) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -1450,6 +1520,7 @@ pub unsafe extern "C" fn ts_pack_file_metrics_total_lines(ptr: *const tree_sitte
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.total_lines
 }
@@ -1462,6 +1533,7 @@ pub unsafe extern "C" fn ts_pack_file_metrics_code_lines(ptr: *const tree_sitter
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.code_lines
 }
@@ -1476,6 +1548,7 @@ pub unsafe extern "C" fn ts_pack_file_metrics_comment_lines(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.comment_lines
 }
@@ -1488,6 +1561,7 @@ pub unsafe extern "C" fn ts_pack_file_metrics_blank_lines(ptr: *const tree_sitte
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.blank_lines
 }
@@ -1500,6 +1574,7 @@ pub unsafe extern "C" fn ts_pack_file_metrics_total_bytes(ptr: *const tree_sitte
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.total_bytes
 }
@@ -1512,6 +1587,7 @@ pub unsafe extern "C" fn ts_pack_file_metrics_node_count(ptr: *const tree_sitter
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.node_count
 }
@@ -1524,6 +1600,7 @@ pub unsafe extern "C" fn ts_pack_file_metrics_error_count(ptr: *const tree_sitte
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.error_count
 }
@@ -1536,6 +1613,7 @@ pub unsafe extern "C" fn ts_pack_file_metrics_max_depth(ptr: *const tree_sitter_
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.max_depth
 }
@@ -1553,6 +1631,7 @@ pub unsafe extern "C" fn ts_pack_structure_item_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -1582,6 +1661,7 @@ pub unsafe extern "C" fn ts_pack_structure_item_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -1604,6 +1684,7 @@ pub unsafe extern "C" fn ts_pack_structure_item_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_structure_item_free(ptr: *mut tree_sitter_language_pack::StructureItem) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -1620,6 +1701,7 @@ pub unsafe extern "C" fn ts_pack_structure_item_kind(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.kind.clone()))
 }
@@ -1634,6 +1716,7 @@ pub unsafe extern "C" fn ts_pack_structure_item_name(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.name {
         Some(val) => match CString::new(val.to_string()) {
@@ -1654,6 +1737,7 @@ pub unsafe extern "C" fn ts_pack_structure_item_visibility(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.visibility {
         Some(val) => match CString::new(val.to_string()) {
@@ -1674,6 +1758,7 @@ pub unsafe extern "C" fn ts_pack_structure_item_span(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.span.clone()))
 }
@@ -1688,6 +1773,7 @@ pub unsafe extern "C" fn ts_pack_structure_item_children(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.children) {
         Ok(s) => match CString::new(s) {
@@ -1708,6 +1794,7 @@ pub unsafe extern "C" fn ts_pack_structure_item_decorators(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.decorators) {
         Ok(s) => match CString::new(s) {
@@ -1728,6 +1815,7 @@ pub unsafe extern "C" fn ts_pack_structure_item_doc_comment(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.doc_comment {
         Some(val) => match CString::new(val.to_string()) {
@@ -1748,6 +1836,7 @@ pub unsafe extern "C" fn ts_pack_structure_item_signature(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.signature {
         Some(val) => match CString::new(val.to_string()) {
@@ -1768,6 +1857,7 @@ pub unsafe extern "C" fn ts_pack_structure_item_body_span(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.body_span {
         Some(val) => Box::into_raw(Box::new(val.clone())),
@@ -1788,6 +1878,7 @@ pub unsafe extern "C" fn ts_pack_comment_info_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -1817,6 +1908,7 @@ pub unsafe extern "C" fn ts_pack_comment_info_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -1839,6 +1931,7 @@ pub unsafe extern "C" fn ts_pack_comment_info_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_comment_info_free(ptr: *mut tree_sitter_language_pack::CommentInfo) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -1855,6 +1948,7 @@ pub unsafe extern "C" fn ts_pack_comment_info_text(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.text.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -1872,6 +1966,7 @@ pub unsafe extern "C" fn ts_pack_comment_info_kind(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.kind.clone()))
 }
@@ -1886,6 +1981,7 @@ pub unsafe extern "C" fn ts_pack_comment_info_span(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.span.clone()))
 }
@@ -1900,6 +1996,7 @@ pub unsafe extern "C" fn ts_pack_comment_info_associated_node(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.associated_node {
         Some(val) => match CString::new(val.to_string()) {
@@ -1923,6 +2020,7 @@ pub unsafe extern "C" fn ts_pack_docstring_info_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -1952,6 +2050,7 @@ pub unsafe extern "C" fn ts_pack_docstring_info_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -1974,6 +2073,7 @@ pub unsafe extern "C" fn ts_pack_docstring_info_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_docstring_info_free(ptr: *mut tree_sitter_language_pack::DocstringInfo) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -1990,6 +2090,7 @@ pub unsafe extern "C" fn ts_pack_docstring_info_text(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.text.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -2007,6 +2108,7 @@ pub unsafe extern "C" fn ts_pack_docstring_info_format(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.format.clone()))
 }
@@ -2021,6 +2123,7 @@ pub unsafe extern "C" fn ts_pack_docstring_info_span(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.span.clone()))
 }
@@ -2035,6 +2138,7 @@ pub unsafe extern "C" fn ts_pack_docstring_info_associated_item(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.associated_item {
         Some(val) => match CString::new(val.to_string()) {
@@ -2055,6 +2159,7 @@ pub unsafe extern "C" fn ts_pack_docstring_info_parsed_sections(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.parsed_sections) {
         Ok(s) => match CString::new(s) {
@@ -2078,6 +2183,7 @@ pub unsafe extern "C" fn ts_pack_doc_section_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -2105,6 +2211,7 @@ pub unsafe extern "C" fn ts_pack_doc_section_to_json(ptr: *const tree_sitter_lan
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -2127,6 +2234,7 @@ pub unsafe extern "C" fn ts_pack_doc_section_to_json(ptr: *const tree_sitter_lan
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_doc_section_free(ptr: *mut tree_sitter_language_pack::DocSection) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -2143,6 +2251,7 @@ pub unsafe extern "C" fn ts_pack_doc_section_kind(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.kind.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -2160,6 +2269,7 @@ pub unsafe extern "C" fn ts_pack_doc_section_name(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.name {
         Some(val) => match CString::new(val.to_string()) {
@@ -2180,6 +2290,7 @@ pub unsafe extern "C" fn ts_pack_doc_section_description(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.description.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -2200,6 +2311,7 @@ pub unsafe extern "C" fn ts_pack_import_info_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -2227,6 +2339,7 @@ pub unsafe extern "C" fn ts_pack_import_info_to_json(ptr: *const tree_sitter_lan
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -2249,6 +2362,7 @@ pub unsafe extern "C" fn ts_pack_import_info_to_json(ptr: *const tree_sitter_lan
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_import_info_free(ptr: *mut tree_sitter_language_pack::ImportInfo) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -2265,6 +2379,7 @@ pub unsafe extern "C" fn ts_pack_import_info_source(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.source.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -2282,6 +2397,7 @@ pub unsafe extern "C" fn ts_pack_import_info_items(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.items) {
         Ok(s) => match CString::new(s) {
@@ -2302,6 +2418,7 @@ pub unsafe extern "C" fn ts_pack_import_info_alias(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.alias {
         Some(val) => match CString::new(val.to_string()) {
@@ -2320,6 +2437,7 @@ pub unsafe extern "C" fn ts_pack_import_info_is_wildcard(ptr: *const tree_sitter
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.is_wildcard as i32
 }
@@ -2334,6 +2452,7 @@ pub unsafe extern "C" fn ts_pack_import_info_span(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.span.clone()))
 }
@@ -2351,6 +2470,7 @@ pub unsafe extern "C" fn ts_pack_export_info_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -2378,6 +2498,7 @@ pub unsafe extern "C" fn ts_pack_export_info_to_json(ptr: *const tree_sitter_lan
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -2400,6 +2521,7 @@ pub unsafe extern "C" fn ts_pack_export_info_to_json(ptr: *const tree_sitter_lan
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_export_info_free(ptr: *mut tree_sitter_language_pack::ExportInfo) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -2416,6 +2538,7 @@ pub unsafe extern "C" fn ts_pack_export_info_name(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.name.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -2433,6 +2556,7 @@ pub unsafe extern "C" fn ts_pack_export_info_kind(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.kind.clone()))
 }
@@ -2447,6 +2571,7 @@ pub unsafe extern "C" fn ts_pack_export_info_span(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.span.clone()))
 }
@@ -2464,6 +2589,7 @@ pub unsafe extern "C" fn ts_pack_symbol_info_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -2491,6 +2617,7 @@ pub unsafe extern "C" fn ts_pack_symbol_info_to_json(ptr: *const tree_sitter_lan
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -2513,6 +2640,7 @@ pub unsafe extern "C" fn ts_pack_symbol_info_to_json(ptr: *const tree_sitter_lan
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_symbol_info_free(ptr: *mut tree_sitter_language_pack::SymbolInfo) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -2529,6 +2657,7 @@ pub unsafe extern "C" fn ts_pack_symbol_info_name(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.name.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -2546,6 +2675,7 @@ pub unsafe extern "C" fn ts_pack_symbol_info_kind(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.kind.clone()))
 }
@@ -2560,6 +2690,7 @@ pub unsafe extern "C" fn ts_pack_symbol_info_span(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.span.clone()))
 }
@@ -2574,6 +2705,7 @@ pub unsafe extern "C" fn ts_pack_symbol_info_type_annotation(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.type_annotation {
         Some(val) => match CString::new(val.to_string()) {
@@ -2594,6 +2726,7 @@ pub unsafe extern "C" fn ts_pack_symbol_info_doc(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.doc {
         Some(val) => match CString::new(val.to_string()) {
@@ -2617,6 +2750,7 @@ pub unsafe extern "C" fn ts_pack_diagnostic_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -2644,6 +2778,7 @@ pub unsafe extern "C" fn ts_pack_diagnostic_to_json(ptr: *const tree_sitter_lang
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -2666,6 +2801,7 @@ pub unsafe extern "C" fn ts_pack_diagnostic_to_json(ptr: *const tree_sitter_lang
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_diagnostic_free(ptr: *mut tree_sitter_language_pack::Diagnostic) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -2682,6 +2818,7 @@ pub unsafe extern "C" fn ts_pack_diagnostic_message(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.message.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -2699,6 +2836,7 @@ pub unsafe extern "C" fn ts_pack_diagnostic_severity(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.severity.clone()))
 }
@@ -2713,6 +2851,7 @@ pub unsafe extern "C" fn ts_pack_diagnostic_span(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.span.clone()))
 }
@@ -2730,6 +2869,7 @@ pub unsafe extern "C" fn ts_pack_code_chunk_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -2757,6 +2897,7 @@ pub unsafe extern "C" fn ts_pack_code_chunk_to_json(ptr: *const tree_sitter_lang
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -2779,6 +2920,7 @@ pub unsafe extern "C" fn ts_pack_code_chunk_to_json(ptr: *const tree_sitter_lang
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_code_chunk_free(ptr: *mut tree_sitter_language_pack::CodeChunk) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -2795,6 +2937,7 @@ pub unsafe extern "C" fn ts_pack_code_chunk_content(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.content.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -2810,6 +2953,7 @@ pub unsafe extern "C" fn ts_pack_code_chunk_start_byte(ptr: *const tree_sitter_l
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.start_byte
 }
@@ -2822,6 +2966,7 @@ pub unsafe extern "C" fn ts_pack_code_chunk_end_byte(ptr: *const tree_sitter_lan
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.end_byte
 }
@@ -2834,6 +2979,7 @@ pub unsafe extern "C" fn ts_pack_code_chunk_start_line(ptr: *const tree_sitter_l
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.start_line
 }
@@ -2846,6 +2992,7 @@ pub unsafe extern "C" fn ts_pack_code_chunk_end_line(ptr: *const tree_sitter_lan
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.end_line
 }
@@ -2860,6 +3007,7 @@ pub unsafe extern "C" fn ts_pack_code_chunk_metadata(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     Box::into_raw(Box::new(obj.metadata.clone()))
 }
@@ -2877,6 +3025,7 @@ pub unsafe extern "C" fn ts_pack_chunk_context_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -2906,6 +3055,7 @@ pub unsafe extern "C" fn ts_pack_chunk_context_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -2928,6 +3078,7 @@ pub unsafe extern "C" fn ts_pack_chunk_context_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_chunk_context_free(ptr: *mut tree_sitter_language_pack::ChunkContext) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -2944,6 +3095,7 @@ pub unsafe extern "C" fn ts_pack_chunk_context_language(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.language.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -2961,6 +3113,7 @@ pub unsafe extern "C" fn ts_pack_chunk_context_chunk_index(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.chunk_index
 }
@@ -2975,6 +3128,7 @@ pub unsafe extern "C" fn ts_pack_chunk_context_total_chunks(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.total_chunks
 }
@@ -2989,6 +3143,7 @@ pub unsafe extern "C" fn ts_pack_chunk_context_node_types(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.node_types) {
         Ok(s) => match CString::new(s) {
@@ -3009,6 +3164,7 @@ pub unsafe extern "C" fn ts_pack_chunk_context_context_path(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.context_path) {
         Ok(s) => match CString::new(s) {
@@ -3029,6 +3185,7 @@ pub unsafe extern "C" fn ts_pack_chunk_context_symbols_defined(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.symbols_defined) {
         Ok(s) => match CString::new(s) {
@@ -3049,6 +3206,7 @@ pub unsafe extern "C" fn ts_pack_chunk_context_comments(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.comments) {
         Ok(s) => match CString::new(s) {
@@ -3069,6 +3227,7 @@ pub unsafe extern "C" fn ts_pack_chunk_context_docstrings(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.docstrings) {
         Ok(s) => match CString::new(s) {
@@ -3089,6 +3248,7 @@ pub unsafe extern "C" fn ts_pack_chunk_context_has_error_nodes(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.has_error_nodes as i32
 }
@@ -3104,6 +3264,7 @@ pub unsafe extern "C" fn ts_pack_node_info_from_json(json: *const c_char) -> *mu
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -3131,6 +3292,7 @@ pub unsafe extern "C" fn ts_pack_node_info_to_json(ptr: *const tree_sitter_langu
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -3153,6 +3315,7 @@ pub unsafe extern "C" fn ts_pack_node_info_to_json(ptr: *const tree_sitter_langu
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_node_info_free(ptr: *mut tree_sitter_language_pack::NodeInfo) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -3167,6 +3330,7 @@ pub unsafe extern "C" fn ts_pack_node_info_is_named(ptr: *const tree_sitter_lang
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.is_named as i32
 }
@@ -3179,6 +3343,7 @@ pub unsafe extern "C" fn ts_pack_node_info_start_byte(ptr: *const tree_sitter_la
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.start_byte
 }
@@ -3191,6 +3356,7 @@ pub unsafe extern "C" fn ts_pack_node_info_end_byte(ptr: *const tree_sitter_lang
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.end_byte
 }
@@ -3203,6 +3369,7 @@ pub unsafe extern "C" fn ts_pack_node_info_start_row(ptr: *const tree_sitter_lan
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.start_row
 }
@@ -3215,6 +3382,7 @@ pub unsafe extern "C" fn ts_pack_node_info_start_col(ptr: *const tree_sitter_lan
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.start_col
 }
@@ -3227,6 +3395,7 @@ pub unsafe extern "C" fn ts_pack_node_info_end_row(ptr: *const tree_sitter_langu
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.end_row
 }
@@ -3239,6 +3408,7 @@ pub unsafe extern "C" fn ts_pack_node_info_end_col(ptr: *const tree_sitter_langu
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.end_col
 }
@@ -3251,6 +3421,7 @@ pub unsafe extern "C" fn ts_pack_node_info_named_child_count(ptr: *const tree_si
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.named_child_count
 }
@@ -3263,6 +3434,7 @@ pub unsafe extern "C" fn ts_pack_node_info_is_error(ptr: *const tree_sitter_lang
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.is_error as i32
 }
@@ -3275,6 +3447,7 @@ pub unsafe extern "C" fn ts_pack_node_info_is_missing(ptr: *const tree_sitter_la
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.is_missing as i32
 }
@@ -3292,6 +3465,7 @@ pub unsafe extern "C" fn ts_pack_pack_config_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -3319,6 +3493,7 @@ pub unsafe extern "C" fn ts_pack_pack_config_to_json(ptr: *const tree_sitter_lan
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -3341,6 +3516,7 @@ pub unsafe extern "C" fn ts_pack_pack_config_to_json(ptr: *const tree_sitter_lan
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_pack_config_free(ptr: *mut tree_sitter_language_pack::PackConfig) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -3357,6 +3533,7 @@ pub unsafe extern "C" fn ts_pack_pack_config_cache_dir(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.cache_dir {
         Some(val) => match CString::new(val.to_string_lossy().to_string()) {
@@ -3377,6 +3554,7 @@ pub unsafe extern "C" fn ts_pack_pack_config_languages(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.languages {
         Some(val) => match serde_json::to_string(&val) {
@@ -3400,6 +3578,7 @@ pub unsafe extern "C" fn ts_pack_pack_config_groups(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.groups {
         Some(val) => match serde_json::to_string(&val) {
@@ -3439,6 +3618,7 @@ pub unsafe extern "C" fn ts_pack_pack_config_from_toml_file(
         set_last_error(1, "Null pointer passed for parameter 'path'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees path is a valid pointer; string is valid UTF-8 from caller.
     let path_rs = match unsafe { CStr::from_ptr(path) }.to_str() {
         Ok(s) => std::path::PathBuf::from(s),
         Err(_) => {
@@ -3499,6 +3679,7 @@ pub unsafe extern "C" fn ts_pack_process_config_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -3528,6 +3709,7 @@ pub unsafe extern "C" fn ts_pack_process_config_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -3550,6 +3732,7 @@ pub unsafe extern "C" fn ts_pack_process_config_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_process_config_free(ptr: *mut tree_sitter_language_pack::ProcessConfig) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -3564,6 +3747,7 @@ pub unsafe extern "C" fn ts_pack_process_config_structure(ptr: *const tree_sitte
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.structure as i32
 }
@@ -3576,6 +3760,7 @@ pub unsafe extern "C" fn ts_pack_process_config_imports(ptr: *const tree_sitter_
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.imports as i32
 }
@@ -3588,6 +3773,7 @@ pub unsafe extern "C" fn ts_pack_process_config_exports(ptr: *const tree_sitter_
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.exports as i32
 }
@@ -3600,6 +3786,7 @@ pub unsafe extern "C" fn ts_pack_process_config_comments(ptr: *const tree_sitter
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.comments as i32
 }
@@ -3614,6 +3801,7 @@ pub unsafe extern "C" fn ts_pack_process_config_docstrings(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.docstrings as i32
 }
@@ -3626,6 +3814,7 @@ pub unsafe extern "C" fn ts_pack_process_config_symbols(ptr: *const tree_sitter_
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.symbols as i32
 }
@@ -3640,6 +3829,7 @@ pub unsafe extern "C" fn ts_pack_process_config_diagnostics(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.diagnostics as i32
 }
@@ -3654,6 +3844,7 @@ pub unsafe extern "C" fn ts_pack_process_config_chunk_max_size(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match &obj.chunk_max_size {
         Some(val) => *val,
@@ -3743,6 +3934,7 @@ pub unsafe extern "C" fn ts_pack_query_match_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -3770,6 +3962,7 @@ pub unsafe extern "C" fn ts_pack_query_match_to_json(ptr: *const tree_sitter_lan
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -3792,6 +3985,7 @@ pub unsafe extern "C" fn ts_pack_query_match_to_json(ptr: *const tree_sitter_lan
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_query_match_free(ptr: *mut tree_sitter_language_pack::QueryMatch) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -3806,6 +4000,7 @@ pub unsafe extern "C" fn ts_pack_query_match_pattern_index(ptr: *const tree_sitt
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.pattern_index
 }
@@ -3816,6 +4011,7 @@ pub unsafe extern "C" fn ts_pack_query_match_pattern_index(ptr: *const tree_sitt
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_language_registry_free(ptr: *mut tree_sitter_language_pack::LanguageRegistry) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -3838,6 +4034,7 @@ pub unsafe extern "C" fn ts_pack_language_registry_with_libs_dir(
         set_last_error(1, "Null pointer passed for parameter 'libs_dir'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees libs_dir is a valid pointer; string is valid UTF-8 from caller.
     let libs_dir_rs = match unsafe { CStr::from_ptr(libs_dir) }.to_str() {
         Ok(s) => std::path::PathBuf::from(s),
         Err(_) => {
@@ -3877,6 +4074,7 @@ pub unsafe extern "C" fn ts_pack_language_registry_add_extra_libs_dir(
         set_last_error(1, "Null pointer passed for parameter 'dir'");
         return;
     }
+    // SAFETY: null check above guarantees dir is a valid pointer; string is valid UTF-8 from caller.
     let dir_rs = match unsafe { CStr::from_ptr(dir) }.to_str() {
         Ok(s) => std::path::PathBuf::from(s),
         Err(_) => {
@@ -3916,6 +4114,7 @@ pub unsafe extern "C" fn ts_pack_language_registry_get_language(
         set_last_error(1, "Null pointer passed for parameter 'name'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let name_rs = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -3984,6 +4183,7 @@ pub unsafe extern "C" fn ts_pack_language_registry_has_language(
         set_last_error(1, "Null pointer passed for parameter 'name'");
         return 0;
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let name_rs = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -4039,6 +4239,7 @@ pub unsafe extern "C" fn ts_pack_language_registry_process(
         set_last_error(1, "Null pointer passed for parameter 'source'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees source is a valid pointer; string is valid UTF-8 from caller.
     let source_rs = match unsafe { CStr::from_ptr(source) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -4050,6 +4251,7 @@ pub unsafe extern "C" fn ts_pack_language_registry_process(
         set_last_error(1, "Null pointer passed for parameter 'config'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees config is a valid pointer.
     let config_rs = unsafe { &*config };
     let result = obj.process(&source_rs, &config_rs);
     match result {
@@ -4084,6 +4286,7 @@ pub unsafe extern "C" fn ts_pack_parser_manifest_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -4113,6 +4316,7 @@ pub unsafe extern "C" fn ts_pack_parser_manifest_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -4135,6 +4339,7 @@ pub unsafe extern "C" fn ts_pack_parser_manifest_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_parser_manifest_free(ptr: *mut tree_sitter_language_pack::download::ParserManifest) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -4151,6 +4356,7 @@ pub unsafe extern "C" fn ts_pack_parser_manifest_version(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.version.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -4168,6 +4374,7 @@ pub unsafe extern "C" fn ts_pack_parser_manifest_platforms(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.platforms) {
         Ok(s) => match CString::new(s) {
@@ -4188,6 +4395,7 @@ pub unsafe extern "C" fn ts_pack_parser_manifest_languages(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.languages) {
         Ok(s) => match CString::new(s) {
@@ -4208,6 +4416,7 @@ pub unsafe extern "C" fn ts_pack_parser_manifest_groups(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match serde_json::to_string(&obj.groups) {
         Ok(s) => match CString::new(s) {
@@ -4231,6 +4440,7 @@ pub unsafe extern "C" fn ts_pack_platform_bundle_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -4260,6 +4470,7 @@ pub unsafe extern "C" fn ts_pack_platform_bundle_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -4282,6 +4493,7 @@ pub unsafe extern "C" fn ts_pack_platform_bundle_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_platform_bundle_free(ptr: *mut tree_sitter_language_pack::download::PlatformBundle) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -4298,6 +4510,7 @@ pub unsafe extern "C" fn ts_pack_platform_bundle_url(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.url.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -4315,6 +4528,7 @@ pub unsafe extern "C" fn ts_pack_platform_bundle_sha256(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.sha256.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -4332,6 +4546,7 @@ pub unsafe extern "C" fn ts_pack_platform_bundle_size(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.size
 }
@@ -4349,6 +4564,7 @@ pub unsafe extern "C" fn ts_pack_language_info_from_json(
         set_last_error(1, "Null pointer passed for JSON string");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees json is a valid pointer; string is valid UTF-8 from caller.
     let c_str = match unsafe { CStr::from_ptr(json) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -4378,6 +4594,7 @@ pub unsafe extern "C" fn ts_pack_language_info_to_json(
         set_last_error(1, "Null pointer passed to to_json");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let val = unsafe { &*ptr };
     match serde_json::to_string(val) {
         Ok(s) => match CString::new(s) {
@@ -4400,6 +4617,7 @@ pub unsafe extern "C" fn ts_pack_language_info_to_json(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_language_info_free(ptr: *mut tree_sitter_language_pack::download::LanguageInfo) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -4416,6 +4634,7 @@ pub unsafe extern "C" fn ts_pack_language_info_group(
     if ptr.is_null() {
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     match CString::new(obj.group.to_string()) {
         Ok(cs) => cs.into_raw(),
@@ -4433,6 +4652,7 @@ pub unsafe extern "C" fn ts_pack_language_info_size(
     if ptr.is_null() {
         return 0;
     }
+    // SAFETY: null check above guarantees ptr is a valid pointer.
     let obj = unsafe { &*ptr };
     obj.size
 }
@@ -4443,6 +4663,7 @@ pub unsafe extern "C" fn ts_pack_language_info_size(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_download_manager_free(ptr: *mut tree_sitter_language_pack::DownloadManager) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -4462,6 +4683,7 @@ pub unsafe extern "C" fn ts_pack_download_manager_new(
         set_last_error(1, "Null pointer passed for parameter 'version'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees version is a valid pointer; string is valid UTF-8 from caller.
     let version_rs = match unsafe { CStr::from_ptr(version) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -4493,6 +4715,7 @@ pub unsafe extern "C" fn ts_pack_download_manager_with_cache_dir(
         set_last_error(1, "Null pointer passed for parameter 'version'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees version is a valid pointer; string is valid UTF-8 from caller.
     let version_rs = match unsafe { CStr::from_ptr(version) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -4504,6 +4727,7 @@ pub unsafe extern "C" fn ts_pack_download_manager_with_cache_dir(
         set_last_error(1, "Null pointer passed for parameter 'cache_dir'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees cache_dir is a valid pointer; string is valid UTF-8 from caller.
     let cache_dir_rs = match unsafe { CStr::from_ptr(cache_dir) }.to_str() {
         Ok(s) => std::path::PathBuf::from(s),
         Err(_) => {
@@ -4528,6 +4752,7 @@ pub unsafe extern "C" fn ts_pack_download_manager_default_cache_dir(
         set_last_error(1, "Null pointer passed for parameter 'version'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees version is a valid pointer; string is valid UTF-8 from caller.
     let version_rs = match unsafe { CStr::from_ptr(version) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -4616,6 +4841,7 @@ pub unsafe extern "C" fn ts_pack_download_manager_ensure_languages(
         set_last_error(1, "Null pointer passed for parameter 'names'");
         return -1;
     }
+    // SAFETY: null check above guarantees names is a valid pointer; string is valid UTF-8 from caller.
     let names_rs_str = match unsafe { CStr::from_ptr(names) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -4661,6 +4887,7 @@ pub unsafe extern "C" fn ts_pack_download_manager_ensure_group(
         set_last_error(1, "Null pointer passed for parameter 'group'");
         return -1;
     }
+    // SAFETY: null check above guarantees group is a valid pointer; string is valid UTF-8 from caller.
     let group_rs = match unsafe { CStr::from_ptr(group) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -4698,6 +4925,7 @@ pub unsafe extern "C" fn ts_pack_download_manager_lib_path(
         set_last_error(1, "Null pointer passed for parameter 'name'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let name_rs = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -4768,6 +4996,7 @@ pub unsafe extern "C" fn ts_pack_download_manager_clean_cache(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_language_free(ptr: *mut tree_sitter_language_pack::Language) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -4780,6 +5009,7 @@ pub unsafe extern "C" fn ts_pack_language_free(ptr: *mut tree_sitter_language_pa
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_parser_free(ptr: *mut tree_sitter_language_pack::Parser) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -4792,6 +5022,7 @@ pub unsafe extern "C" fn ts_pack_parser_free(ptr: *mut tree_sitter_language_pack
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_tree_free(ptr: *mut tree_sitter_language_pack::Tree) {
     if !ptr.is_null() {
+        // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
             drop(Box::from_raw(ptr));
         }
@@ -4824,6 +5055,7 @@ pub unsafe extern "C" fn ts_pack_capture_output_from_str(name: *const c_char) ->
         set_last_error(1, "Null pointer passed for enum name");
         return -1;
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let s = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -4876,6 +5108,7 @@ pub unsafe extern "C" fn ts_pack_structure_kind_from_str(name: *const c_char) ->
         set_last_error(1, "Null pointer passed for enum name");
         return -1;
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let s = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -4928,6 +5161,7 @@ pub unsafe extern "C" fn ts_pack_comment_kind_from_str(name: *const c_char) -> i
         set_last_error(1, "Null pointer passed for enum name");
         return -1;
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let s = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -4975,6 +5209,7 @@ pub unsafe extern "C" fn ts_pack_docstring_format_from_str(name: *const c_char) 
         set_last_error(1, "Null pointer passed for enum name");
         return -1;
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let s = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -5022,6 +5257,7 @@ pub unsafe extern "C" fn ts_pack_export_kind_from_str(name: *const c_char) -> i3
         set_last_error(1, "Null pointer passed for enum name");
         return -1;
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let s = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -5072,6 +5308,7 @@ pub unsafe extern "C" fn ts_pack_symbol_kind_from_str(name: *const c_char) -> i3
         set_last_error(1, "Null pointer passed for enum name");
         return -1;
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let s = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -5122,6 +5359,7 @@ pub unsafe extern "C" fn ts_pack_diagnostic_severity_from_str(name: *const c_cha
         set_last_error(1, "Null pointer passed for enum name");
         return -1;
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let s = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s,
         Err(_) => {
@@ -5160,6 +5398,7 @@ pub unsafe extern "C" fn ts_pack_detect_language_from_extension(ext: *const std:
         set_last_error(1, "Null pointer passed for parameter 'ext'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees ext is a valid pointer; string is valid UTF-8 from caller.
     let ext_rs = match unsafe { CStr::from_ptr(ext) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5198,6 +5437,7 @@ pub unsafe extern "C" fn ts_pack_detect_language_from_path(path: *const std::ffi
         set_last_error(1, "Null pointer passed for parameter 'path'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees path is a valid pointer; string is valid UTF-8 from caller.
     let path_rs = match unsafe { CStr::from_ptr(path) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5249,6 +5489,7 @@ pub unsafe extern "C" fn ts_pack_detect_language_from_content(
         set_last_error(1, "Null pointer passed for parameter 'content'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees content is a valid pointer; string is valid UTF-8 from caller.
     let content_rs = match unsafe { CStr::from_ptr(content) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5279,6 +5520,7 @@ pub unsafe extern "C" fn ts_pack_root_node_info(
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees tree is a valid pointer.
     let tree_rs = unsafe { &*tree };
     let result = tree_sitter_language_pack::root_node_info(&tree_rs);
     Box::into_raw(Box::new(result))
@@ -5300,11 +5542,13 @@ pub unsafe extern "C" fn ts_pack_find_nodes_by_type(
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees tree is a valid pointer.
     let tree_rs = unsafe { &*tree };
     if node_type.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'node_type'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees node_type is a valid pointer; string is valid UTF-8 from caller.
     let node_type_rs = match unsafe { CStr::from_ptr(node_type) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5338,6 +5582,7 @@ pub unsafe extern "C" fn ts_pack_named_children_info(
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees tree is a valid pointer.
     let tree_rs = unsafe { &*tree };
     let result = tree_sitter_language_pack::named_children_info(&tree_rs);
     match serde_json::to_string(&result) {
@@ -5375,6 +5620,7 @@ pub unsafe extern "C" fn ts_pack_parse_string(
         set_last_error(1, "Null pointer passed for parameter 'language'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees language is a valid pointer; string is valid UTF-8 from caller.
     let language_rs = match unsafe { CStr::from_ptr(language) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5386,6 +5632,7 @@ pub unsafe extern "C" fn ts_pack_parse_string(
         set_last_error(1, "Null pointer passed for parameter 'source'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above; ptr and len validated by caller; data is valid for len elements.
     let source_rs = unsafe { std::slice::from_raw_parts(source, source_len) }.to_vec();
     let result = tree_sitter_language_pack::parse_string(&language_rs, &source_rs);
     match result {
@@ -5413,11 +5660,13 @@ pub unsafe extern "C" fn ts_pack_tree_contains_node_type(
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return 0;
     }
+    // SAFETY: null check above guarantees tree is a valid pointer.
     let tree_rs = unsafe { &*tree };
     if node_type.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'node_type'");
         return 0;
     }
+    // SAFETY: null check above guarantees node_type is a valid pointer; string is valid UTF-8 from caller.
     let node_type_rs = match unsafe { CStr::from_ptr(node_type) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5446,6 +5695,7 @@ pub unsafe extern "C" fn ts_pack_tree_has_error_nodes(tree: *const tree_sitter_l
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return 0;
     }
+    // SAFETY: null check above guarantees tree is a valid pointer.
     let tree_rs = unsafe { &*tree };
     let result = tree_sitter_language_pack::tree_has_error_nodes(&tree_rs);
     if result {
@@ -5469,6 +5719,7 @@ pub unsafe extern "C" fn ts_pack_tree_to_sexp(tree: *const tree_sitter_language_
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees tree is a valid pointer.
     let tree_rs = unsafe { &*tree };
     let result = tree_sitter_language_pack::tree_to_sexp(&tree_rs);
     match CString::new(result) {
@@ -5490,6 +5741,7 @@ pub unsafe extern "C" fn ts_pack_tree_error_count(tree: *const tree_sitter_langu
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return 0;
     }
+    // SAFETY: null check above guarantees tree is a valid pointer.
     let tree_rs = unsafe { &*tree };
 
     tree_sitter_language_pack::tree_error_count(&tree_rs)
@@ -5521,6 +5773,7 @@ pub unsafe extern "C" fn ts_pack_get_highlights_query(language: *const std::ffi:
         set_last_error(1, "Null pointer passed for parameter 'language'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees language is a valid pointer; string is valid UTF-8 from caller.
     let language_rs = match unsafe { CStr::from_ptr(language) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5563,6 +5816,7 @@ pub unsafe extern "C" fn ts_pack_get_injections_query(language: *const std::ffi:
         set_last_error(1, "Null pointer passed for parameter 'language'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees language is a valid pointer; string is valid UTF-8 from caller.
     let language_rs = match unsafe { CStr::from_ptr(language) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5605,6 +5859,7 @@ pub unsafe extern "C" fn ts_pack_get_locals_query(language: *const std::ffi::c_c
         set_last_error(1, "Null pointer passed for parameter 'language'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees language is a valid pointer; string is valid UTF-8 from caller.
     let language_rs = match unsafe { CStr::from_ptr(language) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5666,11 +5921,13 @@ pub unsafe extern "C" fn ts_pack_run_query(
         set_last_error(1, "Null pointer passed for parameter 'tree'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees tree is a valid pointer.
     let tree_rs = unsafe { &*tree };
     if language.is_null() {
         set_last_error(1, "Null pointer passed for parameter 'language'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees language is a valid pointer; string is valid UTF-8 from caller.
     let language_rs = match unsafe { CStr::from_ptr(language) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5682,6 +5939,7 @@ pub unsafe extern "C" fn ts_pack_run_query(
         set_last_error(1, "Null pointer passed for parameter 'query_source'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees query_source is a valid pointer; string is valid UTF-8 from caller.
     let query_source_rs = match unsafe { CStr::from_ptr(query_source) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5693,6 +5951,7 @@ pub unsafe extern "C" fn ts_pack_run_query(
         set_last_error(1, "Null pointer passed for parameter 'source'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above; ptr and len validated by caller; data is valid for len elements.
     let source_rs = unsafe { std::slice::from_raw_parts(source, source_len) }.to_vec();
     let result = tree_sitter_language_pack::run_query(&tree_rs, &language_rs, &query_source_rs, &source_rs);
     match result {
@@ -5745,6 +6004,7 @@ pub unsafe extern "C" fn ts_pack_get_language(
         set_last_error(1, "Null pointer passed for parameter 'name'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let name_rs = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5791,6 +6051,7 @@ pub unsafe extern "C" fn ts_pack_get_parser(name: *const std::ffi::c_char) -> *m
         set_last_error(1, "Null pointer passed for parameter 'name'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let name_rs = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5863,6 +6124,7 @@ pub unsafe extern "C" fn ts_pack_has_language(name: *const std::ffi::c_char) -> 
         set_last_error(1, "Null pointer passed for parameter 'name'");
         return 0;
     }
+    // SAFETY: null check above guarantees name is a valid pointer; string is valid UTF-8 from caller.
     let name_rs = match unsafe { CStr::from_ptr(name) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5935,6 +6197,7 @@ pub unsafe extern "C" fn ts_pack_process(
         set_last_error(1, "Null pointer passed for parameter 'source'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees source is a valid pointer; string is valid UTF-8 from caller.
     let source_rs = match unsafe { CStr::from_ptr(source) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -5946,6 +6209,7 @@ pub unsafe extern "C" fn ts_pack_process(
         set_last_error(1, "Null pointer passed for parameter 'config'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees config is a valid pointer.
     let config_rs = unsafe { &*config };
     let result = tree_sitter_language_pack::process(&source_rs, &config_rs);
     match result {
@@ -5996,6 +6260,7 @@ pub unsafe extern "C" fn ts_pack_extract_patterns(
         set_last_error(1, "Null pointer passed for parameter 'source'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees source is a valid pointer; string is valid UTF-8 from caller.
     let source_rs = match unsafe { CStr::from_ptr(source) }.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => {
@@ -6007,6 +6272,7 @@ pub unsafe extern "C" fn ts_pack_extract_patterns(
         set_last_error(1, "Null pointer passed for parameter 'config'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees config is a valid pointer.
     let config_rs = unsafe { &*config };
     let result = tree_sitter_language_pack::extract_patterns(&source_rs, &config_rs);
     match result {
@@ -6037,6 +6303,7 @@ pub unsafe extern "C" fn ts_pack_validate_extraction(
         set_last_error(1, "Null pointer passed for parameter 'config'");
         return std::ptr::null_mut();
     }
+    // SAFETY: null check above guarantees config is a valid pointer.
     let config_rs = unsafe { &*config };
     let result = tree_sitter_language_pack::validate_extraction(&config_rs);
     match result {
@@ -6080,6 +6347,7 @@ pub unsafe extern "C" fn ts_pack_init(config: *const tree_sitter_language_pack::
         set_last_error(1, "Null pointer passed for parameter 'config'");
         return -1;
     }
+    // SAFETY: null check above guarantees config is a valid pointer.
     let config_rs = unsafe { &*config };
     let result = tree_sitter_language_pack::init(&config_rs);
     match result {
@@ -6125,6 +6393,7 @@ pub unsafe extern "C" fn ts_pack_configure(config: *const tree_sitter_language_p
         set_last_error(1, "Null pointer passed for parameter 'config'");
         return -1;
     }
+    // SAFETY: null check above guarantees config is a valid pointer.
     let config_rs = unsafe { &*config };
     let result = tree_sitter_language_pack::configure(&config_rs);
     match result {
@@ -6164,6 +6433,7 @@ pub unsafe extern "C" fn ts_pack_download(names: *const std::ffi::c_char) -> usi
         set_last_error(1, "Null pointer passed for parameter 'names'");
         return 0;
     }
+    // SAFETY: null check above guarantees names is a valid pointer; string is valid UTF-8 from caller.
     let names_rs_str = match unsafe { CStr::from_ptr(names) }.to_str() {
         Ok(s) => s,
         Err(_) => {

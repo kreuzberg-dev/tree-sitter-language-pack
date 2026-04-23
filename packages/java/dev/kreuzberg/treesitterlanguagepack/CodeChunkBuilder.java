@@ -14,36 +14,43 @@ public class CodeChunkBuilder {
     private long endLine = 0;
     private ChunkContext metadata = null;
 
-    public CodeChunkBuilder withContent(String value) {
+    /** Sets the content field. */
+    public CodeChunkBuilder withContent(final String value) {
         this.content = value;
         return this;
     }
 
-    public CodeChunkBuilder withStartByte(long value) {
+    /** Sets the startByte field. */
+    public CodeChunkBuilder withStartByte(final long value) {
         this.startByte = value;
         return this;
     }
 
-    public CodeChunkBuilder withEndByte(long value) {
+    /** Sets the endByte field. */
+    public CodeChunkBuilder withEndByte(final long value) {
         this.endByte = value;
         return this;
     }
 
-    public CodeChunkBuilder withStartLine(long value) {
+    /** Sets the startLine field. */
+    public CodeChunkBuilder withStartLine(final long value) {
         this.startLine = value;
         return this;
     }
 
-    public CodeChunkBuilder withEndLine(long value) {
+    /** Sets the endLine field. */
+    public CodeChunkBuilder withEndLine(final long value) {
         this.endLine = value;
         return this;
     }
 
-    public CodeChunkBuilder withMetadata(ChunkContext value) {
+    /** Sets the metadata field. */
+    public CodeChunkBuilder withMetadata(final ChunkContext value) {
         this.metadata = value;
         return this;
     }
 
+    /** Builds the CodeChunk instance. */
     public CodeChunk build() {
         return new CodeChunk(
             content,

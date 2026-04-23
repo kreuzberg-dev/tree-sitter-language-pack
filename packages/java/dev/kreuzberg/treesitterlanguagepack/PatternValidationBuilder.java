@@ -14,31 +14,37 @@ public class PatternValidationBuilder {
     private List<String> warnings = List.of();
     private List<String> errors = List.of();
 
-    public PatternValidationBuilder withValid(boolean value) {
+    /** Sets the valid field. */
+    public PatternValidationBuilder withValid(final boolean value) {
         this.valid = value;
         return this;
     }
 
-    public PatternValidationBuilder withCaptureNames(List<String> value) {
+    /** Sets the captureNames field. */
+    public PatternValidationBuilder withCaptureNames(final List<String> value) {
         this.captureNames = value;
         return this;
     }
 
-    public PatternValidationBuilder withPatternCount(long value) {
+    /** Sets the patternCount field. */
+    public PatternValidationBuilder withPatternCount(final long value) {
         this.patternCount = value;
         return this;
     }
 
-    public PatternValidationBuilder withWarnings(List<String> value) {
+    /** Sets the warnings field. */
+    public PatternValidationBuilder withWarnings(final List<String> value) {
         this.warnings = value;
         return this;
     }
 
-    public PatternValidationBuilder withErrors(List<String> value) {
+    /** Sets the errors field. */
+    public PatternValidationBuilder withErrors(final List<String> value) {
         this.errors = value;
         return this;
     }
 
+    /** Builds the PatternValidation instance. */
     public PatternValidation build() {
         return new PatternValidation(
             valid,

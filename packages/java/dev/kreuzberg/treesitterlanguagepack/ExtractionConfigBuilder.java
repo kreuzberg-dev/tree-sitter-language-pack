@@ -10,16 +10,19 @@ public class ExtractionConfigBuilder {
     private String language = "";
     private String patterns = "";
 
-    public ExtractionConfigBuilder withLanguage(String value) {
+    /** Sets the language field. */
+    public ExtractionConfigBuilder withLanguage(final String value) {
         this.language = value;
         return this;
     }
 
-    public ExtractionConfigBuilder withPatterns(String value) {
+    /** Sets the patterns field. */
+    public ExtractionConfigBuilder withPatterns(final String value) {
         this.patterns = value;
         return this;
     }
 
+    /** Builds the ExtractionConfig instance. */
     public ExtractionConfig build() {
         return new ExtractionConfig(
             language,

@@ -31,7 +31,7 @@ pub struct JsExtractionPattern {
     #[napi(js_name = "maxResults")]
     pub max_results: Option<i64>,
     #[napi(js_name = "byteRange")]
-    pub byte_range: Option<String>,
+    pub byte_range: Option<Vec<i64>>,
 }
 
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
@@ -885,7 +885,11 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for JsExtractionPattern 
             capture_output: Some(val.capture_output.into()),
             child_fields: Some(val.child_fields),
             max_results: val.max_results.map(|v| v as i64),
-            byte_range: val.byte_range.as_ref().map(|v| format!("{v:?}")),
+            byte_range: val
+                .byte_range
+                .as_ref()
+                .and_then(|v| serde_json::to_value(v).ok())
+                .and_then(|v| serde_json::from_value(v).ok()),
         }
     }
 }

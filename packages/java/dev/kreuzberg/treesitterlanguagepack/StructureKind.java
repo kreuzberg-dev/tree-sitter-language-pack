@@ -24,19 +24,22 @@ public enum StructureKind {
     Namespace("namespace"),
     Other("other");
 
+    /** The string value. */
     private final String value;
 
-    StructureKind(String value) {
+    StructureKind(final String value) {
         this.value = value;
     }
 
+    /** Returns the string value. */
     @JsonValue
     public String getValue() {
         return value;
     }
 
+    /** Creates an instance from a string value. */
     @JsonCreator
-    public static StructureKind fromValue(String value) {
+    public static StructureKind fromValue(final String value) {
         for (StructureKind e : values()) {
             if (e.value.equalsIgnoreCase(value)) {
                 return e;

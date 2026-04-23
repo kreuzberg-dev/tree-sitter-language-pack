@@ -2,11 +2,13 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 public class LockPoisonedException extends ErrorException {
-    public LockPoisonedException(String message) {
+    /** Creates a new LockPoisonedException with the given message. */
+    public LockPoisonedException(final String message) {
         super(message);
     }
 
-    public LockPoisonedException(String message, Throwable cause) {
+    /** Creates a new LockPoisonedException with the given message and cause. */
+    public LockPoisonedException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

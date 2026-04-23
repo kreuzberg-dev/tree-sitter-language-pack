@@ -13,26 +13,31 @@ public class CommentInfoBuilder {
     private Span span = null;
     private Optional<String> associatedNode = Optional.empty();
 
-    public CommentInfoBuilder withText(String value) {
+    /** Sets the text field. */
+    public CommentInfoBuilder withText(final String value) {
         this.text = value;
         return this;
     }
 
-    public CommentInfoBuilder withKind(CommentKind value) {
+    /** Sets the kind field. */
+    public CommentInfoBuilder withKind(final CommentKind value) {
         this.kind = value;
         return this;
     }
 
-    public CommentInfoBuilder withSpan(Span value) {
+    /** Sets the span field. */
+    public CommentInfoBuilder withSpan(final Span value) {
         this.span = value;
         return this;
     }
 
-    public CommentInfoBuilder withAssociatedNode(Optional<String> value) {
+    /** Sets the associatedNode field. */
+    public CommentInfoBuilder withAssociatedNode(final Optional<String> value) {
         this.associatedNode = value;
         return this;
     }
 
+    /** Builds the CommentInfo instance. */
     public CommentInfo build() {
         return new CommentInfo(
             text,

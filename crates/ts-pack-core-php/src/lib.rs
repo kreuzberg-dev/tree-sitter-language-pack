@@ -36,7 +36,7 @@ pub struct ExtractionPattern {
     pub max_results: Option<i64>,
     /// Restrict matches to a byte range `(start, end)`.
     #[php(prop, name = "byte_range")]
-    pub byte_range: Option<String>,
+    pub byte_range: Option<Vec<i64>>,
 }
 
 #[php_impl]
@@ -1419,7 +1419,11 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {
                 .unwrap_or_default(),
             child_fields: val.child_fields,
             max_results: val.max_results.map(|v| v as i64),
-            byte_range: val.byte_range.as_ref().map(|v| format!("{v:?}")),
+            byte_range: val
+                .byte_range
+                .as_ref()
+                .and_then(|v| serde_json::to_value(v).ok())
+                .and_then(|v| serde_json::from_value(v).ok()),
         }
     }
 }

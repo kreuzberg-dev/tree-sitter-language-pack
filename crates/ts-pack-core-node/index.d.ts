@@ -577,7 +577,7 @@ export interface JsExtractionPattern {
 	/** Maximum number of matches to return. `None` means unlimited. */
 	maxResults: number;
 	/** Restrict matches to a byte range `(start, end)`. */
-	byteRange: string;
+	byteRange: Array<number>;
 }
 
 /** Complete extraction results for all patterns. */

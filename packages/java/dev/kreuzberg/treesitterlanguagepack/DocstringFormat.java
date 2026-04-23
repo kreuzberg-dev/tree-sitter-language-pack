@@ -18,19 +18,22 @@ public enum DocstringFormat {
     JavaDoc("javadoc"),
     Other("other");
 
+    /** The string value. */
     private final String value;
 
-    DocstringFormat(String value) {
+    DocstringFormat(final String value) {
         this.value = value;
     }
 
+    /** Returns the string value. */
     @JsonValue
     public String getValue() {
         return value;
     }
 
+    /** Creates an instance from a string value. */
     @JsonCreator
-    public static DocstringFormat fromValue(String value) {
+    public static DocstringFormat fromValue(final String value) {
         for (DocstringFormat e : values()) {
             if (e.value.equalsIgnoreCase(value)) {
                 return e;

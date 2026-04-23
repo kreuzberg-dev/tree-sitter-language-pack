@@ -15,6 +15,7 @@
     clippy::unnecessary_fallible_conversions
 )]
 
+use rustler::Encoder;
 use rustler::ResourceArc;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -25,7 +26,7 @@ pub struct ExtractionPattern {
     pub capture_output: CaptureOutput,
     pub child_fields: Vec<String>,
     pub max_results: Option<usize>,
-    pub byte_range: Option<String>,
+    pub byte_range: Option<Vec<usize>>,
 }
 
 impl ExtractionPattern {
@@ -1225,7 +1226,11 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {
             capture_output: val.capture_output.into(),
             child_fields: val.child_fields,
             max_results: val.max_results,
-            byte_range: val.byte_range.as_ref().map(|v| format!("{v:?}")),
+            byte_range: val
+                .byte_range
+                .as_ref()
+                .and_then(|v| serde_json::to_value(v).ok())
+                .and_then(|v| serde_json::from_value(v).ok()),
         }
     }
 }

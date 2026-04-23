@@ -11,16 +11,19 @@ public class PatternResultBuilder {
     private List<MatchResult> matches = List.of();
     private long totalCount = 0;
 
-    public PatternResultBuilder withMatches(List<MatchResult> value) {
+    /** Sets the matches field. */
+    public PatternResultBuilder withMatches(final List<MatchResult> value) {
         this.matches = value;
         return this;
     }
 
-    public PatternResultBuilder withTotalCount(long value) {
+    /** Sets the totalCount field. */
+    public PatternResultBuilder withTotalCount(final long value) {
         this.totalCount = value;
         return this;
     }
 
+    /** Builds the PatternResult instance. */
     public PatternResult build() {
         return new PatternResult(
             matches,

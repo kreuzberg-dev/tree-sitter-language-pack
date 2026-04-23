@@ -17,36 +17,43 @@ public class SpanBuilder {
     private long endLine = 0;
     private long endColumn = 0;
 
-    public SpanBuilder withStartByte(long value) {
+    /** Sets the startByte field. */
+    public SpanBuilder withStartByte(final long value) {
         this.startByte = value;
         return this;
     }
 
-    public SpanBuilder withEndByte(long value) {
+    /** Sets the endByte field. */
+    public SpanBuilder withEndByte(final long value) {
         this.endByte = value;
         return this;
     }
 
-    public SpanBuilder withStartLine(long value) {
+    /** Sets the startLine field. */
+    public SpanBuilder withStartLine(final long value) {
         this.startLine = value;
         return this;
     }
 
-    public SpanBuilder withStartColumn(long value) {
+    /** Sets the startColumn field. */
+    public SpanBuilder withStartColumn(final long value) {
         this.startColumn = value;
         return this;
     }
 
-    public SpanBuilder withEndLine(long value) {
+    /** Sets the endLine field. */
+    public SpanBuilder withEndLine(final long value) {
         this.endLine = value;
         return this;
     }
 
-    public SpanBuilder withEndColumn(long value) {
+    /** Sets the endColumn field. */
+    public SpanBuilder withEndColumn(final long value) {
         this.endColumn = value;
         return this;
     }
 
+    /** Builds the Span instance. */
     public Span build() {
         return new Span(
             startByte,

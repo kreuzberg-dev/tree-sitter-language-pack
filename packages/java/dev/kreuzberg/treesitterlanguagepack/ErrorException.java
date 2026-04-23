@@ -7,11 +7,13 @@ Covers language lookup failures, parse errors, query errors, and I/O issues.
 Feature-gated variants are included when `config`, `download`, or related
 features are enabled. */
 public class ErrorException extends Exception {
-    public ErrorException(String message) {
+    /** Creates a new ErrorException with the given message. */
+    public ErrorException(final String message) {
         super(message);
     }
 
-    public ErrorException(String message, Throwable cause) {
+    /** Creates a new ErrorException with the given message and cause. */
+    public ErrorException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

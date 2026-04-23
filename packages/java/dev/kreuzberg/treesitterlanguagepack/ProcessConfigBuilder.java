@@ -36,56 +36,67 @@ public class ProcessConfigBuilder {
     private Optional<Long> chunkMaxSize = Optional.empty();
     private Optional<String> extractions = Optional.empty();
 
-    public ProcessConfigBuilder withLanguage(String value) {
+    /** Sets the language field. */
+    public ProcessConfigBuilder withLanguage(final String value) {
         this.language = value;
         return this;
     }
 
-    public ProcessConfigBuilder withStructure(boolean value) {
+    /** Sets the structure field. */
+    public ProcessConfigBuilder withStructure(final boolean value) {
         this.structure = value;
         return this;
     }
 
-    public ProcessConfigBuilder withImports(boolean value) {
+    /** Sets the imports field. */
+    public ProcessConfigBuilder withImports(final boolean value) {
         this.imports = value;
         return this;
     }
 
-    public ProcessConfigBuilder withExports(boolean value) {
+    /** Sets the exports field. */
+    public ProcessConfigBuilder withExports(final boolean value) {
         this.exports = value;
         return this;
     }
 
-    public ProcessConfigBuilder withComments(boolean value) {
+    /** Sets the comments field. */
+    public ProcessConfigBuilder withComments(final boolean value) {
         this.comments = value;
         return this;
     }
 
-    public ProcessConfigBuilder withDocstrings(boolean value) {
+    /** Sets the docstrings field. */
+    public ProcessConfigBuilder withDocstrings(final boolean value) {
         this.docstrings = value;
         return this;
     }
 
-    public ProcessConfigBuilder withSymbols(boolean value) {
+    /** Sets the symbols field. */
+    public ProcessConfigBuilder withSymbols(final boolean value) {
         this.symbols = value;
         return this;
     }
 
-    public ProcessConfigBuilder withDiagnostics(boolean value) {
+    /** Sets the diagnostics field. */
+    public ProcessConfigBuilder withDiagnostics(final boolean value) {
         this.diagnostics = value;
         return this;
     }
 
-    public ProcessConfigBuilder withChunkMaxSize(Optional<Long> value) {
+    /** Sets the chunkMaxSize field. */
+    public ProcessConfigBuilder withChunkMaxSize(final Optional<Long> value) {
         this.chunkMaxSize = value;
         return this;
     }
 
-    public ProcessConfigBuilder withExtractions(Optional<String> value) {
+    /** Sets the extractions field. */
+    public ProcessConfigBuilder withExtractions(final Optional<String> value) {
         this.extractions = value;
         return this;
     }
 
+    /** Builds the ProcessConfig instance. */
     public ProcessConfig build() {
         return new ProcessConfig(
             language,

@@ -3,12 +3,12 @@
 
 import pytest
 from tree_sitter_language_pack import (
-    process,
     detect_language_from_content,
     detect_language_from_extension,
     detect_language_from_path,
     parse_string,
     extract_patterns,
+    process,
     tree_has_error_nodes,
     run_query,
 )

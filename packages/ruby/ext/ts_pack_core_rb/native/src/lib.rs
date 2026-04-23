@@ -61,7 +61,7 @@ pub struct ExtractionPattern {
     pub capture_output: CaptureOutput,
     pub child_fields: Vec<String>,
     pub max_results: Option<usize>,
-    pub byte_range: Option<String>,
+    pub byte_range: Option<Vec<usize>>,
 }
 
 unsafe impl IntoValueFromNative for ExtractionPattern {}
@@ -80,7 +80,7 @@ impl ExtractionPattern {
         capture_output: Option<CaptureOutput>,
         child_fields: Option<Vec<String>>,
         max_results: Option<usize>,
-        byte_range: Option<String>,
+        byte_range: Option<Vec<usize>>,
     ) -> Self {
         Self {
             query: query.unwrap_or_default(),
@@ -107,7 +107,7 @@ impl ExtractionPattern {
         self.max_results
     }
 
-    fn byte_range(&self) -> Option<String> {
+    fn byte_range(&self) -> Option<Vec<usize>> {
         self.byte_range.clone()
     }
 }
@@ -2644,7 +2644,11 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {
             capture_output: val.capture_output.into(),
             child_fields: val.child_fields,
             max_results: val.max_results,
-            byte_range: val.byte_range.as_ref().map(|v| format!("{v:?}")),
+            byte_range: val
+                .byte_range
+                .as_ref()
+                .and_then(|v| serde_json::to_value(v).ok())
+                .and_then(|v| serde_json::from_value(v).ok()),
         }
     }
 }

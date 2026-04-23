@@ -15,31 +15,37 @@ public class ImportInfoBuilder {
     private boolean isWildcard = false;
     private Span span = null;
 
-    public ImportInfoBuilder withSource(String value) {
+    /** Sets the source field. */
+    public ImportInfoBuilder withSource(final String value) {
         this.source = value;
         return this;
     }
 
-    public ImportInfoBuilder withItems(List<String> value) {
+    /** Sets the items field. */
+    public ImportInfoBuilder withItems(final List<String> value) {
         this.items = value;
         return this;
     }
 
-    public ImportInfoBuilder withAlias(Optional<String> value) {
+    /** Sets the alias field. */
+    public ImportInfoBuilder withAlias(final Optional<String> value) {
         this.alias = value;
         return this;
     }
 
-    public ImportInfoBuilder withIsWildcard(boolean value) {
+    /** Sets the isWildcard field. */
+    public ImportInfoBuilder withIsWildcard(final boolean value) {
         this.isWildcard = value;
         return this;
     }
 
-    public ImportInfoBuilder withSpan(Span value) {
+    /** Sets the span field. */
+    public ImportInfoBuilder withSpan(final Span value) {
         this.span = value;
         return this;
     }
 
+    /** Builds the ImportInfo instance. */
     public ImportInfo build() {
         return new ImportInfo(
             source,

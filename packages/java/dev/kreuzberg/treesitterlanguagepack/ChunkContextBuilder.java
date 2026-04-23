@@ -18,51 +18,61 @@ public class ChunkContextBuilder {
     private List<DocstringInfo> docstrings = List.of();
     private boolean hasErrorNodes = false;
 
-    public ChunkContextBuilder withLanguage(String value) {
+    /** Sets the language field. */
+    public ChunkContextBuilder withLanguage(final String value) {
         this.language = value;
         return this;
     }
 
-    public ChunkContextBuilder withChunkIndex(long value) {
+    /** Sets the chunkIndex field. */
+    public ChunkContextBuilder withChunkIndex(final long value) {
         this.chunkIndex = value;
         return this;
     }
 
-    public ChunkContextBuilder withTotalChunks(long value) {
+    /** Sets the totalChunks field. */
+    public ChunkContextBuilder withTotalChunks(final long value) {
         this.totalChunks = value;
         return this;
     }
 
-    public ChunkContextBuilder withNodeTypes(List<String> value) {
+    /** Sets the nodeTypes field. */
+    public ChunkContextBuilder withNodeTypes(final List<String> value) {
         this.nodeTypes = value;
         return this;
     }
 
-    public ChunkContextBuilder withContextPath(List<String> value) {
+    /** Sets the contextPath field. */
+    public ChunkContextBuilder withContextPath(final List<String> value) {
         this.contextPath = value;
         return this;
     }
 
-    public ChunkContextBuilder withSymbolsDefined(List<String> value) {
+    /** Sets the symbolsDefined field. */
+    public ChunkContextBuilder withSymbolsDefined(final List<String> value) {
         this.symbolsDefined = value;
         return this;
     }
 
-    public ChunkContextBuilder withComments(List<CommentInfo> value) {
+    /** Sets the comments field. */
+    public ChunkContextBuilder withComments(final List<CommentInfo> value) {
         this.comments = value;
         return this;
     }
 
-    public ChunkContextBuilder withDocstrings(List<DocstringInfo> value) {
+    /** Sets the docstrings field. */
+    public ChunkContextBuilder withDocstrings(final List<DocstringInfo> value) {
         this.docstrings = value;
         return this;
     }
 
-    public ChunkContextBuilder withHasErrorNodes(boolean value) {
+    /** Sets the hasErrorNodes field. */
+    public ChunkContextBuilder withHasErrorNodes(final boolean value) {
         this.hasErrorNodes = value;
         return this;
     }
 
+    /** Builds the ChunkContext instance. */
     public ChunkContext build() {
         return new ChunkContext(
             language,

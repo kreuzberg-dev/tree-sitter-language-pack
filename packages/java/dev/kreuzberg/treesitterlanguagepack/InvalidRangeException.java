@@ -2,11 +2,13 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 public class InvalidRangeException extends ErrorException {
-    public InvalidRangeException(String message) {
+    /** Creates a new InvalidRangeException with the given message. */
+    public InvalidRangeException(final String message) {
         super(message);
     }
 
-    public InvalidRangeException(String message, Throwable cause) {
+    /** Creates a new InvalidRangeException with the given message and cause. */
+    public InvalidRangeException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

@@ -28,22 +28,22 @@ func lastError() error {
 }
 
 var (
-    ErrLanguageNotFound = errors.New("Language '' not found")
-    ErrDynamicLoad = errors.New("Dynamic library load error")
-    ErrNullLanguagePointer = errors.New("Language function returned null pointer for ''")
-    ErrParserSetup = errors.New("Failed to set parser language")
-    ErrLockPoisoned = errors.New("Registry lock poisoned")
-    ErrConfig = errors.New("Configuration error")
-    ErrParseFailed = errors.New("Parse failed: parsing returned no tree")
-    ErrQueryError = errors.New("Query error")
-    ErrInvalidRange = errors.New("Invalid byte range")
-    ErrIo = errors.New("IO error")
+	ErrLanguageNotFound = errors.New("Language '' not found")
+	ErrDynamicLoad = errors.New("Dynamic library load error")
+	ErrNullLanguagePointer = errors.New("Language function returned null pointer for ''")
+	ErrParserSetup = errors.New("Failed to set parser language")
+	ErrLockPoisoned = errors.New("Registry lock poisoned")
+	ErrConfig = errors.New("Configuration error")
+	ErrParseFailed = errors.New("Parse failed: parsing returned no tree")
+	ErrQueryError = errors.New("Query error")
+	ErrInvalidRange = errors.New("Invalid byte range")
+	ErrIo = errors.New("IO error")
 )
 
 // Error is a structured error type.
 type Error struct {
-    Code    string
-    Message string
+	Code    string
+	Message string
 }
 
 func (e *Error) Error() string { return e.Message }
@@ -139,7 +139,7 @@ type ExtractionPattern struct {
 	// Maximum number of matches to return. `None` means unlimited.
 	MaxResults *uint `json:"max_results,omitempty"`
 	// Restrict matches to a byte range `(start, end)`.
-	ByteRange *string `json:"byte_range,omitempty"`
+	ByteRange *[]uint `json:"byte_range,omitempty"`
 }
 
 
@@ -167,7 +167,7 @@ func WithExtractionPatternMaxResults(v uint) ExtractionPatternOption {
 }
 
 // WithExtractionPatternByteRange sets the byte_range field.
-func WithExtractionPatternByteRange(v string) ExtractionPatternOption {
+func WithExtractionPatternByteRange(v []uint) ExtractionPatternOption {
 	return func(c *ExtractionPattern) { c.ByteRange = &v }
 }
 
@@ -2633,7 +2633,7 @@ func (r *ProcessConfig) WithChunking(max_size uint) (*ProcessConfig, error) {
 	cRecv := C.ts_pack_process_config_from_json(tmpStrRecv)
 	C.free(unsafe.Pointer(tmpStrRecv))
 	defer C.ts_pack_process_config_free(cRecv)
-	ptr := C.ts_pack_process_config_with_chunking (cRecv, cMaxSize)
+	ptr := C.ts_pack_process_config_with_chunking(cRecv, cMaxSize)
 	defer C.ts_pack_process_config_free(ptr)
 	return func() *ProcessConfig {
 	jsonPtr := C.ts_pack_process_config_to_json(ptr)
@@ -2656,7 +2656,7 @@ func (r *ProcessConfig) All() (*ProcessConfig, error) {
 	cRecv := C.ts_pack_process_config_from_json(tmpStrRecv)
 	C.free(unsafe.Pointer(tmpStrRecv))
 	defer C.ts_pack_process_config_free(cRecv)
-	ptr := C.ts_pack_process_config_all (cRecv)
+	ptr := C.ts_pack_process_config_all(cRecv)
 	defer C.ts_pack_process_config_free(ptr)
 	return func() *ProcessConfig {
 	jsonPtr := C.ts_pack_process_config_to_json(ptr)
@@ -2679,7 +2679,7 @@ func (r *ProcessConfig) Minimal() (*ProcessConfig, error) {
 	cRecv := C.ts_pack_process_config_from_json(tmpStrRecv)
 	C.free(unsafe.Pointer(tmpStrRecv))
 	defer C.ts_pack_process_config_free(cRecv)
-	ptr := C.ts_pack_process_config_minimal (cRecv)
+	ptr := C.ts_pack_process_config_minimal(cRecv)
 	defer C.ts_pack_process_config_free(ptr)
 	return func() *ProcessConfig {
 	jsonPtr := C.ts_pack_process_config_to_json(ptr)
@@ -2705,7 +2705,7 @@ func (r *LanguageRegistry) AddExtraLibsDir(dir string) {
 	cDir := C.CString(dir)
 	defer C.free(unsafe.Pointer(cDir))
 
-	C.ts_pack_language_registry_add_extra_libs_dir ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cDir)
+	C.ts_pack_language_registry_add_extra_libs_dir((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cDir)
 }
 
 
@@ -2723,7 +2723,7 @@ func (r *LanguageRegistry) GetLanguage(name string) (*Language, error) {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
 
-	ptr := C.ts_pack_language_registry_get_language ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cName)
+	ptr := C.ts_pack_language_registry_get_language((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cName)
 	if err := lastError(); err != nil {
 		return nil, err
 	}
@@ -2736,7 +2736,7 @@ func (r *LanguageRegistry) GetLanguage(name string) (*Language, error) {
 // Includes statically compiled languages, dynamically loadable languages
 // (if the `dynamic-loading` feature is enabled), and all configured aliases.
 func (r *LanguageRegistry) AvailableLanguages() *[]string {
-	ptr := C.ts_pack_language_registry_available_languages ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)))
+	ptr := C.ts_pack_language_registry_available_languages((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)))
 	return func() *[]string {
 	if ptr == nil { return nil }
 	defer C.ts_pack_free_string(ptr)
@@ -2755,14 +2755,14 @@ func (r *LanguageRegistry) HasLanguage(name string) *bool {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
 
-	ptr := C.ts_pack_language_registry_has_language ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cName)
+	ptr := C.ts_pack_language_registry_has_language((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cName)
 	return func() *bool { v := ptr != 0; return &v }()
 }
 
 
 // Return the total number of available languages (including aliases).
 func (r *LanguageRegistry) LanguageCount() *uint {
-	ptr := C.ts_pack_language_registry_language_count ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)))
+	ptr := C.ts_pack_language_registry_language_count((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)))
 	return func() *uint { v := uint(ptr); return &v }()
 }
 
@@ -2781,7 +2781,7 @@ func (r *LanguageRegistry) Process(source string, config ProcessConfig) (*Proces
 	C.free(unsafe.Pointer(tmpStrcConfig))
 	defer C.ts_pack_process_config_free(cConfig)
 
-	ptr := C.ts_pack_language_registry_process ((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cSource, cConfig)
+	ptr := C.ts_pack_language_registry_process((*C.TS_PACKLanguageRegistry)(unsafe.Pointer(r.ptr)), cSource, cConfig)
 	if err := lastError(); err != nil {
 		return nil, err
 	}
@@ -2802,7 +2802,7 @@ func DownloadManagerDefaultCacheDir(version string) (*string, error) {
 	cVersion := C.CString(version)
 	defer C.free(unsafe.Pointer(cVersion))
 
-	ptr := C.ts_pack_download_manager_default_cache_dir (cVersion)
+	ptr := C.ts_pack_download_manager_default_cache_dir(cVersion)
 	if err := lastError(); err != nil {
 		if ptr != nil {
 			C.ts_pack_free_string(ptr)
@@ -2816,7 +2816,7 @@ func DownloadManagerDefaultCacheDir(version string) (*string, error) {
 
 // Return the path to the libs cache directory.
 func (r *DownloadManager) CacheDir() *string {
-	ptr := C.ts_pack_download_manager_cache_dir ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
+	ptr := C.ts_pack_download_manager_cache_dir((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
 	defer C.ts_pack_free_string(ptr)
 	return func() *string { v := C.GoString(ptr); return &v }()
 }
@@ -2824,7 +2824,7 @@ func (r *DownloadManager) CacheDir() *string {
 
 // List languages that are already downloaded and cached.
 func (r *DownloadManager) InstalledLanguages() *[]string {
-	ptr := C.ts_pack_download_manager_installed_languages ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
+	ptr := C.ts_pack_download_manager_installed_languages((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
 	return func() *[]string {
 	if ptr == nil { return nil }
 	defer C.ts_pack_free_string(ptr)
@@ -2845,7 +2845,7 @@ func (r *DownloadManager) EnsureLanguages(names []string) error {
 	cNames := C.CString(string(jsonBytescNames))
 	defer C.free(unsafe.Pointer(cNames))
 
-	C.ts_pack_download_manager_ensure_languages ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)), cNames)
+	C.ts_pack_download_manager_ensure_languages((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)), cNames)
 	return lastError()
 }
 
@@ -2855,7 +2855,7 @@ func (r *DownloadManager) EnsureGroup(group string) error {
 	cGroup := C.CString(group)
 	defer C.free(unsafe.Pointer(cGroup))
 
-	C.ts_pack_download_manager_ensure_group ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)), cGroup)
+	C.ts_pack_download_manager_ensure_group((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)), cGroup)
 	return lastError()
 }
 
@@ -2865,7 +2865,7 @@ func (r *DownloadManager) LibPath(name string) *string {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
 
-	ptr := C.ts_pack_download_manager_lib_path ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)), cName)
+	ptr := C.ts_pack_download_manager_lib_path((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)), cName)
 	defer C.ts_pack_free_string(ptr)
 	return func() *string { v := C.GoString(ptr); return &v }()
 }
@@ -2873,7 +2873,7 @@ func (r *DownloadManager) LibPath(name string) *string {
 
 // Fetch the parser manifest from GitHub Releases.
 func (r *DownloadManager) FetchManifest() (*ParserManifest, error) {
-	ptr := C.ts_pack_download_manager_fetch_manifest ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
+	ptr := C.ts_pack_download_manager_fetch_manifest((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
 	if err := lastError(); err != nil {
 		return nil, err
 	}
@@ -2891,6 +2891,6 @@ func (r *DownloadManager) FetchManifest() (*ParserManifest, error) {
 
 // Remove all cached parser libraries.
 func (r *DownloadManager) CleanCache() error {
-	C.ts_pack_download_manager_clean_cache ((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
+	C.ts_pack_download_manager_clean_cache((*C.TS_PACKDownloadManager)(unsafe.Pointer(r.ptr)))
 	return lastError()
 }

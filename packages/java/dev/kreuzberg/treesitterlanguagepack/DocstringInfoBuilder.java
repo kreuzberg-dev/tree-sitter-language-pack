@@ -15,31 +15,37 @@ public class DocstringInfoBuilder {
     private Optional<String> associatedItem = Optional.empty();
     private List<DocSection> parsedSections = List.of();
 
-    public DocstringInfoBuilder withText(String value) {
+    /** Sets the text field. */
+    public DocstringInfoBuilder withText(final String value) {
         this.text = value;
         return this;
     }
 
-    public DocstringInfoBuilder withFormat(DocstringFormat value) {
+    /** Sets the format field. */
+    public DocstringInfoBuilder withFormat(final DocstringFormat value) {
         this.format = value;
         return this;
     }
 
-    public DocstringInfoBuilder withSpan(Span value) {
+    /** Sets the span field. */
+    public DocstringInfoBuilder withSpan(final Span value) {
         this.span = value;
         return this;
     }
 
-    public DocstringInfoBuilder withAssociatedItem(Optional<String> value) {
+    /** Sets the associatedItem field. */
+    public DocstringInfoBuilder withAssociatedItem(final Optional<String> value) {
         this.associatedItem = value;
         return this;
     }
 
-    public DocstringInfoBuilder withParsedSections(List<DocSection> value) {
+    /** Sets the parsedSections field. */
+    public DocstringInfoBuilder withParsedSections(final List<DocSection> value) {
         this.parsedSections = value;
         return this;
     }
 
+    /** Builds the DocstringInfo instance. */
     public DocstringInfo build() {
         return new DocstringInfo(
             text,

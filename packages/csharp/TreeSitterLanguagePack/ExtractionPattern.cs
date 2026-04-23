@@ -40,6 +40,6 @@ public sealed class ExtractionPattern
     /// Restrict matches to a byte range `(start, end)`.
     /// </summary>
     [JsonPropertyName("byte_range")]
-    public string? ByteRange { get; set; } = null;
+    public List<ulong>? ByteRange { get; set; } = null;
 
 }

@@ -2,11 +2,13 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 public class QueryErrorException extends ErrorException {
-    public QueryErrorException(String message) {
+    /** Creates a new QueryErrorException with the given message. */
+    public QueryErrorException(final String message) {
         super(message);
     }
 
-    public QueryErrorException(String message, Throwable cause) {
+    /** Creates a new QueryErrorException with the given message and cause. */
+    public QueryErrorException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

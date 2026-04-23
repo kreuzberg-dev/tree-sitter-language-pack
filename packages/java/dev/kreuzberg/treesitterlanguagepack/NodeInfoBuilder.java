@@ -23,61 +23,73 @@ public class NodeInfoBuilder {
     private boolean isError = false;
     private boolean isMissing = false;
 
-    public NodeInfoBuilder withKind(String value) {
+    /** Sets the kind field. */
+    public NodeInfoBuilder withKind(final String value) {
         this.kind = value;
         return this;
     }
 
-    public NodeInfoBuilder withIsNamed(boolean value) {
+    /** Sets the isNamed field. */
+    public NodeInfoBuilder withIsNamed(final boolean value) {
         this.isNamed = value;
         return this;
     }
 
-    public NodeInfoBuilder withStartByte(long value) {
+    /** Sets the startByte field. */
+    public NodeInfoBuilder withStartByte(final long value) {
         this.startByte = value;
         return this;
     }
 
-    public NodeInfoBuilder withEndByte(long value) {
+    /** Sets the endByte field. */
+    public NodeInfoBuilder withEndByte(final long value) {
         this.endByte = value;
         return this;
     }
 
-    public NodeInfoBuilder withStartRow(long value) {
+    /** Sets the startRow field. */
+    public NodeInfoBuilder withStartRow(final long value) {
         this.startRow = value;
         return this;
     }
 
-    public NodeInfoBuilder withStartCol(long value) {
+    /** Sets the startCol field. */
+    public NodeInfoBuilder withStartCol(final long value) {
         this.startCol = value;
         return this;
     }
 
-    public NodeInfoBuilder withEndRow(long value) {
+    /** Sets the endRow field. */
+    public NodeInfoBuilder withEndRow(final long value) {
         this.endRow = value;
         return this;
     }
 
-    public NodeInfoBuilder withEndCol(long value) {
+    /** Sets the endCol field. */
+    public NodeInfoBuilder withEndCol(final long value) {
         this.endCol = value;
         return this;
     }
 
-    public NodeInfoBuilder withNamedChildCount(long value) {
+    /** Sets the namedChildCount field. */
+    public NodeInfoBuilder withNamedChildCount(final long value) {
         this.namedChildCount = value;
         return this;
     }
 
-    public NodeInfoBuilder withIsError(boolean value) {
+    /** Sets the isError field. */
+    public NodeInfoBuilder withIsError(final boolean value) {
         this.isError = value;
         return this;
     }
 
-    public NodeInfoBuilder withIsMissing(boolean value) {
+    /** Sets the isMissing field. */
+    public NodeInfoBuilder withIsMissing(final boolean value) {
         this.isMissing = value;
         return this;
     }
 
+    /** Builds the NodeInfo instance. */
     public NodeInfo build() {
         return new NodeInfo(
             kind,

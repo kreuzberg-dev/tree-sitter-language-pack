@@ -13,33 +13,39 @@ public class ExtractionPatternBuilder {
     private CaptureOutput captureOutput = null;
     private List<String> childFields = List.of();
     private Optional<Long> maxResults = Optional.empty();
-    private Optional<String> byteRange = Optional.empty();
+    private Optional<List<Long>> byteRange = Optional.empty();
 
-    public ExtractionPatternBuilder withQuery(String value) {
+    /** Sets the query field. */
+    public ExtractionPatternBuilder withQuery(final String value) {
         this.query = value;
         return this;
     }
 
-    public ExtractionPatternBuilder withCaptureOutput(CaptureOutput value) {
+    /** Sets the captureOutput field. */
+    public ExtractionPatternBuilder withCaptureOutput(final CaptureOutput value) {
         this.captureOutput = value;
         return this;
     }
 
-    public ExtractionPatternBuilder withChildFields(List<String> value) {
+    /** Sets the childFields field. */
+    public ExtractionPatternBuilder withChildFields(final List<String> value) {
         this.childFields = value;
         return this;
     }
 
-    public ExtractionPatternBuilder withMaxResults(Optional<Long> value) {
+    /** Sets the maxResults field. */
+    public ExtractionPatternBuilder withMaxResults(final Optional<Long> value) {
         this.maxResults = value;
         return this;
     }
 
-    public ExtractionPatternBuilder withByteRange(Optional<String> value) {
+    /** Sets the byteRange field. */
+    public ExtractionPatternBuilder withByteRange(final Optional<List<Long>> value) {
         this.byteRange = value;
         return this;
     }
 
+    /** Builds the ExtractionPattern instance. */
     public ExtractionPattern build() {
         return new ExtractionPattern(
             query,

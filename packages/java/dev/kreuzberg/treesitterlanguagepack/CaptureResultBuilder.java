@@ -14,31 +14,37 @@ public class CaptureResultBuilder {
     private String childFields = "";
     private long startByte = 0;
 
-    public CaptureResultBuilder withName(String value) {
+    /** Sets the name field. */
+    public CaptureResultBuilder withName(final String value) {
         this.name = value;
         return this;
     }
 
-    public CaptureResultBuilder withNode(Optional<NodeInfo> value) {
+    /** Sets the node field. */
+    public CaptureResultBuilder withNode(final Optional<NodeInfo> value) {
         this.node = value;
         return this;
     }
 
-    public CaptureResultBuilder withText(Optional<String> value) {
+    /** Sets the text field. */
+    public CaptureResultBuilder withText(final Optional<String> value) {
         this.text = value;
         return this;
     }
 
-    public CaptureResultBuilder withChildFields(String value) {
+    /** Sets the childFields field. */
+    public CaptureResultBuilder withChildFields(final String value) {
         this.childFields = value;
         return this;
     }
 
-    public CaptureResultBuilder withStartByte(long value) {
+    /** Sets the startByte field. */
+    public CaptureResultBuilder withStartByte(final long value) {
         this.startByte = value;
         return this;
     }
 
+    /** Builds the CaptureResult instance. */
     public CaptureResult build() {
         return new CaptureResult(
             name,

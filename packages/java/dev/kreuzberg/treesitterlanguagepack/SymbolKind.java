@@ -21,19 +21,22 @@ public enum SymbolKind {
     Module("module"),
     Other("other");
 
+    /** The string value. */
     private final String value;
 
-    SymbolKind(String value) {
+    SymbolKind(final String value) {
         this.value = value;
     }
 
+    /** Returns the string value. */
     @JsonValue
     public String getValue() {
         return value;
     }
 
+    /** Creates an instance from a string value. */
     @JsonCreator
-    public static SymbolKind fromValue(String value) {
+    public static SymbolKind fromValue(final String value) {
         for (SymbolKind e : values()) {
             if (e.value.equalsIgnoreCase(value)) {
                 return e;

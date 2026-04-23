@@ -12,21 +12,25 @@ public class DocSectionBuilder {
     private Optional<String> name = Optional.empty();
     private String description = "";
 
-    public DocSectionBuilder withKind(String value) {
+    /** Sets the kind field. */
+    public DocSectionBuilder withKind(final String value) {
         this.kind = value;
         return this;
     }
 
-    public DocSectionBuilder withName(Optional<String> value) {
+    /** Sets the name field. */
+    public DocSectionBuilder withName(final Optional<String> value) {
         this.name = value;
         return this;
     }
 
-    public DocSectionBuilder withDescription(String value) {
+    /** Sets the description field. */
+    public DocSectionBuilder withDescription(final String value) {
         this.description = value;
         return this;
     }
 
+    /** Builds the DocSection instance. */
     public DocSection build() {
         return new DocSection(
             kind,

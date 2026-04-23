@@ -11,21 +11,25 @@ public class DiagnosticBuilder {
     private DiagnosticSeverity severity = null;
     private Span span = null;
 
-    public DiagnosticBuilder withMessage(String value) {
+    /** Sets the message field. */
+    public DiagnosticBuilder withMessage(final String value) {
         this.message = value;
         return this;
     }
 
-    public DiagnosticBuilder withSeverity(DiagnosticSeverity value) {
+    /** Sets the severity field. */
+    public DiagnosticBuilder withSeverity(final DiagnosticSeverity value) {
         this.severity = value;
         return this;
     }
 
-    public DiagnosticBuilder withSpan(Span value) {
+    /** Sets the span field. */
+    public DiagnosticBuilder withSpan(final Span value) {
         this.span = value;
         return this;
     }
 
+    /** Builds the Diagnostic instance. */
     public Diagnostic build() {
         return new Diagnostic(
             message,

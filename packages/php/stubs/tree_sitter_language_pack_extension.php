@@ -68,17 +68,19 @@ class ExtractionPattern
     /** @var array<string> */
     public array $child_fields;
     public ?int $max_results;
-    public ?string $byte_range;
+    /** @var ?array<int> */
+    public ?array $byte_range;
 
     /**
      * @param array<string> $child_fields
+     * @param ?array<int> $byte_range
      */
     public function __construct(
         string $query,
         CaptureOutput $capture_output,
         array $child_fields,
         ?int $max_results = null,
-        ?string $byte_range = null
+        ?array $byte_range = null
     ) { }
 
     public function getQuery(): string { }
@@ -86,7 +88,8 @@ class ExtractionPattern
     /** @return array<string> */
     public function getChildFields(): array { }
     public function getMaxResults(): ?int { }
-    public function getByteRange(): ?string { }
+    /** @return ?array<int> */
+    public function getByteRange(): ?array { }
 }
 
 /**

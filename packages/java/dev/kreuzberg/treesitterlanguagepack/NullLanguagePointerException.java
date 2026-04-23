@@ -2,11 +2,13 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
 public class NullLanguagePointerException extends ErrorException {
-    public NullLanguagePointerException(String message) {
+    /** Creates a new NullLanguagePointerException with the given message. */
+    public NullLanguagePointerException(final String message) {
         super(message);
     }
 
-    public NullLanguagePointerException(String message, Throwable cause) {
+    /** Creates a new NullLanguagePointerException with the given message and cause. */
+    public NullLanguagePointerException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

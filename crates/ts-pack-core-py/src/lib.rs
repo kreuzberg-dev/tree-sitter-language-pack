@@ -42,7 +42,7 @@ pub struct ExtractionPattern {
     pub max_results: Option<usize>,
     /// Restrict matches to a byte range `(start, end)`.
     #[pyo3(get)]
-    pub byte_range: Option<String>,
+    pub byte_range: Option<Vec<usize>>,
 }
 
 #[pymethods]
@@ -55,7 +55,7 @@ impl ExtractionPattern {
         capture_output: Option<CaptureOutput>,
         child_fields: Option<Vec<String>>,
         max_results: Option<usize>,
-        byte_range: Option<String>,
+        byte_range: Option<Vec<usize>>,
     ) -> Self {
         Self {
             query: query.unwrap_or_default(),
@@ -322,7 +322,6 @@ pub struct ProcessResult {
     #[pyo3(get)]
     pub metrics: FileMetrics,
     #[pyo3(get)]
-    #[serde(skip)]
     pub structure: Vec<StructureItem>,
     #[pyo3(get)]
     pub imports: Vec<ImportInfo>,
@@ -331,15 +330,12 @@ pub struct ProcessResult {
     #[pyo3(get)]
     pub comments: Vec<CommentInfo>,
     #[pyo3(get)]
-    #[serde(skip)]
     pub docstrings: Vec<DocstringInfo>,
     #[pyo3(get)]
-    #[serde(skip)]
     pub symbols: Vec<SymbolInfo>,
     #[pyo3(get)]
     pub diagnostics: Vec<Diagnostic>,
     #[pyo3(get)]
-    #[serde(skip)]
     pub chunks: Vec<CodeChunk>,
     /// Results of custom extraction patterns (when `config.extractions` is set).
     #[pyo3(get)]
@@ -435,7 +431,6 @@ impl FileMetrics {
 #[pyclass(frozen, from_py_object)]
 pub struct StructureItem {
     #[pyo3(get)]
-    #[serde(skip)]
     pub kind: StructureKind,
     #[pyo3(get)]
     pub name: Option<String>,
@@ -444,7 +439,6 @@ pub struct StructureItem {
     #[pyo3(get)]
     pub span: Span,
     #[pyo3(get)]
-    #[serde(skip)]
     pub children: Vec<StructureItem>,
     #[pyo3(get)]
     pub decorators: Vec<String>,
@@ -526,7 +520,6 @@ pub struct DocstringInfo {
     #[pyo3(get)]
     pub text: String,
     #[pyo3(get)]
-    #[serde(skip)]
     pub format: DocstringFormat,
     #[pyo3(get)]
     pub span: Span,
@@ -651,7 +644,6 @@ pub struct SymbolInfo {
     #[pyo3(get)]
     pub name: String,
     #[pyo3(get)]
-    #[serde(skip)]
     pub kind: SymbolKind,
     #[pyo3(get)]
     pub span: Span,
@@ -722,7 +714,6 @@ pub struct CodeChunk {
     #[pyo3(get)]
     pub end_line: usize,
     #[pyo3(get)]
-    #[serde(skip)]
     pub metadata: ChunkContext,
 }
 
@@ -768,7 +759,6 @@ pub struct ChunkContext {
     #[pyo3(get)]
     pub comments: Vec<CommentInfo>,
     #[pyo3(get)]
-    #[serde(skip)]
     pub docstrings: Vec<DocstringInfo>,
     #[pyo3(get)]
     pub has_error_nodes: bool,
@@ -1809,7 +1799,11 @@ impl From<tree_sitter_language_pack::ExtractionPattern> for ExtractionPattern {
             capture_output: val.capture_output.into(),
             child_fields: val.child_fields,
             max_results: val.max_results,
-            byte_range: val.byte_range.as_ref().map(|v| format!("{v:?}")),
+            byte_range: val
+                .byte_range
+                .as_ref()
+                .and_then(|v| serde_json::to_value(v).ok())
+                .and_then(|v| serde_json::from_value(v).ok()),
         }
     }
 }
