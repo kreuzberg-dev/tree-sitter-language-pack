@@ -1,11 +1,58 @@
 ---
 title: Installation
-description: "Install tree-sitter-language-pack in Python, Node.js, Rust, Go, Java, C#, Ruby, Elixir, PHP, WebAssembly, or via the CLI."
+description: "Install tree-sitter-language-pack in Python, Node.js, Rust, Go, Java, Ruby, Elixir, PHP, WebAssembly, or via the CLI."
 ---
+
+## Install using the CLI
+
+The `ts-pack` CLI allows you to manage parsers and run code analysis directly from your terminal.
+You can use it in CI pipelines, automation scripts, or simply to explore and experiment with **300+ supported languages**.
+
+
+<div class="install-cli-hero" markdown>
+
+## :material-console-line: CLI
+
+=== ":fontawesome-brands-apple: Homebrew"
+
+    ```bash
+    brew install kreuzberg-dev/tap/ts-pack
+    ```
+
+=== ":material-package-variant-closed: Cargo"
+
+    ```bash
+    cargo install ts-pack-cli
+    ```
+
+```bash title="Verify"
+ts-pack --version
+ts-pack list | wc -l   # → 306
+```
+
+</div>
+
+---
+
+## Language Bindings
 
 tree-sitter-language-pack is available for every major ecosystem. All packages share the same version and API surface.
 
-## Python
+<div class="lang-picker" markdown>
+[Python](#python){ .lang-pill }
+[Node.js](#nodejs){ .lang-pill }
+[Rust](#rust){ .lang-pill }
+[Go](#go){ .lang-pill }
+[Java](#java){ .lang-pill }
+[Ruby](#ruby){ .lang-pill }
+[Elixir](#elixir){ .lang-pill }
+[PHP](#php){ .lang-pill }
+[WebAssembly](#webassembly){ .lang-pill }
+</div>
+
+---
+
+### Python
 
 Requires Python 3.10+.
 
@@ -27,16 +74,18 @@ Requires Python 3.10+.
     poetry add tree-sitter-language-pack
     ```
 
-Verify the installation:
+Verify:
 
 ```python
 import tree_sitter_language_pack as tslp
-print(tslp.language_count())  # 305
+print(tslp.language_count())  # 306
 ```
 
-## Node.js
+---
 
-Requires Node.js 18+.
+### Node.js
+
+Requires Node.js 18+. Pre-built binaries for Linux (x64, arm64), macOS (x64, arm64), and Windows (x64).
 
 === "npm"
 
@@ -60,37 +109,41 @@ Verify:
 
 ```javascript
 const tslp = require("@kreuzberg/tree-sitter-language-pack");
-console.log(tslp.languageCount()); // 305
+console.log(tslp.languageCount()); // 306
 ```
 
-The package ships pre-built native binaries for Linux (x64, arm64), macOS (x64, arm64), and Windows (x64).
+---
 
-## Rust
+### Rust
 
-Requires Rust 1.75+.
+Requires Rust 1.85+.
 
-```bash
-cargo add ts-pack-core
-```
+=== "Cargo CLI"
 
-Or add to `Cargo.toml` manually:
+    ```bash
+    cargo add tree-sitter-language-pack
+    ```
 
-```toml
-[dependencies]
-ts-pack-core = "1"
-```
+=== "Cargo.toml"
+
+    ```toml
+    [dependencies]
+    tree-sitter-language-pack = "1"
+    ```
 
 Verify:
 
 ```rust
 fn main() {
-    println!("{}", ts_pack_core::language_count()); // 305
+    println!("{}", tree_sitter_language_pack::language_count()); // 306
 }
 ```
 
-## Go
+---
 
-Requires Go 1.26+.
+### Go
+
+Requires Go 1.26+. The binding uses cgo and links against the pre-compiled C FFI library.
 
 ```bash
 go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
@@ -100,13 +153,13 @@ go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
 import tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 
 func main() {
-    fmt.Println(tslp.LanguageCount()) // 305
+    fmt.Println(tslp.LanguageCount()) // 306
 }
 ```
 
-The Go binding uses cgo and links against the pre-compiled C FFI library.
+---
 
-## Java
+### Java
 
 Requires JDK 25+ (uses Panama FFM API).
 
@@ -114,9 +167,9 @@ Requires JDK 25+ (uses Panama FFM API).
 
     ```xml
     <dependency>
-        <groupId>dev.kreuzberg</groupId>
+        <groupId>dev.kreuzberg.treesitterlanguagepack</groupId>
         <artifactId>tree-sitter-language-pack</artifactId>
-        <version>1.3.0</version>
+        <version>1.7.0</version>
     </dependency>
     ```
 
@@ -124,7 +177,7 @@ Requires JDK 25+ (uses Panama FFM API).
 
     ```kotlin
     dependencies {
-        implementation("dev.kreuzberg:tree-sitter-language-pack:1.3.0")
+        implementation("dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.7.0")
     }
     ```
 
@@ -132,51 +185,27 @@ Requires JDK 25+ (uses Panama FFM API).
 
     ```groovy
     dependencies {
-        implementation 'dev.kreuzberg:tree-sitter-language-pack:1.3.0'
+        implementation 'dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.7.0'
     }
     ```
+
+Verify:
 
 ```java
 import dev.kreuzberg.TreeSitterLanguagePack;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println(TreeSitterLanguagePack.languageCount()); // 305
+        System.out.println(TreeSitterLanguagePack.languageCount()); // 306
     }
 }
 ```
 
-## C# / .NET
+---
 
-Requires .NET 10+.
+### Ruby
 
-=== "dotnet CLI"
-
-    ```bash
-    dotnet add package TreeSitterLanguagePack
-    ```
-
-=== "Package Manager"
-
-    ```powershell
-    Install-Package TreeSitterLanguagePack
-    ```
-
-=== ".csproj"
-
-    ```xml
-    <PackageReference Include="TreeSitterLanguagePack" Version="1.3.0" />
-    ```
-
-```csharp
-using TreeSitterLanguagePack;
-
-Console.WriteLine(TsPackClient.LanguageCount()); // 305
-```
-
-## Ruby
-
-Requires Ruby 3.4+.
+Requires Ruby 3.2+.
 
 === "gem"
 
@@ -194,13 +223,17 @@ Requires Ruby 3.4+.
     bundle install
     ```
 
+Verify:
+
 ```ruby
 require "tree_sitter_language_pack"
 
-puts TreeSitterLanguagePack.language_count # 305
+puts TreeSitterLanguagePack.language_count # 306
 ```
 
-## Elixir
+---
+
+### Elixir
 
 Requires Elixir 1.14+ and OTP 25+.
 
@@ -218,11 +251,15 @@ Requires Elixir 1.14+ and OTP 25+.
     mix deps.get
     ```
 
+Verify:
+
 ```elixir
-IO.puts TreeSitterLanguagePack.language_count() # 305
+IO.puts TreeSitterLanguagePack.language_count() # 306
 ```
 
-## PHP
+---
+
+### PHP
 
 Requires PHP 8.2+.
 
@@ -242,14 +279,18 @@ Requires PHP 8.2+.
     }
     ```
 
+Verify:
+
 ```php
 <?php
-echo \ts_pack_language_count(); // 305
+echo \ts_pack_language_count(); // 306
 ```
 
-## WebAssembly
+---
 
-Use from any JavaScript environment including browsers, Deno, and Cloudflare Workers.
+### WebAssembly
+
+Use from any JavaScript environment — browsers, Deno, and Cloudflare Workers.
 
 === "npm"
 
@@ -273,32 +314,11 @@ Use from any JavaScript environment including browsers, Deno, and Cloudflare Wor
     console.log(availableLanguages());
     ```
 
-## CLI
-
-The `ts-pack` binary provides parser management and code analysis from the terminal.
-
-=== "Homebrew (macOS / Linux)"
-
-    ```bash
-    brew install kreuzberg-dev/tap/ts-pack
-    ```
-
-=== "Cargo"
-
-    ```bash
-    cargo install ts-pack-cli
-    ```
-
-Verify:
-
-```bash
-ts-pack --version
-ts-pack list | wc -l  # 305
-```
+---
 
 ## Next Steps
 
-- [Download parsers](quickstart.md#step-2-download-parsers) — pre-download grammars for production, CI, or offline use
-- [Quick Start guide](quickstart.md) — parse your first file in 5 minutes
-- [Download model](../concepts/download-model.md) — understand how parser caching works
-- [Languages](../languages.md) — full list of 305 supported languages
+- [:material-arrow-right: Quick Start](quickstart.md) — parse your first file in 5 minutes
+- [:material-arrow-right: Download parsers](quickstart.md#step-2-download-parsers) — pre-download grammars for production, CI, or offline use
+- [:material-arrow-right: Download model](../concepts/download-model.md) — understand how parser caching works
+- [:material-arrow-right: Languages](../languages.md) — full list of 306 supported languages

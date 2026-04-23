@@ -75,8 +75,16 @@ html {
 	color: #ffffff !important;
 }
 
-.md-header__button svg {
+/* Exclude .md-logo: multicolor SVG must keep its own fills (see assets/logo.svg). */
+.md-header__button:not(.md-logo) svg {
 	fill: #ffffff;
+}
+
+.md-header__button.md-logo img {
+	height: 2.25rem;
+	width: 2.25rem;
+	object-fit: contain;
+	display: block;
 }
 
 .md-header .md-search__input {
@@ -901,12 +909,12 @@ strong {
 }
 
 .md-header__button.md-logo {
-	margin-right: -0.6rem;
+	margin-right: 0.2rem;
 	padding: 0;
 }
 
 .md-header__title {
-	margin-left: 0;
+	margin-left: 0.2rem;
 	padding-left: 0;
 }
 
@@ -1321,11 +1329,11 @@ nav.md-nav--secondary > .md-nav__list > .md-nav__item > .md-nav > .md-nav__list 
 	fill: #58fbda;
 }
 
-[data-md-color-scheme="default"] .md-header__button svg {
+[data-md-color-scheme="default"] .md-header__button:not(.md-logo) svg {
 	fill: #da2ae0;
 }
 
-[data-md-color-scheme="slate"] .md-header__button svg {
+[data-md-color-scheme="slate"] .md-header__button:not(.md-logo) svg {
 	fill: #58fbda;
 }
 
@@ -1553,7 +1561,186 @@ body:has(.full-width-iframe) article {
 	color: #58fbda;
 }
 
-/* ── CLI / Docker hero section ── */
+/* Homepage: Part of kreuzberg.dev — three compact cards, always one row */
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards,
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ul,
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ol {
+	grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+	gap: 0.65rem !important;
+	align-items: stretch;
+}
+
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ul > li,
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ol > li {
+	padding: 0.65rem 0.85rem !important;
+	border-radius: 10px;
+	min-width: 0 !important;
+	grid-column: span 1 !important;
+	position: relative;
+	isolation: isolate;
+	cursor: pointer;
+}
+
+/* Stretch the title link to cover the whole card */
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ul > li p:first-of-type a,
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ol > li p:first-of-type a {
+	text-decoration: none;
+	color: inherit;
+}
+
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ul > li p:first-of-type a::after,
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ol > li p:first-of-type a::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	border-radius: inherit;
+}
+
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ul > li > p,
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ol > li > p {
+	font-size: 0.78rem !important;
+	line-height: 1.35 !important;
+	margin: 0.35rem 0 0 !important;
+}
+
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ul > li > p:first-of-type,
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ol > li > p:first-of-type {
+	font-size: 0.88rem !important;
+	margin-top: 0 !important;
+	margin-bottom: 0.15rem !important;
+}
+
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ul > li strong,
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ol > li strong {
+	font-size: 0.82rem !important;
+}
+
+.md-typeset .kreuzberg-ecosystem-grid .twemoji.lg svg,
+.md-typeset .kreuzberg-ecosystem-grid .twemoji.middle svg,
+.md-typeset .kreuzberg-ecosystem-grid .emojione.lg svg,
+.md-typeset .kreuzberg-ecosystem-grid .emojione.middle svg {
+	width: 1.35rem !important;
+	height: 1.35rem !important;
+}
+
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ul > li hr,
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ol > li hr {
+	margin: 0.35rem 0 !important;
+}
+
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ul > li > p:last-child,
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ol > li > p:last-child {
+	margin-bottom: 0 !important;
+}
+
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ul > li > p > a,
+.md-typeset .kreuzberg-ecosystem-grid.grid.cards > ol > li > p > a {
+	font-size: 0.75rem !important;
+}
+
+/* ── Installation page: CLI hero ── */
+.install-cli-hero {
+	background: #f8f7fc;
+	border: 1px solid #e4e0f0;
+	border-left: 4px solid #da2ae0;
+	border-radius: 10px;
+	padding: 28px 32px 24px;
+	margin-bottom: 2rem;
+}
+
+.install-cli-hero h2 {
+	margin-top: 0 !important;
+	margin-bottom: 0.35rem !important;
+}
+
+.install-cli-hero > p {
+	margin-top: 0;
+	margin-bottom: 1.1rem;
+	font-size: 0.95rem;
+	color: rgba(50, 48, 64, 0.7);
+}
+
+.install-cli-hero .highlight {
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+.install-cli-hero .tabbed-set {
+	margin-bottom: 0.85rem;
+}
+
+[data-md-color-scheme="slate"] .install-cli-hero {
+	background: #1f1d2e;
+	border-color: rgba(255, 255, 255, 0.07);
+	border-left-color: #58fbda;
+}
+
+[data-md-color-scheme="slate"] .install-cli-hero > p {
+	color: rgba(210, 210, 228, 0.55);
+}
+
+@media (max-width: 600px) {
+	.install-cli-hero {
+		padding: 20px 18px 18px;
+	}
+}
+
+/* ── Language picker pill nav ── */
+.lang-picker {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 1rem 0 1.5rem;
+}
+
+.lang-picker .lang-pill {
+	display: inline-block;
+	font-size: 0.78rem;
+	font-weight: 600;
+	padding: 4px 14px;
+	border-radius: 999px;
+	border: 1.5px solid rgba(218, 42, 224, 0.25);
+	color: #5a4070 !important;
+	background: rgba(218, 42, 224, 0.05);
+	text-decoration: none !important;
+	transition:
+		background 0.15s ease,
+		border-color 0.15s ease,
+		color 0.15s ease;
+	white-space: nowrap;
+}
+
+.lang-picker .lang-pill:hover {
+	background: rgba(218, 42, 224, 0.12);
+	border-color: rgba(218, 42, 224, 0.5);
+	color: #da2ae0 !important;
+}
+
+[data-md-color-scheme="slate"] .lang-picker .lang-pill {
+	border-color: rgba(88, 251, 218, 0.2);
+	color: rgba(220, 220, 235, 0.75) !important;
+	background: rgba(88, 251, 218, 0.04);
+}
+
+[data-md-color-scheme="slate"] .lang-picker .lang-pill:hover {
+	background: rgba(88, 251, 218, 0.1);
+	border-color: rgba(88, 251, 218, 0.5);
+	color: #58fbda !important;
+}
+
+/* Responsive: stack on narrow screens */
+@media (max-width: 600px) {
+	.install-cli-hero {
+		padding: 22px 20px 20px;
+	}
+
+	.install-cli-hero h2 {
+		font-size: 1.25rem !important;
+	}
+}
+
+/* ── Legacy cli-hero (keep for other pages) ── */
 .cli-hero {
 	background: #f6f5fa;
 	border: 1px solid #e4e1ed;
@@ -1574,70 +1761,9 @@ body:has(.full-width-iframe) article {
 	font-size: 0.95rem;
 }
 
-.cli-hero .install-btn {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	height: 38px;
-	padding: 0 20px;
-	border-radius: 8px;
-	font-size: 0.85rem;
-	font-weight: 600;
-	line-height: 1;
-	text-decoration: none !important;
-	margin-right: 10px;
-	margin-top: 4px;
-	white-space: nowrap;
-}
-
-.cli-hero .install-btn--ghost {
-	border: 1.5px solid #c9a0d4;
-	color: #3f3456 !important;
-	background: transparent;
-}
-
-.cli-hero .install-btn--ghost:hover {
-	border-color: #a86cbf;
-	background: rgba(218, 42, 224, 0.04);
-}
-
-.cli-hero .install-btn--solid {
-	border: none;
-	color: #ffffff !important;
-	background: linear-gradient(135deg, #2f2848, #3d2d60);
-}
-
-.cli-hero .install-btn--solid:hover {
-	background: linear-gradient(135deg, #3d2d60, #2f2848);
-	box-shadow: 0 2px 8px rgba(47, 40, 72, 0.3);
-}
-
 [data-md-color-scheme="slate"] .cli-hero {
 	background: #302d3e;
 	border-color: rgba(255, 255, 255, 0.08);
-}
-
-[data-md-color-scheme="slate"] .cli-hero .install-btn--ghost {
-	border-color: #58fbda;
-	color: #58fbda !important;
-	background: transparent;
-}
-
-[data-md-color-scheme="slate"] .cli-hero .install-btn--ghost:hover {
-	border-color: #7ffce8;
-	color: #7ffce8 !important;
-	background: rgba(88, 251, 218, 0.08);
-}
-
-[data-md-color-scheme="slate"] .cli-hero .install-btn--solid {
-	background: #58fbda;
-	color: #1a1926 !important;
-	border: none;
-}
-
-[data-md-color-scheme="slate"] .cli-hero .install-btn--solid:hover {
-	background: #7ffce8;
-	box-shadow: 0 2px 10px rgba(88, 251, 218, 0.3);
 }
 
 .cli-hero .md-icon svg {

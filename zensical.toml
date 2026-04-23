@@ -1,6 +1,6 @@
 [project]
 site_name = "tree-sitter-language-pack"
-site_description = "Pre-compiled tree-sitter parsers for 305 languages with code intelligence, chunking, and polyglot bindings."
+site_description = "tree-sitter-language-pack — 306 tree-sitter parsers with code intelligence, chunking, and bindings for Python, Node.js, Rust, Go, Java, Ruby, Elixir, PHP, and WebAssembly."
 site_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
 site_author = "kreuzberg.dev"
 repo_name = "kreuzberg-dev/tree-sitter-language-pack"
@@ -24,6 +24,9 @@ nav = [
         { "Configuration" = "guides/configuration.md" },
         { "CLI Usage" = "guides/cli.md" },
         { "Extraction Queries" = "guides/extraction.md" },
+        { "Building from Source" = "guides/building.md" },
+        { "Docker" = "guides/docker.md" },
+        { "Performance & Benchmarks" = "guides/performance.md" },
     ] },
     { "API Reference" = [
         { "Python" = "reference/api-python.md" },
@@ -31,7 +34,6 @@ nav = [
         { "Rust" = "reference/api-rust.md" },
         { "Go" = "reference/api-go.md" },
         { "Java" = "reference/api-java.md" },
-        { "C# / .NET" = "reference/api-csharp.md" },
         { "Ruby" = "reference/api-ruby.md" },
         { "Elixir" = "reference/api-elixir.md" },
         { "PHP" = "reference/api-php.md" },
@@ -43,7 +45,10 @@ nav = [
     ] },
     { "Languages" = "languages.md" },
     { "Changelog" = "CHANGELOG.md" },
-    { "Contributing" = "contributing.md" },
+    { "Contributing" = [
+        { "Overview" = "contributing.md" },
+        { "CI / CD" = "contributing/ci.md" },
+    ] },
 ]
 
 [project.theme]

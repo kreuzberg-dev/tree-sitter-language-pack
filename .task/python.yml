@@ -7,7 +7,7 @@ tasks:
       - echo "Checking Python and uv..."
       - python3 --version
       - uv --version
-      - uv sync --no-install-project
+      - uv sync --no-install-project --group doc
 
   format:
     desc: Format Python code

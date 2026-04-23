@@ -1,10 +1,11 @@
 ---
+title: Download Model
 description: "How tree-sitter-language-pack downloads, caches, and manages parser binaries on demand."
 ---
 
-# Download Model
-
 tree-sitter-language-pack does not bundle parser binaries into the package. Instead, parsers are downloaded on first use and cached locally. This keeps install sizes small and gives you control over which languages are available.
+
+---
 
 ## How It Works
 
@@ -29,7 +30,9 @@ sequenceDiagram
         Cache-->>Core: python.so
         Core-->>App: Parser
     end
-```text
+```
+
+The flow in detail:
 
 1. Your code calls `get_parser("python")` (or `get_language`, or `process`).
 2. The core checks the local cache directory for the parser binary.
@@ -38,9 +41,11 @@ sequenceDiagram
 5. The binary is opened via `dlopen` / `LoadLibrary` and the parser symbol is resolved.
 6. On subsequent calls, the cached binary is used directly — no network access.
 
+---
+
 ## Cache Directory
 
-The default cache directory is platform-specific:
+The default cache location is platform-specific:
 
 | Platform | Default Path |
 |----------|-------------|
@@ -48,7 +53,7 @@ The default cache directory is platform-specific:
 | macOS | `~/Library/Caches/tree-sitter-language-pack` |
 | Windows | `%LOCALAPPDATA%\tree-sitter-language-pack` |
 
-Override the cache directory via:
+You can override it programmatically:
 
 === "Python"
 
@@ -56,8 +61,6 @@ Override the cache directory via:
     from tree_sitter_language_pack import configure, PackConfig
 
     configure(PackConfig(cache_dir="/custom/path"))
-
-    # Or via TSLP_CACHE_DIR environment variable
     ```
 
 === "Node.js"
@@ -71,23 +74,18 @@ Override the cache directory via:
 === "Rust"
 
     ```rust
-    use ts_pack_core::{configure, PackConfig};
+    use tree_sitter_language_pack::{configure, PackConfig};
 
     configure(PackConfig { cache_dir: Some("/custom/path".into()), ..Default::default() })?;
-    ```
-
-=== "Environment"
-
-    ```bash
-    export TSLP_CACHE_DIR=/custom/path
     ```
 
 === "CLI"
 
     ```bash
     ts-pack cache-dir           # show current cache dir
-    ts-pack --cache-dir /path download python
     ```
+
+---
 
 ## Parser Manifest
 
@@ -106,13 +104,15 @@ The manifest is a JSON file (`parsers.json`) hosted on each GitHub release. It m
     }
   }
 }
-```text
+```
 
 The manifest is cached locally alongside the parser binaries and refreshed on version upgrades.
 
+---
+
 ## Pre-Downloading Parsers
 
-For production deployments, CI environments, or offline use, download parsers explicitly rather than relying on auto-download at runtime.
+For production, CI, or offline environments, download parsers explicitly rather than relying on auto-download at runtime.
 
 === "Python"
 
@@ -122,7 +122,7 @@ For production deployments, CI environments, or offline use, download parsers ex
     # Download specific languages
     download(["python", "javascript", "typescript", "rust"])
 
-    # Download everything (248 parsers, ~150 MB)
+    # Download all 306 parsers
     download_all()
 
     # Configure + download in one call
@@ -147,7 +147,7 @@ For production deployments, CI environments, or offline use, download parsers ex
 === "Rust"
 
     ```rust
-    use ts_pack_core::{download, download_all, init};
+    use tree_sitter_language_pack::{download, download_all, init};
 
     // Download specific languages
     download(&["python", "javascript", "rust"])?;
@@ -171,6 +171,8 @@ For production deployments, CI environments, or offline use, download parsers ex
     # Check what's downloaded
     ts-pack list --downloaded
     ```
+
+---
 
 ## Inspecting the Cache
 
@@ -200,10 +202,9 @@ For production deployments, CI environments, or offline use, download parsers ex
 
     # List all available (remote manifest)
     ts-pack list --manifest
-
-    # Show download status for each language
-    ts-pack status
     ```
+
+---
 
 ## Cleaning the Cache
 
@@ -218,15 +219,17 @@ For production deployments, CI environments, or offline use, download parsers ex
 === "CLI"
 
     ```bash
-    ts-pack clean          # remove all cached parsers
-    ts-pack clean python   # remove only the python parser
+    ts-pack clean          # remove all cached parsers (prompts for confirmation)
+    ts-pack clean --force  # skip confirmation prompt
     ```
 
-## Docker and CI Environments
+---
 
-For containerized deployments, pre-download parsers during the build stage and bake them into the image.
+## Docker and CI
 
-```dockerfile
+For containerized deployments, pre-download parsers during the build stage so no network access is needed at runtime.
+
+```dockerfile title="Dockerfile"
 FROM python:3.12-slim
 
 RUN pip install tree-sitter-language-pack
@@ -237,44 +240,45 @@ RUN python -c "from tree_sitter_language_pack import download; download(['python
 COPY . /app
 WORKDIR /app
 CMD ["python", "app.py"]
-```text
+```
 
-For CI pipelines, cache the `TSLP_CACHE_DIR` directory between runs:
+For CI pipelines, cache the parser directory between runs:
 
-```yaml
-# GitHub Actions example
+```yaml title="GitHub Actions"
 - name: Cache tree-sitter parsers
   uses: actions/cache@v4
   with:
     path: ~/.cache/tree-sitter-language-pack
     key: tslp-parsers-${{ hashFiles('requirements.txt') }}
-```text
+```
+
+---
 
 ## Configuration File
 
 For projects that always use the same set of languages, create a `language-pack.toml` in the project root:
 
-```toml
-[pack]
-cache_dir = ".cache/parsers"   # optional: project-local cache
+```toml title="language-pack.toml"
 languages = ["python", "javascript", "typescript", "rust", "go"]
-```text
+cache_dir = ".cache/parsers"   # optional: project-local cache
+```
 
-Load it with:
-
-=== "Python"
-
-    ```python
-    from tree_sitter_language_pack import init_from_config
-
-    # Auto-discovers language-pack.toml in current or parent dirs
-    init_from_config()
-    ```
+Then download everything declared:
 
 === "CLI"
 
     ```bash
-    ts-pack init   # creates language-pack.toml
-    ts-pack add python javascript   # adds languages to the config
+    ts-pack init --languages python,javascript,typescript,rust,go
     ts-pack download   # downloads all configured languages
     ```
+
+=== "Python"
+
+    ```python
+    from tree_sitter_language_pack import init
+
+    # Reads language-pack.toml from current directory
+    init()
+    ```
+
+See [Configuration](../guides/configuration.md) for the full file format and discovery rules.
