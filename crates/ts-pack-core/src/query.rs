@@ -21,7 +21,8 @@ thread_local! {
 }
 
 /// A single match from a tree-sitter query, with captured nodes.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct QueryMatch {
     /// The pattern index that matched (position in the query string).
     pub pattern_index: usize,
@@ -48,8 +49,8 @@ pub struct QueryMatch {
 /// # Examples
 ///
 /// ```no_run
-/// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
-/// let matches = tree_sitter_language_pack::query::run_query(
+/// let tree = tree_sitter_language_pack::parse_string("python", b"def hello(): pass").unwrap();
+/// let matches = tree_sitter_language_pack::run_query(
 ///     &tree,
 ///     "python",
 ///     "(function_definition name: (identifier) @fn_name)",

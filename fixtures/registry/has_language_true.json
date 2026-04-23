@@ -1,10 +1,19 @@
 {
 	"id": "registry_has_language_true",
-	"category": "registry",
 	"description": "has_language('python') should return true",
-	"language": "python",
-	"assertions": {
-		"language_available": true
+	"category": "registry",
+	"tags": ["registry"],
+	"call": "has_language",
+	"input": {
+		"language": "python"
 	},
-	"tags": ["registry"]
+	"assertions": [
+		{
+			"type": "is_true"
+		}
+	],
+	"skip": {
+		"languages": ["rust"],
+		"reason": "Rust e2e generator does not yet support this pattern"
+	}
 }

@@ -1,3 +1,8 @@
+// `extract_intelligence` is a convenience wrapper over the individual extraction
+// functions. `intel::process` calls those functions directly for fine-grained
+// control, but `extract_intelligence` is kept as a public API for consumers.
+#![allow(dead_code)]
+
 use super::types::*;
 
 /// Extract all intelligence from a parsed source file.

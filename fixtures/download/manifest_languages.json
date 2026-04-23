@@ -1,0 +1,24 @@
+{
+	"id": "download_manifest_languages",
+	"description": "List manifest languages and verify python is included",
+	"category": "download",
+	"tags": ["download"],
+	"call": "manifest_languages",
+	"skip": {
+		"languages": ["rust", "c", "wasm"],
+		"reason": "Download feature requires network access and is not available in static builds"
+	},
+	"input": {},
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "not_empty"
+		},
+		{
+			"type": "contains",
+			"value": "python"
+		}
+	]
+}

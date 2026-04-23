@@ -1,14 +1,33 @@
 {
 	"id": "process_python_imports_detail",
-	"category": "process",
 	"description": "Python with multiple imports, verify imports contain specific source",
-	"language": "python",
-	"source_code": "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
-	"assertions": {
-		"tree_not_null": true,
-		"process_language": "python",
-		"process_imports_count_min": 2,
-		"process_imports_contains_source": "os"
+	"category": "process",
+	"tags": ["metadata"],
+	"input": {
+		"source_code": "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+		"config": {
+			"language": "python"
+		}
 	},
-	"tags": ["metadata"]
+	"assertions": [
+		{
+			"type": "equals",
+			"field": "language",
+			"value": "python"
+		},
+		{
+			"type": "count_min",
+			"field": "imports",
+			"value": 2
+		},
+		{
+			"type": "contains",
+			"field": "import_sources",
+			"value": "os"
+		}
+	],
+	"skip": {
+		"languages": ["rust"],
+		"reason": "Uses computed fields not on ProcessResult"
+	}
 }

@@ -1,102 +1,95 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#",
-	"title": "E2E Test Fixture",
-	"description": "A fixture describing an end-to-end test case for tree-sitter-language-pack bindings.",
-	"type": "object",
-	"required": ["id", "category", "description"],
-	"properties": {
-		"id": {
-			"type": "string",
-			"description": "Unique identifier for this fixture (used as test function name)."
-		},
-		"category": {
-			"type": "string",
-			"description": "Category grouping (smoke, parsing, error_handling, registry)."
-		},
-		"description": {
-			"type": "string",
-			"description": "Human-readable description of what this test verifies."
-		},
-		"language": {
-			"type": "string",
-			"description": "The tree-sitter language name to load (omit for registry-level tests)."
-		},
-		"source_code": {
-			"type": "string",
-			"description": "Source code snippet to parse (omit for non-parsing tests)."
-		},
-		"assertions": {
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"title": "Alef E2E Test Fixture",
+	"description": "Schema for alef e2e test fixture files. Each file contains either a single fixture object or an array of fixtures.",
+	"oneOf": [{ "$ref": "#/$defs/fixture" }, { "type": "array", "items": { "$ref": "#/$defs/fixture" } }],
+	"$defs": {
+		"fixture": {
 			"type": "object",
-			"description": "Assertions to verify after parsing.",
+			"required": ["id", "description"],
+			"additionalProperties": false,
 			"properties": {
-				"tree_not_null": {
-					"type": "boolean",
-					"description": "Assert that the parse tree is not null."
-				},
-				"root_child_count_min": {
-					"type": "integer",
-					"minimum": 0,
-					"description": "Assert root node has at least this many children."
-				},
-				"root_contains_node_type": {
+				"id": {
 					"type": "string",
-					"description": "Assert the root node contains a child of this type (recursive search)."
+					"pattern": "^[a-z][a-z0-9_]*$",
+					"description": "Unique snake_case identifier used as the test function name"
 				},
-				"expect_error": {
-					"type": "boolean",
-					"description": "Assert that loading the language or parsing should produce an error."
-				},
-				"has_error_nodes": {
-					"type": "boolean",
-					"description": "Assert that the parse tree contains ERROR nodes."
-				},
-				"language_available": {
-					"type": "boolean",
-					"description": "Expected result of has_language()."
-				},
-				"languages_not_empty": {
-					"type": "boolean",
-					"description": "Assert that available_languages() returns a non-empty list."
-				},
-				"detect_from_extension": {
+				"category": { "type": "string", "description": "Test category. Defaults to parent directory name if omitted" },
+				"description": { "type": "string", "description": "Human-readable test description" },
+				"tags": { "type": "array", "items": { "type": "string" }, "description": "Optional tags for filtering" },
+				"skip": { "$ref": "#/$defs/skip" },
+				"call": {
 					"type": "string",
-					"description": "File extension to pass to detect_language_from_extension()."
+					"description": "Named call config to use. References [e2e.calls.<name>]. Defaults to [e2e.call] when omitted"
 				},
-				"detect_from_path": {
-					"type": "string",
-					"description": "File path to pass to detect_language_from_path()."
+				"input": {
+					"type": "object",
+					"description": "Input data passed to the function under test. Fields map to args via [e2e.call.args] config"
 				},
-				"detect_from_content": {
-					"type": "string",
-					"description": "File content to pass to detect_language_from_content()."
-				},
-				"detect_result": {
-					"type": "string",
-					"description": "Expected language name returned by detect function."
-				},
-				"detect_result_none": {
-					"type": "boolean",
-					"description": "Assert that the detect function returns None/null."
+				"assertions": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/assertion" },
+					"description": "List of assertions to check on the result"
 				}
-			},
-			"additionalProperties": false
+			}
 		},
 		"skip": {
 			"type": "object",
-			"description": "Conditions under which this test should be skipped.",
+			"additionalProperties": false,
 			"properties": {
-				"requires_language": {
-					"type": "string",
-					"description": "Skip if this language is not available."
-				}
-			},
-			"additionalProperties": false
+				"languages": {
+					"type": "array",
+					"items": { "type": "string" },
+					"description": "Languages to skip. Empty array means skip all"
+				},
+				"reason": { "type": "string", "description": "Human-readable reason for skipping" }
+			}
 		},
-		"tags": {
-			"type": "array",
-			"items": { "type": "string" },
-			"description": "Tags for filtering tests."
+		"assertion": {
+			"type": "object",
+			"required": ["type"],
+			"additionalProperties": false,
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"not_error",
+						"error",
+						"equals",
+						"not_equals",
+						"contains",
+						"contains_all",
+						"contains_any",
+						"not_contains",
+						"not_empty",
+						"is_empty",
+						"starts_with",
+						"ends_with",
+						"min_length",
+						"max_length",
+						"count_min",
+						"count_equals",
+						"matches_regex",
+						"is_true",
+						"is_false",
+						"greater_than",
+						"less_than",
+						"greater_than_or_equal",
+						"less_than_or_equal",
+						"method_result"
+					],
+					"description": "Assertion type"
+				},
+				"field": { "type": "string", "description": "Dot-separated field path on the result object" },
+				"value": { "description": "Expected value (type depends on assertion type)" },
+				"values": { "type": "array", "description": "Expected values (for contains_all, contains_any, not_contains)" },
+				"method": { "type": "string", "description": "Method name to call on the result" },
+				"check": {
+					"type": "string",
+					"description": "Assertion check type for the method result (equals, is_true, is_false, greater_than_or_equal, count_min)"
+				},
+				"args": { "type": "object", "description": "Arguments to pass to the method call" }
+			}
 		}
-	},
-	"additionalProperties": false
+	}
 }

@@ -1,12 +1,22 @@
 {
-	"assertions": {
-		"root_child_count_min": 1,
-		"tree_not_null": true
-	},
-	"category": "smoke",
-	"description": "Smoke test: load make and parse a simple snippet",
 	"id": "smoke_make",
-	"language": "make",
-	"source_code": "all:\n\techo hello",
-	"tags": ["smoke"]
+	"description": "Smoke test: load make and parse a simple snippet",
+	"category": "smoke",
+	"tags": ["smoke"],
+	"call": "parse",
+	"input": {
+		"language": "make",
+		"source_code": "all:\n\techo hello"
+	},
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "method_result",
+			"method": "root_child_count",
+			"check": "greater_than_or_equal",
+			"value": 1
+		}
+	]
 }

@@ -1,12 +1,22 @@
 {
-	"assertions": {
-		"root_child_count_min": 1,
-		"tree_not_null": true
-	},
-	"category": "smoke",
-	"description": "Smoke test: load embeddedtemplate and parse a simple snippet",
 	"id": "smoke_embeddedtemplate",
-	"language": "embeddedtemplate",
-	"source_code": "<%= value %>",
-	"tags": ["smoke"]
+	"description": "Smoke test: load embeddedtemplate and parse a simple snippet",
+	"category": "smoke",
+	"tags": ["smoke"],
+	"call": "parse",
+	"input": {
+		"language": "embeddedtemplate",
+		"source_code": "<%= value %>"
+	},
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "method_result",
+			"method": "root_child_count",
+			"check": "greater_than_or_equal",
+			"value": 1
+		}
+	]
 }

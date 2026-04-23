@@ -6,7 +6,7 @@ tasks:
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - cargo build -p ts-pack-ffi --release
+      - cargo build -p ts-pack-core-ffi --release
 
   build:
     desc: Build FFI library (alias for build:ffi)
@@ -29,7 +29,7 @@ tasks:
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - cargo run -p e2e-generator -- generate --lang c
+      - alef e2e generate --lang c
 
   e2e:build:
     desc: Build C E2E tests

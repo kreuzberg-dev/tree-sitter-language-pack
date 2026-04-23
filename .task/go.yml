@@ -8,7 +8,7 @@ tasks:
       TSLP_LINK_MODE: '{{default "static" .TSLP_LINK_MODE}}'
       TSLP_LANGUAGES: '{{default "python,rust,javascript,typescript,go,html,css,json" .TSLP_LANGUAGES}}'
     cmds:
-      - cargo build -p ts-pack-ffi --release
+      - cargo build -p ts-pack-core-ffi --release
 
   build:
     desc: Build Go bindings (requires FFI built first)
@@ -88,7 +88,7 @@ tasks:
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - cargo run -p e2e-generator -- generate --lang go
+      - alef e2e generate --lang go
       - gofmt -w e2e/go/
 
   e2e:test:

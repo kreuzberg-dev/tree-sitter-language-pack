@@ -128,7 +128,7 @@ tasks:
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - cargo run -p e2e-generator -- generate --lang rust
+      - alef e2e generate --lang rust
       - task: e2e:format
 
   e2e:format:
@@ -140,6 +140,7 @@ tasks:
     desc: Run Rust E2E tests
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LANGUAGES: "{{.DEV_LANGUAGES}}"
       TSLP_LINK_MODE: dynamic
     cmds:
       - cargo test --manifest-path e2e/rust/Cargo.toml

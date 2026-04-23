@@ -1,13 +1,29 @@
 {
 	"id": "parsing_javascript_class",
-	"category": "parsing",
 	"description": "Parse a JavaScript class declaration.",
-	"language": "javascript",
-	"source_code": "class Foo { bar() {} }",
-	"assertions": {
-		"tree_not_null": true,
-		"root_child_count_min": 1,
-		"root_contains_node_type": "class_declaration"
+	"category": "parsing",
+	"tags": ["parsing"],
+	"call": "parse",
+	"input": {
+		"language": "javascript",
+		"source_code": "class Foo { bar() {} }"
 	},
-	"tags": ["parsing"]
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "root_child_count",
+			"value": 1
+		},
+		{
+			"type": "method_result",
+			"method": "contains_node_type",
+			"args": {
+				"node_type": "class_declaration"
+			},
+			"check": "is_true"
+		}
+	]
 }

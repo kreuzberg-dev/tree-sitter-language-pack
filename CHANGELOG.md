@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-04-22
+
+### Added
+
+- Migrate to [alef](https://github.com/kreuzberg-dev/alef) polyglot binding generator — all language bindings (Python, TypeScript, Ruby, Go, Java, C#, Elixir, PHP, WASM) are now generated from a single `alef.toml` configuration
+- `Default`, `Hash`, `PartialEq`, `Eq` derives on all public types
+- 18 new e2e test fixtures closing testing gaps across all binding languages
+- Consolidated CI: 12 language-specific workflows merged into a single `ci.yaml`
+- Registry-mode e2e test apps under `test_apps/` (generated via `alef e2e generate --registry`)
+
+### Changed
+
+- Public API locked down with `pub(crate)` — only functions and types that were in the pre-alef Python bindings are exported; internal modules (`json_utils`, `intel` submodules, `config`, `definitions`) are no longer public
+- Workspace lints applied to all binding crates (`clippy::all = "deny"`, `unsafe_code = "deny"`)
+- `test_apps/` moved from `tests/test_apps/` to project root
+
+### Fixed
+
+- `available_languages()`, `has_language()`, and `language_count()` now register the download cache directory before querying the registry — fixes empty results when using the `download` feature (#90)
+- `process()` auto-downloads missing parsers instead of returning `LanguageNotFound` (#94)
+- C# task references updated from `.sln` to `.csproj`
+- Maven version plugin pinned to exclude alpha/beta/RC versions
+- Docker CI: `uv run` changed to `uv run --no-project` to avoid triggering root pyproject.toml build
+- Ruby CI: removed stale `working-directory` that pointed to wrong path
+
+## [1.6.3] - 2026-04-20
+
+### Fixed
+
+- Go: fix FFI build defaults — add `TSLP_LINK_MODE` and `TSLP_LANGUAGES` env vars to Go task (#102)
+- Go: fix CGO `LDFLAGS` paths — point to workspace `target/release/` instead of crate-local path (#102)
+- Go: remove duplicate forward declarations from `ffi.go` (already in `ts_pack.h`) (#102)
+- Go: fix README examples — proper error handling, correct API signatures (`Init`, `Download`) (#102)
+- FFI: add extra libs dir from `cache_dir()` to registry on creation (#102)
+- Docs: fix textlint pre-commit hook — add `additional_dependencies` for all textlint plugins (#102)
+
 ## [1.6.2] - 2026-04-18
 
 ### Fixed

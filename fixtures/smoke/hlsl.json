@@ -1,12 +1,22 @@
 {
-	"assertions": {
-		"root_child_count_min": 1,
-		"tree_not_null": true
-	},
-	"category": "smoke",
-	"description": "Smoke test: load hlsl and parse a simple snippet",
 	"id": "smoke_hlsl",
-	"language": "hlsl",
-	"source_code": "float4 main() : SV_Target { return 0; }",
-	"tags": ["smoke"]
+	"description": "Smoke test: load hlsl and parse a simple snippet",
+	"category": "smoke",
+	"tags": ["smoke"],
+	"call": "parse",
+	"input": {
+		"language": "hlsl",
+		"source_code": "float4 main() : SV_Target { return 0; }"
+	},
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "method_result",
+			"method": "root_child_count",
+			"check": "greater_than_or_equal",
+			"value": 1
+		}
+	]
 }

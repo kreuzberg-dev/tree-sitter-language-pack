@@ -50,15 +50,15 @@ crates/ts-pack-ruby/tmp/
 parsers/
 
 # Test app build/install artifacts
-tests/test_apps/*/target/
-tests/test_apps/*/build/
-tests/test_apps/*/.venv/
-tests/test_apps/*/vendor/
-tests/test_apps/*/_build/
-tests/test_apps/*/deps/
-tests/test_apps/*/obj/
-tests/test_apps/*/bin/
-tests/test_apps/c/build/
+test_apps/*/target/
+test_apps/*/build/
+test_apps/*/.venv/
+test_apps/*/vendor/
+test_apps/*/_build/
+test_apps/*/deps/
+test_apps/*/obj/
+test_apps/*/bin/
+test_apps/c/build/
 
 # E2E build artifacts
 e2e/c/build/
@@ -95,3 +95,54 @@ GEMINI.md
 .cache/
 site/
 .lycheecache
+
+# BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
+.agents/
+.claude/
+.codex/
+.cursor/
+.github/agents/code-reviewer.agent.md
+.github/agents/csharp-specialist.agent.md
+.github/agents/devops-engineer.agent.md
+.github/agents/docs-writer.agent.md
+.github/agents/e2e-generator-engineer.agent.md
+.github/agents/elixir-specialist.agent.md
+.github/agents/ffi-engineer.agent.md
+.github/agents/go-specialist.agent.md
+.github/agents/grammar-engineer.agent.md
+.github/agents/java-specialist.agent.md
+.github/agents/performance-engineer.agent.md
+.github/agents/php-specialist.agent.md
+.github/agents/polyglot-architect.agent.md
+.github/agents/python-specialist.agent.md
+.github/agents/release-engineer.agent.md
+.github/agents/ruby-specialist.agent.md
+.github/agents/rust-core-engineer.agent.md
+.github/agents/security-auditor.agent.md
+.github/agents/typescript-specialist.agent.md
+.github/agents/wasm-specialist.agent.md
+.github/copilot-instructions.md
+.github/skills/add-language-generator/SKILL.md
+.github/skills/common-task-commands/SKILL.md
+.github/skills/create-e2e-fixture/SKILL.md
+.github/skills/quick-start/SKILL.md
+.mcp.json
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+# END ai-rulez
+
+# Additional generated artifacts
+.remote-cache/
+.alef/
+.gemini/
+GEMINI.md
+*.pyd
+.venv/
+.gems/
+vendor/bundle/
+*.h.bak
+*.test
+bin/
+obj/
+*.nupkg

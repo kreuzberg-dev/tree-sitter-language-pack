@@ -1,0 +1,34 @@
+[package]
+name = "ts-pack-core-ffi"
+version = "1.7.0"
+edition = "2021"
+license = "MIT"
+description = "Pre-compiled tree-sitter grammars for 305 programming languages"
+readme = false
+keywords = ["tree-sitter", "parser", "syntax", "language-pack"]
+categories = ["text-processing"]
+repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+
+[package.metadata.cargo-machete]
+ignored = ["tokio"]
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[features]
+default = []
+
+[dependencies]
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+tree-sitter-language-pack = { path = "../ts-pack-core", features = ["download", "serde", "config"] }
+
+[build-dependencies]
+cbindgen = "0.29"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+duplicated_attributes = "allow"
+
+[lints.rust]
+unsafe_code = "allow"

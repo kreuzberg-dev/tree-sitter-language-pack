@@ -139,8 +139,8 @@ jobs:
       - name: Verify Node.js package version
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
-          if [ -f crates/ts-pack-node/package.json ]; then
-            NODE_VERSION=$(python3 -c "import json; print(json.load(open('crates/ts-pack-node/package.json'))['version'])")
+          if [ -f crates/ts-pack-core-node/package.json ]; then
+            NODE_VERSION=$(python3 -c "import json; print(json.load(open('crates/ts-pack-core-node/package.json'))['version'])")
             if [[ "$NODE_VERSION" != "$VERSION" ]]; then
               echo "::error::Node.js package version ($NODE_VERSION) does not match tag version ($VERSION)"
               exit 1
@@ -151,8 +151,8 @@ jobs:
       - name: Verify WASM package version
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
-          if [ -f crates/ts-pack-wasm/package.json ]; then
-            WASM_VERSION=$(python3 -c "import json; print(json.load(open('crates/ts-pack-wasm/package.json'))['version'])")
+          if [ -f crates/ts-pack-core-wasm/package.json ]; then
+            WASM_VERSION=$(python3 -c "import json; print(json.load(open('crates/ts-pack-core-wasm/package.json'))['version'])")
             if [[ "$WASM_VERSION" != "$VERSION" ]]; then
               echo "::error::WASM package version ($WASM_VERSION) does not match tag version ($VERSION)"
               exit 1
@@ -164,8 +164,8 @@ jobs:
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
           RUBY_VERSION="${VERSION//-/.}"
-          if [ -f crates/ts-pack-ruby/tree_sitter_language_pack.gemspec ]; then
-            GEMSPEC_VERSION=$(grep "spec.version" crates/ts-pack-ruby/tree_sitter_language_pack.gemspec | sed "s/.*'\(.*\)'/\1/")
+          if [ -f packages/ruby/tree_sitter_language_pack.gemspec ]; then
+            GEMSPEC_VERSION=$(grep "spec.version" packages/ruby/tree_sitter_language_pack.gemspec | sed "s/.*'\(.*\)'/\1/")
             if [[ "$GEMSPEC_VERSION" != "$RUBY_VERSION" ]]; then
               echo "::error::Gemspec version ($GEMSPEC_VERSION) does not match tag version ($RUBY_VERSION)"
               exit 1
@@ -176,8 +176,8 @@ jobs:
       - name: Verify Maven pom.xml version
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
-          if [ -f crates/ts-pack-java/pom.xml ]; then
-            POM_VERSION=$(grep -m1 '<version>' crates/ts-pack-java/pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/' | tr -d '[:space:]')
+          if [ -f packages/java/pom.xml ]; then
+            POM_VERSION=$(grep -m1 '<version>' packages/java/pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/' | tr -d '[:space:]')
             if [[ "$POM_VERSION" != "$VERSION" ]]; then
               echo "::error::pom.xml version ($POM_VERSION) does not match tag version ($VERSION)"
               exit 1
@@ -188,8 +188,8 @@ jobs:
       - name: Verify Elixir mix.exs version
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
-          if [ -f crates/ts-pack-elixir/mix.exs ]; then
-            MIX_VERSION=$(grep '@version' crates/ts-pack-elixir/mix.exs | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          if [ -f packages/elixir/mix.exs ]; then
+            MIX_VERSION=$(grep '@version' packages/elixir/mix.exs | head -1 | sed 's/.*"\(.*\)".*/\1/')
             if [[ "$MIX_VERSION" != "$VERSION" ]]; then
               echo "::error::mix.exs version ($MIX_VERSION) does not match tag version ($VERSION)"
               exit 1
@@ -401,7 +401,7 @@ jobs:
       - name: Clone vendors
         run: |
           mkdir -p parsers
-          uv run --no-sync scripts/clone_vendors.py
+          uv run --script scripts/clone_vendors.py
 
       - name: Upload parsers
         uses: actions/upload-artifact@v7
@@ -556,7 +556,7 @@ jobs:
         run: pip install maturin
 
       - name: Build wheel
-        run: maturin build --release --manifest-path crates/ts-pack-python/Cargo.toml --out dist
+        run: maturin build --release --manifest-path crates/ts-pack-core-py/Cargo.toml --out dist
         env:
           PROJECT_ROOT: ${{ github.workspace }}
 
@@ -619,7 +619,7 @@ jobs:
         run: npm install -g @napi-rs/cli
 
       - name: Build native module
-        working-directory: crates/ts-pack-node
+        working-directory: crates/ts-pack-core-node
         run: napi build --release --platform --target ${{ matrix.napi_target }}
         env:
           PROJECT_ROOT: ${{ github.workspace }}
@@ -628,7 +628,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: node-native-${{ matrix.label }}
-          path: crates/ts-pack-node/*.node
+          path: crates/ts-pack-core-node/*.node
           retention-days: 14
 
   # ─── Build Ruby gems ──────────────────────────────────────────────
@@ -683,13 +683,13 @@ jobs:
         run: gem install bundler --no-document && bundler --version
 
       - name: Install Ruby dependencies
-        working-directory: crates/ts-pack-ruby
+        working-directory: packages/ruby
         run: |
           bundle config set --local path vendor/bundle
           bundle check || bundle install
 
       - name: Compile native extension
-        working-directory: crates/ts-pack-ruby
+        working-directory: packages/ruby
         timeout-minutes: 60
         run: |
           echo "Compiling native extension..."
@@ -699,13 +699,13 @@ jobs:
           find lib -name '*.so' -o -name '*.bundle' -o -name '*.dylib' 2>/dev/null | head -20
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-          CARGO_TARGET_DIR: ${{ github.workspace }}/crates/ts-pack-ruby/target
+          CARGO_TARGET_DIR: ${{ github.workspace }}/packages/ruby/target
 
       - name: Build platform gem
         run: ruby scripts/publish/ruby/build-native-gem.rb "${{ matrix.ruby_platform }}"
 
       - name: Verify gem was built
-        working-directory: crates/ts-pack-ruby
+        working-directory: packages/ruby
         run: |
           if ! ls ./*.gem 1>/dev/null 2>&1; then
             echo "ERROR: No gem file found" >&2
@@ -717,7 +717,7 @@ jobs:
           gem spec ./*.gem | grep -i platform
 
       - name: Verify gem integrity
-        working-directory: crates/ts-pack-ruby
+        working-directory: packages/ruby
         run: |
           for gem in ./*.gem; do
             echo "Validating: $gem"
@@ -737,7 +737,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: rubygems-${{ matrix.label }}
-          path: crates/ts-pack-ruby/*.gem
+          path: packages/ruby/*.gem
           retention-days: 14
           compression-level: 0
 
@@ -775,7 +775,7 @@ jobs:
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
       - name: Build WASM (web target)
-        working-directory: crates/ts-pack-wasm
+        working-directory: crates/ts-pack-core-wasm
         run: wasm-pack build --target web --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
@@ -785,7 +785,7 @@ jobs:
           NUM_JOBS: "2"
 
       - name: Verify WASM build output
-        working-directory: crates/ts-pack-wasm
+        working-directory: crates/ts-pack-core-wasm
         run: |
           if [ ! -d pkg ]; then
             echo "ERROR: pkg/ directory not created by wasm-pack" >&2
@@ -800,7 +800,7 @@ jobs:
           echo "WASM binary size: $(wc -c < pkg/ts_pack_wasm_bg.wasm) bytes"
 
       - name: Patch WASM package.json
-        working-directory: crates/ts-pack-wasm
+        working-directory: crates/ts-pack-core-wasm
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
           python3 -c "
@@ -822,7 +822,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: wasm-pkg
-          path: crates/ts-pack-wasm/pkg/
+          path: crates/ts-pack-core-wasm/pkg/
           retention-days: 14
 
   # ─── Build Go FFI libraries ────────────────────────────────────────
@@ -864,7 +864,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Build FFI library
-        run: cargo build -p ts-pack-ffi --release
+        run: cargo build -p ts-pack-core-ffi --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
 
@@ -872,10 +872,10 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
-          cp target/release/libts_pack_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/libts_pack_ffi.so staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/libts_pack_ffi.dylib staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp crates/ts-pack-ffi/include/ts_pack.h staging/ts-pack-ffi/include/
+          cp target/release/libts_pack_core_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/libts_pack_core_ffi.so staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/libts_pack_core_ffi.dylib staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp crates/ts-pack-core-ffi/include/ts_pack.h staging/ts-pack-ffi/include/
           cd staging && tar -czf "../go-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
 
       - name: Stage artifacts (Windows)
@@ -883,9 +883,9 @@ jobs:
         shell: bash
         run: |
           mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
-          cp target/release/ts_pack_ffi.lib staging/ts-pack-ffi/lib/ 2>/dev/null || cp target/release/libts_pack_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/ts_pack_ffi.dll staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp crates/ts-pack-ffi/include/ts_pack.h staging/ts-pack-ffi/include/
+          cp target/release/ts_pack_core_ffi.lib staging/ts-pack-ffi/lib/ 2>/dev/null || cp target/release/libts_pack_core_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/ts_pack_core_ffi.dll staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp crates/ts-pack-core-ffi/include/ts_pack.h staging/ts-pack-ffi/include/
           cd staging && tar -czf "../go-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
 
       - name: Upload FFI artifact
@@ -938,7 +938,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Build FFI library for JNI
-        run: cargo build -p ts-pack-ffi --release
+        run: cargo build -p ts-pack-core-ffi --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
 
@@ -946,15 +946,15 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           mkdir -p java-natives/${{ matrix.rid }}
-          cp target/release/libts_pack_ffi.so java-natives/${{ matrix.rid }}/ 2>/dev/null || true
-          cp target/release/libts_pack_ffi.dylib java-natives/${{ matrix.rid }}/ 2>/dev/null || true
+          cp target/release/libts_pack_core_ffi.so java-natives/${{ matrix.rid }}/ 2>/dev/null || true
+          cp target/release/libts_pack_core_ffi.dylib java-natives/${{ matrix.rid }}/ 2>/dev/null || true
 
       - name: Collect native artifacts (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: |
           mkdir -p java-natives/${{ matrix.rid }}
-          cp target/release/ts_pack_ffi.dll java-natives/${{ matrix.rid }}/ 2>/dev/null || true
+          cp target/release/ts_pack_core_ffi.dll java-natives/${{ matrix.rid }}/ 2>/dev/null || true
 
       - name: Upload native artifact
         uses: actions/upload-artifact@v7
@@ -996,7 +996,7 @@ jobs:
       - name: Stage Java native resources
         shell: bash
         run: |
-          RESOURCES_DIR="crates/ts-pack-java/src/main/resources/natives"
+          RESOURCES_DIR="packages/java/src/main/resources/natives"
           mkdir -p "$RESOURCES_DIR"
           for dir in artifacts/java-natives/*/; do
             rid=$(basename "$dir")
@@ -1007,14 +1007,14 @@ jobs:
           find "$RESOURCES_DIR" -type f | head -20
 
       - name: Build and package
-        working-directory: crates/ts-pack-java
+        working-directory: packages/java
         run: mvn clean package -DskipTests
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v7
         with:
           name: maven-packages
-          path: crates/ts-pack-java/target/*.jar
+          path: packages/java/target/*.jar
           retention-days: 14
 
   # ─── Build Elixir NIFs ────────────────────────────────────────────
@@ -1058,7 +1058,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Build Elixir NIF
-        working-directory: crates/ts-pack-elixir
+        working-directory: packages/elixir
         run: cargo build --release --target ${{ matrix.target }}
         env:
           PROJECT_ROOT: ${{ github.workspace }}
@@ -1085,10 +1085,10 @@ jobs:
           # Hyphen name (matches what RustlerPrecompiled expects from crate: "ts-pack-elixir")
           ARTIFACT_HYPHEN="libts-pack-elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
 
-          # ts-pack-elixir is a standalone workspace, output is in crates/ts-pack-elixir/target/
-          LIB_PATH="crates/ts-pack-elixir/target/${TARGET}/release/${LIB_NAME}"
+          # ts-pack-elixir is a standalone workspace, output is in packages/elixir/target/
+          LIB_PATH="packages/elixir/target/${TARGET}/release/${LIB_NAME}"
           if [[ ! -f "$LIB_PATH" ]]; then
-            LIB_PATH="crates/ts-pack-elixir/target/release/${LIB_NAME}"
+            LIB_PATH="packages/elixir/target/release/${LIB_NAME}"
           fi
           if [[ ! -f "$LIB_PATH" ]]; then
             LIB_PATH="target/${TARGET}/release/${LIB_NAME}"
@@ -1130,10 +1130,10 @@ jobs:
           ARTIFACT_UNDERSCORE="libts_pack_elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
           ARTIFACT_HYPHEN="libts-pack-elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
 
-          # ts-pack-elixir is a standalone workspace, output is in crates/ts-pack-elixir/target/
-          LIB_PATH="crates/ts-pack-elixir/target/${TARGET}/release/${LIB_NAME}"
+          # ts-pack-elixir is a standalone workspace, output is in packages/elixir/target/
+          LIB_PATH="packages/elixir/target/${TARGET}/release/${LIB_NAME}"
           if [[ ! -f "$LIB_PATH" ]]; then
-            LIB_PATH="crates/ts-pack-elixir/target/release/${LIB_NAME}"
+            LIB_PATH="packages/elixir/target/release/${LIB_NAME}"
           fi
           if [[ ! -f "$LIB_PATH" ]]; then
             LIB_PATH="target/${TARGET}/release/${LIB_NAME}"
@@ -1203,7 +1203,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Build FFI library
-        run: cargo build -p ts-pack-ffi --release
+        run: cargo build -p ts-pack-core-ffi --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
 
@@ -1211,17 +1211,17 @@ jobs:
         shell: bash
         run: |
           if command -v cbindgen >/dev/null 2>&1; then
-            cbindgen --crate ts-pack-ffi --output target/ts_pack.h 2>/dev/null || true
+            cbindgen --crate ts-pack-core-ffi --output target/ts_pack.h 2>/dev/null || true
           fi
 
       - name: Stage C FFI artifacts (Unix)
         if: runner.os != 'Windows'
         run: |
           mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
-          cp target/release/libts_pack_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/libts_pack_ffi.so staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/libts_pack_ffi.dylib staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp crates/ts-pack-ffi/include/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
+          cp target/release/libts_pack_core_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/libts_pack_core_ffi.so staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/libts_pack_core_ffi.dylib staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp crates/ts-pack-core-ffi/include/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
           cp target/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
           cd staging && tar -czf "../c-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
 
@@ -1230,10 +1230,10 @@ jobs:
         shell: bash
         run: |
           mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
-          cp target/release/ts_pack_ffi.lib staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/ts_pack_ffi.dll staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/libts_pack_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp crates/ts-pack-ffi/include/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
+          cp target/release/ts_pack_core_ffi.lib staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/ts_pack_core_ffi.dll staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp target/release/libts_pack_core_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
+          cp crates/ts-pack-core-ffi/include/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
           cp target/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
           cd staging && tar -czf "../c-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
 
@@ -1296,7 +1296,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Build PHP extension
-        run: cargo build --release --manifest-path crates/ts-pack-php/Cargo.toml
+        run: cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml
         env:
           PROJECT_ROOT: ${{ github.workspace }}
 
@@ -1356,7 +1356,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Build FFI library
-        run: cargo build -p ts-pack-ffi --release
+        run: cargo build -p ts-pack-core-ffi --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
 
@@ -1364,15 +1364,15 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           mkdir -p csharp-natives/${{ matrix.rid }}
-          cp target/release/libts_pack_ffi.so csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
-          cp target/release/libts_pack_ffi.dylib csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
+          cp target/release/libts_pack_core_ffi.so csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
+          cp target/release/libts_pack_core_ffi.dylib csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
 
       - name: Collect native artifacts (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: |
           mkdir -p csharp-natives/${{ matrix.rid }}
-          cp target/release/ts_pack_ffi.dll csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
+          cp target/release/ts_pack_core_ffi.dll csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
 
       - name: Upload native artifact
         uses: actions/upload-artifact@v7
@@ -1765,12 +1765,12 @@ jobs:
       - name: Download all native modules
         uses: actions/download-artifact@v8
         with:
-          path: crates/ts-pack-node/artifacts
+          path: crates/ts-pack-core-node/artifacts
           pattern: node-native-*
           merge-multiple: true
 
       - name: Prepare platform packages
-        working-directory: crates/ts-pack-node
+        working-directory: crates/ts-pack-core-node
         run: |
           echo "=== Downloaded artifacts ==="
           find artifacts -name '*.node' -type f
@@ -1780,7 +1780,7 @@ jobs:
           find npm -name '*.node' -type f
 
       - name: Pack platform packages
-        working-directory: crates/ts-pack-node/npm
+        working-directory: crates/ts-pack-core-node/npm
         run: |
           for dir in ./*/; do
             if [ -f "$dir/package.json" ]; then
@@ -1792,7 +1792,7 @@ jobs:
 
       - name: Dry run summary
         if: ${{ inputs.dry_run }}
-        working-directory: crates/ts-pack-node
+        working-directory: crates/ts-pack-core-node
         run: |
           {
             echo "## npm Dry Run"
@@ -1815,7 +1815,7 @@ jobs:
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
         uses: kreuzberg-dev/actions/publish-npm@v1
         with:
-          packages-dir: crates/ts-pack-node/npm
+          packages-dir: crates/ts-pack-core-node/npm
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           dry-run: ${{ inputs.dry_run }}
         env:
@@ -1825,7 +1825,7 @@ jobs:
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
         uses: kreuzberg-dev/actions/publish-npm@v1
         with:
-          package-dir: crates/ts-pack-node
+          package-dir: crates/ts-pack-core-node
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           dry-run: ${{ inputs.dry_run }}
         env:
@@ -1861,7 +1861,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: wasm-pkg
-          path: crates/ts-pack-wasm/pkg
+          path: crates/ts-pack-core-wasm/pkg
 
       - name: Dry run summary
         if: ${{ inputs.dry_run }}
@@ -1870,7 +1870,7 @@ jobs:
             echo "## npm WASM Dry Run"
             echo "WASM package staged for npm:"
             echo '```'
-            ls -1 crates/ts-pack-wasm/pkg/
+            ls -1 crates/ts-pack-core-wasm/pkg/
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -1887,7 +1887,7 @@ jobs:
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
         uses: kreuzberg-dev/actions/publish-npm@v1
         with:
-          package-dir: crates/ts-pack-wasm/pkg
+          package-dir: crates/ts-pack-core-wasm/pkg
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           provenance: "true"
           dry-run: ${{ inputs.dry_run }}
@@ -1948,7 +1948,7 @@ jobs:
           PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Build source gem (fallback for unsupported platforms)
-        working-directory: crates/ts-pack-ruby
+        working-directory: packages/ruby
         run: |
           gem build ./*.gemspec
           cp ./*.gem ../../dist/ 2>/dev/null || true
@@ -2044,13 +2044,13 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: maven-packages
-          path: crates/ts-pack-java/target
+          path: packages/java/target
 
       - name: Publish to Maven Central
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
         uses: kreuzberg-dev/actions/publish-maven@v1
         with:
-          pom-file: crates/ts-pack-java/pom.xml
+          pom-file: packages/java/pom.xml
           maven-profile: publish
           extra-args: -DskipTests
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -2103,12 +2103,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Install Elixir dependencies
-        working-directory: crates/ts-pack-elixir
+        working-directory: packages/elixir
         run: mix deps.get
 
       - name: Verify checksum file exists before compile
         run: |
-          CHECKSUM_FILE="crates/ts-pack-elixir/checksum-Elixir.TreeSitterLanguagePack.exs"
+          CHECKSUM_FILE="packages/elixir/checksum-Elixir.TreeSitterLanguagePack.exs"
           if [[ ! -f "$CHECKSUM_FILE" ]]; then
             echo "ERROR: Checksum file not found: $CHECKSUM_FILE"
             echo "The generate_checksums.sh step must have failed silently."
@@ -2119,12 +2119,12 @@ jobs:
           cat "$CHECKSUM_FILE"
 
       - name: Patch Rustler --cfg flag placement
-        working-directory: crates/ts-pack-elixir
+        working-directory: packages/elixir
         run: |
           sed -i 's/args ++ \["--cfg", "build_#{System.system_time(:millisecond)}"\]/args ++ ["--", "--cfg", "build_#{System.system_time(:millisecond)}"]/' deps/rustler/lib/rustler/compiler.ex
 
       - name: Compile project (precompiled mode — checksums already generated)
-        working-directory: crates/ts-pack-elixir
+        working-directory: packages/elixir
         run: mix compile
 
       - name: Re-check Hex.pm before publish
@@ -2139,7 +2139,7 @@ jobs:
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
         uses: kreuzberg-dev/actions/publish-hex@v1
         with:
-          package-dir: crates/ts-pack-elixir
+          package-dir: packages/elixir
           skip-docs: "true"
           dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:

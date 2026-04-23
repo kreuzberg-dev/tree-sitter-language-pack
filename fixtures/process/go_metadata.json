@@ -1,19 +1,47 @@
 {
 	"id": "go_function_process_detail",
-	"category": "process",
 	"description": "Intel: extract structure from Go function definition",
-	"language": "go",
-	"source_code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n",
-	"assertions": {
-		"process_language": "go",
-		"process_structure_count_min": 1,
-		"process_structure_contains_kind": "Function",
-		"process_imports_count_min": 1,
-		"process_metrics_total_lines_min": 7,
-		"process_metrics_error_count": 0
-	},
+	"category": "process",
+	"tags": ["metadata"],
 	"skip": {
-		"requires_language": "go"
+		"reason": "Requires go language"
 	},
-	"tags": ["metadata"]
+	"input": {
+		"source_code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n",
+		"config": {
+			"language": "go"
+		}
+	},
+	"assertions": [
+		{
+			"type": "equals",
+			"field": "language",
+			"value": "go"
+		},
+		{
+			"type": "count_min",
+			"field": "structure",
+			"value": 1
+		},
+		{
+			"type": "contains",
+			"field": "structure_kinds",
+			"value": "Function"
+		},
+		{
+			"type": "count_min",
+			"field": "imports",
+			"value": 1
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "metrics.total_lines",
+			"value": 7
+		},
+		{
+			"type": "equals",
+			"field": "metrics.error_count",
+			"value": 0
+		}
+	]
 }

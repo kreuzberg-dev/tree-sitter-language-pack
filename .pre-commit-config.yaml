@@ -1,7 +1,7 @@
 default_install_hook_types:
   - pre-commit
   - commit-msg
-exclude: ^e2e/|vendor/|node_modules/|target/|parsers/|crates/.*/deps/|crates/.*/tmp/|_build/
+exclude: ^e2e/|^test_apps/|vendor/|node_modules/|target/|parsers/|crates/.*/deps/|crates/.*/tmp/|_build/
 
 repos:
   # Commit message linting
@@ -75,11 +75,7 @@ repos:
             "--allow-staged",
             "--workspace",
             "--exclude",
-            "ts-pack-ruby",
-            "--exclude",
-            "ts-pack-php",
-            "--exclude",
-            "ts-pack-wasm",
+            "ts-pack-core-wasm",
             "--all-targets",
             "--",
             "-D",
@@ -117,7 +113,7 @@ repos:
 
   # Markdown: linting
   - repo: https://github.com/rvben/rumdl-pre-commit
-    rev: "v0.1.73"
+    rev: "v0.1.77"
     hooks:
       - id: rumdl-fmt
         exclude: "^.ai-rulez/"
@@ -146,15 +142,15 @@ repos:
           - textlint-rule-stop-words@5.2.0
           - textlint-rule-terminology@5.2.16
           - textlint-rule-write-good@2.0.0
-          - '@textlint-rule/textlint-rule-no-invalid-control-character@3.0.0'
-          - '@textlint-rule/textlint-rule-no-unmatched-pair@2.0.4'
+          - "@textlint-rule/textlint-rule-no-invalid-control-character@3.0.0"
+          - "@textlint-rule/textlint-rule-no-unmatched-pair@2.0.4"
         files: ^docs/.*\.md$
         exclude: ^docs/(CHANGELOG|snippets/)
         pass_filenames: true
 
   # AI Rules
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v3.12.0
+    rev: v3.14.2
     hooks:
       - id: ai-rulez-generate
 
@@ -177,7 +173,7 @@ repos:
     hooks:
       - id: clang-format
         args: [--style=file]
-        files: (^crates/ts-pack-ffi/)
+        files: (^crates/ts-pack-core-ffi/)
         exclude: (include/)
       - id: cppcheck
         args:
@@ -186,7 +182,7 @@ repos:
             "--enable=warning,style,performance",
             "--suppress=missingIncludeSystem",
           ]
-        files: (^crates/ts-pack-ffi/)
+        files: (^crates/ts-pack-core-ffi/)
 
   # Go: formatting and linting via Taskfile
   - repo: local
@@ -276,6 +272,13 @@ repos:
         files: \.(ex|exs)$
         pass_filenames: false
         require_serial: true
+
+  # Alef: polyglot binding generation and version sync
+  - repo: https://github.com/kreuzberg-dev/alef
+    rev: v0.5.3
+    hooks:
+      - id: alef-verify
+      - id: alef-sync-versions
 
   # Spelling: fast Rust-based spell checker
   - repo: https://github.com/crate-ci/typos

@@ -1,0 +1,27 @@
+[build-system]
+build-backend = "maturin"
+requires = [ "maturin>=1,<2" ]
+
+[project]
+name = "tree-sitter-language-pack"
+version = "1.7.0"
+description = "Pre-compiled tree-sitter grammars for 305 programming languages"
+keywords = [ "language-pack", "parser", "syntax", "tree-sitter" ]
+license = "MIT"
+authors = [ { name = "Kreuzberg Team" } ]
+requires-python = ">=3.10"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+urls.repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+
+[tool.maturin]
+module-name = "tree_sitter_language_pack._native"
+manifest-path = "../../crates/ts-pack-core-py/Cargo.toml"
+features = [ "pyo3/extension-module" ]
+python-packages = [ "tree_sitter_language_pack" ]

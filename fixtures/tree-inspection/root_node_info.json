@@ -1,12 +1,22 @@
 {
 	"id": "tree_root_node_info_python",
-	"category": "tree-inspection",
 	"description": "Parse Python source and verify root node info",
-	"language": "python",
-	"source_code": "def hello():\n    pass\n",
-	"assertions": {
-		"tree_not_null": true,
-		"tree_root_node_type": "module"
+	"category": "tree-inspection",
+	"tags": ["tree-inspection"],
+	"call": "parse",
+	"input": {
+		"language": "python",
+		"source_code": "def hello():\n    pass\n"
 	},
-	"tags": ["tree-inspection"]
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "method_result",
+			"method": "root_node_type",
+			"check": "equals",
+			"value": "module"
+		}
+	]
 }

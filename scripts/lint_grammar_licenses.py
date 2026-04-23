@@ -11,8 +11,6 @@ Exit codes:
     1  One or more grammars have disallowed or undetected licenses
 """
 
-from __future__ import annotations
-
 import json
 import subprocess
 import sys

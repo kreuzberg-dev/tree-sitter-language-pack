@@ -168,14 +168,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "e2e-tests"
-version = "0.0.0"
-dependencies = [
- "tree-sitter",
- "tree-sitter-language-pack",
-]
-
-[[package]]
 name = "equivalent"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -510,9 +502,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-webpki"
-version = "0.103.12"
+version = "0.103.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8279bb85272c9f10811ae6a6c547ff594d6a7f3c6c6b02ee9726d1d0dcfcdd06"
+checksum = "61c429a8649f110dddef65e2a5ad240f747e85f7758a6bccc7e5777bd33f756e"
 dependencies = [
  "ring",
  "rustls-pki-types",
@@ -671,7 +663,7 @@ checksum = "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
 
 [[package]]
 name = "tree-sitter-language-pack"
-version = "1.6.1"
+version = "1.7.0"
 dependencies = [
  "ahash",
  "cc",
@@ -689,10 +681,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "tree_sitter_language_pack-e2e-rust"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "tree-sitter-language-pack",
+]
+
+[[package]]
 name = "typenum"
-version = "1.19.0"
+version = "1.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "562d481066bde0658276a35467c4af00bdc6ee726305698a55b86e61d7ad82bb"
+checksum = "40ce102ab67701b8526c123c1bab5cbe42d7040ccfd0f64af1a385808d2f43de"
 
 [[package]]
 name = "unicode-ident"

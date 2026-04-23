@@ -15,7 +15,7 @@ pub(crate) fn ahashmap_is_empty<K, V>(map: &AHashMap<K, V>) -> bool {
 }
 
 /// Controls what data is captured for each query match.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum CaptureOutput {
     /// Capture only the matched text.
@@ -28,7 +28,7 @@ pub enum CaptureOutput {
 }
 
 /// Defines a single extraction pattern and its configuration.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ExtractionPattern {
     /// The tree-sitter query string (S-expression).
@@ -49,7 +49,7 @@ pub struct ExtractionPattern {
 }
 
 /// Configuration for an extraction run against a single language.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ExtractionConfig {
     /// The language name (e.g., `"python"`).
@@ -59,7 +59,7 @@ pub struct ExtractionConfig {
 }
 
 /// A single captured node within a match.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CaptureResult {
     /// The capture name from the query (e.g., `"fn_name"`).
@@ -75,7 +75,7 @@ pub struct CaptureResult {
 }
 
 /// A single query match containing one or more captures.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MatchResult {
     /// The pattern index within the query that produced this match.
@@ -85,7 +85,7 @@ pub struct MatchResult {
 }
 
 /// Results for a single named pattern.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PatternResult {
     /// The individual matches.
@@ -95,7 +95,7 @@ pub struct PatternResult {
 }
 
 /// Complete extraction results for all patterns.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ExtractionResult {
     /// The language that was used.
@@ -105,7 +105,7 @@ pub struct ExtractionResult {
 }
 
 /// Validation information for a single pattern.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PatternValidation {
     /// Whether the pattern compiled successfully.
@@ -121,7 +121,7 @@ pub struct PatternValidation {
 }
 
 /// Validation results for an entire extraction config.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ValidationResult {
     /// Whether all patterns are valid.

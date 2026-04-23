@@ -1,10 +1,18 @@
 [workspace]
-members = ["crates/*", "tools/e2e-generator", "tools/snippet-runner"]
-exclude = ["crates/ts-pack-elixir", "crates/ts-pack-java", "tests/test_apps/rust"]
+members = ["crates/*", "tools/snippet-runner"]
+exclude = [
+    "crates/tree-sitter-language-pack-ffi",
+    "crates/tree-sitter-language-pack-wasm",
+    "crates/ts-pack-elixir",
+    "crates/ts-pack-java",
+    "crates/ts-pack-node",
+    "crates/ts-pack-ruby",
+    "test_apps/rust",
+]
 resolver = "2"
 
 [workspace.package]
-version = "1.6.2"
+version = "1.7.0"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
@@ -48,6 +56,13 @@ walkdir = "2.5"
 wasm-bindgen = "0.2"
 wasm-bindgen-test = "0.3"
 zstd = "0.13"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+duplicated_attributes = "allow"
+
+[workspace.lints.rust]
+unsafe_code = "deny"
 
 [profile.release]
 lto = "thin"

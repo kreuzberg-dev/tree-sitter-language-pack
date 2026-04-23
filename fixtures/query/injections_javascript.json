@@ -1,0 +1,19 @@
+{
+	"id": "injections_query_javascript",
+	"description": "get_injections_query returns non-empty for javascript (has embedded languages)",
+	"category": "query",
+	"tags": ["query", "injections"],
+	"call": "injections",
+	"input": {
+		"language": "javascript"
+	},
+	"assertions": [
+		{
+			"type": "not_empty"
+		}
+	],
+	"skip": {
+		"languages": ["rust"],
+		"reason": "Query files not bundled in limited TSLP_LANGUAGES builds"
+	}
+}

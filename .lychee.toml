@@ -90,7 +90,7 @@ exclude_path = [
     "vendor/",
     "e2e/",
     "parsers/",
-    "tests/test_apps/",
+    "test_apps/",
     "scripts/",
     "examples/",
     "tools/e2e-generator/",

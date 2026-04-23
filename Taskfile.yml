@@ -175,110 +175,25 @@ tasks:
       - uv run --no-sync scripts/check_grammar_updates.py
 
   # E2E test generation
+  # E2E test generation (via alef)
   e2e:generate:all:
     desc: Generate E2E tests for all languages from fixtures
     cmds:
-      - cargo run -p e2e-generator -- generate --lang all
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      - alef e2e generate
 
   e2e:generate:rust:
     desc: Generate and format Rust E2E tests
     cmds:
-      - cargo run -p e2e-generator -- generate --lang rust
-      - cargo fmt --manifest-path e2e/rust/Cargo.toml
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
-
-  e2e:generate:python:
-    desc: Generate and lint Python E2E tests
-    cmds:
-      - cargo run -p e2e-generator -- generate --lang python
-      - uv run --no-sync ruff check --fix e2e/python/
-      - uv run --no-sync ruff format e2e/python/
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
-
-  e2e:generate:typescript:
-    desc: Generate TypeScript E2E tests
-    cmds:
-      - cargo run -p e2e-generator -- generate --lang typescript
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
-
-  e2e:generate:go:
-    desc: Generate and format Go E2E tests
-    cmds:
-      - cargo run -p e2e-generator -- generate --lang go
-      - gofmt -w e2e/go/
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
-
-  e2e:generate:java:
-    desc: Generate Java E2E tests
-    cmds:
-      - cargo run -p e2e-generator -- generate --lang java
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
-
-  e2e:generate:elixir:
-    desc: Generate Elixir E2E tests
-    cmds:
-      - cargo run -p e2e-generator -- generate --lang elixir
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
-
-  e2e:generate:ruby:
-    desc: Generate and format Ruby E2E tests
-    cmds:
-      - cargo run -p e2e-generator -- generate --lang ruby
-      - bundle exec rubocop -a e2e/ruby/ || true
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
-
-  e2e:generate:wasm:
-    desc: Generate WASM E2E tests
-    cmds:
-      - cargo run -p e2e-generator -- generate --lang wasm
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
-
-  e2e:generate:c:
-    desc: Generate C E2E tests
-    cmds:
-      - cargo run -p e2e-generator -- generate --lang c
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
-
-  e2e:generate:php:
-    desc: Generate PHP E2E tests
-    cmds:
-      - cargo run -p e2e-generator -- generate --lang php
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
-
-  e2e:generate:csharp:
-    desc: Generate C# E2E tests
-    cmds:
-      - cargo run -p e2e-generator -- generate --lang csharp
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      - alef e2e generate --lang rust
 
   e2e:test:rust:
-    desc: Run Rust E2E tests (generate + format + test)
+    desc: Run Rust E2E tests (generate + test)
     cmds:
       - task: e2e:generate:rust
       - cargo test --manifest-path e2e/rust/Cargo.toml
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
-      TSLP_LINK_MODE: dynamic
-
-  e2e:generate:smoke-fixtures:
-    desc: Auto-generate smoke fixtures from language_definitions.json
-    cmds:
-      - cargo run -p e2e-generator -- generate-smoke-fixtures --definitions sources/language_definitions.json --output fixtures/smoke
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LINK_MODE: static
 
   # Documentation generation
   docs:generate:languages:
@@ -290,18 +205,13 @@ tasks:
     generates:
       - docs/supported-languages.md
 
-  # README generation
+  docs:generate:api:
+    desc: Generate API reference docs (via alef)
+    cmds:
+      - alef docs
+
+  # README generation (via alef)
   generate-readme:
-    desc: Generate all READMEs from templates
+    desc: Generate all package READMEs
     cmds:
-      - python3 scripts/generate_readme.py
-
-  generate-readme:check:
-    desc: Validate READMEs match templates (CI)
-    cmds:
-      - python3 scripts/generate_readme.py --validate
-
-  generate-readme:dry-run:
-    desc: Preview README generation without writing
-    cmds:
-      - python3 scripts/generate_readme.py --dry-run
+      - alef readme

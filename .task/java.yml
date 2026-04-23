@@ -1,12 +1,12 @@
 version: "3"
 
 vars:
-  FFI_LIB_PATH: '{{.PROJECT_ROOT}}/target/release/libts_pack_ffi.{{if eq OS "darwin"}}dylib{{else if eq OS "windows"}}dll{{else}}so{{end}}'
+  FFI_LIB_PATH: '{{.PROJECT_ROOT}}/target/release/libts_pack_core_ffi.{{if eq OS "darwin"}}dylib{{else if eq OS "windows"}}dll{{else}}so{{end}}'
 
 tasks:
   deps:
     desc: Resolve Java/Maven dependencies
-    dir: crates/ts-pack-java
+    dir: packages/java
     cmds:
       - mvn dependency:resolve -q
 
@@ -15,19 +15,19 @@ tasks:
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - cargo build -p ts-pack-ffi --release
+      - cargo build -p ts-pack-core-ffi --release
 
   build:
     desc: Build FFI library and Java package
     deps: [build:ffi]
-    dir: crates/ts-pack-java
+    dir: packages/java
     cmds:
       - mvn package -DskipTests -q
 
   test:
     desc: Run Java tests (requires FFI built first)
     deps: [build:ffi]
-    dir: crates/ts-pack-java
+    dir: packages/java
     env:
       TSPACK_LIB_PATH: "{{.FFI_LIB_PATH}}"
     cmds:
@@ -35,44 +35,46 @@ tasks:
 
   format:
     desc: Format Java code
-    dir: crates/ts-pack-java
+    dir: packages/java
     cmds:
       - mvn com.spotify.fmt:fmt-maven-plugin:format
 
   format:check:
     desc: Check Java formatting (CI)
-    dir: crates/ts-pack-java
+    dir: packages/java
     cmds:
       - mvn com.spotify.fmt:fmt-maven-plugin:check
 
   lint:
     desc: Lint Java code
-    dir: crates/ts-pack-java
+    dir: packages/java
     cmds:
       - mvn com.spotify.fmt:fmt-maven-plugin:check
 
   lint:check:
     desc: Check Java linting without modifications (CI)
-    dir: crates/ts-pack-java
+    dir: packages/java
     cmds:
       - mvn com.spotify.fmt:fmt-maven-plugin:check
 
   update:
-    desc: Update Java dependencies and plugins (including linters)
-    dir: crates/ts-pack-java
+    desc: Update Java dependencies and plugins (stable releases only)
+    dir: packages/java
+    vars:
+      RULES_URI: 'file:///${PWD}/maven-version-rules.xml'
     cmds:
-      - echo "Updating Java dependencies and plugins..."
-      - mvn -DallowSnapshots=false versions:use-latest-releases -DprocessDependencies=true -DprocessParent=false -DgenerateBackupPoms=false
+      - echo "Updating Java dependencies and plugins (stable releases only)..."
+      - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:use-latest-releases -DprocessDependencies=true -DprocessParent=false -DgenerateBackupPoms=false
       - echo "Updating plugin versions in properties..."
-      - mvn -DallowSnapshots=false versions:update-properties -DgenerateBackupPoms=false || true
+      - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:update-properties -DgenerateBackupPoms=false || true
       - echo "Displaying final dependency updates..."
-      - mvn -DallowSnapshots=false versions:display-dependency-updates
+      - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:display-dependency-updates
       - echo "Displaying final plugin updates..."
-      - mvn -DallowSnapshots=false versions:display-plugin-updates
+      - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:display-plugin-updates
 
   clean:
     desc: Clean Java build artifacts
-    dir: crates/ts-pack-java
+    dir: packages/java
     cmds:
       - mvn clean -q
 
@@ -81,7 +83,7 @@ tasks:
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - cargo run -p e2e-generator -- generate --lang java
+      - alef e2e generate --lang java
 
   e2e:test:
     desc: Run Java E2E tests

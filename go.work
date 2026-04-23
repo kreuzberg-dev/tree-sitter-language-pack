@@ -3,5 +3,5 @@ go 1.26
 use (
 	./e2e/go
 	./packages/go
-	./tests/test_apps/go
+	./test_apps/go
 )

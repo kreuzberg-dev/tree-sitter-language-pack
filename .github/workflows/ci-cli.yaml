@@ -11,8 +11,8 @@ on:
       - 'Cargo.lock'
       - 'crates/ts-pack-cli/**'
       - 'crates/ts-pack-core/**'
-      - 'tests/test_apps/cli/**'
-      - 'tests/test_apps/fixtures/**'
+      - 'test_apps/cli/**'
+      - 'test_apps/fixtures/**'
   pull_request:
     branches: [main]
     paths:
@@ -23,8 +23,8 @@ on:
       - 'Cargo.lock'
       - 'crates/ts-pack-cli/**'
       - 'crates/ts-pack-core/**'
-      - 'tests/test_apps/cli/**'
-      - 'tests/test_apps/fixtures/**'
+      - 'test_apps/cli/**'
+      - 'test_apps/fixtures/**'
   workflow_run:
     workflows: ["Publish Release"]
     types: [completed]
@@ -84,7 +84,7 @@ jobs:
       - name: Clone vendors
         run: |
           mkdir -p parsers
-          uv run --no-sync scripts/clone_vendors.py
+          uv run --script scripts/clone_vendors.py
 
       - name: Upload parsers
         uses: actions/upload-artifact@v7
@@ -144,14 +144,14 @@ jobs:
       - name: Run CLI smoke test script
         shell: bash
         run: |
-          chmod +x tests/test_apps/cli/smoke_test.sh
-          TS_PACK_BIN=./target/release/ts-pack tests/test_apps/cli/smoke_test.sh
+          chmod +x test_apps/cli/smoke_test.sh
+          TS_PACK_BIN=./target/release/ts-pack test_apps/cli/smoke_test.sh
 
       - name: Run grammar test (static subset)
         shell: bash
         run: |
-          chmod +x tests/test_apps/cli/test_all_grammars.sh
-          TS_PACK_BIN=./target/release/ts-pack TS_PACK_LANGUAGES="python,rust,javascript,typescript,go,html,css,json" tests/test_apps/cli/test_all_grammars.sh
+          chmod +x test_apps/cli/test_all_grammars.sh
+          TS_PACK_BIN=./target/release/ts-pack TS_PACK_LANGUAGES="python,rust,javascript,typescript,go,html,css,json" test_apps/cli/test_all_grammars.sh
 
       - name: Upload CLI binary (artifact)
         if: success()

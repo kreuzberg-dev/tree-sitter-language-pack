@@ -1,0 +1,19 @@
+{
+	"id": "ambiguity_py_extension",
+	"description": "The .py extension is NOT ambiguous (only maps to python)",
+	"category": "language-detection",
+	"tags": ["language-detection", "ambiguity"],
+	"call": "ambiguity",
+	"input": {
+		"extension": "py"
+	},
+	"assertions": [
+		{
+			"type": "is_empty"
+		}
+	],
+	"skip": {
+		"languages": ["rust"],
+		"reason": "Rust e2e generator does not yet support this pattern"
+	}
+}

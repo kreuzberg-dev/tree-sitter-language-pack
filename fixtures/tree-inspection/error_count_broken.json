@@ -1,12 +1,22 @@
 {
 	"id": "tree_error_count_broken",
-	"category": "tree-inspection",
 	"description": "Parse broken Python code and verify error count >= 1",
-	"language": "python",
-	"source_code": "def (broken syntax @@@ !!!",
-	"assertions": {
-		"tree_not_null": true,
-		"has_error_nodes": true
+	"category": "tree-inspection",
+	"tags": ["tree-inspection"],
+	"call": "parse",
+	"input": {
+		"language": "python",
+		"source_code": "def (broken syntax @@@ !!!"
 	},
-	"tags": ["tree-inspection"]
+	"assertions": [
+		{
+			"type": "not_error"
+		},
+		{
+			"type": "method_result",
+			"method": "has_error_nodes",
+			"check": "equals",
+			"value": true
+		}
+	]
 }

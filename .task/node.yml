@@ -3,7 +3,7 @@ version: "3"
 tasks:
   deps:
     desc: Install Node.js dependencies
-    dir: crates/ts-pack-node
+    dir: crates/ts-pack-core-node
     cmds:
       - pnpm install
 
@@ -17,7 +17,7 @@ tasks:
 
   build:
     desc: Build NAPI-RS native module (release)
-    dir: crates/ts-pack-node
+    dir: crates/ts-pack-core-node
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
@@ -25,7 +25,7 @@ tasks:
 
   build:dev:
     desc: Build NAPI-RS native module (debug)
-    dir: crates/ts-pack-node
+    dir: crates/ts-pack-core-node
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
@@ -33,7 +33,7 @@ tasks:
 
   test:
     desc: Smoke test Node.js native module
-    dir: crates/ts-pack-node
+    dir: crates/ts-pack-core-node
     cmds:
       - node -e "const m = require('./'); console.log('Languages:', m.availableLanguages().length)"
 
@@ -61,7 +61,7 @@ tasks:
 
   clean:
     desc: Clean Node.js build artifacts
-    dir: crates/ts-pack-node
+    dir: crates/ts-pack-core-node
     cmds:
       - rm -f *.node
 
@@ -70,7 +70,7 @@ tasks:
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - cargo run -p e2e-generator -- generate --lang typescript
+      - alef e2e generate --lang typescript
 
   e2e:test:
     desc: Run TypeScript/Node E2E tests

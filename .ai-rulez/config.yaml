@@ -6,7 +6,9 @@ gitignore: true
 
 presets:
   - claude
-  - gemini
+  - copilot
+  - cursor
+  - antigravity
   - codex
 
 builtins:

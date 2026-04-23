@@ -1,15 +1,34 @@
 {
 	"id": "process_python_metrics_detail",
-	"category": "process",
 	"description": "Python code with metrics assertions",
-	"language": "python",
-	"source_code": "# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n",
-	"assertions": {
-		"tree_not_null": true,
-		"process_language": "python",
-		"process_metrics_code_lines_min": 4,
-		"process_metrics_comment_lines_min": 1,
-		"process_metrics_max_depth_min": 1
+	"category": "process",
+	"tags": ["metadata"],
+	"input": {
+		"source_code": "# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n",
+		"config": {
+			"language": "python"
+		}
 	},
-	"tags": ["metadata"]
+	"assertions": [
+		{
+			"type": "equals",
+			"field": "language",
+			"value": "python"
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "metrics.code_lines",
+			"value": 4
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "metrics.comment_lines",
+			"value": 1
+		},
+		{
+			"type": "greater_than_or_equal",
+			"field": "metrics.max_depth",
+			"value": 1
+		}
+	]
 }

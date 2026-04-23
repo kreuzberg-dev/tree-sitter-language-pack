@@ -1,0 +1,1711 @@
+---
+title: "Go API Reference"
+---
+
+## Go API Reference <span class="version-badge">v1.7.0</span>
+
+### Functions
+
+#### DetectLanguageFromExtension()
+
+Detect language name from a file extension (without leading dot).
+
+Returns `nil` for unrecognized extensions. The match is case-insensitive.
+
+**Signature:**
+
+```go
+func DetectLanguageFromExtension(ext string) *string
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ext` | `string` | Yes | The ext |
+
+**Returns:** `*string`
+
+
+---
+
+#### DetectLanguageFromPath()
+
+Detect language name from a file path.
+
+Extracts the file extension and looks it up. Returns `nil` if the
+path has no extension or the extension is not recognized.
+
+**Signature:**
+
+```go
+func DetectLanguageFromPath(path string) *string
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Path` | `string` | Yes | Path to the file |
+
+**Returns:** `*string`
+
+
+---
+
+#### DetectLanguageFromContent()
+
+Detect language name from file content using the shebang line (`#!`).
+
+Inspects only the first line of `content`. If it begins with `#!`, the
+interpreter name is extracted and mapped to a language name.
+
+Handles common patterns:
+
+- `#!/usr/bin/env python3` → `"python"`
+- `#!/bin/bash` → `"bash"`
+- `#!/usr/bin/env node` → `"javascript"`
+
+The `-S` flag accepted by some `env` implementations is skipped automatically.
+Version suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.
+
+Returns `nil` when content does not start with `#!`, the shebang is
+malformed, or the interpreter is not recognised.
+
+**Signature:**
+
+```go
+func DetectLanguageFromContent(content string) *string
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Content` | `string` | Yes | The content to process |
+
+**Returns:** `*string`
+
+
+---
+
+#### RootNodeInfo()
+
+Get a `NodeInfo` snapshot of the root node.
+
+**Signature:**
+
+```go
+func RootNodeInfo(tree Tree) NodeInfo
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Tree` | `Tree` | Yes | The tree |
+
+**Returns:** `NodeInfo`
+
+
+---
+
+#### FindNodesByType()
+
+Find all nodes matching the given type name, returning their `NodeInfo`.
+
+Performs a depth-first traversal. Returns an empty vec if no matches.
+
+**Signature:**
+
+```go
+func FindNodesByType(tree Tree, nodeType string) []NodeInfo
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Tree` | `Tree` | Yes | The tree |
+| `NodeType` | `string` | Yes | The node type |
+
+**Returns:** `[]NodeInfo`
+
+
+---
+
+#### NamedChildrenInfo()
+
+Get `NodeInfo` for all named children of the root node.
+
+Useful for understanding the top-level structure of a file
+(e.g., list of function definitions, class declarations, imports).
+
+**Signature:**
+
+```go
+func NamedChildrenInfo(tree Tree) []NodeInfo
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Tree` | `Tree` | Yes | The tree |
+
+**Returns:** `[]NodeInfo`
+
+
+---
+
+#### ParseString()
+
+Parse source code with the named language, returning the syntax tree.
+
+Uses the global registry to look up the language by name.
+Caches parsers per-thread so repeated calls for the same language avoid
+re-creating the parser.
+
+**Signature:**
+
+```go
+func ParseString(language string, source []byte) (Tree, error)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Language` | `string` | Yes | The language |
+| `Source` | `[]byte` | Yes | The source |
+
+**Returns:** `Tree`
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### TreeContainsNodeType()
+
+Check whether any node in the tree matches the given type name.
+
+Performs a depth-first traversal using `TreeCursor`.
+
+**Signature:**
+
+```go
+func TreeContainsNodeType(tree Tree, nodeType string) bool
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Tree` | `Tree` | Yes | The tree |
+| `NodeType` | `string` | Yes | The node type |
+
+**Returns:** `bool`
+
+
+---
+
+#### TreeHasErrorNodes()
+
+Check whether the tree contains any ERROR or MISSING nodes.
+
+Useful for determining if the parse was clean or had syntax errors.
+
+**Signature:**
+
+```go
+func TreeHasErrorNodes(tree Tree) bool
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Tree` | `Tree` | Yes | The tree |
+
+**Returns:** `bool`
+
+
+---
+
+#### TreeToSexp()
+
+Return the S-expression representation of the entire tree.
+
+This is the standard tree-sitter debug format, useful for logging,
+snapshot testing, and debugging grammars.
+
+**Signature:**
+
+```go
+func TreeToSexp(tree Tree) string
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Tree` | `Tree` | Yes | The tree |
+
+**Returns:** `string`
+
+
+---
+
+#### TreeErrorCount()
+
+Count the number of ERROR and MISSING nodes in the tree.
+
+Returns 0 for a clean parse.
+
+**Signature:**
+
+```go
+func TreeErrorCount(tree Tree) int
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Tree` | `Tree` | Yes | The tree |
+
+**Returns:** `int`
+
+
+---
+
+#### GetHighlightsQuery()
+
+Get the highlights query for a language, if bundled.
+
+Returns the contents of `highlights.scm` as a static string, or `nil`
+if no highlights query is bundled for this language.
+
+**Signature:**
+
+```go
+func GetHighlightsQuery(language string) *string
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Language` | `string` | Yes | The language |
+
+**Returns:** `*string`
+
+
+---
+
+#### GetInjectionsQuery()
+
+Get the injections query for a language, if bundled.
+
+Returns the contents of `injections.scm` as a static string, or `nil`
+if no injections query is bundled for this language.
+
+**Signature:**
+
+```go
+func GetInjectionsQuery(language string) *string
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Language` | `string` | Yes | The language |
+
+**Returns:** `*string`
+
+
+---
+
+#### GetLocalsQuery()
+
+Get the locals query for a language, if bundled.
+
+Returns the contents of `locals.scm` as a static string, or `nil`
+if no locals query is bundled for this language.
+
+**Signature:**
+
+```go
+func GetLocalsQuery(language string) *string
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Language` | `string` | Yes | The language |
+
+**Returns:** `*string`
+
+
+---
+
+#### RunQuery()
+
+Execute a tree-sitter query pattern against a parsed tree.
+
+The `query_source` is an S-expression pattern like:
+
+```text
+(function_definition name: (identifier) @name)
+```
+
+Returns all matches with their captured nodes.
+
+**Signature:**
+
+```go
+func RunQuery(tree Tree, language string, querySource string, source []byte) ([]QueryMatch, error)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Tree` | `Tree` | Yes | The parsed syntax tree to query. |
+| `Language` | `string` | Yes | Language name (used to compile the query pattern). |
+| `QuerySource` | `string` | Yes | The tree-sitter query pattern string. |
+| `Source` | `[]byte` | Yes | The original source code bytes (needed for capture resolution). |
+
+**Returns:** `[]QueryMatch`
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### GetLanguage()
+
+Get a tree-sitter `Language` by name using the global registry.
+
+Resolves language aliases (e.g., `"shell"` maps to `"bash"`).
+When the `download` feature is enabled (default), automatically downloads
+the parser from GitHub releases if not found locally.
+
+**Errors:**
+
+Returns `Error.LanguageNotFound` if the language is not recognized,
+or `Error.Download` if auto-download fails.
+
+**Signature:**
+
+```go
+func GetLanguage(name string) (Language, error)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Name` | `string` | Yes | The name |
+
+**Returns:** `Language`
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### GetParser()
+
+Get a tree-sitter `Parser` pre-configured for the given language.
+
+This is a convenience function that calls `get_language` and configures
+a new parser in one step.
+
+**Errors:**
+
+Returns `Error.LanguageNotFound` if the language is not recognized, or
+`Error.ParserSetup` if the language cannot be applied to the parser.
+
+**Signature:**
+
+```go
+func GetParser(name string) (Parser, error)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Name` | `string` | Yes | The name |
+
+**Returns:** `Parser`
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### AvailableLanguages()
+
+List all available language names (sorted, deduplicated, includes aliases).
+
+Returns names of both statically compiled and dynamically loadable languages,
+plus any configured aliases.
+
+**Signature:**
+
+```go
+func AvailableLanguages() []string
+```
+
+**Returns:** `[]string`
+
+
+---
+
+#### HasLanguage()
+
+Check if a language is available by name or alias.
+
+Returns `true` if the language can be loaded (statically compiled,
+dynamically available, or a known alias for one of these).
+
+**Signature:**
+
+```go
+func HasLanguage(name string) bool
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Name` | `string` | Yes | The name |
+
+**Returns:** `bool`
+
+
+---
+
+#### LanguageCount()
+
+Return the number of available languages.
+
+Includes statically compiled languages, dynamically loadable languages,
+and aliases.
+
+**Signature:**
+
+```go
+func LanguageCount() int
+```
+
+**Returns:** `int`
+
+
+---
+
+#### Process()
+
+Process source code and extract file intelligence using the global registry.
+
+Parses the source with tree-sitter and extracts metrics, structure, imports,
+exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+the flags set in `ProcessConfig`.
+
+**Errors:**
+
+Returns an error if the language is not found or parsing fails.
+
+**Signature:**
+
+```go
+func Process(source string, config ProcessConfig) (ProcessResult, error)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Source` | `string` | Yes | The source |
+| `Config` | `ProcessConfig` | Yes | The configuration options |
+
+**Returns:** `ProcessResult`
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### ExtractPatterns()
+
+Run extraction patterns against source code.
+
+Convenience wrapper around `extract.extract`.
+
+**Errors:**
+
+Returns an error if the language is not found, parsing fails, or a query
+pattern is invalid.
+
+**Signature:**
+
+```go
+func ExtractPatterns(source string, config ExtractionConfig) (ExtractionResult, error)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Source` | `string` | Yes | The source |
+| `Config` | `ExtractionConfig` | Yes | The configuration options |
+
+**Returns:** `ExtractionResult`
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### ValidateExtraction()
+
+Validate extraction patterns without running them.
+
+Convenience wrapper around `extract.validate_extraction`.
+
+**Errors:**
+
+Returns an error if the language cannot be loaded.
+
+**Signature:**
+
+```go
+func ValidateExtraction(config ExtractionConfig) (ValidationResult, error)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Config` | `ExtractionConfig` | Yes | The configuration options |
+
+**Returns:** `ValidationResult`
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### Init()
+
+Initialize the language pack with the given configuration.
+
+Applies any custom cache directory, then downloads all languages and groups
+specified in the config. This is the recommended entry point when you want
+to pre-warm the cache before use.
+
+**Errors:**
+
+Returns an error if configuration cannot be applied or if downloads fail.
+
+**Signature:**
+
+```go
+func Init(config PackConfig) error
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Config` | `PackConfig` | Yes | The configuration options |
+
+**Returns:** ``
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### Configure()
+
+Apply download configuration without downloading anything.
+
+Use this to set a custom cache directory before the first call to
+`get_language` or any download function. Changing the cache dir
+after languages have been registered has no effect on already-loaded
+languages.
+
+**Errors:**
+
+Returns an error if the lock cannot be acquired.
+
+**Signature:**
+
+```go
+func Configure(config PackConfig) error
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Config` | `PackConfig` | Yes | The configuration options |
+
+**Returns:** ``
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### Download()
+
+Download specific languages to the local cache.
+
+Returns the number of newly downloaded languages (languages that were
+already cached are not counted).
+
+**Errors:**
+
+Returns an error if any language is not available in the manifest or if
+the download fails.
+
+**Signature:**
+
+```go
+func Download(names []string) (int, error)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Names` | `[]string` | Yes | The names |
+
+**Returns:** `int`
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### DownloadAll()
+
+Download all available languages from the remote manifest.
+
+Returns the number of newly downloaded languages.
+
+**Errors:**
+
+Returns an error if the manifest cannot be fetched or a download fails.
+
+**Signature:**
+
+```go
+func DownloadAll() (int, error)
+```
+
+**Returns:** `int`
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### ManifestLanguages()
+
+Return all language names available in the remote manifest (305).
+
+Fetches (and caches) the remote manifest to discover the full list of
+downloadable languages. Use `downloaded_languages` to list what is
+already cached locally.
+
+**Errors:**
+
+Returns an error if the manifest cannot be fetched.
+
+**Signature:**
+
+```go
+func ManifestLanguages() ([]string, error)
+```
+
+**Returns:** `[]string`
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### DownloadedLanguages()
+
+Return languages that are already downloaded and cached locally.
+
+Does not perform any network requests. Returns an empty list if the
+cache directory does not exist or cannot be read.
+
+**Signature:**
+
+```go
+func DownloadedLanguages() []string
+```
+
+**Returns:** `[]string`
+
+
+---
+
+#### CleanCache()
+
+Delete all cached parser shared libraries.
+
+Resets the cache registration so the next call to `get_language` or
+a download function will re-register the (now empty) cache directory.
+
+**Errors:**
+
+Returns an error if the cache directory cannot be removed.
+
+**Signature:**
+
+```go
+func CleanCache() error
+```
+
+**Returns:** ``
+
+**Errors:** Returns `error`.
+
+
+---
+
+#### CacheDir()
+
+Return the effective cache directory path.
+
+This is either the custom path set via `configure` / `init` or the
+default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
+
+**Errors:**
+
+Returns an error if the system cache directory cannot be determined.
+
+**Signature:**
+
+```go
+func CacheDir() (string, error)
+```
+
+**Returns:** `string`
+
+**Errors:** Returns `error`.
+
+
+---
+
+### Types
+
+#### CaptureResult
+
+A single captured node within a match.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Name` | `string` | — | The capture name from the query (e.g., `"fn_name"`). |
+| `Node` | `*NodeInfo` | `nil` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
+| `Text` | `*string` | `nil` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
+| `ChildFields` | `string` | — | Values of requested child fields, keyed by field name. |
+| `StartByte` | `int` | — | Byte offset where this capture starts in the source. |
+
+
+---
+
+#### ChunkContext
+
+Metadata for a single chunk of source code.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Language` | `string` | — | Language |
+| `ChunkIndex` | `int` | — | Chunk index |
+| `TotalChunks` | `int` | — | Total chunks |
+| `NodeTypes` | `[]string` | `nil` | Node types |
+| `ContextPath` | `[]string` | `nil` | Context path |
+| `SymbolsDefined` | `[]string` | `nil` | Symbols defined |
+| `Comments` | `[]CommentInfo` | `nil` | Comments |
+| `Docstrings` | `[]DocstringInfo` | `nil` | Docstrings |
+| `HasErrorNodes` | `bool` | — | Whether error nodes |
+
+
+---
+
+#### CodeChunk
+
+A chunk of source code with rich metadata.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Content` | `string` | — | The extracted text content |
+| `StartByte` | `int` | — | Start byte |
+| `EndByte` | `int` | — | End byte |
+| `StartLine` | `int` | — | Start line |
+| `EndLine` | `int` | — | End line |
+| `Metadata` | `ChunkContext` | — | Document metadata |
+
+
+---
+
+#### CommentInfo
+
+A comment extracted from source code.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Text` | `string` | — | Text |
+| `Kind` | `CommentKind` | `CommentKind.Line` | Kind (comment kind) |
+| `Span` | `Span` | — | Span (span) |
+| `AssociatedNode` | `*string` | `nil` | Associated node |
+
+
+---
+
+#### Diagnostic
+
+A diagnostic (syntax error, missing node, etc.) from parsing.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Message` | `string` | — | Message |
+| `Severity` | `DiagnosticSeverity` | `DiagnosticSeverity.Error` | Severity (diagnostic severity) |
+| `Span` | `Span` | — | Span (span) |
+
+
+---
+
+#### DocSection
+
+A section within a docstring (e.g., Args, Returns, Raises).
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Kind` | `string` | — | Kind |
+| `Name` | `*string` | `nil` | The name |
+| `Description` | `string` | — | Human-readable description |
+
+
+---
+
+#### DocstringInfo
+
+A docstring extracted from source code.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Text` | `string` | — | Text |
+| `Format` | `DocstringFormat` | `DocstringFormat.PythonTripleQuote` | Format (docstring format) |
+| `Span` | `Span` | — | Span (span) |
+| `AssociatedItem` | `*string` | `nil` | Associated item |
+| `ParsedSections` | `[]DocSection` | `nil` | Parsed sections |
+
+
+---
+
+#### DownloadManager
+
+Manages downloading and caching of pre-built parser shared libraries.
+
+##### Methods
+
+###### New()
+
+Create a new download manager for the given version.
+
+**Signature:**
+
+```go
+func (o *DownloadManager) New(version string) (DownloadManager, error)
+```
+
+###### WithCacheDir()
+
+Create a download manager with a custom cache directory.
+
+**Signature:**
+
+```go
+func (o *DownloadManager) WithCacheDir(version string, cacheDir string) DownloadManager
+```
+
+###### DefaultCacheDir()
+
+Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
+
+**Signature:**
+
+```go
+func (o *DownloadManager) DefaultCacheDir(version string) (string, error)
+```
+
+###### CacheDir()
+
+Return the path to the libs cache directory.
+
+**Signature:**
+
+```go
+func (o *DownloadManager) CacheDir() string
+```
+
+###### InstalledLanguages()
+
+List languages that are already downloaded and cached.
+
+**Signature:**
+
+```go
+func (o *DownloadManager) InstalledLanguages() []string
+```
+
+###### EnsureLanguages()
+
+Ensure the specified languages are available in the cache.
+Downloads the platform bundle if any requested languages are missing.
+
+**Signature:**
+
+```go
+func (o *DownloadManager) EnsureLanguages(names []string) error
+```
+
+###### EnsureGroup()
+
+Ensure all languages in a named group are available.
+
+**Signature:**
+
+```go
+func (o *DownloadManager) EnsureGroup(group string) error
+```
+
+###### LibPath()
+
+Get the expected path for a language's shared library in the cache.
+
+**Signature:**
+
+```go
+func (o *DownloadManager) LibPath(name string) string
+```
+
+###### FetchManifest()
+
+Fetch the parser manifest from GitHub Releases.
+
+**Signature:**
+
+```go
+func (o *DownloadManager) FetchManifest() (ParserManifest, error)
+```
+
+###### CleanCache()
+
+Remove all cached parser libraries.
+
+**Signature:**
+
+```go
+func (o *DownloadManager) CleanCache() error
+```
+
+
+---
+
+#### ExportInfo
+
+An export statement extracted from source code.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Name` | `string` | — | The name |
+| `Kind` | `ExportKind` | `ExportKind.Named` | Kind (export kind) |
+| `Span` | `Span` | — | Span (span) |
+
+
+---
+
+#### ExtractionConfig
+
+Configuration for an extraction run against a single language.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Language` | `string` | — | The language name (e.g., `"python"`). |
+| `Patterns` | `string` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+
+
+---
+
+#### ExtractionPattern
+
+Defines a single extraction pattern and its configuration.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Query` | `string` | — | The tree-sitter query string (S-expression). |
+| `CaptureOutput` | `CaptureOutput` | `CaptureOutput.Full` | What to include in each capture result. |
+| `ChildFields` | `[]string` | `nil` | Field names to extract from child nodes of each capture. Maps a label to a tree-sitter field name used with `child_by_field_name`. |
+| `MaxResults` | `*int` | `nil` | Maximum number of matches to return. `nil` means unlimited. |
+| `ByteRange` | `*string` | `nil` | Restrict matches to a byte range `(start, end)`. |
+
+
+---
+
+#### ExtractionResult
+
+Complete extraction results for all patterns.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Language` | `string` | — | The language that was used. |
+| `Results` | `string` | — | Results keyed by pattern name. |
+
+
+---
+
+#### FileMetrics
+
+Aggregate metrics for a source file.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `TotalLines` | `int` | — | Total lines |
+| `CodeLines` | `int` | — | Code lines |
+| `CommentLines` | `int` | — | Comment lines |
+| `BlankLines` | `int` | — | Blank lines |
+| `TotalBytes` | `int` | — | Total bytes |
+| `NodeCount` | `int` | — | Number of nodes |
+| `ErrorCount` | `int` | — | Number of errors |
+| `MaxDepth` | `int` | — | Maximum depth |
+
+
+---
+
+#### ImportInfo
+
+An import statement extracted from source code.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Source` | `string` | — | Source |
+| `Items` | `[]string` | `nil` | Items |
+| `Alias` | `*string` | `nil` | Alias |
+| `IsWildcard` | `bool` | — | Whether wildcard |
+| `Span` | `Span` | — | Span (span) |
+
+
+---
+
+#### Language
+
+
+---
+
+#### LanguageInfo
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Group` | `string` | — | Group |
+| `Size` | `uint64` | — | Size in bytes |
+
+
+---
+
+#### LanguageRegistry
+
+Thread-safe registry of tree-sitter language parsers.
+
+Manages both statically compiled and dynamically loaded language grammars.
+Use `LanguageRegistry.new()` for the default registry, or access the
+global instance via the module-level convenience functions
+(`crate.get_language`, `crate.available_languages`, etc.).
+
+##### Methods
+
+###### WithLibsDir()
+
+Create a registry with a custom directory for dynamic libraries.
+
+Overrides the default build-time library directory. Useful when
+dynamic grammar shared libraries are stored in a non-standard location.
+
+**Signature:**
+
+```go
+func (o *LanguageRegistry) WithLibsDir(libsDir string) LanguageRegistry
+```
+
+###### AddExtraLibsDir()
+
+Add an additional directory to search for dynamic libraries.
+
+When `get_language` cannot find a grammar in the
+primary library directory, it searches these extra directories in order.
+Typically used by the download system to register its cache directory.
+
+Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
+mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
+immutable while the directory list is updated.
+
+**Signature:**
+
+```go
+func (o *LanguageRegistry) AddExtraLibsDir(dir string)
+```
+
+###### GetLanguage()
+
+Get a tree-sitter `Language` by name.
+
+Resolves aliases (e.g., `"shell"` -> `"bash"`, `"makefile"` -> `"make"`),
+then looks up the language in the static table. When the `dynamic-loading`
+feature is enabled, falls back to loading a shared library on demand.
+
+**Errors:**
+
+Returns `Error.LanguageNotFound` if the name (after alias resolution)
+does not match any known grammar.
+
+**Signature:**
+
+```go
+func (o *LanguageRegistry) GetLanguage(name string) (Language, error)
+```
+
+###### AvailableLanguages()
+
+List all available language names, sorted and deduplicated.
+
+Includes statically compiled languages, dynamically loadable languages
+(if the `dynamic-loading` feature is enabled), and all configured aliases.
+
+**Signature:**
+
+```go
+func (o *LanguageRegistry) AvailableLanguages() []string
+```
+
+###### HasLanguage()
+
+Check whether a language is available by name or alias.
+
+Returns `true` if the language can be loaded, either from the static
+table or from a dynamic library on disk.
+
+**Signature:**
+
+```go
+func (o *LanguageRegistry) HasLanguage(name string) bool
+```
+
+###### LanguageCount()
+
+Return the total number of available languages (including aliases).
+
+**Signature:**
+
+```go
+func (o *LanguageRegistry) LanguageCount() int
+```
+
+###### Process()
+
+Parse source code and extract file intelligence based on config in a single pass.
+
+**Signature:**
+
+```go
+func (o *LanguageRegistry) Process(source string, config ProcessConfig) (ProcessResult, error)
+```
+
+###### Default()
+
+**Signature:**
+
+```go
+func (o *LanguageRegistry) Default() LanguageRegistry
+```
+
+
+---
+
+#### MatchResult
+
+A single query match containing one or more captures.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `PatternIndex` | `int` | — | The pattern index within the query that produced this match. |
+| `Captures` | `[]CaptureResult` | `nil` | The captures for this match. |
+
+
+---
+
+#### NodeInfo
+
+Lightweight snapshot of a tree-sitter node's properties.
+
+Contains only primitive types for easy cross-language serialization.
+This is an owned type that can be passed across FFI boundaries, unlike
+`tree_sitter.Node` which borrows from the tree.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Kind` | `string` | — | The grammar type name (e.g., "function_definition", "identifier"). |
+| `IsNamed` | `bool` | — | Whether this is a named node (vs anonymous like punctuation). |
+| `StartByte` | `int` | — | Start byte offset in source. |
+| `EndByte` | `int` | — | End byte offset in source. |
+| `StartRow` | `int` | — | Start row (zero-indexed). |
+| `StartCol` | `int` | — | Start column (zero-indexed). |
+| `EndRow` | `int` | — | End row (zero-indexed). |
+| `EndCol` | `int` | — | End column (zero-indexed). |
+| `NamedChildCount` | `int` | — | Number of named children. |
+| `IsError` | `bool` | — | Whether this node is an ERROR node. |
+| `IsMissing` | `bool` | — | Whether this node is a MISSING node. |
+
+
+---
+
+#### PackConfig
+
+Configuration for the tree-sitter language pack.
+
+Controls cache directory and which languages to pre-download.
+Can be loaded from a TOML file, constructed programmatically,
+or passed as a dict/object from language bindings.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `CacheDir` | `*string` | `nil` | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
+| `Languages` | `*[]string` | `nil` | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`). |
+| `Groups` | `*[]string` | `nil` | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). |
+
+##### Methods
+
+###### FromTomlFile()
+
+Load configuration from a TOML file.
+
+**Errors:**
+
+Returns an error if the file cannot be read or the TOML is invalid.
+
+**Signature:**
+
+```go
+func (o *PackConfig) FromTomlFile(path string) (PackConfig, error)
+```
+
+###### Discover()
+
+Discover configuration by searching for `language-pack.toml` in:
+
+1. Current directory and up to 10 parent directories
+2. `$XDG_CONFIG_HOME/tree-sitter-language-pack/config.toml`
+3. `~/.config/tree-sitter-language-pack/config.toml`
+
+Returns `nil` if no configuration file is found.
+
+**Signature:**
+
+```go
+func (o *PackConfig) Discover() *PackConfig
+```
+
+
+---
+
+#### Parser
+
+
+---
+
+#### ParserManifest
+
+Manifest describing available parser downloads for a specific version.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Version` | `string` | — | Version string |
+| `Platforms` | `map[string]PlatformBundle` | — | Platforms |
+| `Languages` | `map[string]LanguageInfo` | — | Languages |
+| `Groups` | `map[string][]string` | — | Groups |
+
+
+---
+
+#### PatternResult
+
+Results for a single named pattern.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Matches` | `[]MatchResult` | `nil` | The individual matches. |
+| `TotalCount` | `int` | — | Total number of matches before `max_results` truncation. |
+
+
+---
+
+#### PatternValidation
+
+Validation information for a single pattern.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Valid` | `bool` | — | Whether the pattern compiled successfully. |
+| `CaptureNames` | `[]string` | `nil` | Names of captures defined in the query. |
+| `PatternCount` | `int` | — | Number of patterns in the query. |
+| `Warnings` | `[]string` | `nil` | Non-fatal warnings (e.g., unused captures). |
+| `Errors` | `[]string` | `nil` | Fatal errors (e.g., query syntax errors). |
+
+
+---
+
+#### PlatformBundle
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Url` | `string` | — | Url |
+| `Sha256` | `string` | — | Sha256 |
+| `Size` | `uint64` | — | Size in bytes |
+
+
+---
+
+#### ProcessConfig
+
+Configuration for the `process()` function.
+
+Controls which analysis features are enabled and whether chunking is performed.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Language` | `string` | — | Language name (required). |
+| `Structure` | `bool` | `true` | Extract structural items (functions, classes, etc.). Default: true. |
+| `Imports` | `bool` | `true` | Extract import statements. Default: true. |
+| `Exports` | `bool` | `true` | Extract export statements. Default: true. |
+| `Comments` | `bool` | `false` | Extract comments. Default: false. |
+| `Docstrings` | `bool` | `false` | Extract docstrings. Default: false. |
+| `Symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
+| `Diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
+| `ChunkMaxSize` | `*int` | `nil` | Maximum chunk size in bytes. `nil` disables chunking. |
+| `Extractions` | `*string` | `nil` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+
+##### Methods
+
+###### Default()
+
+**Signature:**
+
+```go
+func (o *ProcessConfig) Default() ProcessConfig
+```
+
+###### WithChunking()
+
+Enable chunking with the given maximum chunk size in bytes.
+
+**Signature:**
+
+```go
+func (o *ProcessConfig) WithChunking(maxSize int) ProcessConfig
+```
+
+###### All()
+
+Enable all analysis features.
+
+**Signature:**
+
+```go
+func (o *ProcessConfig) All() ProcessConfig
+```
+
+###### Minimal()
+
+Disable all analysis features (only metrics computed).
+
+**Signature:**
+
+```go
+func (o *ProcessConfig) Minimal() ProcessConfig
+```
+
+
+---
+
+#### ProcessResult
+
+Complete analysis result from processing a source file.
+
+Contains metrics, structural analysis, imports/exports, comments,
+docstrings, symbols, diagnostics, and optionally chunked code segments.
+Fields are populated based on the `crate.ProcessConfig` flags.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Language` | `string` | — | Language |
+| `Metrics` | `FileMetrics` | — | Metrics (file metrics) |
+| `Structure` | `[]StructureItem` | `nil` | Structure |
+| `Imports` | `[]ImportInfo` | `nil` | Imports |
+| `Exports` | `[]ExportInfo` | `nil` | Exports |
+| `Comments` | `[]CommentInfo` | `nil` | Comments |
+| `Docstrings` | `[]DocstringInfo` | `nil` | Docstrings |
+| `Symbols` | `[]SymbolInfo` | `nil` | Symbols |
+| `Diagnostics` | `[]Diagnostic` | `nil` | Diagnostics |
+| `Chunks` | `[]CodeChunk` | `nil` | Text chunks for chunking/embedding |
+| `Extractions` | `string` | — | Results of custom extraction patterns (when `config.extractions` is set). |
+
+
+---
+
+#### QueryMatch
+
+A single match from a tree-sitter query, with captured nodes.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `PatternIndex` | `int` | — | The pattern index that matched (position in the query string). |
+| `Captures` | `[]string` | `nil` | Captures: list of (capture_name, node_info) pairs. |
+
+
+---
+
+#### Span
+
+Byte and line/column range in source code.
+
+Represents both byte offsets (for slicing) and human-readable line/column
+positions (for display and diagnostics).
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `StartByte` | `int` | — | Start byte |
+| `EndByte` | `int` | — | End byte |
+| `StartLine` | `int` | — | Start line |
+| `StartColumn` | `int` | — | Start column |
+| `EndLine` | `int` | — | End line |
+| `EndColumn` | `int` | — | End column |
+
+
+---
+
+#### StructureItem
+
+A structural item (function, class, struct, etc.) in source code.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Kind` | `StructureKind` | `StructureKind.Function` | Kind (structure kind) |
+| `Name` | `*string` | `nil` | The name |
+| `Visibility` | `*string` | `nil` | Visibility |
+| `Span` | `Span` | — | Span (span) |
+| `Children` | `[]StructureItem` | `nil` | Children |
+| `Decorators` | `[]string` | `nil` | Decorators |
+| `DocComment` | `*string` | `nil` | Doc comment |
+| `Signature` | `*string` | `nil` | Signature |
+| `BodySpan` | `*Span` | `nil` | Body span (span) |
+
+
+---
+
+#### SymbolInfo
+
+A symbol (variable, function, type, etc.) extracted from source code.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Name` | `string` | — | The name |
+| `Kind` | `SymbolKind` | `SymbolKind.Variable` | Kind (symbol kind) |
+| `Span` | `Span` | — | Span (span) |
+| `TypeAnnotation` | `*string` | `nil` | Type annotation |
+| `Doc` | `*string` | `nil` | Doc |
+
+
+---
+
+#### Tree
+
+
+---
+
+#### ValidationResult
+
+Validation results for an entire extraction config.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Valid` | `bool` | — | Whether all patterns are valid. |
+| `Patterns` | `string` | — | Per-pattern validation details. |
+
+
+---
+
+### Enums
+
+#### CaptureOutput
+
+Controls what data is captured for each query match.
+
+| Value | Description |
+|-------|-------------|
+| `Text` | Capture only the matched text. |
+| `Node` | Capture only the `NodeInfo`. |
+| `Full` | Capture both text and `NodeInfo` (default). |
+
+
+---
+
+#### StructureKind
+
+The kind of structural item found in source code.
+
+Categorizes top-level and nested declarations such as functions, classes,
+structs, enums, traits, and more. Use `Other` for
+language-specific constructs that do not fit a standard category.
+
+| Value | Description |
+|-------|-------------|
+| `Function` | Function |
+| `Method` | Method |
+| `Class` | Class |
+| `Struct` | Struct |
+| `Interface` | Interface |
+| `Enum` | Enum |
+| `Module` | Module |
+| `Trait` | Trait |
+| `Impl` | Impl |
+| `Namespace` | Namespace |
+| `Other` | Other — Fields: `0`: `string` |
+
+
+---
+
+#### CommentKind
+
+The kind of a comment found in source code.
+
+Distinguishes between single-line comments, block (multi-line) comments,
+and documentation comments.
+
+| Value | Description |
+|-------|-------------|
+| `Line` | Line |
+| `Block` | Block |
+| `Doc` | Doc |
+
+
+---
+
+#### DocstringFormat
+
+The format of a docstring extracted from source code.
+
+Identifies the docstring convention used, which varies by language
+(e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
+
+| Value | Description |
+|-------|-------------|
+| `PythonTripleQuote` | Python triple quote |
+| `JsDoc` | J s doc |
+| `Rustdoc` | Rustdoc |
+| `GoDoc` | Go doc |
+| `JavaDoc` | Java doc |
+| `Other` | Other — Fields: `0`: `string` |
+
+
+---
+
+#### ExportKind
+
+The kind of an export statement found in source code.
+
+Covers named exports, default exports, and re-exports from other modules.
+
+| Value | Description |
+|-------|-------------|
+| `Named` | Named |
+| `Default` | Default |
+| `ReExport` | Re export |
+
+
+---
+
+#### SymbolKind
+
+The kind of a symbol definition found in source code.
+
+Categorizes symbol definitions such as variables, constants, functions,
+classes, types, interfaces, enums, and modules.
+
+| Value | Description |
+|-------|-------------|
+| `Variable` | Variable |
+| `Constant` | Constant |
+| `Function` | Function |
+| `Class` | Class |
+| `Type` | Type |
+| `Interface` | Interface |
+| `Enum` | Enum |
+| `Module` | Module |
+| `Other` | Other — Fields: `0`: `string` |
+
+
+---
+
+#### DiagnosticSeverity
+
+Severity level of a diagnostic produced during parsing.
+
+Used to classify parse errors, warnings, and informational messages
+found in the syntax tree.
+
+| Value | Description |
+|-------|-------------|
+| `Error` | Error |
+| `Warning` | Warning |
+| `Info` | Info |
+
+
+---
+
+### Errors
+
+#### Error
+
+Errors that can occur when using the tree-sitter language pack.
+
+Covers language lookup failures, parse errors, query errors, and I/O issues.
+Feature-gated variants are included when `config`, `download`, or related
+features are enabled.
+
+| Variant | Description |
+|---------|-------------|
+| `LanguageNotFound` | Language '{0}' not found |
+| `DynamicLoad` | Dynamic library load error: {0} |
+| `NullLanguagePointer` | Language function returned null pointer for '{0}' |
+| `ParserSetup` | Failed to set parser language: {0} |
+| `LockPoisoned` | Registry lock poisoned: {0} |
+| `Config` | Configuration error: {0} |
+| `ParseFailed` | Parse failed: parsing returned no tree |
+| `QueryError` | Query error: {0} |
+| `InvalidRange` | Invalid byte range: {0} |
+| `Io` | IO error: {0} |
+
+
+---

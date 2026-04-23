@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
+use std::sync::Mutex;
 
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -36,7 +37,7 @@ pub struct LanguageInfo {
 pub struct DownloadManager {
     version: String,
     cache_dir: PathBuf,
-    manifest: Option<ParserManifest>,
+    manifest: Mutex<Option<ParserManifest>>,
 }
 
 impl DownloadManager {
@@ -46,7 +47,7 @@ impl DownloadManager {
         Ok(Self {
             version: version.to_string(),
             cache_dir,
-            manifest: None,
+            manifest: Mutex::new(None),
         })
     }
 
@@ -55,7 +56,7 @@ impl DownloadManager {
         Self {
             version: version.to_string(),
             cache_dir,
-            manifest: None,
+            manifest: Mutex::new(None),
         }
     }
 
@@ -109,7 +110,7 @@ impl DownloadManager {
 
     /// Ensure the specified languages are available in the cache.
     /// Downloads the platform bundle if any requested languages are missing.
-    pub fn ensure_languages(&mut self, names: &[&str]) -> Result<(), Error> {
+    pub fn ensure_languages(&self, names: &[&str]) -> Result<(), Error> {
         let missing: Vec<&str> = names.iter().filter(|name| !self.is_cached(name)).copied().collect();
 
         if missing.is_empty() {
@@ -117,11 +118,15 @@ impl DownloadManager {
         }
 
         // Fetch manifest if not already loaded
-        if self.manifest.is_none() {
-            self.manifest = Some(self.fetch_manifest()?);
+        {
+            let mut guard = self.manifest.lock().unwrap();
+            if guard.is_none() {
+                *guard = Some(self.fetch_manifest_inner()?);
+            }
         }
 
-        let manifest = self.manifest.as_ref().expect("manifest loaded above");
+        let guard = self.manifest.lock().unwrap();
+        let manifest = guard.as_ref().expect("manifest loaded above");
 
         // Verify requested languages exist in manifest
         for name in &missing {
@@ -163,12 +168,16 @@ impl DownloadManager {
     }
 
     /// Ensure all languages in a named group are available.
-    pub fn ensure_group(&mut self, group: &str) -> Result<(), Error> {
-        if self.manifest.is_none() {
-            self.manifest = Some(self.fetch_manifest()?);
+    pub fn ensure_group(&self, group: &str) -> Result<(), Error> {
+        {
+            let mut guard = self.manifest.lock().unwrap();
+            if guard.is_none() {
+                *guard = Some(self.fetch_manifest_inner()?);
+            }
         }
 
-        let manifest = self.manifest.as_ref().expect("manifest loaded above");
+        let guard = self.manifest.lock().unwrap();
+        let manifest = guard.as_ref().expect("manifest loaded above");
         let langs = manifest.groups.get(group).ok_or_else(|| {
             Error::Download(format!(
                 "Group '{}' not found. Available: {:?}",
@@ -178,6 +187,7 @@ impl DownloadManager {
         })?;
 
         let lang_names: Vec<String> = langs.clone();
+        drop(guard);
         let names: Vec<&str> = lang_names.iter().map(String::as_str).collect();
         self.ensure_languages(&names)
     }
@@ -201,7 +211,12 @@ impl DownloadManager {
     }
 
     /// Fetch the parser manifest from GitHub Releases.
-    pub fn fetch_manifest(&mut self) -> Result<ParserManifest, Error> {
+    pub fn fetch_manifest(&self) -> Result<ParserManifest, Error> {
+        self.fetch_manifest_inner()
+    }
+
+    /// Internal manifest fetcher (does not require &mut self).
+    fn fetch_manifest_inner(&self) -> Result<ParserManifest, Error> {
         // Check for cached manifest first
         let manifest_path = self.cache_dir.parent().map(|p| p.join("manifest.json"));
         if let Some(ref path) = manifest_path

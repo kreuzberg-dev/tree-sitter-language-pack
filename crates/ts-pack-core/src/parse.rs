@@ -17,7 +17,7 @@ thread_local! {
 /// # Examples
 ///
 /// ```no_run
-/// let tree = tree_sitter_language_pack::parse::parse_string("python", b"def hello(): pass").unwrap();
+/// let tree = tree_sitter_language_pack::parse_string("python", b"def hello(): pass").unwrap();
 /// assert_eq!(tree.root_node().kind(), "module");
 /// ```
 pub fn parse_string(language: &str, source: &[u8]) -> Result<tree_sitter::Tree, Error> {
