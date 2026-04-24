@@ -47,12 +47,6 @@ repos:
       - id: cargo-sort
         args: [-w]
 
-  - repo: https://github.com/ComPWA/taplo-pre-commit
-    rev: v0.9.3
-    hooks:
-      - id: taplo-format
-        exclude: "pyproject.toml|Cargo.toml"
-
   # Rust: formatting and linting
   - repo: https://github.com/AndrejOrsula/pre-commit-cargo
     rev: 0.5.0
