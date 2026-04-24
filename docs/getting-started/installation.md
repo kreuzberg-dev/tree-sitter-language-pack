@@ -261,7 +261,13 @@ IO.puts TreeSitterLanguagePack.language_count() # 306
 
 ### PHP
 
-Requires PHP 8.2+.
+Requires PHP 8.4+. This package is a native PHP extension (`type: php-ext`). Install
+[`mlocati/php-extension-installer`](https://github.com/mlocati/php-extension-installer) first
+so Composer can download and register the compiled `.so`/`.dll`:
+
+```bash
+composer require mlocati/php-extension-installer
+```
 
 === "Composer"
 
@@ -274,6 +280,7 @@ Requires PHP 8.2+.
     ```json
     {
         "require": {
+            "mlocati/php-extension-installer": "^2.0",
             "kreuzberg/tree-sitter-language-pack": "^1.0"
         }
     }

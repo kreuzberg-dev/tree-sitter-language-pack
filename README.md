@@ -177,7 +177,7 @@ See [WebAssembly README](crates/ts-pack-wasm/README.md) for full documentation.
 composer require kreuzberg/tree-sitter-language-pack
 ```
 
-See [PHP README](crates/ts-pack-php/README.md) for full documentation.
+See [PHP README](packages/php/README.md) for full documentation.
 
 ### .NET (C#)
 
@@ -244,7 +244,7 @@ This pack includes 305+ languages. See the [full language list](docs/supported-l
 - [Elixir](crates/ts-pack-elixir/README.md) -- Elixir bindings for tree-sitter-language-pack with on-demand parser downloads.
 - [Ruby](crates/ts-pack-ruby/README.md) -- Ruby bindings for tree-sitter-language-pack with on-demand parser downloads.
 - [WebAssembly](crates/ts-pack-wasm/README.md) -- WebAssembly bindings for tree-sitter-language-pack. Includes a curated subset of 30 languages optimized for browser and edge runtimes. For all 305 languages, use native bindings (Python, Node.js, etc.).
-- [PHP](crates/ts-pack-php/README.md) -- PHP extension via ext-php-rs with on-demand parser downloads.
+- [PHP](packages/php/README.md) -- PHP extension via ext-php-rs with on-demand parser downloads.
 - [.NET (C#)](packages/csharp/TreeSitterLanguagePack/README.md) -- .NET P/Invoke bindings with on-demand parser downloads.
 - [C/C++ (FFI)](crates/ts-pack-ffi/README.md) -- C-compatible FFI bindings for tree-sitter-language-pack. Use from any language with C interop.
 - [CLI](crates/ts-pack-cli/README.md) -- Command-line tool for managing tree-sitter language parsers with download utilities.
