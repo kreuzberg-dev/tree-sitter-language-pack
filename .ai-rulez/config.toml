@@ -7,7 +7,7 @@ description = 'Comprehensive tree-sitter grammar compilation and polyglot parser
 gitignore = true
 default = 'full'
 presets = ['claude', 'copilot', 'cursor', 'antigravity', 'codex']
-builtins = ['rust', 'python', 'typescript', 'go', 'php', 'csharp', 'security', 'git-workflow', 'code-quality', 'testing', 'token-efficiency', 'default-commands']
+builtins = ['rust', 'python', 'typescript', 'go', 'php', 'csharp', 'default-commands']
 
 [header]
 style = 'minimal'
