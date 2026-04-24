@@ -284,6 +284,20 @@ e2e = "cd e2e/rust && cargo test"
 e2e = "cd e2e/c && make clean && make && DYLD_LIBRARY_PATH=../../target/release ./test_runner"
 
 # E2E test generation configuration
+[publish]
+core_crate = "crates/ts-pack-core"
+
+[publish.languages.ruby]
+vendor_mode = "core-only"
+
+[publish.languages.elixir]
+vendor_mode = "core-only"
+nif_versions = ["2.16", "2.17"]
+
+[publish.languages.ffi]
+pkg_config = true
+cmake_config = true
+
 [e2e]
 fixtures = "fixtures"
 output = "e2e"

@@ -142,6 +142,27 @@ tasks:
     cmds:
       - uv run --no-sync scripts/check_grammar_updates.py
 
+  # Publish tasks (via alef)
+  publish:validate:
+    desc: "Validate publish manifests are consistent"
+    cmds:
+      - alef publish validate
+
+  publish:prepare:
+    desc: "Prepare packages for publishing (vendor deps, stage FFI)"
+    cmds:
+      - alef publish prepare
+
+  publish:build:
+    desc: "Build release artifacts for all languages"
+    cmds:
+      - alef publish build
+
+  publish:package:
+    desc: "Package built artifacts into distributable archives"
+    cmds:
+      - alef publish package -o dist/
+
   # E2E test generation
   # E2E test generation (via alef)
   e2e:generate:all:

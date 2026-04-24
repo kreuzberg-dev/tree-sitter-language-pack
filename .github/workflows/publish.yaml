@@ -838,12 +838,16 @@ jobs:
         include:
           - os: ubuntu-latest
             label: linux-x86_64
+            target: x86_64-unknown-linux-gnu
           - os: ubuntu-24.04-arm
             label: linux-aarch64
+            target: aarch64-unknown-linux-gnu
           - os: macos-latest
             label: macos-arm64
+            target: aarch64-apple-darwin
           - os: windows-latest
             label: windows-x86_64
+            target: x86_64-pc-windows-msvc
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -863,36 +867,22 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Build FFI library
-        run: cargo build -p ts-pack-core-ffi --release
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1
 
-      - name: Stage artifacts (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
-          cp target/release/libts_pack_core_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/libts_pack_core_ffi.so staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/libts_pack_core_ffi.dylib staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp crates/ts-pack-core-ffi/include/ts_pack.h staging/ts-pack-ffi/include/
-          cd staging && tar -czf "../go-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
-
-      - name: Stage artifacts (Windows)
-        if: runner.os == 'Windows'
+      - name: Build and package Go FFI library
         shell: bash
         run: |
-          mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
-          cp target/release/ts_pack_core_ffi.lib staging/ts-pack-ffi/lib/ 2>/dev/null || cp target/release/libts_pack_core_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/ts_pack_core_ffi.dll staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp crates/ts-pack-core-ffi/include/ts_pack.h staging/ts-pack-ffi/include/
-          cd staging && tar -czf "../go-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
+          alef publish build --lang ffi --target ${{ matrix.target }}
+          alef publish package --lang go --target ${{ matrix.target }} -o dist/go-ffi
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Upload FFI artifact
         uses: actions/upload-artifact@v7
         with:
           name: go-ffi-${{ matrix.label }}
-          path: go-ffi-${{ matrix.label }}.tar.gz
+          path: dist/go-ffi/
           retention-days: 14
 
   # ─── Build Java native libraries ───────────────────────────────────
@@ -908,16 +898,20 @@ jobs:
         include:
           - os: ubuntu-latest
             label: linux-x86_64
-            rid: linux-x86_64
+            target: x86_64-unknown-linux-gnu
+            platform: linux-x86_64
           - os: ubuntu-24.04-arm
             label: linux-aarch64
-            rid: linux-arm64
+            target: aarch64-unknown-linux-gnu
+            platform: linux-arm64
           - os: macos-latest
             label: macos-arm64
-            rid: macos-arm64
+            target: aarch64-apple-darwin
+            platform: macos-arm64
           - os: windows-latest
             label: windows-x86_64
-            rid: windows-x86_64
+            target: x86_64-pc-windows-msvc
+            platform: windows-x86_64
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -937,30 +931,23 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Build FFI library for JNI
-        run: cargo build -p ts-pack-core-ffi --release
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1
 
-      - name: Collect native artifacts (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          mkdir -p java-natives/${{ matrix.rid }}
-          cp target/release/libts_pack_core_ffi.so java-natives/${{ matrix.rid }}/ 2>/dev/null || true
-          cp target/release/libts_pack_core_ffi.dylib java-natives/${{ matrix.rid }}/ 2>/dev/null || true
-
-      - name: Collect native artifacts (Windows)
-        if: runner.os == 'Windows'
+      - name: Build and stage FFI library
         shell: bash
         run: |
-          mkdir -p java-natives/${{ matrix.rid }}
-          cp target/release/ts_pack_core_ffi.dll java-natives/${{ matrix.rid }}/ 2>/dev/null || true
+          alef publish build --lang ffi --target ${{ matrix.target }}
+          mkdir -p dist/java-ffi/${{ matrix.platform }}/native
+          find target/release -maxdepth 1 -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) -name '*ts_pack_core_ffi*' -exec cp {} dist/java-ffi/${{ matrix.platform }}/native/ \;
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Upload native artifact
         uses: actions/upload-artifact@v7
         with:
           name: java-natives-${{ matrix.label }}
-          path: java-natives/${{ matrix.rid }}
+          path: dist/java-ffi
           retention-days: 14
 
   # ─── Build Java package ────────────────────────────────────────────
@@ -1177,12 +1164,16 @@ jobs:
         include:
           - os: ubuntu-latest
             label: linux-x86_64
+            target: x86_64-unknown-linux-gnu
           - os: ubuntu-24.04-arm
             label: linux-aarch64
+            target: aarch64-unknown-linux-gnu
           - os: macos-latest
             label: macos-arm64
+            target: aarch64-apple-darwin
           - os: windows-latest
             label: windows-x86_64
+            target: x86_64-pc-windows-msvc
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -1202,46 +1193,22 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Build FFI library
-        run: cargo build -p ts-pack-core-ffi --release
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1
+
+      - name: Build and package C FFI distribution
+        shell: bash
+        run: |
+          alef publish build --lang ffi --target ${{ matrix.target }}
+          alef publish package --lang ffi --target ${{ matrix.target }} -o dist/c-ffi
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-
-      - name: Generate C headers
-        shell: bash
-        run: |
-          if command -v cbindgen >/dev/null 2>&1; then
-            cbindgen --crate ts-pack-core-ffi --output target/ts_pack.h 2>/dev/null || true
-          fi
-
-      - name: Stage C FFI artifacts (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
-          cp target/release/libts_pack_core_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/libts_pack_core_ffi.so staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/libts_pack_core_ffi.dylib staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp crates/ts-pack-core-ffi/include/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
-          cp target/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
-          cd staging && tar -czf "../c-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
-
-      - name: Stage C FFI artifacts (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          mkdir -p staging/ts-pack-ffi/lib staging/ts-pack-ffi/include
-          cp target/release/ts_pack_core_ffi.lib staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/ts_pack_core_ffi.dll staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp target/release/libts_pack_core_ffi.a staging/ts-pack-ffi/lib/ 2>/dev/null || true
-          cp crates/ts-pack-core-ffi/include/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
-          cp target/ts_pack.h staging/ts-pack-ffi/include/ 2>/dev/null || true
-          cd staging && tar -czf "../c-ffi-${{ matrix.label }}.tar.gz" ts-pack-ffi/
 
       - name: Upload C FFI artifact
         uses: actions/upload-artifact@v7
         with:
           name: c-ffi-${{ matrix.label }}
-          path: c-ffi-${{ matrix.label }}.tar.gz
+          path: dist/c-ffi/
           retention-days: 14
 
   # ─── Build PHP PIE package ──────────────────────────────────────────
@@ -1257,13 +1224,13 @@ jobs:
         include:
           - os: ubuntu-latest
             label: linux-x86_64
-            platform: linux-x86_64
+            target: x86_64-unknown-linux-gnu
           - os: ubuntu-24.04-arm
             label: linux-aarch64
-            platform: linux-aarch64
+            target: aarch64-unknown-linux-gnu
           - os: macos-latest
             label: macos-arm64
-            platform: macos-arm64
+            target: aarch64-apple-darwin
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -1295,16 +1262,16 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Build PHP extension
-        run: cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1
+
+      - name: Build and package PHP extension
+        shell: bash
+        run: |
+          alef publish build --lang php --target ${{ matrix.target }}
+          alef publish package --lang php --target ${{ matrix.target }} -o dist/php
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-
-      - name: Build PIE package
-        shell: bash
-        env:
-          VERSION: ${{ needs.prepare.outputs.version }}
-        run: scripts/publish/php/build-pie-package.sh "${{ matrix.platform }}" "dist/php"
 
       - name: Upload PHP PIE package artifact
         uses: actions/upload-artifact@v7
@@ -1326,15 +1293,19 @@ jobs:
         include:
           - os: ubuntu-latest
             label: linux-x86_64
+            target: x86_64-unknown-linux-gnu
             rid: linux-x64
           - os: ubuntu-24.04-arm
             label: linux-aarch64
+            target: aarch64-unknown-linux-gnu
             rid: linux-arm64
           - os: macos-latest
             label: macos-arm64
+            target: aarch64-apple-darwin
             rid: osx-arm64
           - os: windows-latest
             label: windows-x86_64
+            target: x86_64-pc-windows-msvc
             rid: win-x64
     steps:
       - name: Checkout
@@ -1355,30 +1326,23 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Build FFI library
-        run: cargo build -p ts-pack-core-ffi --release
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1
 
-      - name: Collect native artifacts (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          mkdir -p csharp-natives/${{ matrix.rid }}
-          cp target/release/libts_pack_core_ffi.so csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
-          cp target/release/libts_pack_core_ffi.dylib csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
-
-      - name: Collect native artifacts (Windows)
-        if: runner.os == 'Windows'
+      - name: Build and stage FFI library
         shell: bash
         run: |
-          mkdir -p csharp-natives/${{ matrix.rid }}
-          cp target/release/ts_pack_core_ffi.dll csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
+          alef publish build --lang ffi --target ${{ matrix.target }}
+          mkdir -p dist/csharp-ffi/${{ matrix.rid }}/native
+          find target/release -maxdepth 1 -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) -name '*ts_pack_core_ffi*' -exec cp {} dist/csharp-ffi/${{ matrix.rid }}/native/ \;
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Upload native artifact
         uses: actions/upload-artifact@v7
         with:
           name: csharp-natives-${{ matrix.label }}
-          path: csharp-natives/${{ matrix.rid }}
+          path: dist/csharp-ffi
           retention-days: 14
 
   # ─── Build C# NuGet package ─────────────────────────────────────────
