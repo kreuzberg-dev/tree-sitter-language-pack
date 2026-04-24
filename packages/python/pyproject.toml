@@ -20,6 +20,9 @@ classifiers = [
 ]
 urls.repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
 
+[dependency-groups]
+dev = [ "mypy>=1.19", "pytest>=9.0.2", "ruff>=0.14.8" ]
+
 [tool.maturin]
 module-name = "tree_sitter_language_pack._native"
 manifest-path = "../../crates/ts-pack-core-py/Cargo.toml"

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- Allow star imports in test files -->
+    <suppress checks="AvoidStarImport" files=".*Test\.java"/>
+
+    <!-- Suppress package-info requirement for test packages -->
+    <suppress checks="JavadocPackage" files=".*[\\/]test[\\/].*"/>
+
+    <!-- Allow magic numbers in test files -->
+    <suppress checks="MagicNumber" files=".*Test\.java"/>
+</suppressions>

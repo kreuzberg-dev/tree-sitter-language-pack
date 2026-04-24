@@ -46,19 +46,10 @@ tasks:
       - echo "Installing pre-commit hooks..."
       - prek install
       - prek install --hook-type commit-msg
-      - echo "Installing language tools..."
-      - task: rust:install
-      - task: python:install
-      - task: ruby:deps
-      - task: node:deps
-      - task: go:build:ffi
-      - task: java:deps
-      - task: elixir:deps
-      - task: wasm:deps
-      - task: php:build
-      - task: csharp:build
       - echo "Cloning parser sources..."
       - task: clone
+      - echo "Setting up language tools..."
+      - alef setup
       - echo "Generating AI rules..."
       - task: ai-rulez
       - echo "Setup complete - safe to re-run anytime"
@@ -115,44 +106,21 @@ tasks:
     desc: Format all code
     cmds:
       - task: rust:format
-      - task: python:format
-      - task: ruby:format
-      - task: go:format
-      - task: java:format
-      - task: elixir:format
+      - alef fmt
 
   clean:
     desc: Clean all build artifacts
     cmds:
       - task: rust:clean
-      - task: python:clean
-      - task: ruby:clean
-      - task: wasm:clean
-      - task: elixir:clean
+      - alef clean
 
   update:
     desc: Update all dependencies to latest versions
     cmds:
       - echo "Updating Rust dependencies..."
       - task: rust:update
-      - echo "Updating Python dependencies..."
-      - task: python:update
-      - echo "Updating Ruby dependencies..."
-      - task: ruby:update
-      - echo "Updating TypeScript dependencies..."
-      - task: node:update
-      - echo "Updating Go dependencies..."
-      - task: go:update
-      - echo "Updating Java dependencies..."
-      - task: java:update
-      - echo "Updating Elixir dependencies..."
-      - task: elixir:update
-      - echo "Updating WASM tools..."
-      - task: wasm:update
-      - echo "Updating PHP dependencies..."
-      - task: php:update
-      - echo "Updating C# dependencies..."
-      - task: csharp:update
+      - echo "Updating binding language dependencies..."
+      - alef update
       - echo "Updating language grammar revisions..."
       - uv run --no-sync scripts/pin_vendors.py
       - echo "Updating prek dependencies..."

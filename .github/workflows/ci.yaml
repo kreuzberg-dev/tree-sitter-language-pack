@@ -22,7 +22,6 @@ on:
       - "Taskfile.yml"
       - ".task/**"
       - "pyproject.toml"
-      - "biome.json"
       - ".clang-format"
       - "alef.toml"
   pull_request:
@@ -46,7 +45,6 @@ on:
       - "Taskfile.yml"
       - ".task/**"
       - "pyproject.toml"
-      - "biome.json"
       - ".clang-format"
       - "alef.toml"
   workflow_run:
@@ -155,14 +153,9 @@ jobs:
       - name: Install Python dependencies
         run: uv sync --no-install-project
 
-      # --- Node.js (for biome) ---
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-
-      - name: Install biome
-        run: npm install -g @biomejs/biome
+      # --- Alef ---
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1
 
       # --- Ruby ---
       - name: Setup Ruby
@@ -202,6 +195,10 @@ jobs:
       - name: Install Elixir dependencies
         run: cd packages/elixir && mix deps.get
 
+      # --- Alef binding deps ---
+      - name: Install binding dependencies
+        run: alef setup
+
       # --- C/C++ ---
       - name: Install C/C++ tools
         run: |
@@ -218,7 +215,7 @@ jobs:
         with:
           extra-args: --all-files
         env:
-          SKIP: alef-verify,alef-sync-versions
+          SKIP: alef-verify
 
   # ---------------------------------------------------------------------------
   # 2. validate-rust — Rust lint + alef checks
@@ -256,12 +253,7 @@ jobs:
           TSLP_LINK_MODE: static
 
       - name: Install alef
-        run: cargo install --git https://github.com/kreuzberg-dev/alef --tag v0.6.0 --locked --bin alef
-        env:
-          CARGO_INSTALL_ROOT: ${{ runner.temp }}/alef
-
-      - name: Add alef to PATH
-        run: echo "${{ runner.temp }}/alef/bin" >> "$GITHUB_PATH"
+        uses: kreuzberg-dev/actions/install-alef@v1
 
       - name: Verify binding API parity
         run: alef verify
