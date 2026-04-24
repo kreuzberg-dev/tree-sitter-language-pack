@@ -153,6 +153,17 @@ jobs:
       - name: Install Python dependencies
         run: uv sync --no-install-project
 
+      # --- Node.js / pnpm ---
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10"
+
       # --- Alef ---
       - name: Install alef
         uses: kreuzberg-dev/actions/install-alef@v1
