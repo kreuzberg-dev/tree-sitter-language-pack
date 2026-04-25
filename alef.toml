@@ -311,6 +311,11 @@ e2e = "cd e2e/rust && cargo test"
 precondition = "command -v make >/dev/null 2>&1"
 e2e = "cd e2e/c && make clean && make && DYLD_LIBRARY_PATH=../../target/release ./test_runner"
 
+# Override node setup: the Node.js package lives in packages/typescript, not packages/node
+[setup.node]
+precondition = "command -v pnpm >/dev/null 2>&1"
+install = "cd packages/typescript && pnpm install"
+
 # E2E test generation configuration
 [publish]
 core_crate = "crates/ts-pack-core"
