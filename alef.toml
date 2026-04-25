@@ -235,8 +235,26 @@ check = "npx oxlint packages/wasm"
 format = "cd packages/php && PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config php-cs-fixer.php src"
 check = "cd packages/php && PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config php-cs-fixer.php --dry-run src"
 
+[lint.ruby]
+before = "cd packages/ruby && bundle install"
+format = "cd packages/ruby && bundle exec rubocop -a ."
+check = "cd packages/ruby && bundle exec rubocop ."
+
 [lint.go]
 before = "cargo build --release -p ts-pack-core-ffi"
+
+[lint.elixir]
+before = "cd packages/elixir && mix deps.get"
+format = "cd packages/elixir && mix format"
+check = "cd packages/elixir && mix credo"
+
+[lint.java]
+format = "mvn -f packages/java/pom.xml spotless:apply -q"
+check = "mvn -f packages/java/pom.xml spotless:check -q"
+
+[lint.csharp]
+format = "dotnet format packages/csharp"
+check = "dotnet format packages/csharp --verify-no-changes"
 
 [lint.ffi]
 precondition = "test -d crates/ts-pack-core-ffi/src"
