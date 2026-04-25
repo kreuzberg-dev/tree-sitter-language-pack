@@ -11,7 +11,7 @@ npm install @kreuzberg/tree-sitter-language-pack
 ## Quick Start
 
 ```typescript
-import { /* ... */ } from '@kreuzberg/tree-sitter-language-pack';
+import {} from /* ... */ "@kreuzberg/tree-sitter-language-pack";
 
 // TODO: add usage example
 ```

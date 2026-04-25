@@ -128,7 +128,7 @@ repos:
 
   # Alef: polyglot binding generation and version sync
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.7.2
+    rev: v0.7.3
     hooks:
       - id: alef-fmt
       - id: alef-lint
