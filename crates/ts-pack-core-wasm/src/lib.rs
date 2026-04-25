@@ -3280,6 +3280,7 @@ pub fn configure(config: JsValue) -> Result<(), JsValue> {
 #[allow(clippy::missing_errors_doc)]
 #[wasm_bindgen]
 pub fn download(names: Vec<String>) -> Result<usize, JsValue> {
+    let names_refs: Vec<&str> = names.iter().map(String::as_str).collect();
     let result = tree_sitter_language_pack::download(&names_refs).map_err(|e| JsValue::from_str(&e.to_string()))?;
     Ok(result)
 }
@@ -4252,8 +4253,5 @@ fn error_error_code(e: &tree_sitter_language_pack::error::Error) -> &'static str
 fn error_to_js_value(e: tree_sitter_language_pack::error::Error) -> wasm_bindgen::JsValue {
     let code = error_error_code(&e);
     let message = e.to_string();
-    let obj = js_sys::Object::new();
-    js_sys::Reflect::set(&obj, &"code".into(), &code.into()).ok();
-    js_sys::Reflect::set(&obj, &"message".into(), &message.into()).ok();
-    obj.into()
+    JsValue::from_str(&format!("{code}: {message}"))
 }

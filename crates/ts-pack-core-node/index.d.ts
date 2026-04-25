@@ -399,57 +399,57 @@ export declare function init(config: JsPackConfig): void;
 
 /** Controls what data is captured for each query match. */
 export declare enum JsCaptureOutput {
-	/** Capture only the matched text. */
-	Text = "Text",
-	/** Capture only the `NodeInfo`. */
-	Node = "Node",
-	/** Capture both text and `NodeInfo` (default). */
-	Full = "Full",
+  /** Capture only the matched text. */
+  Text = "Text",
+  /** Capture only the `NodeInfo`. */
+  Node = "Node",
+  /** Capture both text and `NodeInfo` (default). */
+  Full = "Full",
 }
 
 /** A single captured node within a match. */
 export interface JsCaptureResult {
-	/** The capture name from the query (e.g., `"fn_name"`). */
-	name: string;
-	/** The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. */
-	node: JsNodeInfo;
-	/** The matched source text, present when `CaptureOutput` is `Text` or `Full`. */
-	text: string;
-	/** Values of requested child fields, keyed by field name. */
-	childFields: string;
-	/** Byte offset where this capture starts in the source. */
-	startByte: number;
+  /** The capture name from the query (e.g., `"fn_name"`). */
+  name: string
+  /** The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. */
+  node: JsNodeInfo
+  /** The matched source text, present when `CaptureOutput` is `Text` or `Full`. */
+  text: string
+  /** Values of requested child fields, keyed by field name. */
+  childFields: string
+  /** Byte offset where this capture starts in the source. */
+  startByte: number
 }
 
 /** Metadata for a single chunk of source code. */
 export interface JsChunkContext {
-	language: string;
-	chunkIndex: number;
-	totalChunks: number;
-	nodeTypes: Array<string>;
-	contextPath: Array<string>;
-	symbolsDefined: Array<string>;
-	comments: Array<JsCommentInfo>;
-	docstrings: Array<JsDocstringInfo>;
-	hasErrorNodes: boolean;
+  language: string
+  chunkIndex: number
+  totalChunks: number
+  nodeTypes: Array<string>
+  contextPath: Array<string>
+  symbolsDefined: Array<string>
+  comments: Array<JsCommentInfo>
+  docstrings: Array<JsDocstringInfo>
+  hasErrorNodes: boolean
 }
 
 /** A chunk of source code with rich metadata. */
 export interface JsCodeChunk {
-	content: string;
-	startByte: number;
-	endByte: number;
-	startLine: number;
-	endLine: number;
-	metadata: JsChunkContext;
+  content: string
+  startByte: number
+  endByte: number
+  startLine: number
+  endLine: number
+  metadata: JsChunkContext
 }
 
 /** A comment extracted from source code. */
 export interface JsCommentInfo {
-	text: string;
-	kind: JsCommentKind;
-	span: JsSpan;
-	associatedNode: string;
+  text: string
+  kind: JsCommentKind
+  span: JsSpan
+  associatedNode: string
 }
 
 /**
@@ -459,16 +459,16 @@ export interface JsCommentInfo {
  * and documentation comments.
  */
 export declare enum JsCommentKind {
-	Line = "Line",
-	Block = "Block",
-	Doc = "Doc",
+  Line = "Line",
+  Block = "Block",
+  Doc = "Doc",
 }
 
 /** A diagnostic (syntax error, missing node, etc.) from parsing. */
 export interface JsDiagnostic {
-	message: string;
-	severity: JsDiagnosticSeverity;
-	span: JsSpan;
+  message: string
+  severity: JsDiagnosticSeverity
+  span: JsSpan
 }
 
 /**
@@ -478,16 +478,16 @@ export interface JsDiagnostic {
  * found in the syntax tree.
  */
 export declare enum JsDiagnosticSeverity {
-	Error = "Error",
-	Warning = "Warning",
-	Info = "Info",
+  Error = "Error",
+  Warning = "Warning",
+  Info = "Info",
 }
 
 /** A section within a docstring (e.g., Args, Returns, Raises). */
 export interface JsDocSection {
-	kind: string;
-	name: string;
-	description: string;
+  kind: string
+  name: string
+  description: string
 }
 
 /**
@@ -497,55 +497,55 @@ export interface JsDocSection {
  * (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
  */
 export declare enum JsDocstringFormat {
-	PythonTripleQuote = "PythonTripleQuote",
-	JSDoc = "JSDoc",
-	Rustdoc = "Rustdoc",
-	GoDoc = "GoDoc",
-	JavaDoc = "JavaDoc",
-	Other = "Other",
+  PythonTripleQuote = "PythonTripleQuote",
+  JSDoc = "JSDoc",
+  Rustdoc = "Rustdoc",
+  GoDoc = "GoDoc",
+  JavaDoc = "JavaDoc",
+  Other = "Other",
 }
 
 /** A docstring extracted from source code. */
 export interface JsDocstringInfo {
-	text: string;
-	format: JsDocstringFormat;
-	span: JsSpan;
-	associatedItem: string;
-	parsedSections: Array<JsDocSection>;
+  text: string
+  format: JsDocstringFormat
+  span: JsSpan
+  associatedItem: string
+  parsedSections: Array<JsDocSection>
 }
 
 /** Manages downloading and caching of pre-built parser shared libraries. */
 export declare class JsDownloadManager {
-	/** Create a new download manager for the given version. */
-	static new(version: string): JsDownloadManager;
-	/** Create a download manager with a custom cache directory. */
-	static withCacheDir(version: string, cacheDir: string): JsDownloadManager;
-	/** Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/` */
-	static defaultCacheDir(version: string): string;
-	/** Return the path to the libs cache directory. */
-	cacheDir(): string;
-	/** List languages that are already downloaded and cached. */
-	installedLanguages(): Array<string>;
-	/**
-	 * Ensure the specified languages are available in the cache.
-	 * Downloads the platform bundle if any requested languages are missing.
-	 */
-	ensureLanguages(names: Array<string>): void;
-	/** Ensure all languages in a named group are available. */
-	ensureGroup(group: string): void;
-	/** Get the expected path for a language's shared library in the cache. */
-	libPath(name: string): string;
-	/** Fetch the parser manifest from GitHub Releases. */
-	fetchManifest(): JsParserManifest;
-	/** Remove all cached parser libraries. */
-	cleanCache(): void;
+  /** Create a new download manager for the given version. */
+  static new(version: string): JsDownloadManager
+  /** Create a download manager with a custom cache directory. */
+  static withCacheDir(version: string, cacheDir: string): JsDownloadManager
+  /** Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/` */
+  static defaultCacheDir(version: string): string
+  /** Return the path to the libs cache directory. */
+  cacheDir(): string
+  /** List languages that are already downloaded and cached. */
+  installedLanguages(): Array<string>
+  /**
+   * Ensure the specified languages are available in the cache.
+   * Downloads the platform bundle if any requested languages are missing.
+   */
+  ensureLanguages(names: Array<string>): void
+  /** Ensure all languages in a named group are available. */
+  ensureGroup(group: string): void
+  /** Get the expected path for a language's shared library in the cache. */
+  libPath(name: string): string
+  /** Fetch the parser manifest from GitHub Releases. */
+  fetchManifest(): JsParserManifest
+  /** Remove all cached parser libraries. */
+  cleanCache(): void
 }
 
 /** An export statement extracted from source code. */
 export interface JsExportInfo {
-	name: string;
-	kind: JsExportKind;
-	span: JsSpan;
+  name: string
+  kind: JsExportKind
+  span: JsSpan
 }
 
 /**
@@ -554,70 +554,71 @@ export interface JsExportInfo {
  * Covers named exports, default exports, and re-exports from other modules.
  */
 export declare enum JsExportKind {
-	Named = "Named",
-	Default = "Default",
-	ReExport = "ReExport",
+  Named = "Named",
+  Default = "Default",
+  ReExport = "ReExport",
 }
 
 /** Configuration for an extraction run against a single language. */
 export interface JsExtractionConfig {
-	/** The language name (e.g., `"python"`). */
-	language: string;
-	/** Named patterns to run. Keys become the keys in `ExtractionResult::results`. */
-	patterns: string;
+  /** The language name (e.g., `"python"`). */
+  language: string
+  /** Named patterns to run. Keys become the keys in `ExtractionResult::results`. */
+  patterns: string
 }
 
 /** Defines a single extraction pattern and its configuration. */
 export interface JsExtractionPattern {
-	/** The tree-sitter query string (S-expression). */
-	query: string;
-	/** What to include in each capture result. */
-	captureOutput: JsCaptureOutput;
-	/**
-	 * Field names to extract from child nodes of each capture.
-	 * Maps a label to a tree-sitter field name used with `child_by_field_name`.
-	 */
-	childFields: Array<string>;
-	/** Maximum number of matches to return. `None` means unlimited. */
-	maxResults: number;
-	/** Restrict matches to a byte range `(start, end)`. */
-	byteRange: Array<number>;
+  /** The tree-sitter query string (S-expression). */
+  query: string
+  /** What to include in each capture result. */
+  captureOutput: JsCaptureOutput
+  /**
+   * Field names to extract from child nodes of each capture.
+   * Maps a label to a tree-sitter field name used with `child_by_field_name`.
+   */
+  childFields: Array<string>
+  /** Maximum number of matches to return. `None` means unlimited. */
+  maxResults: number
+  /** Restrict matches to a byte range `(start, end)`. */
+  byteRange: Array<number>
 }
 
 /** Complete extraction results for all patterns. */
 export interface JsExtractionResult {
-	/** The language that was used. */
-	language: string;
-	/** Results keyed by pattern name. */
-	results: string;
+  /** The language that was used. */
+  language: string
+  /** Results keyed by pattern name. */
+  results: string
 }
 
 /** Aggregate metrics for a source file. */
 export interface JsFileMetrics {
-	totalLines: number;
-	codeLines: number;
-	commentLines: number;
-	blankLines: number;
-	totalBytes: number;
-	nodeCount: number;
-	errorCount: number;
-	maxDepth: number;
+  totalLines: number
+  codeLines: number
+  commentLines: number
+  blankLines: number
+  totalBytes: number
+  nodeCount: number
+  errorCount: number
+  maxDepth: number
 }
 
 /** An import statement extracted from source code. */
 export interface JsImportInfo {
-	source: string;
-	items: Array<string>;
-	alias: string;
-	isWildcard: boolean;
-	span: JsSpan;
+  source: string
+  items: Array<string>
+  alias: string
+  isWildcard: boolean
+  span: JsSpan
 }
 
-export declare class JsLanguage {}
+export declare class JsLanguage {
+}
 
 export interface JsLanguageInfo {
-	group: string;
-	size: number;
+  group: string
+  size: number
 }
 
 /**
@@ -643,65 +644,65 @@ export interface JsLanguageInfo {
  * ```
  */
 export declare class JsLanguageRegistry {
-	/**
-	 * Create a registry with a custom directory for dynamic libraries.
-	 *
-	 * Overrides the default build-time library directory. Useful when
-	 * dynamic grammar shared libraries are stored in a non-standard location.
-	 */
-	static withLibsDir(libsDir: string): JsLanguageRegistry;
-	/**
-	 * Add an additional directory to search for dynamic libraries.
-	 *
-	 * When [`get_language`](Self::get_language) cannot find a grammar in the
-	 * primary library directory, it searches these extra directories in order.
-	 * Typically used by the download system to register its cache directory.
-	 *
-	 * Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
-	 * mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
-	 * immutable while the directory list is updated.
-	 */
-	addExtraLibsDir(dir: string): void;
-	/**
-	 * Get a tree-sitter [`Language`] by name.
-	 *
-	 * Resolves aliases (e.g., `"shell"` -> `"bash"`, `"makefile"` -> `"make"`),
-	 * then looks up the language in the static table. When the `dynamic-loading`
-	 * feature is enabled, falls back to loading a shared library on demand.
-	 *
-	 * # Errors
-	 *
-	 * Returns [`Error::LanguageNotFound`] if the name (after alias resolution)
-	 * does not match any known grammar.
-	 */
-	getLanguage(name: string): JsLanguage;
-	/**
-	 * List all available language names, sorted and deduplicated.
-	 *
-	 * Includes statically compiled languages, dynamically loadable languages
-	 * (if the `dynamic-loading` feature is enabled), and all configured aliases.
-	 */
-	availableLanguages(): Array<string>;
-	/**
-	 * Check whether a language is available by name or alias.
-	 *
-	 * Returns `true` if the language can be loaded, either from the static
-	 * table or from a dynamic library on disk.
-	 */
-	hasLanguage(name: string): boolean;
-	/** Return the total number of available languages (including aliases). */
-	languageCount(): number;
-	/** Parse source code and extract file intelligence based on config in a single pass. */
-	process(source: string, config: JsProcessConfig): JsProcessResult;
-	static default(): JsLanguageRegistry;
+  /**
+   * Create a registry with a custom directory for dynamic libraries.
+   *
+   * Overrides the default build-time library directory. Useful when
+   * dynamic grammar shared libraries are stored in a non-standard location.
+   */
+  static withLibsDir(libsDir: string): JsLanguageRegistry
+  /**
+   * Add an additional directory to search for dynamic libraries.
+   *
+   * When [`get_language`](Self::get_language) cannot find a grammar in the
+   * primary library directory, it searches these extra directories in order.
+   * Typically used by the download system to register its cache directory.
+   *
+   * Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
+   * mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
+   * immutable while the directory list is updated.
+   */
+  addExtraLibsDir(dir: string): void
+  /**
+   * Get a tree-sitter [`Language`] by name.
+   *
+   * Resolves aliases (e.g., `"shell"` -> `"bash"`, `"makefile"` -> `"make"`),
+   * then looks up the language in the static table. When the `dynamic-loading`
+   * feature is enabled, falls back to loading a shared library on demand.
+   *
+   * # Errors
+   *
+   * Returns [`Error::LanguageNotFound`] if the name (after alias resolution)
+   * does not match any known grammar.
+   */
+  getLanguage(name: string): JsLanguage
+  /**
+   * List all available language names, sorted and deduplicated.
+   *
+   * Includes statically compiled languages, dynamically loadable languages
+   * (if the `dynamic-loading` feature is enabled), and all configured aliases.
+   */
+  availableLanguages(): Array<string>
+  /**
+   * Check whether a language is available by name or alias.
+   *
+   * Returns `true` if the language can be loaded, either from the static
+   * table or from a dynamic library on disk.
+   */
+  hasLanguage(name: string): boolean
+  /** Return the total number of available languages (including aliases). */
+  languageCount(): number
+  /** Parse source code and extract file intelligence based on config in a single pass. */
+  process(source: string, config: JsProcessConfig): JsProcessResult
+  static default(): JsLanguageRegistry
 }
 
 /** A single query match containing one or more captures. */
 export interface JsMatchResult {
-	/** The pattern index within the query that produced this match. */
-	patternIndex: number;
-	/** The captures for this match. */
-	captures: Array<JsCaptureResult>;
+  /** The pattern index within the query that produced this match. */
+  patternIndex: number
+  /** The captures for this match. */
+  captures: Array<JsCaptureResult>
 }
 
 /**
@@ -712,28 +713,28 @@ export interface JsMatchResult {
  * `tree_sitter::Node` which borrows from the tree.
  */
 export interface JsNodeInfo {
-	/** The grammar type name (e.g., "function_definition", "identifier"). */
-	kind: string;
-	/** Whether this is a named node (vs anonymous like punctuation). */
-	isNamed: boolean;
-	/** Start byte offset in source. */
-	startByte: number;
-	/** End byte offset in source. */
-	endByte: number;
-	/** Start row (zero-indexed). */
-	startRow: number;
-	/** Start column (zero-indexed). */
-	startCol: number;
-	/** End row (zero-indexed). */
-	endRow: number;
-	/** End column (zero-indexed). */
-	endCol: number;
-	/** Number of named children. */
-	namedChildCount: number;
-	/** Whether this node is an ERROR node. */
-	isError: boolean;
-	/** Whether this node is a MISSING node. */
-	isMissing: boolean;
+  /** The grammar type name (e.g., "function_definition", "identifier"). */
+  kind: string
+  /** Whether this is a named node (vs anonymous like punctuation). */
+  isNamed: boolean
+  /** Start byte offset in source. */
+  startByte: number
+  /** End byte offset in source. */
+  endByte: number
+  /** Start row (zero-indexed). */
+  startRow: number
+  /** Start column (zero-indexed). */
+  startCol: number
+  /** End row (zero-indexed). */
+  endRow: number
+  /** End column (zero-indexed). */
+  endCol: number
+  /** Number of named children. */
+  namedChildCount: number
+  /** Whether this node is an ERROR node. */
+  isError: boolean
+  /** Whether this node is a MISSING node. */
+  isMissing: boolean
 }
 
 /**
@@ -756,58 +757,59 @@ export interface JsNodeInfo {
  * ```
  */
 export interface JsPackConfig {
-	/**
-	 * Override default cache directory.
-	 *
-	 * Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
-	 */
-	cacheDir: string;
-	/**
-	 * Languages to pre-download on init.
-	 *
-	 * Each entry is a language name (e.g. `"python"`, `"rust"`).
-	 */
-	languages: Array<string>;
-	/** Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). */
-	groups: Array<string>;
+  /**
+   * Override default cache directory.
+   *
+   * Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
+   */
+  cacheDir: string
+  /**
+   * Languages to pre-download on init.
+   *
+   * Each entry is a language name (e.g. `"python"`, `"rust"`).
+   */
+  languages: Array<string>
+  /** Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). */
+  groups: Array<string>
 }
 
-export declare class JsParser {}
+export declare class JsParser {
+}
 
 /** Manifest describing available parser downloads for a specific version. */
 export interface JsParserManifest {
-	version: string;
-	platforms: Record<string, JsPlatformBundle>;
-	languages: Record<string, JsLanguageInfo>;
-	groups: Record<string, Array<string>>;
+  version: string
+  platforms: Record<string, JsPlatformBundle>
+  languages: Record<string, JsLanguageInfo>
+  groups: Record<string, Array<string>>
 }
 
 /** Results for a single named pattern. */
 export interface JsPatternResult {
-	/** The individual matches. */
-	matches: Array<JsMatchResult>;
-	/** Total number of matches before `max_results` truncation. */
-	totalCount: number;
+  /** The individual matches. */
+  matches: Array<JsMatchResult>
+  /** Total number of matches before `max_results` truncation. */
+  totalCount: number
 }
 
 /** Validation information for a single pattern. */
 export interface JsPatternValidation {
-	/** Whether the pattern compiled successfully. */
-	valid: boolean;
-	/** Names of captures defined in the query. */
-	captureNames: Array<string>;
-	/** Number of patterns in the query. */
-	patternCount: number;
-	/** Non-fatal warnings (e.g., unused captures). */
-	warnings: Array<string>;
-	/** Fatal errors (e.g., query syntax errors). */
-	errors: Array<string>;
+  /** Whether the pattern compiled successfully. */
+  valid: boolean
+  /** Names of captures defined in the query. */
+  captureNames: Array<string>
+  /** Number of patterns in the query. */
+  patternCount: number
+  /** Non-fatal warnings (e.g., unused captures). */
+  warnings: Array<string>
+  /** Fatal errors (e.g., query syntax errors). */
+  errors: Array<string>
 }
 
 export interface JsPlatformBundle {
-	url: string;
-	sha256: string;
-	size: number;
+  url: string
+  sha256: string
+  size: number
 }
 
 /**
@@ -831,29 +833,29 @@ export interface JsPlatformBundle {
  * ```
  */
 export interface JsProcessConfig {
-	/** Language name (required). */
-	language: string;
-	/** Extract structural items (functions, classes, etc.). Default: true. */
-	structure: boolean;
-	/** Extract import statements. Default: true. */
-	imports: boolean;
-	/** Extract export statements. Default: true. */
-	exports: boolean;
-	/** Extract comments. Default: false. */
-	comments: boolean;
-	/** Extract docstrings. Default: false. */
-	docstrings: boolean;
-	/** Extract symbol definitions. Default: false. */
-	symbols: boolean;
-	/** Include parse diagnostics. Default: false. */
-	diagnostics: boolean;
-	/** Maximum chunk size in bytes. `None` disables chunking. */
-	chunkMaxSize: number;
-	/**
-	 * Custom extraction patterns to run against the parsed tree.
-	 * Keys become the keys in `ProcessResult::extractions`.
-	 */
-	extractions: string;
+  /** Language name (required). */
+  language: string
+  /** Extract structural items (functions, classes, etc.). Default: true. */
+  structure: boolean
+  /** Extract import statements. Default: true. */
+  imports: boolean
+  /** Extract export statements. Default: true. */
+  exports: boolean
+  /** Extract comments. Default: false. */
+  comments: boolean
+  /** Extract docstrings. Default: false. */
+  docstrings: boolean
+  /** Extract symbol definitions. Default: false. */
+  symbols: boolean
+  /** Include parse diagnostics. Default: false. */
+  diagnostics: boolean
+  /** Maximum chunk size in bytes. `None` disables chunking. */
+  chunkMaxSize: number
+  /**
+   * Custom extraction patterns to run against the parsed tree.
+   * Keys become the keys in `ProcessResult::extractions`.
+   */
+  extractions: string
 }
 
 /**
@@ -877,26 +879,26 @@ export interface JsProcessConfig {
  * - `chunks` - Chunked code segments (when `config.chunk_max_size` is set)
  */
 export interface JsProcessResult {
-	language: string;
-	metrics: JsFileMetrics;
-	structure: Array<JsStructureItem>;
-	imports: Array<JsImportInfo>;
-	exports: Array<JsExportInfo>;
-	comments: Array<JsCommentInfo>;
-	docstrings: Array<JsDocstringInfo>;
-	symbols: Array<JsSymbolInfo>;
-	diagnostics: Array<JsDiagnostic>;
-	chunks: Array<JsCodeChunk>;
-	/** Results of custom extraction patterns (when `config.extractions` is set). */
-	extractions: string;
+  language: string
+  metrics: JsFileMetrics
+  structure: Array<JsStructureItem>
+  imports: Array<JsImportInfo>
+  exports: Array<JsExportInfo>
+  comments: Array<JsCommentInfo>
+  docstrings: Array<JsDocstringInfo>
+  symbols: Array<JsSymbolInfo>
+  diagnostics: Array<JsDiagnostic>
+  chunks: Array<JsCodeChunk>
+  /** Results of custom extraction patterns (when `config.extractions` is set). */
+  extractions: string
 }
 
 /** A single match from a tree-sitter query, with captured nodes. */
 export interface JsQueryMatch {
-	/** The pattern index that matched (position in the query string). */
-	patternIndex: number;
-	/** Captures: list of (capture_name, node_info) pairs. */
-	captures: Array<string>;
+  /** The pattern index that matched (position in the query string). */
+  patternIndex: number
+  /** Captures: list of (capture_name, node_info) pairs. */
+  captures: Array<string>
 }
 
 /**
@@ -906,25 +908,25 @@ export interface JsQueryMatch {
  * positions (for display and diagnostics).
  */
 export interface JsSpan {
-	startByte: number;
-	endByte: number;
-	startLine: number;
-	startColumn: number;
-	endLine: number;
-	endColumn: number;
+  startByte: number
+  endByte: number
+  startLine: number
+  startColumn: number
+  endLine: number
+  endColumn: number
 }
 
 /** A structural item (function, class, struct, etc.) in source code. */
 export interface JsStructureItem {
-	kind: JsStructureKind;
-	name: string;
-	visibility: string;
-	span: JsSpan;
-	children: Array<JsStructureItem>;
-	decorators: Array<string>;
-	docComment: string;
-	signature: string;
-	bodySpan: JsSpan;
+  kind: JsStructureKind
+  name: string
+  visibility: string
+  span: JsSpan
+  children: Array<JsStructureItem>
+  decorators: Array<string>
+  docComment: string
+  signature: string
+  bodySpan: JsSpan
 }
 
 /**
@@ -935,26 +937,26 @@ export interface JsStructureItem {
  * language-specific constructs that do not fit a standard category.
  */
 export declare enum JsStructureKind {
-	Function = "Function",
-	Method = "Method",
-	Class = "Class",
-	Struct = "Struct",
-	Interface = "Interface",
-	Enum = "Enum",
-	Module = "Module",
-	Trait = "Trait",
-	Impl = "Impl",
-	Namespace = "Namespace",
-	Other = "Other",
+  Function = "Function",
+  Method = "Method",
+  Class = "Class",
+  Struct = "Struct",
+  Interface = "Interface",
+  Enum = "Enum",
+  Module = "Module",
+  Trait = "Trait",
+  Impl = "Impl",
+  Namespace = "Namespace",
+  Other = "Other",
 }
 
 /** A symbol (variable, function, type, etc.) extracted from source code. */
 export interface JsSymbolInfo {
-	name: string;
-	kind: JsSymbolKind;
-	span: JsSpan;
-	typeAnnotation: string;
-	doc: string;
+  name: string
+  kind: JsSymbolKind
+  span: JsSpan
+  typeAnnotation: string
+  doc: string
 }
 
 /**
@@ -964,25 +966,26 @@ export interface JsSymbolInfo {
  * classes, types, interfaces, enums, and modules.
  */
 export declare enum JsSymbolKind {
-	Variable = "Variable",
-	Constant = "Constant",
-	Function = "Function",
-	Class = "Class",
-	Type = "Type",
-	Interface = "Interface",
-	Enum = "Enum",
-	Module = "Module",
-	Other = "Other",
+  Variable = "Variable",
+  Constant = "Constant",
+  Function = "Function",
+  Class = "Class",
+  Type = "Type",
+  Interface = "Interface",
+  Enum = "Enum",
+  Module = "Module",
+  Other = "Other",
 }
 
-export declare class JsTree {}
+export declare class JsTree {
+}
 
 /** Validation results for an entire extraction config. */
 export interface JsValidationResult {
-	/** Whether all patterns are valid. */
-	valid: boolean;
-	/** Per-pattern validation details. */
-	patterns: string;
+  /** Whether all patterns are valid. */
+  valid: boolean
+  /** Per-pattern validation details. */
+  patterns: string
 }
 
 /**
@@ -1106,12 +1109,7 @@ export declare function rootNodeInfo(tree: JsTree): JsNodeInfo;
  * assert!(!matches.is_empty());
  * ```
  */
-export declare function runQuery(
-	tree: JsTree,
-	language: string,
-	querySource: string,
-	source: Uint8Array,
-): Array<JsQueryMatch>;
+export declare function runQuery(tree: JsTree, language: string, querySource: string, source: Uint8Array): Array<JsQueryMatch>;
 
 /**
  * Check whether any node in the tree matches the given type name.
