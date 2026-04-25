@@ -60,8 +60,6 @@ repos:
             "--allow-dirty",
             "--allow-staged",
             "--workspace",
-            "--exclude",
-            "ts-pack-core-wasm",
             "--all-targets",
             "--",
             "-D",
