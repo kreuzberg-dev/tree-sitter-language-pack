@@ -17,7 +17,7 @@
 )]
 
 use std::cell::RefCell;
-use std::ffi::{CStr, CString, c_char};
+use std::ffi::{c_char, CStr, CString};
 
 thread_local! {
     static LAST_ERROR_CODE: RefCell<i32> = const { RefCell::new(0) };
@@ -4193,7 +4193,11 @@ pub unsafe extern "C" fn ts_pack_language_registry_has_language(
         }
     };
     let result = obj.has_language(&name_rs);
-    if result { 1 } else { 0 }
+    if result {
+        1
+    } else {
+        0
+    }
 }
 
 /// Return the total number of available languages (including aliases).
@@ -5672,7 +5676,11 @@ pub unsafe extern "C" fn ts_pack_tree_contains_node_type(
         }
     };
     let result = tree_sitter_language_pack::tree_contains_node_type(&tree_rs, &node_type_rs);
-    if result { 1 } else { 0 }
+    if result {
+        1
+    } else {
+        0
+    }
 }
 
 /// Check whether the tree contains any ERROR or MISSING nodes.
@@ -5691,7 +5699,11 @@ pub unsafe extern "C" fn ts_pack_tree_has_error_nodes(tree: *const tree_sitter_l
     // SAFETY: null check above guarantees tree is a valid pointer.
     let tree_rs = unsafe { &*tree };
     let result = tree_sitter_language_pack::tree_has_error_nodes(&tree_rs);
-    if result { 1 } else { 0 }
+    if result {
+        1
+    } else {
+        0
+    }
 }
 
 /// Return the S-expression representation of the entire tree.
@@ -6122,7 +6134,11 @@ pub unsafe extern "C" fn ts_pack_has_language(name: *const std::ffi::c_char) -> 
         }
     };
     let result = tree_sitter_language_pack::has_language(&name_rs);
-    if result { 1 } else { 0 }
+    if result {
+        1
+    } else {
+        0
+    }
 }
 
 /// Return the number of available languages.
