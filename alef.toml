@@ -218,32 +218,78 @@ path = "packages/elixir/native/tree_sitter_language_pack_nif/Cargo.toml"
 search = 'version = "[^"]*"'
 replace = 'version = "{version}"'
 
+[lint.python]
+before = "uv sync --no-install-project"
+format = "uv run --no-sync ruff check --fix --select I packages/python scripts && uv run --no-sync ruff format packages/python scripts"
+check = "uv run --no-sync ruff check packages/python scripts && uv run --no-sync ruff format --check packages/python scripts"
+
+[lint.node]
+format = "npx oxfmt packages/typescript"
+check = "npx oxlint packages/typescript"
+
+[lint.wasm]
+format = "npx oxfmt packages/wasm"
+check = "npx oxlint packages/wasm"
+
+[lint.php]
+format = "cd packages/php && PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config php-cs-fixer.php src"
+check = "cd packages/php && PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config php-cs-fixer.php --dry-run src"
+
+[lint.ruby]
+before = "cd packages/ruby && bundle install"
+format = "cd packages/ruby && bundle exec rubocop -a ."
+check = "cd packages/ruby && bundle exec rubocop ."
+
+[lint.go]
+before = "cargo build --release -p ts-pack-core-ffi"
+
+[lint.elixir]
+before = "cd packages/elixir && mix deps.get"
+format = "cd packages/elixir && mix format"
+check = "cd packages/elixir && mix credo"
+
+[lint.java]
+format = "mvn -f packages/java/pom.xml spotless:apply -q"
+check = "mvn -f packages/java/pom.xml spotless:check -q"
+
+[lint.csharp]
+format = "dotnet format packages/csharp"
+check = "dotnet format packages/csharp --verify-no-changes"
+
+[lint.ffi]
+precondition = "test -d crates/ts-pack-core-ffi/src"
+
 [test.python]
-command = "task python:test"
+before = "maturin develop --manifest-path crates/ts-pack-core-py/Cargo.toml"
+command = "cd packages/python && python -m pytest"
 e2e = "cd e2e/python && python3 -m pytest tests/ -q"
 
 [test.node]
-command = "task node:test"
+command = "cd crates/ts-pack-core-node && node -e \"const m = require('./'); console.log('OK:', m.availableLanguages().length)\""
 e2e = "cd e2e/typescript && npx vitest run"
 
 [test.go]
-command = "task go:test"
+before = "cargo build --release -p ts-pack-core-ffi"
+command = "cd packages/go && go test -tags tspack_dev -v ./..."
 e2e = "cd e2e/go && go test ./... -count=1"
 
 [test.ruby]
-command = "task ruby:test"
+before = "cd packages/ruby && bundle exec rake compile"
+command = "cd packages/ruby && bundle exec rspec"
 
 [test.php]
-command = "task php:test"
+before = "cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml"
 
 [test.java]
-command = "task java:test"
+before = "cargo build --release -p ts-pack-core-ffi"
+command = "cd packages/java && mvn test"
 
 [test.csharp]
-command = "task csharp:test"
+before = "cargo build --release -p ts-pack-core-ffi"
+command = "cd packages/csharp && dotnet test -c Release"
 
 [test.elixir]
-command = "task elixir:test"
+command = "cd packages/elixir && mix test"
 e2e = "cd e2e/elixir && mix test"
 
 [test.wasm]
@@ -256,6 +302,20 @@ e2e = "cd e2e/rust && cargo test"
 e2e = "cd e2e/c && make clean && make && DYLD_LIBRARY_PATH=../../target/release ./test_runner"
 
 # E2E test generation configuration
+[publish]
+core_crate = "crates/ts-pack-core"
+
+[publish.languages.ruby]
+vendor_mode = "core-only"
+
+[publish.languages.elixir]
+vendor_mode = "core-only"
+nif_versions = ["2.16", "2.17"]
+
+[publish.languages.ffi]
+pkg_config = true
+cmake_config = true
+
 [e2e]
 fixtures = "fixtures"
 output = "e2e"

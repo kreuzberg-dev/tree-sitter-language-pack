@@ -22,7 +22,6 @@ on:
       - "Taskfile.yml"
       - ".task/**"
       - "pyproject.toml"
-      - "biome.json"
       - ".clang-format"
       - "alef.toml"
   pull_request:
@@ -46,7 +45,6 @@ on:
       - "Taskfile.yml"
       - ".task/**"
       - "pyproject.toml"
-      - "biome.json"
       - ".clang-format"
       - "alef.toml"
   workflow_run:
@@ -128,11 +126,15 @@ jobs:
   validate:
     name: Validate (Lint & Format)
     if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      # --- Task runner ---
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1
 
       # --- Rust ---
       - name: Setup Rust
@@ -142,35 +144,14 @@ jobs:
           install-llvm-cov: "false"
 
       # --- Python ---
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: true
-
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: kreuzberg-dev/actions/setup-python-env@v1
         with:
-          python-version: "3.14"
+          python-version: "3.13"
 
-      - name: Install Python dependencies
-        run: uv sync --no-install-project
-
-      # --- Node.js (for biome) ---
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-
-      - name: Install biome
-        run: npm install -g @biomejs/biome
-
-      # --- Ruby ---
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.4"
-          bundler-cache: true
-          working-directory: packages/ruby
+      # --- Node.js / pnpm ---
+      - name: Setup Node Workspace
+        uses: kreuzberg-dev/actions/setup-node-workspace@v1
 
       # --- Go ---
       - name: Setup Go
@@ -180,27 +161,32 @@ jobs:
           cache-dependency-path: packages/go/go.sum
 
       - name: Install golangci-lint
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v2.1.6
-          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+        uses: golangci/golangci-lint-action@v9
+        with:
+          install-only: true
 
       # --- Java ---
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: "temurin"
-          java-version: "25.0.2+10"
+          java-version: "25"
 
       # --- Elixir ---
       - name: Setup Elixir
-        uses: erlef/setup-elixir@v1
-        with:
-          elixir-version: "1.17"
-          otp-version: "27.2"
-          version-type: strict
+        uses: kreuzberg-dev/actions/setup-elixir@v1
 
-      - name: Install Elixir dependencies
-        run: cd packages/elixir && mix deps.get
+      # --- Ruby ---
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+          working-directory: packages/ruby
+
+      # --- PHP ---
+      - name: Setup PHP
+        uses: kreuzberg-dev/actions/setup-php@v1
 
       # --- C/C++ ---
       - name: Install C/C++ tools
@@ -208,9 +194,13 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends cppcheck clang-format
 
-      # --- Task runner ---
-      - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@v1
+      # --- Alef ---
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1
+
+      # --- Alef binding deps ---
+      - name: Install binding dependencies
+        run: alef setup
 
       # --- Prek ---
       - name: Run prek hooks
@@ -218,7 +208,7 @@ jobs:
         with:
           extra-args: --all-files
         env:
-          SKIP: alef-verify,alef-sync-versions
+          SKIP: alef-verify
 
   # ---------------------------------------------------------------------------
   # 2. validate-rust — Rust lint + alef checks
@@ -256,12 +246,7 @@ jobs:
           TSLP_LINK_MODE: static
 
       - name: Install alef
-        run: cargo install --git https://github.com/kreuzberg-dev/alef --tag v0.6.0 --locked --bin alef
-        env:
-          CARGO_INSTALL_ROOT: ${{ runner.temp }}/alef
-
-      - name: Add alef to PATH
-        run: echo "${{ runner.temp }}/alef/bin" >> "$GITHUB_PATH"
+        uses: kreuzberg-dev/actions/install-alef@v1
 
       - name: Verify binding API parity
         run: alef verify
@@ -949,7 +934,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: "temurin"
-          java-version: "25.0.2+10"
+          java-version: "25"
           cache: "maven"
 
       - name: Set library paths for JNI

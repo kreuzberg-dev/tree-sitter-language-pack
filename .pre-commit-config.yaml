@@ -4,6 +4,12 @@ default_install_hook_types:
 exclude: ^e2e/|^test_apps/|vendor/|node_modules/|target/|parsers/|crates/.*/deps/|crates/.*/tmp/|_build/
 
 repos:
+  # AI Rules
+  - repo: https://github.com/Goldziher/ai-rulez
+    rev: v4.0.4
+    hooks:
+      - id: ai-rulez-generate
+
   # Commit message linting
   - repo: https://github.com/Goldziher/gitfluff
     rev: v0.8.0
@@ -41,26 +47,6 @@ repos:
       - id: cargo-sort
         args: [-w]
 
-  - repo: https://github.com/ComPWA/taplo-pre-commit
-    rev: v0.9.3
-    hooks:
-      - id: taplo-format
-        exclude: "pyproject.toml|Cargo.toml"
-
-  # Python: ruff (linting + formatting) + mypy (type checking)
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.11
-    hooks:
-      - id: ruff
-        args: ["--fix", "--unsafe-fixes"]
-      - id: ruff-format
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.20.2
-    hooks:
-      - id: mypy
-        exclude: "e2e/|scripts/|tests/|crates/|fixtures/"
-
   # Rust: formatting and linting
   - repo: https://github.com/AndrejOrsula/pre-commit-cargo
     rev: 0.5.0
@@ -74,8 +60,7 @@ repos:
             "--allow-dirty",
             "--allow-staged",
             "--workspace",
-            "--exclude",
-            "ts-pack-core-wasm",
+            "--all-features",
             "--all-targets",
             "--",
             "-D",
@@ -93,27 +78,9 @@ repos:
       - id: cargo-deny
         args: ["check"]
 
-  # Shell scripts: formatting and linting
-  - repo: https://github.com/scop/pre-commit-shfmt
-    rev: v3.13.1-1
-    hooks:
-      - id: shfmt
-        args: ["-w", "-i", "2"]
-
-  - repo: https://github.com/koalaman/shellcheck-precommit
-    rev: v0.11.0
-    hooks:
-      - id: shellcheck
-
-  # GitHub Actions: linting
-  - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.12
-    hooks:
-      - id: actionlint
-
   # Markdown: linting
   - repo: https://github.com/rvben/rumdl-pre-commit
-    rev: "v0.1.80"
+    rev: "v0.1.81"
     hooks:
       - id: rumdl-fmt
         exclude: "^.ai-rulez/"
@@ -148,137 +115,32 @@ repos:
         exclude: ^docs/(CHANGELOG|snippets/)
         pass_filenames: true
 
-  # AI Rules
-  - repo: https://github.com/Goldziher/ai-rulez
-    rev: v3.14.2
+  # Shell scripts: formatting and linting
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.13.1-1
     hooks:
-      - id: ai-rulez-generate
+      - id: shfmt
+        args: ["-w", "-i", "2"]
 
-  # JavaScript/TypeScript/JSON: biome (formatting + linting)
-  - repo: https://github.com/biomejs/pre-commit
-    rev: v2.4.12
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.11.0
     hooks:
-      - id: biome-format
-      - id: biome-lint
-
-  - repo: https://github.com/oxc-project/mirrors-oxlint
-    rev: v1.60.0
-    hooks:
-      - id: oxlint
-        args: ["--fix"]
-
-  # C/C++: formatting and linting (FFI code)
-  - repo: https://github.com/pocc/pre-commit-hooks
-    rev: v1.3.5
-    hooks:
-      - id: clang-format
-        args: [--style=file]
-        files: (^crates/ts-pack-core-ffi/)
-        exclude: (include/)
-      - id: cppcheck
-        args:
-          [
-            "--std=c11",
-            "--enable=warning,style,performance",
-            "--suppress=missingIncludeSystem",
-          ]
-        files: (^crates/ts-pack-core-ffi/)
-
-  # Go: formatting and linting via Taskfile
-  - repo: local
-    hooks:
-      - id: golangci-lint-full
-        name: golangci-lint (all Go modules)
-        entry: task go:lint
-        language: system
-        files: \.go$
-        pass_filenames: false
-
-  # Local hooks for languages without native pre-commit support
-  - repo: local
-    hooks:
-      # Ruby - rubocop formatting and linting
-      - id: ruby-format
-        name: Ruby formatting (rubocop)
-        entry: task ruby:format
-        language: system
-        files: \.rb$
-        pass_filenames: false
-        require_serial: true
-
-      - id: ruby-lint
-        name: Ruby linting (rubocop)
-        entry: task ruby:lint
-        language: system
-        files: \.(rb|rbs)$
-        pass_filenames: false
-        require_serial: true
-
-      - id: rbs-validate
-        name: RBS type signature validation
-        entry: task ruby:rbs-validate
-        language: system
-        files: \.(rb|rbs)$
-        pass_filenames: false
-        require_serial: true
-
-      - id: ruby-typecheck
-        name: Ruby type checking (steep)
-        entry: task ruby:typecheck
-        language: system
-        files: \.(rb|rbs)$
-        pass_filenames: false
-        require_serial: true
-
-      # Java - formatting and linting
-      - id: java-format
-        name: Java formatting (google-java-format)
-        entry: task java:format
-        language: system
-        files: \.java$
-        pass_filenames: false
-        require_serial: true
-
-      - id: java-lint
-        name: Java linting
-        entry: task java:lint
-        language: system
-        files: \.java$
-        pass_filenames: false
-        require_serial: true
-
-      # C# - dotnet format
-      - id: csharp-format
-        name: C# formatting (dotnet format)
-        entry: task csharp:format
-        language: system
-        files: \.cs$
-        pass_filenames: false
-        require_serial: true
-
-      # Elixir - mix format and credo
-      - id: elixir-format
-        name: Elixir formatting (mix format)
-        entry: task elixir:format
-        language: system
-        files: \.(ex|exs)$
-        pass_filenames: false
-        require_serial: true
-
-      - id: elixir-lint
-        name: Elixir linting (mix credo)
-        entry: "bash -c 'task elixir:lint 2>&1 || echo WARN - Elixir lint skipped'"
-        language: system
-        files: \.(ex|exs)$
-        pass_filenames: false
-        require_serial: true
+      - id: shellcheck
 
   # Alef: polyglot binding generation and version sync
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.6.1
+    rev: v0.7.3
     hooks:
+      - id: alef-fmt
+      - id: alef-lint
       - id: alef-verify
       - id: alef-sync-versions
+
+  # GitHub Actions: linting
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
 
   # Spelling: fast Rust-based spell checker
   - repo: https://github.com/crate-ci/typos

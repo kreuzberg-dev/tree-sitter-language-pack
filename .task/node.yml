@@ -40,24 +40,22 @@ tasks:
   lint:
     desc: Lint TypeScript/JavaScript code
     cmds:
-      - npx biome lint --fix .
       - npx oxlint --fix .
 
   lint:check:
     desc: Check TypeScript/JavaScript linting (CI)
     cmds:
-      - npx biome lint .
       - npx oxlint .
 
   format:
     desc: Format TypeScript/JavaScript code
     cmds:
-      - npx biome format --write .
+      - npx oxfmt .
 
   format:check:
     desc: Check TypeScript/JavaScript formatting (CI)
     cmds:
-      - npx biome format .
+      - npx oxfmt --check .
 
   clean:
     desc: Clean Node.js build artifacts

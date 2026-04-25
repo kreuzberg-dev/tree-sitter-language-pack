@@ -80,6 +80,10 @@ e2e/c/test_*
 requirements.txt
 vendor/
 
+# PHP cs-fixer cache
+packages/php/var/
+.php-cs-fixer.cache
+
 # AI assistant config (generated)
 CLAUDE.md
 .claude/
