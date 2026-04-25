@@ -1,4 +1,4 @@
-version = "0.7.7"
+version = "0.7.8"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
 [crate]
