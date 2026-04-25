@@ -6,7 +6,7 @@ exclude: ^e2e/|^test_apps/|vendor/|node_modules/|target/|parsers/|crates/.*/deps
 repos:
   # AI Rules
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v4.0.3
+    rev: v4.0.4
     hooks:
       - id: ai-rulez-generate
 
@@ -60,6 +60,7 @@ repos:
             "--allow-dirty",
             "--allow-staged",
             "--workspace",
+            "--all-features",
             "--all-targets",
             "--",
             "-D",
