@@ -6,7 +6,7 @@ exclude: ^e2e/|^test_apps/|vendor/|node_modules/|target/|parsers/|crates/.*/deps
 repos:
   # AI Rules
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v4.0.4
+    rev: v4.0.5
     hooks:
       - id: ai-rulez-generate
 
@@ -129,7 +129,7 @@ repos:
 
   # Alef: polyglot binding generation and version sync
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.7.6
+    rev: v0.7.7
     hooks:
       - id: alef-fmt
       - id: alef-lint
