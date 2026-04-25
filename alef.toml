@@ -1,3 +1,6 @@
+[alef]
+version = "0.7.6"
+
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
 [crate]
