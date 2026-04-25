@@ -126,7 +126,7 @@ jobs:
   validate:
     name: Validate (Lint & Format)
     if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -161,9 +161,9 @@ jobs:
           cache-dependency-path: packages/go/go.sum
 
       - name: Install golangci-lint
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v2.1.6
-          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+        uses: golangci/golangci-lint-action@v9
+        with:
+          install-only: true
 
       # --- Java ---
       - name: Setup Java
