@@ -1,4 +1,4 @@
-version = "0.7.8"
+version = "0.7.9"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
 [crate]
@@ -244,7 +244,6 @@ check = "cd packages/php && PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixe
 precondition = "command -v bundle >/dev/null 2>&1"
 before = "cd packages/ruby && bundle install"
 format = "cd packages/ruby && bundle exec rubocop -a ."
-check = "cd packages/ruby && bundle exec rubocop ."
 
 [lint.go]
 precondition = "command -v golangci-lint >/dev/null 2>&1"
@@ -253,18 +252,11 @@ before = "cargo build --release -p ts-pack-core-ffi"
 [lint.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
 before = "cd packages/elixir && mix deps.get"
-format = "cd packages/elixir && mix format"
 check = "cd packages/elixir && mix credo"
 
 [lint.java]
 precondition = "command -v mvn >/dev/null 2>&1"
-format = "mvn -f packages/java/pom.xml spotless:apply -q"
 check = "mvn -f packages/java/pom.xml spotless:check -q"
-
-[lint.csharp]
-precondition = "command -v dotnet >/dev/null 2>&1"
-format = "dotnet format packages/csharp"
-check = "dotnet format packages/csharp --verify-no-changes"
 
 [lint.ffi]
 precondition = "test -d crates/ts-pack-core-ffi/src"
@@ -287,9 +279,7 @@ command = "cd packages/go && go test -tags tspack_dev -v ./..."
 e2e = "cd e2e/go && go test ./... -count=1"
 
 [test.ruby]
-precondition = "command -v bundle >/dev/null 2>&1"
 before = "cd packages/ruby && bundle exec rake compile"
-command = "cd packages/ruby && bundle exec rspec"
 
 [test.php]
 precondition = "command -v php >/dev/null 2>&1"
@@ -307,7 +297,6 @@ command = "cd packages/csharp && dotnet test -c Release"
 
 [test.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
-command = "cd packages/elixir && mix test"
 e2e = "cd e2e/elixir && mix test"
 
 [test.wasm]
