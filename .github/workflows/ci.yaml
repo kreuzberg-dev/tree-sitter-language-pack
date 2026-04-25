@@ -170,7 +170,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: "temurin"
-          java-version: "25.0.2+10"
+          java-version: "25"
 
       # --- Elixir ---
       - name: Setup Elixir
@@ -934,7 +934,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: "temurin"
-          java-version: "25.0.2+10"
+          java-version: "25"
           cache: "maven"
 
       - name: Set library paths for JNI
