@@ -24,6 +24,8 @@ on:
         default: "all"
   release:
     types: [published]
+  repository_dispatch:
+    types: [publish-release]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.inputs.tag || github.event.release.tag_name || github.run_id }}
