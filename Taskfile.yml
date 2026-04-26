@@ -34,6 +34,14 @@ vars:
   VERSION:
     sh: python3 -c "import tomllib; print(tomllib.load(open('Cargo.toml','rb'))['workspace']['package']['version'])"
 
+# Preconditions for task setup:
+# - Rust toolchain (rustup) — install via https://rustup.rs
+# - alef CLI — install via cargo install --git https://github.com/kreuzberg-dev/alef
+# - prek — install via cargo install prek
+# - uv (Python package manager) — for clone_vendors.py and other Python scripts
+# - git, network access for grammar cloning
+# - Per-language tools auto-skipped via alef preconditions
+
 tasks:
   default:
     desc: Show available tasks
@@ -41,18 +49,13 @@ tasks:
       - task --list
 
   setup:
-    desc: "Install all dependencies and initialize project. Idempotent - safe to re-run anytime."
+    desc: "Install all dependencies and dev tools"
     cmds:
-      - echo "Installing pre-commit hooks..."
+      - task: rust:install
+      - alef setup
       - prek install
       - prek install --hook-type commit-msg
-      - echo "Cloning parser sources..."
-      - task: clone
-      - echo "Setting up language tools..."
-      - alef setup
-      - echo "Generating AI rules..."
-      - task: ai-rulez
-      - echo "Setup complete - safe to re-run anytime"
+      - task: clone:if-missing
 
   ai-rulez:
     desc: Generate ai-rulez configuration files (CLAUDE.md, etc.)
@@ -60,11 +63,16 @@ tasks:
       - npx -y ai-rulez@latest generate
 
   clone:
-    desc: Clone all vendor parser repositories
+    desc: "Clone all language grammar repositories (full re-clone)"
     cmds:
       - uv run --no-sync scripts/clone_vendors.py
-    sources:
-      - sources/language_definitions.json
+
+  clone:if-missing:
+    desc: "Clone only missing language grammar repositories"
+    status:
+      - test -d parsers && [ "$(ls -A parsers 2>/dev/null | wc -l)" -gt 0 ]
+    cmds:
+      - uv run --no-sync scripts/clone_vendors.py
 
   build:
     desc: Build all crates (dynamic mode, all languages)
