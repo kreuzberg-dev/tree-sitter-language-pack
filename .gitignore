@@ -83,6 +83,7 @@ vendor/
 # PHP cs-fixer cache
 packages/php/var/
 .php-cs-fixer.cache
+.php-cs-fixer.dist.php
 
 # AI assistant config (generated)
 CLAUDE.md

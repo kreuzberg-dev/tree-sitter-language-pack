@@ -154,7 +154,7 @@ def _extensions_cell(extensions: list[str]) -> str:
     return ", ".join(f"`.{ext}`" for ext in extensions)
 
 
-def generate_table(definitions: dict) -> str:
+def generate_table(definitions: dict[str, dict[str, object]]) -> str:
     """Build the full markdown document content.
 
     Args:
@@ -179,8 +179,10 @@ def generate_table(definitions: dict) -> str:
         key=lambda x: x[1].lower(),
     ):
         entry = definitions[lang_id]
-        extensions = entry.get("extensions", [])
-        repo = entry.get("repo", "")
+        raw_extensions = entry.get("extensions", [])
+        extensions: list[str] = raw_extensions if isinstance(raw_extensions, list) else []
+        raw_repo = entry.get("repo", "")
+        repo: str = raw_repo if isinstance(raw_repo, str) else ""
         ext_cell = _extensions_cell(extensions)
         repo_cell = _repo_link(repo)
         lines.append(f"| {name} | {ext_cell} | {repo_cell} |")
@@ -189,7 +191,7 @@ def generate_table(definitions: dict) -> str:
     return "\n".join(lines)
 
 
-def load_definitions(project_root: Path) -> dict:
+def load_definitions(project_root: Path) -> dict[str, dict[str, object]]:
     """Load language_definitions.json from the sources directory.
 
     Args:
@@ -209,7 +211,7 @@ def load_definitions(project_root: Path) -> dict:
         raise FileNotFoundError(msg)
 
     with definitions_path.open(encoding="utf-8") as f:
-        data = json.load(f)
+        data: dict[str, dict[str, object]] = json.load(f)
 
     if not data:
         msg = "language_definitions.json is empty"

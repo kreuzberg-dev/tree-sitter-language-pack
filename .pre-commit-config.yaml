@@ -139,7 +139,7 @@ repos:
     rev: v1.20.2
     hooks:
       - id: mypy
-        exclude: "e2e/"
+        exclude: "^(e2e/|fixtures/bench/|scripts/clone_vendors\\.py$)"
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/oxc-project/mirrors-oxlint
@@ -153,7 +153,7 @@ repos:
     rev: v0.6.37
     hooks:
       - id: cpd
-        exclude: ^(e2e/|test_apps/)
+        exclude: ^(e2e/|test_apps/|packages/java/dev/)
       - id: checkstyle
         args:
           [
@@ -162,15 +162,16 @@ repos:
             "-p",
             "packages/java/checkstyle.properties",
           ]
-        exclude: ^(e2e/|test_apps/|packages/java/src/)
+        exclude: ^(e2e/|test_apps/|packages/java/src/|packages/java/dev/)
 
   # C/FFI: formatting and linting
   - repo: https://github.com/pocc/pre-commit-hooks
     rev: v1.3.5
     hooks:
       - id: clang-format
-        args: [--style=file]
+        args: [--style=file, -i]
         files: (^crates/tree-sitter-language-pack-ffi/|^crates/ts-pack-core-ffi/)
+        exclude: ^crates/ts-pack-core-ffi/include/ts_pack\.h$
       - id: cppcheck
         args:
           [

@@ -14,12 +14,13 @@ import os
 import re
 import shutil
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 try:
     import tomllib
 except ImportError:
-    import tomli as tomllib  # type: ignore[no-redef]
+    import tomli as tomllib
 
 
 def get_repo_root() -> Path:
@@ -34,19 +35,33 @@ def get_repo_root() -> Path:
 def read_toml(path: Path) -> dict[str, object]:
     """Read TOML file."""
     with path.open("rb") as f:
-        return tomllib.load(f)
+        result: dict[str, object] = tomllib.load(f)
+        return result
 
 
 def get_workspace_deps(repo_root: Path) -> dict[str, object]:
     """Extract workspace.dependencies from root Cargo.toml."""
     data = read_toml(repo_root / "Cargo.toml")
-    return data.get("workspace", {}).get("dependencies", {})
+    workspace = data.get("workspace")
+    if not isinstance(workspace, dict):
+        return {}
+    deps = workspace.get("dependencies")
+    if not isinstance(deps, dict):
+        return {}
+    return deps
 
 
 def get_workspace_version(repo_root: Path) -> str:
     """Extract version from workspace.package."""
     data = read_toml(repo_root / "Cargo.toml")
-    return data.get("workspace", {}).get("package", {}).get("version", "0.0.0")
+    workspace = data.get("workspace")
+    if not isinstance(workspace, dict):
+        return "0.0.0"
+    package = workspace.get("package")
+    if not isinstance(package, dict):
+        return "0.0.0"
+    version = package.get("version", "0.0.0")
+    return str(version)
 
 
 def format_dependency(name: str, dep_spec: object) -> str:
@@ -99,7 +114,7 @@ def _add_field(field: str, fields: dict[str, str]) -> None:
         fields[key.strip()] = val.strip()
 
 
-def _make_replacer(dep_name: str, dep_spec: object):  # noqa: ANN202
+def _make_replacer(dep_name: str, dep_spec: object) -> Callable[[re.Match[str]], str]:
     """Create a regex replacer that merges workspace fields with crate-specific fields."""
 
     def replace_with_fields(match: re.Match[str]) -> str:

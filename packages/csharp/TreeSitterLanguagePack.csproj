@@ -9,6 +9,7 @@
     <RepositoryUrl>https://github.com/kreuzberg-dev/tree-sitter-language-pack</RepositoryUrl>
     <Authors>Kreuzberg Team</Authors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

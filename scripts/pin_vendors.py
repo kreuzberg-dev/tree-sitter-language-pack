@@ -21,9 +21,10 @@ async def get_latest_commit_hash(repo_url: str, branch: str | None = None) -> st
     ref = f"refs/heads/{branch}" if branch else "HEAD"
     try:
         result = await run_process(["git", "ls-remote", repo_url, ref], check=True)
-        output = result.stdout.decode().strip()
+        output: str = result.stdout.decode().strip()
         if output:
-            return output.split("\t")[0]
+            commit_hash: str = output.split("\t", maxsplit=1)[0]
+            return commit_hash
         return None
     except (OSError, RuntimeError, ValueError) as e:
         print(f"Error fetching commit for {repo_url}: {e}")

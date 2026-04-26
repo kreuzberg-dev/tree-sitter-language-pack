@@ -89,7 +89,8 @@ def _gh_api_license(owner_repo: str) -> str | None:
 
 def _load_cache() -> dict[str, str]:
     if _cache_path.exists():
-        return json.loads(_cache_path.read_text())
+        result: dict[str, str] = json.loads(_cache_path.read_text())
+        return result
     return {}
 
 
@@ -109,7 +110,7 @@ def _classify_license(spdx: str | None) -> str:
 
 
 def _check_grammars(
-    definitions: dict,
+    definitions: dict[str, dict[str, str]],
     cache: dict[str, str],
     no_cache: bool,
 ) -> tuple[list[str], list[tuple[str, str]], list[tuple[str, str]], list[tuple[str, str]]]:
@@ -128,6 +129,7 @@ def _check_grammars(
             errors.append((lang, f"not a GitHub URL: {repo_url}"))
             continue
 
+        spdx: str | None
         if owner_repo in cache and not no_cache:
             spdx = cache[owner_repo]
         else:
@@ -189,7 +191,7 @@ def main() -> int:
     update_cache = "--update-cache" in sys.argv
     no_cache = "--no-cache" in sys.argv
 
-    definitions: dict = json.loads(_definitions_path.read_text())
+    definitions: dict[str, dict[str, str]] = json.loads(_definitions_path.read_text())
     cache = {} if no_cache else _load_cache()
 
     permissive, rejected, unknown, errors = _check_grammars(definitions, cache, no_cache)

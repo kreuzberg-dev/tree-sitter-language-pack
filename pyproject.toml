@@ -97,7 +97,7 @@ max_supported_python = "3.14"
 
 [tool.mypy]
 packages = [ "scripts" ]
-exclude = [ "fixtures/bench" ]
+exclude = [ "fixtures/bench", "scripts/clone_vendors.py" ]
 python_version = "3.10"
 disallow_untyped_decorators = true
 disallow_any_unimported = true
