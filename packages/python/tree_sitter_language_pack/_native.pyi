@@ -4,7 +4,7 @@
 # To verify freshness: alef verify --exit-code
 # Issues & docs: https://github.com/kreuzberg-dev/alef
 
-from typing import Literal, TypeAlias, TypedDict
+from typing import Any, Literal, TypeAlias, TypedDict
 
 class ExtractionPattern:
     query: str
@@ -482,7 +482,7 @@ class StructureKindOtherVariant(TypedDict):
     type: Literal["Other"]
     _0: str
 
-StructureKind: TypeAlias = (
+StructureKind = (
     StructureKindFunctionVariant
     | StructureKindMethodVariant
     | StructureKindClassVariant
@@ -521,7 +521,7 @@ class DocstringFormatOtherVariant(TypedDict):
     type: Literal["Other"]
     _0: str
 
-DocstringFormat: TypeAlias = (
+DocstringFormat = (
     DocstringFormatPythonTripleQuoteVariant
     | DocstringFormatJSDocVariant
     | DocstringFormatRustdocVariant
@@ -564,7 +564,7 @@ class SymbolKindOtherVariant(TypedDict):
     type: Literal["Other"]
     _0: str
 
-SymbolKind: TypeAlias = (
+SymbolKind = (
     SymbolKindVariableVariant
     | SymbolKindConstantVariant
     | SymbolKindFunctionVariant

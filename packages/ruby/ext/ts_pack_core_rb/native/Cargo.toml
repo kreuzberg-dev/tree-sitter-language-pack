@@ -1,3 +1,5 @@
+[workspace]
+
 [package]
 name = "ts-pack-core-rb"
 version = "1.6.3"

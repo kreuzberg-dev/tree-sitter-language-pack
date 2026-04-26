@@ -278,7 +278,7 @@ repos:
 
   # Alef: polyglot binding generation and version sync
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.7.11
+    rev: v0.8.1
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

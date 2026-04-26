@@ -1,4 +1,4 @@
-version = "0.7.11"
+version = "0.8.1"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
 [crate]
@@ -6,6 +6,7 @@ name = "tree-sitter-language-pack"
 core_import = "tree_sitter_language_pack"
 sources = ["crates/ts-pack-core/src/lib.rs"]
 version_from = "Cargo.toml"
+features = ["serde", "config", "download"]
 
 [[crate.source_crates]]
 name = "tree-sitter-language-pack"
@@ -99,7 +100,7 @@ ffi = "crates/ts-pack-core-ffi/src/"
 go = "packages/go/"
 java = "packages/java/"
 csharp = "packages/csharp/"
-elixir = "packages/elixir/native/tree_sitter_language_pack_rustler/src/"
+elixir = "packages/elixir/native/tree_sitter_language_pack_nif/src/"
 wasm = "crates/ts-pack-core-wasm/src/"
 
 [python]
@@ -210,13 +211,8 @@ search = "gem 'tree_sitter_language_pack', '[^']*'"
 replace = "gem 'tree_sitter_language_pack', '{version}'"
 
 [[sync.text_replacements]]
-path = "packages/elixir/native/tree_sitter_language_pack_rustler/Cargo.toml"
-search = 'version = "[^"]*"'
-replace = 'version = "{version}"'
-
-[[sync.text_replacements]]
 path = "packages/elixir/native/tree_sitter_language_pack_nif/Cargo.toml"
-search = 'version = "[^"]*"'
+search = '^version = "[^"]*"'
 replace = 'version = "{version}"'
 
 [lint.python]

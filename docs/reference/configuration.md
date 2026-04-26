@@ -375,3 +375,4 @@ A single match from a tree-sitter query, with captured nodes.
 | `captures` | `list[str]` | `[]` | Captures: list of (capture_name, node_info) pairs. |
 
 ---
+

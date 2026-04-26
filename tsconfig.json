@@ -37,8 +37,6 @@
 	},
 	"files": [],
 	"references": [
-		{ "path": "./crates/ts-pack-node" },
-		{ "path": "./crates/ts-pack-wasm" },
 		{ "path": "./test_apps/node" }
 	]
 }

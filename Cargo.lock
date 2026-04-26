@@ -2343,7 +2343,10 @@ dependencies = [
 name = "ts-pack-core-wasm"
 version = "1.8.0-rc.2"
 dependencies = [
+ "futures-util",
+ "js-sys",
  "serde-wasm-bindgen",
+ "serde_json",
  "tree-sitter-language-pack",
  "wasm-bindgen",
  "wasm-bindgen-futures",
