@@ -33,7 +33,7 @@ export {
   treeHasErrorNodes,
   treeToSexp,
   validateExtraction,
-} from "@kreuzberg/tree-sitter-language-pack";
+} from '@kreuzberg/tree-sitter-language-pack';
 
 export type {
   JsCaptureOutput,
@@ -76,4 +76,4 @@ export type {
   JsSymbolKind,
   JsTree,
   JsValidationResult,
-} from "@kreuzberg/tree-sitter-language-pack";
+} from '@kreuzberg/tree-sitter-language-pack';

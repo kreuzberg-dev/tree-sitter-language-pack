@@ -115,17 +115,26 @@ tasks:
       - alef clean
 
   update:
-    desc: Update all dependencies to latest versions
+    desc: Update all dependencies within current major versions
     cmds:
-      - echo "Updating Rust dependencies..."
-      - task: rust:update
-      - echo "Updating binding language dependencies..."
+      - echo "Updating binding language dependencies (within-major)..."
       - alef update
       - echo "Updating language grammar revisions..."
       - uv run --no-sync scripts/pin_vendors.py
       - echo "Updating prek dependencies..."
       - prek autoupdate
-      - echo "All dependencies updated"
+      - echo "Within-major update complete"
+
+  upgrade:
+    desc: Upgrade all dependencies to latest versions (cross-major)
+    cmds:
+      - echo "Upgrading binding language dependencies (cross-major)..."
+      - alef update --latest
+      - echo "Updating language grammar revisions..."
+      - uv run --no-sync scripts/pin_vendors.py
+      - echo "Updating prek dependencies..."
+      - prek autoupdate
+      - echo "Cross-major upgrade complete"
 
   update:grammars:
     desc: Update language grammar revisions

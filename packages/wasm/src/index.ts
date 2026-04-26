@@ -76,5 +76,5 @@ export {
   treeErrorCount,
   treeHasErrorNodes,
   treeToSexp,
-  validateExtraction,
-} from "./wasm";
+  validateExtraction
+} from './wasm';

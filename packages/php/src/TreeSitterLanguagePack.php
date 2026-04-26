@@ -23,6 +23,8 @@ final class TreeSitterLanguagePack
      * assert_eq!(detect_language_from_extension("xyz"), None);
      * ```
      *
+     * @param string $ext
+     * @return ?string
      */
     public static function detectLanguageFromExtension(string $ext): ?string
     {
@@ -42,6 +44,8 @@ final class TreeSitterLanguagePack
      * assert_eq!(detect_language_from_path("Makefile"), None);
      * ```
      *
+     * @param string $path
+     * @return ?string
      */
     public static function detectLanguageFromPath(string $path): ?string
     {
@@ -72,6 +76,8 @@ final class TreeSitterLanguagePack
      * assert_eq!(detect_language_from_content("no shebang here"), None);
      * ```
      *
+     * @param string $content
+     * @return ?string
      */
     public static function detectLanguageFromContent(string $content): ?string
     {
@@ -81,6 +87,8 @@ final class TreeSitterLanguagePack
     /**
      * Get a `NodeInfo` snapshot of the root node.
      *
+     * @param Tree $tree
+     * @return NodeInfo
      */
     public static function rootNodeInfo(Tree $tree): NodeInfo
     {
@@ -92,6 +100,8 @@ final class TreeSitterLanguagePack
      *
      * Performs a depth-first traversal. Returns an empty vec if no matches.
      *
+     * @param Tree $tree
+     * @param string $node_type
      * @return array<NodeInfo>
      */
     public static function findNodesByType(Tree $tree, string $node_type): array
@@ -105,6 +115,7 @@ final class TreeSitterLanguagePack
      * Useful for understanding the top-level structure of a file
      * (e.g., list of function definitions, class declarations, imports).
      *
+     * @param Tree $tree
      * @return array<NodeInfo>
      */
     public static function namedChildrenInfo(Tree $tree): array
@@ -126,6 +137,9 @@ final class TreeSitterLanguagePack
      * assert_eq!(tree.root_node().kind(), "module");
      * ```
      *
+     * @param string $language
+     * @param string $source
+     * @return Tree
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
     public static function parseString(string $language, string $source): Tree
@@ -138,6 +152,9 @@ final class TreeSitterLanguagePack
      *
      * Performs a depth-first traversal using `TreeCursor`.
      *
+     * @param Tree $tree
+     * @param string $node_type
+     * @return bool
      */
     public static function treeContainsNodeType(Tree $tree, string $node_type): bool
     {
@@ -149,6 +166,8 @@ final class TreeSitterLanguagePack
      *
      * Useful for determining if the parse was clean or had syntax errors.
      *
+     * @param Tree $tree
+     * @return bool
      */
     public static function treeHasErrorNodes(Tree $tree): bool
     {
@@ -161,6 +180,8 @@ final class TreeSitterLanguagePack
      * This is the standard tree-sitter debug format, useful for logging,
      * snapshot testing, and debugging grammars.
      *
+     * @param Tree $tree
+     * @return string
      */
     public static function treeToSexp(Tree $tree): string
     {
@@ -172,6 +193,8 @@ final class TreeSitterLanguagePack
      *
      * Returns 0 for a clean parse.
      *
+     * @param Tree $tree
+     * @return int
      */
     public static function treeErrorCount(Tree $tree): int
     {
@@ -196,6 +219,8 @@ final class TreeSitterLanguagePack
      * assert!(missing.is_none());
      * ```
      *
+     * @param string $language
+     * @return ?string
      */
     public static function getHighlightsQuery(string $language): ?string
     {
@@ -219,6 +244,8 @@ final class TreeSitterLanguagePack
      * assert!(missing.is_none());
      * ```
      *
+     * @param string $language
+     * @return ?string
      */
     public static function getInjectionsQuery(string $language): ?string
     {
@@ -242,6 +269,8 @@ final class TreeSitterLanguagePack
      * assert!(missing.is_none());
      * ```
      *
+     * @param string $language
+     * @return ?string
      */
     public static function getLocalsQuery(string $language): ?string
     {
@@ -278,6 +307,10 @@ final class TreeSitterLanguagePack
      * assert!(!matches.is_empty());
      * ```
      *
+     * @param Tree $tree
+     * @param string $language
+     * @param string $query_source
+     * @param string $source
      * @return array<QueryMatch>
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
@@ -311,6 +344,8 @@ final class TreeSitterLanguagePack
      * assert_eq!(tree.root_node().kind(), "module");
      * ```
      *
+     * @param string $name
+     * @return Language
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
     public static function getLanguage(string $name): Language
@@ -339,6 +374,8 @@ final class TreeSitterLanguagePack
      * assert!(!tree.root_node().has_error());
      * ```
      *
+     * @param string $name
+     * @return Parser
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
     public static function getParser(string $name): Parser
@@ -386,6 +423,8 @@ final class TreeSitterLanguagePack
      * assert!(!has_language("nonexistent_language"));
      * ```
      *
+     * @param string $name
+     * @return bool
      */
     public static function hasLanguage(string $name): bool
     {
@@ -407,6 +446,7 @@ final class TreeSitterLanguagePack
      * println!("{} languages available", count);
      * ```
      *
+     * @return int
      */
     public static function languageCount(): int
     {
@@ -436,6 +476,9 @@ final class TreeSitterLanguagePack
      * println!("Structures: {}", result.structure.len());
      * ```
      *
+     * @param string $source
+     * @param ProcessConfig $config
+     * @return ProcessResult
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
     public static function process(string $source, ProcessConfig $config): ProcessResult
@@ -471,6 +514,9 @@ final class TreeSitterLanguagePack
      * let result = extract_patterns("def hello(): pass", &config).unwrap();
      * ```
      *
+     * @param string $source
+     * @param ExtractionConfig $config
+     * @return ExtractionResult
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
     public static function extractPatterns(string $source, ExtractionConfig $config): ExtractionResult
@@ -487,6 +533,8 @@ final class TreeSitterLanguagePack
      *
      * Returns an error if the language cannot be loaded.
      *
+     * @param ExtractionConfig $config
+     * @return ValidationResult
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
     public static function validateExtraction(ExtractionConfig $config): ValidationResult
@@ -518,6 +566,8 @@ final class TreeSitterLanguagePack
      * init(&config).unwrap();
      * ```
      *
+     * @param PackConfig $config
+     * @return void
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
     public static function init(PackConfig $config): void
@@ -551,6 +601,8 @@ final class TreeSitterLanguagePack
      * configure(&config).unwrap();
      * ```
      *
+     * @param PackConfig $config
+     * @return void
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
     public static function configure(PackConfig $config): void
@@ -579,6 +631,7 @@ final class TreeSitterLanguagePack
      * ```
      *
      * @param array<string> $names
+     * @return int
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
     public static function download(array $names): int
@@ -604,6 +657,7 @@ final class TreeSitterLanguagePack
      * println!("Downloaded {} languages", count);
      * ```
      *
+     * @return int
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
     public static function downloadAll(): int
@@ -680,6 +734,7 @@ final class TreeSitterLanguagePack
      * println!("Cache cleared");
      * ```
      *
+     * @return void
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
     public static function cleanCache(): void
@@ -706,6 +761,7 @@ final class TreeSitterLanguagePack
      * println!("Cache directory: {}", dir.display());
      * ```
      *
+     * @return string
      * @throws \Tree\Sitter\Language\Pack\TreeSitterLanguagePackException
      */
     public static function cacheDir(): string
