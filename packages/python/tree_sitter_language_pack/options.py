@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TypedDict  # noqa: F401
+from typing import TypedDict
 
 
 class CaptureOutput(str, Enum):
