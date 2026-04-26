@@ -2503,6 +2503,8 @@ jobs:
       (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
