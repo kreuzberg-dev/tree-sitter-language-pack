@@ -16,7 +16,7 @@ package main
 import "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 
 func main() {
-	// TODO: add usage example
+	// See https://github.com/kreuzberg-dev/tree-sitter-language-pack for usage examples.
 }
 ```
 

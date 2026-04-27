@@ -13,7 +13,8 @@ pip install tree-sitter-language-pack
 ```python
 import native
 
-# TODO: add usage example
+# result = native.detect_language_from_extension(...)
+# See the main repository's docs for full usage.
 ```
 
 ## Documentation

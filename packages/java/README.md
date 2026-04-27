@@ -19,7 +19,7 @@ Add to your `pom.xml`:
 ```java
 import dev.kreuzberg.treesitterlanguagepack.*;
 
-// TODO: add usage example
+// See https://github.com/kreuzberg-dev/tree-sitter-language-pack for usage examples.
 ```
 
 ## Documentation

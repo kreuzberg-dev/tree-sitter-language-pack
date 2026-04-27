@@ -15,7 +15,7 @@ composer require kreuzberg-dev/tree-sitter-language-pack
 
 use tree_sitter_language_pack;
 
-// TODO: add usage example
+// See https://github.com/kreuzberg-dev/tree-sitter-language-pack for usage examples.
 ```
 
 ## Documentation

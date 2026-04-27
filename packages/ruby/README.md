@@ -13,7 +13,7 @@ gem install tree_sitter_language_pack
 ```ruby
 require 'tree_sitter_language_pack'
 
-# TODO: add usage example
+# See https://github.com/kreuzberg-dev/tree-sitter-language-pack for usage examples.
 ```
 
 ## Documentation

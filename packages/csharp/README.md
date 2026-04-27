@@ -13,7 +13,7 @@ dotnet add package TreeSitterLanguagePack
 ```csharp
 using TreeSitterLanguagePack;
 
-// TODO: add usage example
+// See https://github.com/kreuzberg-dev/tree-sitter-language-pack for usage examples.
 ```
 
 ## Documentation

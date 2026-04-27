@@ -14,7 +14,7 @@ npm install tree-sitter-language-pack-wasm
 import init from 'tree-sitter-language-pack-wasm';
 
 await init();
-// TODO: add usage example
+// See https://github.com/kreuzberg-dev/tree-sitter-language-pack for usage examples.
 ```
 
 ## Documentation

@@ -14,7 +14,7 @@ See the build instructions in the main repository.
 #include "ts_pack.h"
 
 int main(void) {
-    // TODO: add usage example
+    // See https://github.com/kreuzberg-dev/tree-sitter-language-pack for usage examples.
     return 0;
 }
 ```

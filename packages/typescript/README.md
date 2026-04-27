@@ -13,7 +13,8 @@ npm install @kreuzberg/tree-sitter-language-pack
 ```typescript
 import { /* ... */ } from '@kreuzberg/tree-sitter-language-pack';
 
-// TODO: add usage example
+// const result = await detectLanguageFromExtension(...);
+// See the main repository's docs for full usage.
 ```
 
 ## Documentation
