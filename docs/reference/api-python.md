@@ -61,6 +61,7 @@ Inspects only the first line of `content`. If it begins with `#!`, the
 interpreter name is extracted and mapped to a language name.
 
 Handles common patterns:
+
 - `#!/usr/bin/env python3` → `"python"`
 - `#!/bin/bash` → `"bash"`
 - `#!/usr/bin/env node` → `"javascript"`
@@ -356,6 +357,7 @@ def get_locals_query(language: str) -> str | None
 Execute a tree-sitter query pattern against a parsed tree.
 
 The `query_source` is an S-expression pattern like:
+
 ```text
 (function_definition name: (identifier) @name)
 ```
@@ -1717,4 +1719,3 @@ features are enabled.
 
 
 ---
-
