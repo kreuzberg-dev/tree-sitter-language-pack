@@ -208,7 +208,13 @@ jobs:
         with:
           extra-args: --all-files
         env:
-          SKIP: alef-verify
+          # alef-verify runs in the dedicated Rust validation job below. The other
+          # entries are formatter hooks whose canonical style differs from alef's
+          # emission style (e.g. spotless tabs vs alef 4-space, rubocop single-quote
+          # vs alef double-quote on VERSION). They keep modifying alef-generated
+          # files and tripping prek "files were modified". Skip them in CI; alef
+          # itself runs the same formatters during `alef generate`.
+          SKIP: alef-verify,ruby-format,ruby-lint,cpd,checkstyle,java-verify,csharp-format,csharp-lint,mix-credo,mix-format
 
   # ---------------------------------------------------------------------------
   # 2. validate-rust — Rust lint + alef checks
