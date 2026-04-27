@@ -69,7 +69,7 @@
       "asciidoc"
     ],
     "repo": "https://github.com/cathaysia/tree-sitter-asciidoc",
-    "rev": "b115673e1e1c2d63f3074cd7289e77b8c69bb6a5"
+    "rev": "dd042737a453599bc851b7338d9222d3bd35df53"
   },
   "asm": {
     "extensions": [
@@ -246,7 +246,7 @@
       "cfc"
     ],
     "repo": "https://github.com/cfmleditor/tree-sitter-cfml",
-    "rev": "6a5e26a6254f2ffba92ebd9f2499a6fd6e08f16a"
+    "rev": "66bb2ba2bda0c1c006d75221824a338550222e2c"
   },
   "chatito": {
     "extensions": [
@@ -1118,7 +1118,7 @@
       "kts"
     ],
     "repo": "https://github.com/fwcd/tree-sitter-kotlin",
-    "rev": "55622a49bd59ca42cec5c01ba5251bb4da9b8930"
+    "rev": "85e46e9e148f2016d098397ce3b78e1f1e58e515"
   },
   "latex": {
     "branch": "master",
@@ -1332,7 +1332,7 @@
       "nix"
     ],
     "repo": "https://github.com/nix-community/tree-sitter-nix",
-    "rev": "eabf96807ea4ab6d6c7f09b671a88cd483542840"
+    "rev": "35b2a51e93625e50e0bbff58b4aad45706cdc299"
   },
   "norg": {
     "extensions": [
@@ -1707,7 +1707,7 @@
       "resi"
     ],
     "repo": "https://github.com/rescript-lang/tree-sitter-rescript",
-    "rev": "7dbc8a80640e794302938fef3555e272ec7ff33f"
+    "rev": "5b90cd4e4138b1231a67977303bda47eb608480a"
   },
   "robot": {
     "extensions": [
@@ -1767,7 +1767,7 @@
       "scala"
     ],
     "repo": "https://github.com/tree-sitter/tree-sitter-scala",
-    "rev": "e805b8050835280a11dea4aedebc9bb3d4be9460"
+    "rev": "a68000002745b94eec61cef741efe7cede4ff465"
   },
   "scheme": {
     "extensions": [
