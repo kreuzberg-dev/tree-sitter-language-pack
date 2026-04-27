@@ -6,7 +6,7 @@ exclude: ^e2e/|^test_apps/|vendor/|node_modules/|target/|parsers/|crates/.*/deps
 repos:
   # AI Rules
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v4.0.7
+    rev: v4.0.8
     hooks:
       - id: ai-rulez-generate
 
@@ -143,7 +143,7 @@ repos:
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/oxc-project/mirrors-oxlint
-    rev: v1.61.0
+    rev: v1.62.0
     hooks:
       - id: oxlint
         args: ["--fix"]
@@ -278,7 +278,7 @@ repos:
 
   # Alef: polyglot binding generation and version sync
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.10.0
+    rev: v0.10.3
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
@@ -291,7 +291,7 @@ repos:
 
   # Spelling: fast Rust-based spell checker
   - repo: https://github.com/crate-ci/typos
-    rev: v1.45.1
+    rev: v1.45.2
     hooks:
       - id: typos
         args: [--force-exclude]

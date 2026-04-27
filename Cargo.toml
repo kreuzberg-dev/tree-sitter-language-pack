@@ -7,6 +7,7 @@ exclude = [
     "crates/ts-pack-java",
     "crates/ts-pack-node",
     "crates/ts-pack-ruby",
+    "e2e/rust",
     "packages/elixir/native/tree_sitter_language_pack_nif",
     "test_apps/rust",
 ]

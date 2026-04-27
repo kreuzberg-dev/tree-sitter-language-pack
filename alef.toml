@@ -514,7 +514,7 @@ version = "v0.0.0"
 [e2e.format]
 python = "ruff check --fix {dir} && ruff format {dir}"
 go = "gofmt -w {dir}"
-rust = "cargo fmt --manifest-path {dir}/Cargo.toml"
+rust = "(cd {dir} && cargo fmt --all)"
 
 # Registry-mode test apps (standalone, use published packages)
 [e2e.registry]
