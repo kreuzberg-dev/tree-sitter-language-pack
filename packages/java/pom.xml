@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.kreuzberg.treesitterlanguagepack</groupId>
+    <groupId>dev.kreuzberg</groupId>
     <artifactId>tree-sitter-language-pack</artifactId>
     <version>1.8.0-rc.8</version>
     <packaging>jar</packaging>
