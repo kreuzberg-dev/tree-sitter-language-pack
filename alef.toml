@@ -134,6 +134,10 @@ namespace = "TreeSitterLanguagePack"
 
 [elixir]
 app_name = "tree_sitter_language_pack"
+# alef-backend-rustler doesn't yet bridge `&[&str]` (it punts on Vec<String>+is_ref
+# in the serde-recovery path); exclude these download helpers until alef gains
+# slice-of-str support. They remain available in Python/Node/Ruby bindings.
+exclude_functions = ["download", "download_all"]
 
 [wasm]
 env_shims = ["iswspace", "iswalnum", "towupper", "iswalpha"]
