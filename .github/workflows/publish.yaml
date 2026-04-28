@@ -165,11 +165,19 @@ jobs:
       - name: Verify Ruby gemspec version
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
-          RUBY_VERSION="${VERSION//-/.}"
+          # Ruby pre-release versions use ".pre.<id>" rather than "-<id>"
+          # (cargo/semver convention), e.g. 1.8.0-rc.3 → 1.8.0.pre.rc.3.
+          if [[ "$VERSION" == *-* ]]; then
+            base="${VERSION%%-*}"
+            suffix="${VERSION#*-}"
+            RUBY_VERSION="${base}.pre.${suffix//-/.}"
+          else
+            RUBY_VERSION="$VERSION"
+          fi
           if [ -f packages/ruby/tree_sitter_language_pack.gemspec ]; then
             GEMSPEC_VERSION=$(grep "spec.version" packages/ruby/tree_sitter_language_pack.gemspec | sed "s/.*'\(.*\)'/\1/")
             if [[ "$GEMSPEC_VERSION" != "$RUBY_VERSION" ]]; then
-              echo "::error::Gemspec version ($GEMSPEC_VERSION) does not match tag version ($RUBY_VERSION)"
+              echo "::error::Gemspec version ($GEMSPEC_VERSION) does not match expected ($RUBY_VERSION) for tag $VERSION"
               exit 1
             fi
             echo "Ruby: $GEMSPEC_VERSION"
@@ -2377,13 +2385,25 @@ jobs:
 
   # ─── Build Homebrew bottle ─────────────────────────────────────────
   homebrew-bottles:
-    name: Build Homebrew bottle
+    name: Build Homebrew bottle (${{ matrix.bottle_tag }})
     needs: [prepare, check-homebrew, clone-vendors]
     if: |
       needs.prepare.outputs.release_homebrew == 'true' &&
       (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
-    runs-on: macos-latest
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-latest
+            bottle_tag: arm64_sequoia
+          - runner: macos-15-intel
+            bottle_tag: sequoia
+          - runner: ubuntu-latest
+            bottle_tag: x86_64_linux
+          - runner: ubuntu-24.04-arm
+            bottle_tag: arm64_linux
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -2422,23 +2442,12 @@ jobs:
           TSLP_LANGUAGES: ${{ steps.langs.outputs.names }}
           TSLP_LINK_MODE: static
 
-      - name: Detect macOS bottle tag
-        id: os-info
-        run: |
-          OS_VERSION=$(sw_vers -productVersion | cut -d. -f1)
-          case "$OS_VERSION" in
-            15) BOTTLE_TAG="arm64_sequoia" ;;
-            14) BOTTLE_TAG="arm64_sonoma" ;;
-            13) BOTTLE_TAG="arm64_ventura" ;;
-            *) BOTTLE_TAG="arm64_macos${OS_VERSION}" ;;
-          esac
-          echo "bottle_tag=$BOTTLE_TAG" >> "$GITHUB_OUTPUT"
-
       - name: Create Homebrew bottle
         id: bottle
+        shell: bash
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
-          BOTTLE_TAG="${{ steps.os-info.outputs.bottle_tag }}"
+          BOTTLE_TAG="${{ matrix.bottle_tag }}"
           bottle_root="/tmp/ts-pack-bottle"
           bottle_dir="${bottle_root}/ts-pack/${VERSION}"
           mkdir -p "${bottle_dir}/bin"
@@ -2456,7 +2465,7 @@ jobs:
       - name: Upload bottle artifact
         uses: actions/upload-artifact@v7
         with:
-          name: homebrew-bottle
+          name: homebrew-bottle-${{ matrix.bottle_tag }}
           path: ts-pack-*.bottle.tar.gz
           retention-days: 14
 
@@ -2480,8 +2489,9 @@ jobs:
       - name: Download bottle artifacts
         uses: actions/download-artifact@v8
         with:
-          name: homebrew-bottle
+          pattern: homebrew-bottle-*
           path: dist/homebrew
+          merge-multiple: true
 
       - name: Upload to GitHub Release
         uses: kreuzberg-dev/actions/publish-github-release@v1
@@ -2516,8 +2526,9 @@ jobs:
       - name: Download bottle artifacts
         uses: actions/download-artifact@v8
         with:
-          name: homebrew-bottle
+          pattern: homebrew-bottle-*
           path: dist/homebrew
+          merge-multiple: true
 
       - name: Setup Git credentials for tap push
         env:
