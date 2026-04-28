@@ -119,14 +119,7 @@ obj/
 
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 .agents/
-.claude/
-.codex/
-.cursor/
 .github/agents/
 .github/commands/
-.github/copilot-instructions.md
 .github/skills/
-AGENTS.md
-CLAUDE.md
-GEMINI.md
 # END ai-rulez
