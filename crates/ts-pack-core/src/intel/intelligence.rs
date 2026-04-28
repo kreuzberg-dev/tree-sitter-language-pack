@@ -69,7 +69,6 @@ pub(crate) fn compute_metrics(source: &str, root: &tree_sitter::Node) -> FileMet
             comment_lines += 1;
         }
     }
-    total_lines = total_lines.max(1);
     let code_lines = total_lines.saturating_sub(blank_lines + comment_lines);
     let mut node_count = 0;
     let mut error_count = 0;
