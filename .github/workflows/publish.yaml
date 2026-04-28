@@ -314,8 +314,7 @@ jobs:
         uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: maven
-          package: tree-sitter-language-pack
-          group-id: dev.kreuzberg
+          package: dev.kreuzberg:tree-sitter-language-pack
           version: ${{ needs.prepare.outputs.version }}
 
   check-hex:
@@ -1055,7 +1054,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Build Elixir NIF
-        working-directory: packages/elixir
+        working-directory: packages/elixir/native/tree_sitter_language_pack_nif
         run: cargo build --release --target ${{ matrix.target }}
         env:
           PROJECT_ROOT: ${{ github.workspace }}
@@ -1070,22 +1069,22 @@ jobs:
 
           if [[ "${{ runner.os }}" == "macOS" ]]; then
             ARCHIVE_EXT="so"
-            LIB_NAME="libts_pack_elixir.dylib"
+            LIB_NAME="libtree_sitter_language_pack_nif.dylib"
           else
             ARCHIVE_EXT="so"
-            LIB_NAME="libts_pack_elixir.so"
+            LIB_NAME="libtree_sitter_language_pack_nif.so"
           fi
 
           mkdir -p dist/elixir
           # Underscore name (matches Cargo output)
-          ARTIFACT_UNDERSCORE="libts_pack_elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
+          ARTIFACT_UNDERSCORE="libtree_sitter_language_pack_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
           # Hyphen name (matches what RustlerPrecompiled expects from crate: "ts-pack-elixir")
-          ARTIFACT_HYPHEN="libts-pack-elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
+          ARTIFACT_HYPHEN="libtree-sitter-language-pack-nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
 
           # ts-pack-elixir is a standalone workspace, output is in packages/elixir/target/
-          LIB_PATH="packages/elixir/target/${TARGET}/release/${LIB_NAME}"
+          LIB_PATH="packages/elixir/native/tree_sitter_language_pack_nif/target/${TARGET}/release/${LIB_NAME}"
           if [[ ! -f "$LIB_PATH" ]]; then
-            LIB_PATH="packages/elixir/target/release/${LIB_NAME}"
+            LIB_PATH="packages/elixir/native/tree_sitter_language_pack_nif/target/release/${LIB_NAME}"
           fi
           if [[ ! -f "$LIB_PATH" ]]; then
             LIB_PATH="target/${TARGET}/release/${LIB_NAME}"
@@ -1118,19 +1117,19 @@ jobs:
 
           if [[ "${{ runner.os }}" == "macOS" ]]; then
             ARCHIVE_EXT="so"
-            LIB_NAME="libts_pack_elixir.dylib"
+            LIB_NAME="libtree_sitter_language_pack_nif.dylib"
           else
             ARCHIVE_EXT="so"
-            LIB_NAME="libts_pack_elixir.so"
+            LIB_NAME="libtree_sitter_language_pack_nif.so"
           fi
 
-          ARTIFACT_UNDERSCORE="libts_pack_elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
-          ARTIFACT_HYPHEN="libts-pack-elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
+          ARTIFACT_UNDERSCORE="libtree_sitter_language_pack_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
+          ARTIFACT_HYPHEN="libtree-sitter-language-pack-nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
 
           # ts-pack-elixir is a standalone workspace, output is in packages/elixir/target/
-          LIB_PATH="packages/elixir/target/${TARGET}/release/${LIB_NAME}"
+          LIB_PATH="packages/elixir/native/tree_sitter_language_pack_nif/target/${TARGET}/release/${LIB_NAME}"
           if [[ ! -f "$LIB_PATH" ]]; then
-            LIB_PATH="packages/elixir/target/release/${LIB_NAME}"
+            LIB_PATH="packages/elixir/native/tree_sitter_language_pack_nif/target/release/${LIB_NAME}"
           fi
           if [[ ! -f "$LIB_PATH" ]]; then
             LIB_PATH="target/${TARGET}/release/${LIB_NAME}"

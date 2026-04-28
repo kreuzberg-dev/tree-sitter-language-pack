@@ -1,4 +1,4 @@
-version = "0.11.5"
+version = "0.11.6"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
 [crate]
@@ -137,6 +137,10 @@ app_name = "tree_sitter_language_pack"
 
 [wasm]
 env_shims = ["iswspace", "iswalnum", "towupper", "iswalpha"]
+# wasm32-unknown-unknown cannot link the download feature stack: ureq pulls
+# getrandom (which needs the `js` feature) and zstd needs a C toolchain.
+# Restrict the WASM crate to pure in-memory parsing.
+features = ["serde", "config"]
 
 [ruby]
 gem_name = "tree_sitter_language_pack"
