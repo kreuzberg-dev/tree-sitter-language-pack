@@ -565,7 +565,13 @@ jobs:
         run: pip install maturin
 
       - name: Build wheel
-        run: maturin build --release --manifest-path crates/ts-pack-core-py/Cargo.toml --out dist
+        # Run from packages/python so maturin picks up pyproject.toml's
+        # python-packages = ["tree_sitter_language_pack"] — without this,
+        # maturin builds a binary-only wheel containing just the .so plus
+        # dist-info and ships no Python source code (PyPI v1.6.3 regression,
+        # see #108).
+        working-directory: packages/python
+        run: maturin build --release --manifest-path ../../crates/ts-pack-core-py/Cargo.toml --out ../../dist
         env:
           PROJECT_ROOT: ${{ github.workspace }}
 
