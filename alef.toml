@@ -357,6 +357,12 @@ module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 function = "Process"
 alias = "tspack"
 
+[e2e.call.overrides.java]
+class = "dev.kreuzberg.treesitterlanguagepack.TreeSitterLanguagePack"
+
+[e2e.call.overrides.csharp]
+class = "TreeSitterLanguagePack"
+
 [e2e.calls.parse]
 function = "parse_string"
 module = "tree_sitter_language_pack"

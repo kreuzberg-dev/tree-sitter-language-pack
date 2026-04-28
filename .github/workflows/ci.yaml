@@ -882,6 +882,9 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1
+
       - name: Generate Go E2E tests
         run: task go:e2e:generate
 
