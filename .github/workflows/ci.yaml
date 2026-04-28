@@ -208,7 +208,11 @@ jobs:
         with:
           extra-args: --all-files
         env:
-          SKIP: alef-verify
+          # ai-rulez 4.0.8 has a non-deterministic Source-Hash that
+          # recomputes differently in CI versus local, so the hook always
+          # rewrites the header even when sources are byte-identical.
+          # Generation runs locally via `prek install`; skip here.
+          SKIP: alef-verify,ai-rulez-generate
 
   # ---------------------------------------------------------------------------
   # 2. validate-rust — Rust lint + alef checks
