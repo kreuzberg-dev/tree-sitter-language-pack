@@ -94,7 +94,7 @@ Tree = "tree_sitter_language_pack::Tree"
 [output]
 python = "crates/ts-pack-core-py/src/"
 node = "crates/ts-pack-core-node/src/"
-ruby = "packages/ruby/ext/ts_pack_core_rb/native/src/"
+ruby = "packages/ruby/ext/ts_pack_core_rb/src/"
 php = "crates/ts-pack-core-php/src/"
 ffi = "crates/ts-pack-core-ffi/src/"
 go = "packages/go/"
