@@ -12,7 +12,7 @@ defmodule E2eElixir.MixProject do
 
   defp deps do
     [
-      {:tree_sitter_language_pack, "0.1.0"}
+      {:tree_sitter_language_pack, "~> 1.8.0-rc.17"}
     ]
   end
 end

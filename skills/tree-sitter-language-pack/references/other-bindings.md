@@ -54,16 +54,16 @@ Maven:
 
 ```xml
 <dependency>
-    <groupId>io.github.treesitter</groupId>
-    <artifactId>languagepack</artifactId>
-    <version>1.0.0</version>
+    <groupId>dev.kreuzberg.treesitterlanguagepack</groupId>
+    <artifactId>tree-sitter-language-pack</artifactId>
+    <version>1.8.0-rc.17</version>
 </dependency>
 ```
 
 ### Quick Start
 
 ```java
-import io.github.treesitter.languagepack.*;
+import dev.kreuzberg.treesitterlanguagepack.*;
 
 public class Main {
     public static void main(String[] args) {

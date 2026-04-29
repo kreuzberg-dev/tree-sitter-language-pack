@@ -58,16 +58,16 @@ Rust core library providing access to 305 tree-sitter parsers with on-demand dow
 ## Installation
 
 ```sh
-cargo add ts-pack-core
+cargo add tree-sitter-language-pack
 ```
 
 ## Quick Start
 
 ```rust
-use ts_pack_core::{get_language, get_parser, available_languages};
+use tree_sitter_language_pack::{get_language, get_parser, available_languages};
 
 // Initialize and download specific languages (optional)
-ts_pack_core::init(&["python", "javascript", "rust"]).unwrap();
+tree_sitter_language_pack::init(&["python", "javascript", "rust"]).unwrap();
 
 // Get a language (auto-downloads if needed)
 let lang = get_language("python").unwrap();
@@ -83,17 +83,17 @@ for lang in available_languages() {
 }
 
 // Process source code (auto-downloads language if needed)
-let config = ts_pack_core::ProcessConfig::new("python").all();
-let result = ts_pack_core::process("def hello(): pass", &config).unwrap();
+let config = tree_sitter_language_pack::ProcessConfig::new("python").all();
+let result = tree_sitter_language_pack::process("def hello(): pass", &config).unwrap();
 println!("Functions: {}", result.structure.len());
 println!("Imports: {}", result.imports.len());
 
 // Pre-download languages for offline use
-ts_pack_core::download(&["python", "javascript"]).unwrap();
+tree_sitter_language_pack::download(&["python", "javascript"]).unwrap();
 
 // With chunking
-let config = ts_pack_core::ProcessConfig::new("python").all().with_chunking(1000);
-let result = ts_pack_core::process(source, &config).unwrap();
+let config = tree_sitter_language_pack::ProcessConfig::new("python").all().with_chunking(1000);
+let result = tree_sitter_language_pack::process(source, &config).unwrap();
 println!("Chunks: {}", result.chunks.len());
 ```
 
@@ -114,10 +114,10 @@ Parsers are downloaded automatically on first use. For production, CI, or Docker
 
 ```rust
 // Download specific languages
-ts_pack_core::download(&["python", "javascript", "rust"])?;
+tree_sitter_language_pack::download(&["python", "javascript", "rust"])?;
 
 // Download all 305 languages
-ts_pack_core::download_all()?;
+tree_sitter_language_pack::download_all()?;
 ```
 
 Or use the CLI:

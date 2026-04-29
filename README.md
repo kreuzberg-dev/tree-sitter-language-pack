@@ -82,7 +82,7 @@ tree-sitter-language-pack/
 ### Rust
 
 ```sh
-cargo add ts-pack-core
+cargo add tree-sitter-language-pack
 ```
 
 See [Rust README](crates/ts-pack-core/README.md) for full documentation.
@@ -97,7 +97,7 @@ pip install tree-sitter-language-pack
 uv add tree-sitter-language-pack
 ```
 
-See [Python README](crates/ts-pack-python/README.md) for full documentation.
+See [Python README](packages/python/README.md) for full documentation.
 
 ### Node.js
 
@@ -113,7 +113,7 @@ pnpm add @kreuzberg/tree-sitter-language-pack
 yarn add @kreuzberg/tree-sitter-language-pack
 ```
 
-See [Node.js README](crates/ts-pack-node/README.md) for full documentation.
+See [Node.js README](packages/typescript/README.md) for full documentation.
 
 ### Go
 
@@ -127,17 +127,17 @@ See [Go README](packages/go/README.md) for full documentation.
 
 ```xml
 <dependency>
-  <groupId>dev.kreuzberg</groupId>
+  <groupId>dev.kreuzberg.treesitterlanguagepack</groupId>
   <artifactId>tree-sitter-language-pack</artifactId>
-  <version>1.6.2</version>
+  <version>1.8.0-rc.17</version>
 </dependency>
 ```
 
 ```groovy
-implementation("dev.kreuzberg:tree-sitter-language-pack:1.6.2")
+implementation("dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.8.0-rc.17")
 ```
 
-See [Java README](crates/ts-pack-java/README.md) for full documentation.
+See [Java README](packages/java/README.md) for full documentation.
 
 ### Elixir
 
@@ -145,7 +145,7 @@ See [Java README](crates/ts-pack-java/README.md) for full documentation.
 {:tree_sitter_language_pack, "~> 1.0"}
 ```
 
-See [Elixir README](crates/ts-pack-elixir/README.md) for full documentation.
+See [Elixir README](packages/elixir/README.md) for full documentation.
 
 ### Ruby
 
@@ -153,7 +153,7 @@ See [Elixir README](crates/ts-pack-elixir/README.md) for full documentation.
 gem install tree_sitter_language_pack
 ```
 
-See [Ruby README](crates/ts-pack-ruby/README.md) for full documentation.
+See [Ruby README](packages/ruby/README.md) for full documentation.
 
 ### WebAssembly
 
@@ -169,7 +169,7 @@ pnpm add @kreuzberg/tree-sitter-language-pack-wasm
 yarn add @kreuzberg/tree-sitter-language-pack-wasm
 ```
 
-See [WebAssembly README](crates/ts-pack-wasm/README.md) for full documentation.
+See [WebAssembly README](crates/tree-sitter-language-pack-wasm/README.md) for full documentation.
 
 ### PHP
 
@@ -185,18 +185,18 @@ See [PHP README](packages/php/README.md) for full documentation.
 dotnet add package TreeSitterLanguagePack
 ```
 
-See [.NET (C#) README](packages/csharp/TreeSitterLanguagePack/README.md) for full documentation.
+See [.NET (C#) README](packages/csharp/README.md) for full documentation.
 
 ### C/C++ (FFI)
 
 Build from source as part of this workspace.
 
-See [C/C++ (FFI) README](crates/ts-pack-ffi/README.md) for full documentation.
+See [C/C++ (FFI) README](crates/tree-sitter-language-pack-ffi/README.md) for full documentation.
 
 ### CLI
 
 ```sh
-cargo install ts-pack
+cargo install ts-pack-cli
 ```
 
 See [CLI README](crates/ts-pack-cli/README.md) for full documentation.
