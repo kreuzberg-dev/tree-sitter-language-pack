@@ -1,4 +1,4 @@
-version = "0.11.6"
+version = "0.11.7"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
 [crate]
@@ -148,6 +148,10 @@ features = ["serde", "config"]
 
 [ruby]
 gem_name = "tree_sitter_language_pack"
+# Same &[&str] limitation as the elixir nif — alef-backend-magnus emits
+# `download(&names_refs)` but never declares `names_refs`. Exclude until
+# alef gains slice-of-str support.
+exclude_functions = ["download", "download_all"]
 
 [ruby.stubs]
 output = "packages/ruby/sig"
