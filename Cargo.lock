@@ -937,9 +937,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd"
 dependencies = [
  "cfg-if",
+ "js-sys",
  "libc",
  "r-efi 5.3.0",
  "wasip2",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -2012,7 +2014,7 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
 name = "snippet-runner"
-version = "1.8.0-rc.13"
+version = "1.8.0-rc.15"
 dependencies = [
  "clap",
  "rayon",
@@ -2266,7 +2268,7 @@ checksum = "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
 
 [[package]]
 name = "tree-sitter-language-pack"
-version = "1.8.0-rc.13"
+version = "1.8.0-rc.15"
 dependencies = [
  "ahash",
  "cc",
@@ -2287,7 +2289,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-cli"
-version = "1.8.0-rc.13"
+version = "1.8.0-rc.15"
 dependencies = [
  "clap",
  "clap_complete",
@@ -2297,7 +2299,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-ffi"
-version = "1.8.0-rc.13"
+version = "1.8.0-rc.15"
 dependencies = [
  "cbindgen",
  "serde_json",
@@ -2307,7 +2309,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-node"
-version = "1.8.0-rc.13"
+version = "1.8.0-rc.15"
 dependencies = [
  "napi",
  "napi-build",
@@ -2319,7 +2321,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-php"
-version = "1.8.0-rc.13"
+version = "1.8.0-rc.15"
 dependencies = [
  "ext-php-rs",
  "serde",
@@ -2330,7 +2332,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-py"
-version = "1.8.0-rc.13"
+version = "1.8.0-rc.15"
 dependencies = [
  "pyo3",
  "pyo3-async-runtimes",
@@ -2341,9 +2343,10 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-wasm"
-version = "1.8.0-rc.13"
+version = "1.8.0-rc.15"
 dependencies = [
  "futures-util",
+ "getrandom 0.3.4",
  "js-sys",
  "serde-wasm-bindgen",
  "serde_json",
