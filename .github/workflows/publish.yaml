@@ -808,11 +808,11 @@ jobs:
           fi
           echo "=== WASM build output (web) ==="
           ls -lh pkg/
-          if [ ! -f pkg/ts_pack_wasm_bg.wasm ]; then
+          if [ ! -f pkg/ts_pack_core_wasm_bg.wasm ]; then
             echo "ERROR: WASM binary not found" >&2
             exit 1
           fi
-          echo "WASM binary size: $(wc -c < pkg/ts_pack_wasm_bg.wasm) bytes"
+          echo "WASM binary size: $(wc -c < pkg/ts_pack_core_wasm_bg.wasm) bytes"
 
       - name: Patch WASM package.json
         working-directory: crates/ts-pack-core-wasm

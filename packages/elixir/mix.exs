@@ -4,7 +4,7 @@ defmodule Tree_sitter_language_pack.MixProject do
   def project do
     [
       app: :tree_sitter_language_pack,
-      version: "1.8.0-rc.21",
+      version: "1.8.0-rc.22",
       elixir: "~> 1.14",
       rustler_crates: [tree_sitter_language_pack_nif: [mode: :release]],
       description: "Pre-compiled tree-sitter grammars for 305 programming languages",
@@ -17,7 +17,13 @@ defmodule Tree_sitter_language_pack.MixProject do
     [
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/kreuzberg-dev/tree-sitter-language-pack"},
-      files: ~w(lib native .formatter.exs mix.exs README* checksum-*.exs)
+      files:
+        ~w(lib .formatter.exs mix.exs README* checksum-*.exs) ++
+          Path.wildcard("native/*/Cargo.toml") ++
+          Path.wildcard("native/*/Cargo.lock") ++
+          Path.wildcard("native/*/src/**/*") ++
+          Path.wildcard("native/*/build.rs") ++
+          Path.wildcard("native/*/.cargo/**/*")
     ]
   end
 
