@@ -79,7 +79,7 @@ impl PackConfig {
     ///     println!("Found config with {:?} languages", config.languages);
     /// }
     /// ```
-    #[cfg(all(feature = "config", feature = "download"))]
+    #[cfg(feature = "config")]
     pub fn discover() -> Option<Self> {
         // Search CWD upward
         if let Ok(cwd) = std::env::current_dir() {
