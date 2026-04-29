@@ -5,13 +5,13 @@ Pre-compiled tree-sitter grammars for 305 programming languages
 ## Installation
 
 ```bash
-npm install @kreuzberg/tree-sitter-language-pack-wasm
+npm install tree-sitter-language-pack-wasm
 ```
 
 ## Quick Start
 
 ```javascript
-import init from '@kreuzberg/tree-sitter-language-pack-wasm';
+import init from 'tree-sitter-language-pack-wasm';
 
 await init();
 // See https://github.com/kreuzberg-dev/tree-sitter-language-pack for usage examples.

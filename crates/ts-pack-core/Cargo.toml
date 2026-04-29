@@ -25,7 +25,6 @@ download = [
 [dependencies]
 ahash = { workspace = true }
 dirs = { workspace = true, optional = true }
-libloading = { workspace = true, optional = true }
 memchr = { workspace = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
@@ -36,6 +35,11 @@ toml = { workspace = true, optional = true }
 tree-sitter = { workspace = true }
 ureq = { workspace = true, optional = true }
 zstd = { workspace = true, optional = true }
+
+# libloading does not support wasm32. The `dynamic-loading` feature falls back
+# to stub implementations in registry.rs on wasm32 (always returns errors).
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+libloading = { workspace = true, optional = true }
 
 [build-dependencies]
 cc = { workspace = true }

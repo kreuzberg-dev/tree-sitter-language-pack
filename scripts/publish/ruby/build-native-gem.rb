@@ -22,7 +22,7 @@ unless VALID_PLATFORMS.include?(platform)
 end
 
 # Work from the Ruby crate directory
-gem_dir = File.expand_path('../../../crates/ts-pack-ruby', __dir__)
+gem_dir = File.expand_path('../../../packages/ruby', __dir__)
 Dir.chdir(gem_dir)
 
 # Validate compiled native library exists

@@ -5,7 +5,7 @@ Pre-compiled tree-sitter grammars for 305 programming languages
 ## Installation
 
 ```bash
-composer require kreuzberg/tree-sitter-language-pack
+composer require kreuzberg-dev/tree-sitter-language-pack
 ```
 
 ## Quick Start

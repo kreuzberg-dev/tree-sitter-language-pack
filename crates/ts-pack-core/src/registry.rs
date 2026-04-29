@@ -69,7 +69,55 @@ fn lib_path_in(dir: &std::path::Path, name: &str) -> PathBuf {
     dir.join(format!("{prefix}{lib_name}.{ext}"))
 }
 
-#[cfg(feature = "dynamic-loading")]
+#[cfg(all(feature = "dynamic-loading", target_arch = "wasm32"))]
+mod dynamic {
+    //! wasm32 stub: shared-library loading is unsupported on wasm32-unknown-unknown.
+    //! The public API mirrors the native impl but every load attempt returns an error.
+    use std::path::PathBuf;
+    use tree_sitter::Language;
+
+    use crate::error::Error;
+
+    pub(crate) struct DynamicLoader {
+        pub(crate) libs_dir: PathBuf,
+        pub(crate) dynamic_names: Vec<&'static str>,
+    }
+
+    impl DynamicLoader {
+        pub(crate) fn new(libs_dir: PathBuf, dynamic_names: Vec<&'static str>) -> Self {
+            Self {
+                libs_dir,
+                dynamic_names,
+            }
+        }
+
+        pub(crate) fn get_cached(&self, _name: &str) -> Result<Option<Language>, Error> {
+            Ok(None)
+        }
+
+        pub(crate) fn cached_names(&self) -> Vec<String> {
+            Vec::new()
+        }
+
+        pub(crate) fn lib_file_exists(&self, _name: &str) -> bool {
+            false
+        }
+
+        pub(crate) fn load_from_dir(&self, name: &str, _dir: &std::path::Path) -> Result<Language, Error> {
+            Err(Error::DynamicLoad(format!(
+                "Dynamic loading is unsupported on wasm32 (requested '{name}')"
+            )))
+        }
+
+        pub(crate) fn load(&self, name: &str) -> Result<Language, Error> {
+            Err(Error::DynamicLoad(format!(
+                "Dynamic loading is unsupported on wasm32 (requested '{name}')"
+            )))
+        }
+    }
+}
+
+#[cfg(all(feature = "dynamic-loading", not(target_arch = "wasm32")))]
 mod dynamic {
     use std::collections::HashMap;
     use std::path::PathBuf;

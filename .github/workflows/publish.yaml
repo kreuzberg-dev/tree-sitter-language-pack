@@ -1388,7 +1388,7 @@ jobs:
       - name: Stage native assets
         shell: bash
         run: |
-          RUNTIMES_DIR="packages/csharp/TreeSitterLanguagePack/runtimes"
+          RUNTIMES_DIR="packages/csharp/runtimes"
           mkdir -p "$RUNTIMES_DIR"
           for dir in artifacts/csharp-natives/*/; do
             rid=$(basename "$dir")
@@ -1399,14 +1399,14 @@ jobs:
           find "$RUNTIMES_DIR" -type f | head -20
 
       - name: Build and pack NuGet
-        working-directory: packages/csharp/TreeSitterLanguagePack
-        run: dotnet pack -c Release
+        working-directory: packages/csharp
+        run: dotnet pack TreeSitterLanguagePack.csproj -c Release
 
       - name: Upload NuGet package
         uses: actions/upload-artifact@v7
         with:
           name: nuget-packages
-          path: packages/csharp/TreeSitterLanguagePack/bin/Release/*.nupkg
+          path: packages/csharp/bin/Release/*.nupkg
           retention-days: 14
 
   # ─── Upload to GitHub Release: parser binaries ─────────────────────
@@ -1754,6 +1754,7 @@ jobs:
           echo "=== Downloaded artifacts ==="
           find artifacts -name '*.node' -type f
           echo ""
+          napi create-npm-dirs --npm-dir npm
           napi artifacts --build-output-dir artifacts --npm-dir npm
           echo "=== Generated platform packages ==="
           find npm -name '*.node' -type f
@@ -1998,7 +1999,7 @@ jobs:
         uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: maven
-          package: tree-sitter-language-pack
+          package: dev.kreuzberg:tree-sitter-language-pack
           version: ${{ needs.prepare.outputs.version }}
 
       - name: Setup Java
