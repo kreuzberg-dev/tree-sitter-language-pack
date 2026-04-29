@@ -12,7 +12,7 @@ set -euo pipefail
 
 VERSION="${1:?Usage: $0 <version>}"
 REPO="kreuzberg-dev/tree-sitter-language-pack"
-CHECKSUM_FILE="crates/ts-pack-elixir/checksum-Elixir.TreeSitterLanguagePack.exs"
+CHECKSUM_FILE="packages/elixir/checksum-Elixir.TreeSitterLanguagePack.exs"
 
 # Targets that are built in CI (from publish.yaml build-elixir-nifs matrix)
 TARGETS=(
@@ -40,9 +40,10 @@ CHECKSUMS=()
 
 for TARGET in "${TARGETS[@]}"; do
   for NIF_VERSION in "${NIF_VERSIONS[@]}"; do
-    # Upload both underscore and hyphen variants; RustlerPrecompiled uses hyphens
-    # (from crate: "ts-pack-elixir"), Cargo output uses underscores.
-    for PREFIX in "libts_pack_elixir" "libts-pack-elixir"; do
+    # Upload both underscore and hyphen variants; RustlerPrecompiled with
+    # crate: "tree_sitter_language_pack_nif" expects either form depending
+    # on the runtime's name normalization.
+    for PREFIX in "libtree_sitter_language_pack_nif" "libtree-sitter-language-pack-nif"; do
       FILENAME="${PREFIX}-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.so.tar.gz"
       URL="https://github.com/${REPO}/releases/download/v${VERSION}/${FILENAME}"
 

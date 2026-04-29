@@ -10,7 +10,7 @@ description = "Core library for tree-sitter language pack - provides compiled pa
 default = ["dynamic-loading", "download"]
 dynamic-loading = ["dep:libloading"]
 serde = ["dep:serde", "dep:serde_json"]
-config = ["dep:serde", "dep:serde_json", "dep:toml"]
+config = ["dep:serde", "dep:serde_json", "dep:toml", "dep:dirs"]
 download = [
     "dep:ureq",
     "dep:sha2",
