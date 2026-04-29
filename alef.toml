@@ -143,8 +143,10 @@ exclude_functions = ["download", "download_all"]
 env_shims = ["iswspace", "iswalnum", "towupper", "iswalpha"]
 # wasm32-unknown-unknown cannot link the download feature stack: ureq pulls
 # getrandom (which needs the `js` feature) and zstd needs a C toolchain.
-# Restrict the WASM crate to pure in-memory parsing.
-features = ["serde", "config"]
+# Keep dynamic-loading because alef-generated wasm wrappers reference
+# PackConfig::discover / LanguageRegistry::with_libs_dir which are gated
+# behind it.
+features = ["serde", "config", "dynamic-loading"]
 
 [ruby]
 gem_name = "tree_sitter_language_pack"

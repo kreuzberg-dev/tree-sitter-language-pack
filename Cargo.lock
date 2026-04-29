@@ -2012,7 +2012,7 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
 name = "snippet-runner"
-version = "1.8.0-rc.12"
+version = "1.8.0-rc.13"
 dependencies = [
  "clap",
  "rayon",
@@ -2266,7 +2266,7 @@ checksum = "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
 
 [[package]]
 name = "tree-sitter-language-pack"
-version = "1.8.0-rc.12"
+version = "1.8.0-rc.13"
 dependencies = [
  "ahash",
  "cc",
@@ -2287,7 +2287,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-cli"
-version = "1.8.0-rc.12"
+version = "1.8.0-rc.13"
 dependencies = [
  "clap",
  "clap_complete",
@@ -2297,7 +2297,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-ffi"
-version = "1.8.0-rc.12"
+version = "1.8.0-rc.13"
 dependencies = [
  "cbindgen",
  "serde_json",
@@ -2307,7 +2307,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-node"
-version = "1.8.0-rc.12"
+version = "1.8.0-rc.13"
 dependencies = [
  "napi",
  "napi-build",
@@ -2319,7 +2319,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-php"
-version = "1.8.0-rc.12"
+version = "1.8.0-rc.13"
 dependencies = [
  "ext-php-rs",
  "serde",
@@ -2330,7 +2330,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-py"
-version = "1.8.0-rc.12"
+version = "1.8.0-rc.13"
 dependencies = [
  "pyo3",
  "pyo3-async-runtimes",
@@ -2341,7 +2341,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-wasm"
-version = "1.8.0-rc.12"
+version = "1.8.0-rc.13"
 dependencies = [
  "futures-util",
  "js-sys",
