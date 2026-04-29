@@ -8,23 +8,23 @@ package dev.kreuzberg.treesitterlanguagepack;
 /** Configuration for an extraction run against a single language. */
 public class ExtractionConfigBuilder {
 
-  private String language = "";
-  private String patterns = "";
+	private String language = "";
+	private String patterns = "";
 
-  /** Sets the language field. */
-  public ExtractionConfigBuilder withLanguage(final String value) {
-    this.language = value;
-    return this;
-  }
+	/** Sets the language field. */
+	public ExtractionConfigBuilder withLanguage(final String value) {
+		this.language = value;
+		return this;
+	}
 
-  /** Sets the patterns field. */
-  public ExtractionConfigBuilder withPatterns(final String value) {
-    this.patterns = value;
-    return this;
-  }
+	/** Sets the patterns field. */
+	public ExtractionConfigBuilder withPatterns(final String value) {
+		this.patterns = value;
+		return this;
+	}
 
-  /** Builds the ExtractionConfig instance. */
-  public ExtractionConfig build() {
-    return new ExtractionConfig(language, patterns);
-  }
+	/** Builds the ExtractionConfig instance. */
+	public ExtractionConfig build() {
+		return new ExtractionConfig(language, patterns);
+	}
 }

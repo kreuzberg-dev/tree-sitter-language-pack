@@ -8,51 +8,51 @@ package dev.kreuzberg.treesitterlanguagepack;
 /** A chunk of source code with rich metadata. */
 public class CodeChunkBuilder {
 
-  private String content = "";
-  private long startByte = 0;
-  private long endByte = 0;
-  private long startLine = 0;
-  private long endLine = 0;
-  private ChunkContext metadata = null;
+	private String content = "";
+	private long startByte = 0;
+	private long endByte = 0;
+	private long startLine = 0;
+	private long endLine = 0;
+	private ChunkContext metadata = null;
 
-  /** Sets the content field. */
-  public CodeChunkBuilder withContent(final String value) {
-    this.content = value;
-    return this;
-  }
+	/** Sets the content field. */
+	public CodeChunkBuilder withContent(final String value) {
+		this.content = value;
+		return this;
+	}
 
-  /** Sets the startByte field. */
-  public CodeChunkBuilder withStartByte(final long value) {
-    this.startByte = value;
-    return this;
-  }
+	/** Sets the startByte field. */
+	public CodeChunkBuilder withStartByte(final long value) {
+		this.startByte = value;
+		return this;
+	}
 
-  /** Sets the endByte field. */
-  public CodeChunkBuilder withEndByte(final long value) {
-    this.endByte = value;
-    return this;
-  }
+	/** Sets the endByte field. */
+	public CodeChunkBuilder withEndByte(final long value) {
+		this.endByte = value;
+		return this;
+	}
 
-  /** Sets the startLine field. */
-  public CodeChunkBuilder withStartLine(final long value) {
-    this.startLine = value;
-    return this;
-  }
+	/** Sets the startLine field. */
+	public CodeChunkBuilder withStartLine(final long value) {
+		this.startLine = value;
+		return this;
+	}
 
-  /** Sets the endLine field. */
-  public CodeChunkBuilder withEndLine(final long value) {
-    this.endLine = value;
-    return this;
-  }
+	/** Sets the endLine field. */
+	public CodeChunkBuilder withEndLine(final long value) {
+		this.endLine = value;
+		return this;
+	}
 
-  /** Sets the metadata field. */
-  public CodeChunkBuilder withMetadata(final ChunkContext value) {
-    this.metadata = value;
-    return this;
-  }
+	/** Sets the metadata field. */
+	public CodeChunkBuilder withMetadata(final ChunkContext value) {
+		this.metadata = value;
+		return this;
+	}
 
-  /** Builds the CodeChunk instance. */
-  public CodeChunk build() {
-    return new CodeChunk(content, startByte, endByte, startLine, endLine, metadata);
-  }
+	/** Builds the CodeChunk instance. */
+	public CodeChunk build() {
+		return new CodeChunk(content, startByte, endByte, startLine, endLine, metadata);
+	}
 }

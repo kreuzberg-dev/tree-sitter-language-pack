@@ -10,17 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 /** A structural item (function, class, struct, etc.) in source code. */
-public record StructureItem(
-    Object kind,
-    Optional<String> name,
-    Optional<String> visibility,
-    Span span,
-    List<StructureItem> children,
-    List<String> decorators,
-    @JsonProperty("doc_comment") Optional<String> docComment,
-    Optional<String> signature,
-    @JsonProperty("body_span") Optional<Span> bodySpan) {
-  public static StructureItemBuilder builder() {
-    return new StructureItemBuilder();
-  }
+public record StructureItem(Object kind, Optional<String> name, Optional<String> visibility, Span span,
+		List<StructureItem> children, List<String> decorators, @JsonProperty("doc_comment") Optional<String> docComment,
+		Optional<String> signature, @JsonProperty("body_span") Optional<Span> bodySpan) {
+	public static StructureItemBuilder builder() {
+		return new StructureItemBuilder();
+	}
 }

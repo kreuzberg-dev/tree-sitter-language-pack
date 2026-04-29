@@ -9,17 +9,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /** Metadata for a single chunk of source code. */
-public record ChunkContext(
-    String language,
-    @JsonProperty("chunk_index") long chunkIndex,
-    @JsonProperty("total_chunks") long totalChunks,
-    @JsonProperty("node_types") List<String> nodeTypes,
-    @JsonProperty("context_path") List<String> contextPath,
-    @JsonProperty("symbols_defined") List<String> symbolsDefined,
-    List<CommentInfo> comments,
-    List<DocstringInfo> docstrings,
-    @JsonProperty("has_error_nodes") boolean hasErrorNodes) {
-  public static ChunkContextBuilder builder() {
-    return new ChunkContextBuilder();
-  }
+public record ChunkContext(String language, @JsonProperty("chunk_index") long chunkIndex,
+		@JsonProperty("total_chunks") long totalChunks, @JsonProperty("node_types") List<String> nodeTypes,
+		@JsonProperty("context_path") List<String> contextPath,
+		@JsonProperty("symbols_defined") List<String> symbolsDefined, List<CommentInfo> comments,
+		List<DocstringInfo> docstrings, @JsonProperty("has_error_nodes") boolean hasErrorNodes) {
+	public static ChunkContextBuilder builder() {
+		return new ChunkContextBuilder();
+	}
 }

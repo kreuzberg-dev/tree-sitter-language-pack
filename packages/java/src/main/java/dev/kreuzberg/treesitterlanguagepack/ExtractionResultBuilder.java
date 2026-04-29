@@ -8,23 +8,23 @@ package dev.kreuzberg.treesitterlanguagepack;
 /** Complete extraction results for all patterns. */
 public class ExtractionResultBuilder {
 
-  private String language = "";
-  private String results = "";
+	private String language = "";
+	private String results = "";
 
-  /** Sets the language field. */
-  public ExtractionResultBuilder withLanguage(final String value) {
-    this.language = value;
-    return this;
-  }
+	/** Sets the language field. */
+	public ExtractionResultBuilder withLanguage(final String value) {
+		this.language = value;
+		return this;
+	}
 
-  /** Sets the results field. */
-  public ExtractionResultBuilder withResults(final String value) {
-    this.results = value;
-    return this;
-  }
+	/** Sets the results field. */
+	public ExtractionResultBuilder withResults(final String value) {
+		this.results = value;
+		return this;
+	}
 
-  /** Builds the ExtractionResult instance. */
-  public ExtractionResult build() {
-    return new ExtractionResult(language, results);
-  }
+	/** Builds the ExtractionResult instance. */
+	public ExtractionResult build() {
+		return new ExtractionResult(language, results);
+	}
 }

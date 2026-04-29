@@ -10,37 +10,37 @@ import java.util.Optional;
 /** A comment extracted from source code. */
 public class CommentInfoBuilder {
 
-  private String text = "";
-  private CommentKind kind = null;
-  private Span span = null;
-  private Optional<String> associatedNode = Optional.empty();
+	private String text = "";
+	private CommentKind kind = null;
+	private Span span = null;
+	private Optional<String> associatedNode = Optional.empty();
 
-  /** Sets the text field. */
-  public CommentInfoBuilder withText(final String value) {
-    this.text = value;
-    return this;
-  }
+	/** Sets the text field. */
+	public CommentInfoBuilder withText(final String value) {
+		this.text = value;
+		return this;
+	}
 
-  /** Sets the kind field. */
-  public CommentInfoBuilder withKind(final CommentKind value) {
-    this.kind = value;
-    return this;
-  }
+	/** Sets the kind field. */
+	public CommentInfoBuilder withKind(final CommentKind value) {
+		this.kind = value;
+		return this;
+	}
 
-  /** Sets the span field. */
-  public CommentInfoBuilder withSpan(final Span value) {
-    this.span = value;
-    return this;
-  }
+	/** Sets the span field. */
+	public CommentInfoBuilder withSpan(final Span value) {
+		this.span = value;
+		return this;
+	}
 
-  /** Sets the associatedNode field. */
-  public CommentInfoBuilder withAssociatedNode(final Optional<String> value) {
-    this.associatedNode = value;
-    return this;
-  }
+	/** Sets the associatedNode field. */
+	public CommentInfoBuilder withAssociatedNode(final Optional<String> value) {
+		this.associatedNode = value;
+		return this;
+	}
 
-  /** Builds the CommentInfo instance. */
-  public CommentInfo build() {
-    return new CommentInfo(text, kind, span, associatedNode);
-  }
+	/** Builds the CommentInfo instance. */
+	public CommentInfo build() {
+		return new CommentInfo(text, kind, span, associatedNode);
+	}
 }

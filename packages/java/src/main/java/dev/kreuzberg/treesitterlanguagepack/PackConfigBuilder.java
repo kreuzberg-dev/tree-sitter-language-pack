@@ -11,42 +11,48 @@ import java.util.Optional;
 /**
  * Configuration for the tree-sitter language pack.
  *
- * <p>Controls cache directory and which languages to pre-download. Can be loaded from a TOML file,
- * constructed programmatically, or passed as a dict/object from language bindings.
+ * <p>
+ * Controls cache directory and which languages to pre-download. Can be loaded
+ * from a TOML file, constructed programmatically, or passed as a dict/object
+ * from language bindings.
  *
- * <p># Example
+ * <p>
+ * # Example
  *
- * <p>{@code }{@code no_run} use tree_sitter_language_pack::PackConfig;
+ * <p>
+ * {@code }{@code no_run} use tree_sitter_language_pack::PackConfig;
  *
- * <p>let config = PackConfig { cache_dir: None, languages: Some(vec!["python".to_string(),
- * "rust".to_string()]), groups: None, }; {@code }{@code }
+ * <p>
+ * let config = PackConfig { cache_dir: None, languages:
+ * Some(vec!["python".to_string(), "rust".to_string()]), groups: None, };
+ * {@code }{@code }
  */
 public class PackConfigBuilder {
 
-  private Optional<java.nio.file.Path> cacheDir = Optional.empty();
-  private Optional<List<String>> languages = Optional.empty();
-  private Optional<List<String>> groups = Optional.empty();
+	private Optional<java.nio.file.Path> cacheDir = Optional.empty();
+	private Optional<List<String>> languages = Optional.empty();
+	private Optional<List<String>> groups = Optional.empty();
 
-  /** Sets the cacheDir field. */
-  public PackConfigBuilder withCacheDir(final Optional<java.nio.file.Path> value) {
-    this.cacheDir = value;
-    return this;
-  }
+	/** Sets the cacheDir field. */
+	public PackConfigBuilder withCacheDir(final Optional<java.nio.file.Path> value) {
+		this.cacheDir = value;
+		return this;
+	}
 
-  /** Sets the languages field. */
-  public PackConfigBuilder withLanguages(final Optional<List<String>> value) {
-    this.languages = value;
-    return this;
-  }
+	/** Sets the languages field. */
+	public PackConfigBuilder withLanguages(final Optional<List<String>> value) {
+		this.languages = value;
+		return this;
+	}
 
-  /** Sets the groups field. */
-  public PackConfigBuilder withGroups(final Optional<List<String>> value) {
-    this.groups = value;
-    return this;
-  }
+	/** Sets the groups field. */
+	public PackConfigBuilder withGroups(final Optional<List<String>> value) {
+		this.groups = value;
+		return this;
+	}
 
-  /** Builds the PackConfig instance. */
-  public PackConfig build() {
-    return new PackConfig(cacheDir, languages, groups);
-  }
+	/** Builds the PackConfig instance. */
+	public PackConfig build() {
+		return new PackConfig(cacheDir, languages, groups);
+	}
 }

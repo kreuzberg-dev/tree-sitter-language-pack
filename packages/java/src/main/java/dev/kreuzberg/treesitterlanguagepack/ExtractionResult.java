@@ -7,7 +7,7 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 /** Complete extraction results for all patterns. */
 public record ExtractionResult(String language, String results) {
-  public static ExtractionResultBuilder builder() {
-    return new ExtractionResultBuilder();
-  }
+	public static ExtractionResultBuilder builder() {
+		return new ExtractionResultBuilder();
+	}
 }

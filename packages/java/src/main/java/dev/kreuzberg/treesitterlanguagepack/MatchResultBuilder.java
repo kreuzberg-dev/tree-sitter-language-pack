@@ -10,23 +10,23 @@ import java.util.List;
 /** A single query match containing one or more captures. */
 public class MatchResultBuilder {
 
-  private long patternIndex = 0;
-  private List<CaptureResult> captures = List.of();
+	private long patternIndex = 0;
+	private List<CaptureResult> captures = List.of();
 
-  /** Sets the patternIndex field. */
-  public MatchResultBuilder withPatternIndex(final long value) {
-    this.patternIndex = value;
-    return this;
-  }
+	/** Sets the patternIndex field. */
+	public MatchResultBuilder withPatternIndex(final long value) {
+		this.patternIndex = value;
+		return this;
+	}
 
-  /** Sets the captures field. */
-  public MatchResultBuilder withCaptures(final List<CaptureResult> value) {
-    this.captures = value;
-    return this;
-  }
+	/** Sets the captures field. */
+	public MatchResultBuilder withCaptures(final List<CaptureResult> value) {
+		this.captures = value;
+		return this;
+	}
 
-  /** Builds the MatchResult instance. */
-  public MatchResult build() {
-    return new MatchResult(patternIndex, captures);
-  }
+	/** Builds the MatchResult instance. */
+	public MatchResult build() {
+		return new MatchResult(patternIndex, captures);
+	}
 }

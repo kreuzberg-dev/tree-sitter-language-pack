@@ -8,23 +8,23 @@ package dev.kreuzberg.treesitterlanguagepack;
 /** Validation results for an entire extraction config. */
 public class ValidationResultBuilder {
 
-  private boolean valid = false;
-  private String patterns = "";
+	private boolean valid = false;
+	private String patterns = "";
 
-  /** Sets the valid field. */
-  public ValidationResultBuilder withValid(final boolean value) {
-    this.valid = value;
-    return this;
-  }
+	/** Sets the valid field. */
+	public ValidationResultBuilder withValid(final boolean value) {
+		this.valid = value;
+		return this;
+	}
 
-  /** Sets the patterns field. */
-  public ValidationResultBuilder withPatterns(final String value) {
-    this.patterns = value;
-    return this;
-  }
+	/** Sets the patterns field. */
+	public ValidationResultBuilder withPatterns(final String value) {
+		this.patterns = value;
+		return this;
+	}
 
-  /** Builds the ValidationResult instance. */
-  public ValidationResult build() {
-    return new ValidationResult(valid, patterns);
-  }
+	/** Builds the ValidationResult instance. */
+	public ValidationResult build() {
+		return new ValidationResult(valid, patterns);
+	}
 }

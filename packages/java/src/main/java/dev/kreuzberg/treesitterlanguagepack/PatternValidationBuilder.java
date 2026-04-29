@@ -10,44 +10,44 @@ import java.util.List;
 /** Validation information for a single pattern. */
 public class PatternValidationBuilder {
 
-  private boolean valid = false;
-  private List<String> captureNames = List.of();
-  private long patternCount = 0;
-  private List<String> warnings = List.of();
-  private List<String> errors = List.of();
+	private boolean valid = false;
+	private List<String> captureNames = List.of();
+	private long patternCount = 0;
+	private List<String> warnings = List.of();
+	private List<String> errors = List.of();
 
-  /** Sets the valid field. */
-  public PatternValidationBuilder withValid(final boolean value) {
-    this.valid = value;
-    return this;
-  }
+	/** Sets the valid field. */
+	public PatternValidationBuilder withValid(final boolean value) {
+		this.valid = value;
+		return this;
+	}
 
-  /** Sets the captureNames field. */
-  public PatternValidationBuilder withCaptureNames(final List<String> value) {
-    this.captureNames = value;
-    return this;
-  }
+	/** Sets the captureNames field. */
+	public PatternValidationBuilder withCaptureNames(final List<String> value) {
+		this.captureNames = value;
+		return this;
+	}
 
-  /** Sets the patternCount field. */
-  public PatternValidationBuilder withPatternCount(final long value) {
-    this.patternCount = value;
-    return this;
-  }
+	/** Sets the patternCount field. */
+	public PatternValidationBuilder withPatternCount(final long value) {
+		this.patternCount = value;
+		return this;
+	}
 
-  /** Sets the warnings field. */
-  public PatternValidationBuilder withWarnings(final List<String> value) {
-    this.warnings = value;
-    return this;
-  }
+	/** Sets the warnings field. */
+	public PatternValidationBuilder withWarnings(final List<String> value) {
+		this.warnings = value;
+		return this;
+	}
 
-  /** Sets the errors field. */
-  public PatternValidationBuilder withErrors(final List<String> value) {
-    this.errors = value;
-    return this;
-  }
+	/** Sets the errors field. */
+	public PatternValidationBuilder withErrors(final List<String> value) {
+		this.errors = value;
+		return this;
+	}
 
-  /** Builds the PatternValidation instance. */
-  public PatternValidation build() {
-    return new PatternValidation(valid, captureNames, patternCount, warnings, errors);
-  }
+	/** Builds the PatternValidation instance. */
+	public PatternValidation build() {
+		return new PatternValidation(valid, captureNames, patternCount, warnings, errors);
+	}
 }

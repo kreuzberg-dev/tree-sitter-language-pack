@@ -10,23 +10,23 @@ import java.util.List;
 /** Results for a single named pattern. */
 public class PatternResultBuilder {
 
-  private List<MatchResult> matches = List.of();
-  private long totalCount = 0;
+	private List<MatchResult> matches = List.of();
+	private long totalCount = 0;
 
-  /** Sets the matches field. */
-  public PatternResultBuilder withMatches(final List<MatchResult> value) {
-    this.matches = value;
-    return this;
-  }
+	/** Sets the matches field. */
+	public PatternResultBuilder withMatches(final List<MatchResult> value) {
+		this.matches = value;
+		return this;
+	}
 
-  /** Sets the totalCount field. */
-  public PatternResultBuilder withTotalCount(final long value) {
-    this.totalCount = value;
-    return this;
-  }
+	/** Sets the totalCount field. */
+	public PatternResultBuilder withTotalCount(final long value) {
+		this.totalCount = value;
+		return this;
+	}
 
-  /** Builds the PatternResult instance. */
-  public PatternResult build() {
-    return new PatternResult(matches, totalCount);
-  }
+	/** Builds the PatternResult instance. */
+	public PatternResult build() {
+		return new PatternResult(matches, totalCount);
+	}
 }

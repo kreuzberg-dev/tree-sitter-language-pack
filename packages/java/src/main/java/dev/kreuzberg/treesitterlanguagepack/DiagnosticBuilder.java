@@ -8,30 +8,30 @@ package dev.kreuzberg.treesitterlanguagepack;
 /** A diagnostic (syntax error, missing node, etc.) from parsing. */
 public class DiagnosticBuilder {
 
-  private String message = "";
-  private DiagnosticSeverity severity = null;
-  private Span span = null;
+	private String message = "";
+	private DiagnosticSeverity severity = null;
+	private Span span = null;
 
-  /** Sets the message field. */
-  public DiagnosticBuilder withMessage(final String value) {
-    this.message = value;
-    return this;
-  }
+	/** Sets the message field. */
+	public DiagnosticBuilder withMessage(final String value) {
+		this.message = value;
+		return this;
+	}
 
-  /** Sets the severity field. */
-  public DiagnosticBuilder withSeverity(final DiagnosticSeverity value) {
-    this.severity = value;
-    return this;
-  }
+	/** Sets the severity field. */
+	public DiagnosticBuilder withSeverity(final DiagnosticSeverity value) {
+		this.severity = value;
+		return this;
+	}
 
-  /** Sets the span field. */
-  public DiagnosticBuilder withSpan(final Span value) {
-    this.span = value;
-    return this;
-  }
+	/** Sets the span field. */
+	public DiagnosticBuilder withSpan(final Span value) {
+		this.span = value;
+		return this;
+	}
 
-  /** Builds the Diagnostic instance. */
-  public Diagnostic build() {
-    return new Diagnostic(message, severity, span);
-  }
+	/** Builds the Diagnostic instance. */
+	public Diagnostic build() {
+		return new Diagnostic(message, severity, span);
+	}
 }

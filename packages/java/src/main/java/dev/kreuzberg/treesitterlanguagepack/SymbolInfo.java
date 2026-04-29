@@ -9,13 +9,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Optional;
 
 /** A symbol (variable, function, type, etc.) extracted from source code. */
-public record SymbolInfo(
-    String name,
-    Object kind,
-    Span span,
-    @JsonProperty("type_annotation") Optional<String> typeAnnotation,
-    Optional<String> doc) {
-  public static SymbolInfoBuilder builder() {
-    return new SymbolInfoBuilder();
-  }
+public record SymbolInfo(String name, Object kind, Span span,
+		@JsonProperty("type_annotation") Optional<String> typeAnnotation, Optional<String> doc) {
+	public static SymbolInfoBuilder builder() {
+		return new SymbolInfoBuilder();
+	}
 }

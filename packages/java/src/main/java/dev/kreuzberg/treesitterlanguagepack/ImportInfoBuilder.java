@@ -11,44 +11,44 @@ import java.util.Optional;
 /** An import statement extracted from source code. */
 public class ImportInfoBuilder {
 
-  private String source = "";
-  private List<String> items = List.of();
-  private Optional<String> alias = Optional.empty();
-  private boolean isWildcard = false;
-  private Span span = null;
+	private String source = "";
+	private List<String> items = List.of();
+	private Optional<String> alias = Optional.empty();
+	private boolean isWildcard = false;
+	private Span span = null;
 
-  /** Sets the source field. */
-  public ImportInfoBuilder withSource(final String value) {
-    this.source = value;
-    return this;
-  }
+	/** Sets the source field. */
+	public ImportInfoBuilder withSource(final String value) {
+		this.source = value;
+		return this;
+	}
 
-  /** Sets the items field. */
-  public ImportInfoBuilder withItems(final List<String> value) {
-    this.items = value;
-    return this;
-  }
+	/** Sets the items field. */
+	public ImportInfoBuilder withItems(final List<String> value) {
+		this.items = value;
+		return this;
+	}
 
-  /** Sets the alias field. */
-  public ImportInfoBuilder withAlias(final Optional<String> value) {
-    this.alias = value;
-    return this;
-  }
+	/** Sets the alias field. */
+	public ImportInfoBuilder withAlias(final Optional<String> value) {
+		this.alias = value;
+		return this;
+	}
 
-  /** Sets the isWildcard field. */
-  public ImportInfoBuilder withIsWildcard(final boolean value) {
-    this.isWildcard = value;
-    return this;
-  }
+	/** Sets the isWildcard field. */
+	public ImportInfoBuilder withIsWildcard(final boolean value) {
+		this.isWildcard = value;
+		return this;
+	}
 
-  /** Sets the span field. */
-  public ImportInfoBuilder withSpan(final Span value) {
-    this.span = value;
-    return this;
-  }
+	/** Sets the span field. */
+	public ImportInfoBuilder withSpan(final Span value) {
+		this.span = value;
+		return this;
+	}
 
-  /** Builds the ImportInfo instance. */
-  public ImportInfo build() {
-    return new ImportInfo(source, items, alias, isWildcard, span);
-  }
+	/** Builds the ImportInfo instance. */
+	public ImportInfo build() {
+		return new ImportInfo(source, items, alias, isWildcard, span);
+	}
 }

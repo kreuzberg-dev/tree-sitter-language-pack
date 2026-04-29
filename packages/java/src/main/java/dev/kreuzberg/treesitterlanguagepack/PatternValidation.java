@@ -10,17 +10,16 @@ import java.util.List;
 
 /** Validation information for a single pattern. */
 public record PatternValidation(
-    /** Whether the pattern compiled successfully. */
-    boolean valid,
-    /** Names of captures defined in the query. */
-    @JsonProperty("capture_names") List<String> captureNames,
-    /** Number of patterns in the query. */
-    @JsonProperty("pattern_count") long patternCount,
-    /** Non-fatal warnings (e.g., unused captures). */
-    List<String> warnings,
-    /** Fatal errors (e.g., query syntax errors). */
-    List<String> errors) {
-  public static PatternValidationBuilder builder() {
-    return new PatternValidationBuilder();
-  }
+		/** Whether the pattern compiled successfully. */
+		boolean valid,
+		/** Names of captures defined in the query. */
+		@JsonProperty("capture_names") List<String> captureNames,
+		/** Number of patterns in the query. */
+		@JsonProperty("pattern_count") long patternCount,
+		/** Non-fatal warnings (e.g., unused captures). */
+		List<String> warnings, /** Fatal errors (e.g., query syntax errors). */
+		List<String> errors) {
+	public static PatternValidationBuilder builder() {
+		return new PatternValidationBuilder();
+	}
 }

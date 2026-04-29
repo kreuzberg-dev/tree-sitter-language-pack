@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 /** Manifest describing available parser downloads for a specific version. */
-public record ParserManifest(
-    String version,
-    Map<String, PlatformBundle> platforms,
-    Map<String, LanguageInfo> languages,
-    Map<String, List<String>> groups) {}
+public record ParserManifest(String version, Map<String, PlatformBundle> platforms, Map<String, LanguageInfo> languages,
+		Map<String, List<String>> groups) {
+}

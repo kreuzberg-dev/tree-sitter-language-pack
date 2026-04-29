@@ -10,40 +10,46 @@ import java.lang.foreign.MemorySegment;
 /**
  * Thread-safe registry of tree-sitter language parsers.
  *
- * <p>Manages both statically compiled and dynamically loaded language grammars. Use
- * [`LanguageRegistry::new()`] for the default registry, or access the global instance via the
- * module-level convenience functions ([`crate::get_language`], [`crate::available_languages`],
- * etc.).
+ * <p>
+ * Manages both statically compiled and dynamically loaded language grammars.
+ * Use [`LanguageRegistry::new()`] for the default registry, or access the
+ * global instance via the module-level convenience functions
+ * ([`crate::get_language`], [`crate::available_languages`], etc.).
  *
- * <p># Example
+ * <p>
+ * # Example
  *
- * <p>```no_run use tree_sitter_language_pack::{LanguageRegistry, ProcessConfig};
+ * <p>
+ * ```no_run use tree_sitter_language_pack::{LanguageRegistry, ProcessConfig};
  *
- * <p>let registry = LanguageRegistry::new(); let langs = registry.available_languages();
- * println!("Available: {:?}", langs);
+ * <p>
+ * let registry = LanguageRegistry::new(); let langs =
+ * registry.available_languages(); println!("Available: {:?}", langs);
  *
- * <p>let config = ProcessConfig::new("python").all(); let result = registry.process("def hello():
- * pass", &config).unwrap(); println!("Structure: {:?}", result.structure); ```
+ * <p>
+ * let config = ProcessConfig::new("python").all(); let result =
+ * registry.process("def hello(): pass", &config).unwrap(); println!("Structure:
+ * {:?}", result.structure); ```
  */
 public class LanguageRegistry implements AutoCloseable {
-  private final MemorySegment handle;
+	private final MemorySegment handle;
 
-  LanguageRegistry(MemorySegment handle) {
-    this.handle = handle;
-  }
+	LanguageRegistry(MemorySegment handle) {
+		this.handle = handle;
+	}
 
-  MemorySegment handle() {
-    return this.handle;
-  }
+	MemorySegment handle() {
+		return this.handle;
+	}
 
-  @Override
-  public void close() {
-    if (handle != null && !handle.equals(MemorySegment.NULL)) {
-      try {
-        NativeLib.TS_PACK_LANGUAGE_REGISTRY_FREE.invoke(handle);
-      } catch (Throwable e) {
-        throw new RuntimeException("Failed to free LanguageRegistry: " + e.getMessage(), e);
-      }
-    }
-  }
+	@Override
+	public void close() {
+		if (handle != null && !handle.equals(MemorySegment.NULL)) {
+			try {
+				NativeLib.TS_PACK_LANGUAGE_REGISTRY_FREE.invoke(handle);
+			} catch (Throwable e) {
+				throw new RuntimeException("Failed to free LanguageRegistry: " + e.getMessage(), e);
+			}
+		}
+	}
 }

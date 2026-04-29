@@ -8,30 +8,30 @@ package dev.kreuzberg.treesitterlanguagepack;
 /** An export statement extracted from source code. */
 public class ExportInfoBuilder {
 
-  private String name = "";
-  private ExportKind kind = null;
-  private Span span = null;
+	private String name = "";
+	private ExportKind kind = null;
+	private Span span = null;
 
-  /** Sets the name field. */
-  public ExportInfoBuilder withName(final String value) {
-    this.name = value;
-    return this;
-  }
+	/** Sets the name field. */
+	public ExportInfoBuilder withName(final String value) {
+		this.name = value;
+		return this;
+	}
 
-  /** Sets the kind field. */
-  public ExportInfoBuilder withKind(final ExportKind value) {
-    this.kind = value;
-    return this;
-  }
+	/** Sets the kind field. */
+	public ExportInfoBuilder withKind(final ExportKind value) {
+		this.kind = value;
+		return this;
+	}
 
-  /** Sets the span field. */
-  public ExportInfoBuilder withSpan(final Span value) {
-    this.span = value;
-    return this;
-  }
+	/** Sets the span field. */
+	public ExportInfoBuilder withSpan(final Span value) {
+		this.span = value;
+		return this;
+	}
 
-  /** Builds the ExportInfo instance. */
-  public ExportInfo build() {
-    return new ExportInfo(name, kind, span);
-  }
+	/** Builds the ExportInfo instance. */
+	public ExportInfo build() {
+		return new ExportInfo(name, kind, span);
+	}
 }

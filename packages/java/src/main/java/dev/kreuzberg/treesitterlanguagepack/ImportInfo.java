@@ -10,13 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 /** An import statement extracted from source code. */
-public record ImportInfo(
-    String source,
-    List<String> items,
-    Optional<String> alias,
-    @JsonProperty("is_wildcard") boolean isWildcard,
-    Span span) {
-  public static ImportInfoBuilder builder() {
-    return new ImportInfoBuilder();
-  }
+public record ImportInfo(String source, List<String> items, Optional<String> alias,
+		@JsonProperty("is_wildcard") boolean isWildcard, Span span) {
+	public static ImportInfoBuilder builder() {
+		return new ImportInfoBuilder();
+	}
 }

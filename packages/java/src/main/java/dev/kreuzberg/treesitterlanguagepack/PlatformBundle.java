@@ -5,4 +5,5 @@
 // Issues & docs: https://github.com/kreuzberg-dev/alef
 package dev.kreuzberg.treesitterlanguagepack;
 
-public record PlatformBundle(String url, String sha256, long size) {}
+public record PlatformBundle(String url, String sha256, long size) {
+}

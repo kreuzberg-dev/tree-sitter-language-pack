@@ -10,44 +10,44 @@ import java.util.Optional;
 /** A single captured node within a match. */
 public class CaptureResultBuilder {
 
-  private String name = "";
-  private Optional<NodeInfo> node = Optional.empty();
-  private Optional<String> text = Optional.empty();
-  private String childFields = "";
-  private long startByte = 0;
+	private String name = "";
+	private Optional<NodeInfo> node = Optional.empty();
+	private Optional<String> text = Optional.empty();
+	private String childFields = "";
+	private long startByte = 0;
 
-  /** Sets the name field. */
-  public CaptureResultBuilder withName(final String value) {
-    this.name = value;
-    return this;
-  }
+	/** Sets the name field. */
+	public CaptureResultBuilder withName(final String value) {
+		this.name = value;
+		return this;
+	}
 
-  /** Sets the node field. */
-  public CaptureResultBuilder withNode(final Optional<NodeInfo> value) {
-    this.node = value;
-    return this;
-  }
+	/** Sets the node field. */
+	public CaptureResultBuilder withNode(final Optional<NodeInfo> value) {
+		this.node = value;
+		return this;
+	}
 
-  /** Sets the text field. */
-  public CaptureResultBuilder withText(final Optional<String> value) {
-    this.text = value;
-    return this;
-  }
+	/** Sets the text field. */
+	public CaptureResultBuilder withText(final Optional<String> value) {
+		this.text = value;
+		return this;
+	}
 
-  /** Sets the childFields field. */
-  public CaptureResultBuilder withChildFields(final String value) {
-    this.childFields = value;
-    return this;
-  }
+	/** Sets the childFields field. */
+	public CaptureResultBuilder withChildFields(final String value) {
+		this.childFields = value;
+		return this;
+	}
 
-  /** Sets the startByte field. */
-  public CaptureResultBuilder withStartByte(final long value) {
-    this.startByte = value;
-    return this;
-  }
+	/** Sets the startByte field. */
+	public CaptureResultBuilder withStartByte(final long value) {
+		this.startByte = value;
+		return this;
+	}
 
-  /** Builds the CaptureResult instance. */
-  public CaptureResult build() {
-    return new CaptureResult(name, node, text, childFields, startByte);
-  }
+	/** Builds the CaptureResult instance. */
+	public CaptureResult build() {
+		return new CaptureResult(name, node, text, childFields, startByte);
+	}
 }

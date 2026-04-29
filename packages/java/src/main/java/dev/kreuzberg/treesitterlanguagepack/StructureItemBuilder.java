@@ -11,73 +11,72 @@ import java.util.Optional;
 /** A structural item (function, class, struct, etc.) in source code. */
 public class StructureItemBuilder {
 
-  private StructureKind kind = null;
-  private Optional<String> name = Optional.empty();
-  private Optional<String> visibility = Optional.empty();
-  private Span span = null;
-  private List<StructureItem> children = List.of();
-  private List<String> decorators = List.of();
-  private Optional<String> docComment = Optional.empty();
-  private Optional<String> signature = Optional.empty();
-  private Optional<Span> bodySpan = Optional.empty();
+	private StructureKind kind = null;
+	private Optional<String> name = Optional.empty();
+	private Optional<String> visibility = Optional.empty();
+	private Span span = null;
+	private List<StructureItem> children = List.of();
+	private List<String> decorators = List.of();
+	private Optional<String> docComment = Optional.empty();
+	private Optional<String> signature = Optional.empty();
+	private Optional<Span> bodySpan = Optional.empty();
 
-  /** Sets the kind field. */
-  public StructureItemBuilder withKind(final StructureKind value) {
-    this.kind = value;
-    return this;
-  }
+	/** Sets the kind field. */
+	public StructureItemBuilder withKind(final StructureKind value) {
+		this.kind = value;
+		return this;
+	}
 
-  /** Sets the name field. */
-  public StructureItemBuilder withName(final Optional<String> value) {
-    this.name = value;
-    return this;
-  }
+	/** Sets the name field. */
+	public StructureItemBuilder withName(final Optional<String> value) {
+		this.name = value;
+		return this;
+	}
 
-  /** Sets the visibility field. */
-  public StructureItemBuilder withVisibility(final Optional<String> value) {
-    this.visibility = value;
-    return this;
-  }
+	/** Sets the visibility field. */
+	public StructureItemBuilder withVisibility(final Optional<String> value) {
+		this.visibility = value;
+		return this;
+	}
 
-  /** Sets the span field. */
-  public StructureItemBuilder withSpan(final Span value) {
-    this.span = value;
-    return this;
-  }
+	/** Sets the span field. */
+	public StructureItemBuilder withSpan(final Span value) {
+		this.span = value;
+		return this;
+	}
 
-  /** Sets the children field. */
-  public StructureItemBuilder withChildren(final List<StructureItem> value) {
-    this.children = value;
-    return this;
-  }
+	/** Sets the children field. */
+	public StructureItemBuilder withChildren(final List<StructureItem> value) {
+		this.children = value;
+		return this;
+	}
 
-  /** Sets the decorators field. */
-  public StructureItemBuilder withDecorators(final List<String> value) {
-    this.decorators = value;
-    return this;
-  }
+	/** Sets the decorators field. */
+	public StructureItemBuilder withDecorators(final List<String> value) {
+		this.decorators = value;
+		return this;
+	}
 
-  /** Sets the docComment field. */
-  public StructureItemBuilder withDocComment(final Optional<String> value) {
-    this.docComment = value;
-    return this;
-  }
+	/** Sets the docComment field. */
+	public StructureItemBuilder withDocComment(final Optional<String> value) {
+		this.docComment = value;
+		return this;
+	}
 
-  /** Sets the signature field. */
-  public StructureItemBuilder withSignature(final Optional<String> value) {
-    this.signature = value;
-    return this;
-  }
+	/** Sets the signature field. */
+	public StructureItemBuilder withSignature(final Optional<String> value) {
+		this.signature = value;
+		return this;
+	}
 
-  /** Sets the bodySpan field. */
-  public StructureItemBuilder withBodySpan(final Optional<Span> value) {
-    this.bodySpan = value;
-    return this;
-  }
+	/** Sets the bodySpan field. */
+	public StructureItemBuilder withBodySpan(final Optional<Span> value) {
+		this.bodySpan = value;
+		return this;
+	}
 
-  /** Builds the StructureItem instance. */
-  public StructureItem build() {
-    return new StructureItem(
-        kind, name, visibility, span, children, decorators, docComment, signature, bodySpan);
-  }
+	/** Builds the StructureItem instance. */
+	public StructureItem build() {
+		return new StructureItem(kind, name, visibility, span, children, decorators, docComment, signature, bodySpan);
+	}
 }

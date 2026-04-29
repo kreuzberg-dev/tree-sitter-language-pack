@@ -9,24 +9,24 @@ import java.lang.foreign.MemorySegment;
 
 /** Manages downloading and caching of pre-built parser shared libraries. */
 public class DownloadManager implements AutoCloseable {
-  private final MemorySegment handle;
+	private final MemorySegment handle;
 
-  DownloadManager(MemorySegment handle) {
-    this.handle = handle;
-  }
+	DownloadManager(MemorySegment handle) {
+		this.handle = handle;
+	}
 
-  MemorySegment handle() {
-    return this.handle;
-  }
+	MemorySegment handle() {
+		return this.handle;
+	}
 
-  @Override
-  public void close() {
-    if (handle != null && !handle.equals(MemorySegment.NULL)) {
-      try {
-        NativeLib.TS_PACK_DOWNLOAD_MANAGER_FREE.invoke(handle);
-      } catch (Throwable e) {
-        throw new RuntimeException("Failed to free DownloadManager: " + e.getMessage(), e);
-      }
-    }
-  }
+	@Override
+	public void close() {
+		if (handle != null && !handle.equals(MemorySegment.NULL)) {
+			try {
+				NativeLib.TS_PACK_DOWNLOAD_MANAGER_FREE.invoke(handle);
+			} catch (Throwable e) {
+				throw new RuntimeException("Failed to free DownloadManager: " + e.getMessage(), e);
+			}
+		}
+	}
 }

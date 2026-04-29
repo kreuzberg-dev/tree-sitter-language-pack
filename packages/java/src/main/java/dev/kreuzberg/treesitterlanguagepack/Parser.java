@@ -8,24 +8,24 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.lang.foreign.MemorySegment;
 
 public class Parser implements AutoCloseable {
-  private final MemorySegment handle;
+	private final MemorySegment handle;
 
-  Parser(MemorySegment handle) {
-    this.handle = handle;
-  }
+	Parser(MemorySegment handle) {
+		this.handle = handle;
+	}
 
-  MemorySegment handle() {
-    return this.handle;
-  }
+	MemorySegment handle() {
+		return this.handle;
+	}
 
-  @Override
-  public void close() {
-    if (handle != null && !handle.equals(MemorySegment.NULL)) {
-      try {
-        NativeLib.TS_PACK_PARSER_FREE.invoke(handle);
-      } catch (Throwable e) {
-        throw new RuntimeException("Failed to free Parser: " + e.getMessage(), e);
-      }
-    }
-  }
+	@Override
+	public void close() {
+		if (handle != null && !handle.equals(MemorySegment.NULL)) {
+			try {
+				NativeLib.TS_PACK_PARSER_FREE.invoke(handle);
+			} catch (Throwable e) {
+				throw new RuntimeException("Failed to free Parser: " + e.getMessage(), e);
+			}
+		}
+	}
 }

@@ -7,7 +7,7 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 /** A diagnostic (syntax error, missing node, etc.) from parsing. */
 public record Diagnostic(String message, DiagnosticSeverity severity, Span span) {
-  public static DiagnosticBuilder builder() {
-    return new DiagnosticBuilder();
-  }
+	public static DiagnosticBuilder builder() {
+		return new DiagnosticBuilder();
+	}
 }

@@ -8,56 +8,57 @@ package dev.kreuzberg.treesitterlanguagepack;
 /**
  * Byte and line/column range in source code.
  *
- * <p>Represents both byte offsets (for slicing) and human-readable line/column positions (for
- * display and diagnostics).
+ * <p>
+ * Represents both byte offsets (for slicing) and human-readable line/column
+ * positions (for display and diagnostics).
  */
 public class SpanBuilder {
 
-  private long startByte = 0;
-  private long endByte = 0;
-  private long startLine = 0;
-  private long startColumn = 0;
-  private long endLine = 0;
-  private long endColumn = 0;
+	private long startByte = 0;
+	private long endByte = 0;
+	private long startLine = 0;
+	private long startColumn = 0;
+	private long endLine = 0;
+	private long endColumn = 0;
 
-  /** Sets the startByte field. */
-  public SpanBuilder withStartByte(final long value) {
-    this.startByte = value;
-    return this;
-  }
+	/** Sets the startByte field. */
+	public SpanBuilder withStartByte(final long value) {
+		this.startByte = value;
+		return this;
+	}
 
-  /** Sets the endByte field. */
-  public SpanBuilder withEndByte(final long value) {
-    this.endByte = value;
-    return this;
-  }
+	/** Sets the endByte field. */
+	public SpanBuilder withEndByte(final long value) {
+		this.endByte = value;
+		return this;
+	}
 
-  /** Sets the startLine field. */
-  public SpanBuilder withStartLine(final long value) {
-    this.startLine = value;
-    return this;
-  }
+	/** Sets the startLine field. */
+	public SpanBuilder withStartLine(final long value) {
+		this.startLine = value;
+		return this;
+	}
 
-  /** Sets the startColumn field. */
-  public SpanBuilder withStartColumn(final long value) {
-    this.startColumn = value;
-    return this;
-  }
+	/** Sets the startColumn field. */
+	public SpanBuilder withStartColumn(final long value) {
+		this.startColumn = value;
+		return this;
+	}
 
-  /** Sets the endLine field. */
-  public SpanBuilder withEndLine(final long value) {
-    this.endLine = value;
-    return this;
-  }
+	/** Sets the endLine field. */
+	public SpanBuilder withEndLine(final long value) {
+		this.endLine = value;
+		return this;
+	}
 
-  /** Sets the endColumn field. */
-  public SpanBuilder withEndColumn(final long value) {
-    this.endColumn = value;
-    return this;
-  }
+	/** Sets the endColumn field. */
+	public SpanBuilder withEndColumn(final long value) {
+		this.endColumn = value;
+		return this;
+	}
 
-  /** Builds the Span instance. */
-  public Span build() {
-    return new Span(startByte, endByte, startLine, startColumn, endLine, endColumn);
-  }
+	/** Builds the Span instance. */
+	public Span build() {
+		return new Span(startByte, endByte, startLine, startColumn, endLine, endColumn);
+	}
 }

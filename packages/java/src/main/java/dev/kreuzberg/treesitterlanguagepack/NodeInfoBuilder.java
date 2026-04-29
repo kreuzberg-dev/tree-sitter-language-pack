@@ -8,103 +8,94 @@ package dev.kreuzberg.treesitterlanguagepack;
 /**
  * Lightweight snapshot of a tree-sitter node's properties.
  *
- * <p>Contains only primitive types for easy cross-language serialization. This is an owned type
- * that can be passed across FFI boundaries, unlike {@code tree_sitter::Node} which borrows from the
- * tree.
+ * <p>
+ * Contains only primitive types for easy cross-language serialization. This is
+ * an owned type that can be passed across FFI boundaries, unlike
+ * {@code tree_sitter::Node} which borrows from the tree.
  */
 public class NodeInfoBuilder {
 
-  private String kind = "";
-  private boolean isNamed = false;
-  private long startByte = 0;
-  private long endByte = 0;
-  private long startRow = 0;
-  private long startCol = 0;
-  private long endRow = 0;
-  private long endCol = 0;
-  private long namedChildCount = 0;
-  private boolean isError = false;
-  private boolean isMissing = false;
+	private String kind = "";
+	private boolean isNamed = false;
+	private long startByte = 0;
+	private long endByte = 0;
+	private long startRow = 0;
+	private long startCol = 0;
+	private long endRow = 0;
+	private long endCol = 0;
+	private long namedChildCount = 0;
+	private boolean isError = false;
+	private boolean isMissing = false;
 
-  /** Sets the kind field. */
-  public NodeInfoBuilder withKind(final String value) {
-    this.kind = value;
-    return this;
-  }
+	/** Sets the kind field. */
+	public NodeInfoBuilder withKind(final String value) {
+		this.kind = value;
+		return this;
+	}
 
-  /** Sets the isNamed field. */
-  public NodeInfoBuilder withIsNamed(final boolean value) {
-    this.isNamed = value;
-    return this;
-  }
+	/** Sets the isNamed field. */
+	public NodeInfoBuilder withIsNamed(final boolean value) {
+		this.isNamed = value;
+		return this;
+	}
 
-  /** Sets the startByte field. */
-  public NodeInfoBuilder withStartByte(final long value) {
-    this.startByte = value;
-    return this;
-  }
+	/** Sets the startByte field. */
+	public NodeInfoBuilder withStartByte(final long value) {
+		this.startByte = value;
+		return this;
+	}
 
-  /** Sets the endByte field. */
-  public NodeInfoBuilder withEndByte(final long value) {
-    this.endByte = value;
-    return this;
-  }
+	/** Sets the endByte field. */
+	public NodeInfoBuilder withEndByte(final long value) {
+		this.endByte = value;
+		return this;
+	}
 
-  /** Sets the startRow field. */
-  public NodeInfoBuilder withStartRow(final long value) {
-    this.startRow = value;
-    return this;
-  }
+	/** Sets the startRow field. */
+	public NodeInfoBuilder withStartRow(final long value) {
+		this.startRow = value;
+		return this;
+	}
 
-  /** Sets the startCol field. */
-  public NodeInfoBuilder withStartCol(final long value) {
-    this.startCol = value;
-    return this;
-  }
+	/** Sets the startCol field. */
+	public NodeInfoBuilder withStartCol(final long value) {
+		this.startCol = value;
+		return this;
+	}
 
-  /** Sets the endRow field. */
-  public NodeInfoBuilder withEndRow(final long value) {
-    this.endRow = value;
-    return this;
-  }
+	/** Sets the endRow field. */
+	public NodeInfoBuilder withEndRow(final long value) {
+		this.endRow = value;
+		return this;
+	}
 
-  /** Sets the endCol field. */
-  public NodeInfoBuilder withEndCol(final long value) {
-    this.endCol = value;
-    return this;
-  }
+	/** Sets the endCol field. */
+	public NodeInfoBuilder withEndCol(final long value) {
+		this.endCol = value;
+		return this;
+	}
 
-  /** Sets the namedChildCount field. */
-  public NodeInfoBuilder withNamedChildCount(final long value) {
-    this.namedChildCount = value;
-    return this;
-  }
+	/** Sets the namedChildCount field. */
+	public NodeInfoBuilder withNamedChildCount(final long value) {
+		this.namedChildCount = value;
+		return this;
+	}
 
-  /** Sets the isError field. */
-  public NodeInfoBuilder withIsError(final boolean value) {
-    this.isError = value;
-    return this;
-  }
+	/** Sets the isError field. */
+	public NodeInfoBuilder withIsError(final boolean value) {
+		this.isError = value;
+		return this;
+	}
 
-  /** Sets the isMissing field. */
-  public NodeInfoBuilder withIsMissing(final boolean value) {
-    this.isMissing = value;
-    return this;
-  }
+	/** Sets the isMissing field. */
+	public NodeInfoBuilder withIsMissing(final boolean value) {
+		this.isMissing = value;
+		return this;
+	}
 
-  /** Builds the NodeInfo instance. */
-  public NodeInfo build() {
-    return new NodeInfo(
-        kind,
-        isNamed,
-        startByte,
-        endByte,
-        startRow,
-        startCol,
-        endRow,
-        endCol,
-        namedChildCount,
-        isError,
-        isMissing);
-  }
+	/** Builds the NodeInfo instance. */
+	public NodeInfo build() {
+		return new NodeInfo(kind, isNamed, startByte, endByte, startRow, startCol, endRow, endCol, namedChildCount,
+				isError, isMissing);
+	}
 }

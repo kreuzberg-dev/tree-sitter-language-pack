@@ -10,34 +10,34 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 /** Controls what data is captured for each query match. */
 public enum CaptureOutput {
-  /** Capture only the matched text. */
-  Text("text"),
-  /** Capture only the {@code NodeInfo}. */
-  Node("node"),
-  /** Capture both text and {@code NodeInfo} (default). */
-  Full("full");
+	/** Capture only the matched text. */
+	Text("text"),
+	/** Capture only the {@code NodeInfo}. */
+	Node("node"),
+	/** Capture both text and {@code NodeInfo} (default). */
+	Full("full");
 
-  /** The string value. */
-  private final String value;
+	/** The string value. */
+	private final String value;
 
-  CaptureOutput(final String value) {
-    this.value = value;
-  }
+	CaptureOutput(final String value) {
+		this.value = value;
+	}
 
-  /** Returns the string value. */
-  @JsonValue
-  public String getValue() {
-    return value;
-  }
+	/** Returns the string value. */
+	@JsonValue
+	public String getValue() {
+		return value;
+	}
 
-  /** Creates an instance from a string value. */
-  @JsonCreator
-  public static CaptureOutput fromValue(final String value) {
-    for (CaptureOutput e : values()) {
-      if (e.value.equalsIgnoreCase(value)) {
-        return e;
-      }
-    }
-    throw new IllegalArgumentException("Unknown value: " + value);
-  }
+	/** Creates an instance from a string value. */
+	@JsonCreator
+	public static CaptureOutput fromValue(final String value) {
+		for (CaptureOutput e : values()) {
+			if (e.value.equalsIgnoreCase(value)) {
+				return e;
+			}
+		}
+		throw new IllegalArgumentException("Unknown value: " + value);
+	}
 }

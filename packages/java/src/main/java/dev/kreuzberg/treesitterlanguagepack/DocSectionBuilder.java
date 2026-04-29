@@ -10,30 +10,30 @@ import java.util.Optional;
 /** A section within a docstring (e.g., Args, Returns, Raises). */
 public class DocSectionBuilder {
 
-  private String kind = "";
-  private Optional<String> name = Optional.empty();
-  private String description = "";
+	private String kind = "";
+	private Optional<String> name = Optional.empty();
+	private String description = "";
 
-  /** Sets the kind field. */
-  public DocSectionBuilder withKind(final String value) {
-    this.kind = value;
-    return this;
-  }
+	/** Sets the kind field. */
+	public DocSectionBuilder withKind(final String value) {
+		this.kind = value;
+		return this;
+	}
 
-  /** Sets the name field. */
-  public DocSectionBuilder withName(final Optional<String> value) {
-    this.name = value;
-    return this;
-  }
+	/** Sets the name field. */
+	public DocSectionBuilder withName(final Optional<String> value) {
+		this.name = value;
+		return this;
+	}
 
-  /** Sets the description field. */
-  public DocSectionBuilder withDescription(final String value) {
-    this.description = value;
-    return this;
-  }
+	/** Sets the description field. */
+	public DocSectionBuilder withDescription(final String value) {
+		this.description = value;
+		return this;
+	}
 
-  /** Builds the DocSection instance. */
-  public DocSection build() {
-    return new DocSection(kind, name, description);
-  }
+	/** Builds the DocSection instance. */
+	public DocSection build() {
+		return new DocSection(kind, name, description);
+	}
 }

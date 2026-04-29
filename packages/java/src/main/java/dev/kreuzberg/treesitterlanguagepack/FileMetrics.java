@@ -8,16 +8,11 @@ package dev.kreuzberg.treesitterlanguagepack;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /** Aggregate metrics for a source file. */
-public record FileMetrics(
-    @JsonProperty("total_lines") long totalLines,
-    @JsonProperty("code_lines") long codeLines,
-    @JsonProperty("comment_lines") long commentLines,
-    @JsonProperty("blank_lines") long blankLines,
-    @JsonProperty("total_bytes") long totalBytes,
-    @JsonProperty("node_count") long nodeCount,
-    @JsonProperty("error_count") long errorCount,
-    @JsonProperty("max_depth") long maxDepth) {
-  public static FileMetricsBuilder builder() {
-    return new FileMetricsBuilder();
-  }
+public record FileMetrics(@JsonProperty("total_lines") long totalLines, @JsonProperty("code_lines") long codeLines,
+		@JsonProperty("comment_lines") long commentLines, @JsonProperty("blank_lines") long blankLines,
+		@JsonProperty("total_bytes") long totalBytes, @JsonProperty("node_count") long nodeCount,
+		@JsonProperty("error_count") long errorCount, @JsonProperty("max_depth") long maxDepth) {
+	public static FileMetricsBuilder builder() {
+		return new FileMetricsBuilder();
+	}
 }

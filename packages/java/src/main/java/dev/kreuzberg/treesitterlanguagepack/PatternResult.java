@@ -10,11 +10,10 @@ import java.util.List;
 
 /** Results for a single named pattern. */
 public record PatternResult(
-    /** The individual matches. */
-    List<MatchResult> matches,
-    /** Total number of matches before {@code max_results} truncation. */
-    @JsonProperty("total_count") long totalCount) {
-  public static PatternResultBuilder builder() {
-    return new PatternResultBuilder();
-  }
+		/** The individual matches. */
+		List<MatchResult> matches, /** Total number of matches before {@code max_results} truncation. */
+		@JsonProperty("total_count") long totalCount) {
+	public static PatternResultBuilder builder() {
+		return new PatternResultBuilder();
+	}
 }

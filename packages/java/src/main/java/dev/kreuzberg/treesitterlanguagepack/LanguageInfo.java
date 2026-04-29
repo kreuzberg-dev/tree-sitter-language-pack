@@ -5,4 +5,5 @@
 // Issues & docs: https://github.com/kreuzberg-dev/alef
 package dev.kreuzberg.treesitterlanguagepack;
 
-public record LanguageInfo(String group, long size) {}
+public record LanguageInfo(String group, long size) {
+}

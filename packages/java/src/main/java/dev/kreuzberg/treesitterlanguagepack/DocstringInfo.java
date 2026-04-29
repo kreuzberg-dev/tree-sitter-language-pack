@@ -10,13 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 /** A docstring extracted from source code. */
-public record DocstringInfo(
-    String text,
-    Object format,
-    Span span,
-    @JsonProperty("associated_item") Optional<String> associatedItem,
-    @JsonProperty("parsed_sections") List<DocSection> parsedSections) {
-  public static DocstringInfoBuilder builder() {
-    return new DocstringInfoBuilder();
-  }
+public record DocstringInfo(String text, Object format, Span span,
+		@JsonProperty("associated_item") Optional<String> associatedItem,
+		@JsonProperty("parsed_sections") List<DocSection> parsedSections) {
+	public static DocstringInfoBuilder builder() {
+		return new DocstringInfoBuilder();
+	}
 }

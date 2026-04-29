@@ -8,73 +8,66 @@ package dev.kreuzberg.treesitterlanguagepack;
 /** Aggregate metrics for a source file. */
 public class FileMetricsBuilder {
 
-  private long totalLines = 0;
-  private long codeLines = 0;
-  private long commentLines = 0;
-  private long blankLines = 0;
-  private long totalBytes = 0;
-  private long nodeCount = 0;
-  private long errorCount = 0;
-  private long maxDepth = 0;
+	private long totalLines = 0;
+	private long codeLines = 0;
+	private long commentLines = 0;
+	private long blankLines = 0;
+	private long totalBytes = 0;
+	private long nodeCount = 0;
+	private long errorCount = 0;
+	private long maxDepth = 0;
 
-  /** Sets the totalLines field. */
-  public FileMetricsBuilder withTotalLines(final long value) {
-    this.totalLines = value;
-    return this;
-  }
+	/** Sets the totalLines field. */
+	public FileMetricsBuilder withTotalLines(final long value) {
+		this.totalLines = value;
+		return this;
+	}
 
-  /** Sets the codeLines field. */
-  public FileMetricsBuilder withCodeLines(final long value) {
-    this.codeLines = value;
-    return this;
-  }
+	/** Sets the codeLines field. */
+	public FileMetricsBuilder withCodeLines(final long value) {
+		this.codeLines = value;
+		return this;
+	}
 
-  /** Sets the commentLines field. */
-  public FileMetricsBuilder withCommentLines(final long value) {
-    this.commentLines = value;
-    return this;
-  }
+	/** Sets the commentLines field. */
+	public FileMetricsBuilder withCommentLines(final long value) {
+		this.commentLines = value;
+		return this;
+	}
 
-  /** Sets the blankLines field. */
-  public FileMetricsBuilder withBlankLines(final long value) {
-    this.blankLines = value;
-    return this;
-  }
+	/** Sets the blankLines field. */
+	public FileMetricsBuilder withBlankLines(final long value) {
+		this.blankLines = value;
+		return this;
+	}
 
-  /** Sets the totalBytes field. */
-  public FileMetricsBuilder withTotalBytes(final long value) {
-    this.totalBytes = value;
-    return this;
-  }
+	/** Sets the totalBytes field. */
+	public FileMetricsBuilder withTotalBytes(final long value) {
+		this.totalBytes = value;
+		return this;
+	}
 
-  /** Sets the nodeCount field. */
-  public FileMetricsBuilder withNodeCount(final long value) {
-    this.nodeCount = value;
-    return this;
-  }
+	/** Sets the nodeCount field. */
+	public FileMetricsBuilder withNodeCount(final long value) {
+		this.nodeCount = value;
+		return this;
+	}
 
-  /** Sets the errorCount field. */
-  public FileMetricsBuilder withErrorCount(final long value) {
-    this.errorCount = value;
-    return this;
-  }
+	/** Sets the errorCount field. */
+	public FileMetricsBuilder withErrorCount(final long value) {
+		this.errorCount = value;
+		return this;
+	}
 
-  /** Sets the maxDepth field. */
-  public FileMetricsBuilder withMaxDepth(final long value) {
-    this.maxDepth = value;
-    return this;
-  }
+	/** Sets the maxDepth field. */
+	public FileMetricsBuilder withMaxDepth(final long value) {
+		this.maxDepth = value;
+		return this;
+	}
 
-  /** Builds the FileMetrics instance. */
-  public FileMetrics build() {
-    return new FileMetrics(
-        totalLines,
-        codeLines,
-        commentLines,
-        blankLines,
-        totalBytes,
-        nodeCount,
-        errorCount,
-        maxDepth);
-  }
+	/** Builds the FileMetrics instance. */
+	public FileMetrics build() {
+		return new FileMetrics(totalLines, codeLines, commentLines, blankLines, totalBytes, nodeCount, errorCount,
+				maxDepth);
+	}
 }

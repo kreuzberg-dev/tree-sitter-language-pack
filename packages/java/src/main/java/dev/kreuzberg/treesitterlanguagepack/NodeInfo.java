@@ -10,34 +10,34 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Lightweight snapshot of a tree-sitter node's properties.
  *
- * <p>Contains only primitive types for easy cross-language serialization. This is an owned type
- * that can be passed across FFI boundaries, unlike {@code tree_sitter::Node} which borrows from the
- * tree.
+ * <p>
+ * Contains only primitive types for easy cross-language serialization. This is
+ * an owned type that can be passed across FFI boundaries, unlike
+ * {@code tree_sitter::Node} which borrows from the tree.
  */
 public record NodeInfo(
-    /** The grammar type name (e.g., "function_definition", "identifier"). */
-    String kind,
-    /** Whether this is a named node (vs anonymous like punctuation). */
-    @JsonProperty("is_named") boolean isNamed,
-    /** Start byte offset in source. */
-    @JsonProperty("start_byte") long startByte,
-    /** End byte offset in source. */
-    @JsonProperty("end_byte") long endByte,
-    /** Start row (zero-indexed). */
-    @JsonProperty("start_row") long startRow,
-    /** Start column (zero-indexed). */
-    @JsonProperty("start_col") long startCol,
-    /** End row (zero-indexed). */
-    @JsonProperty("end_row") long endRow,
-    /** End column (zero-indexed). */
-    @JsonProperty("end_col") long endCol,
-    /** Number of named children. */
-    @JsonProperty("named_child_count") long namedChildCount,
-    /** Whether this node is an ERROR node. */
-    @JsonProperty("is_error") boolean isError,
-    /** Whether this node is a MISSING node. */
-    @JsonProperty("is_missing") boolean isMissing) {
-  public static NodeInfoBuilder builder() {
-    return new NodeInfoBuilder();
-  }
+		/** The grammar type name (e.g., "function_definition", "identifier"). */
+		String kind,
+		/** Whether this is a named node (vs anonymous like punctuation). */
+		@JsonProperty("is_named") boolean isNamed,
+		/** Start byte offset in source. */
+		@JsonProperty("start_byte") long startByte,
+		/** End byte offset in source. */
+		@JsonProperty("end_byte") long endByte,
+		/** Start row (zero-indexed). */
+		@JsonProperty("start_row") long startRow,
+		/** Start column (zero-indexed). */
+		@JsonProperty("start_col") long startCol,
+		/** End row (zero-indexed). */
+		@JsonProperty("end_row") long endRow,
+		/** End column (zero-indexed). */
+		@JsonProperty("end_col") long endCol,
+		/** Number of named children. */
+		@JsonProperty("named_child_count") long namedChildCount,
+		/** Whether this node is an ERROR node. */
+		@JsonProperty("is_error") boolean isError, /** Whether this node is a MISSING node. */
+		@JsonProperty("is_missing") boolean isMissing) {
+	public static NodeInfoBuilder builder() {
+		return new NodeInfoBuilder();
+	}
 }

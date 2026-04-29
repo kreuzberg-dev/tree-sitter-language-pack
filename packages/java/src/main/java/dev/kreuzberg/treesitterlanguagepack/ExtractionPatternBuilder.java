@@ -11,44 +11,44 @@ import java.util.Optional;
 /** Defines a single extraction pattern and its configuration. */
 public class ExtractionPatternBuilder {
 
-  private String query = "";
-  private CaptureOutput captureOutput = null;
-  private List<String> childFields = List.of();
-  private Optional<Long> maxResults = Optional.empty();
-  private Optional<List<Long>> byteRange = Optional.empty();
+	private String query = "";
+	private CaptureOutput captureOutput = null;
+	private List<String> childFields = List.of();
+	private Optional<Long> maxResults = Optional.empty();
+	private Optional<List<Long>> byteRange = Optional.empty();
 
-  /** Sets the query field. */
-  public ExtractionPatternBuilder withQuery(final String value) {
-    this.query = value;
-    return this;
-  }
+	/** Sets the query field. */
+	public ExtractionPatternBuilder withQuery(final String value) {
+		this.query = value;
+		return this;
+	}
 
-  /** Sets the captureOutput field. */
-  public ExtractionPatternBuilder withCaptureOutput(final CaptureOutput value) {
-    this.captureOutput = value;
-    return this;
-  }
+	/** Sets the captureOutput field. */
+	public ExtractionPatternBuilder withCaptureOutput(final CaptureOutput value) {
+		this.captureOutput = value;
+		return this;
+	}
 
-  /** Sets the childFields field. */
-  public ExtractionPatternBuilder withChildFields(final List<String> value) {
-    this.childFields = value;
-    return this;
-  }
+	/** Sets the childFields field. */
+	public ExtractionPatternBuilder withChildFields(final List<String> value) {
+		this.childFields = value;
+		return this;
+	}
 
-  /** Sets the maxResults field. */
-  public ExtractionPatternBuilder withMaxResults(final Optional<Long> value) {
-    this.maxResults = value;
-    return this;
-  }
+	/** Sets the maxResults field. */
+	public ExtractionPatternBuilder withMaxResults(final Optional<Long> value) {
+		this.maxResults = value;
+		return this;
+	}
 
-  /** Sets the byteRange field. */
-  public ExtractionPatternBuilder withByteRange(final Optional<List<Long>> value) {
-    this.byteRange = value;
-    return this;
-  }
+	/** Sets the byteRange field. */
+	public ExtractionPatternBuilder withByteRange(final Optional<List<Long>> value) {
+		this.byteRange = value;
+		return this;
+	}
 
-  /** Builds the ExtractionPattern instance. */
-  public ExtractionPattern build() {
-    return new ExtractionPattern(query, captureOutput, childFields, maxResults, byteRange);
-  }
+	/** Builds the ExtractionPattern instance. */
+	public ExtractionPattern build() {
+		return new ExtractionPattern(query, captureOutput, childFields, maxResults, byteRange);
+	}
 }

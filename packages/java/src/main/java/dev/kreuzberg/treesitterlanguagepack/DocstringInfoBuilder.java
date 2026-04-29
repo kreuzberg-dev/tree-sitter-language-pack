@@ -11,44 +11,44 @@ import java.util.Optional;
 /** A docstring extracted from source code. */
 public class DocstringInfoBuilder {
 
-  private String text = "";
-  private DocstringFormat format = null;
-  private Span span = null;
-  private Optional<String> associatedItem = Optional.empty();
-  private List<DocSection> parsedSections = List.of();
+	private String text = "";
+	private DocstringFormat format = null;
+	private Span span = null;
+	private Optional<String> associatedItem = Optional.empty();
+	private List<DocSection> parsedSections = List.of();
 
-  /** Sets the text field. */
-  public DocstringInfoBuilder withText(final String value) {
-    this.text = value;
-    return this;
-  }
+	/** Sets the text field. */
+	public DocstringInfoBuilder withText(final String value) {
+		this.text = value;
+		return this;
+	}
 
-  /** Sets the format field. */
-  public DocstringInfoBuilder withFormat(final DocstringFormat value) {
-    this.format = value;
-    return this;
-  }
+	/** Sets the format field. */
+	public DocstringInfoBuilder withFormat(final DocstringFormat value) {
+		this.format = value;
+		return this;
+	}
 
-  /** Sets the span field. */
-  public DocstringInfoBuilder withSpan(final Span value) {
-    this.span = value;
-    return this;
-  }
+	/** Sets the span field. */
+	public DocstringInfoBuilder withSpan(final Span value) {
+		this.span = value;
+		return this;
+	}
 
-  /** Sets the associatedItem field. */
-  public DocstringInfoBuilder withAssociatedItem(final Optional<String> value) {
-    this.associatedItem = value;
-    return this;
-  }
+	/** Sets the associatedItem field. */
+	public DocstringInfoBuilder withAssociatedItem(final Optional<String> value) {
+		this.associatedItem = value;
+		return this;
+	}
 
-  /** Sets the parsedSections field. */
-  public DocstringInfoBuilder withParsedSections(final List<DocSection> value) {
-    this.parsedSections = value;
-    return this;
-  }
+	/** Sets the parsedSections field. */
+	public DocstringInfoBuilder withParsedSections(final List<DocSection> value) {
+		this.parsedSections = value;
+		return this;
+	}
 
-  /** Builds the DocstringInfo instance. */
-  public DocstringInfo build() {
-    return new DocstringInfo(text, format, span, associatedItem, parsedSections);
-  }
+	/** Builds the DocstringInfo instance. */
+	public DocstringInfo build() {
+		return new DocstringInfo(text, format, span, associatedItem, parsedSections);
+	}
 }

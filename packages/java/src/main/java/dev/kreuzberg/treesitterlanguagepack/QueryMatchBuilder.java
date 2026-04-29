@@ -10,23 +10,23 @@ import java.util.List;
 /** A single match from a tree-sitter query, with captured nodes. */
 public class QueryMatchBuilder {
 
-  private long patternIndex = 0;
-  private List<String> captures = List.of();
+	private long patternIndex = 0;
+	private List<String> captures = List.of();
 
-  /** Sets the patternIndex field. */
-  public QueryMatchBuilder withPatternIndex(final long value) {
-    this.patternIndex = value;
-    return this;
-  }
+	/** Sets the patternIndex field. */
+	public QueryMatchBuilder withPatternIndex(final long value) {
+		this.patternIndex = value;
+		return this;
+	}
 
-  /** Sets the captures field. */
-  public QueryMatchBuilder withCaptures(final List<String> value) {
-    this.captures = value;
-    return this;
-  }
+	/** Sets the captures field. */
+	public QueryMatchBuilder withCaptures(final List<String> value) {
+		this.captures = value;
+		return this;
+	}
 
-  /** Builds the QueryMatch instance. */
-  public QueryMatch build() {
-    return new QueryMatch(patternIndex, captures);
-  }
+	/** Builds the QueryMatch instance. */
+	public QueryMatch build() {
+		return new QueryMatch(patternIndex, captures);
+	}
 }

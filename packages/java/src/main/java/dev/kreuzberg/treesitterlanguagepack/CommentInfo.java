@@ -9,12 +9,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Optional;
 
 /** A comment extracted from source code. */
-public record CommentInfo(
-    String text,
-    CommentKind kind,
-    Span span,
-    @JsonProperty("associated_node") Optional<String> associatedNode) {
-  public static CommentInfoBuilder builder() {
-    return new CommentInfoBuilder();
-  }
+public record CommentInfo(String text, CommentKind kind, Span span,
+		@JsonProperty("associated_node") Optional<String> associatedNode) {
+	public static CommentInfoBuilder builder() {
+		return new CommentInfoBuilder();
+	}
 }
