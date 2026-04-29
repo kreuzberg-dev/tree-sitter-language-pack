@@ -35,7 +35,7 @@ pub(crate) fn c_symbol_for(name: &str) -> &str {
 
 /// Reverse lookup: given a c_symbol (e.g. "c_sharp"), return the language name ("csharp").
 /// If no override matches, returns the input as-is.
-#[cfg(any(feature = "dynamic-loading", feature = "download"))]
+#[cfg(any(all(feature = "dynamic-loading", not(target_arch = "wasm32")), feature = "download",))]
 #[inline(always)]
 pub(crate) fn lang_name_for_symbol(symbol: &str) -> &str {
     for &(lang, sym) in C_SYMBOL_OVERRIDES {
