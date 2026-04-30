@@ -148,22 +148,25 @@ repos:
       - id: mypy
         exclude: "^(e2e/|fixtures/bench/|scripts/clone_vendors\\.py$)"
       - id: go-fmt
+        exclude: ^(e2e/|test_apps/)
       - id: golangci-lint
+        exclude: ^(e2e/|test_apps/)
       - id: govulncheck
+        exclude: ^(e2e/|test_apps/)
       - id: rubocop
-        files: \.rb$
+        files: ^packages/ruby/.*\.rb$
       - id: rubocop-lint
-        files: \.(rb|rbs)$
+        files: ^packages/ruby/.*\.(rb|rbs)$
       - id: steep
-        files: \.(rb|rbs)$
+        files: ^packages/ruby/.*\.(rb|rbs)$
       - id: dotnet-format
-        files: \.cs$
+        files: ^packages/csharp/.*\.cs$
       - id: dotnet-format-check
-        files: \.cs$
+        files: ^packages/csharp/.*\.cs$
       - id: php-cs-fixer
-        files: \.php$
+        files: ^packages/php/.*\.php$
       - id: phpstan
-        files: \.php$
+        files: ^packages/php/.*\.php$
       - id: mix-format
         files: ^packages/elixir/
       - id: mix-credo
@@ -171,8 +174,8 @@ repos:
       - id: java-verify
         files: ^packages/java/
       - id: textlint
-        files: ^docs/.*\.md$
-        exclude: ^docs/(CHANGELOG|snippets/)
+        files: ^docs/[^/]+/[^/]+\.md$
+        exclude: ^docs/(CHANGELOG|snippets/|reference/|api-)
 
   # Alef: polyglot binding generation and version sync
   - repo: https://github.com/kreuzberg-dev/alef
