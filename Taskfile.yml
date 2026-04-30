@@ -113,7 +113,6 @@ tasks:
   format:
     desc: Format all code
     cmds:
-      - task: rust:format
       - alef fmt
 
   clean:
