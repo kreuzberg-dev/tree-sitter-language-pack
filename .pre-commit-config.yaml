@@ -85,61 +85,13 @@ repos:
       - id: rumdl-fmt
         exclude: "^.ai-rulez/"
 
-  # Markdown prose linting: textlint
-  - repo: local
-    hooks:
-      - id: textlint
-        name: textlint (docs prose)
-        entry: textlint
-        language: node
-        additional_dependencies:
-          - textlint@15.5.4
-          - textlint-filter-rule-comments@1.3.0
-          - textlint-filter-rule-node-types@1.1.0
-          - textlint-rule-alex@5.0.0
-          - textlint-rule-common-misspellings@1.0.1
-          - textlint-rule-doubled-spaces@1.0.2
-          - textlint-rule-en-capitalization@2.0.3
-          - textlint-rule-en-max-word-count@2.0.1
-          - textlint-rule-no-empty-section@1.1.0
-          - textlint-rule-no-start-duplicated-conjunction@2.0.2
-          - textlint-rule-no-surrogate-pair@1.0.1
-          - textlint-rule-no-todo@2.0.1
-          - textlint-rule-no-zero-width-spaces@1.0.1
-          - textlint-rule-stop-words@5.2.0
-          - textlint-rule-terminology@5.2.16
-          - textlint-rule-write-good@2.0.0
-          - "@textlint-rule/textlint-rule-no-invalid-control-character@3.0.0"
-          - "@textlint-rule/textlint-rule-no-unmatched-pair@2.0.4"
-        files: ^docs/.*\.md$
-        exclude: ^docs/(CHANGELOG|snippets/)
-        pass_filenames: true
-
-  # Shell scripts: formatting and linting
-  - repo: https://github.com/scop/pre-commit-shfmt
-    rev: v3.13.1-1
-    hooks:
-      - id: shfmt
-        args: ["-w", "-i", "2"]
-
-  - repo: https://github.com/koalaman/shellcheck-precommit
-    rev: v0.11.0
-    hooks:
-      - id: shellcheck
-
-  # Python: ruff (linting + formatting) + mypy (type checking)
+  # Python: ruff (linting + formatting)
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.12
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.20.2
-    hooks:
-      - id: mypy
-        exclude: "^(e2e/|fixtures/bench/|scripts/clone_vendors\\.py$)"
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/oxc-project/mirrors-oxlint
@@ -148,30 +100,10 @@ repos:
       - id: oxlint
         args: ["--fix"]
 
-  # Java: copy-paste detection and style checking
-  - repo: https://github.com/gherynos/pre-commit-java
-    rev: v0.6.37
-    hooks:
-      - id: cpd
-        exclude: ^(e2e/|test_apps/|packages/java/dev/)
-      - id: checkstyle
-        args:
-          [
-            "-c",
-            "packages/java/checkstyle.xml",
-            "-p",
-            "packages/java/checkstyle.properties",
-          ]
-        exclude: ^(e2e/|test_apps/|packages/java/src/|packages/java/dev/)
-
-  # C/FFI: formatting and linting
+  # cppcheck — kept upstream until shared repo ships it
   - repo: https://github.com/pocc/pre-commit-hooks
     rev: v1.3.5
     hooks:
-      - id: clang-format
-        args: [--style=file, -i]
-        files: (^crates/tree-sitter-language-pack-ffi/|^crates/ts-pack-core-ffi/)
-        exclude: ^crates/ts-pack-core-ffi/include/ts_pack\.h$
       - id: cppcheck
         args:
           [
@@ -183,98 +115,64 @@ repos:
           ]
         files: (^crates/tree-sitter-language-pack-ffi/|^crates/ts-pack-core-ffi/)
 
-  # Go: formatting and linting (runs per Go module via Taskfile)
-  - repo: local
+  # Java cpd — kept upstream (not yet in shared repo)
+  - repo: https://github.com/gherynos/pre-commit-java
+    rev: v0.6.37
     hooks:
-      - id: golangci-lint-full
-        name: golangci-lint (all Go modules)
-        entry: task go:lint
-        language: system
-        files: \.go$
-        pass_filenames: false
+      - id: cpd
+        exclude: ^(e2e/|test_apps/|packages/java/dev/)
 
-  # Local hooks for Ruby, Java verify, C#, PHP, Elixir
-  - repo: local
+  # Shared kreuzberg-dev polyglot hooks
+  - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
+    rev: v0.1.0
     hooks:
-      # Ruby
-      - id: ruby-format
-        name: Ruby formatting (rubocop)
-        entry: task ruby:format
-        language: system
+      - id: shfmt
+        args: ["-w", "-i", "2"]
+      - id: shellcheck
+      - id: clang-format
+        args: ["--style=file", "-i"]
+        files: (^crates/tree-sitter-language-pack-ffi/|^crates/ts-pack-core-ffi/)
+        exclude: ^crates/ts-pack-core-ffi/include/ts_pack\.h$
+      - id: clang-tidy
+        files: (^crates/tree-sitter-language-pack-ffi/|^crates/ts-pack-core-ffi/)
+        exclude: ^crates/ts-pack-core-ffi/include/ts_pack\.h$
+      - id: checkstyle
+        args:
+          [
+            "-c",
+            "packages/java/checkstyle.xml",
+            "-p",
+            "packages/java/checkstyle.properties",
+          ]
+        exclude: ^(e2e/|test_apps/|packages/java/src/|packages/java/dev/)
+      - id: mypy
+        exclude: "^(e2e/|fixtures/bench/|scripts/clone_vendors\\.py$)"
+      - id: go-fmt
+      - id: golangci-lint
+      - id: govulncheck
+      - id: rubocop
         files: \.rb$
-        pass_filenames: false
-        require_serial: true
-        stages: [commit]
-
-      - id: ruby-lint
-        name: Ruby linting (rubocop + steep)
-        entry: task ruby:lint
-        language: system
+      - id: rubocop-lint
         files: \.(rb|rbs)$
-        pass_filenames: false
-        require_serial: true
-        stages: [commit]
-
-      # Java (maven verify — cpd/checkstyle handled by pre-commit-java above)
-      - id: java-verify
-        name: maven verify (java)
-        entry: bash -lc 'if [ -f "$HOME/.sdkman/bin/sdkman-init.sh" ]; then source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk env; fi; MAVEN_OPTS="${MAVEN_OPTS:-} --enable-native-access=ALL-UNNAMED -Dsun.misc.unsafe.memory.access=allow" mvn -f packages/java/pom.xml -B -DskipTests -Dgpg.skip=true -Dskip.rust.ffi=true verify'
-        language: system
-        files: ^packages/java/
-        pass_filenames: false
-
-      # C#
-      - id: csharp-format
-        name: C# formatting (dotnet format)
-        entry: task csharp:format
-        language: system
+      - id: steep
+        files: \.(rb|rbs)$
+      - id: dotnet-format
         files: \.cs$
-        pass_filenames: false
-        require_serial: true
-        stages: [commit]
-
-      - id: csharp-lint
-        name: C# linting (dotnet format)
-        entry: task csharp:lint
-        language: system
+      - id: dotnet-format-check
         files: \.cs$
-        pass_filenames: false
-        require_serial: true
-        stages: [commit]
-
-      # PHP
-      - id: php-format
-        name: PHP formatting (php-cs-fixer)
-        entry: task php:format
-        language: system
+      - id: php-cs-fixer
         files: \.php$
-        pass_filenames: false
-        require_serial: true
-        stages: [commit]
-
-      - id: php-lint
-        name: PHP linting (phpstan + php-cs-fixer)
-        entry: task php:lint
-        language: system
+      - id: phpstan
         files: \.php$
-        pass_filenames: false
-        require_serial: true
-        stages: [commit]
-
-      # Elixir
       - id: mix-format
-        name: mix format
-        entry: bash -c 'cd packages/elixir && MIX_ENV=dev mix format --check-formatted'
-        language: system
         files: ^packages/elixir/
-        pass_filenames: false
-
       - id: mix-credo
-        name: mix credo
-        entry: bash -c 'cd packages/elixir && MIX_ENV=dev mix credo --strict'
-        language: system
         files: ^packages/elixir/
-        pass_filenames: false
+      - id: java-verify
+        files: ^packages/java/
+      - id: textlint
+        files: ^docs/.*\.md$
+        exclude: ^docs/(CHANGELOG|snippets/)
 
   # Alef: polyglot binding generation and version sync
   - repo: https://github.com/kreuzberg-dev/alef
