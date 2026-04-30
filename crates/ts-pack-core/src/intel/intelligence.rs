@@ -254,6 +254,35 @@ pub(crate) fn extract_structure(root: &tree_sitter::Node, source: &str) -> Vec<S
     items
 }
 
+/// Resolve the name of a structure node using a fallback chain.
+///
+/// Tries `"name"` field first (covers Python, Rust, Java classes), then finds
+/// the first named child with kind `"type_identifier"` (Kotlin classes), then
+/// `"identifier"` (Kotlin packages), then `"scoped_identifier"` (Java packages).
+/// Returns `None` if no non-empty text is found via any strategy.
+fn resolve_structure_name(node: &tree_sitter::Node, source: &str) -> Option<String> {
+    // 1. Named field "name" — the common case
+    if let Some(n) = node.child_by_field_name("name") {
+        let text = node_text(&n, source);
+        if !text.is_empty() {
+            return Some(text.to_string());
+        }
+    }
+    // 2–4. Walk named children, trying each kind in priority order
+    for target_kind in &["type_identifier", "identifier", "scoped_identifier"] {
+        let mut cursor = node.walk();
+        for child in node.named_children(&mut cursor) {
+            if child.kind() == *target_kind {
+                let text = node_text(&child, source);
+                if !text.is_empty() {
+                    return Some(text.to_string());
+                }
+            }
+        }
+    }
+    None
+}
+
 fn collect_structure(node: &tree_sitter::Node, source: &str, items: &mut Vec<StructureItem>) {
     let kind = node.kind();
     let structure_kind = match kind {
@@ -265,16 +294,14 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, items: &mut Vec<Str
         "struct_item" | "struct_definition" | "struct_declaration" => Some(StructureKind::Struct),
         "interface_declaration" | "interface_definition" => Some(StructureKind::Interface),
         "enum_item" | "enum_definition" | "enum_declaration" => Some(StructureKind::Enum),
-        "module_definition" | "mod_item" => Some(StructureKind::Module),
+        "module_definition" | "mod_item" | "package_header" | "package_declaration" => Some(StructureKind::Module),
         "trait_item" => Some(StructureKind::Trait),
         "impl_item" => Some(StructureKind::Impl),
         _ => None,
     };
 
     if let Some(sk) = structure_kind {
-        let name = node
-            .child_by_field_name("name")
-            .map(|n| node_text(&n, source).to_string());
+        let name = resolve_structure_name(node, source);
         let body_span = node.child_by_field_name("body").map(|n| span_from_node(&n));
         let mut children = Vec::new();
         if let Some(body) = node.child_by_field_name("body") {
@@ -611,5 +638,44 @@ mod tests {
         };
         let intel = extract_intelligence(source, "python", &tree);
         assert_eq!(intel.language, "python");
+    }
+
+    // -- Kotlin / Java package and class structure tests (issues #111 and #112) --
+
+    #[test]
+    fn collect_structure_kotlin_package_and_class() {
+        let source = "package foo.bar\n\nclass Widget {}\n";
+        let Some(tree) = parse_or_skip(source, "kotlin") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "kotlin", &tree);
+
+        let module = intel.structure.iter().find(|s| s.kind == StructureKind::Module);
+        assert!(module.is_some(), "should find a Module entry for the package header");
+        assert_eq!(module.unwrap().name.as_deref(), Some("foo.bar"));
+
+        let class = intel.structure.iter().find(|s| s.kind == StructureKind::Class);
+        assert!(class.is_some(), "should find a Class entry");
+        assert_eq!(class.unwrap().name.as_deref(), Some("Widget"));
+    }
+
+    #[test]
+    fn collect_structure_java_package_and_class() {
+        let source = "package com.example;\n\npublic class Widget {}\n";
+        let Some(tree) = parse_or_skip(source, "java") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "java", &tree);
+
+        let module = intel.structure.iter().find(|s| s.kind == StructureKind::Module);
+        assert!(
+            module.is_some(),
+            "should find a Module entry for the package declaration"
+        );
+        assert_eq!(module.unwrap().name.as_deref(), Some("com.example"));
+
+        let class = intel.structure.iter().find(|s| s.kind == StructureKind::Class);
+        assert!(class.is_some(), "should find a Class entry");
+        assert_eq!(class.unwrap().name.as_deref(), Some("Widget"));
     }
 }
