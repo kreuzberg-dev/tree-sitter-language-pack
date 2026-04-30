@@ -1002,19 +1002,59 @@ jobs:
       - name: Stage Java native resources
         shell: bash
         run: |
+          ARTIFACTS_DIR="artifacts/java-natives"
           RESOURCES_DIR="packages/java/src/main/resources/natives"
           mkdir -p "$RESOURCES_DIR"
-          for dir in artifacts/java-natives/*/; do
-            rid=$(basename "$dir")
-            mkdir -p "$RESOURCES_DIR/$rid"
-            cp "$dir"/* "$RESOURCES_DIR/$rid/" 2>/dev/null || true
+          # Artifact layout: $ARTIFACTS_DIR/java-natives-{label}/{platform}/native/{libfile}
+          # Two dirname levels up from the lib file gives {platform}.
+          find "$ARTIFACTS_DIR" \( -name '*.so' -o -name '*.dll' -o -name '*.dylib' \) -print0 |
+          while IFS= read -r -d '' f; do
+            platform=$(basename "$(dirname "$(dirname "$f")")")
+            mkdir -p "$RESOURCES_DIR/$platform"
+            cp "$f" "$RESOURCES_DIR/$platform/"
           done
           echo "=== Staged native resources ==="
-          find "$RESOURCES_DIR" -type f | head -20
+          find "$RESOURCES_DIR" -type f | sort
+
+      - name: Verify staged native resources
+        shell: bash
+        run: |
+          RESOURCES_DIR="packages/java/src/main/resources/natives"
+          # RIDs must match the build-java-natives matrix platform values
+          for rid in linux-x86_64 linux-arm64 macos-arm64 windows-x86_64; do
+            if ! ls "$RESOURCES_DIR/$rid"/ts_pack_core_ffi.* "$RESOURCES_DIR/$rid"/libts_pack_core_ffi.* >/dev/null 2>&1; then
+              echo "::error::Missing native lib for $rid in $RESOURCES_DIR/$rid"
+              exit 1
+            fi
+          done
+          echo "All expected native libs present."
 
       - name: Build and package
         working-directory: packages/java
         run: mvn clean package -DskipTests
+
+      - name: Verify JAR contains native libs
+        working-directory: packages/java
+        shell: bash
+        run: |
+          JAR=""
+          for f in target/tree-sitter-language-pack-*.jar; do
+            case "$f" in *-sources.jar|*-javadoc.jar) continue ;; esac
+            JAR="$f"
+            break
+          done
+          if [ -z "$JAR" ]; then
+            echo "::error::No JAR found in target/"
+            exit 1
+          fi
+          echo "Checking JAR: $JAR"
+          COUNT=$(jar tf "$JAR" | grep -cE '^natives/[^/]+/(lib)?ts_pack_core_ffi\.(so|dll|dylib)$' || true)
+          echo "Native libs found in JAR: $COUNT"
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::JAR contains no natives/ entries — native staging failed"
+            jar tf "$JAR" | grep -E '^natives/' || echo "(no natives/ entries at all)"
+            exit 1
+          fi
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v7
