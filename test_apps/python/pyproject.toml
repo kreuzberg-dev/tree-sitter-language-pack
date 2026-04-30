@@ -15,10 +15,14 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
-dependencies = [ "pytest>=7.4", "pytest-asyncio>=0.23", "pytest-timeout>=2.1", "tree-sitter-language-pack0-1-0" ]
+dependencies = [ "pytest>=7.4", "pytest-asyncio>=0.23", "pytest-timeout>=2.1", "tree-sitter-language-pack0.1.0" ]
 
 [tool.setuptools]
-packages = []
+packages = [  ]
+
+[tool.ruff]
+lint.ignore = [ "PLR2004" ]
+lint.per-file-ignores."tests/**" = [ "B017", "PT011", "S101", "S108" ]
 
 [tool.pytest]
 ini_options.asyncio_mode = "auto"

@@ -9,11 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Intel: emit `StructureKind::Module` for Kotlin `package_header` and Java `package_declaration` so callers can build fully-qualified names for JVM languages (#112)
+- Intel: resolve structure names via a fallback chain (`name` field → `type_identifier` → `identifier` → `scoped_identifier`) so Kotlin classes and Java/Kotlin packages no longer surface with null names (#111)
+- Java: ship `natives/{rid}/` entries inside the published JAR — `actions/download-artifact` produces nested artifact paths, and the previous staging loop preserved them, so every platform hit `UnsatisfiedLinkError` on load. Flatten via `find` and add presence/`jar tf` guard steps so the regression cannot ship silently again (#114)
+- Bindings: surface `extractions` as a typed `Map<String, ExtractionPattern>` / `Map<String, PatternResult>` across Java, Python, Go, TypeScript, Ruby, PHP, C#, Elixir, FFI, and WASM (was `Optional<String>` on Java, blocking pattern extractions through the high-level API). Driven by the alef 0.12.4 codegen fix for `AHashMap`-typed fields (#115)
 - PHP: fix broken `crates/ts-pack-php/README.md` links in root `README.md` — path moved to `packages/php/README.md` after alef migration (#106)
 - PHP: fix `.task/php.yml` `build`, `build:dev`, and `clean` tasks pointing to removed `crates/ts-pack-php/` — corrected to `crates/ts-pack-core-php/` (#106)
 - PHP: align `packages/php/composer.json` and `packages/php/README.md` package name to canonical Packagist vendor slug (`kreuzberg/` not `kreuzberg-dev/`) (#106)
 - PHP: document `mlocati/php-extension-installer` prerequisite in install docs and correct minimum PHP version to 8.4+ (#106)
 - Go: regenerate stale `binding.go` with current alef generator
+
+### Added
+
+- E2E fixtures covering Kotlin package + class structure (`kotlin_package_class_intel.json`), Java package declarations (`java_package_intel.json`), and a process call exercising the typed `extractions` map (`process_with_extractions.json`)
 
 ## [1.7.0] - 2026-04-22
 
