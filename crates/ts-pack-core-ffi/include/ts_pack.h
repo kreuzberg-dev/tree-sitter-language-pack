@@ -165,6 +165,13 @@ void ts_pack_extraction_config_free(TS_PACKExtractionConfig *ptr);
 char *ts_pack_extraction_config_language(const TS_PACKExtractionConfig *ptr);
 
 /**
+ * Get the `patterns` field from a `ExtractionConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_extraction_config_patterns(const TS_PACKExtractionConfig *ptr);
+
+/**
  * Create a `CaptureResult` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
@@ -207,6 +214,13 @@ TS_PACKNodeInfo *ts_pack_capture_result_node(const TS_PACKCaptureResult *ptr);
  * Pointer must be a valid handle returned by this library.
  */
 char *ts_pack_capture_result_text(const TS_PACKCaptureResult *ptr);
+
+/**
+ * Get the `child_fields` field from a `CaptureResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_capture_result_child_fields(const TS_PACKCaptureResult *ptr);
 
 /**
  * Get the `start_byte` field from a `CaptureResult`.
@@ -320,6 +334,13 @@ void ts_pack_extraction_result_free(TS_PACKExtractionResult *ptr);
 char *ts_pack_extraction_result_language(const TS_PACKExtractionResult *ptr);
 
 /**
+ * Get the `results` field from a `ExtractionResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_extraction_result_results(const TS_PACKExtractionResult *ptr);
+
+/**
  * Create a `PatternValidation` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
@@ -406,6 +427,13 @@ void ts_pack_validation_result_free(TS_PACKValidationResult *ptr);
  * Pointer must be a valid handle returned by this library.
  */
 int32_t ts_pack_validation_result_valid(const TS_PACKValidationResult *ptr);
+
+/**
+ * Get the `patterns` field from a `ValidationResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_validation_result_patterns(const TS_PACKValidationResult *ptr);
 
 /**
  * Create a `Span` from a JSON string. Returns null on failure.
@@ -564,6 +592,13 @@ char *ts_pack_process_result_diagnostics(const TS_PACKProcessResult *ptr);
  * Pointer must be a valid handle returned by this library.
  */
 char *ts_pack_process_result_chunks(const TS_PACKProcessResult *ptr);
+
+/**
+ * Get the `extractions` field from a `ProcessResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_process_result_extractions(const TS_PACKProcessResult *ptr);
 
 /**
  * Create a `FileMetrics` from a JSON string. Returns null on failure.
@@ -1498,6 +1533,13 @@ int32_t ts_pack_process_config_diagnostics(const TS_PACKProcessConfig *ptr);
  * Pointer must be a valid handle returned by this library.
  */
 uintptr_t ts_pack_process_config_chunk_max_size(const TS_PACKProcessConfig *ptr);
+
+/**
+ * Get the `extractions` field from a `ProcessConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_process_config_extractions(const TS_PACKProcessConfig *ptr);
 
 /**
  * # Safety
