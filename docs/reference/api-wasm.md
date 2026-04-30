@@ -2,7 +2,7 @@
 title: "WebAssembly API Reference"
 ---
 
-## WebAssembly API Reference <span class="version-badge">v1.8.0-rc.17</span>
+## WebAssembly API Reference <span class="version-badge">v1.8.0-rc.24</span>
 
 ### Functions
 

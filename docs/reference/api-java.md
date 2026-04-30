@@ -2,7 +2,7 @@
 title: "Java API Reference"
 ---
 
-## Java API Reference <span class="version-badge">v1.8.0-rc.17</span>
+## Java API Reference <span class="version-badge">v1.8.0-rc.24</span>
 
 ### Functions
 
