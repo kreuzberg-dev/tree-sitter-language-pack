@@ -7,3 +7,4 @@ on:
 jobs:
   validate:
     uses: kreuzberg-dev/actions/.github/workflows/reusable-validate-issues.yml@main
+    secrets: inherit
