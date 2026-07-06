@@ -841,7 +841,10 @@ fn generate_queries_registry(definitions: &BTreeMap<String, LanguageDefinition>,
             }
             match candidate.parent() {
                 Some(p) => candidate = p,
-                None => break,
+                None => {
+                    candidate = &manifest_dir;
+                    break;
+                }
             }
         }
         candidate.join("query-overlays")
@@ -897,7 +900,9 @@ fn generate_queries_registry(definitions: &BTreeMap<String, LanguageDefinition>,
 
     // Emit rerun triggers for the overlay directory itself so adding a new overlay
     // file causes a rebuild even before any language list changes.
-    println!("cargo:rerun-if-changed={}", overlays_dir.display());
+    if overlays_dir.exists() {
+        println!("cargo:rerun-if-changed={}", overlays_dir.display());
+    }
 
     // Helper: generate a query lookup function, or just return None if empty.
     // We read query file contents at build time and embed them as string literals
@@ -1313,7 +1318,10 @@ fn main() {
             continue;
         }
 
-        emit_rerun_if_changed(&parser_dir);
+        let out_dir = env::var("OUT_DIR").unwrap_or_default();
+        if !parser_dir.starts_with(&out_dir) {
+            emit_rerun_if_changed(&parser_dir);
+        }
 
         let ok = match link_mode.as_str() {
             "static" => {
