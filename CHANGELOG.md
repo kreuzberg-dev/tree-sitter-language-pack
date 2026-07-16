@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **ci**: run Ruby package and Ruby e2e tests on Ruby 4.0 in addition to Ruby 3.4.
+
 ### Fixed
 
 - **ruby**: remove the `< 4.0` RubyGems constraint from the Ruby package. The native extension

@@ -993,7 +993,7 @@ jobs:
         uses: xberg-io/actions/cleanup-rust-cache@v1
 
   test-ruby:
-    name: Test Ruby
+    name: Test Ruby (${{ matrix.ruby-version }})
     if: |
       github.repository == 'xberg-io/tree-sitter-language-pack' &&
       github.actor != 'dependabot[bot]' &&
@@ -1003,6 +1003,10 @@ jobs:
     needs: [changes, clone-vendors, build-e2e-bundles]
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version: ["3.4", "4.0"]
     env:
       PROJECT_ROOT: ${{ github.workspace }}
       TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
@@ -1039,7 +1043,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.4"
+          ruby-version: ${{ matrix.ruby-version }}
 
       - name: Install Ruby dependencies
         working-directory: packages/ruby
