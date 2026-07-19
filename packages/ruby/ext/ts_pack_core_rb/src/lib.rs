@@ -1796,14 +1796,26 @@ unsafe impl IntoValueFromNative for Parser {}
 
 impl magnus::TryConvert for Parser {
     fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Parser = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
+        let r: magnus::typed_data::Obj<Parser> = magnus::TryConvert::try_convert(val)?;
+        Ok((*r).clone())
     }
 }
 
 unsafe impl TryConvertOwned for Parser {}
 
 impl Parser {
+    fn new() -> Self {
+        Self {
+            inner: Arc::new(std::sync::Mutex::new(tree_sitter_language_pack::Parser::new())),
+        }
+    }
+
+    fn default() -> Self {
+        Self {
+            inner: Arc::new(std::sync::Mutex::new(tree_sitter_language_pack::Parser::default())),
+        }
+    }
+
     fn set_language(&self, name: String) -> Result<(), Error> {
         self.inner.lock().unwrap().set_language(&name).map_err(|e| {
             magnus::Error::new(
@@ -1845,8 +1857,8 @@ unsafe impl IntoValueFromNative for Tree {}
 
 impl magnus::TryConvert for Tree {
     fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Tree = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
+        let r: magnus::typed_data::Obj<Tree> = magnus::TryConvert::try_convert(val)?;
+        Ok((*r).clone())
     }
 }
 
@@ -1876,8 +1888,8 @@ unsafe impl IntoValueFromNative for Node {}
 
 impl magnus::TryConvert for Node {
     fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Node = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
+        let r: magnus::typed_data::Obj<Node> = magnus::TryConvert::try_convert(val)?;
+        Ok((*r).clone())
     }
 }
 
@@ -1985,8 +1997,8 @@ unsafe impl IntoValueFromNative for TreeCursor {}
 
 impl magnus::TryConvert for TreeCursor {
     fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &TreeCursor = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
+        let r: magnus::typed_data::Obj<TreeCursor> = magnus::TryConvert::try_convert(val)?;
+        Ok((*r).clone())
     }
 }
 
@@ -2266,8 +2278,8 @@ unsafe impl IntoValueFromNative for LanguageRegistry {}
 
 impl magnus::TryConvert for LanguageRegistry {
     fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &LanguageRegistry = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
+        let r: magnus::typed_data::Obj<LanguageRegistry> = magnus::TryConvert::try_convert(val)?;
+        Ok((*r).clone())
     }
 }
 
@@ -2324,8 +2336,8 @@ unsafe impl IntoValueFromNative for DownloadManager {}
 
 impl magnus::TryConvert for DownloadManager {
     fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &DownloadManager = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
+        let r: magnus::typed_data::Obj<DownloadManager> = magnus::TryConvert::try_convert(val)?;
+        Ok((*r).clone())
     }
 }
 
@@ -2367,8 +2379,8 @@ unsafe impl IntoValueFromNative for Language {}
 
 impl magnus::TryConvert for Language {
     fn try_convert(val: magnus::Value) -> Result<Self, magnus::Error> {
-        let r: &Language = magnus::TryConvert::try_convert(val)?;
-        Ok(r.clone())
+        let r: magnus::typed_data::Obj<Language> = magnus::TryConvert::try_convert(val)?;
+        Ok((*r).clone())
     }
 }
 
@@ -3935,6 +3947,18 @@ fn ruby_init(ruby: &Ruby) -> Result<(), Error> {
     class.define_method("end", method!(ByteRange::end, 0))?;
 
     let class = module.define_class("Parser", ruby.class_object())?;
+
+    class.define_singleton_method("new", function!(Parser::new, 0))?;
+
+    class.define_singleton_method("default", function!(Parser::default, 0))?;
+
+    class.define_method("set_language", method!(Parser::set_language, 1))?;
+
+    class.define_method("parse", method!(Parser::parse, 1))?;
+
+    class.define_method("parse_bytes", method!(Parser::parse_bytes, 1))?;
+
+    class.define_method("reset", method!(Parser::reset, 0))?;
 
     let class = module.define_class("Tree", ruby.class_object())?;
 
