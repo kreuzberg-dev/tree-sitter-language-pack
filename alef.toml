@@ -807,6 +807,12 @@ options_type = "ProcessConfig"
 [crates.e2e.call.overrides.php]
 options_type = "ProcessConfig"
 
+# Elixir public wrappers JSON-encode config arguments before calling the NIF.
+# Generate typed config structs here so E2E tests exercise the supported wrapper
+# shape instead of passing raw JSON strings that would be encoded a second time.
+[crates.e2e.call.overrides.elixir]
+options_type = "ProcessConfig"
+
 [crates.e2e.call.overrides.c]
 function = "ts_pack_process"
 result_type = "ProcessResult"
@@ -1048,6 +1054,11 @@ options_type = "PackConfig"
 [crates.e2e.calls.init_pack.overrides.php]
 options_type = "PackConfig"
 
+# Keep Elixir init/configure aligned with the public wrapper contract: callers
+# pass PackConfig structs, and the wrapper serializes them for the native layer.
+[crates.e2e.calls.init_pack.overrides.elixir]
+options_type = "PackConfig"
+
 [crates.e2e.calls.init_pack.overrides.java]
 options_type = "PackConfig"
 
@@ -1072,6 +1083,11 @@ options_type = "PackConfig"
 options_type = "PackConfig"
 
 [crates.e2e.calls.configure_pack.overrides.php]
+options_type = "PackConfig"
+
+# Keep Elixir init/configure aligned with the public wrapper contract: callers
+# pass PackConfig structs, and the wrapper serializes them for the native layer.
+[crates.e2e.calls.configure_pack.overrides.elixir]
 options_type = "PackConfig"
 
 [crates.e2e.calls.configure_pack.overrides.java]
