@@ -15,5 +15,12 @@ RSpec.describe TreeSitterLanguagePack::Parser do
 
     expect(tree).not_to be_nil
     expect(tree.root_node.kind).not_to be_empty
+
+    bytes_tree = parser.parse_bytes('{"byte":true}'.bytes)
+
+    expect(bytes_tree).not_to be_nil
+    expect(bytes_tree.root_node.kind).not_to be_empty
+
+    expect(parser.reset).to be_nil
   end
 end
