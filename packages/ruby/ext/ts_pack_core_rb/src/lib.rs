@@ -19,9 +19,8 @@
     clippy::clone_on_copy
 )]
 
-use magnus::{function, method, prelude::*, try_convert::TryConvertOwned, Error, IntoValueFromNative, Ruby};
-use std::sync::Mutex;
-use std::sync::{Arc, MutexGuard};
+use magnus::{Error, IntoValueFromNative, RString, Ruby, function, method, prelude::*, try_convert::TryConvertOwned};
+use std::sync::{Arc, Mutex, MutexGuard};
 
 fn json_to_ruby(handle: &Ruby, val: serde_json::Value) -> magnus::Value {
     use magnus::IntoValue;
@@ -1789,7 +1788,7 @@ impl ByteRange {
 #[derive(Clone)]
 #[magnus::wrap(class = "TreeSitterLanguagePack::Parser")]
 pub struct Parser {
-    inner: Arc<std::sync::Mutex<tree_sitter_language_pack::Parser>>,
+    inner: Arc<Mutex<tree_sitter_language_pack::Parser>>,
 }
 
 unsafe impl IntoValueFromNative for Parser {}
@@ -1805,21 +1804,15 @@ unsafe impl TryConvertOwned for Parser {}
 
 impl Parser {
     fn lock_inner(&self) -> Result<MutexGuard<'_, tree_sitter_language_pack::Parser>, Error> {
-        self.inner.lock().map_err(|_| {
-            magnus::Error::new(
-                unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
-                "parser mutex poisoned",
-            )
-        })
+        self.inner.lock().map_err(|_| runtime_error(
+            "parser mutex poisoned: another thread panicked while holding the parser lock; discard this parser and request a new one"
+        ))
     }
 
     fn set_language(&self, name: String) -> Result<(), Error> {
-        self.lock_inner()?.set_language(&name).map_err(|e| {
-            magnus::Error::new(
-                unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
-                e.to_string(),
-            )
-        })?;
+        self.lock_inner()?
+            .set_language(&name)
+            .map_err(|e| runtime_error(e.to_string()))?;
         Ok(())
     }
 
@@ -1827,7 +1820,8 @@ impl Parser {
         Ok(self.lock_inner()?.parse(&source).map(|v| Tree { inner: Arc::new(v) }))
     }
 
-    fn parse_bytes(&self, source: Vec<u8>) -> Result<Option<Tree>, Error> {
+    fn parse_bytes(&self, source: RString) -> Result<Option<Tree>, Error> {
+        let source = unsafe { source.as_slice().to_vec() };
         Ok(self
             .lock_inner()?
             .parse_bytes(&source)
@@ -3714,8 +3708,14 @@ impl From<tree_sitter_language_pack::DiagnosticSeverity> for DiagnosticSeverity 
 /// Convert a `tree_sitter_language_pack::error::Error` error to a Magnus runtime error.
 #[allow(dead_code)]
 fn error_to_magnus_err(e: tree_sitter_language_pack::error::Error) -> magnus::Error {
-    let msg = e.to_string();
-    magnus::Error::new(unsafe { magnus::Ruby::get_unchecked() }.exception_runtime_error(), msg)
+    runtime_error(e.to_string())
+}
+
+fn runtime_error(message: impl Into<String>) -> magnus::Error {
+    magnus::Error::new(
+        unsafe { magnus::Ruby::get_unchecked() }.exception_runtime_error(),
+        message.into(),
+    )
 }
 
 #[magnus::init]
