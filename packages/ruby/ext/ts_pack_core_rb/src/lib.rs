@@ -19,9 +19,9 @@
     clippy::clone_on_copy
 )]
 
-use magnus::{Error, IntoValueFromNative, Ruby, function, method, prelude::*, try_convert::TryConvertOwned};
-use std::sync::Arc;
+use magnus::{function, method, prelude::*, try_convert::TryConvertOwned, Error, IntoValueFromNative, Ruby};
 use std::sync::Mutex;
+use std::sync::{Arc, MutexGuard};
 
 fn json_to_ruby(handle: &Ruby, val: serde_json::Value) -> magnus::Value {
     use magnus::IntoValue;
@@ -1804,8 +1804,17 @@ impl magnus::TryConvert for Parser {
 unsafe impl TryConvertOwned for Parser {}
 
 impl Parser {
+    fn lock_inner(&self) -> Result<MutexGuard<'_, tree_sitter_language_pack::Parser>, Error> {
+        self.inner.lock().map_err(|_| {
+            magnus::Error::new(
+                unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
+                "parser mutex poisoned",
+            )
+        })
+    }
+
     fn set_language(&self, name: String) -> Result<(), Error> {
-        self.inner.lock().unwrap().set_language(&name).map_err(|e| {
+        self.lock_inner()?.set_language(&name).map_err(|e| {
             magnus::Error::new(
                 unsafe { Ruby::get_unchecked() }.exception_runtime_error(),
                 e.to_string(),
@@ -1814,24 +1823,20 @@ impl Parser {
         Ok(())
     }
 
-    fn parse(&self, source: String) -> Option<Tree> {
-        self.inner
-            .lock()
-            .unwrap()
-            .parse(&source)
-            .map(|v| Tree { inner: Arc::new(v) })
+    fn parse(&self, source: String) -> Result<Option<Tree>, Error> {
+        Ok(self.lock_inner()?.parse(&source).map(|v| Tree { inner: Arc::new(v) }))
     }
 
-    fn parse_bytes(&self, source: Vec<u8>) -> Option<Tree> {
-        self.inner
-            .lock()
-            .unwrap()
+    fn parse_bytes(&self, source: Vec<u8>) -> Result<Option<Tree>, Error> {
+        Ok(self
+            .lock_inner()?
             .parse_bytes(&source)
-            .map(|v| Tree { inner: Arc::new(v) })
+            .map(|v| Tree { inner: Arc::new(v) }))
     }
 
-    fn reset(&self) -> () {
-        self.inner.lock().unwrap().reset()
+    fn reset(&self) -> Result<(), Error> {
+        self.lock_inner()?.reset();
+        Ok(())
     }
 }
 
