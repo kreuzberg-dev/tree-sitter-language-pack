@@ -1834,11 +1834,11 @@ impl Parser {
             .map(|v| Tree { inner: Arc::new(v) })
     }
 
-    fn parse_bytes(&self, source: Vec<u8>) -> Option<Tree> {
+    fn parse_bytes(&self, source: String) -> Option<Tree> {
         self.inner
             .lock()
             .unwrap()
-            .parse_bytes(&source)
+            .parse_bytes(source.as_bytes())
             .map(|v| Tree { inner: Arc::new(v) })
     }
 

@@ -58,4 +58,18 @@ RSpec.describe "parsing" do
 
     expect(result).not_to(be_nil)
   end
+
+  it "parser_parse: parses source through the parser API" do
+    parser = TreeSitterLanguagePack.get_parser("json")
+    tree = parser.parse('{"a":1}')
+
+    expect(tree.root_node.kind).to(eq("document"))
+  end
+
+  it "parser_parse_bytes: parses string bytes through the parser API" do
+    parser = TreeSitterLanguagePack.get_parser("json")
+    tree = parser.parse_bytes('{"a":1}')
+
+    expect(tree.root_node.kind).to(eq("document"))
+  end
 end
