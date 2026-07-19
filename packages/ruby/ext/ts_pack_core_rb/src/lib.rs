@@ -3982,6 +3982,14 @@ fn ruby_init(ruby: &Ruby) -> Result<(), Error> {
 
     let class = module.define_class("Parser", ruby.class_object())?;
 
+    class.define_method("set_language", method!(Parser::set_language, 1))?;
+
+    class.define_method("parse", method!(Parser::parse, 1))?;
+
+    class.define_method("parse_bytes", method!(Parser::parse_bytes, 1))?;
+
+    class.define_method("reset", method!(Parser::reset, 0))?;
+
     let class = module.define_class("Tree", ruby.class_object())?;
 
     class.define_method("root_node", method!(Tree::root_node, 0))?;
