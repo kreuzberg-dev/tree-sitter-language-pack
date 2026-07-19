@@ -184,7 +184,7 @@
     "extensions": ["cedar"],
     "generate": true,
     "repo": "https://github.com/DuskSystems/tree-sitter-cedar",
-    "rev": "ac1fe619df3d4af9f797903d4b8852f12082a0d5"
+    "rev": "05f0223c406d4e9a91d55143dbe63e7788dfa29d"
   },
   "cedarschema": {
     "abi_version": 14,
@@ -192,7 +192,7 @@
     "extensions": ["cedarschema"],
     "generate": true,
     "repo": "https://github.com/DuskSystems/tree-sitter-cedar",
-    "rev": "ac1fe619df3d4af9f797903d4b8852f12082a0d5"
+    "rev": "05f0223c406d4e9a91d55143dbe63e7788dfa29d"
   },
   "cel": {
     "abi_version": 14,
