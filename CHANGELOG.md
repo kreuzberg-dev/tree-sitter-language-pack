@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **ruby**: platform-specific native gems now package one native extension per supported Ruby ABI and
+  load the extension matching the current runtime. This keeps precompiled gems usable on Ruby 3.2,
+  3.3, 3.4, 3.5, and Ruby 4 while avoiding `Parser#parse` self-conversion `TypeError`s from loading
+  an extension compiled against a different Ruby ABI.
+
 ## [1.13.2] - 2026-07-20
 
 ### Fixed

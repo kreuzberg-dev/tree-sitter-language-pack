@@ -16,9 +16,13 @@ end
 gem_dir = File.expand_path("../../../packages/ruby", __dir__)
 Dir.chdir(gem_dir)
 
-native_extensions = Dir.glob("lib/**/*.{so,bundle,dylib}")
+staged_native_glob = "lib/ts_pack_core_rb/**/*.{so,bundle,dylib}"
+native_extensions = Dir.glob(staged_native_glob)
 if native_extensions.empty?
-  abort("ERROR: No compiled native extensions found in lib/. Run 'rake compile' first.")
+  abort(
+    "ERROR: No staged native extensions found under lib/ts_pack_core_rb/. " \
+      "Run scripts/publish/ruby/stage-native-abi.rb for each supported Ruby ABI first."
+  )
 end
 
 puts("Found native extensions: #{native_extensions.join(", ")}")
@@ -27,14 +31,17 @@ spec = Gem::Specification.load("tree_sitter_language_pack.gemspec")
 abort("ERROR: Could not load tree_sitter_language_pack.gemspec") unless spec
 
 spec.platform = Gem::Platform.new(platform)
-
 spec.extensions = []
 
 native_extensions.each do |ext|
   spec.files << ext unless spec.files.include?(ext)
 end
 
-spec.files.reject! { |f| f.start_with?("vendor/") || f.start_with?("ext/") }
+spec.files.reject! do |file|
+  file.start_with?("vendor/") ||
+    file.start_with?("ext/") ||
+    file.match?(%r{\Alib/ts_pack_core_rb\.(?:so|bundle|dylib)\z})
+end
 
 spec.dependencies.reject! { |d| d.name == "rb_sys" }
 

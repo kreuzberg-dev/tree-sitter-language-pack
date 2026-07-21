@@ -706,6 +706,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     env:
+      BUNDLER_VERSION: "4.0.7"
       RB_SYS_CARGO_PROFILE: release
     strategy:
       fail-fast: false
@@ -742,42 +743,145 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Setup Ruby
+      - name: Rewrite native dependencies
+        uses: xberg-io/actions/rewrite-native-deps@v1
+        with:
+          lang: ruby
+
+      - name: Setup Ruby 3.2
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler: none
+          bundler-cache: false
+
+      - name: Stage Ruby 3.2 native extension
+        run: |
+          gem install bundler -v "$BUNDLER_VERSION" --no-document
+          ruby scripts/publish/ruby/stage-native-abi.rb
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          CARGO_TARGET_DIR: ${{ github.workspace }}/packages/ruby/target
+
+      - name: Setup Ruby 3.3
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler: none
+          bundler-cache: false
+
+      - name: Stage Ruby 3.3 native extension
+        run: |
+          gem install bundler -v "$BUNDLER_VERSION" --no-document
+          ruby scripts/publish/ruby/stage-native-abi.rb
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          CARGO_TARGET_DIR: ${{ github.workspace }}/packages/ruby/target
+
+      - name: Setup Ruby 3.4
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
           bundler: none
           bundler-cache: false
 
-      - name: Install Bundler
-        run: gem install bundler --no-document && bundler --version
-
-      - name: Install Ruby dependencies
-        working-directory: packages/ruby
+      - name: Stage Ruby 3.4 native extension
         run: |
-          bundle config set --local path vendor/bundle
-          bundle check || bundle install
-
-      - name: Rewrite native dependencies
-        uses: xberg-io/actions/rewrite-native-deps@v1
-        with:
-          lang: ruby
-
-      - name: Compile native extension
-        working-directory: packages/ruby
-        timeout-minutes: 60
-        run: |
-          echo "Compiling native extension..."
-          bundle exec rake compile
-          echo "Native extension compiled successfully"
-          echo "=== Native libraries ==="
-          find lib -name '*.so' -o -name '*.bundle' -o -name '*.dylib' 2>/dev/null | head -20
+          gem install bundler -v "$BUNDLER_VERSION" --no-document
+          ruby scripts/publish/ruby/stage-native-abi.rb
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           CARGO_TARGET_DIR: ${{ github.workspace }}/packages/ruby/target
 
+      - name: Setup Ruby 3.5
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.5"
+          bundler: none
+          bundler-cache: false
+
+      - name: Stage Ruby 3.5 native extension
+        run: |
+          gem install bundler -v "$BUNDLER_VERSION" --no-document
+          ruby scripts/publish/ruby/stage-native-abi.rb
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          CARGO_TARGET_DIR: ${{ github.workspace }}/packages/ruby/target
+
+      - name: Setup Ruby 4.0
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+          bundler: none
+          bundler-cache: false
+
+      - name: Stage Ruby 4.0 native extension
+        run: |
+          gem install bundler -v "$BUNDLER_VERSION" --no-document
+          ruby scripts/publish/ruby/stage-native-abi.rb
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          CARGO_TARGET_DIR: ${{ github.workspace }}/packages/ruby/target
+
+      - name: List staged native libraries
+        working-directory: packages/ruby
+        run: find lib/ts_pack_core_rb -type f | sort
+
       - name: Build platform gem
         run: ruby scripts/publish/ruby/build-native-gem.rb "${{ matrix.ruby_platform }}"
+
+      - name: Verify platform gem on Ruby 4.0
+        run: |
+          gem install packages/ruby/tree_sitter_language_pack-*.gem --no-document
+          ruby -e 'require "tree_sitter_language_pack"; abort("parse failed") unless TreeSitterLanguagePack.get_parser("json").parse("{}").root_node.kind == "document"'
+
+      - name: Setup Ruby 3.5 for platform gem verification
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.5"
+          bundler: none
+          bundler-cache: false
+
+      - name: Verify platform gem on Ruby 3.5
+        run: |
+          gem install packages/ruby/tree_sitter_language_pack-*.gem --no-document
+          ruby -e 'require "tree_sitter_language_pack"; abort("parse failed") unless TreeSitterLanguagePack.get_parser("json").parse("{}").root_node.kind == "document"'
+
+      - name: Setup Ruby 3.4 for platform gem verification
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler: none
+          bundler-cache: false
+
+      - name: Verify platform gem on Ruby 3.4
+        run: |
+          gem install packages/ruby/tree_sitter_language_pack-*.gem --no-document
+          ruby -e 'require "tree_sitter_language_pack"; abort("parse failed") unless TreeSitterLanguagePack.get_parser("json").parse("{}").root_node.kind == "document"'
+
+      - name: Setup Ruby 3.3 for platform gem verification
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler: none
+          bundler-cache: false
+
+      - name: Verify platform gem on Ruby 3.3
+        run: |
+          gem install packages/ruby/tree_sitter_language_pack-*.gem --no-document
+          ruby -e 'require "tree_sitter_language_pack"; abort("parse failed") unless TreeSitterLanguagePack.get_parser("json").parse("{}").root_node.kind == "document"'
+
+      - name: Setup Ruby 3.2 for platform gem verification
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler: none
+          bundler-cache: false
+
+      - name: Verify platform gem on Ruby 3.2
+        run: |
+          gem install packages/ruby/tree_sitter_language_pack-*.gem --no-document
+          ruby -e 'require "tree_sitter_language_pack"; abort("parse failed") unless TreeSitterLanguagePack.get_parser("json").parse("{}").root_node.kind == "document"'
 
       - name: Verify gem was built
         working-directory: packages/ruby
