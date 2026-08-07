@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.55.6"
+alef_version = "0.55.7"
 languages = [
   "python",
   "node",
@@ -58,7 +58,6 @@ extra_paths = [
   "crates/ts-pack-core-node/npm/*/package.json",
   "crates/ts-pack-core-py/src/pyproject.toml",
   "packages/ruby/ext/ts_pack_core_rb/native/Cargo.toml",
-  "pyproject.toml",
 ]
 
 [workspace.citation]
