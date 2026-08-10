@@ -1,17 +1,24 @@
 {
-	"id": "smoke_poe_filter",
-	"description": "Smoke test: load poe_filter and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "x",
-		"config": {
-			"language": "poe_filter"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_poe_filter",
+  "description": "Smoke test: load poe_filter and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "x",
+    "config": {
+      "language": "poe_filter"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_poe_filter",
+    "title": "Smoke test: load poe_filter and parse a simple snippet"
+  }
 }

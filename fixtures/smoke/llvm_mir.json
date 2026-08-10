@@ -1,17 +1,24 @@
 {
-	"id": "smoke_llvm_mir",
-	"description": "Smoke test: load llvm_mir and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "---\nname: foo\n...\n",
-		"config": {
-			"language": "llvm_mir"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_llvm_mir",
+  "description": "Smoke test: load llvm_mir and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "---\nname: foo\n...\n",
+    "config": {
+      "language": "llvm_mir"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_llvm_mir",
+    "title": "Smoke test: load llvm_mir and parse a simple snippet"
+  }
 }

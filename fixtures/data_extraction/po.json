@@ -1,20 +1,37 @@
 [
-	{
-		"id": "data_extraction_po_message",
-		"description": "Data extraction: PO gettext message pairs with msgid as key and msgstr as value",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "po"],
-		"input": {
-			"source_code": "msgid \"Hello\"\nmsgstr \"Hallo\"\n",
-			"config": {
-				"language": "po",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "count_min", "field": "data.children", "value": 1 }
-		]
-	}
+  {
+    "id": "data_extraction_po_message",
+    "description": "Data extraction: PO gettext message pairs with msgid as key and msgstr as value",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "po"
+    ],
+    "input": {
+      "source_code": "msgid \"Hello\"\nmsgstr \"Hallo\"\n",
+      "config": {
+        "language": "po",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 1
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_po_message",
+      "title": "Data extraction: PO gettext message pairs with msgid as key and msgstr as value"
+    }
+  }
 ]

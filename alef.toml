@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.55.7"
+alef_version = "0.60.0"
 languages = [
   "python",
   "node",
@@ -18,9 +18,6 @@ languages = [
   "jni",
 ]
 
-[workspace.format]
-enabled = false
-
 [workspace.docs]
 reference_output = "docs-site/src/content/docs/reference"
 
@@ -36,7 +33,67 @@ template_dir = "templates/docs/skills"
 outputs = [".codex/skills", ".agents/skills", ".github/skills", ".claude/skills"]
 
 [workspace.docs.snippets]
-dirs = ["docs-site/src/snippets"]
+dirs = ["docs-site/src/snippets/generated"]
+validation_level = "compile"
+timeout_secs = 120
+strict = true
+deny_unclassified = true
+
+[workspace.docs.snippets.sessions.python]
+cwd = "packages/python"
+manifest = "packages/python/pyproject.toml"
+
+[workspace.docs.snippets.sessions.node]
+cwd = "crates/ts-pack-core-node"
+manifest = "crates/ts-pack-core-node/package.json"
+
+[workspace.docs.snippets.sessions.wasm]
+cwd = "crates/ts-pack-core-wasm"
+manifest = "crates/ts-pack-core-wasm/package.json"
+
+[workspace.docs.snippets.sessions.ruby]
+cwd = "packages/ruby"
+
+[workspace.docs.snippets.sessions.php]
+cwd = "."
+manifest = "composer.json"
+
+[workspace.docs.snippets.sessions.go]
+cwd = "packages/go"
+manifest = "packages/go/go.mod"
+
+[workspace.docs.snippets.sessions.java]
+cwd = "packages/java"
+manifest = "packages/java/pom.xml"
+
+[workspace.docs.snippets.sessions.csharp]
+cwd = "packages/csharp"
+
+[workspace.docs.snippets.sessions.elixir]
+cwd = "packages/elixir"
+manifest = "packages/elixir/mix.exs"
+
+[workspace.docs.snippets.sessions.rust]
+cwd = "crates/ts-pack-core"
+manifest = "crates/ts-pack-core/Cargo.toml"
+
+[workspace.docs.snippets.sessions.kotlin_android]
+cwd = "packages/kotlin-android"
+manifest = "packages/kotlin-android/build.gradle.kts"
+
+[workspace.docs.snippets.sessions.swift]
+cwd = "packages/swift"
+manifest = "packages/swift/Package.swift"
+before = ["swift build"]
+
+[workspace.docs.snippets.sessions.dart]
+cwd = "packages/dart"
+manifest = "packages/dart/pubspec.yaml"
+
+[workspace.docs.snippets.sessions.zig]
+cwd = "packages/zig"
+manifest = "packages/zig/build.zig"
+env = { ZIG_GLOBAL_CACHE_DIR = ".zig-global-cache", ZIG_LOCAL_CACHE_DIR = ".zig-cache" }
 
 [workspace.opaque_types]
 Language = "tree_sitter_language_pack::Language"
@@ -836,6 +893,25 @@ result_fields = [
   "symbols",
   "diagnostics",
   "chunks",
+]
+
+[crates.e2e.snippets]
+output = "docs-site/src/snippets/generated"
+languages = [
+  "python",
+  "node",
+  "ruby",
+  "php",
+  "go",
+  "java",
+  "csharp",
+  "elixir",
+  "wasm",
+  "rust",
+  "kotlin_android",
+  "swift",
+  "dart",
+  "zig",
 ]
 
 [crates.e2e.harness_extras.node]

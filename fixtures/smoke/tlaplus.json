@@ -1,17 +1,24 @@
 {
-	"id": "smoke_tlaplus",
-	"description": "Smoke test: load tlaplus and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "---- MODULE Main ----\n====",
-		"config": {
-			"language": "tlaplus"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_tlaplus",
+  "description": "Smoke test: load tlaplus and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "---- MODULE Main ----\n====",
+    "config": {
+      "language": "tlaplus"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_tlaplus",
+    "title": "Smoke test: load tlaplus and parse a simple snippet"
+  }
 }

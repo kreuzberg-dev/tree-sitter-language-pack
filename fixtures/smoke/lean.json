@@ -1,17 +1,24 @@
 {
-	"id": "smoke_lean",
-	"description": "Smoke test: load lean and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "def main : IO Unit := pure ()",
-		"config": {
-			"language": "lean"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_lean",
+  "description": "Smoke test: load lean and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "def main : IO Unit := pure ()",
+    "config": {
+      "language": "lean"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_lean",
+    "title": "Smoke test: load lean and parse a simple snippet"
+  }
 }

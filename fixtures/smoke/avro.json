@@ -1,17 +1,24 @@
 {
-	"id": "smoke_avro",
-	"description": "Smoke test: load avro and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "protocol P {\n}\n",
-		"config": {
-			"language": "avro"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_avro",
+  "description": "Smoke test: load avro and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "protocol P {\n}\n",
+    "config": {
+      "language": "avro"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_avro",
+    "title": "Smoke test: load avro and parse a simple snippet"
+  }
 }

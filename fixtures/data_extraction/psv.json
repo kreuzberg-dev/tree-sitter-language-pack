@@ -1,21 +1,42 @@
 [
-	{
-		"id": "data_extraction_psv_rows",
-		"description": "Data extraction: PSV (pipe-separated values) rows as Sequence nodes",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "psv"],
-		"input": {
-			"source_code": "a|b|c\n1|2|3\n",
-			"config": {
-				"language": "psv",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "equals", "field": "data.kind", "value": "Sequence" },
-			{ "type": "count_min", "field": "data.children", "value": 2 }
-		]
-	}
+  {
+    "id": "data_extraction_psv_rows",
+    "description": "Data extraction: PSV (pipe-separated values) rows as Sequence nodes",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "psv"
+    ],
+    "input": {
+      "source_code": "a|b|c\n1|2|3\n",
+      "config": {
+        "language": "psv",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "equals",
+        "field": "data.kind",
+        "value": "Sequence"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 2
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_psv_rows",
+      "title": "Data extraction: PSV (pipe-separated values) rows as Sequence nodes"
+    }
+  }
 ]

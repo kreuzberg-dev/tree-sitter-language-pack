@@ -1,48 +1,97 @@
 [
-	{
-		"id": "data_extraction_xml_element",
-		"description": "Data extraction: XML element with attributes",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "xml"],
-		"input": {
-			"source_code": "<server id=\"main\"><host>localhost</host></server>",
-			"config": {
-				"language": "xml",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "equals", "field": "data.kind", "value": "Element" }
-		]
-	},
-	{
-		"id": "data_extraction_xml_nested",
-		"description": "Data extraction: XML nested elements produce child nodes",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "xml"],
-		"input": {
-			"source_code": "<config><host>localhost</host><port>8080</port></config>",
-			"config": {
-				"language": "xml",
-				"data_extraction": true
-			}
-		},
-		"assertions": [{ "type": "not_error" }, { "type": "is_true", "field": "data" }]
-	},
-	{
-		"id": "data_extraction_xml_empty_element",
-		"description": "Data extraction: XML self-closing element produces an Element node",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "xml"],
-		"input": {
-			"source_code": "<br/>",
-			"config": {
-				"language": "xml",
-				"data_extraction": true
-			}
-		},
-		"assertions": [{ "type": "not_error" }, { "type": "is_true", "field": "data" }]
-	}
+  {
+    "id": "data_extraction_xml_element",
+    "description": "Data extraction: XML element with attributes",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "xml"
+    ],
+    "input": {
+      "source_code": "<server id=\"main\"><host>localhost</host></server>",
+      "config": {
+        "language": "xml",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "equals",
+        "field": "data.kind",
+        "value": "Element"
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_xml_element",
+      "title": "Data extraction: XML element with attributes"
+    }
+  },
+  {
+    "id": "data_extraction_xml_nested",
+    "description": "Data extraction: XML nested elements produce child nodes",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "xml"
+    ],
+    "input": {
+      "source_code": "<config><host>localhost</host><port>8080</port></config>",
+      "config": {
+        "language": "xml",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_xml_nested",
+      "title": "Data extraction: XML nested elements produce child nodes"
+    }
+  },
+  {
+    "id": "data_extraction_xml_empty_element",
+    "description": "Data extraction: XML self-closing element produces an Element node",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "xml"
+    ],
+    "input": {
+      "source_code": "<br/>",
+      "config": {
+        "language": "xml",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_xml_empty_element",
+      "title": "Data extraction: XML self-closing element produces an Element node"
+    }
+  }
 ]

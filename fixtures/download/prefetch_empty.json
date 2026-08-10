@@ -1,19 +1,35 @@
 {
-	"id": "prefetch_empty_list",
-	"description": "prefetch([]) is a no-op that succeeds",
-	"category": "download",
-	"tags": ["download", "prefetch"],
-	"call": "prefetch",
-	"skip": {
-		"languages": ["wasm"],
-		"reason": "Prefetch feature requires network access and is not available in static builds"
-	},
-	"input": {
-		"languages": []
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "prefetch_empty_list",
+  "description": "prefetch([]) is a no-op that succeeds",
+  "category": "download",
+  "tags": [
+    "download",
+    "prefetch"
+  ],
+  "call": "prefetch",
+  "skip": {
+    "languages": [
+      "wasm"
+    ],
+    "reason": "Prefetch feature requires network access and is not available in static builds"
+  },
+  "input": {
+    "languages": []
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "download",
+    "stem": "prefetch_empty_list",
+    "title": "prefetch([]) is a no-op that succeeds",
+    "coverage_exceptions": {
+      "wasm": {
+        "reason": "The WASM package uses statically compiled parsers and does not expose runtime parser download or cache management.",
+        "documentation": "docs-site/src/content/docs/guides/building.md"
+      }
+    }
+  }
 }

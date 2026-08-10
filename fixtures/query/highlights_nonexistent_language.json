@@ -1,18 +1,26 @@
 {
-	"id": "highlights_nonexistent_language",
-	"description": "Get highlights query for nonexistent language returns null/empty",
-	"category": "query",
-	"tags": ["query", "highlights"],
-	"call": "highlights",
-	"input": {
-		"language": "zzz_nonexistent_lang"
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		},
-		{
-			"type": "is_empty"
-		}
-	]
+  "id": "highlights_nonexistent_language",
+  "description": "Get highlights query for nonexistent language returns null/empty",
+  "category": "query",
+  "tags": [
+    "query",
+    "highlights"
+  ],
+  "call": "highlights",
+  "input": {
+    "language": "zzz_nonexistent_lang"
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    },
+    {
+      "type": "is_empty"
+    }
+  ],
+  "docs": {
+    "topic": "query",
+    "stem": "highlights_nonexistent_language",
+    "title": "Get highlights query for nonexistent language returns null/empty"
+  }
 }

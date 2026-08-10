@@ -1,17 +1,24 @@
 {
-	"id": "smoke_postgres",
-	"description": "Smoke test: load postgres and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "SELECT 1;\n",
-		"config": {
-			"language": "postgres"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_postgres",
+  "description": "Smoke test: load postgres and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "SELECT 1;\n",
+    "config": {
+      "language": "postgres"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_postgres",
+    "title": "Smoke test: load postgres and parse a simple snippet"
+  }
 }

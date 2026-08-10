@@ -1,17 +1,24 @@
 {
-	"id": "smoke_arduino",
-	"description": "Smoke test: load arduino and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "void setup() {}",
-		"config": {
-			"language": "arduino"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_arduino",
+  "description": "Smoke test: load arduino and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "void setup() {}",
+    "config": {
+      "language": "arduino"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_arduino",
+    "title": "Smoke test: load arduino and parse a simple snippet"
+  }
 }

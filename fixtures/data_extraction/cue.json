@@ -1,20 +1,37 @@
 [
-	{
-		"id": "data_extraction_cue_fields",
-		"description": "Data extraction: CUE field definitions as KeyValue nodes",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "cue"],
-		"input": {
-			"source_code": "host: \"localhost\"\nport: 8080\n",
-			"config": {
-				"language": "cue",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "equals", "field": "data.kind", "value": "KeyValue" }
-		]
-	}
+  {
+    "id": "data_extraction_cue_fields",
+    "description": "Data extraction: CUE field definitions as KeyValue nodes",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "cue"
+    ],
+    "input": {
+      "source_code": "host: \"localhost\"\nport: 8080\n",
+      "config": {
+        "language": "cue",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "equals",
+        "field": "data.kind",
+        "value": "KeyValue"
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_cue_fields",
+      "title": "Data extraction: CUE field definitions as KeyValue nodes"
+    }
+  }
 ]

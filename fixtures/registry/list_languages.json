@@ -1,12 +1,19 @@
 {
-	"id": "registry_list_languages",
-	"description": "available_languages should return a non-empty list",
-	"category": "registry",
-	"tags": ["registry"],
-	"call": "list_languages",
-	"assertions": [
-		{
-			"type": "not_empty"
-		}
-	]
+  "id": "registry_list_languages",
+  "description": "available_languages should return a non-empty list",
+  "category": "registry",
+  "tags": [
+    "registry"
+  ],
+  "call": "list_languages",
+  "assertions": [
+    {
+      "type": "not_empty"
+    }
+  ],
+  "docs": {
+    "topic": "registry",
+    "stem": "registry_list_languages",
+    "title": "available_languages should return a non-empty list"
+  }
 }

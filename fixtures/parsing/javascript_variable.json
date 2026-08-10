@@ -1,17 +1,25 @@
 {
-	"id": "parsing_javascript_variable",
-	"description": "Parse a JavaScript variable declaration and assert node type",
-	"category": "parsing",
-	"tags": ["parsing", "javascript"],
-	"input": {
-		"source_code": "const x = 1;",
-		"config": {
-			"language": "javascript"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "parsing_javascript_variable",
+  "description": "Parse a JavaScript variable declaration and assert node type",
+  "category": "parsing",
+  "tags": [
+    "parsing",
+    "javascript"
+  ],
+  "input": {
+    "source_code": "const x = 1;",
+    "config": {
+      "language": "javascript"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "parsing",
+    "stem": "parsing_javascript_variable",
+    "title": "Parse a JavaScript variable declaration and assert node type"
+  }
 }

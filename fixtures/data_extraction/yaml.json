@@ -1,53 +1,107 @@
 [
-	{
-		"id": "data_extraction_yaml_flat",
-		"description": "Data extraction: YAML flat mapping",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "yaml"],
-		"input": {
-			"source_code": "host: localhost\nport: 8080\n",
-			"config": {
-				"language": "yaml",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "equals", "field": "data.kind", "value": "KeyValue" },
-			{ "type": "count_min", "field": "data.children", "value": 2 }
-		]
-	},
-	{
-		"id": "data_extraction_yaml_nested",
-		"description": "Data extraction: YAML nested block mapping preserves hierarchy",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "yaml"],
-		"input": {
-			"source_code": "server:\n  host: localhost\n  port: 8080\n",
-			"config": {
-				"language": "yaml",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "count_min", "field": "data.children", "value": 1 }
-		]
-	},
-	{
-		"id": "data_extraction_yaml_sequence",
-		"description": "Data extraction: YAML block sequence emits Sequence nodes",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "yaml"],
-		"input": {
-			"source_code": "ports:\n  - 8080\n  - 8081\n",
-			"config": {
-				"language": "yaml",
-				"data_extraction": true
-			}
-		},
-		"assertions": [{ "type": "not_error" }, { "type": "is_true", "field": "data" }]
-	}
+  {
+    "id": "data_extraction_yaml_flat",
+    "description": "Data extraction: YAML flat mapping",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "yaml"
+    ],
+    "input": {
+      "source_code": "host: localhost\nport: 8080\n",
+      "config": {
+        "language": "yaml",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "equals",
+        "field": "data.kind",
+        "value": "KeyValue"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 2
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_yaml_flat",
+      "title": "Data extraction: YAML flat mapping"
+    }
+  },
+  {
+    "id": "data_extraction_yaml_nested",
+    "description": "Data extraction: YAML nested block mapping preserves hierarchy",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "yaml"
+    ],
+    "input": {
+      "source_code": "server:\n  host: localhost\n  port: 8080\n",
+      "config": {
+        "language": "yaml",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 1
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_yaml_nested",
+      "title": "Data extraction: YAML nested block mapping preserves hierarchy"
+    }
+  },
+  {
+    "id": "data_extraction_yaml_sequence",
+    "description": "Data extraction: YAML block sequence emits Sequence nodes",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "yaml"
+    ],
+    "input": {
+      "source_code": "ports:\n  - 8080\n  - 8081\n",
+      "config": {
+        "language": "yaml",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_yaml_sequence",
+      "title": "Data extraction: YAML block sequence emits Sequence nodes"
+    }
+  }
 ]

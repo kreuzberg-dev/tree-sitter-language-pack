@@ -1,17 +1,24 @@
 {
-	"id": "smoke_gcode",
-	"description": "Smoke test: load gcode and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "G0 X0\n",
-		"config": {
-			"language": "gcode"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_gcode",
+  "description": "Smoke test: load gcode and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "G0 X0\n",
+    "config": {
+      "language": "gcode"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_gcode",
+    "title": "Smoke test: load gcode and parse a simple snippet"
+  }
 }

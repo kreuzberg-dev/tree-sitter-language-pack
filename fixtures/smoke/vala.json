@@ -1,17 +1,24 @@
 {
-	"id": "smoke_vala",
-	"description": "Smoke test: load vala and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "class Foo {\n}\n",
-		"config": {
-			"language": "vala"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_vala",
+  "description": "Smoke test: load vala and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "class Foo {\n}\n",
+    "config": {
+      "language": "vala"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_vala",
+    "title": "Smoke test: load vala and parse a simple snippet"
+  }
 }

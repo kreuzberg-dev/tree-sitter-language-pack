@@ -1,17 +1,24 @@
 {
-	"id": "smoke_dotenv",
-	"description": "Smoke test: load dotenv and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "KEY=value\n",
-		"config": {
-			"language": "dotenv"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_dotenv",
+  "description": "Smoke test: load dotenv and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "KEY=value\n",
+    "config": {
+      "language": "dotenv"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_dotenv",
+    "title": "Smoke test: load dotenv and parse a simple snippet"
+  }
 }

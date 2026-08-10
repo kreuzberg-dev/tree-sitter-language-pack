@@ -1,17 +1,24 @@
 {
-	"id": "smoke_wolfram",
-	"description": "Smoke test: load wolfram and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "x = 1\n",
-		"config": {
-			"language": "wolfram"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_wolfram",
+  "description": "Smoke test: load wolfram and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "x = 1\n",
+    "config": {
+      "language": "wolfram"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_wolfram",
+    "title": "Smoke test: load wolfram and parse a simple snippet"
+  }
 }

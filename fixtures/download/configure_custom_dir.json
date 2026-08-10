@@ -1,21 +1,37 @@
 {
-	"id": "download_configure_custom_dir",
-	"description": "Configure language pack with a custom cache directory",
-	"category": "download",
-	"tags": ["download"],
-	"call": "configure_pack",
-	"skip": {
-		"languages": ["c", "wasm"],
-		"reason": "Download feature requires network access and global cache configuration is covered by Rust unit tests"
-	},
-	"input": {
-		"config": {
-			"cache_dir": "/tmp/tslp_test_cache"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "download_configure_custom_dir",
+  "description": "Configure language pack with a custom cache directory",
+  "category": "download",
+  "tags": [
+    "download"
+  ],
+  "call": "configure_pack",
+  "skip": {
+    "languages": [
+      "c",
+      "wasm"
+    ],
+    "reason": "Download feature requires network access and global cache configuration is covered by Rust unit tests"
+  },
+  "input": {
+    "config": {
+      "cache_dir": "/tmp/tslp_test_cache"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "download",
+    "stem": "download_configure_custom_dir",
+    "title": "Configure language pack with a custom cache directory",
+    "coverage_exceptions": {
+      "wasm": {
+        "reason": "The WASM package uses statically compiled parsers and does not expose runtime parser download or cache management.",
+        "documentation": "docs-site/src/content/docs/guides/building.md"
+      }
+    }
+  }
 }

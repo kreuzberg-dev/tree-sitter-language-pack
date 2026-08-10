@@ -1,17 +1,24 @@
 {
-	"id": "smoke_vimdoc",
-	"description": "Smoke test: load vimdoc and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "x",
-		"config": {
-			"language": "vimdoc"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_vimdoc",
+  "description": "Smoke test: load vimdoc and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "x",
+    "config": {
+      "language": "vimdoc"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_vimdoc",
+    "title": "Smoke test: load vimdoc and parse a simple snippet"
+  }
 }

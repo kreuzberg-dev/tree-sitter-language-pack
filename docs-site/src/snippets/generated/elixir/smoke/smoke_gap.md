@@ -1,0 +1,5 @@
+```elixir title="Elixir"
+config_value = %TreeSitterLanguagePack.ProcessConfig{language: "gap"}
+result = TreeSitterLanguagePack.process("x", config_value)
+
+```

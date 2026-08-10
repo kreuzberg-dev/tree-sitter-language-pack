@@ -1,17 +1,24 @@
 {
-	"id": "smoke_postscript",
-	"description": "Smoke test: load postscript and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "/hello { (Hello) show } def",
-		"config": {
-			"language": "postscript"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_postscript",
+  "description": "Smoke test: load postscript and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "/hello { (Hello) show } def",
+    "config": {
+      "language": "postscript"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_postscript",
+    "title": "Smoke test: load postscript and parse a simple snippet"
+  }
 }

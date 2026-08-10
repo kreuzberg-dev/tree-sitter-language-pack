@@ -1,17 +1,24 @@
 {
-	"id": "smoke_cython",
-	"description": "Smoke test: load cython and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "x = 1\n",
-		"config": {
-			"language": "cython"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_cython",
+  "description": "Smoke test: load cython and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "x = 1\n",
+    "config": {
+      "language": "cython"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_cython",
+    "title": "Smoke test: load cython and parse a simple snippet"
+  }
 }

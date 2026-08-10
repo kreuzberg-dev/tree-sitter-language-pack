@@ -1,19 +1,37 @@
 {
-	"id": "prefetch_languages",
-	"description": "prefetch(['python']) downloads and loads parser",
-	"category": "download",
-	"tags": ["download", "prefetch"],
-	"call": "prefetch",
-	"skip": {
-		"languages": ["wasm"],
-		"reason": "Prefetch feature requires network access and is not available in static builds"
-	},
-	"input": {
-		"languages": ["python"]
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "prefetch_languages",
+  "description": "prefetch(['python']) downloads and loads parser",
+  "category": "download",
+  "tags": [
+    "download",
+    "prefetch"
+  ],
+  "call": "prefetch",
+  "skip": {
+    "languages": [
+      "wasm"
+    ],
+    "reason": "Prefetch feature requires network access and is not available in static builds"
+  },
+  "input": {
+    "languages": [
+      "python"
+    ]
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "download",
+    "stem": "prefetch_languages",
+    "title": "prefetch(['python']) downloads and loads parser",
+    "coverage_exceptions": {
+      "wasm": {
+        "reason": "The WASM package uses statically compiled parsers and does not expose runtime parser download or cache management.",
+        "documentation": "docs-site/src/content/docs/guides/building.md"
+      }
+    }
+  }
 }

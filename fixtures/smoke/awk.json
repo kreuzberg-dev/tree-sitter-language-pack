@@ -1,17 +1,24 @@
 {
-	"id": "smoke_awk",
-	"description": "Smoke test: load awk and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "BEGIN { print \"hello\" }",
-		"config": {
-			"language": "awk"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_awk",
+  "description": "Smoke test: load awk and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "BEGIN { print \"hello\" }",
+    "config": {
+      "language": "awk"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_awk",
+    "title": "Smoke test: load awk and parse a simple snippet"
+  }
 }

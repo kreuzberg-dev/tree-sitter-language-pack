@@ -1,38 +1,72 @@
 [
-	{
-		"id": "data_extraction_kdl_flat",
-		"description": "Data extraction: KDL flat nodes with scalar values",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "kdl"],
-		"input": {
-			"source_code": "host \"localhost\"\nport 8080\n",
-			"config": {
-				"language": "kdl",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "count_min", "field": "data.children", "value": 2 }
-		]
-	},
-	{
-		"id": "data_extraction_kdl_nested",
-		"description": "Data extraction: KDL node with children block",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "kdl"],
-		"input": {
-			"source_code": "server {\n  host \"localhost\"\n  port 8080\n}\n",
-			"config": {
-				"language": "kdl",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "count_min", "field": "data.children", "value": 1 }
-		]
-	}
+  {
+    "id": "data_extraction_kdl_flat",
+    "description": "Data extraction: KDL flat nodes with scalar values",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "kdl"
+    ],
+    "input": {
+      "source_code": "host \"localhost\"\nport 8080\n",
+      "config": {
+        "language": "kdl",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 2
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_kdl_flat",
+      "title": "Data extraction: KDL flat nodes with scalar values"
+    }
+  },
+  {
+    "id": "data_extraction_kdl_nested",
+    "description": "Data extraction: KDL node with children block",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "kdl"
+    ],
+    "input": {
+      "source_code": "server {\n  host \"localhost\"\n  port 8080\n}\n",
+      "config": {
+        "language": "kdl",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 1
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_kdl_nested",
+      "title": "Data extraction: KDL node with children block"
+    }
+  }
 ]

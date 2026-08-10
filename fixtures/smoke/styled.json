@@ -1,17 +1,24 @@
 {
-	"id": "smoke_styled",
-	"description": "Smoke test: load styled and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "color: red;\n",
-		"config": {
-			"language": "styled"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_styled",
+  "description": "Smoke test: load styled and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "color: red;\n",
+    "config": {
+      "language": "styled"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_styled",
+    "title": "Smoke test: load styled and parse a simple snippet"
+  }
 }

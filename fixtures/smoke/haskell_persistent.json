@@ -1,17 +1,24 @@
 {
-	"id": "smoke_haskell_persistent",
-	"description": "Smoke test: load haskell_persistent and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "Person\n  name String\n",
-		"config": {
-			"language": "haskell_persistent"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_haskell_persistent",
+  "description": "Smoke test: load haskell_persistent and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "Person\n  name String\n",
+    "config": {
+      "language": "haskell_persistent"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_haskell_persistent",
+    "title": "Smoke test: load haskell_persistent and parse a simple snippet"
+  }
 }

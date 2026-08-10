@@ -1967,11 +1967,6 @@ public class PackConfig: PackConfigRefMut {
         }
     }
 }
-extension PackConfig {
-    public convenience init<GenericIntoRustString: IntoRustString>(_ cache_dir: Optional<GenericIntoRustString>, _ languages: Optional<RustVec<GenericIntoRustString>>, _ groups: Optional<RustVec<GenericIntoRustString>>) {
-        self.init(ptr: __swift_bridge__$PackConfig$new({ if let rustString = optionalStringIntoRustString(cache_dir) { rustString.isOwned = false; return rustString.ptr } else { return nil } }(), { if let val = languages { val.isOwned = false; return val.ptr } else { return nil } }(), { if let val = groups { val.isOwned = false; return val.ptr } else { return nil } }()))
-    }
-}
 public class PackConfigRefMut: PackConfigRef {
     public override init(ptr: UnsafeMutableRawPointer) {
         super.init(ptr: ptr)
@@ -1989,12 +1984,12 @@ extension PackConfigRef {
         { let val = __swift_bridge__$PackConfig$cache_dir(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func languages() -> Optional<RustVec<RustString>> {
-        { let val = __swift_bridge__$PackConfig$languages(ptr); if val != nil { return RustVec(ptr: val!) } else { return nil } }()
+    public func languages() -> RustString {
+        RustString(ptr: __swift_bridge__$PackConfig$languages(ptr))
     }
 
-    public func groups() -> Optional<RustVec<RustString>> {
-        { let val = __swift_bridge__$PackConfig$groups(ptr); if val != nil { return RustVec(ptr: val!) } else { return nil } }()
+    public func groups() -> RustString {
+        RustString(ptr: __swift_bridge__$PackConfig$groups(ptr))
     }
 }
 extension PackConfig: Vectorizable {
@@ -3429,6 +3424,3 @@ extension Language: Vectorizable {
         __swift_bridge__$Vec_Language$len(vecPtr)
     }
 }
-
-
-

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Documentation snippets are generated from the complete E2E fixture corpus and checked for
+  fixture-by-language coverage parity in local tasks and CI.
+
 ### Fixed
 
 - Dart: the native loader downloads and caches the library again on a cold cache. It only read

@@ -1,17 +1,25 @@
 {
-	"id": "process_unknown_language",
-	"description": "process() returns error when config language is unknown",
-	"category": "error-handling",
-	"tags": ["error-handling", "process"],
-	"input": {
-		"source_code": "x = 1",
-		"config": {
-			"language": "nonexistent_xyz"
-		}
-	},
-	"assertions": [
-		{
-			"type": "error"
-		}
-	]
+  "id": "process_unknown_language",
+  "description": "process() returns error when config language is unknown",
+  "category": "error-handling",
+  "tags": [
+    "error-handling",
+    "process"
+  ],
+  "input": {
+    "source_code": "x = 1",
+    "config": {
+      "language": "nonexistent_xyz"
+    }
+  },
+  "assertions": [
+    {
+      "type": "error"
+    }
+  ],
+  "docs": {
+    "topic": "error-handling",
+    "stem": "process_unknown_language",
+    "title": "process() returns error when config language is unknown"
+  }
 }

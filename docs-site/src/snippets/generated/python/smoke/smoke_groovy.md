@@ -1,0 +1,11 @@
+```python title="Python"
+from tree_sitter_language_pack import process
+
+def main() -> None:
+    source = "def x = 1"
+    config = {"language": "groovy"}
+    _ = process(source, config)
+
+main()
+
+```

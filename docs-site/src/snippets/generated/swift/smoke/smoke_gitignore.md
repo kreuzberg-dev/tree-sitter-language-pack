@@ -1,0 +1,7 @@
+```swift title="Swift"
+import TreeSitterLanguagePack
+
+let configObj = try TreeSitterLanguagePack.processConfigFromJson("{\"language\":\"gitignore\"}")
+_ = try TreeSitterLanguagePack.process(source: "*.o\n*.log", config: configObj)
+
+```

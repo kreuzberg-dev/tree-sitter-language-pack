@@ -1,17 +1,24 @@
 {
-	"id": "smoke_cypher",
-	"description": "Smoke test: load cypher and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "MATCH (n) RETURN n\n",
-		"config": {
-			"language": "cypher"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_cypher",
+  "description": "Smoke test: load cypher and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "MATCH (n) RETURN n\n",
+    "config": {
+      "language": "cypher"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_cypher",
+    "title": "Smoke test: load cypher and parse a simple snippet"
+  }
 }

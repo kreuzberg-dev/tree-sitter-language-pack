@@ -44,9 +44,9 @@ tasks:
       - alef snippets list --snippets docs-site/src/snippets --languages {{.LANGUAGES}}
 
   snippets:validate:
-    desc: Syntax-validate all snippet entries via alef
+    desc: Validate all documentation snippets with fixture coverage parity
     cmds:
-      - alef snippets validate --snippets docs-site/src/snippets --timeout 120
+      - alef snippets check --strict --cache off
 
   snippets:validate:lang:
     desc: Validate snippets for specific languages (LANGUAGES=rust,python LEVEL=syntax)
@@ -68,8 +68,7 @@ tasks:
       - alef snippets audit --snippets docs-site/src/snippets
 
   snippets:all:
-    desc: Run audit + gaps + validate (canonical docs:snippets gate)
+    desc: Generate and strictly validate fixture-driven documentation snippets
     cmds:
-      - alef snippets audit --snippets docs-site/src/snippets
-      - alef snippets gaps --snippets docs-site/src/snippets --docs docs-site/src/content/docs
-      - alef snippets validate --snippets docs-site/src/snippets --timeout 120
+      - alef e2e generate
+      - alef snippets check --strict --cache off

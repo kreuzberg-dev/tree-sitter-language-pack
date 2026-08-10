@@ -1,39 +1,77 @@
 [
-	{
-		"id": "data_extraction_csv_rows",
-		"description": "Data extraction: CSV rows are positional Sequence nodes with indexed cells",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "csv"],
-		"input": {
-			"source_code": "a,b,c\n1,2,3\n",
-			"config": {
-				"language": "csv",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "equals", "field": "data.kind", "value": "Sequence" },
-			{ "type": "count_min", "field": "data.children", "value": 2 }
-		]
-	},
-	{
-		"id": "data_extraction_csv_single_row",
-		"description": "Data extraction: CSV single row three cells",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "csv"],
-		"input": {
-			"source_code": "x,y,z\n",
-			"config": {
-				"language": "csv",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "count_min", "field": "data.children", "value": 1 }
-		]
-	}
+  {
+    "id": "data_extraction_csv_rows",
+    "description": "Data extraction: CSV rows are positional Sequence nodes with indexed cells",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "csv"
+    ],
+    "input": {
+      "source_code": "a,b,c\n1,2,3\n",
+      "config": {
+        "language": "csv",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "equals",
+        "field": "data.kind",
+        "value": "Sequence"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 2
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_csv_rows",
+      "title": "Data extraction: CSV rows are positional Sequence nodes with indexed cells"
+    }
+  },
+  {
+    "id": "data_extraction_csv_single_row",
+    "description": "Data extraction: CSV single row three cells",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "csv"
+    ],
+    "input": {
+      "source_code": "x,y,z\n",
+      "config": {
+        "language": "csv",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 1
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_csv_single_row",
+      "title": "Data extraction: CSV single row three cells"
+    }
+  }
 ]

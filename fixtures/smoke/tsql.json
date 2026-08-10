@@ -1,17 +1,24 @@
 {
-	"id": "smoke_tsql",
-	"description": "Smoke test: load tsql and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "SELECT 1;\n",
-		"config": {
-			"language": "tsql"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_tsql",
+  "description": "Smoke test: load tsql and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "SELECT 1;\n",
+    "config": {
+      "language": "tsql"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_tsql",
+    "title": "Smoke test: load tsql and parse a simple snippet"
+  }
 }

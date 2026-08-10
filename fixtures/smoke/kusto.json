@@ -1,17 +1,24 @@
 {
-	"id": "smoke_kusto",
-	"description": "Smoke test: load kusto and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "T | count\n",
-		"config": {
-			"language": "kusto"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_kusto",
+  "description": "Smoke test: load kusto and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "T | count\n",
+    "config": {
+      "language": "kusto"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_kusto",
+    "title": "Smoke test: load kusto and parse a simple snippet"
+  }
 }

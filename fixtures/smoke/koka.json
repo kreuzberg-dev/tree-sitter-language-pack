@@ -1,17 +1,24 @@
 {
-	"id": "smoke_koka",
-	"description": "Smoke test: load koka and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "fun main()\n  1\n",
-		"config": {
-			"language": "koka"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_koka",
+  "description": "Smoke test: load koka and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "fun main()\n  1\n",
+    "config": {
+      "language": "koka"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_koka",
+    "title": "Smoke test: load koka and parse a simple snippet"
+  }
 }

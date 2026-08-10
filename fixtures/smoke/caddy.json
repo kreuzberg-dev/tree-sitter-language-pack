@@ -1,17 +1,24 @@
 {
-	"id": "smoke_caddy",
-	"description": "Smoke test: load caddy and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": ":8080 {\n\trespond \"Hello\"\n}",
-		"config": {
-			"language": "caddy"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_caddy",
+  "description": "Smoke test: load caddy and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": ":8080 {\n\trespond \"Hello\"\n}",
+    "config": {
+      "language": "caddy"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_caddy",
+    "title": "Smoke test: load caddy and parse a simple snippet"
+  }
 }

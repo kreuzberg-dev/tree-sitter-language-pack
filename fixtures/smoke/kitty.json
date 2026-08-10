@@ -1,17 +1,24 @@
 {
-	"id": "smoke_kitty",
-	"description": "Smoke test: load kitty and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "font_size 12\n",
-		"config": {
-			"language": "kitty"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_kitty",
+  "description": "Smoke test: load kitty and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "font_size 12\n",
+    "config": {
+      "language": "kitty"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_kitty",
+    "title": "Smoke test: load kitty and parse a simple snippet"
+  }
 }

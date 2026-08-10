@@ -1,17 +1,24 @@
 {
-	"id": "smoke_aiken",
-	"description": "Smoke test: load aiken and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "fn main() {\n  1\n}\n",
-		"config": {
-			"language": "aiken"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_aiken",
+  "description": "Smoke test: load aiken and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "fn main() {\n  1\n}\n",
+    "config": {
+      "language": "aiken"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_aiken",
+    "title": "Smoke test: load aiken and parse a simple snippet"
+  }
 }

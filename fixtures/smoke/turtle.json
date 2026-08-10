@@ -1,17 +1,24 @@
 {
-	"id": "smoke_turtle",
-	"description": "Smoke test: load turtle and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "x",
-		"config": {
-			"language": "turtle"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_turtle",
+  "description": "Smoke test: load turtle and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "x",
+    "config": {
+      "language": "turtle"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_turtle",
+    "title": "Smoke test: load turtle and parse a simple snippet"
+  }
 }

@@ -1,17 +1,24 @@
 {
-	"id": "smoke_sflog",
-	"description": "Smoke test: load sflog and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "37.0 APEX_CODE,DEBUG\n16:06:58.18 (1)|EXECUTION_STARTED\n",
-		"config": {
-			"language": "sflog"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_sflog",
+  "description": "Smoke test: load sflog and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "37.0 APEX_CODE,DEBUG\n16:06:58.18 (1)|EXECUTION_STARTED\n",
+    "config": {
+      "language": "sflog"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_sflog",
+    "title": "Smoke test: load sflog and parse a simple snippet"
+  }
 }

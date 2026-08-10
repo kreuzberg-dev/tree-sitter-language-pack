@@ -1,17 +1,24 @@
 {
-	"id": "smoke_requirements",
-	"description": "Smoke test: load requirements and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "flask>=2.0",
-		"config": {
-			"language": "requirements"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_requirements",
+  "description": "Smoke test: load requirements and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "flask>=2.0",
+    "config": {
+      "language": "requirements"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_requirements",
+    "title": "Smoke test: load requirements and parse a simple snippet"
+  }
 }

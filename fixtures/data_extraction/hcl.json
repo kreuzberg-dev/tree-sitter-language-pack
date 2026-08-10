@@ -1,39 +1,77 @@
 [
-	{
-		"id": "data_extraction_hcl_attribute",
-		"description": "Data extraction: HCL attribute key-value pair",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "hcl"],
-		"input": {
-			"source_code": "region = \"us-east-1\"\ncount  = 3\n",
-			"config": {
-				"language": "hcl",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "equals", "field": "data.kind", "value": "KeyValue" },
-			{ "type": "count_min", "field": "data.children", "value": 2 }
-		]
-	},
-	{
-		"id": "data_extraction_hcl_block",
-		"description": "Data extraction: HCL block becomes a container KeyValue node",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "hcl"],
-		"input": {
-			"source_code": "resource \"aws_instance\" \"web\" {\n  ami = \"ami-123\"\n  instance_type = \"t2.micro\"\n}\n",
-			"config": {
-				"language": "hcl",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "count_min", "field": "data.children", "value": 1 }
-		]
-	}
+  {
+    "id": "data_extraction_hcl_attribute",
+    "description": "Data extraction: HCL attribute key-value pair",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "hcl"
+    ],
+    "input": {
+      "source_code": "region = \"us-east-1\"\ncount  = 3\n",
+      "config": {
+        "language": "hcl",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "equals",
+        "field": "data.kind",
+        "value": "KeyValue"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 2
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_hcl_attribute",
+      "title": "Data extraction: HCL attribute key-value pair"
+    }
+  },
+  {
+    "id": "data_extraction_hcl_block",
+    "description": "Data extraction: HCL block becomes a container KeyValue node",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "hcl"
+    ],
+    "input": {
+      "source_code": "resource \"aws_instance\" \"web\" {\n  ami = \"ami-123\"\n  instance_type = \"t2.micro\"\n}\n",
+      "config": {
+        "language": "hcl",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 1
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_hcl_block",
+      "title": "Data extraction: HCL block becomes a container KeyValue node"
+    }
+  }
 ]

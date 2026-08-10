@@ -1,15 +1,22 @@
 {
-	"id": "registry_has_language_true",
-	"description": "has_language('python') should return true",
-	"category": "registry",
-	"tags": ["registry"],
-	"call": "has_language",
-	"input": {
-		"language": "python"
-	},
-	"assertions": [
-		{
-			"type": "is_true"
-		}
-	]
+  "id": "registry_has_language_true",
+  "description": "has_language('python') should return true",
+  "category": "registry",
+  "tags": [
+    "registry"
+  ],
+  "call": "has_language",
+  "input": {
+    "language": "python"
+  },
+  "assertions": [
+    {
+      "type": "is_true"
+    }
+  ],
+  "docs": {
+    "topic": "registry",
+    "stem": "registry_has_language_true",
+    "title": "has_language('python') should return true"
+  }
 }

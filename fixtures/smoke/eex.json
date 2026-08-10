@@ -1,17 +1,24 @@
 {
-	"id": "smoke_eex",
-	"description": "Smoke test: load eex and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "x",
-		"config": {
-			"language": "eex"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_eex",
+  "description": "Smoke test: load eex and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "x",
+    "config": {
+      "language": "eex"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_eex",
+    "title": "Smoke test: load eex and parse a simple snippet"
+  }
 }

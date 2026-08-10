@@ -1,17 +1,24 @@
 {
-	"id": "smoke_func",
-	"description": "Smoke test: load func and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "() recv_internal() {}",
-		"config": {
-			"language": "func"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_func",
+  "description": "Smoke test: load func and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "() recv_internal() {}",
+    "config": {
+      "language": "func"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_func",
+    "title": "Smoke test: load func and parse a simple snippet"
+  }
 }

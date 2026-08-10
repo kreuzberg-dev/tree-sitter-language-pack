@@ -1,0 +1,7 @@
+```swift title="Swift"
+import TreeSitterLanguagePack
+
+let configObj = try TreeSitterLanguagePack.processConfigFromJson("{\"language\":\"css\"}")
+_ = try TreeSitterLanguagePack.process(source: "body { color: red; }", config: configObj)
+
+```

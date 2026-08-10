@@ -1,17 +1,24 @@
 {
-	"id": "smoke_koto",
-	"description": "Smoke test: load koto and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "x = 1\n",
-		"config": {
-			"language": "koto"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_koto",
+  "description": "Smoke test: load koto and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "x = 1\n",
+    "config": {
+      "language": "koto"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_koto",
+    "title": "Smoke test: load koto and parse a simple snippet"
+  }
 }

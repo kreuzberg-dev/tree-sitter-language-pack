@@ -7,9 +7,19 @@
     "url": "git+https://github.com/xberg-io/tree-sitter-language-pack.git"
   },
   "main": "ts-pack-core-node.darwin-arm64.node",
-  "files": ["ts-pack-core-node.darwin-arm64.node"],
-  "os": ["darwin"],
-  "cpu": ["arm64"],
-  "engines": { "node": ">= 22" },
-  "publishConfig": { "access": "public" }
+  "files": [
+    "ts-pack-core-node.darwin-arm64.node"
+  ],
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "engines": {
+    "node": ">= 22"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

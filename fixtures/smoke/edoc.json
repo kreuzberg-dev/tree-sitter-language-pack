@@ -1,17 +1,24 @@
 {
-	"id": "smoke_edoc",
-	"description": "Smoke test: load edoc and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "@doc foo\n",
-		"config": {
-			"language": "edoc"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_edoc",
+  "description": "Smoke test: load edoc and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "@doc foo\n",
+    "config": {
+      "language": "edoc"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_edoc",
+    "title": "Smoke test: load edoc and parse a simple snippet"
+  }
 }

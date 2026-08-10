@@ -1,17 +1,24 @@
 {
-	"id": "smoke_textproto",
-	"description": "Smoke test: load textproto and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "key: \"value\"",
-		"config": {
-			"language": "textproto"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_textproto",
+  "description": "Smoke test: load textproto and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "key: \"value\"",
+    "config": {
+      "language": "textproto"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_textproto",
+    "title": "Smoke test: load textproto and parse a simple snippet"
+  }
 }

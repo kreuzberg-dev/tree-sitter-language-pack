@@ -1,17 +1,24 @@
 {
-	"id": "smoke_pkl",
-	"description": "Smoke test: load pkl and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "name = \"hello\"",
-		"config": {
-			"language": "pkl"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_pkl",
+  "description": "Smoke test: load pkl and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "name = \"hello\"",
+    "config": {
+      "language": "pkl"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_pkl",
+    "title": "Smoke test: load pkl and parse a simple snippet"
+  }
 }

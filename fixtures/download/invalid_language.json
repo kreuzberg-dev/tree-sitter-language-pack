@@ -1,19 +1,36 @@
 {
-	"id": "download_invalid_language",
-	"description": "download with an unknown language name returns an error",
-	"category": "download",
-	"tags": ["download"],
-	"call": "download_languages",
-	"skip": {
-		"languages": ["wasm"],
-		"reason": "Download feature requires network access and is not available in static builds"
-	},
-	"input": {
-		"languages": ["zzz_definitely_not_a_real_language_xyz"]
-	},
-	"assertions": [
-		{
-			"type": "error"
-		}
-	]
+  "id": "download_invalid_language",
+  "description": "download with an unknown language name returns an error",
+  "category": "download",
+  "tags": [
+    "download"
+  ],
+  "call": "download_languages",
+  "skip": {
+    "languages": [
+      "wasm"
+    ],
+    "reason": "Download feature requires network access and is not available in static builds"
+  },
+  "input": {
+    "languages": [
+      "zzz_definitely_not_a_real_language_xyz"
+    ]
+  },
+  "assertions": [
+    {
+      "type": "error"
+    }
+  ],
+  "docs": {
+    "topic": "download",
+    "stem": "download_invalid_language",
+    "title": "download with an unknown language name returns an error",
+    "coverage_exceptions": {
+      "wasm": {
+        "reason": "The WASM package uses statically compiled parsers and does not expose runtime parser download or cache management.",
+        "documentation": "docs-site/src/content/docs/guides/building.md"
+      }
+    }
+  }
 }

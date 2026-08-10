@@ -1,17 +1,24 @@
 {
-	"id": "smoke_promela",
-	"description": "Smoke test: load promela and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "init {\n}\n",
-		"config": {
-			"language": "promela"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_promela",
+  "description": "Smoke test: load promela and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "init {\n}\n",
+    "config": {
+      "language": "promela"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_promela",
+    "title": "Smoke test: load promela and parse a simple snippet"
+  }
 }

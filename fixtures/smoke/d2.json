@@ -1,17 +1,24 @@
 {
-	"id": "smoke_d2",
-	"description": "Smoke test: load d2 and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "a -> b\n",
-		"config": {
-			"language": "d2"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_d2",
+  "description": "Smoke test: load d2 and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "a -> b\n",
+    "config": {
+      "language": "d2"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_d2",
+    "title": "Smoke test: load d2 and parse a simple snippet"
+  }
 }

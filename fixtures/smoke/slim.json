@@ -1,17 +1,24 @@
 {
-	"id": "smoke_slim",
-	"description": "Smoke test: load slim and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "p hello\n",
-		"config": {
-			"language": "slim"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_slim",
+  "description": "Smoke test: load slim and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "p hello\n",
+    "config": {
+      "language": "slim"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_slim",
+    "title": "Smoke test: load slim and parse a simple snippet"
+  }
 }

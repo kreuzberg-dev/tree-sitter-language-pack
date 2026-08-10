@@ -1,17 +1,24 @@
 {
-	"id": "smoke_abnf",
-	"description": "Smoke test: load abnf and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "a = \"b\"\r\n",
-		"config": {
-			"language": "abnf"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_abnf",
+  "description": "Smoke test: load abnf and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "a = \"b\"\r\n",
+    "config": {
+      "language": "abnf"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_abnf",
+    "title": "Smoke test: load abnf and parse a simple snippet"
+  }
 }

@@ -1,17 +1,32 @@
 {
-	"id": "download_clean_cache",
-	"description": "Clean the parser cache directory",
-	"category": "download",
-	"tags": ["download"],
-	"call": "clean_cache",
-	"skip": {
-		"languages": ["wasm"],
-		"reason": "Download feature requires network access and cache cleanup is covered by Rust unit tests"
-	},
-	"input": {},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "download_clean_cache",
+  "description": "Clean the parser cache directory",
+  "category": "download",
+  "tags": [
+    "download"
+  ],
+  "call": "clean_cache",
+  "skip": {
+    "languages": [
+      "wasm"
+    ],
+    "reason": "Download feature requires network access and cache cleanup is covered by Rust unit tests"
+  },
+  "input": {},
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "download",
+    "stem": "download_clean_cache",
+    "title": "Clean the parser cache directory",
+    "coverage_exceptions": {
+      "wasm": {
+        "reason": "The WASM package uses statically compiled parsers and does not expose runtime parser download or cache management.",
+        "documentation": "docs-site/src/content/docs/guides/building.md"
+      }
+    }
+  }
 }

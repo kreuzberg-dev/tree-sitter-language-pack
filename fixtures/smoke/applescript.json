@@ -1,17 +1,24 @@
 {
-	"id": "smoke_applescript",
-	"description": "Smoke test: load applescript and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "set x to 1\n",
-		"config": {
-			"language": "applescript"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_applescript",
+  "description": "Smoke test: load applescript and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "set x to 1\n",
+    "config": {
+      "language": "applescript"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_applescript",
+    "title": "Smoke test: load applescript and parse a simple snippet"
+  }
 }

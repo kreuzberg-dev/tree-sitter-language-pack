@@ -1,17 +1,24 @@
 {
-	"id": "smoke_yang",
-	"description": "Smoke test: load yang and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "module m {\n}\n",
-		"config": {
-			"language": "yang"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_yang",
+  "description": "Smoke test: load yang and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "module m {\n}\n",
+    "config": {
+      "language": "yang"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_yang",
+    "title": "Smoke test: load yang and parse a simple snippet"
+  }
 }

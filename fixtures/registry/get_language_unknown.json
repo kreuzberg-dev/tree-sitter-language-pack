@@ -1,15 +1,24 @@
 {
-	"id": "get_language_unknown",
-	"description": "get_language('nonexistent_xyz') returns an error for unknown language",
-	"category": "registry",
-	"tags": ["registry", "get_language", "error"],
-	"call": "get_language",
-	"input": {
-		"language": "nonexistent_xyz"
-	},
-	"assertions": [
-		{
-			"type": "error"
-		}
-	]
+  "id": "get_language_unknown",
+  "description": "get_language('nonexistent_xyz') returns an error for unknown language",
+  "category": "registry",
+  "tags": [
+    "registry",
+    "get_language",
+    "error"
+  ],
+  "call": "get_language",
+  "input": {
+    "language": "nonexistent_xyz"
+  },
+  "assertions": [
+    {
+      "type": "error"
+    }
+  ],
+  "docs": {
+    "topic": "registry",
+    "stem": "get_language_unknown",
+    "title": "get_language('nonexistent_xyz') returns an error for unknown language"
+  }
 }

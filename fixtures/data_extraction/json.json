@@ -1,76 +1,151 @@
 [
-	{
-		"id": "data_extraction_json_flat",
-		"description": "Data extraction: JSON flat key-value object",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "json"],
-		"input": {
-			"source_code": "{\"host\": \"localhost\", \"port\": 8080}",
-			"config": {
-				"language": "json",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "equals", "field": "data.kind", "value": "KeyValue" },
-			{ "type": "count_min", "field": "data.children", "value": 2 }
-		]
-	},
-	{
-		"id": "data_extraction_json_nested",
-		"description": "Data extraction: JSON nested object preserves hierarchy",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "json"],
-		"input": {
-			"source_code": "{\"server\": {\"host\": \"x\", \"port\": 8080}}",
-			"config": {
-				"language": "json",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "count_min", "field": "data.children", "value": 1 }
-		]
-	},
-	{
-		"id": "data_extraction_json_array",
-		"description": "Data extraction: JSON top-level array emits Sequence nodes",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "json"],
-		"input": {
-			"source_code": "[1, 2, 3]",
-			"config": {
-				"language": "json",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "equals", "field": "data.kind", "value": "Sequence" },
-			{ "type": "count_equals", "field": "data.children", "value": 3 }
-		]
-	},
-	{
-		"id": "data_extraction_json_empty_object",
-		"description": "Data extraction: JSON empty object produces zero children",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "json"],
-		"input": {
-			"source_code": "{}",
-			"config": {
-				"language": "json",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "is_empty", "field": "data.children" }
-		]
-	}
+  {
+    "id": "data_extraction_json_flat",
+    "description": "Data extraction: JSON flat key-value object",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "json"
+    ],
+    "input": {
+      "source_code": "{\"host\": \"localhost\", \"port\": 8080}",
+      "config": {
+        "language": "json",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "equals",
+        "field": "data.kind",
+        "value": "KeyValue"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 2
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_json_flat",
+      "title": "Data extraction: JSON flat key-value object"
+    }
+  },
+  {
+    "id": "data_extraction_json_nested",
+    "description": "Data extraction: JSON nested object preserves hierarchy",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "json"
+    ],
+    "input": {
+      "source_code": "{\"server\": {\"host\": \"x\", \"port\": 8080}}",
+      "config": {
+        "language": "json",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 1
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_json_nested",
+      "title": "Data extraction: JSON nested object preserves hierarchy"
+    }
+  },
+  {
+    "id": "data_extraction_json_array",
+    "description": "Data extraction: JSON top-level array emits Sequence nodes",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "json"
+    ],
+    "input": {
+      "source_code": "[1, 2, 3]",
+      "config": {
+        "language": "json",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "equals",
+        "field": "data.kind",
+        "value": "Sequence"
+      },
+      {
+        "type": "count_equals",
+        "field": "data.children",
+        "value": 3
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_json_array",
+      "title": "Data extraction: JSON top-level array emits Sequence nodes"
+    }
+  },
+  {
+    "id": "data_extraction_json_empty_object",
+    "description": "Data extraction: JSON empty object produces zero children",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "json"
+    ],
+    "input": {
+      "source_code": "{}",
+      "config": {
+        "language": "json",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "is_empty",
+        "field": "data.children"
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_json_empty_object",
+      "title": "Data extraction: JSON empty object produces zero children"
+    }
+  }
 ]

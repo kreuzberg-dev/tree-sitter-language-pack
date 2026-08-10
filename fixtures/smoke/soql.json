@@ -1,17 +1,24 @@
 {
-	"id": "smoke_soql",
-	"description": "Smoke test: load soql and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "SELECT Id FROM Account\n",
-		"config": {
-			"language": "soql"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_soql",
+  "description": "Smoke test: load soql and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "SELECT Id FROM Account\n",
+    "config": {
+      "language": "soql"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_soql",
+    "title": "Smoke test: load soql and parse a simple snippet"
+  }
 }

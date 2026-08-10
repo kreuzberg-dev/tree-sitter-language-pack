@@ -1921,6 +1921,7 @@ fn wire__crate__available_languages_impl(
         },
     )
 }
+#[cfg(feature = "download")]
 fn wire__crate__cache_dir_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1948,6 +1949,7 @@ fn wire__crate__cache_dir_impl(
         },
     )
 }
+#[cfg(feature = "download")]
 fn wire__crate__clean_cache_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1975,6 +1977,7 @@ fn wire__crate__clean_cache_impl(
         },
     )
 }
+#[cfg(feature = "download")]
 fn wire__crate__configure_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -2647,6 +2650,7 @@ fn wire__crate__detect_language_from_path_impl(
         },
     )
 }
+#[cfg(feature = "download")]
 fn wire__crate__download_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -2675,6 +2679,7 @@ fn wire__crate__download_impl(
         },
     )
 }
+#[cfg(feature = "download")]
 fn wire__crate__download_all_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -2702,6 +2707,7 @@ fn wire__crate__download_all_impl(
         },
     )
 }
+#[cfg(feature = "download")]
 fn wire__crate__download_group_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -2730,6 +2736,7 @@ fn wire__crate__download_group_impl(
         },
     )
 }
+#[cfg(feature = "download")]
 fn wire__crate__downloaded_languages_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -3009,6 +3016,7 @@ fn wire__crate__has_language_impl(
         },
     )
 }
+#[cfg(feature = "download")]
 fn wire__crate__init_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -3064,6 +3072,7 @@ fn wire__crate__language_count_impl(
         },
     )
 }
+#[cfg(feature = "download")]
 fn wire__crate__manifest_languages_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -3091,6 +3100,7 @@ fn wire__crate__manifest_languages_impl(
         },
     )
 }
+#[cfg(any(feature = "download", not(feature = "download")))]
 fn wire__crate__prefetch_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -4466,8 +4476,11 @@ fn pde_ffi_dispatcher_primary_impl(
         45 => wire__crate__Tree_root_node_impl(port, ptr, rust_vec_len, data_len),
         46 => wire__crate__Tree_walk_impl(port, ptr, rust_vec_len, data_len),
         47 => wire__crate__available_languages_impl(port, ptr, rust_vec_len, data_len),
+        #[cfg(feature = "download")]
         48 => wire__crate__cache_dir_impl(port, ptr, rust_vec_len, data_len),
+        #[cfg(feature = "download")]
         49 => wire__crate__clean_cache_impl(port, ptr, rust_vec_len, data_len),
+        #[cfg(feature = "download")]
         50 => wire__crate__configure_impl(port, ptr, rust_vec_len, data_len),
         51 => wire__crate__create_byte_range_from_json_impl(port, ptr, rust_vec_len, data_len),
         52 => wire__crate__create_chunk_context_from_json_impl(port, ptr, rust_vec_len, data_len),
@@ -4492,9 +4505,13 @@ fn pde_ffi_dispatcher_primary_impl(
         71 => wire__crate__detect_language_from_content_impl(port, ptr, rust_vec_len, data_len),
         72 => wire__crate__detect_language_from_extension_impl(port, ptr, rust_vec_len, data_len),
         73 => wire__crate__detect_language_from_path_impl(port, ptr, rust_vec_len, data_len),
+        #[cfg(feature = "download")]
         74 => wire__crate__download_impl(port, ptr, rust_vec_len, data_len),
+        #[cfg(feature = "download")]
         75 => wire__crate__download_all_impl(port, ptr, rust_vec_len, data_len),
+        #[cfg(feature = "download")]
         76 => wire__crate__download_group_impl(port, ptr, rust_vec_len, data_len),
+        #[cfg(feature = "download")]
         77 => wire__crate__downloaded_languages_impl(port, ptr, rust_vec_len, data_len),
         78 => wire__crate__get_folds_query_impl(port, ptr, rust_vec_len, data_len),
         79 => wire__crate__get_highlights_query_impl(port, ptr, rust_vec_len, data_len),
@@ -4505,9 +4522,12 @@ fn pde_ffi_dispatcher_primary_impl(
         84 => wire__crate__get_parser_impl(port, ptr, rust_vec_len, data_len),
         85 => wire__crate__get_tags_query_impl(port, ptr, rust_vec_len, data_len),
         86 => wire__crate__has_language_impl(port, ptr, rust_vec_len, data_len),
+        #[cfg(feature = "download")]
         87 => wire__crate__init_impl(port, ptr, rust_vec_len, data_len),
         88 => wire__crate__language_count_impl(port, ptr, rust_vec_len, data_len),
+        #[cfg(feature = "download")]
         89 => wire__crate__manifest_languages_impl(port, ptr, rust_vec_len, data_len),
+        #[cfg(any(feature = "download", not(feature = "download")))]
         90 => wire__crate__prefetch_impl(port, ptr, rust_vec_len, data_len),
         91 => wire__crate__process_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),

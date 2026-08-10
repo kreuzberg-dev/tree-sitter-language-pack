@@ -1,17 +1,24 @@
 {
-	"id": "smoke_jjdescription",
-	"description": "Smoke test: load jjdescription and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "commit message\n",
-		"config": {
-			"language": "jjdescription"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_jjdescription",
+  "description": "Smoke test: load jjdescription and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "commit message\n",
+    "config": {
+      "language": "jjdescription"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_jjdescription",
+    "title": "Smoke test: load jjdescription and parse a simple snippet"
+  }
 }

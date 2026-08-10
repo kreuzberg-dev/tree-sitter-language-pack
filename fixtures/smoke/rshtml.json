@@ -1,17 +1,24 @@
 {
-	"id": "smoke_rshtml",
-	"description": "Smoke test: load rshtml and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "<p>hi</p>\n",
-		"config": {
-			"language": "rshtml"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_rshtml",
+  "description": "Smoke test: load rshtml and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "<p>hi</p>\n",
+    "config": {
+      "language": "rshtml"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_rshtml",
+    "title": "Smoke test: load rshtml and parse a simple snippet"
+  }
 }

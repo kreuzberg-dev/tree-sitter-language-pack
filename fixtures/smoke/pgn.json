@@ -1,17 +1,24 @@
 {
-	"id": "smoke_pgn",
-	"description": "Smoke test: load pgn and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "1. e4 e5 *",
-		"config": {
-			"language": "pgn"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_pgn",
+  "description": "Smoke test: load pgn and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "1. e4 e5 *",
+    "config": {
+      "language": "pgn"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_pgn",
+    "title": "Smoke test: load pgn and parse a simple snippet"
+  }
 }

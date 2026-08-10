@@ -1,17 +1,24 @@
 {
-	"id": "smoke_leo",
-	"description": "Smoke test: load leo and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "program test.aleo {\n}\n",
-		"config": {
-			"language": "leo"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_leo",
+  "description": "Smoke test: load leo and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "program test.aleo {\n}\n",
+    "config": {
+      "language": "leo"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_leo",
+    "title": "Smoke test: load leo and parse a simple snippet"
+  }
 }

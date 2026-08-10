@@ -1,15 +1,15 @@
 [build-system]
 build-backend = "maturin"
-requires = [ "maturin>=1,<2" ]
+requires = ["maturin>=1,<2"]
 
 [project]
 name = "tree-sitter-language-pack"
 version = "1.14.3"
 description = "Pre-compiled tree-sitter grammars for 371 programming languages"
-keywords = [ "language-pack", "parser", "syntax", "tree-sitter" ]
+keywords = ["language-pack", "parser", "syntax", "tree-sitter"]
 license = "MIT"
-license-files = [ "LICENSE" ]
-authors = [ { name = "Na'aman Hirschfeld" } ]
+license-files = ["LICENSE"]
+authors = [{ name = "Na'aman Hirschfeld" }]
 requires-python = ">=3.10"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
@@ -19,13 +19,11 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
-dependencies = [
-  "tree-sitter>=0.23",
-]
+dependencies = ["tree-sitter>=0.23"]
 urls.repository = "https://github.com/xberg-io/tree-sitter-language-pack"
 
 [dependency-groups]
-dev = [ "pyrefly>=1.1.1" ]
+dev = ["pyrefly>=1.1.1"]
 
 [tool.maturin]
 profile = "release"
@@ -33,8 +31,8 @@ module-name = "tree_sitter_language_pack._native"
 manifest-path = "../../crates/ts-pack-core-py/Cargo.toml"
 # abi3-py310 produces a single wheel per platform that loads on Python 3.10+,
 # avoiding a per-Python-version build matrix.
-features = [ "pyo3/extension-module", "pyo3/abi3-py310" ]
-python-packages = [ "tree_sitter_language_pack" ]
+features = ["pyo3/extension-module", "pyo3/abi3-py310"]
+python-packages = ["tree_sitter_language_pack"]
 
 [tool.pyrefly]
 python-version = "3.10"

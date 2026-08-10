@@ -1,0 +1,9 @@
+```typescript title="WebAssembly"
+import { process } from "@xberg-io/tree-sitter-language-pack-wasm";
+function main() {
+  const result = process("config FOO\n\tbool \"Enable foo\"", { language: "kconfig" });
+}
+
+void main();
+
+```

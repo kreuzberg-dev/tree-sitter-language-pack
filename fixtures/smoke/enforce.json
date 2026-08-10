@@ -1,17 +1,24 @@
 {
-	"id": "smoke_enforce",
-	"description": "Smoke test: load enforce and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "x",
-		"config": {
-			"language": "enforce"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_enforce",
+  "description": "Smoke test: load enforce and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "x",
+    "config": {
+      "language": "enforce"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_enforce",
+    "title": "Smoke test: load enforce and parse a simple snippet"
+  }
 }

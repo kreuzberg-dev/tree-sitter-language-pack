@@ -1,17 +1,24 @@
 {
-	"id": "smoke_strace",
-	"description": "Smoke test: load strace and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "open(\"/x\", O_RDONLY) = 3\n",
-		"config": {
-			"language": "strace"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_strace",
+  "description": "Smoke test: load strace and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "open(\"/x\", O_RDONLY) = 3\n",
+    "config": {
+      "language": "strace"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_strace",
+    "title": "Smoke test: load strace and parse a simple snippet"
+  }
 }

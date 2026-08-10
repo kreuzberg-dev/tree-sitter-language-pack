@@ -1,17 +1,24 @@
 {
-	"id": "smoke_vento",
-	"description": "Smoke test: load vento and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "hello\n",
-		"config": {
-			"language": "vento"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_vento",
+  "description": "Smoke test: load vento and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "hello\n",
+    "config": {
+      "language": "vento"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_vento",
+    "title": "Smoke test: load vento and parse a simple snippet"
+  }
 }

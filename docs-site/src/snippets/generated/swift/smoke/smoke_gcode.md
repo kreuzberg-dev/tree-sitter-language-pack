@@ -1,0 +1,7 @@
+```swift title="Swift"
+import TreeSitterLanguagePack
+
+let configObj = try TreeSitterLanguagePack.processConfigFromJson("{\"language\":\"gcode\"}")
+_ = try TreeSitterLanguagePack.process(source: "G0 X0\n", config: configObj)
+
+```

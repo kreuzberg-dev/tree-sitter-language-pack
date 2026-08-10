@@ -44,25 +44,27 @@ typedef struct TS_PACKDataAttribute TS_PACKDataAttribute;
 /**
  * A node in the hierarchical data tree produced by data-format extraction.
  *
- * When `ProcessConfig::data_extraction` (crate::ProcessConfig::data_extraction) is
- * `true`, `ProcessResult.data` is populated with a root `DataNode` whose
+ * When `ProcessConfig::data_extraction` (crate::ProcessConfig::data_extraction)
+ * is `true`, `ProcessResult.data` is populated with a root `DataNode` whose
  * `children` (DataNode::children) mirror the structure of the parsed file.
  *
  * The `kind` field determines which other fields are meaningful:
  *
- * | `kind`     | `key`                    | `value`       | `attributes` | `children` |
+ * | `kind`     | `key`                    | `value`       | `attributes` |
+ * `children` |
  * |------------|--------------------------|---------------|--------------|------------|
- * | `KeyValue` | key / mapping key / index | leaf value   | empty        | nested map |
- * | `Element`  | XML tag name             | text content  | XML attrs    | child elements |
- * | `Sequence` | positional index (`"0"`) | leaf value   | empty        | sub-items  |
+ * | `KeyValue` | key / mapping key / index | leaf value   | empty        |
+ * nested map | | `Element`  | XML tag name             | text content  | XML
+ * attrs    | child elements | | `Sequence` | positional index (`"0"`) | leaf
+ * value   | empty        | sub-items  |
  * \code
  * use tree_sitter_language_pack::{ProcessConfig, process};
  *
  * let config = ProcessConfig::new("json").with_data_extraction(true);
- * let result = process(r#"{"host": "localhost", "port": 8080}"#, &config).unwrap();
- * if let Some(root) = &result.data {
- *     for child in &root.children {
- *         println!("{} = {:?}", child.key.as_deref().unwrap_or("?"), child.value);
+ * let result = process(r#"{"host": "localhost", "port": 8080}"#,
+ * &config).unwrap(); if let Some(root) = &result.data { for child in
+ * &root.children { println!("{} = {:?}", child.key.as_deref().unwrap_or("?"),
+ * child.value);
  *     }
  * }
  * \endcode
@@ -77,8 +79,8 @@ typedef struct TS_PACKDataNode TS_PACKDataNode;
  * # Wire format (public JSON contract)
  *
  * Unit variants serialize as a bare string (`"KeyValue"`). DO NOT add
- * `#[serde(tag = "...")]` or rename variants â every language binding has a
- * hand-written deserializer matching this exact shape, and any change breaks
+ * `#[serde(tag = "...")]` or rename variants â every language binding has
+ * a hand-written deserializer matching this exact shape, and any change breaks
  * all bindings' `process()` tests simultaneously.
  * Covered by `tests/wire_format.rs`.
  */
@@ -202,7 +204,8 @@ typedef struct TS_PACKPoint TS_PACKPoint;
 /**
  * Configuration for the `process()` function.
  *
- * Controls which analysis features are enabled and whether chunking is performed.
+ * Controls which analysis features are enabled and whether chunking is
+ * performed.
  * \code
  * use tree_sitter_language_pack::ProcessConfig;
  *
@@ -292,7 +295,6 @@ typedef struct TS_PACKTree TS_PACKTree;
  */
 typedef struct TS_PACKTreeCursor TS_PACKTreeCursor;
 
-
 /**
  * Return the last error code (0 means no error).
  * # Safety
@@ -302,10 +304,10 @@ typedef struct TS_PACKTreeCursor TS_PACKTreeCursor;
 int32_t ts_pack_last_error_code(void);
 
 /**
- * Return the last error message. The pointer is borrowed and valid until the next FFI call on this thread.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * The returned pointer is borrowed from thread-local storage and must NOT be freed.
+ * Return the last error message. The pointer is borrowed and valid until the
+ * next FFI call on this thread. # Safety Caller must ensure all pointer
+ * arguments are valid or null. The returned pointer is borrowed from
+ * thread-local storage and must NOT be freed.
  */
 const char *ts_pack_last_error_context(void);
 
@@ -318,20 +320,18 @@ void ts_pack_free_string(char *ptr);
 
 /**
  * Free a byte buffer previously returned by this library via out-params.
- * `ptr`, `len`, and `cap` must match the values written by the library function,
- * or the call must pass `ptr = null` (in which case it is a no-op).
+ * `ptr`, `len`, and `cap` must match the values written by the library
+ * function, or the call must pass `ptr = null` (in which case it is a no-op).
  * # Safety
- * Pointer must have been returned by this library (via out_ptr / out_len / out_cap
- * out-params), or be null. The len and cap values must be unchanged since the call.
+ * Pointer must have been returned by this library (via out_ptr / out_len /
+ * out_cap out-params), or be null. The len and cap values must be unchanged
+ * since the call.
  */
-void ts_pack_free_bytes(uint8_t *ptr,
-    uintptr_t len,
-    uintptr_t cap);
+void ts_pack_free_bytes(uint8_t *ptr, uintptr_t len, uintptr_t cap);
 
 /**
- * Return the library version string. The pointer is static and must NOT be freed.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
+ * Return the library version string. The pointer is static and must NOT be
+ * freed. # Safety Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
 const char *ts_pack_version(void);
@@ -545,7 +545,8 @@ char *ts_pack_process_result_language(const TS_PACKProcessResult *ptr);
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
-TS_PACKFileMetrics *ts_pack_process_result_metrics(const TS_PACKProcessResult *ptr);
+TS_PACKFileMetrics *
+ts_pack_process_result_metrics(const TS_PACKProcessResult *ptr);
 
 /**
  * Get the `structure` field from a `ProcessResult`.
@@ -717,7 +718,8 @@ void ts_pack_structure_item_free(TS_PACKStructureItem *ptr);
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
-TS_PACKStructureKind *ts_pack_structure_item_kind(const TS_PACKStructureItem *ptr);
+TS_PACKStructureKind *
+ts_pack_structure_item_kind(const TS_PACKStructureItem *ptr);
 
 /**
  * Get the `name` field from a `StructureItem`.
@@ -861,7 +863,8 @@ char *ts_pack_docstring_info_text(const TS_PACKDocstringInfo *ptr);
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
-TS_PACKDocstringFormat *ts_pack_docstring_info_format(const TS_PACKDocstringInfo *ptr);
+TS_PACKDocstringFormat *
+ts_pack_docstring_info_format(const TS_PACKDocstringInfo *ptr);
 
 /**
  * Get the `span` field from a `DocstringInfo`.
@@ -1123,7 +1126,8 @@ char *ts_pack_diagnostic_message(const TS_PACKDiagnostic *ptr);
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
-TS_PACKDiagnosticSeverity *ts_pack_diagnostic_severity(const TS_PACKDiagnostic *ptr);
+TS_PACKDiagnosticSeverity *
+ts_pack_diagnostic_severity(const TS_PACKDiagnostic *ptr);
 
 /**
  * Get the `span` field from a `Diagnostic`.
@@ -1411,42 +1415,41 @@ void ts_pack_parser_free(TS_PACKParser *ptr);
 TS_PACKParser *ts_pack_parser_new(void);
 
 /**
- * Configure the parser to use the language identified by name (e.g. `"python"`).
+ * Configure the parser to use the language identified by name (e.g.
+ * `"python"`).
  *
  * Resolves the language through the global registry â auto-downloading
  * if necessary, when the `download` feature is enabled.
  * \note Returns `Error.LanguageNotFound` if the language is not recognized,
  * or `Error.ParserSetup` if the language ABI is incompatible.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-int32_t ts_pack_parser_set_language(TS_PACKParser *this_,
-    const char *name);
+int32_t ts_pack_parser_set_language(TS_PACKParser *this_, const char *name);
 
 /**
  * Parse a UTF-8 source string. Returns `None` if parsing was cancelled
  * or no language is set.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TS_PACKTree *ts_pack_parser_parse(TS_PACKParser *this_,
-    const char *source);
+TS_PACKTree *ts_pack_parser_parse(TS_PACKParser *this_, const char *source);
 
 /**
  * Parse a raw byte slice. Returns `None` if parsing was cancelled or
  * no language is set.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKTree *ts_pack_parser_parse_bytes(TS_PACKParser *this_,
-    const uint8_t *source,
-    uintptr_t source_len);
+                                        const uint8_t *source,
+                                        uintptr_t source_len);
 
 /**
  * Reset internal state. The next call to `parse` (Self::parse) will
  * not be incremental.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 void ts_pack_parser_reset(TS_PACKParser *this_);
 
@@ -1459,15 +1462,15 @@ void ts_pack_tree_free(TS_PACKTree *ptr);
 
 /**
  * Return the root `Node` of this tree.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKNode *ts_pack_tree_root_node(const TS_PACKTree *this_);
 
 /**
  * Return a `TreeCursor` positioned at the root.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKTreeCursor *ts_pack_tree_walk(const TS_PACKTree *this_);
 
@@ -1479,15 +1482,15 @@ TS_PACKTreeCursor *ts_pack_tree_walk(const TS_PACKTree *this_);
 void ts_pack_node_free(TS_PACKNode *ptr);
 
 /**
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKNode *ts_pack_node_clone(const TS_PACKNode *this_);
 
 /**
  * Return the node's kind name (e.g. `"function_definition"`).
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *ts_pack_node_kind(const TS_PACKNode *this_);
 
@@ -1497,22 +1500,22 @@ char *ts_pack_node_kind(const TS_PACKNode *this_);
  * Tree-sitter assigns a stable `u16` ID to every node kind in a grammar
  * (e.g. `"function_definition" â 42`). Comparing `kind_id()` is cheaper
  * than comparing the string `kind()` (Self::kind) in tight AST loops.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 uint16_t ts_pack_node_kind_id(const TS_PACKNode *this_);
 
 /**
  * Return the inclusive start byte offset of this node.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 uintptr_t ts_pack_node_start_byte(const TS_PACKNode *this_);
 
 /**
  * Return the exclusive end byte offset of this node.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 uintptr_t ts_pack_node_end_byte(const TS_PACKNode *this_);
 
@@ -1521,116 +1524,114 @@ uintptr_t ts_pack_node_end_byte(const TS_PACKNode *this_);
  *
  * Callers should slice their own source bytes â this is a zero-copy
  * text accessor.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKByteRange *ts_pack_node_byte_range(const TS_PACKNode *this_);
 
 /**
  * Return the start `Point` (row, column).
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKPoint *ts_pack_node_start_position(const TS_PACKNode *this_);
 
 /**
  * Return the end `Point` (row, column).
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKPoint *ts_pack_node_end_position(const TS_PACKNode *this_);
 
 /**
  * True when this node is named (not punctuation/whitespace).
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t ts_pack_node_is_named(const TS_PACKNode *this_);
 
 /**
  * True when this is an error node.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t ts_pack_node_is_error(const TS_PACKNode *this_);
 
 /**
  * True when this is a missing-token node.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t ts_pack_node_is_missing(const TS_PACKNode *this_);
 
 /**
  * True when this is an "extra" node (e.g. a comment).
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t ts_pack_node_is_extra(const TS_PACKNode *this_);
 
 /**
  * True when this node or any descendant is an error.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t ts_pack_node_has_error(const TS_PACKNode *this_);
 
 /**
  * Return this node's parent, if any.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKNode *ts_pack_node_parent(const TS_PACKNode *this_);
 
 /**
  * Return the i-th child of this node, if any.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TS_PACKNode *ts_pack_node_child(const TS_PACKNode *this_,
-    uint32_t index);
+TS_PACKNode *ts_pack_node_child(const TS_PACKNode *this_, uint32_t index);
 
 /**
  * Total number of children (including unnamed).
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 uintptr_t ts_pack_node_child_count(const TS_PACKNode *this_);
 
 /**
  * Return the i-th named child of this node, if any.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TS_PACKNode *ts_pack_node_named_child(const TS_PACKNode *this_,
-    uint32_t index);
+TS_PACKNode *ts_pack_node_named_child(const TS_PACKNode *this_, uint32_t index);
 
 /**
  * Number of named children of this node.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 uintptr_t ts_pack_node_named_child_count(const TS_PACKNode *this_);
 
 /**
  * Look up a child by its grammar-defined field name.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKNode *ts_pack_node_child_by_field_name(const TS_PACKNode *this_,
-    const char *name);
+                                              const char *name);
 
 /**
  * Return the S-expression form of this node's subtree.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *ts_pack_node_to_sexp(const TS_PACKNode *this_);
 
 /**
  * Return a `TreeCursor` positioned at this node.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKTreeCursor *ts_pack_node_walk(const TS_PACKNode *this_);
 
@@ -1643,39 +1644,39 @@ void ts_pack_tree_cursor_free(TS_PACKTreeCursor *ptr);
 
 /**
  * Return the `Node` at the cursor's current position.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKNode *ts_pack_tree_cursor_node(const TS_PACKTreeCursor *this_);
 
 /**
  * Move the cursor to the first child of the current node.
  * Returns `true` if a child existed.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t ts_pack_tree_cursor_goto_first_child(TS_PACKTreeCursor *this_);
 
 /**
  * Move the cursor to the parent of the current node.
  * Returns `true` if a parent existed.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t ts_pack_tree_cursor_goto_parent(TS_PACKTreeCursor *this_);
 
 /**
  * Move the cursor to the next sibling of the current node.
  * Returns `true` if a sibling existed.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 int32_t ts_pack_tree_cursor_goto_next_sibling(TS_PACKTreeCursor *this_);
 
 /**
  * Return the field name for the current node, if any.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *ts_pack_tree_cursor_field_name(const TS_PACKTreeCursor *this_);
 
@@ -1763,7 +1764,8 @@ int32_t ts_pack_process_config_diagnostics(const TS_PACKProcessConfig *ptr);
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
-uintptr_t ts_pack_process_config_chunk_max_size(const TS_PACKProcessConfig *ptr);
+uintptr_t
+ts_pack_process_config_chunk_max_size(const TS_PACKProcessConfig *ptr);
 
 /**
  * Get the `data_extraction` field from a `ProcessConfig`.
@@ -1773,43 +1775,46 @@ uintptr_t ts_pack_process_config_chunk_max_size(const TS_PACKProcessConfig *ptr)
 int32_t ts_pack_process_config_data_extraction(const TS_PACKProcessConfig *ptr);
 
 /**
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKProcessConfig *ts_pack_process_config_default(void);
 
 /**
  * Enable chunking with the given maximum chunk size in bytes.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TS_PACKProcessConfig *ts_pack_process_config_with_chunking(TS_PACKProcessConfig *this_,
-    uintptr_t max_size);
+TS_PACKProcessConfig *
+ts_pack_process_config_with_chunking(TS_PACKProcessConfig *this_,
+                                     uintptr_t max_size);
 
 /**
  * Enable all analysis features.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKProcessConfig *ts_pack_process_config_all(TS_PACKProcessConfig *this_);
 
 /**
  * Disable all analysis features (only metrics computed).
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TS_PACKProcessConfig *ts_pack_process_config_minimal(TS_PACKProcessConfig *this_);
+TS_PACKProcessConfig *
+ts_pack_process_config_minimal(TS_PACKProcessConfig *this_);
 
 /**
  * Enable or disable hierarchical data extraction for data-format files.
  *
  * When `true`, `ProcessResult::data` (crate::ProcessResult::data) is
  * populated with a key/value tree for supported data-format languages.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TS_PACKProcessConfig *ts_pack_process_config_with_data_extraction(TS_PACKProcessConfig *this_,
-    int32_t enabled);
+TS_PACKProcessConfig *
+ts_pack_process_config_with_data_extraction(TS_PACKProcessConfig *this_,
+                                            int32_t enabled);
 
 /**
  * Free a `LanguageRegistry` handle.
@@ -1828,21 +1833,23 @@ TS_PACKLanguageRegistry *ts_pack_language_registry_new(void);
  * feature is enabled, falls back to loading a shared library on demand.
  * \note Returns `Error.LanguageNotFound` if the name (after alias resolution)
  * does not match any known grammar.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TS_PACKLanguage *ts_pack_language_registry_get_language(const TS_PACKLanguageRegistry *this_,
-    const char *name);
+TS_PACKLanguage *
+ts_pack_language_registry_get_language(const TS_PACKLanguageRegistry *this_,
+                                       const char *name);
 
 /**
  * List all available language names, sorted and deduplicated.
  *
  * Includes statically compiled languages, dynamically loadable languages
  * (if the `dynamic-loading` feature is enabled), and all configured aliases.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *ts_pack_language_registry_available_languages(const TS_PACKLanguageRegistry *this_);
+char *ts_pack_language_registry_available_languages(
+    const TS_PACKLanguageRegistry *this_);
 
 /**
  * Check whether a parser is statically compiled into this build.
@@ -1857,46 +1864,53 @@ char *ts_pack_language_registry_available_languages(const TS_PACKLanguageRegistr
  * "we can actually parse files in that language right now".
  *
  * ```no_run
- * use tree_sitter_language_pack::{detect_language_from_extension, LanguageRegistry};
+ * use tree_sitter_language_pack::{detect_language_from_extension,
+ * LanguageRegistry};
  *
  * let registry = LanguageRegistry::new();
- * // Extension detection uses the static table â independent of compiled parsers.
- * let lang = detect_language_from_extension("feature"); // always returns Some("gherkin")
+ * // Extension detection uses the static table â independent of compiled
+ * parsers. let lang = detect_language_from_extension("feature"); // always
+ * returns Some("gherkin")
  * // Parser availability depends on which grammars were compiled in.
  * let can_parse = lang.map(|name| registry.has_parser(name)).unwrap_or(false);
  * ```
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-int32_t ts_pack_language_registry_has_parser(const TS_PACKLanguageRegistry *this_,
-    const char *name);
+int32_t
+ts_pack_language_registry_has_parser(const TS_PACKLanguageRegistry *this_,
+                                     const char *name);
 
 /**
  * Check whether a language is available by name or alias.
  *
  * Returns `true` if the language can be loaded, either from the static
  * table or from a dynamic library on disk.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-int32_t ts_pack_language_registry_has_language(const TS_PACKLanguageRegistry *this_,
-    const char *name);
+int32_t
+ts_pack_language_registry_has_language(const TS_PACKLanguageRegistry *this_,
+                                       const char *name);
 
 /**
  * Return the total number of available languages (including aliases).
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-uintptr_t ts_pack_language_registry_language_count(const TS_PACKLanguageRegistry *this_);
+uintptr_t
+ts_pack_language_registry_language_count(const TS_PACKLanguageRegistry *this_);
 
 /**
- * Parse source code and extract file intelligence based on config in a single pass.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * Parse source code and extract file intelligence based on config in a single
+ * pass.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-TS_PACKProcessResult *ts_pack_language_registry_process(const TS_PACKLanguageRegistry *this_,
-    const char *source,
-    const TS_PACKProcessConfig *config);
+TS_PACKProcessResult *
+ts_pack_language_registry_process(const TS_PACKLanguageRegistry *this_,
+                                  const char *source,
+                                  const TS_PACKProcessConfig *config);
 
 /**
  * Free a `DownloadManager` handle.
@@ -1909,38 +1923,43 @@ TS_PACKDownloadManager *ts_pack_download_manager_new(const char *version);
 
 /**
  * List languages that are already downloaded and cached.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-char *ts_pack_download_manager_installed_languages(const TS_PACKDownloadManager *this_);
+char *ts_pack_download_manager_installed_languages(
+    const TS_PACKDownloadManager *this_);
 
 /**
  * Download the platform bundle and extract every library file it contains.
  *
- * Unlike `Self.ensure_languages`, this does not check the manifest language list
- * against archive contents â it simply extracts all `.so`/`.dylib`/`.dll` files
- * from the bundle. Languages in the manifest that are missing from the archive
- * are silently ignored rather than returning an error.
+ * Unlike `Self.ensure_languages`, this does not check the manifest language
+ * list against archive contents â it simply extracts all
+ * `.so`/`.dylib`/`.dll` files from the bundle. Languages in the manifest that
+ * are missing from the archive are silently ignored rather than returning an
+ * error.
  *
- * Returns the number of library files extracted (including those already cached).
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * Returns the number of library files extracted (including those already
+ * cached).
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-uintptr_t ts_pack_download_manager_download_all_best_effort(const TS_PACKDownloadManager *this_);
+uintptr_t ts_pack_download_manager_download_all_best_effort(
+    const TS_PACKDownloadManager *this_);
 
 /**
  * Remove all cached parser libraries.
  *
  * Acquires the cross-process lock so `clean_cache` cannot race a concurrent
  * downloader (avoids Windows sharing-violation errors against an in-flight
- * bundle write). The `.download.lock` file itself is **not** removed â it is
- * permanent infrastructure; deleting it could allow a concurrent process that
- * already opened the file to continue holding a stale lock handle while a new
- * process opens a fresh inode, breaking the mutual-exclusion guarantee.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * bundle write). The `.download.lock` file itself is **not** removed â it
+ * is permanent infrastructure; deleting it could allow a concurrent process
+ * that already opened the file to continue holding a stale lock handle while a
+ * new process opens a fresh inode, breaking the mutual-exclusion guarantee.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
-int32_t ts_pack_download_manager_clean_cache(const TS_PACKDownloadManager *this_);
+int32_t
+ts_pack_download_manager_clean_cache(const TS_PACKDownloadManager *this_);
 
 /**
  * Free a `Language` handle.
@@ -1958,9 +1977,9 @@ void ts_pack_language_free(TS_PACKLanguage *ptr);
 int32_t ts_pack_data_node_kind_from_i32(int32_t value);
 
 /**
- * Convert a `DataNodeKind` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ * Convert a `DataNodeKind` variant name (C string) to its integer value.
+ * Returns -1 on invalid input. # Safety Caller must ensure `ptr` is a valid
+ * pointer to a `c_char` or null.
  */
 int32_t ts_pack_data_node_kind_from_str(const char *name);
 
@@ -1973,9 +1992,9 @@ int32_t ts_pack_data_node_kind_from_str(const char *name);
 int32_t ts_pack_structure_kind_from_i32(int32_t value);
 
 /**
- * Convert a `StructureKind` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ * Convert a `StructureKind` variant name (C string) to its integer value.
+ * Returns -1 on invalid input. # Safety Caller must ensure `ptr` is a valid
+ * pointer to a `c_char` or null.
  */
 int32_t ts_pack_structure_kind_from_str(const char *name);
 
@@ -1988,24 +2007,23 @@ int32_t ts_pack_structure_kind_from_str(const char *name);
 int32_t ts_pack_comment_kind_from_i32(int32_t value);
 
 /**
- * Convert a `CommentKind` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ * Convert a `CommentKind` variant name (C string) to its integer value. Returns
+ * -1 on invalid input. # Safety Caller must ensure `ptr` is a valid pointer to
+ * a `c_char` or null.
  */
 int32_t ts_pack_comment_kind_from_str(const char *name);
 
 /**
- * Convert an integer to a `DocstringFormat` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
+ * Convert an integer to a `DocstringFormat` variant. Returns -1 on invalid
+ * input. # Safety Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
 int32_t ts_pack_docstring_format_from_i32(int32_t value);
 
 /**
- * Convert a `DocstringFormat` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ * Convert a `DocstringFormat` variant name (C string) to its integer value.
+ * Returns -1 on invalid input. # Safety Caller must ensure `ptr` is a valid
+ * pointer to a `c_char` or null.
  */
 int32_t ts_pack_docstring_format_from_str(const char *name);
 
@@ -2018,9 +2036,9 @@ int32_t ts_pack_docstring_format_from_str(const char *name);
 int32_t ts_pack_export_kind_from_i32(int32_t value);
 
 /**
- * Convert a `ExportKind` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ * Convert a `ExportKind` variant name (C string) to its integer value. Returns
+ * -1 on invalid input. # Safety Caller must ensure `ptr` is a valid pointer to
+ * a `c_char` or null.
  */
 int32_t ts_pack_export_kind_from_str(const char *name);
 
@@ -2033,31 +2051,30 @@ int32_t ts_pack_export_kind_from_str(const char *name);
 int32_t ts_pack_symbol_kind_from_i32(int32_t value);
 
 /**
- * Convert a `SymbolKind` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ * Convert a `SymbolKind` variant name (C string) to its integer value. Returns
+ * -1 on invalid input. # Safety Caller must ensure `ptr` is a valid pointer to
+ * a `c_char` or null.
  */
 int32_t ts_pack_symbol_kind_from_str(const char *name);
 
 /**
- * Convert an integer to a `DiagnosticSeverity` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
+ * Convert an integer to a `DiagnosticSeverity` variant. Returns -1 on invalid
+ * input. # Safety Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
 int32_t ts_pack_diagnostic_severity_from_i32(int32_t value);
 
 /**
- * Convert a `DiagnosticSeverity` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ * Convert a `DiagnosticSeverity` variant name (C string) to its integer value.
+ * Returns -1 on invalid input. # Safety Caller must ensure `ptr` is a valid
+ * pointer to a `c_char` or null.
  */
 int32_t ts_pack_diagnostic_severity_from_str(const char *name);
 
 /**
- * Free a heap-allocated `DataNodeKind` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
+ * Free a heap-allocated `DataNodeKind` returned by a pointer-returning FFI
+ * function. # Safety Pointer must have been returned by this library, or be
+ * null.
  */
 void ts_pack_data_node_kind_free(TS_PACKDataNodeKind *ptr);
 
@@ -2080,9 +2097,9 @@ char *ts_pack_data_node_kind_to_json(const TS_PACKDataNodeKind *ptr);
 char *ts_pack_data_node_kind_to_string(const TS_PACKDataNodeKind *ptr);
 
 /**
- * Free a heap-allocated `StructureKind` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
+ * Free a heap-allocated `StructureKind` returned by a pointer-returning FFI
+ * function. # Safety Pointer must have been returned by this library, or be
+ * null.
  */
 void ts_pack_structure_kind_free(TS_PACKStructureKind *ptr);
 
@@ -2105,9 +2122,9 @@ char *ts_pack_structure_kind_to_json(const TS_PACKStructureKind *ptr);
 char *ts_pack_structure_kind_to_string(const TS_PACKStructureKind *ptr);
 
 /**
- * Free a heap-allocated `CommentKind` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
+ * Free a heap-allocated `CommentKind` returned by a pointer-returning FFI
+ * function. # Safety Pointer must have been returned by this library, or be
+ * null.
  */
 void ts_pack_comment_kind_free(TS_PACKCommentKind *ptr);
 
@@ -2130,9 +2147,9 @@ char *ts_pack_comment_kind_to_json(const TS_PACKCommentKind *ptr);
 char *ts_pack_comment_kind_to_string(const TS_PACKCommentKind *ptr);
 
 /**
- * Free a heap-allocated `DocstringFormat` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
+ * Free a heap-allocated `DocstringFormat` returned by a pointer-returning FFI
+ * function. # Safety Pointer must have been returned by this library, or be
+ * null.
  */
 void ts_pack_docstring_format_free(TS_PACKDocstringFormat *ptr);
 
@@ -2155,9 +2172,9 @@ char *ts_pack_docstring_format_to_json(const TS_PACKDocstringFormat *ptr);
 char *ts_pack_docstring_format_to_string(const TS_PACKDocstringFormat *ptr);
 
 /**
- * Free a heap-allocated `ExportKind` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
+ * Free a heap-allocated `ExportKind` returned by a pointer-returning FFI
+ * function. # Safety Pointer must have been returned by this library, or be
+ * null.
  */
 void ts_pack_export_kind_free(TS_PACKExportKind *ptr);
 
@@ -2180,9 +2197,9 @@ char *ts_pack_export_kind_to_json(const TS_PACKExportKind *ptr);
 char *ts_pack_export_kind_to_string(const TS_PACKExportKind *ptr);
 
 /**
- * Free a heap-allocated `SymbolKind` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
+ * Free a heap-allocated `SymbolKind` returned by a pointer-returning FFI
+ * function. # Safety Pointer must have been returned by this library, or be
+ * null.
  */
 void ts_pack_symbol_kind_free(TS_PACKSymbolKind *ptr);
 
@@ -2205,9 +2222,9 @@ char *ts_pack_symbol_kind_to_json(const TS_PACKSymbolKind *ptr);
 char *ts_pack_symbol_kind_to_string(const TS_PACKSymbolKind *ptr);
 
 /**
- * Free a heap-allocated `DiagnosticSeverity` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
+ * Free a heap-allocated `DiagnosticSeverity` returned by a pointer-returning
+ * FFI function. # Safety Pointer must have been returned by this library, or be
+ * null.
  */
 void ts_pack_diagnostic_severity_free(TS_PACKDiagnosticSeverity *ptr);
 
@@ -2227,7 +2244,8 @@ char *ts_pack_diagnostic_severity_to_json(const TS_PACKDiagnosticSeverity *ptr);
  * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
  * The returned string must be freed with `ts_pack_free_string`.
  */
-char *ts_pack_diagnostic_severity_to_string(const TS_PACKDiagnosticSeverity *ptr);
+char *
+ts_pack_diagnostic_severity_to_string(const TS_PACKDiagnosticSeverity *ptr);
 
 /**
  * Detect language name from a file extension (without leading dot).
@@ -2240,18 +2258,18 @@ char *ts_pack_diagnostic_severity_to_string(const TS_PACKDiagnosticSeverity *ptr
  * assert_eq!(detect_language_from_extension("RS"), Some("rust"));
  * assert_eq!(detect_language_from_extension("xyz"), None);
  * ```
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *ts_pack_detect_language_from_extension(const char *ext);
 
 /**
  * Return the byte length of the C string most recently returned by
- * `ts_pack_detect_language_from_extension` on this thread. Returns 0 when the primary call returned
- * null or failed before producing a string. Enables safe slice construction in Zig and Java FFM Panama
- * without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_detect_language_from_extension`.
+ * `ts_pack_detect_language_from_extension` on this thread. Returns 0 when the
+ * primary call returned null or failed before producing a string. Enables safe
+ * slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the
+ * companion ABI aligned with `ts_pack_detect_language_from_extension`.
  */
 uintptr_t ts_pack_detect_language_from_extension_len(const char *_ext);
 
@@ -2267,17 +2285,18 @@ uintptr_t ts_pack_detect_language_from_extension_len(const char *_ext);
  * assert_eq!(detect_language_from_path("README.md"), Some("markdown"));
  * assert_eq!(detect_language_from_path("Makefile"), None);
  * ```
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *ts_pack_detect_language_from_path(const char *path);
 
 /**
- * Return the byte length of the C string most recently returned by `ts_pack_detect_language_from_path`
- * on this thread. Returns 0 when the primary call returned null or failed before producing a string.
- * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_detect_language_from_path`.
+ * Return the byte length of the C string most recently returned by
+ * `ts_pack_detect_language_from_path` on this thread. Returns 0 when the
+ * primary call returned null or failed before producing a string. Enables safe
+ * slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the
+ * companion ABI aligned with `ts_pack_detect_language_from_path`.
  */
 uintptr_t ts_pack_detect_language_from_path_len(const char *_path);
 
@@ -2292,30 +2311,32 @@ uintptr_t ts_pack_detect_language_from_path_len(const char *_path);
  * - `#!/bin/bash` â `"bash"`
  * - `#!/usr/bin/env node` â `"javascript"`
  *
- * The `-S` flag accepted by some `env` implementations is skipped automatically.
- * Version suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.
+ * The `-S` flag accepted by some `env` implementations is skipped
+ * automatically. Version suffixes (e.g. `python3.11`, `ruby3.2`) are stripped
+ * before matching.
  *
  * Returns `None` when content does not start with `#!`, the shebang is
  * malformed, or the interpreter is not recognised.
  *
  * ```
  * use tree_sitter_language_pack::detect_language_from_content;
- * assert_eq!(detect_language_from_content("#!/usr/bin/env python3\npass"), Some("python"));
- * assert_eq!(detect_language_from_content("#!/bin/bash\necho hi"), Some("bash"));
- * assert_eq!(detect_language_from_content("no shebang here"), None);
+ * assert_eq!(detect_language_from_content("#!/usr/bin/env python3\npass"),
+ * Some("python")); assert_eq!(detect_language_from_content("#!/bin/bash\necho
+ * hi"), Some("bash")); assert_eq!(detect_language_from_content("no shebang
+ * here"), None);
  * ```
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *ts_pack_detect_language_from_content(const char *content);
 
 /**
  * Return the byte length of the C string most recently returned by
- * `ts_pack_detect_language_from_content` on this thread. Returns 0 when the primary call returned null
- * or failed before producing a string. Enables safe slice construction in Zig and Java FFM Panama
- * without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_detect_language_from_content`.
+ * `ts_pack_detect_language_from_content` on this thread. Returns 0 when the
+ * primary call returned null or failed before producing a string. Enables safe
+ * slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the
+ * companion ABI aligned with `ts_pack_detect_language_from_content`.
  */
 uintptr_t ts_pack_detect_language_from_content_len(const char *_content);
 
@@ -2324,8 +2345,8 @@ uintptr_t ts_pack_detect_language_from_content_len(const char *_content);
  *
  * Returns the contents of `highlights.scm` as a static string, or `None`
  * if no highlights query is bundled for this language.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::get_highlights_query;
  *
@@ -2339,11 +2360,12 @@ uintptr_t ts_pack_detect_language_from_content_len(const char *_content);
 char *ts_pack_get_highlights_query(const char *language);
 
 /**
- * Return the byte length of the C string most recently returned by `ts_pack_get_highlights_query` on
- * this thread. Returns 0 when the primary call returned null or failed before producing a string.
- * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_get_highlights_query`.
+ * Return the byte length of the C string most recently returned by
+ * `ts_pack_get_highlights_query` on this thread. Returns 0 when the primary
+ * call returned null or failed before producing a string. Enables safe slice
+ * construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the
+ * companion ABI aligned with `ts_pack_get_highlights_query`.
  */
 uintptr_t ts_pack_get_highlights_query_len(const char *_language);
 
@@ -2352,8 +2374,8 @@ uintptr_t ts_pack_get_highlights_query_len(const char *_language);
  *
  * Returns the contents of `injections.scm` as a static string, or `None`
  * if no injections query is bundled for this language.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::get_injections_query;
  *
@@ -2366,11 +2388,12 @@ uintptr_t ts_pack_get_highlights_query_len(const char *_language);
 char *ts_pack_get_injections_query(const char *language);
 
 /**
- * Return the byte length of the C string most recently returned by `ts_pack_get_injections_query` on
- * this thread. Returns 0 when the primary call returned null or failed before producing a string.
- * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_get_injections_query`.
+ * Return the byte length of the C string most recently returned by
+ * `ts_pack_get_injections_query` on this thread. Returns 0 when the primary
+ * call returned null or failed before producing a string. Enables safe slice
+ * construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the
+ * companion ABI aligned with `ts_pack_get_injections_query`.
  */
 uintptr_t ts_pack_get_injections_query_len(const char *_language);
 
@@ -2379,8 +2402,8 @@ uintptr_t ts_pack_get_injections_query_len(const char *_language);
  *
  * Returns the contents of `locals.scm` as a static string, or `None`
  * if no locals query is bundled for this language.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::get_locals_query;
  *
@@ -2393,11 +2416,12 @@ uintptr_t ts_pack_get_injections_query_len(const char *_language);
 char *ts_pack_get_locals_query(const char *language);
 
 /**
- * Return the byte length of the C string most recently returned by `ts_pack_get_locals_query` on this
- * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
- * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_get_locals_query`.
+ * Return the byte length of the C string most recently returned by
+ * `ts_pack_get_locals_query` on this thread. Returns 0 when the primary call
+ * returned null or failed before producing a string. Enables safe slice
+ * construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the
+ * companion ABI aligned with `ts_pack_get_locals_query`.
  */
 uintptr_t ts_pack_get_locals_query_len(const char *_language);
 
@@ -2406,8 +2430,8 @@ uintptr_t ts_pack_get_locals_query_len(const char *_language);
  *
  * Returns the contents of `tags.scm` as a static string, or `None`
  * if no tags query is bundled for this language.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::get_tags_query;
  *
@@ -2420,11 +2444,12 @@ uintptr_t ts_pack_get_locals_query_len(const char *_language);
 char *ts_pack_get_tags_query(const char *language);
 
 /**
- * Return the byte length of the C string most recently returned by `ts_pack_get_tags_query` on this
- * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
- * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_get_tags_query`.
+ * Return the byte length of the C string most recently returned by
+ * `ts_pack_get_tags_query` on this thread. Returns 0 when the primary call
+ * returned null or failed before producing a string. Enables safe slice
+ * construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the
+ * companion ABI aligned with `ts_pack_get_tags_query`.
  */
 uintptr_t ts_pack_get_tags_query_len(const char *_language);
 
@@ -2436,8 +2461,8 @@ uintptr_t ts_pack_get_tags_query_len(const char *_language);
  * the parser from GitHub releases if not found locally.
  * \note Returns `Error.LanguageNotFound` if the language is not recognized,
  * or `Error.Download` if auto-download fails.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::{get_language, Parser};
  *
@@ -2458,8 +2483,8 @@ const TSLanguage *ts_pack_get_language(const char *name);
  * a new parser in one step.
  * \note Returns `Error.LanguageNotFound` if the language is not recognized, or
  * `Error.ParserSetup` if the language cannot be applied to the parser.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::get_parser;
  *
@@ -2475,17 +2500,18 @@ TS_PACKParser *ts_pack_get_parser(const char *name);
  * Detect language name from a file path or extension.
  *
  * This compatibility alias matches the pre-Alef Python binding API.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  */
 char *ts_pack_detect_language(const char *path);
 
 /**
- * Return the byte length of the C string most recently returned by `ts_pack_detect_language` on this
- * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
- * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_detect_language`.
+ * Return the byte length of the C string most recently returned by
+ * `ts_pack_detect_language` on this thread. Returns 0 when the primary call
+ * returned null or failed before producing a string. Enables safe slice
+ * construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the
+ * companion ABI aligned with `ts_pack_detect_language`.
  */
 uintptr_t ts_pack_detect_language_len(const char *_path);
 
@@ -2494,8 +2520,8 @@ uintptr_t ts_pack_detect_language_len(const char *_path);
  *
  * Returns names of both statically compiled and dynamically loadable languages,
  * plus any configured aliases.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::available_languages;
  *
@@ -2508,11 +2534,12 @@ uintptr_t ts_pack_detect_language_len(const char *_path);
 char *ts_pack_available_languages(void);
 
 /**
- * Return the byte length of the C string most recently returned by `ts_pack_available_languages` on
- * this thread. Returns 0 when the primary call returned null or failed before producing a string.
- * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_available_languages`.
+ * Return the byte length of the C string most recently returned by
+ * `ts_pack_available_languages` on this thread. Returns 0 when the primary call
+ * returned null or failed before producing a string. Enables safe slice
+ * construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the
+ * companion ABI aligned with `ts_pack_available_languages`.
  */
 uintptr_t ts_pack_available_languages_len(void);
 
@@ -2521,8 +2548,8 @@ uintptr_t ts_pack_available_languages_len(void);
  *
  * Returns `true` if the language can be loaded (statically compiled,
  * dynamically available, or a known alias for one of these).
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::has_language;
  *
@@ -2538,8 +2565,8 @@ int32_t ts_pack_has_language(const char *name);
  *
  * Includes statically compiled languages, dynamically loadable languages,
  * and aliases.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::language_count;
  *
@@ -2556,8 +2583,8 @@ uintptr_t ts_pack_language_count(void);
  * exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
  * the flags set in `ProcessConfig`.
  * \note Returns an error if the language is not found or parsing fails.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::{ProcessConfig, process};
  *
@@ -2569,7 +2596,7 @@ uintptr_t ts_pack_language_count(void);
  * \endcode
  */
 TS_PACKProcessResult *ts_pack_process(const char *source,
-    const TS_PACKProcessConfig *config);
+                                      const TS_PACKProcessConfig *config);
 
 /**
  * Initialize the language pack with the given configuration.
@@ -2577,9 +2604,10 @@ TS_PACKProcessResult *ts_pack_process(const char *source,
  * Applies any custom cache directory, then downloads all languages and groups
  * specified in the config. This is the recommended entry point when you want
  * to pre-warm the cache before use.
- * \note Returns an error if configuration cannot be applied or if downloads fail.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note Returns an error if configuration cannot be applied or if downloads
+ * fail.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::{PackConfig, init};
  *
@@ -2601,8 +2629,8 @@ int32_t ts_pack_init(const TS_PACKPackConfig *config);
  * after languages have been registered has no effect on already-loaded
  * languages.
  * \note Returns an error if the lock cannot be acquired.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use std::path::PathBuf;
  * use tree_sitter_language_pack::{PackConfig, configure};
@@ -2624,8 +2652,8 @@ int32_t ts_pack_configure(const TS_PACKPackConfig *config);
  * compiled or cached languages are included in the count.
  * \note Returns an error if any language is not available in the manifest or if
  * the download fails.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::download;
  *
@@ -2645,9 +2673,10 @@ uintptr_t ts_pack_download(const char *names);
  *
  * Returns the total number of languages now available (statically compiled
  * plus downloaded and cached).
- * \note Returns an error if the manifest cannot be fetched or the bundle download fails.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note Returns an error if the manifest cannot be fetched or the bundle
+ * download fails.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::download_all;
  *
@@ -2666,10 +2695,10 @@ uintptr_t ts_pack_download_all(void);
  *
  * Returns the total number of languages now available (statically compiled
  * plus downloaded and cached).
- * \note Returns an error if the manifest cannot be fetched, the group is unknown,
- * or any constituent language fails to download.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note Returns an error if the manifest cannot be fetched, the group is
+ * unknown, or any constituent language fails to download.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::download_group;
  *
@@ -2686,8 +2715,8 @@ uintptr_t ts_pack_download_group(const char *name);
  * downloadable languages. Use `downloaded_languages` to list what is
  * already cached locally.
  * \note Returns an error if the manifest cannot be fetched.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::manifest_languages;
  *
@@ -2698,11 +2727,12 @@ uintptr_t ts_pack_download_group(const char *name);
 char *ts_pack_manifest_languages(void);
 
 /**
- * Return the byte length of the C string most recently returned by `ts_pack_manifest_languages` on
- * this thread. Returns 0 when the primary call returned null or failed before producing a string.
- * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_manifest_languages`.
+ * Return the byte length of the C string most recently returned by
+ * `ts_pack_manifest_languages` on this thread. Returns 0 when the primary call
+ * returned null or failed before producing a string. Enables safe slice
+ * construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the
+ * companion ABI aligned with `ts_pack_manifest_languages`.
  */
 uintptr_t ts_pack_manifest_languages_len(void);
 
@@ -2711,8 +2741,8 @@ uintptr_t ts_pack_manifest_languages_len(void);
  *
  * Does not perform any network requests. Returns an empty list if the
  * cache directory does not exist or cannot be read.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::downloaded_languages;
  *
@@ -2723,11 +2753,12 @@ uintptr_t ts_pack_manifest_languages_len(void);
 char *ts_pack_downloaded_languages(void);
 
 /**
- * Return the byte length of the C string most recently returned by `ts_pack_downloaded_languages` on
- * this thread. Returns 0 when the primary call returned null or failed before producing a string.
- * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_downloaded_languages`.
+ * Return the byte length of the C string most recently returned by
+ * `ts_pack_downloaded_languages` on this thread. Returns 0 when the primary
+ * call returned null or failed before producing a string. Enables safe slice
+ * construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the
+ * companion ABI aligned with `ts_pack_downloaded_languages`.
  */
 uintptr_t ts_pack_downloaded_languages_len(void);
 
@@ -2737,8 +2768,8 @@ uintptr_t ts_pack_downloaded_languages_len(void);
  * Resets the cache registration so the next call to `get_language` or
  * a download function will re-register the (now empty) cache directory.
  * \note Returns an error if the cache directory cannot be removed.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::clean_cache;
  *
@@ -2754,8 +2785,8 @@ int32_t ts_pack_clean_cache(void);
  * This is either the custom path set via `configure` / `init` or the
  * default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
  * \note Returns an error if the system cache directory cannot be determined.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
  * \code
  * use tree_sitter_language_pack::cache_dir;
  *
@@ -2766,12 +2797,13 @@ int32_t ts_pack_clean_cache(void);
 char *ts_pack_cache_dir(void);
 
 /**
- * Return the byte length of the C string most recently returned by `ts_pack_cache_dir` on this thread.
- * Returns 0 when the primary call returned null or failed before producing a string. Enables safe
- * slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_cache_dir`.
+ * Return the byte length of the C string most recently returned by
+ * `ts_pack_cache_dir` on this thread. Returns 0 when the primary call returned
+ * null or failed before producing a string. Enables safe slice construction in
+ * Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the
+ * companion ABI aligned with `ts_pack_cache_dir`.
  */
 uintptr_t ts_pack_cache_dir_len(void);
 
-#endif  /* TS_PACK_H */
+#endif /* TS_PACK_H */

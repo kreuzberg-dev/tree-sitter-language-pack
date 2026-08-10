@@ -1,17 +1,24 @@
 {
-	"id": "smoke_git_rebase",
-	"description": "Smoke test: load git_rebase and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "x",
-		"config": {
-			"language": "git_rebase"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_git_rebase",
+  "description": "Smoke test: load git_rebase and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "x",
+    "config": {
+      "language": "git_rebase"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_git_rebase",
+    "title": "Smoke test: load git_rebase and parse a simple snippet"
+  }
 }

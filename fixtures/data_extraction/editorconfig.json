@@ -1,21 +1,42 @@
 [
-	{
-		"id": "data_extraction_editorconfig_section",
-		"description": "Data extraction: .editorconfig INI dialect sections and settings",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "editorconfig"],
-		"input": {
-			"source_code": "[*.rs]\nindent_style = space\nindent_size = 4\n",
-			"config": {
-				"language": "editorconfig",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "equals", "field": "data.kind", "value": "KeyValue" },
-			{ "type": "count_min", "field": "data.children", "value": 1 }
-		]
-	}
+  {
+    "id": "data_extraction_editorconfig_section",
+    "description": "Data extraction: .editorconfig INI dialect sections and settings",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "editorconfig"
+    ],
+    "input": {
+      "source_code": "[*.rs]\nindent_style = space\nindent_size = 4\n",
+      "config": {
+        "language": "editorconfig",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "equals",
+        "field": "data.kind",
+        "value": "KeyValue"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 1
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_editorconfig_section",
+      "title": "Data extraction: .editorconfig INI dialect sections and settings"
+    }
+  }
 ]

@@ -1,17 +1,24 @@
 {
-	"id": "smoke_eiffel",
-	"description": "Smoke test: load eiffel and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "class FOO\nend\n",
-		"config": {
-			"language": "eiffel"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_eiffel",
+  "description": "Smoke test: load eiffel and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "class FOO\nend\n",
+    "config": {
+      "language": "eiffel"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_eiffel",
+    "title": "Smoke test: load eiffel and parse a simple snippet"
+  }
 }

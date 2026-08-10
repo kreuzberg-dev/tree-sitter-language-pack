@@ -1,17 +1,24 @@
 {
-	"id": "smoke_unison",
-	"description": "Smoke test: load unison and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "x = 1\n",
-		"config": {
-			"language": "unison"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_unison",
+  "description": "Smoke test: load unison and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "x = 1\n",
+    "config": {
+      "language": "unison"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_unison",
+    "title": "Smoke test: load unison and parse a simple snippet"
+  }
 }

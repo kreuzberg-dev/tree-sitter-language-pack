@@ -1,17 +1,24 @@
 {
-	"id": "smoke_reason",
-	"description": "Smoke test: load reason and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "let x = 1;\n",
-		"config": {
-			"language": "reason"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_reason",
+  "description": "Smoke test: load reason and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "let x = 1;\n",
+    "config": {
+      "language": "reason"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_reason",
+    "title": "Smoke test: load reason and parse a simple snippet"
+  }
 }

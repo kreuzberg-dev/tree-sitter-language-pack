@@ -1,17 +1,24 @@
 {
-	"id": "smoke_haml",
-	"description": "Smoke test: load haml and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "%p hello\n",
-		"config": {
-			"language": "haml"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_haml",
+  "description": "Smoke test: load haml and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "%p hello\n",
+    "config": {
+      "language": "haml"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_haml",
+    "title": "Smoke test: load haml and parse a simple snippet"
+  }
 }

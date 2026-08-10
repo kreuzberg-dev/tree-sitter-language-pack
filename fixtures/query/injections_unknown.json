@@ -1,15 +1,23 @@
 {
-	"id": "injections_query_unknown_language",
-	"description": "get_injections_query returns empty for unknown language",
-	"category": "query",
-	"tags": ["query", "injections"],
-	"call": "injections",
-	"input": {
-		"language": "nonexistent_xyz"
-	},
-	"assertions": [
-		{
-			"type": "is_empty"
-		}
-	]
+  "id": "injections_query_unknown_language",
+  "description": "get_injections_query returns empty for unknown language",
+  "category": "query",
+  "tags": [
+    "query",
+    "injections"
+  ],
+  "call": "injections",
+  "input": {
+    "language": "nonexistent_xyz"
+  },
+  "assertions": [
+    {
+      "type": "is_empty"
+    }
+  ],
+  "docs": {
+    "topic": "query",
+    "stem": "injections_query_unknown_language",
+    "title": "get_injections_query returns empty for unknown language"
+  }
 }

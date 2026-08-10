@@ -228,5 +228,10 @@ e2e/zig/zig-pkg/
 
 poly.local.toml
 
+# Alef snippet validator scratch workspaces and caches ~keep
+**/.alef-snippet-*/
+**/.alef-cache/
+**/.alef/
+
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 # END ai-rulez

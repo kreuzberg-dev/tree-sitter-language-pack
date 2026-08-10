@@ -1,17 +1,24 @@
 {
-	"id": "smoke_sysml",
-	"description": "Smoke test: load sysml and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "package P {}\n",
-		"config": {
-			"language": "sysml"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_sysml",
+  "description": "Smoke test: load sysml and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "package P {}\n",
+    "config": {
+      "language": "sysml"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_sysml",
+    "title": "Smoke test: load sysml and parse a simple snippet"
+  }
 }

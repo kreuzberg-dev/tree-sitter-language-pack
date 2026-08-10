@@ -1,57 +1,111 @@
 [
-	{
-		"id": "data_extraction_properties_flat",
-		"description": "Data extraction: .properties flat key=value pairs (closes issue #136)",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "properties"],
-		"input": {
-			"source_code": "host=localhost\nport=8080\n",
-			"config": {
-				"language": "properties",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "equals", "field": "data.kind", "value": "KeyValue" },
-			{ "type": "count_min", "field": "data.children", "value": 2 }
-		]
-	},
-	{
-		"id": "data_extraction_properties_dotted_key",
-		"description": "Data extraction: .properties dotted key preserved verbatim",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "properties"],
-		"input": {
-			"source_code": "server.host=localhost\nserver.port=8080\n",
-			"config": {
-				"language": "properties",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "count_min", "field": "data.children", "value": 2 }
-		]
-	},
-	{
-		"id": "data_extraction_properties_empty",
-		"description": "Data extraction: empty .properties file produces zero children",
-		"category": "data_extraction",
-		"tags": ["data_extraction", "properties"],
-		"input": {
-			"source_code": "",
-			"config": {
-				"language": "properties",
-				"data_extraction": true
-			}
-		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" },
-			{ "type": "is_empty", "field": "data.children" }
-		]
-	}
+  {
+    "id": "data_extraction_properties_flat",
+    "description": "Data extraction: .properties flat key=value pairs (closes issue #136)",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "properties"
+    ],
+    "input": {
+      "source_code": "host=localhost\nport=8080\n",
+      "config": {
+        "language": "properties",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "equals",
+        "field": "data.kind",
+        "value": "KeyValue"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 2
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_properties_flat",
+      "title": "Data extraction: .properties flat key=value pairs (closes issue #136)"
+    }
+  },
+  {
+    "id": "data_extraction_properties_dotted_key",
+    "description": "Data extraction: .properties dotted key preserved verbatim",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "properties"
+    ],
+    "input": {
+      "source_code": "server.host=localhost\nserver.port=8080\n",
+      "config": {
+        "language": "properties",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "count_min",
+        "field": "data.children",
+        "value": 2
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_properties_dotted_key",
+      "title": "Data extraction: .properties dotted key preserved verbatim"
+    }
+  },
+  {
+    "id": "data_extraction_properties_empty",
+    "description": "Data extraction: empty .properties file produces zero children",
+    "category": "data_extraction",
+    "tags": [
+      "data_extraction",
+      "properties"
+    ],
+    "input": {
+      "source_code": "",
+      "config": {
+        "language": "properties",
+        "data_extraction": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_error"
+      },
+      {
+        "type": "is_true",
+        "field": "data"
+      },
+      {
+        "type": "is_empty",
+        "field": "data.children"
+      }
+    ],
+    "docs": {
+      "topic": "data_extraction",
+      "stem": "data_extraction_properties_empty",
+      "title": "Data extraction: empty .properties file produces zero children"
+    }
+  }
 ]

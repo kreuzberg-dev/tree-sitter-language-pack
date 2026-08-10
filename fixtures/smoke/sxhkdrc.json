@@ -1,17 +1,24 @@
 {
-	"id": "smoke_sxhkdrc",
-	"description": "Smoke test: load sxhkdrc and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "super + a\n\techo hi\n",
-		"config": {
-			"language": "sxhkdrc"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_sxhkdrc",
+  "description": "Smoke test: load sxhkdrc and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "super + a\n\techo hi\n",
+    "config": {
+      "language": "sxhkdrc"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_sxhkdrc",
+    "title": "Smoke test: load sxhkdrc and parse a simple snippet"
+  }
 }

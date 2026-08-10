@@ -1,17 +1,24 @@
 {
-	"id": "smoke_readline",
-	"description": "Smoke test: load readline and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "set editing-mode vi",
-		"config": {
-			"language": "readline"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_readline",
+  "description": "Smoke test: load readline and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "set editing-mode vi",
+    "config": {
+      "language": "readline"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_readline",
+    "title": "Smoke test: load readline and parse a simple snippet"
+  }
 }

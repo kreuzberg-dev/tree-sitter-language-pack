@@ -1,17 +1,32 @@
 {
-	"id": "download_downloaded_empty",
-	"description": "List downloaded languages (may be empty before any downloads)",
-	"category": "download",
-	"tags": ["download"],
-	"call": "downloaded_languages",
-	"skip": {
-		"languages": ["wasm"],
-		"reason": "Download feature requires network access and is not available in static builds"
-	},
-	"input": {},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "download_downloaded_empty",
+  "description": "List downloaded languages (may be empty before any downloads)",
+  "category": "download",
+  "tags": [
+    "download"
+  ],
+  "call": "downloaded_languages",
+  "skip": {
+    "languages": [
+      "wasm"
+    ],
+    "reason": "Download feature requires network access and is not available in static builds"
+  },
+  "input": {},
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "download",
+    "stem": "download_downloaded_empty",
+    "title": "List downloaded languages (may be empty before any downloads)",
+    "coverage_exceptions": {
+      "wasm": {
+        "reason": "The WASM package uses statically compiled parsers and does not expose runtime parser download or cache management.",
+        "documentation": "docs-site/src/content/docs/guides/building.md"
+      }
+    }
+  }
 }

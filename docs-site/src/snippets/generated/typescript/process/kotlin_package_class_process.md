@@ -1,0 +1,9 @@
+```typescript title="TypeScript"
+import { process } from "@xberg-io/tree-sitter-language-pack";
+function main() {
+  const result = process("package foo.bar\n\nclass Widget {\n    fun greet(): String = \"hi\"\n}\n", { language: "kotlin" });
+}
+
+void main();
+
+```

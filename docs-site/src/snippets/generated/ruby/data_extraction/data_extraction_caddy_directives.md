@@ -1,0 +1,5 @@
+```ruby title="Ruby"
+require "tree_sitter_language_pack"
+result = TreeSitterLanguagePack.process("localhost\nroot * /var/www\nfile_server\n", { 'data_extraction' => true, 'language' => 'caddy' })
+
+```

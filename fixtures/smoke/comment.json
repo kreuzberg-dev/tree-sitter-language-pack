@@ -1,17 +1,24 @@
 {
-	"id": "smoke_comment",
-	"description": "Smoke test: load comment and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"input": {
-		"source_code": "Review: handle edge case",
-		"config": {
-			"language": "comment"
-		}
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_comment",
+  "description": "Smoke test: load comment and parse a simple snippet",
+  "category": "smoke",
+  "tags": [
+    "smoke"
+  ],
+  "input": {
+    "source_code": "Review: handle edge case",
+    "config": {
+      "language": "comment"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ],
+  "docs": {
+    "topic": "smoke",
+    "stem": "smoke_comment",
+    "title": "Smoke test: load comment and parse a simple snippet"
+  }
 }
