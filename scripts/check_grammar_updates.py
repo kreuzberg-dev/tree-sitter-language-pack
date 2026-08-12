@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from _vendor_sources import validate_branch, validate_repo_url, validate_rev
 from anyio import run_process
 
 DEFINITIONS_PATH = Path(__file__).parent.parent / "sources" / "language_definitions.json"
@@ -52,23 +53,33 @@ class CheckReport:
         }
 
 
-async def get_latest_commit_hash(repo_url: str, branch: str | None = None) -> str | None:
+async def get_latest_commit_hash(language: str, repo_url: str, branch: str | None = None) -> str | None:
     """Fetch the HEAD commit hash from a remote repo using git ls-remote.
 
     Args:
+        language: The language the repository belongs to (used in error messages).
         repo_url: The repository URL.
         branch: Optional branch name; defaults to HEAD if not provided.
+
+    Raises:
+        InvalidLanguageSourceError: If the URL or branch is not allowlisted.
 
     Returns:
         The commit hash string, or None if the query failed.
     """
+    # ~keep `git ls-remote <url>` parses a leading '-' as an option, so a repo value of
+    # "--upload-pack=..." would execute a command instead of naming a remote.
+    validate_repo_url(language, repo_url)
+    if branch is not None:
+        validate_branch(language, branch)
+
     ref = f"refs/heads/{branch}" if branch else "HEAD"
     try:
         result = await run_process(["git", "ls-remote", repo_url, ref], check=True)
         output: str = result.stdout.decode().strip()
         if output:
             commit_hash: str = output.split("\t", maxsplit=1)[0]
-            return commit_hash
+            return validate_rev(language, commit_hash)
         return None
     except (OSError, RuntimeError, ValueError) as e:
         print(f"  ERROR fetching {repo_url}: {e}", file=sys.stderr)
@@ -96,7 +107,7 @@ async def check_language(
         branch = definition.get("branch")
         current_rev = definition["rev"]
 
-        latest_rev = await get_latest_commit_hash(repo_url, branch)
+        latest_rev = await get_latest_commit_hash(language, repo_url, branch)
 
         if latest_rev is None:
             print(f"  FAIL {language}", file=sys.stderr)

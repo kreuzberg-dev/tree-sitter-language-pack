@@ -157,7 +157,7 @@ def _repo_link(repo_url: str) -> str:
     if not repo_url:
         return "—"
     parts = repo_url.rstrip("/").split("/")
-    label = "/".join(parts[-2:]) if len(parts) >= 2 else repo_url  # noqa: PLR2004
+    label = "/".join(parts[-2:]) if len(parts) >= 2 else repo_url
     return f"[{label}]({repo_url})"
 
 
@@ -205,7 +205,7 @@ def generate_table(project_root: Path, definitions: dict[str, dict[str, object]]
         "---",
         "title: Supported Languages",
         (
-            'description: "The full list of 371 tree-sitter grammars bundled by '
+            f'description: "The full list of {lang_count} tree-sitter grammars bundled by '
             "tree-sitter-language-pack, with file extensions, source repository, and "
             'ABI version."'
         ),

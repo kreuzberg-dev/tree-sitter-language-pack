@@ -5,26 +5,37 @@ import os
 from pathlib import Path
 from typing import Any
 
+from _vendor_sources import validate_branch, validate_repo_url, validate_rev
 from anyio import run_process
 
 
-async def get_latest_commit_hash(repo_url: str, branch: str | None = None) -> str | None:
+async def get_latest_commit_hash(language_name: str, repo_url: str, branch: str | None = None) -> str | None:
     """Get the latest commit hash using git ls-remote (no clone needed).
 
     Args:
+        language_name: The language the repository belongs to (used in error messages).
         repo_url: The repository URL.
         branch: The branch to query (defaults to HEAD).
+
+    Raises:
+        InvalidLanguageSourceError: If the URL or branch is not allowlisted.
 
     Returns:
         The latest commit hash, or None on failure.
     """
+    # ~keep `git ls-remote <url>` parses a leading '-' as an option, so a repo value of
+    # "--upload-pack=..." would execute a command instead of naming a remote.
+    validate_repo_url(language_name, repo_url)
+    if branch is not None:
+        validate_branch(language_name, branch)
+
     ref = f"refs/heads/{branch}" if branch else "HEAD"
     try:
         result = await run_process(["git", "ls-remote", repo_url, ref], check=True)
         output: str = result.stdout.decode().strip()
         if output:
             commit_hash: str = output.split("\t", maxsplit=1)[0]
-            return commit_hash
+            return validate_rev(language_name, commit_hash)
         return None
     except (OSError, RuntimeError, ValueError) as e:
         print(f"Error fetching commit for {repo_url}: {e}")
@@ -47,7 +58,7 @@ async def process_language(
     repo_url = language_def["repo"]
     branch = language_def.get("branch")
 
-    latest_commit = await get_latest_commit_hash(repo_url, branch)
+    latest_commit = await get_latest_commit_hash(language_name, repo_url, branch)
 
     if latest_commit:
         language_def_copy["rev"] = latest_commit

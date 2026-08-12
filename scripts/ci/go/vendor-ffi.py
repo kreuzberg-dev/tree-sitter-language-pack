@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Vendor FFI artifacts into Go package for distribution.
+"""Vendor FFI artifacts into Go package for distribution.
 
 Copies the pre-built FFI header and static library into the Go binding's
 include/ and lib/ directories so that `go build` works without the

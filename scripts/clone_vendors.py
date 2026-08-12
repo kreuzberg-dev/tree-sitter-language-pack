@@ -12,6 +12,7 @@ from pathlib import Path
 from shutil import copytree, move, rmtree, which
 from typing import NotRequired, TypedDict
 
+from _vendor_sources import validate_branch, validate_language_definitions, validate_repo_url, validate_rev
 from anyio import Path as AsyncPath
 from anyio import run_process
 from anyio.to_thread import run_sync
@@ -143,6 +144,7 @@ def get_language_definitions() -> tuple[dict[str, LanguageDict], list[str]]:
     language_definitions: dict[str, LanguageDict] = loads(
         (_project_root / "sources" / "language_definitions.json").read_text()
     )
+    validate_language_definitions(language_definitions)
 
     language_names = list(language_definitions.keys())
 
@@ -198,11 +200,20 @@ async def clone_repository(repo_url: str, branch: str | None, language_name: str
         rev: The revision to clone.  If passed, perform  a non-shallow clone.
 
     Raises:
+        InvalidLanguageSourceError: If the URL, branch or revision is not allowlisted.
         RuntimeError: If cloning fails
 
     Returns:
         Repo: The cloned repository.
     """
+    # ~keep Re-validate at the boundary: these three values are handed to git verbatim,
+    # and git parses a leading '-' as an option rather than as a URL/ref.
+    validate_repo_url(language_name, repo_url)
+    if branch is not None:
+        validate_branch(language_name, branch)
+    if rev is not None:
+        validate_rev(language_name, rev)
+
     print(f"Cloning {repo_url}")
     clone_target = vendor_directory / language_name
 
@@ -378,7 +389,7 @@ async def handle_generate(
             npm_cmd = ["cmd", "/c", "npm", *npm_args] if platform.system() == "Windows" else ["npm", *npm_args]
             try:
                 await run_process(npm_cmd, cwd=str(npm_root), check=False)
-            except Exception as e:  # noqa: BLE001 - npm deps are best-effort; generate reports the real failure
+            except Exception as e:
                 print(f"npm install for {language_name} failed (continuing): {e}")
 
         if platform.system() == "Windows":

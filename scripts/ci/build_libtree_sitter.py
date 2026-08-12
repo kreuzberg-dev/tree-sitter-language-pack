@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Build a standalone ``libtree-sitter`` shared library.
+"""Build a standalone ``libtree-sitter`` shared library.
 
 ``get_language()`` returns the host runtime's native tree-sitter ``Language``
 (a raw ``TSLanguage *``). Host bindings that do NOT bundle their own tree-sitter
