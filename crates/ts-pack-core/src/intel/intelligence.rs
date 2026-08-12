@@ -101,16 +101,21 @@ pub(super) fn is_comment_node(node: &tree_sitter::Node) -> bool {
 /// Record the source rows that a comment `node` occupies.
 ///
 /// The comment's own first row counts only when nothing but whitespace precedes
-/// it, so a trailing `x = 1; // note` stays a code line. Every later row of a
-/// block comment is wholly inside the comment and always counts.
+/// it, so a trailing `x = 1; // note` stays a code line. Interior rows of a
+/// block comment are wholly inside the comment and always count. The closing
+/// row counts only when nothing but whitespace follows the comment's end
+/// column, so `*/ fn main() {}` leaves that row as code.
 pub(super) fn mark_comment_rows(node: &tree_sitter::Node, source: &str, rows: &mut BTreeSet<usize>) {
     let start = node.start_position();
     let end = node.end_position();
     if line_prefix_is_blank(source, node.start_byte(), start.column) {
         rows.insert(start.row);
     }
-    for row in (start.row + 1)..=end.row {
+    for row in (start.row + 1)..end.row {
         rows.insert(row);
+    }
+    if end.row > start.row && line_suffix_is_blank(source, node.end_byte()) {
+        rows.insert(end.row);
     }
 }
 
@@ -123,6 +128,16 @@ fn line_prefix_is_blank(source: &str, start_byte: usize, column: usize) -> bool 
     source
         .get(line_start..start_byte)
         .is_some_and(|prefix| prefix.trim().is_empty())
+}
+
+/// Whether only whitespace follows the byte at `end_byte` up to the end of its line.
+fn line_suffix_is_blank(source: &str, end_byte: usize) -> bool {
+    let line_end = source[end_byte..]
+        .find('\n')
+        .map_or(source.len(), |offset| end_byte + offset);
+    source
+        .get(end_byte..line_end)
+        .is_some_and(|suffix| suffix.trim().is_empty())
 }
 
 /// Fill `metrics.comment_lines` from the rows the AST reported as comment rows,
@@ -183,9 +198,11 @@ pub(super) fn docstring_at(node: &tree_sitter::Node, source: &str, language: &st
         return None;
     }
     let (string_node, body) = python_docstring_parts(node)?;
+    let text = node_text(&string_node, source).to_string();
+    let format = python_docstring_format(&text);
     Some(DocstringInfo {
-        text: node_text(&string_node, source).to_string(),
-        format: DocstringFormat::PythonTripleQuote,
+        text,
+        format,
         span: span_from_node(&string_node),
         associated_item: body.parent().and_then(|item| {
             item.child_by_field_name("name")
@@ -203,11 +220,19 @@ pub(super) fn docstring_at(node: &tree_sitter::Node, source: &str, language: &st
 /// ~keep accepted, for grammars that expose the statement node; the two forms are
 /// ~keep disjoint (a wrapped string's parent is the statement, not the block), so
 /// ~keep no docstring is reported twice.
+///
+/// ~keep A Python docstring is positional, not merely "a bare string in a
+/// ~keep body": only the body's first statement counts. Without this check
+/// ~keep any stray string statement later in the body — `"stray"` after real
+/// ~keep code — was reported as a second, fabricated docstring.
 fn python_docstring_parts<'tree>(
     node: &tree_sitter::Node<'tree>,
 ) -> Option<(tree_sitter::Node<'tree>, tree_sitter::Node<'tree>)> {
     let parent = node.parent()?;
     if !is_python_body(&parent) {
+        return None;
+    }
+    if parent.named_child(0).map(|first| first.id()) != Some(node.id()) {
         return None;
     }
     if is_python_string(node) {
@@ -229,6 +254,20 @@ fn is_python_string(node: &tree_sitter::Node) -> bool {
 
 fn is_python_body(node: &tree_sitter::Node) -> bool {
     matches!(node.kind(), "block" | "module")
+}
+
+/// The [`DocstringFormat`] for a Python docstring's raw text.
+///
+/// ~keep Only the triple-quoted form is `PythonTripleQuote`; `def f(): 'x'`
+/// ~keep is a single-quoted string statement, not the triple-quote convention,
+/// ~keep so it is reported as `Other` instead of being mislabelled.
+fn python_docstring_format(text: &str) -> DocstringFormat {
+    let quoted = text.trim_start_matches(|c: char| c.is_ascii_alphabetic());
+    if quoted.starts_with("\"\"\"") || quoted.starts_with("'''") {
+        DocstringFormat::PythonTripleQuote
+    } else {
+        DocstringFormat::Other("python-single-quote".to_string())
+    }
 }
 
 /// Classify `node` as an import for the language-neutral matcher.
@@ -906,5 +945,72 @@ mod tests {
         let class = intel.structure.iter().find(|s| s.kind == StructureKind::Class);
         assert!(class.is_some(), "should find a Class entry");
         assert_eq!(class.unwrap().name.as_deref(), Some("Widget"));
+    }
+
+    #[test]
+    fn should_report_exactly_one_docstring_when_a_stray_string_follows_it() {
+        let source = "def greet():\n    \"\"\"Real doc.\"\"\"\n    name = \"cafe\"\n    \"stray string\"\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(
+            intel.docstrings.len(),
+            1,
+            "only the first statement is a docstring; got {:?}",
+            intel.docstrings
+        );
+        assert_eq!(intel.docstrings[0].text, "\"\"\"Real doc.\"\"\"");
+        assert_eq!(intel.docstrings[0].associated_item.as_deref(), Some("greet"));
+    }
+
+    #[test]
+    fn should_use_a_non_triple_quote_format_when_docstring_is_single_quoted() {
+        let source = "def f():\n    'x'\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(intel.docstrings.len(), 1);
+        assert_eq!(
+            intel.docstrings[0].format,
+            DocstringFormat::Other("python-single-quote".to_string()),
+            "a single-quoted string statement is not the triple-quote convention"
+        );
+    }
+
+    #[test]
+    fn should_count_code_lines_when_a_block_comment_closes_mid_line() {
+        let source = "/* a\n*/ fn main() {}\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+
+        assert_eq!(
+            intel.metrics.comment_lines, 1,
+            "only the opening row is wholly a comment; the closing row carries code"
+        );
+        assert_eq!(
+            intel.metrics.code_lines, 1,
+            "the line containing `fn main` must not be entirely swallowed by the comment"
+        );
+    }
+
+    #[test]
+    fn should_count_closing_row_as_comment_when_blank_after_close() {
+        let source = "/* a\n*/   \nfn main() {}\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+
+        assert_eq!(
+            intel.metrics.comment_lines, 2,
+            "the closing row has only whitespace after `*/` so it is still a comment row"
+        );
+        assert_eq!(intel.metrics.code_lines, 1);
     }
 }
