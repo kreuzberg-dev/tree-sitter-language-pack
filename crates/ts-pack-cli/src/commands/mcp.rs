@@ -901,11 +901,7 @@ async fn guard_http_request(
         .map(str::to_string);
     if !guard.is_token_valid(token.as_deref()) {
         tracing::warn!("rejected MCP HTTP request: missing or invalid bearer token");
-        return (
-            axum::http::StatusCode::UNAUTHORIZED,
-            "Missing or invalid bearer token",
-        )
-            .into_response();
+        return (axum::http::StatusCode::UNAUTHORIZED, "Missing or invalid bearer token").into_response();
     }
 
     next.run(request).await
@@ -1001,10 +997,7 @@ mod tests {
             "py\0thon",
             "py;rm -rf /",
         ] {
-            assert!(
-                validate_name("language", name).is_err(),
-                "'{name}' should be rejected"
-            );
+            assert!(validate_name("language", name).is_err(), "'{name}' should be rejected");
         }
         let too_long = "a".repeat(MAX_NAME_LEN + 1);
         assert!(validate_name("language", &too_long).is_err(), "over-long name rejected");

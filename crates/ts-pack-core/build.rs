@@ -1093,9 +1093,7 @@ fn try_clone_vendors_locally(project_root: &Path, parsers_dir: &Path, selected: 
     }
 
     println!("cargo:rerun-if-env-changed={CLONE_VENDORS_INTERPRETER_ENV}");
-    println!(
-        "cargo:warning=parsers/ tree is empty; running {CLONE_VENDORS_SCRIPT} to populate from upstream grammars"
-    );
+    println!("cargo:warning=parsers/ tree is empty; running {CLONE_VENDORS_SCRIPT} to populate from upstream grammars");
 
     let runners = clone_vendors_runners();
     let mut spawned_any = false;
@@ -1117,11 +1115,7 @@ fn try_clone_vendors_locally(project_root: &Path, parsers_dir: &Path, selected: 
             }
             Ok(status) => {
                 spawned_any = true;
-                println!(
-                    "cargo:warning={} exited with {:?}",
-                    cmd_args.join(" "),
-                    status.code()
-                );
+                println!("cargo:warning={} exited with {:?}", cmd_args.join(" "), status.code());
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
                 println!("cargo:warning=interpreter '{}' not found on PATH", cmd_args[0]);
@@ -1250,8 +1244,8 @@ fn apply_grammar_patches(
     selected: &[String],
 ) {
     println!("cargo:rerun-if-changed={}", patches_root.display());
-    let entries = fs::read_dir(patches_root)
-        .unwrap_or_else(|e| panic!("Failed to read {}: {e}", patches_root.display()));
+    let entries =
+        fs::read_dir(patches_root).unwrap_or_else(|e| panic!("Failed to read {}: {e}", patches_root.display()));
     let mut language_dirs: Vec<PathBuf> = entries
         .filter_map(|entry| entry.ok().map(|entry| entry.path()))
         .filter(|path| path.is_dir())
@@ -1286,8 +1280,7 @@ fn apply_grammar_patches(
 
 /// Apply every `*.patch` in `patch_dir` to `grammar_root`, panicking on failure.
 fn apply_language_patches(grammar_root: &Path, patch_dir: &Path, language: &str) {
-    let entries = fs::read_dir(patch_dir)
-        .unwrap_or_else(|e| panic!("Failed to read {}: {e}", patch_dir.display()));
+    let entries = fs::read_dir(patch_dir).unwrap_or_else(|e| panic!("Failed to read {}: {e}", patch_dir.display()));
     let mut patch_files: Vec<PathBuf> = entries
         .filter_map(|entry| entry.ok().map(|entry| entry.path()))
         .filter(|path| path.extension().and_then(|ext| ext.to_str()) == Some(GRAMMAR_PATCH_EXTENSION))
@@ -1320,8 +1313,7 @@ fn apply_grammar_patch(grammar_root: &Path, patch_path: &Path) -> Result<(), Str
     let target = unified_diff_target(&patch_text)?;
     let hunks = parse_unified_diff(&patch_text)?;
     let file_path = grammar_root.join(&target);
-    let raw = fs::read_to_string(&file_path)
-        .map_err(|e| format!("read patch target {}: {e}", file_path.display()))?;
+    let raw = fs::read_to_string(&file_path).map_err(|e| format!("read patch target {}: {e}", file_path.display()))?;
 
     // ~keep A Windows checkout with core.autocrlf rewrites the vendored sources; the
     // committed diffs are LF, so normalize for matching and restore on write.
@@ -1355,7 +1347,10 @@ fn apply_grammar_patch(grammar_root: &Path, patch_path: &Path) -> Result<(), Str
 
 /// Extract the grammar-root-relative target path from a unified diff's `+++` header.
 fn unified_diff_target(patch_text: &str) -> Result<String, String> {
-    let targets: Vec<&str> = patch_text.lines().filter_map(|line| line.strip_prefix("+++ ")).collect();
+    let targets: Vec<&str> = patch_text
+        .lines()
+        .filter_map(|line| line.strip_prefix("+++ "))
+        .collect();
     if targets.len() != 1 {
         return Err(format!(
             "expected exactly one '+++' target header (single-file patches only), found {}",
@@ -1382,7 +1377,10 @@ fn parse_unified_diff(patch_text: &str) -> Result<Vec<PatchHunk>, String> {
             continue;
         };
         let (old_start, old_count, new_count) = parse_hunk_header(rest)?;
-        let mut hunk = PatchHunk { old_start, body: Vec::new() };
+        let mut hunk = PatchHunk {
+            old_start,
+            body: Vec::new(),
+        };
         let mut seen_old = 0usize;
         let mut seen_new = 0usize;
         while seen_old < old_count || seen_new < new_count {
@@ -1425,10 +1423,8 @@ fn parse_hunk_header(rest: &str) -> Result<(usize, usize, usize), String> {
             None => Some((spec.parse().ok()?, 1)),
         }
     };
-    let (old_start, old_count) =
-        parse_range(old).ok_or_else(|| format!("malformed hunk pre-image range '-{old}'"))?;
-    let (_, new_count) =
-        parse_range(new).ok_or_else(|| format!("malformed hunk post-image range '+{new}'"))?;
+    let (old_start, old_count) = parse_range(old).ok_or_else(|| format!("malformed hunk pre-image range '-{old}'"))?;
+    let (_, new_count) = parse_range(new).ok_or_else(|| format!("malformed hunk post-image range '+{new}'"))?;
     Ok((old_start, old_count, new_count))
 }
 
@@ -1475,7 +1471,9 @@ fn find_hunk_position(lines: &[String], old: &[&str], guess: isize) -> Option<us
         if start + old.len() > lines.len() {
             return false;
         }
-        old.iter().enumerate().all(|(index, want)| lines[start + index] == *want)
+        old.iter()
+            .enumerate()
+            .all(|(index, want)| lines[start + index] == *want)
     };
 
     let clamped = guess.max(0) as usize;
