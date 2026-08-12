@@ -1,3 +1,10 @@
+// Benchmark setup that cannot proceed should abort the run outright — a bench has no
+// caller to hand a `Result` to, and silently measuring a degraded path is worse than
+// failing. The crate-wide deny exists to protect host processes, which a bench is not.
+// Criterion bodies are plain fns, not `#[test]`, so clippy.toml's test exemption misses
+// them. ~keep
+#![allow(clippy::unwrap_used, clippy::expect_used)]
+
 //! Benchmarks for the language pack.
 //!
 //! Layout, and what each group is for:
@@ -132,8 +139,11 @@ fn feature_config(language: &str, enable: fn(&mut ProcessConfig)) -> ProcessConf
     config
 }
 
+/// A named extractor stage and the flag that turns it on.
+type Extractor = (&'static str, fn(&mut ProcessConfig));
+
 /// One extractor per entry, so a regression lands on the stage that caused it.
-const EXTRACTORS: &[(&str, fn(&mut ProcessConfig))] = &[
+const EXTRACTORS: &[Extractor] = &[
     ("structure", |c| c.structure = true),
     ("imports", |c| c.imports = true),
     ("exports", |c| c.exports = true),
