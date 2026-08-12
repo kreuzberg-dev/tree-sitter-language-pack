@@ -70,6 +70,15 @@ pub(crate) fn extract_data(root: &Node, source: &str, language: &str) -> Option<
         _ => None,
     };
     warn_if_truncated(*truncated, "intel::data_extraction", language);
+    // ~keep `produced = false` is the normal answer for a non-data language, not a fault:
+    // ~keep callers routinely enable data extraction across a mixed-language tree.
+    tracing::debug!(
+        target: "ts_pack::intel",
+        operation = "intel::data_extraction",
+        language,
+        produced = extracted.is_some(),
+        "data extraction complete"
+    );
     extracted
 }
 

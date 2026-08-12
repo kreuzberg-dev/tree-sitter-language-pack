@@ -21,13 +21,55 @@ pub use types::*;
 use crate::process_config::ProcessConfig;
 
 /// Process source code: parse once, extract intelligence based on config, and return it.
+///
+/// # Observability
+///
+/// Opens the `intel::process` span (target `ts_pack::intel`, DEBUG). The span
+/// fields describe the resolved request; every stage reports its own counts as a
+/// DEBUG event keyed by `operation`. Per-node work inside the walk is
+/// deliberately uninstrumented: an event per node would cost more than the
+/// single-pass traversal it would be describing.
+#[tracing::instrument(
+    name = "intel::process",
+    target = "ts_pack::intel",
+    level = "debug",
+    skip_all,
+    fields(
+        language = %config.language,
+        source_bytes = source.len(),
+        want_structure = config.structure,
+        want_imports = config.imports,
+        want_exports = config.exports,
+        want_comments = config.comments,
+        want_docstrings = config.docstrings,
+        want_symbols = config.symbols,
+        want_diagnostics = config.diagnostics,
+        want_chunking = config.chunk_max_size.is_some(),
+        want_data_extraction = config.data_extraction
+    )
+)]
 pub fn process(
     source: &str,
     config: &ProcessConfig,
     registry: &crate::LanguageRegistry,
 ) -> Result<ProcessResult, crate::Error> {
-    let (lang, tree) = parse_source(source, config, registry)?;
+    let (lang, tree) = parse_source(source, config, registry).inspect_err(|error| {
+        tracing::debug!(
+            target: "ts_pack::intel",
+            operation = "intel::parse",
+            language = %config.language,
+            error = %error,
+            "parse failed; no intelligence extracted"
+        );
+    })?;
     let root = tree.root_node();
+    tracing::debug!(
+        target: "ts_pack::intel",
+        operation = "intel::parse",
+        language = %config.language,
+        has_errors = root.has_error(),
+        "parsed source"
+    );
 
     let mut result = ProcessResult {
         language: config.language.as_ref().to_string(),

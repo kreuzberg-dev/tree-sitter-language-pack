@@ -72,6 +72,24 @@ pub(crate) fn extract_all(root: &Node<'_>, source: &str, language: &str, wanted:
     let truncated = walk_bounded(root, |node, depth| collector.visit(node, depth));
     warn_if_truncated(truncated, "intel::extract", language);
     collector.finish(out);
+    // ~keep Counts are reported once here, after the walk: a per-node event would
+    // ~keep reintroduce the per-node cost this single-pass design exists to remove.
+    tracing::debug!(
+        target: "ts_pack::intel",
+        operation = "intel::extract",
+        language,
+        nodes = out.metrics.node_count,
+        max_depth = out.metrics.max_depth,
+        error_nodes = out.metrics.error_count,
+        structure = out.structure.len(),
+        imports = out.imports.len(),
+        exports = out.exports.len(),
+        comments = out.comments.len(),
+        docstrings = out.docstrings.len(),
+        symbols = out.symbols.len(),
+        diagnostics = out.diagnostics.len(),
+        "extraction complete"
+    );
 }
 
 struct Collector<'a> {

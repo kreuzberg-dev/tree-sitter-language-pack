@@ -780,9 +780,44 @@ fn generate_registry(
     writeln!(f, "];").unwrap();
     writeln!(f).unwrap();
 
+    // ~keep `libs_dir` is this build host's `OUT_DIR/libs`, so baking it in makes a
+    // ~keep `dynamic-loading` build non-relocatable: move or copy the artifact and the
+    // ~keep static points at a directory that no longer exists. It cannot be fixed here —
+    // ~keep a `static &str` is a compile-time constant and nothing in build.rs knows where
+    // ~keep the artifact will end up — so it is emitted as a documented last-resort
+    // ~keep fallback and the runtime search order is `registry.rs`'s responsibility.
+    writeln!(f, "/// Directory this build wrote dynamically loadable parsers to.").unwrap();
+    writeln!(f, "///").unwrap();
     writeln!(
         f,
-        "#[allow(unused)]\npub(crate) static LIBS_DIR: &str = {:?};",
+        "/// An absolute path on the build host, and therefore only valid where the"
+    )
+    .unwrap();
+    writeln!(
+        f,
+        "/// crate was built. A relocated artifact must point the registry elsewhere:"
+    )
+    .unwrap();
+    writeln!(f, "/// `LanguageRegistry::with_libs_dir` replaces this directory, and").unwrap();
+    writeln!(
+        f,
+        "/// `LanguageRegistry::add_extra_libs_dir` adds another one to search — the"
+    )
+    .unwrap();
+    writeln!(
+        f,
+        "/// download cache registers itself that way. Empty unless the build actually"
+    )
+    .unwrap();
+    writeln!(
+        f,
+        "/// produced dynamic libraries (`TSLP_LINK_MODE` + `TSLP_LANGUAGES`)."
+    )
+    .unwrap();
+    writeln!(f, "#[allow(unused)]").unwrap();
+    writeln!(
+        f,
+        "pub(crate) static LIBS_DIR: &str = {:?};",
         libs_dir.display().to_string()
     )
     .unwrap();

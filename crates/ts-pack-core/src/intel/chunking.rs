@@ -70,6 +70,14 @@ pub fn chunk_source(
         .collect();
 
     warn_if_truncated(truncated, "intel::chunking", language);
+    tracing::debug!(
+        target: "ts_pack::intel",
+        operation = "intel::chunking",
+        language,
+        max_chunk_size,
+        chunks = total_chunks,
+        "chunking complete"
+    );
     chunks
 }
 
