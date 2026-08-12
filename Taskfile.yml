@@ -208,8 +208,12 @@ tasks:
       - task: zig:update
       - echo "Updating Kotlin-Android..."
       - task: kotlin-android:update
-      - echo "Updating language grammar revisions..."
-      - uv run --no-sync scripts/pin_vendors.py
+      # Grammar pins are NOT bumped automatically: a new pin makes
+      # `tree-sitter generate` execute that revision's grammar.js under Node, so
+      # every bump is arbitrary upstream code execution and needs human review.
+      # Report only; run `task update:grammars` explicitly to apply. ~keep
+      - echo "Checking for language grammar updates (report only)..."
+      - uv run --no-sync scripts/check_grammar_updates.py --dry-run
       - echo "Updating GitHub Actions pins..."
       - uvx --from gh-actions-updater gau --update --recursive --pin-style major --missing-ref fallback .github
       - echo "Within-major update complete (non-breaking changes only)"
@@ -246,14 +250,15 @@ tasks:
       - task: zig:upgrade
       - echo "Upgrading Kotlin-Android..."
       - task: kotlin-android:upgrade
-      - echo "Updating language grammar revisions..."
-      - uv run --no-sync scripts/pin_vendors.py
+      # See the note in `update`: grammar pins stay under human review. ~keep
+      - echo "Checking for language grammar updates (report only)..."
+      - uv run --no-sync scripts/check_grammar_updates.py --dry-run
       - echo "Updating GitHub Actions pins..."
       - uvx --from gh-actions-updater gau --update --recursive --pin-style major --missing-ref fallback .github
       - echo "Cross-major upgrade complete (breaking bumps applied)"
 
   update:grammars:
-    desc: Update language grammar revisions
+    desc: "DANGER (opt-in): re-pin ALL grammars to upstream HEAD, unreviewed — each new pin runs upstream grammar.js under Node. Review the diff before committing."
     cmds:
       - uv run --no-sync scripts/pin_vendors.py
 

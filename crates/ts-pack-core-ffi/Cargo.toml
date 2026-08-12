@@ -40,3 +40,11 @@ cbindgen = "0.29"
 
 [dev-dependencies]
 tempfile = "3"
+
+# Only the diagnostics lints are inherited explicitly. A blanket `[lints]
+# workspace = true` would also pull in `rust.unsafe_code = "deny"`, which this
+# C ABI crate cannot satisfy. ~keep
+[lints.clippy]
+print_stdout = "deny"
+print_stderr = "deny"
+dbg_macro = "deny"

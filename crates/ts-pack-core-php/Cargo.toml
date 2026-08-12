@@ -26,3 +26,11 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["full"] }
 tree-sitter-language-pack = { version = "1.14.3", path = "../ts-pack-core", features = ["serde", "config", "download"] }
+
+# Only the diagnostics lints are inherited explicitly; a blanket `[lints]
+# workspace = true` would also apply `clippy::all = "deny"` to ext-php-rs
+# macro expansions. ~keep
+[lints.clippy]
+print_stdout = "deny"
+print_stderr = "deny"
+dbg_macro = "deny"

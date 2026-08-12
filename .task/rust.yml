@@ -25,7 +25,7 @@ tasks:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
       TSLP_LINK_MODE: "{{.LINK_MODE}}"
     cmds:
-      - cargo build --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm
+      - cargo build --locked --workspace --exclude ts-pack-core-php --exclude ts-pack-core-wasm
 
   build:dev:
     desc: Build with a small set of languages for fast iteration
@@ -34,7 +34,7 @@ tasks:
       TSLP_LANGUAGES: "{{.DEV_LANGUAGES}}"
       TSLP_LINK_MODE: "{{.LINK_MODE}}"
     cmds:
-      - cargo build --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm
+      - cargo build --locked --workspace --exclude ts-pack-core-php --exclude ts-pack-core-wasm
 
   build:release:
     desc: Build in release mode (optimized)
@@ -42,7 +42,7 @@ tasks:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
       TSLP_LINK_MODE: "{{.LINK_MODE}}"
     cmds:
-      - cargo build --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm --release
+      - cargo build --locked --workspace --exclude ts-pack-core-php --exclude ts-pack-core-wasm --release
 
   test:
     desc: Run all Rust tests
@@ -50,7 +50,7 @@ tasks:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
       TSLP_LINK_MODE: "{{.LINK_MODE}}"
     cmds:
-      - cargo test --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm
+      - cargo test --locked --workspace --exclude ts-pack-core-php --exclude ts-pack-core-wasm
 
   test:quick:
     desc: Run tests with a small set of languages
@@ -59,7 +59,7 @@ tasks:
       TSLP_LANGUAGES: "{{.DEV_LANGUAGES}}"
       TSLP_LINK_MODE: "{{.LINK_MODE}}"
     cmds:
-      - cargo test --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm
+      - cargo test --locked --workspace --exclude ts-pack-core-php --exclude ts-pack-core-wasm
 
   lint:
     desc: Auto-fix Rust code linting (cargo fmt + clippy)
@@ -69,7 +69,7 @@ tasks:
       TSLP_LINK_MODE: static
     cmds:
       - cargo fmt --all
-      - cargo clippy --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm --fix --allow-dirty --allow-staged -- -D warnings
+      - cargo clippy --locked --workspace --exclude ts-pack-core-php --exclude ts-pack-core-wasm --fix --allow-dirty --allow-staged -- -D warnings
 
   lint:check:
     desc: Check Rust code linting without modifications
@@ -79,7 +79,7 @@ tasks:
       TSLP_LINK_MODE: static
     cmds:
       - cargo fmt --all -- --check
-      - cargo clippy --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm -- -D warnings
+      - cargo clippy --locked --workspace --exclude ts-pack-core-php --exclude ts-pack-core-wasm -- -D warnings
 
   format:
     desc: Format all Rust code
@@ -103,7 +103,7 @@ tasks:
       TSLP_LANGUAGES: "{{.DEV_LANGUAGES}}"
       TSLP_LINK_MODE: static
     cmds:
-      - cargo doc --workspace --no-deps --exclude ts-pack-ruby --open
+      - cargo doc --workspace --no-deps --exclude ts-pack-core-php --exclude ts-pack-core-wasm --open
 
   update:
     desc: Update Rust dependencies within current major versions (non-breaking)

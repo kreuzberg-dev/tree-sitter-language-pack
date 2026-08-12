@@ -112,8 +112,8 @@ task format
 # Run all linters via prek
 task lint
 
-# Generate READMEs from templates
-task generate-readme
+# Regenerate the alef-managed bindings, docs, and e2e suites
+task alef:sync
 ```
 
 ```bash
@@ -207,7 +207,7 @@ task c:e2e:test        # Run C E2E tests
 
 ## Parser Caching
 
-Cloning 371 tree-sitter grammar repositories is slow. The build system includes a multi-layer
+Cloning the 371 tree-sitter grammar repositories is slow. The build system includes a multi-layer
 caching strategy to avoid redundant work.
 
 ### How It Works
@@ -231,6 +231,7 @@ caching strategy to avoid redundant work.
 | `TSLP_CACHE_DIR`  | `<project_root>/parsers` | Override compiled parser sources location |
 | `TSLP_VENDOR_DIR` | `<project_root>/vendor`  | Override grammar clone location           |
 | `TSLP_NO_CACHE`   | (unset)              | Force full re-clone, ignore cache manifest    |
+| `TSLP_LANGUAGES`  | (unset)              | Comma-separated subset of languages to clone  |
 
 ### Common Scenarios
 
@@ -243,6 +244,9 @@ TSLP_NO_CACHE=1 task clone
 
 # Use a custom cache directory (useful for shared CI caches)
 TSLP_CACHE_DIR=/tmp/tslp-parsers task clone
+
+# Clone only a subset of grammars
+TSLP_LANGUAGES=python,rust task clone
 ```
 
 ## Adding Languages
@@ -289,37 +293,31 @@ Before proposing a new grammar, verify its license by checking the `LICENSE` fil
    task build:dev
    ```
 
-4. **Regenerate E2E smoke fixtures and test**
+4. **Regenerate E2E suites and test**
 
    ```bash
-   task e2e:generate:smoke-fixtures
-   task e2e:generate:all
-   task test
+   task e2e:generate
+   task e2e:test
    ```
 
 ## E2E Tests
 
-E2E tests are generated from JSON fixtures in `tools/e2e-generator/fixtures/` and produce
-runnable test suites for each language binding.
+E2E tests are generated from JSON fixtures in `fixtures/` and produce runnable test suites
+for each language binding.
 
 ```bash
-# Generate E2E tests for all languages
-task e2e:generate:all
+# Regenerate the e2e suites from fixtures
+task e2e:generate
 
-# Generate for a specific language
-task e2e:generate:rust
-task e2e:generate:python
-task e2e:generate:go
-task e2e:generate:java
-task e2e:generate:elixir
-task e2e:generate:ruby
-task e2e:generate:c
+# Build and run them
+task e2e:build
+task e2e:test
 
-# Run Rust E2E tests
-task e2e:test:rust
+# Generate, build, and run in one go
+task e2e:all
 
-# Auto-generate smoke fixtures from language_definitions.json
-task e2e:generate:smoke-fixtures
+# Verify the checked-in suites are up to date (what CI enforces)
+task e2e:verify
 ```
 
 Generated test files in `e2e/` should not be edited directly — modify fixtures or the generator source instead.

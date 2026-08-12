@@ -32,3 +32,11 @@ tree-sitter-language-pack = { version = "1.14.3", path = "../ts-pack-core", feat
 
 [build-dependencies]
 napi-build = "2"
+
+# Only the diagnostics lints are inherited explicitly; a blanket `[lints]
+# workspace = true` would also apply `clippy::all = "deny"` to napi-derive
+# macro expansions. ~keep
+[lints.clippy]
+print_stdout = "deny"
+print_stderr = "deny"
+dbg_macro = "deny"
