@@ -74,7 +74,7 @@ pub(crate) fn run_parse(
     // ~keep Same reader `tree_sitter::Parser::parse` builds internally. The chunk-callback entry
     // ~keep point is the only one that also takes `ParseOptions`, which carries the cancellation
     // ~keep hook; `set_timeout_micros` no longer exists in tree-sitter 0.26.
-    let mut read = |offset: usize, _: tree_sitter::Point| (offset < len).then(|| &source[offset..]).unwrap_or_default();
+    let mut read = |offset: usize, _: tree_sitter::Point| if offset < len { &source[offset..] } else { Default::default() };
 
     let deadline = match timeout_ms {
         Some(budget_ms) => Instant::now().checked_add(Duration::from_millis(budget_ms)),

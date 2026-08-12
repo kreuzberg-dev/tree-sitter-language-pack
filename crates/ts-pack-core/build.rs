@@ -1300,7 +1300,7 @@ fn apply_grammar_patches(
              so this is a hard error: rename the directory to the language key or delete it."
         );
         println!("cargo:rerun-if-changed={}", dir.display());
-        if !selected.iter().any(|name| *name == language) {
+        if !selected.contains(&language) {
             continue;
         }
         let grammar_root = parsers_dir.join(&language);
