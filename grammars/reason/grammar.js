@@ -890,17 +890,29 @@ module.exports = grammar({
   },
 });
 
-function barSep1(rule) { return seq(rule, repeat(seq("|", rule))); }
+function barSep1(rule) {
+  return seq(rule, repeat(seq("|", rule)));
+}
 
-function commaSep1(rule) { return seq(rule, repeat(seq(",", rule))); }
+function commaSep1(rule) {
+  return seq(rule, repeat(seq(",", rule)));
+}
 
-function commaSep2(rule) { return seq(rule, ",", commaSep1(rule)); }
+function commaSep2(rule) {
+  return seq(rule, ",", commaSep1(rule));
+}
 
-function commaSep1t(rule) { return seq(commaSep1(rule), optional(",")); }
+function commaSep1t(rule) {
+  return seq(commaSep1(rule), optional(","));
+}
 
-function commaSep2t(rule) { return seq(commaSep2(rule), optional(",")); }
+function commaSep2t(rule) {
+  return seq(commaSep2(rule), optional(","));
+}
 
-function commaSept(rule) { return optional(commaSep1t(rule)); }
+function commaSept(rule) {
+  return optional(commaSep1t(rule));
+}
 
 function sep1(delimiter, rule) {
   return seq(rule, repeat(seq(delimiter, rule)));

@@ -14,12 +14,8 @@
   },
   "tree-sitter": [
     {
-      "file-types": [
-        "pml"
-      ],
-      "highlights": [
-        "queries/highlights.scm"
-      ],
+      "file-types": ["pml"],
+      "highlights": ["queries/highlights.scm"],
       "scope": "source.nix"
     }
   ]

@@ -16,10 +16,7 @@
   "tree-sitter": [
     {
       "scope": "source.reason",
-      "file-types": [
-        "re",
-        "rei"
-      ],
+      "file-types": ["re", "rei"],
       "injection-regex": "reason"
     }
   ]
