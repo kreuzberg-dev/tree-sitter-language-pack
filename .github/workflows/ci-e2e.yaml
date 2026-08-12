@@ -740,8 +740,11 @@ jobs:
           cp -r ffi-artifacts/crates/ts-pack-core-ffi/include/* crates/ts-pack-core-ffi/include/ 2>/dev/null || true
           mkdir -p crates/ts-pack-core-ffi/target/release
           cp target/release/libts_pack_core_ffi.* crates/ts-pack-core-ffi/target/release/ 2>/dev/null || true
-          mkdir -p packages/go/.lib/linux-amd64 packages/go/include
-          cp target/release/libts_pack_core_ffi.* packages/go/.lib/linux-amd64/ 2>/dev/null || true
+          # binding.go's cgo LDFLAGS search .lib/linux-x86_64, not the Go-arch
+          # spelling .lib/linux-amd64. Restoring into the latter left the link
+          # path empty on every Linux runner.
+          mkdir -p packages/go/.lib/linux-x86_64 packages/go/include
+          cp target/release/libts_pack_core_ffi.* packages/go/.lib/linux-x86_64/ 2>/dev/null || true
           cp crates/ts-pack-core-ffi/include/ts_pack.h packages/go/include/ 2>/dev/null || true
 
       - name: Verify go.mod placement
