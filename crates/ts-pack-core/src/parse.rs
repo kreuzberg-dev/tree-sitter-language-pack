@@ -8,6 +8,21 @@ use ahash::AHashMap;
 use crate::Error;
 
 thread_local! {
+    /// One `tree_sitter::Parser` per language, per thread.
+    ///
+    /// Unbounded and never evicted, by design: an entry is a parser plus its
+    /// grown-to-high-water-mark scratch buffers, and the alternative — dropping
+    /// parsers a hot loop is about to ask for again — trades a bounded, per-thread
+    /// footprint for repeated reallocation. The ceiling is
+    /// `threads x languages-that-thread-parsed`, which for the intended usage
+    /// (a worker pool over a handful of languages) is tens of entries.
+    ///
+    /// It is *not* bounded by the number of languages in the pack unless the
+    /// program actually parses them all: the measured 20.4 MB -> 398.4 MB growth
+    /// for all 377 grammars is dominated by the loaded shared libraries and
+    /// compiled queries, not by this map. Retained `Tree`s are the other large
+    /// consumer and belong to the caller — a 23.5 KB source retains ~620 KB of
+    /// tree, so holding 100 of them costs ~62 MB no cache can reclaim. ~keep
     static PARSER_CACHE: RefCell<AHashMap<String, tree_sitter::Parser>> = RefCell::new(AHashMap::new());
 }
 
@@ -59,8 +74,7 @@ pub(crate) fn run_parse(
     // ~keep Same reader `tree_sitter::Parser::parse` builds internally. The chunk-callback entry
     // ~keep point is the only one that also takes `ParseOptions`, which carries the cancellation
     // ~keep hook; `set_timeout_micros` no longer exists in tree-sitter 0.26.
-    let mut read =
-        |offset: usize, _: tree_sitter::Point| (offset < len).then(|| &source[offset..]).unwrap_or_default();
+    let mut read = |offset: usize, _: tree_sitter::Point| (offset < len).then(|| &source[offset..]).unwrap_or_default();
 
     let deadline = match timeout_ms {
         Some(budget_ms) => Instant::now().checked_add(Duration::from_millis(budget_ms)),
@@ -69,7 +83,9 @@ pub(crate) fn run_parse(
 
     let Some(deadline) = deadline else {
         // ~keep No budget configured, or a budget so large its deadline is unrepresentable.
-        return parser.parse_with_options(&mut read, None, None).ok_or(Error::ParseFailed);
+        return parser
+            .parse_with_options(&mut read, None, None)
+            .ok_or(Error::ParseFailed);
     };
 
     let mut on_progress = |_: &tree_sitter::ParseState| {

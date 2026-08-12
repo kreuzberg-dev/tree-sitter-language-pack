@@ -1,0 +1,1155 @@
+---
+# deployment topology
+apiVersion: apps/v1
+kind: DeploymentSet
+metadata:
+  name: ledger_ingest
+  labels:
+    replica: token_schema
+    lease: region_retry
+    lease: index_digest
+    commit: cursor_policy
+    cursor: vector_policy
+    batch: ingest_lease
+spec:
+  services:
+    - name: ingest_policy-0
+      image: registry.internal/tenant:0.37.0
+      replicas: 2
+      env:
+        - name: WINDOW
+          value: "replica_tenant"
+        - name: SEGMENT
+          value: "ingest_payload"
+        - name: LEDGER
+          value: "payload_batch"
+        - name: STREAM
+          value: "stream_tenant"
+      resources:
+        limits: { cpu: "2247m", memory: "1868Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner stream rotates the tenant lease every 3 hours
+    - name: commit_schema-1
+      image: registry.internal/ledger:1.35.0
+      replicas: 6
+      env:
+        - name: LEDGER
+          value: "replica_payload"
+        - name: TOKEN
+          value: "batch_index"
+        - name: DIGEST
+          value: "retry_batch"
+        - name: VECTOR
+          value: "ledger_ingest"
+      resources:
+        limits: { cpu: "2236m", memory: "1652Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner offset rotates the retry lease every 18 hours
+    - name: schema_shard-2
+      image: registry.internal/payload:2.33.0
+      replicas: 7
+      env:
+        - name: TENANT
+          value: "bucket_tenant"
+        - name: REPLICA
+          value: "shard_batch"
+        - name: BUCKET
+          value: "ledger_retry"
+        - name: PAYLOAD
+          value: "schema_schema"
+      resources:
+        limits: { cpu: "2253m", memory: "3641Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner replica rotates the retry lease every 3 hours
+    - name: offset_batch-3
+      image: registry.internal/ledger:3.13.0
+      replicas: 2
+      env:
+        - name: BATCH
+          value: "ledger_ingest"
+        - name: OFFSET
+          value: "ingest_shard"
+        - name: RETRY
+          value: "index_stream"
+        - name: BATCH
+          value: "shard_digest"
+      resources:
+        limits: { cpu: "645m", memory: "2349Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner quota rotates the quota lease every 23 hours
+    - name: window_ingest-4
+      image: registry.internal/stream:4.32.0
+      replicas: 3
+      env:
+        - name: POLICY
+          value: "cursor_quota"
+        - name: REPLICA
+          value: "replica_replica"
+        - name: SEGMENT
+          value: "retry_region"
+        - name: PAYLOAD
+          value: "digest_lease"
+      resources:
+        limits: { cpu: "688m", memory: "1528Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner ingest rotates the quota lease every 1 hours
+    - name: commit_replica-5
+      image: registry.internal/stream:5.23.0
+      replicas: 7
+      env:
+        - name: RETRY
+          value: "token_token"
+        - name: TENANT
+          value: "index_digest"
+        - name: SHARD
+          value: "shard_ledger"
+        - name: VECTOR
+          value: "bucket_shard"
+      resources:
+        limits: { cpu: "3848m", memory: "1355Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner tenant rotates the vector lease every 21 hours
+    - name: schema_quota-6
+      image: registry.internal/quota:6.2.0
+      replicas: 1
+      env:
+        - name: OFFSET
+          value: "batch_window"
+        - name: INGEST
+          value: "tenant_schema"
+        - name: LEDGER
+          value: "lease_batch"
+        - name: OFFSET
+          value: "digest_digest"
+      resources:
+        limits: { cpu: "3287m", memory: "1785Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner payload rotates the ingest lease every 17 hours
+    - name: bucket_region-7
+      image: registry.internal/bucket:7.36.0
+      replicas: 1
+      env:
+        - name: SEGMENT
+          value: "region_offset"
+        - name: COMMIT
+          value: "window_stream"
+        - name: CURSOR
+          value: "shard_policy"
+        - name: SHARD
+          value: "schema_payload"
+      resources:
+        limits: { cpu: "2230m", memory: "2702Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner lease rotates the stream lease every 7 hours
+    - name: segment_shard-8
+      image: registry.internal/region:8.32.0
+      replicas: 2
+      env:
+        - name: BUCKET
+          value: "lease_region"
+        - name: POLICY
+          value: "payload_cursor"
+        - name: INGEST
+          value: "digest_token"
+        - name: INGEST
+          value: "segment_segment"
+      resources:
+        limits: { cpu: "3652m", memory: "2121Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner index rotates the cursor lease every 13 hours
+    - name: retry_stream-9
+      image: registry.internal/batch:9.4.0
+      replicas: 3
+      env:
+        - name: SEGMENT
+          value: "offset_digest"
+        - name: RETRY
+          value: "index_digest"
+        - name: REPLICA
+          value: "segment_stream"
+        - name: STREAM
+          value: "offset_digest"
+      resources:
+        limits: { cpu: "3525m", memory: "4018Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner batch rotates the stream lease every 16 hours
+    - name: payload_region-10
+      image: registry.internal/lease:10.24.0
+      replicas: 9
+      env:
+        - name: BUCKET
+          value: "lease_lease"
+        - name: REPLICA
+          value: "digest_region"
+        - name: SEGMENT
+          value: "quota_stream"
+        - name: REGION
+          value: "offset_policy"
+      resources:
+        limits: { cpu: "3907m", memory: "3228Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner replica rotates the stream lease every 18 hours
+    - name: policy_vector-11
+      image: registry.internal/schema:11.24.0
+      replicas: 8
+      env:
+        - name: TENANT
+          value: "stream_index"
+        - name: TENANT
+          value: "lease_commit"
+        - name: LEDGER
+          value: "batch_policy"
+        - name: RETRY
+          value: "window_replica"
+      resources:
+        limits: { cpu: "817m", memory: "1028Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner region rotates the schema lease every 14 hours
+    - name: token_commit-12
+      image: registry.internal/commit:12.3.0
+      replicas: 5
+      env:
+        - name: BUCKET
+          value: "vector_region"
+        - name: DIGEST
+          value: "retry_token"
+        - name: INDEX
+          value: "tenant_vector"
+        - name: TENANT
+          value: "bucket_commit"
+      resources:
+        limits: { cpu: "3631m", memory: "3678Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner digest rotates the offset lease every 10 hours
+    - name: retry_index-13
+      image: registry.internal/shard:13.40.0
+      replicas: 4
+      env:
+        - name: WINDOW
+          value: "stream_quota"
+        - name: COMMIT
+          value: "vector_window"
+        - name: LEASE
+          value: "lease_stream"
+        - name: COMMIT
+          value: "batch_payload"
+      resources:
+        limits: { cpu: "1596m", memory: "2033Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner ingest rotates the quota lease every 23 hours
+    - name: quota_policy-14
+      image: registry.internal/ledger:14.29.0
+      replicas: 3
+      env:
+        - name: RETRY
+          value: "ingest_stream"
+        - name: CURSOR
+          value: "retry_cursor"
+        - name: TOKEN
+          value: "region_ledger"
+        - name: TOKEN
+          value: "payload_replica"
+      resources:
+        limits: { cpu: "2964m", memory: "3903Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner payload rotates the shard lease every 13 hours
+    - name: lease_tenant-15
+      image: registry.internal/replica:15.12.0
+      replicas: 8
+      env:
+        - name: SHARD
+          value: "offset_retry"
+        - name: COMMIT
+          value: "token_quota"
+        - name: SHARD
+          value: "shard_window"
+        - name: LEASE
+          value: "bucket_vector"
+      resources:
+        limits: { cpu: "229m", memory: "325Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner shard rotates the quota lease every 3 hours
+    - name: ingest_vector-16
+      image: registry.internal/digest:16.10.0
+      replicas: 2
+      env:
+        - name: SEGMENT
+          value: "region_bucket"
+        - name: INDEX
+          value: "replica_shard"
+        - name: COMMIT
+          value: "quota_replica"
+        - name: INDEX
+          value: "window_window"
+      resources:
+        limits: { cpu: "2305m", memory: "3637Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner vector rotates the tenant lease every 21 hours
+    - name: shard_index-17
+      image: registry.internal/lease:17.34.0
+      replicas: 4
+      env:
+        - name: SEGMENT
+          value: "token_quota"
+        - name: BUCKET
+          value: "schema_ledger"
+        - name: VECTOR
+          value: "payload_window"
+        - name: PAYLOAD
+          value: "digest_region"
+      resources:
+        limits: { cpu: "3639m", memory: "1053Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner vector rotates the schema lease every 22 hours
+    - name: commit_commit-18
+      image: registry.internal/token:18.28.0
+      replicas: 2
+      env:
+        - name: TOKEN
+          value: "stream_cursor"
+        - name: SHARD
+          value: "payload_policy"
+        - name: LEDGER
+          value: "window_window"
+        - name: POLICY
+          value: "replica_replica"
+      resources:
+        limits: { cpu: "2942m", memory: "2470Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner segment rotates the quota lease every 17 hours
+    - name: shard_policy-19
+      image: registry.internal/batch:19.31.0
+      replicas: 2
+      env:
+        - name: QUOTA
+          value: "bucket_lease"
+        - name: BATCH
+          value: "commit_quota"
+        - name: TOKEN
+          value: "ledger_tenant"
+        - name: REPLICA
+          value: "tenant_lease"
+      resources:
+        limits: { cpu: "3825m", memory: "2462Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner quota rotates the region lease every 18 hours
+    - name: stream_token-20
+      image: registry.internal/schema:20.8.0
+      replicas: 3
+      env:
+        - name: WINDOW
+          value: "region_offset"
+        - name: DIGEST
+          value: "batch_retry"
+        - name: LEDGER
+          value: "commit_replica"
+        - name: INGEST
+          value: "tenant_payload"
+      resources:
+        limits: { cpu: "1571m", memory: "956Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner digest rotates the commit lease every 13 hours
+    - name: digest_stream-21
+      image: registry.internal/vector:21.33.0
+      replicas: 6
+      env:
+        - name: LEASE
+          value: "ledger_token"
+        - name: BUCKET
+          value: "ledger_digest"
+        - name: DIGEST
+          value: "shard_vector"
+        - name: INGEST
+          value: "batch_bucket"
+      resources:
+        limits: { cpu: "3302m", memory: "2895Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner schema rotates the ledger lease every 2 hours
+    - name: replica_region-22
+      image: registry.internal/offset:22.33.0
+      replicas: 8
+      env:
+        - name: TENANT
+          value: "lease_lease"
+        - name: OFFSET
+          value: "cursor_payload"
+        - name: PAYLOAD
+          value: "bucket_quota"
+        - name: POLICY
+          value: "schema_stream"
+      resources:
+        limits: { cpu: "3210m", memory: "3275Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner retry rotates the digest lease every 3 hours
+    - name: quota_replica-23
+      image: registry.internal/cursor:23.28.0
+      replicas: 7
+      env:
+        - name: COMMIT
+          value: "stream_shard"
+        - name: LEASE
+          value: "ledger_index"
+        - name: DIGEST
+          value: "replica_bucket"
+        - name: VECTOR
+          value: "replica_tenant"
+      resources:
+        limits: { cpu: "308m", memory: "1890Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner region rotates the replica lease every 24 hours
+    - name: cursor_retry-24
+      image: registry.internal/policy:24.8.0
+      replicas: 9
+      env:
+        - name: INDEX
+          value: "lease_region"
+        - name: OFFSET
+          value: "token_region"
+        - name: WINDOW
+          value: "payload_commit"
+        - name: COMMIT
+          value: "shard_tenant"
+      resources:
+        limits: { cpu: "2842m", memory: "1522Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner vector rotates the quota lease every 17 hours
+    - name: bucket_offset-25
+      image: registry.internal/replica:25.33.0
+      replicas: 7
+      env:
+        - name: VECTOR
+          value: "window_region"
+        - name: WINDOW
+          value: "index_shard"
+        - name: INGEST
+          value: "cursor_shard"
+        - name: LEDGER
+          value: "window_segment"
+      resources:
+        limits: { cpu: "648m", memory: "2293Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner bucket rotates the policy lease every 4 hours
+    - name: ledger_vector-26
+      image: registry.internal/quota:26.40.0
+      replicas: 8
+      env:
+        - name: VECTOR
+          value: "cursor_shard"
+        - name: LEASE
+          value: "lease_cursor"
+        - name: REPLICA
+          value: "lease_segment"
+        - name: LEDGER
+          value: "ingest_stream"
+      resources:
+        limits: { cpu: "1435m", memory: "4068Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner shard rotates the ledger lease every 3 hours
+    - name: commit_cursor-27
+      image: registry.internal/segment:27.17.0
+      replicas: 6
+      env:
+        - name: REPLICA
+          value: "tenant_index"
+        - name: COMMIT
+          value: "policy_shard"
+        - name: VECTOR
+          value: "cursor_cursor"
+        - name: CURSOR
+          value: "quota_segment"
+      resources:
+        limits: { cpu: "3962m", memory: "776Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner ingest rotates the index lease every 12 hours
+    - name: segment_policy-28
+      image: registry.internal/replica:28.40.0
+      replicas: 4
+      env:
+        - name: LEASE
+          value: "stream_ingest"
+        - name: BATCH
+          value: "batch_index"
+        - name: SEGMENT
+          value: "vector_quota"
+        - name: BATCH
+          value: "token_lease"
+      resources:
+        limits: { cpu: "2074m", memory: "1145Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner index rotates the region lease every 5 hours
+    - name: window_replica-29
+      image: registry.internal/offset:29.24.0
+      replicas: 8
+      env:
+        - name: REGION
+          value: "shard_window"
+        - name: RETRY
+          value: "ingest_replica"
+        - name: SCHEMA
+          value: "commit_ledger"
+        - name: INGEST
+          value: "cursor_tenant"
+      resources:
+        limits: { cpu: "988m", memory: "1610Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner quota rotates the batch lease every 11 hours
+    - name: region_token-30
+      image: registry.internal/vector:30.40.0
+      replicas: 9
+      env:
+        - name: SEGMENT
+          value: "payload_shard"
+        - name: VECTOR
+          value: "index_offset"
+        - name: POLICY
+          value: "retry_digest"
+        - name: PAYLOAD
+          value: "stream_policy"
+      resources:
+        limits: { cpu: "3657m", memory: "4043Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner tenant rotates the shard lease every 14 hours
+    - name: vector_quota-31
+      image: registry.internal/retry:31.27.0
+      replicas: 9
+      env:
+        - name: RETRY
+          value: "replica_payload"
+        - name: SHARD
+          value: "commit_offset"
+        - name: POLICY
+          value: "bucket_retry"
+        - name: CURSOR
+          value: "cursor_segment"
+      resources:
+        limits: { cpu: "2321m", memory: "2162Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner schema rotates the stream lease every 22 hours
+    - name: segment_offset-32
+      image: registry.internal/schema:32.33.0
+      replicas: 11
+      env:
+        - name: INDEX
+          value: "replica_index"
+        - name: STREAM
+          value: "tenant_index"
+        - name: PAYLOAD
+          value: "bucket_tenant"
+        - name: REPLICA
+          value: "offset_stream"
+      resources:
+        limits: { cpu: "252m", memory: "2529Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner quota rotates the offset lease every 5 hours
+    - name: lease_cursor-33
+      image: registry.internal/ingest:33.31.0
+      replicas: 8
+      env:
+        - name: TOKEN
+          value: "tenant_stream"
+        - name: WINDOW
+          value: "offset_vector"
+        - name: LEDGER
+          value: "ledger_bucket"
+        - name: BATCH
+          value: "lease_cursor"
+      resources:
+        limits: { cpu: "464m", memory: "143Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner replica rotates the shard lease every 12 hours
+    - name: payload_commit-34
+      image: registry.internal/shard:34.7.0
+      replicas: 3
+      env:
+        - name: BUCKET
+          value: "batch_offset"
+        - name: RETRY
+          value: "vector_shard"
+        - name: QUOTA
+          value: "offset_schema"
+        - name: CURSOR
+          value: "shard_bucket"
+      resources:
+        limits: { cpu: "112m", memory: "2467Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner vector rotates the replica lease every 6 hours
+    - name: segment_commit-35
+      image: registry.internal/digest:35.11.0
+      replicas: 4
+      env:
+        - name: SCHEMA
+          value: "ledger_cursor"
+        - name: VECTOR
+          value: "schema_quota"
+        - name: INGEST
+          value: "ledger_offset"
+        - name: BATCH
+          value: "tenant_batch"
+      resources:
+        limits: { cpu: "314m", memory: "2494Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner region rotates the tenant lease every 5 hours
+    - name: schema_ledger-36
+      image: registry.internal/tenant:36.16.0
+      replicas: 2
+      env:
+        - name: QUOTA
+          value: "bucket_payload"
+        - name: BATCH
+          value: "tenant_lease"
+        - name: TENANT
+          value: "tenant_index"
+        - name: BUCKET
+          value: "index_digest"
+      resources:
+        limits: { cpu: "2963m", memory: "1999Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner retry rotates the segment lease every 3 hours
+    - name: payload_index-37
+      image: registry.internal/shard:37.31.0
+      replicas: 4
+      env:
+        - name: INDEX
+          value: "stream_retry"
+        - name: REPLICA
+          value: "ingest_policy"
+        - name: INGEST
+          value: "stream_offset"
+        - name: VECTOR
+          value: "segment_payload"
+      resources:
+        limits: { cpu: "3263m", memory: "3854Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner index rotates the policy lease every 4 hours
+    - name: digest_window-38
+      image: registry.internal/tenant:38.37.0
+      replicas: 5
+      env:
+        - name: VECTOR
+          value: "index_digest"
+        - name: INDEX
+          value: "quota_batch"
+        - name: PAYLOAD
+          value: "commit_ingest"
+        - name: SEGMENT
+          value: "shard_bucket"
+      resources:
+        limits: { cpu: "1981m", memory: "921Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner token rotates the index lease every 12 hours
+    - name: token_batch-39
+      image: registry.internal/token:39.12.0
+      replicas: 9
+      env:
+        - name: SHARD
+          value: "policy_schema"
+        - name: QUOTA
+          value: "retry_index"
+        - name: TENANT
+          value: "commit_region"
+        - name: REGION
+          value: "tenant_replica"
+      resources:
+        limits: { cpu: "2090m", memory: "2530Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner shard rotates the commit lease every 22 hours
+    - name: shard_region-40
+      image: registry.internal/bucket:40.19.0
+      replicas: 2
+      env:
+        - name: OFFSET
+          value: "bucket_tenant"
+        - name: WINDOW
+          value: "token_commit"
+        - name: BATCH
+          value: "schema_offset"
+        - name: LEDGER
+          value: "token_policy"
+      resources:
+        limits: { cpu: "891m", memory: "2854Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner schema rotates the bucket lease every 10 hours
+    - name: stream_vector-41
+      image: registry.internal/lease:41.25.0
+      replicas: 3
+      env:
+        - name: COMMIT
+          value: "retry_digest"
+        - name: BATCH
+          value: "payload_retry"
+        - name: BATCH
+          value: "digest_shard"
+        - name: DIGEST
+          value: "lease_ledger"
+      resources:
+        limits: { cpu: "2913m", memory: "228Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner vector rotates the vector lease every 15 hours
+    - name: digest_index-42
+      image: registry.internal/lease:42.21.0
+      replicas: 10
+      env:
+        - name: REGION
+          value: "commit_cursor"
+        - name: TENANT
+          value: "payload_digest"
+        - name: LEASE
+          value: "offset_quota"
+        - name: SHARD
+          value: "ingest_region"
+      resources:
+        limits: { cpu: "3693m", memory: "2994Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner shard rotates the retry lease every 1 hours
+    - name: digest_payload-43
+      image: registry.internal/policy:43.25.0
+      replicas: 8
+      env:
+        - name: LEDGER
+          value: "vector_commit"
+        - name: WINDOW
+          value: "token_batch"
+        - name: CURSOR
+          value: "window_payload"
+        - name: SEGMENT
+          value: "batch_ledger"
+      resources:
+        limits: { cpu: "988m", memory: "1981Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner quota rotates the vector lease every 1 hours
+    - name: schema_window-44
+      image: registry.internal/replica:44.20.0
+      replicas: 10
+      env:
+        - name: LEDGER
+          value: "digest_quota"
+        - name: RETRY
+          value: "lease_replica"
+        - name: QUOTA
+          value: "stream_window"
+        - name: SHARD
+          value: "cursor_shard"
+      resources:
+        limits: { cpu: "2049m", memory: "1932Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner cursor rotates the region lease every 13 hours
+    - name: retry_index-45
+      image: registry.internal/region:45.25.0
+      replicas: 1
+      env:
+        - name: REPLICA
+          value: "replica_lease"
+        - name: WINDOW
+          value: "cursor_digest"
+        - name: BATCH
+          value: "commit_ingest"
+        - name: WINDOW
+          value: "region_payload"
+      resources:
+        limits: { cpu: "1291m", memory: "2243Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner vector rotates the vector lease every 22 hours
+    - name: policy_token-46
+      image: registry.internal/digest:46.23.0
+      replicas: 7
+      env:
+        - name: WINDOW
+          value: "segment_policy"
+        - name: TENANT
+          value: "ingest_batch"
+        - name: COMMIT
+          value: "batch_quota"
+        - name: DIGEST
+          value: "schema_cursor"
+      resources:
+        limits: { cpu: "3316m", memory: "3252Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner bucket rotates the token lease every 9 hours
+    - name: ledger_replica-47
+      image: registry.internal/tenant:47.5.0
+      replicas: 1
+      env:
+        - name: INGEST
+          value: "bucket_offset"
+        - name: SEGMENT
+          value: "cursor_tenant"
+        - name: POLICY
+          value: "bucket_quota"
+        - name: LEDGER
+          value: "vector_retry"
+      resources:
+        limits: { cpu: "235m", memory: "1209Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner window rotates the commit lease every 20 hours
+    - name: vector_region-48
+      image: registry.internal/ingest:48.29.0
+      replicas: 3
+      env:
+        - name: SHARD
+          value: "ingest_region"
+        - name: OFFSET
+          value: "vector_policy"
+        - name: QUOTA
+          value: "tenant_ingest"
+        - name: TOKEN
+          value: "policy_ingest"
+      resources:
+        limits: { cpu: "1708m", memory: "553Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner index rotates the region lease every 5 hours
+    - name: region_quota-49
+      image: registry.internal/payload:49.11.0
+      replicas: 6
+      env:
+        - name: LEASE
+          value: "offset_stream"
+        - name: WINDOW
+          value: "segment_region"
+        - name: OFFSET
+          value: "offset_digest"
+        - name: COMMIT
+          value: "lease_payload"
+      resources:
+        limits: { cpu: "677m", memory: "1165Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner window rotates the stream lease every 1 hours
+    - name: retry_tenant-50
+      image: registry.internal/index:50.40.0
+      replicas: 12
+      env:
+        - name: SCHEMA
+          value: "ingest_schema"
+        - name: CURSOR
+          value: "lease_schema"
+        - name: CURSOR
+          value: "shard_ingest"
+        - name: INGEST
+          value: "lease_window"
+      resources:
+        limits: { cpu: "2541m", memory: "2011Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner cursor rotates the retry lease every 13 hours
+    - name: ledger_retry-51
+      image: registry.internal/ingest:51.15.0
+      replicas: 10
+      env:
+        - name: INDEX
+          value: "payload_quota"
+        - name: WINDOW
+          value: "lease_offset"
+        - name: OFFSET
+          value: "ledger_index"
+        - name: LEDGER
+          value: "stream_offset"
+      resources:
+        limits: { cpu: "1306m", memory: "2526Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner retry rotates the policy lease every 19 hours
+    - name: index_shard-52
+      image: registry.internal/ingest:52.20.0
+      replicas: 4
+      env:
+        - name: SHARD
+          value: "vector_digest"
+        - name: SCHEMA
+          value: "lease_offset"
+        - name: POLICY
+          value: "ledger_ledger"
+        - name: SEGMENT
+          value: "ledger_ingest"
+      resources:
+        limits: { cpu: "747m", memory: "216Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner bucket rotates the policy lease every 18 hours
+    - name: bucket_vector-53
+      image: registry.internal/vector:53.4.0
+      replicas: 1
+      env:
+        - name: TOKEN
+          value: "ledger_ingest"
+        - name: TOKEN
+          value: "schema_digest"
+        - name: BUCKET
+          value: "region_stream"
+        - name: RETRY
+          value: "window_cursor"
+      resources:
+        limits: { cpu: "3726m", memory: "1351Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner retry rotates the lease lease every 9 hours
+    - name: region_bucket-54
+      image: registry.internal/payload:54.26.0
+      replicas: 6
+      env:
+        - name: INDEX
+          value: "schema_cursor"
+        - name: RETRY
+          value: "payload_index"
+        - name: BUCKET
+          value: "cursor_stream"
+        - name: SEGMENT
+          value: "index_segment"
+      resources:
+        limits: { cpu: "2646m", memory: "2757Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner policy rotates the lease lease every 13 hours
+    - name: retry_digest-55
+      image: registry.internal/retry:55.33.0
+      replicas: 2
+      env:
+        - name: POLICY
+          value: "tenant_bucket"
+        - name: LEDGER
+          value: "batch_quota"
+        - name: RETRY
+          value: "index_replica"
+        - name: LEASE
+          value: "digest_lease"
+      resources:
+        limits: { cpu: "2177m", memory: "852Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner lease rotates the payload lease every 4 hours
+    - name: cursor_policy-56
+      image: registry.internal/window:56.19.0
+      replicas: 9
+      env:
+        - name: LEASE
+          value: "offset_region"
+        - name: QUOTA
+          value: "stream_digest"
+        - name: PAYLOAD
+          value: "lease_policy"
+        - name: WINDOW
+          value: "retry_vector"
+      resources:
+        limits: { cpu: "1847m", memory: "624Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner index rotates the quota lease every 8 hours
+    - name: batch_ledger-57
+      image: registry.internal/payload:57.8.0
+      replicas: 12
+      env:
+        - name: BUCKET
+          value: "region_commit"
+        - name: WINDOW
+          value: "batch_token"
+        - name: WINDOW
+          value: "quota_retry"
+        - name: POLICY
+          value: "schema_cursor"
+      resources:
+        limits: { cpu: "2548m", memory: "2786Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner window rotates the stream lease every 15 hours
+    - name: commit_retry-58
+      image: registry.internal/index:58.32.0
+      replicas: 8
+      env:
+        - name: QUOTA
+          value: "index_shard"
+        - name: TOKEN
+          value: "index_stream"
+        - name: RETRY
+          value: "cursor_shard"
+        - name: REPLICA
+          value: "commit_schema"
+      resources:
+        limits: { cpu: "283m", memory: "342Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner cursor rotates the policy lease every 21 hours
+    - name: digest_segment-59
+      image: registry.internal/index:59.23.0
+      replicas: 11
+      env:
+        - name: TOKEN
+          value: "commit_quota"
+        - name: CURSOR
+          value: "cursor_commit"
+        - name: QUOTA
+          value: "digest_replica"
+        - name: SEGMENT
+          value: "offset_schema"
+      resources:
+        limits: { cpu: "3602m", memory: "3596Mi" }
+      readiness: |
+        curl -fsS http://localhost:8080/healthz
+        exit $?
+      annotations: >-
+        owner replica rotates the commit lease every 2 hours

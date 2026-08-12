@@ -1,4 +1,5 @@
 use ahash::{AHashMap, AHashSet};
+use std::borrow::Cow;
 #[cfg(feature = "dynamic-loading")]
 use std::path::PathBuf;
 #[cfg(feature = "dynamic-loading")]
@@ -88,6 +89,17 @@ pub(crate) fn lang_name_from_lib_filename(filename: &str) -> Option<String> {
         .or_else(|| name.strip_suffix(".dylib"))
         .or_else(|| name.strip_suffix(".dll"))?;
     Some(lang_name_for_symbol(name).to_string())
+}
+
+/// Whether the build-time manifest knows this (already alias-resolved) language.
+///
+/// `KNOWN_LANGUAGES` is emitted from a `BTreeMap` in `build.rs`, so it is sorted
+/// by byte order and can be binary-searched; `known_languages_is_sorted` pins
+/// that cross-file invariant so the search cannot silently start lying. ~keep
+#[cfg(feature = "download")]
+#[inline]
+fn known_language(name: &str) -> bool {
+    KNOWN_LANGUAGES.binary_search(&name).is_ok()
 }
 
 #[inline(always)]
@@ -453,24 +465,23 @@ impl LanguageRegistry {
         Err(Error::LanguageNotFound(name.to_string()))
     }
 
-    /// List all available language names, sorted and deduplicated.
+    /// The deduplicated set of every available language name, including aliases.
     ///
-    /// Includes statically compiled languages, dynamically loadable languages
-    /// (if the `dynamic-loading` feature is enabled), and all configured aliases.
-    pub fn available_languages(&self) -> Vec<String> {
-        let mut seen: AHashSet<&str> = self.static_lookup.keys().copied().collect();
-
-        // ~keep Own dynamic-source names here so borrowed `seen` entries remain valid.
-        #[cfg(feature = "dynamic-loading")]
-        let _owned_names: Vec<String>;
+    /// Static, dynamic and alias names are borrowed `&'static str`; only names
+    /// recovered from a directory listing or from the loaded-grammar map are
+    /// owned, so a caller that just wants the count never allocates per name. ~keep
+    fn collect_language_names(&self) -> AHashSet<Cow<'static, str>> {
+        let mut seen: AHashSet<Cow<'static, str>> =
+            self.static_lookup.keys().map(|&name| Cow::Borrowed(name)).collect();
 
         #[cfg(feature = "dynamic-loading")]
         {
-            for name in self.dynamic_loader.dynamic_names.iter() {
-                seen.insert(name);
+            for &name in self.dynamic_loader.dynamic_names.iter() {
+                seen.insert(Cow::Borrowed(name));
             }
-
-            let mut owned = self.dynamic_loader.cached_names();
+            for name in self.dynamic_loader.cached_names() {
+                seen.insert(Cow::Owned(name));
+            }
 
             let extra_dirs: Arc<Vec<PathBuf>> = self
                 .extra_lib_dirs
@@ -478,30 +489,34 @@ impl LanguageRegistry {
                 .map(|dirs| Arc::clone(&dirs))
                 .unwrap_or_default();
             for extra_dir in extra_dirs.iter() {
-                if let Ok(entries) = std::fs::read_dir(extra_dir) {
-                    for entry in entries.flatten() {
-                        // ~keep Must map the C symbol back to the language id, otherwise the
-                        // ~keep list reports `c_sharp`/`TSQL`/`apache_avro` instead of the
-                        // ~keep documented names and inflates `language_count()`.
-                        if let Some(lang) = lang_name_from_lib_filename(&entry.file_name().to_string_lossy()) {
-                            owned.push(lang);
-                        }
+                let Ok(entries) = std::fs::read_dir(extra_dir) else {
+                    continue;
+                };
+                for entry in entries.flatten() {
+                    // ~keep Must map the C symbol back to the language id, otherwise the
+                    // ~keep list reports `c_sharp`/`TSQL`/`apache_avro` instead of the
+                    // ~keep documented names and inflates `language_count()`.
+                    if let Some(lang) = lang_name_from_lib_filename(&entry.file_name().to_string_lossy()) {
+                        seen.insert(Cow::Owned(lang));
                     }
                 }
             }
-
-            _owned_names = owned;
-            for name in &_owned_names {
-                seen.insert(name.as_str());
-            }
         }
+
         for &(alias, target) in LANGUAGE_ALIASES {
             if seen.contains(target) {
-                seen.insert(alias);
+                seen.insert(Cow::Borrowed(alias));
             }
         }
+        seen
+    }
 
-        let mut langs: Vec<String> = seen.into_iter().map(String::from).collect();
+    /// List all available language names, sorted and deduplicated.
+    ///
+    /// Includes statically compiled languages, dynamically loadable languages
+    /// (if the `dynamic-loading` feature is enabled), and all configured aliases.
+    pub fn available_languages(&self) -> Vec<String> {
+        let mut langs: Vec<String> = self.collect_language_names().into_iter().map(Cow::into_owned).collect();
         langs.sort_unstable();
         langs
     }
@@ -546,6 +561,12 @@ impl LanguageRegistry {
     ///
     /// Returns `true` if the language can be loaded, either from the static
     /// table or from a dynamic library on disk.
+    ///
+    /// Every branch is one more way to answer `true`, so they are ordered
+    /// cheapest-first and the filesystem is only consulted once every in-memory
+    /// source has said no. Probing the loaded-grammar map and the manifest ahead
+    /// of the `stat` calls is what keeps this off the syscall path for the
+    /// languages a process actually uses. ~keep
     pub fn has_language(&self, name: &str) -> bool {
         let name = resolve_alias(name);
         if self.static_lookup.contains_key(name) {
@@ -554,7 +575,25 @@ impl LanguageRegistry {
 
         #[cfg(feature = "dynamic-loading")]
         {
-            if self.dynamic_loader.dynamic_names.contains(&name) || self.dynamic_loader.lib_file_exists(name) {
+            if self.dynamic_loader.dynamic_names.contains(&name) {
+                return true;
+            }
+            if matches!(self.dynamic_loader.get_cached(name), Ok(Some(_))) {
+                return true;
+            }
+        }
+
+        // ~keep Download-enabled builds report known languages as available before on-demand fetch.
+        #[cfg(feature = "download")]
+        {
+            if known_language(name) {
+                return true;
+            }
+        }
+
+        #[cfg(feature = "dynamic-loading")]
+        {
+            if self.dynamic_loader.lib_file_exists(name) {
                 return true;
             }
 
@@ -570,20 +609,15 @@ impl LanguageRegistry {
             }
         }
 
-        // ~keep Download-enabled builds report known languages as available before on-demand fetch.
-        #[cfg(feature = "download")]
-        {
-            if KNOWN_LANGUAGES.contains(&name) {
-                return true;
-            }
-        }
-
         false
     }
 
     /// Return the total number of available languages (including aliases).
+    ///
+    /// Counts the same set [`available_languages`](Self::available_languages)
+    /// lists, without materialising or sorting it. ~keep
     pub fn language_count(&self) -> usize {
-        self.available_languages().len()
+        self.collect_language_names().len()
     }
 
     /// Parse source code and extract file intelligence based on config in a single pass.
@@ -707,6 +741,25 @@ mod tests {
             );
         }
         assert_eq!(registry.language_count(), langs.len());
+    }
+
+    #[cfg(feature = "download")]
+    #[test]
+    fn known_languages_is_sorted() {
+        assert!(
+            KNOWN_LANGUAGES.windows(2).all(|pair| pair[0] < pair[1]),
+            "KNOWN_LANGUAGES must stay sorted: has_language() binary-searches it"
+        );
+    }
+
+    #[cfg(feature = "download")]
+    #[test]
+    fn known_language_matches_linear_scan() {
+        for name in KNOWN_LANGUAGES {
+            assert!(known_language(name), "binary search missed known language {name}");
+        }
+        assert!(!known_language("nonexistent_lang_xyz"));
+        assert!(!known_language(""));
     }
 
     #[test]

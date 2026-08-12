@@ -1,0 +1,4151 @@
+{
+  "version": "2026.8.12",
+  "generated": false,
+  "regions": [
+    {
+      "name": "shard_replica",
+      "depth": 5,
+      "attributes": {
+        "digest": "quota_shard",
+        "commit": "bucket_vector",
+        "index": "cursor_commit"
+      },
+      "children": [
+        {
+          "name": "segment_stream",
+          "depth": 4,
+          "attributes": {
+            "vector": "schema_cursor",
+            "cursor": "window_batch",
+            "shard": "digest_retry",
+            "commit": "ledger_stream"
+          },
+          "children": [
+            {
+              "name": "commit_token",
+              "depth": 3,
+              "attributes": {
+                "cursor": "stream_window",
+                "token": "lease_segment",
+                "replica": "index_window",
+                "quota": "payload_commit"
+              },
+              "children": [
+                {
+                  "name": "stream_bucket",
+                  "depth": 2,
+                  "attributes": {
+                    "window": "ledger_offset",
+                    "schema": "payload_ledger",
+                    "digest": "tenant_token",
+                    "ingest": "lease_segment"
+                  },
+                  "children": [
+                    {
+                      "name": "vector_shard",
+                      "depth": 1,
+                      "attributes": {
+                        "commit": "cursor_schema",
+                        "stream": "policy_replica",
+                        "schema": "stream_offset",
+                        "payload": "schema_batch"
+                      },
+                      "children": [
+                        {
+                          "id": "payload_schema",
+                          "enabled": false,
+                          "weight": 43.5026,
+                          "tags": [
+                            "offset",
+                            "policy"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "policy_tenant",
+                          "enabled": false,
+                          "weight": 37.7877,
+                          "tags": [
+                            "token"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "schema_retry",
+                          "enabled": false,
+                          "weight": 25.6453,
+                          "tags": [
+                            "digest",
+                            "cursor"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "index_stream",
+                      "depth": 1,
+                      "attributes": {
+                        "lease": "schema_lease",
+                        "index": "bucket_window",
+                        "schema": "cursor_cursor"
+                      },
+                      "children": [
+                        {
+                          "id": "retry_cursor",
+                          "enabled": false,
+                          "weight": 30.3643,
+                          "tags": [
+                            "shard",
+                            "offset",
+                            "retry"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "digest_policy",
+                          "enabled": true,
+                          "weight": 88.8494,
+                          "tags": [
+                            "window",
+                            "tenant",
+                            "tenant",
+                            "region",
+                            "ledger"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "index_vector",
+                          "enabled": false,
+                          "weight": 7.2291,
+                          "tags": [
+                            "bucket",
+                            "shard",
+                            "vector"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "index_shard",
+                      "depth": 1,
+                      "attributes": {
+                        "quota": "ledger_tenant",
+                        "policy": "segment_region",
+                        "commit": "shard_schema",
+                        "index": "stream_segment"
+                      },
+                      "children": [
+                        {
+                          "id": "lease_token",
+                          "enabled": false,
+                          "weight": 68.6397,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "digest_quota",
+                          "enabled": false,
+                          "weight": 27.5121,
+                          "tags": [
+                            "stream",
+                            "bucket"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "ingest_policy",
+                          "enabled": true,
+                          "weight": 93.6788,
+                          "tags": [
+                            "window"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "vector_quota",
+                  "depth": 2,
+                  "attributes": {
+                    "bucket": "digest_offset",
+                    "policy": "cursor_retry",
+                    "ledger": "commit_index",
+                    "payload": "schema_cursor"
+                  },
+                  "children": [
+                    {
+                      "name": "payload_vector",
+                      "depth": 1,
+                      "attributes": {
+                        "vector": "bucket_commit",
+                        "bucket": "digest_window",
+                        "offset": "ledger_ingest",
+                        "replica": "tenant_index"
+                      },
+                      "children": [
+                        {
+                          "id": "quota_digest",
+                          "enabled": false,
+                          "weight": 32.7041,
+                          "tags": [
+                            "replica",
+                            "ledger",
+                            "retry",
+                            "digest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "offset_lease",
+                          "enabled": false,
+                          "weight": 11.8857,
+                          "tags": [
+                            "region",
+                            "window",
+                            "commit",
+                            "index"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "segment_tenant",
+                          "enabled": true,
+                          "weight": 1.8924,
+                          "tags": [
+                            "batch",
+                            "segment",
+                            "batch",
+                            "stream"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "schema_cursor",
+                      "depth": 1,
+                      "attributes": {
+                        "vector": "retry_window",
+                        "segment": "payload_index",
+                        "ledger": "lease_schema",
+                        "bucket": "policy_token"
+                      },
+                      "children": [
+                        {
+                          "id": "commit_shard",
+                          "enabled": false,
+                          "weight": 44.218,
+                          "tags": [
+                            "policy",
+                            "tenant",
+                            "lease"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "offset_commit",
+                          "enabled": false,
+                          "weight": 7.3994,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "payload_shard",
+                          "enabled": true,
+                          "weight": 68.5277,
+                          "tags": [
+                            "policy",
+                            "tenant",
+                            "shard",
+                            "vector",
+                            "replica"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "retry_segment",
+                      "depth": 1,
+                      "attributes": {
+                        "index": "retry_stream",
+                        "stream": "offset_digest",
+                        "lease": "payload_lease",
+                        "window": "tenant_replica"
+                      },
+                      "children": [
+                        {
+                          "id": "window_replica",
+                          "enabled": true,
+                          "weight": 21.443,
+                          "tags": [
+                            "index",
+                            "segment"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "lease_policy",
+                          "enabled": true,
+                          "weight": 95.4794,
+                          "tags": [
+                            "replica",
+                            "schema",
+                            "batch",
+                            "policy",
+                            "replica"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "window_index",
+                          "enabled": false,
+                          "weight": 56.7732,
+                          "tags": [
+                            "window",
+                            "schema",
+                            "token"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "segment_policy",
+                  "depth": 2,
+                  "attributes": {
+                    "segment": "index_region",
+                    "commit": "shard_lease",
+                    "payload": "commit_index",
+                    "ingest": "shard_ingest"
+                  },
+                  "children": [
+                    {
+                      "name": "ingest_schema",
+                      "depth": 1,
+                      "attributes": {
+                        "policy": "lease_tenant",
+                        "schema": "replica_policy",
+                        "ledger": "index_token",
+                        "bucket": "retry_window"
+                      },
+                      "children": [
+                        {
+                          "id": "region_bucket",
+                          "enabled": false,
+                          "weight": 29.7133,
+                          "tags": [
+                            "ingest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "tenant_ledger",
+                          "enabled": false,
+                          "weight": 98.4596,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "digest_payload",
+                          "enabled": true,
+                          "weight": 19.8613,
+                          "tags": [
+                            "bucket",
+                            "window",
+                            "policy",
+                            "offset",
+                            "token"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "replica_retry",
+                      "depth": 1,
+                      "attributes": {
+                        "index": "policy_token",
+                        "segment": "digest_retry",
+                        "digest": "quota_schema",
+                        "stream": "offset_schema"
+                      },
+                      "children": [
+                        {
+                          "id": "quota_tenant",
+                          "enabled": false,
+                          "weight": 12.0875,
+                          "tags": [
+                            "bucket",
+                            "ledger",
+                            "schema"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "digest_tenant",
+                          "enabled": true,
+                          "weight": 63.4996,
+                          "tags": [
+                            "index",
+                            "region",
+                            "policy",
+                            "schema"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "bucket_segment",
+                          "enabled": false,
+                          "weight": 12.9576,
+                          "tags": [],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "schema_token",
+                      "depth": 1,
+                      "attributes": {
+                        "cursor": "offset_stream",
+                        "policy": "lease_region",
+                        "vector": "window_schema",
+                        "retry": "digest_tenant"
+                      },
+                      "children": [
+                        {
+                          "id": "commit_shard",
+                          "enabled": false,
+                          "weight": 17.0052,
+                          "tags": [
+                            "index",
+                            "replica",
+                            "tenant"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "batch_retry",
+                          "enabled": true,
+                          "weight": 23.5007,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "cursor_retry",
+                          "enabled": true,
+                          "weight": 35.7988,
+                          "tags": [
+                            "segment",
+                            "region"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "window_bucket",
+              "depth": 3,
+              "attributes": {
+                "shard": "lease_cursor",
+                "schema": "segment_region",
+                "index": "offset_stream",
+                "bucket": "ledger_schema"
+              },
+              "children": [
+                {
+                  "name": "region_shard",
+                  "depth": 2,
+                  "attributes": {
+                    "digest": "digest_commit",
+                    "stream": "offset_payload",
+                    "replica": "lease_bucket",
+                    "offset": "ingest_vector"
+                  },
+                  "children": [
+                    {
+                      "name": "commit_region",
+                      "depth": 1,
+                      "attributes": {
+                        "token": "region_quota",
+                        "cursor": "bucket_policy",
+                        "digest": "window_shard",
+                        "region": "cursor_retry"
+                      },
+                      "children": [
+                        {
+                          "id": "bucket_digest",
+                          "enabled": false,
+                          "weight": 88.3471,
+                          "tags": [
+                            "shard",
+                            "quota"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "stream_quota",
+                          "enabled": false,
+                          "weight": 89.4966,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "policy_batch",
+                          "enabled": true,
+                          "weight": 49.1869,
+                          "tags": [
+                            "digest",
+                            "cursor",
+                            "ledger"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "token_digest",
+                      "depth": 1,
+                      "attributes": {
+                        "window": "cursor_replica",
+                        "commit": "ledger_batch",
+                        "schema": "region_bucket",
+                        "payload": "quota_tenant"
+                      },
+                      "children": [
+                        {
+                          "id": "digest_ingest",
+                          "enabled": true,
+                          "weight": 87.7712,
+                          "tags": [
+                            "stream"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "offset_index",
+                          "enabled": false,
+                          "weight": 76.4445,
+                          "tags": [
+                            "payload",
+                            "offset"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "policy_tenant",
+                          "enabled": true,
+                          "weight": 70.5949,
+                          "tags": [
+                            "schema",
+                            "batch"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "commit_vector",
+                      "depth": 1,
+                      "attributes": {
+                        "quota": "commit_vector",
+                        "digest": "retry_tenant",
+                        "policy": "token_commit",
+                        "payload": "lease_bucket"
+                      },
+                      "children": [
+                        {
+                          "id": "segment_bucket",
+                          "enabled": true,
+                          "weight": 95.1313,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "commit_replica",
+                          "enabled": true,
+                          "weight": 24.4308,
+                          "tags": [
+                            "quota",
+                            "index",
+                            "segment",
+                            "vector",
+                            "policy"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "region_cursor",
+                          "enabled": true,
+                          "weight": 4.1515,
+                          "tags": [
+                            "cursor",
+                            "cursor"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "digest_schema",
+                  "depth": 2,
+                  "attributes": {
+                    "batch": "retry_retry",
+                    "replica": "ingest_offset",
+                    "segment": "bucket_ingest",
+                    "tenant": "policy_retry"
+                  },
+                  "children": [
+                    {
+                      "name": "ingest_segment",
+                      "depth": 1,
+                      "attributes": {
+                        "index": "bucket_commit",
+                        "retry": "payload_commit",
+                        "window": "cursor_payload",
+                        "token": "commit_tenant"
+                      },
+                      "children": [
+                        {
+                          "id": "index_commit",
+                          "enabled": false,
+                          "weight": 84.3404,
+                          "tags": [
+                            "cursor",
+                            "offset",
+                            "payload",
+                            "segment",
+                            "batch"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "index_cursor",
+                          "enabled": true,
+                          "weight": 2.6851,
+                          "tags": [
+                            "tenant",
+                            "lease"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "index_ledger",
+                          "enabled": true,
+                          "weight": 42.7636,
+                          "tags": [
+                            "schema",
+                            "lease",
+                            "digest"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "stream_cursor",
+                      "depth": 1,
+                      "attributes": {
+                        "cursor": "ingest_shard",
+                        "schema": "quota_shard"
+                      },
+                      "children": [
+                        {
+                          "id": "quota_policy",
+                          "enabled": true,
+                          "weight": 68.5677,
+                          "tags": [
+                            "digest",
+                            "replica",
+                            "cursor",
+                            "ingest",
+                            "replica"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "commit_tenant",
+                          "enabled": false,
+                          "weight": 81.5889,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "batch_window",
+                          "enabled": true,
+                          "weight": 72.8369,
+                          "tags": [],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "ingest_window",
+                      "depth": 1,
+                      "attributes": {
+                        "bucket": "shard_digest",
+                        "window": "commit_bucket",
+                        "cursor": "region_ledger"
+                      },
+                      "children": [
+                        {
+                          "id": "region_schema",
+                          "enabled": false,
+                          "weight": 93.8323,
+                          "tags": [
+                            "shard",
+                            "region",
+                            "token",
+                            "ingest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "ledger_offset",
+                          "enabled": true,
+                          "weight": 46.0366,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "window_schema",
+                          "enabled": true,
+                          "weight": 31.9759,
+                          "tags": [
+                            "commit",
+                            "cursor",
+                            "commit",
+                            "region",
+                            "replica"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "lease_batch",
+                  "depth": 2,
+                  "attributes": {
+                    "quota": "schema_schema",
+                    "commit": "replica_retry",
+                    "schema": "token_batch",
+                    "retry": "window_digest"
+                  },
+                  "children": [
+                    {
+                      "name": "shard_token",
+                      "depth": 1,
+                      "attributes": {
+                        "vector": "vector_region",
+                        "quota": "region_retry",
+                        "replica": "payload_window",
+                        "index": "cursor_quota"
+                      },
+                      "children": [
+                        {
+                          "id": "window_window",
+                          "enabled": true,
+                          "weight": 29.4858,
+                          "tags": [
+                            "commit"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "index_digest",
+                          "enabled": false,
+                          "weight": 41.859,
+                          "tags": [
+                            "window",
+                            "replica",
+                            "cursor",
+                            "commit",
+                            "window"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "commit_digest",
+                          "enabled": false,
+                          "weight": 37.3522,
+                          "tags": [
+                            "shard",
+                            "batch"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "payload_schema",
+                      "depth": 1,
+                      "attributes": {
+                        "window": "commit_token",
+                        "region": "commit_replica",
+                        "segment": "policy_digest",
+                        "policy": "schema_token"
+                      },
+                      "children": [
+                        {
+                          "id": "lease_replica",
+                          "enabled": false,
+                          "weight": 22.6627,
+                          "tags": [
+                            "segment",
+                            "segment",
+                            "lease"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "payload_digest",
+                          "enabled": true,
+                          "weight": 47.6612,
+                          "tags": [
+                            "digest",
+                            "cursor",
+                            "commit",
+                            "shard"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "shard_vector",
+                          "enabled": false,
+                          "weight": 60.9057,
+                          "tags": [
+                            "ingest",
+                            "replica",
+                            "commit",
+                            "commit"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "vector_bucket",
+                      "depth": 1,
+                      "attributes": {
+                        "commit": "commit_payload",
+                        "token": "policy_replica",
+                        "index": "segment_tenant",
+                        "quota": "retry_ledger"
+                      },
+                      "children": [
+                        {
+                          "id": "policy_token",
+                          "enabled": true,
+                          "weight": 49.9451,
+                          "tags": [
+                            "batch",
+                            "retry",
+                            "bucket"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "lease_cursor",
+                          "enabled": false,
+                          "weight": 59.0036,
+                          "tags": [
+                            "ledger",
+                            "schema",
+                            "batch",
+                            "replica",
+                            "window"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "payload_token",
+                          "enabled": false,
+                          "weight": 11.992,
+                          "tags": [
+                            "policy",
+                            "index",
+                            "ledger",
+                            "index",
+                            "tenant"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "retry_tenant",
+          "depth": 4,
+          "attributes": {
+            "policy": "ingest_ledger",
+            "offset": "index_tenant",
+            "shard": "shard_shard",
+            "window": "cursor_segment"
+          },
+          "children": [
+            {
+              "name": "policy_vector",
+              "depth": 3,
+              "attributes": {
+                "replica": "policy_vector",
+                "cursor": "vector_quota",
+                "bucket": "commit_cursor"
+              },
+              "children": [
+                {
+                  "name": "batch_quota",
+                  "depth": 2,
+                  "attributes": {
+                    "ledger": "region_offset",
+                    "shard": "window_offset",
+                    "index": "retry_batch",
+                    "token": "bucket_vector"
+                  },
+                  "children": [
+                    {
+                      "name": "region_region",
+                      "depth": 1,
+                      "attributes": {
+                        "commit": "ingest_token",
+                        "index": "replica_segment",
+                        "ledger": "bucket_quota",
+                        "policy": "stream_retry"
+                      },
+                      "children": [
+                        {
+                          "id": "token_quota",
+                          "enabled": false,
+                          "weight": 11.0225,
+                          "tags": [
+                            "cursor",
+                            "retry",
+                            "digest",
+                            "token",
+                            "segment"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "stream_bucket",
+                          "enabled": false,
+                          "weight": 95.1137,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "index_payload",
+                          "enabled": false,
+                          "weight": 63.978,
+                          "tags": [
+                            "window",
+                            "lease",
+                            "payload",
+                            "quota"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "digest_shard",
+                      "depth": 1,
+                      "attributes": {
+                        "schema": "offset_vector",
+                        "shard": "region_segment",
+                        "batch": "policy_segment",
+                        "bucket": "segment_digest"
+                      },
+                      "children": [
+                        {
+                          "id": "vector_ledger",
+                          "enabled": false,
+                          "weight": 92.7609,
+                          "tags": [
+                            "cursor",
+                            "stream",
+                            "payload",
+                            "token"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "segment_schema",
+                          "enabled": true,
+                          "weight": 71.8964,
+                          "tags": [
+                            "index",
+                            "digest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "quota_window",
+                          "enabled": true,
+                          "weight": 90.0638,
+                          "tags": [
+                            "token",
+                            "shard",
+                            "replica",
+                            "tenant",
+                            "offset"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "policy_cursor",
+                      "depth": 1,
+                      "attributes": {
+                        "window": "region_batch",
+                        "stream": "schema_retry",
+                        "region": "policy_stream",
+                        "retry": "replica_payload"
+                      },
+                      "children": [
+                        {
+                          "id": "retry_replica",
+                          "enabled": false,
+                          "weight": 7.8227,
+                          "tags": [
+                            "batch",
+                            "replica",
+                            "policy",
+                            "ingest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "policy_shard",
+                          "enabled": false,
+                          "weight": 47.1386,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "index_offset",
+                          "enabled": false,
+                          "weight": 39.1098,
+                          "tags": [
+                            "ledger",
+                            "schema",
+                            "lease",
+                            "stream",
+                            "ledger"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "retry_replica",
+                  "depth": 2,
+                  "attributes": {
+                    "commit": "shard_payload",
+                    "batch": "shard_schema",
+                    "payload": "payload_ledger",
+                    "lease": "schema_batch"
+                  },
+                  "children": [
+                    {
+                      "name": "ledger_tenant",
+                      "depth": 1,
+                      "attributes": {
+                        "policy": "token_replica",
+                        "vector": "region_stream",
+                        "payload": "bucket_window",
+                        "ingest": "commit_schema"
+                      },
+                      "children": [
+                        {
+                          "id": "token_digest",
+                          "enabled": true,
+                          "weight": 61.6831,
+                          "tags": [
+                            "tenant",
+                            "policy",
+                            "ingest",
+                            "bucket",
+                            "quota"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "policy_stream",
+                          "enabled": false,
+                          "weight": 56.8654,
+                          "tags": [
+                            "bucket",
+                            "ingest",
+                            "region",
+                            "window",
+                            "ingest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "policy_index",
+                          "enabled": true,
+                          "weight": 91.7038,
+                          "tags": [
+                            "ingest",
+                            "digest"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "bucket_policy",
+                      "depth": 1,
+                      "attributes": {
+                        "segment": "policy_index",
+                        "window": "offset_retry",
+                        "payload": "window_index",
+                        "cursor": "region_offset"
+                      },
+                      "children": [
+                        {
+                          "id": "quota_retry",
+                          "enabled": false,
+                          "weight": 29.3489,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "policy_ledger",
+                          "enabled": true,
+                          "weight": 51.5551,
+                          "tags": [
+                            "shard",
+                            "ingest",
+                            "commit",
+                            "cursor",
+                            "ledger"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "index_commit",
+                          "enabled": true,
+                          "weight": 8.6339,
+                          "tags": [
+                            "ledger",
+                            "payload",
+                            "ingest",
+                            "tenant",
+                            "digest"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "schema_ledger",
+                      "depth": 1,
+                      "attributes": {
+                        "digest": "index_retry",
+                        "replica": "region_cursor",
+                        "commit": "shard_segment",
+                        "offset": "payload_policy"
+                      },
+                      "children": [
+                        {
+                          "id": "policy_tenant",
+                          "enabled": true,
+                          "weight": 85.7898,
+                          "tags": [
+                            "ledger",
+                            "tenant",
+                            "batch",
+                            "commit",
+                            "bucket"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "segment_cursor",
+                          "enabled": true,
+                          "weight": 87.263,
+                          "tags": [
+                            "tenant",
+                            "shard"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "index_stream",
+                          "enabled": true,
+                          "weight": 71.7639,
+                          "tags": [
+                            "ledger"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "token_payload",
+                  "depth": 2,
+                  "attributes": {
+                    "digest": "stream_token",
+                    "lease": "tenant_cursor",
+                    "index": "ingest_token",
+                    "tenant": "commit_stream"
+                  },
+                  "children": [
+                    {
+                      "name": "schema_ingest",
+                      "depth": 1,
+                      "attributes": {
+                        "policy": "policy_vector",
+                        "segment": "vector_ingest",
+                        "token": "ingest_digest"
+                      },
+                      "children": [
+                        {
+                          "id": "commit_tenant",
+                          "enabled": true,
+                          "weight": 84.1414,
+                          "tags": [
+                            "batch",
+                            "token"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "batch_payload",
+                          "enabled": false,
+                          "weight": 46.3639,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "window_shard",
+                          "enabled": false,
+                          "weight": 47.0628,
+                          "tags": [
+                            "token"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "schema_schema",
+                      "depth": 1,
+                      "attributes": {
+                        "digest": "policy_token",
+                        "commit": "digest_offset",
+                        "payload": "segment_lease",
+                        "policy": "vector_index"
+                      },
+                      "children": [
+                        {
+                          "id": "vector_cursor",
+                          "enabled": true,
+                          "weight": 25.3905,
+                          "tags": [
+                            "ingest",
+                            "token"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "segment_window",
+                          "enabled": false,
+                          "weight": 70.1148,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "region_token",
+                          "enabled": false,
+                          "weight": 44.9008,
+                          "tags": [
+                            "segment",
+                            "replica",
+                            "digest"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "retry_shard",
+                      "depth": 1,
+                      "attributes": {
+                        "payload": "batch_quota",
+                        "commit": "tenant_token",
+                        "quota": "commit_digest",
+                        "token": "retry_commit"
+                      },
+                      "children": [
+                        {
+                          "id": "ledger_replica",
+                          "enabled": false,
+                          "weight": 72.6004,
+                          "tags": [
+                            "replica",
+                            "window",
+                            "region",
+                            "ingest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "index_bucket",
+                          "enabled": false,
+                          "weight": 23.1545,
+                          "tags": [
+                            "offset",
+                            "stream"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "token_tenant",
+                          "enabled": false,
+                          "weight": 89.4955,
+                          "tags": [
+                            "vector",
+                            "policy",
+                            "token"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "offset_vector",
+              "depth": 3,
+              "attributes": {
+                "shard": "token_commit",
+                "token": "index_vector",
+                "index": "region_segment",
+                "payload": "commit_token"
+              },
+              "children": [
+                {
+                  "name": "commit_cursor",
+                  "depth": 2,
+                  "attributes": {
+                    "bucket": "stream_payload",
+                    "lease": "segment_offset",
+                    "window": "stream_token",
+                    "stream": "segment_policy"
+                  },
+                  "children": [
+                    {
+                      "name": "ingest_token",
+                      "depth": 1,
+                      "attributes": {
+                        "tenant": "bucket_policy",
+                        "digest": "vector_bucket",
+                        "lease": "digest_bucket"
+                      },
+                      "children": [
+                        {
+                          "id": "retry_region",
+                          "enabled": false,
+                          "weight": 22.8714,
+                          "tags": [
+                            "index",
+                            "shard",
+                            "quota",
+                            "index",
+                            "bucket"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "offset_vector",
+                          "enabled": true,
+                          "weight": 88.298,
+                          "tags": [
+                            "offset"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "tenant_lease",
+                          "enabled": false,
+                          "weight": 86.9146,
+                          "tags": [
+                            "ledger",
+                            "token"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "replica_cursor",
+                      "depth": 1,
+                      "attributes": {
+                        "index": "schema_stream",
+                        "offset": "retry_window",
+                        "ingest": "shard_batch",
+                        "shard": "vector_commit"
+                      },
+                      "children": [
+                        {
+                          "id": "digest_cursor",
+                          "enabled": false,
+                          "weight": 5.744,
+                          "tags": [
+                            "cursor",
+                            "replica",
+                            "bucket",
+                            "digest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "quota_policy",
+                          "enabled": false,
+                          "weight": 30.827,
+                          "tags": [
+                            "window",
+                            "vector",
+                            "commit"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "quota_index",
+                          "enabled": false,
+                          "weight": 28.9435,
+                          "tags": [],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "commit_segment",
+                      "depth": 1,
+                      "attributes": {
+                        "region": "schema_window",
+                        "vector": "replica_stream",
+                        "offset": "stream_ledger",
+                        "payload": "quota_batch"
+                      },
+                      "children": [
+                        {
+                          "id": "cursor_schema",
+                          "enabled": true,
+                          "weight": 9.6862,
+                          "tags": [
+                            "ingest",
+                            "region",
+                            "shard"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "schema_bucket",
+                          "enabled": false,
+                          "weight": 75.1724,
+                          "tags": [
+                            "ingest",
+                            "tenant"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "segment_ingest",
+                          "enabled": true,
+                          "weight": 37.4694,
+                          "tags": [
+                            "ledger",
+                            "schema",
+                            "window"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "replica_payload",
+                  "depth": 2,
+                  "attributes": {
+                    "quota": "ledger_bucket",
+                    "schema": "replica_policy",
+                    "index": "digest_digest",
+                    "segment": "replica_index"
+                  },
+                  "children": [
+                    {
+                      "name": "tenant_retry",
+                      "depth": 1,
+                      "attributes": {
+                        "digest": "index_commit",
+                        "retry": "offset_stream",
+                        "vector": "token_cursor"
+                      },
+                      "children": [
+                        {
+                          "id": "stream_commit",
+                          "enabled": false,
+                          "weight": 30.2877,
+                          "tags": [
+                            "ingest",
+                            "retry",
+                            "commit"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "batch_offset",
+                          "enabled": false,
+                          "weight": 77.1795,
+                          "tags": [
+                            "index",
+                            "token",
+                            "batch"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "offset_cursor",
+                          "enabled": false,
+                          "weight": 87.7825,
+                          "tags": [
+                            "retry",
+                            "schema",
+                            "digest",
+                            "lease",
+                            "segment"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "retry_quota",
+                      "depth": 1,
+                      "attributes": {
+                        "segment": "segment_shard",
+                        "retry": "tenant_retry",
+                        "payload": "token_digest",
+                        "region": "batch_window"
+                      },
+                      "children": [
+                        {
+                          "id": "payload_ledger",
+                          "enabled": true,
+                          "weight": 4.3744,
+                          "tags": [
+                            "shard",
+                            "stream",
+                            "region"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "tenant_schema",
+                          "enabled": false,
+                          "weight": 76.8472,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "policy_vector",
+                          "enabled": false,
+                          "weight": 49.1187,
+                          "tags": [
+                            "commit",
+                            "quota",
+                            "replica",
+                            "segment",
+                            "ledger"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "shard_stream",
+                      "depth": 1,
+                      "attributes": {
+                        "replica": "commit_commit",
+                        "window": "shard_schema",
+                        "ingest": "segment_bucket",
+                        "cursor": "quota_policy"
+                      },
+                      "children": [
+                        {
+                          "id": "segment_policy",
+                          "enabled": true,
+                          "weight": 37.9194,
+                          "tags": [
+                            "batch",
+                            "quota",
+                            "lease",
+                            "lease",
+                            "vector"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "commit_shard",
+                          "enabled": true,
+                          "weight": 76.8382,
+                          "tags": [
+                            "tenant",
+                            "replica",
+                            "shard",
+                            "bucket"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "cursor_region",
+                          "enabled": false,
+                          "weight": 80.4172,
+                          "tags": [
+                            "shard",
+                            "bucket",
+                            "cursor"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "vector_shard",
+                  "depth": 2,
+                  "attributes": {
+                    "replica": "ingest_stream",
+                    "digest": "window_ingest",
+                    "stream": "bucket_shard",
+                    "ingest": "policy_quota"
+                  },
+                  "children": [
+                    {
+                      "name": "schema_batch",
+                      "depth": 1,
+                      "attributes": {
+                        "tenant": "index_cursor",
+                        "bucket": "region_tenant",
+                        "cursor": "segment_batch",
+                        "ingest": "retry_cursor"
+                      },
+                      "children": [
+                        {
+                          "id": "tenant_ledger",
+                          "enabled": false,
+                          "weight": 85.6233,
+                          "tags": [
+                            "shard",
+                            "digest",
+                            "index",
+                            "bucket",
+                            "window"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "policy_vector",
+                          "enabled": true,
+                          "weight": 84.8724,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "token_schema",
+                          "enabled": true,
+                          "weight": 52.7885,
+                          "tags": [
+                            "commit",
+                            "token"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "quota_tenant",
+                      "depth": 1,
+                      "attributes": {
+                        "vector": "bucket_lease",
+                        "commit": "policy_tenant",
+                        "bucket": "stream_ledger",
+                        "retry": "vector_commit"
+                      },
+                      "children": [
+                        {
+                          "id": "segment_digest",
+                          "enabled": false,
+                          "weight": 33.4286,
+                          "tags": [
+                            "segment",
+                            "quota"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "bucket_region",
+                          "enabled": false,
+                          "weight": 7.8527,
+                          "tags": [
+                            "window",
+                            "lease",
+                            "token"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "replica_bucket",
+                          "enabled": false,
+                          "weight": 83.027,
+                          "tags": [
+                            "ingest",
+                            "quota"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "tenant_batch",
+                      "depth": 1,
+                      "attributes": {
+                        "tenant": "offset_lease",
+                        "token": "payload_replica",
+                        "policy": "window_payload",
+                        "payload": "retry_cursor"
+                      },
+                      "children": [
+                        {
+                          "id": "shard_window",
+                          "enabled": false,
+                          "weight": 9.4983,
+                          "tags": [
+                            "shard",
+                            "cursor",
+                            "window",
+                            "ledger",
+                            "cursor"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "commit_ledger",
+                          "enabled": false,
+                          "weight": 37.149,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "token_cursor",
+                          "enabled": true,
+                          "weight": 81.4958,
+                          "tags": [
+                            "shard",
+                            "vector",
+                            "replica",
+                            "region"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "lease_ledger",
+      "depth": 5,
+      "attributes": {
+        "region": "offset_replica",
+        "stream": "shard_batch",
+        "digest": "offset_digest",
+        "token": "payload_token"
+      },
+      "children": [
+        {
+          "name": "lease_ingest",
+          "depth": 4,
+          "attributes": {
+            "window": "quota_policy",
+            "batch": "vector_ingest",
+            "lease": "retry_ledger",
+            "stream": "tenant_token"
+          },
+          "children": [
+            {
+              "name": "cursor_vector",
+              "depth": 3,
+              "attributes": {
+                "policy": "offset_region",
+                "bucket": "quota_retry",
+                "shard": "ingest_payload",
+                "region": "commit_batch"
+              },
+              "children": [
+                {
+                  "name": "commit_lease",
+                  "depth": 2,
+                  "attributes": {
+                    "ingest": "batch_token",
+                    "schema": "offset_shard",
+                    "tenant": "quota_policy",
+                    "segment": "token_batch"
+                  },
+                  "children": [
+                    {
+                      "name": "cursor_offset",
+                      "depth": 1,
+                      "attributes": {
+                        "offset": "payload_policy",
+                        "vector": "shard_payload",
+                        "shard": "ledger_digest",
+                        "lease": "policy_schema"
+                      },
+                      "children": [
+                        {
+                          "id": "cursor_index",
+                          "enabled": true,
+                          "weight": 66.6774,
+                          "tags": [
+                            "commit",
+                            "payload",
+                            "offset"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "window_retry",
+                          "enabled": true,
+                          "weight": 36.6409,
+                          "tags": [
+                            "cursor",
+                            "bucket",
+                            "token"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "stream_payload",
+                          "enabled": false,
+                          "weight": 24.4891,
+                          "tags": [],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "policy_ledger",
+                      "depth": 1,
+                      "attributes": {
+                        "replica": "schema_lease",
+                        "batch": "region_segment",
+                        "retry": "tenant_shard",
+                        "digest": "ledger_tenant"
+                      },
+                      "children": [
+                        {
+                          "id": "region_quota",
+                          "enabled": true,
+                          "weight": 62.1851,
+                          "tags": [
+                            "schema",
+                            "window",
+                            "retry",
+                            "token"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "schema_shard",
+                          "enabled": false,
+                          "weight": 62.7111,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "region_replica",
+                          "enabled": true,
+                          "weight": 79.0264,
+                          "tags": [],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "replica_ledger",
+                      "depth": 1,
+                      "attributes": {
+                        "offset": "payload_retry",
+                        "shard": "lease_cursor",
+                        "bucket": "cursor_bucket",
+                        "commit": "schema_cursor"
+                      },
+                      "children": [
+                        {
+                          "id": "commit_schema",
+                          "enabled": true,
+                          "weight": 74.4517,
+                          "tags": [
+                            "region",
+                            "tenant",
+                            "retry"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "bucket_payload",
+                          "enabled": true,
+                          "weight": 16.7909,
+                          "tags": [
+                            "payload",
+                            "window",
+                            "window",
+                            "quota",
+                            "region"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "shard_quota",
+                          "enabled": false,
+                          "weight": 3.224,
+                          "tags": [
+                            "commit",
+                            "region",
+                            "lease",
+                            "schema",
+                            "window"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "replica_schema",
+                  "depth": 2,
+                  "attributes": {
+                    "token": "schema_token",
+                    "segment": "batch_commit",
+                    "lease": "ingest_bucket",
+                    "retry": "retry_bucket"
+                  },
+                  "children": [
+                    {
+                      "name": "ingest_offset",
+                      "depth": 1,
+                      "attributes": {
+                        "ledger": "payload_index",
+                        "digest": "schema_offset",
+                        "ingest": "retry_index"
+                      },
+                      "children": [
+                        {
+                          "id": "segment_stream",
+                          "enabled": true,
+                          "weight": 28.2123,
+                          "tags": [
+                            "policy",
+                            "stream"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "segment_ingest",
+                          "enabled": false,
+                          "weight": 99.4694,
+                          "tags": [
+                            "vector",
+                            "ingest",
+                            "policy"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "region_token",
+                          "enabled": false,
+                          "weight": 69.343,
+                          "tags": [
+                            "region",
+                            "lease"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "ingest_shard",
+                      "depth": 1,
+                      "attributes": {
+                        "lease": "commit_bucket",
+                        "tenant": "shard_segment",
+                        "window": "window_region",
+                        "segment": "tenant_lease"
+                      },
+                      "children": [
+                        {
+                          "id": "stream_offset",
+                          "enabled": false,
+                          "weight": 17.3658,
+                          "tags": [
+                            "stream",
+                            "payload",
+                            "tenant"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "ingest_ledger",
+                          "enabled": true,
+                          "weight": 51.4034,
+                          "tags": [
+                            "replica",
+                            "commit"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "window_tenant",
+                          "enabled": false,
+                          "weight": 60.6216,
+                          "tags": [],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "offset_segment",
+                      "depth": 1,
+                      "attributes": {
+                        "ingest": "digest_ingest",
+                        "digest": "ingest_lease",
+                        "bucket": "token_vector",
+                        "token": "segment_vector"
+                      },
+                      "children": [
+                        {
+                          "id": "ingest_region",
+                          "enabled": true,
+                          "weight": 70.5684,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "shard_shard",
+                          "enabled": false,
+                          "weight": 16.1628,
+                          "tags": [
+                            "quota",
+                            "ingest",
+                            "digest",
+                            "stream",
+                            "tenant"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "commit_offset",
+                          "enabled": false,
+                          "weight": 45.2792,
+                          "tags": [
+                            "vector",
+                            "region",
+                            "offset"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "replica_commit",
+                  "depth": 2,
+                  "attributes": {
+                    "offset": "retry_offset",
+                    "retry": "window_tenant",
+                    "stream": "window_tenant",
+                    "vector": "quota_replica"
+                  },
+                  "children": [
+                    {
+                      "name": "ledger_replica",
+                      "depth": 1,
+                      "attributes": {
+                        "index": "schema_schema",
+                        "policy": "ingest_quota",
+                        "offset": "window_window"
+                      },
+                      "children": [
+                        {
+                          "id": "tenant_payload",
+                          "enabled": true,
+                          "weight": 24.5174,
+                          "tags": [
+                            "cursor",
+                            "stream",
+                            "stream",
+                            "cursor"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "shard_policy",
+                          "enabled": true,
+                          "weight": 70.0666,
+                          "tags": [
+                            "region",
+                            "bucket"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "lease_stream",
+                          "enabled": false,
+                          "weight": 81.9211,
+                          "tags": [
+                            "offset"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "token_replica",
+                      "depth": 1,
+                      "attributes": {
+                        "batch": "token_token",
+                        "index": "window_index",
+                        "digest": "vector_vector",
+                        "schema": "shard_tenant"
+                      },
+                      "children": [
+                        {
+                          "id": "stream_shard",
+                          "enabled": true,
+                          "weight": 71.1296,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "quota_offset",
+                          "enabled": true,
+                          "weight": 71.7436,
+                          "tags": [
+                            "index",
+                            "digest",
+                            "schema"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "shard_shard",
+                          "enabled": true,
+                          "weight": 86.7371,
+                          "tags": [
+                            "batch"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "region_stream",
+                      "depth": 1,
+                      "attributes": {
+                        "offset": "vector_policy",
+                        "ledger": "vector_token",
+                        "batch": "segment_quota",
+                        "stream": "cursor_schema"
+                      },
+                      "children": [
+                        {
+                          "id": "digest_retry",
+                          "enabled": false,
+                          "weight": 37.402,
+                          "tags": [
+                            "cursor",
+                            "region",
+                            "digest",
+                            "segment",
+                            "shard"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "vector_region",
+                          "enabled": true,
+                          "weight": 85.7179,
+                          "tags": [
+                            "window",
+                            "payload",
+                            "quota",
+                            "region"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "lease_digest",
+                          "enabled": true,
+                          "weight": 57.7523,
+                          "tags": [
+                            "policy",
+                            "retry",
+                            "token",
+                            "vector"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "region_schema",
+              "depth": 3,
+              "attributes": {
+                "batch": "payload_vector",
+                "replica": "offset_region",
+                "window": "retry_vector",
+                "quota": "retry_payload"
+              },
+              "children": [
+                {
+                  "name": "digest_window",
+                  "depth": 2,
+                  "attributes": {
+                    "policy": "shard_commit",
+                    "ledger": "ledger_cursor",
+                    "lease": "payload_window",
+                    "region": "cursor_vector"
+                  },
+                  "children": [
+                    {
+                      "name": "ledger_index",
+                      "depth": 1,
+                      "attributes": {
+                        "token": "region_bucket",
+                        "retry": "shard_quota",
+                        "tenant": "token_quota",
+                        "ingest": "commit_cursor"
+                      },
+                      "children": [
+                        {
+                          "id": "policy_window",
+                          "enabled": false,
+                          "weight": 45.8671,
+                          "tags": [
+                            "shard",
+                            "token"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "window_lease",
+                          "enabled": true,
+                          "weight": 61.9434,
+                          "tags": [
+                            "lease"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "digest_offset",
+                          "enabled": false,
+                          "weight": 55.0738,
+                          "tags": [
+                            "stream",
+                            "token",
+                            "vector",
+                            "batch",
+                            "ingest"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "retry_quota",
+                      "depth": 1,
+                      "attributes": {
+                        "commit": "stream_schema",
+                        "replica": "index_vector",
+                        "stream": "schema_quota"
+                      },
+                      "children": [
+                        {
+                          "id": "index_digest",
+                          "enabled": true,
+                          "weight": 77.1692,
+                          "tags": [
+                            "retry",
+                            "retry",
+                            "shard"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "cursor_commit",
+                          "enabled": true,
+                          "weight": 97.405,
+                          "tags": [
+                            "window",
+                            "window"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "replica_stream",
+                          "enabled": false,
+                          "weight": 12.2063,
+                          "tags": [
+                            "ingest"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "region_index",
+                      "depth": 1,
+                      "attributes": {
+                        "payload": "ledger_token",
+                        "index": "stream_segment",
+                        "batch": "schema_vector",
+                        "replica": "retry_cursor"
+                      },
+                      "children": [
+                        {
+                          "id": "cursor_replica",
+                          "enabled": true,
+                          "weight": 85.8626,
+                          "tags": [
+                            "ingest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "vector_ledger",
+                          "enabled": true,
+                          "weight": 87.416,
+                          "tags": [
+                            "segment",
+                            "replica",
+                            "schema"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "replica_cursor",
+                          "enabled": true,
+                          "weight": 1.0151,
+                          "tags": [
+                            "ingest",
+                            "payload"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "cursor_batch",
+                  "depth": 2,
+                  "attributes": {
+                    "ledger": "vector_digest",
+                    "window": "tenant_shard",
+                    "batch": "retry_replica",
+                    "stream": "quota_ingest"
+                  },
+                  "children": [
+                    {
+                      "name": "replica_region",
+                      "depth": 1,
+                      "attributes": {
+                        "offset": "bucket_policy",
+                        "payload": "region_batch",
+                        "digest": "shard_retry",
+                        "policy": "ingest_batch"
+                      },
+                      "children": [
+                        {
+                          "id": "segment_index",
+                          "enabled": true,
+                          "weight": 20.5516,
+                          "tags": [
+                            "index",
+                            "schema"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "region_batch",
+                          "enabled": false,
+                          "weight": 4.5847,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "schema_commit",
+                          "enabled": false,
+                          "weight": 26.1268,
+                          "tags": [
+                            "replica"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "stream_policy",
+                      "depth": 1,
+                      "attributes": {
+                        "vector": "policy_batch",
+                        "ledger": "ledger_bucket",
+                        "region": "shard_batch"
+                      },
+                      "children": [
+                        {
+                          "id": "retry_vector",
+                          "enabled": false,
+                          "weight": 15.4025,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "cursor_bucket",
+                          "enabled": false,
+                          "weight": 90.6861,
+                          "tags": [
+                            "index",
+                            "index",
+                            "quota"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "commit_region",
+                          "enabled": true,
+                          "weight": 6.494,
+                          "tags": [
+                            "tenant",
+                            "retry",
+                            "stream",
+                            "ingest",
+                            "window"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "tenant_lease",
+                      "depth": 1,
+                      "attributes": {
+                        "region": "window_commit",
+                        "schema": "cursor_quota",
+                        "ingest": "index_bucket",
+                        "index": "offset_quota"
+                      },
+                      "children": [
+                        {
+                          "id": "window_schema",
+                          "enabled": true,
+                          "weight": 8.3336,
+                          "tags": [
+                            "ingest",
+                            "window",
+                            "index"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "policy_commit",
+                          "enabled": false,
+                          "weight": 92.2654,
+                          "tags": [
+                            "ingest",
+                            "payload",
+                            "policy",
+                            "schema",
+                            "commit"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "ledger_token",
+                          "enabled": false,
+                          "weight": 28.8012,
+                          "tags": [
+                            "retry",
+                            "window",
+                            "segment"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "cursor_commit",
+                  "depth": 2,
+                  "attributes": {
+                    "segment": "offset_retry",
+                    "schema": "commit_window",
+                    "stream": "stream_commit",
+                    "token": "index_policy"
+                  },
+                  "children": [
+                    {
+                      "name": "lease_region",
+                      "depth": 1,
+                      "attributes": {
+                        "digest": "policy_quota",
+                        "ingest": "quota_offset",
+                        "quota": "region_offset",
+                        "bucket": "ledger_vector"
+                      },
+                      "children": [
+                        {
+                          "id": "cursor_ledger",
+                          "enabled": true,
+                          "weight": 11.5588,
+                          "tags": [
+                            "batch",
+                            "ledger",
+                            "segment"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "ingest_batch",
+                          "enabled": false,
+                          "weight": 53.892,
+                          "tags": [
+                            "ledger",
+                            "policy",
+                            "retry"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "vector_vector",
+                          "enabled": false,
+                          "weight": 76.6916,
+                          "tags": [
+                            "stream"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "ingest_retry",
+                      "depth": 1,
+                      "attributes": {
+                        "segment": "segment_ledger",
+                        "lease": "cursor_retry",
+                        "replica": "region_digest",
+                        "commit": "ingest_tenant"
+                      },
+                      "children": [
+                        {
+                          "id": "shard_payload",
+                          "enabled": true,
+                          "weight": 2.6023,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "region_offset",
+                          "enabled": true,
+                          "weight": 78.0349,
+                          "tags": [
+                            "window",
+                            "bucket",
+                            "ingest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "token_vector",
+                          "enabled": true,
+                          "weight": 85.0168,
+                          "tags": [
+                            "schema",
+                            "replica",
+                            "shard",
+                            "digest",
+                            "index"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "commit_replica",
+                      "depth": 1,
+                      "attributes": {
+                        "index": "window_ingest",
+                        "lease": "region_schema",
+                        "bucket": "index_region",
+                        "policy": "shard_lease"
+                      },
+                      "children": [
+                        {
+                          "id": "schema_commit",
+                          "enabled": false,
+                          "weight": 20.1257,
+                          "tags": [
+                            "quota",
+                            "retry",
+                            "token",
+                            "stream",
+                            "replica"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "vector_payload",
+                          "enabled": true,
+                          "weight": 88.7859,
+                          "tags": [
+                            "offset",
+                            "shard",
+                            "digest",
+                            "replica"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "cursor_commit",
+                          "enabled": false,
+                          "weight": 44.9709,
+                          "tags": [
+                            "token"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "payload_token",
+          "depth": 4,
+          "attributes": {
+            "schema": "digest_bucket",
+            "index": "schema_token",
+            "vector": "window_batch",
+            "batch": "batch_schema"
+          },
+          "children": [
+            {
+              "name": "quota_region",
+              "depth": 3,
+              "attributes": {
+                "schema": "index_lease",
+                "ledger": "schema_token",
+                "quota": "token_stream",
+                "lease": "cursor_offset"
+              },
+              "children": [
+                {
+                  "name": "replica_digest",
+                  "depth": 2,
+                  "attributes": {
+                    "bucket": "cursor_ledger",
+                    "token": "lease_ledger",
+                    "retry": "payload_digest",
+                    "cursor": "schema_replica"
+                  },
+                  "children": [
+                    {
+                      "name": "vector_schema",
+                      "depth": 1,
+                      "attributes": {
+                        "batch": "commit_ledger",
+                        "cursor": "token_retry",
+                        "commit": "token_replica",
+                        "token": "token_cursor"
+                      },
+                      "children": [
+                        {
+                          "id": "digest_cursor",
+                          "enabled": true,
+                          "weight": 46.5245,
+                          "tags": [
+                            "region",
+                            "digest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "schema_quota",
+                          "enabled": false,
+                          "weight": 68.2749,
+                          "tags": [
+                            "schema",
+                            "region"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "token_token",
+                          "enabled": true,
+                          "weight": 71.181,
+                          "tags": [
+                            "quota",
+                            "quota",
+                            "policy",
+                            "payload",
+                            "window"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "shard_tenant",
+                      "depth": 1,
+                      "attributes": {
+                        "index": "region_ledger",
+                        "lease": "digest_token",
+                        "batch": "batch_schema"
+                      },
+                      "children": [
+                        {
+                          "id": "tenant_index",
+                          "enabled": false,
+                          "weight": 90.357,
+                          "tags": [
+                            "ledger",
+                            "lease"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "replica_token",
+                          "enabled": false,
+                          "weight": 54.4525,
+                          "tags": [
+                            "cursor",
+                            "token",
+                            "region",
+                            "replica",
+                            "region"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "schema_tenant",
+                          "enabled": false,
+                          "weight": 53.9449,
+                          "tags": [
+                            "batch",
+                            "replica",
+                            "digest",
+                            "segment"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "stream_batch",
+                      "depth": 1,
+                      "attributes": {
+                        "index": "shard_batch",
+                        "window": "batch_commit",
+                        "lease": "bucket_payload",
+                        "stream": "vector_payload"
+                      },
+                      "children": [
+                        {
+                          "id": "ingest_digest",
+                          "enabled": false,
+                          "weight": 9.9106,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "replica_region",
+                          "enabled": false,
+                          "weight": 55.7804,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "ingest_segment",
+                          "enabled": false,
+                          "weight": 69.734,
+                          "tags": [
+                            "shard",
+                            "payload",
+                            "quota"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "segment_segment",
+                  "depth": 2,
+                  "attributes": {
+                    "segment": "digest_token",
+                    "lease": "stream_ledger",
+                    "ingest": "payload_window",
+                    "policy": "stream_payload"
+                  },
+                  "children": [
+                    {
+                      "name": "shard_index",
+                      "depth": 1,
+                      "attributes": {
+                        "digest": "stream_batch",
+                        "region": "vector_lease",
+                        "token": "ingest_payload",
+                        "replica": "commit_retry"
+                      },
+                      "children": [
+                        {
+                          "id": "window_lease",
+                          "enabled": true,
+                          "weight": 85.0402,
+                          "tags": [
+                            "retry",
+                            "quota",
+                            "policy",
+                            "commit",
+                            "schema"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "batch_tenant",
+                          "enabled": false,
+                          "weight": 26.5533,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "stream_quota",
+                          "enabled": true,
+                          "weight": 89.3,
+                          "tags": [
+                            "lease",
+                            "digest",
+                            "digest"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "segment_stream",
+                      "depth": 1,
+                      "attributes": {
+                        "cursor": "index_digest",
+                        "retry": "cursor_cursor",
+                        "quota": "digest_index",
+                        "token": "payload_commit"
+                      },
+                      "children": [
+                        {
+                          "id": "payload_cursor",
+                          "enabled": true,
+                          "weight": 48.1111,
+                          "tags": [
+                            "digest",
+                            "tenant",
+                            "shard",
+                            "tenant",
+                            "commit"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "shard_offset",
+                          "enabled": true,
+                          "weight": 14.2046,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "retry_token",
+                          "enabled": true,
+                          "weight": 0.9213,
+                          "tags": [
+                            "digest"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "region_replica",
+                      "depth": 1,
+                      "attributes": {
+                        "bucket": "shard_retry",
+                        "ingest": "replica_window",
+                        "payload": "index_replica"
+                      },
+                      "children": [
+                        {
+                          "id": "commit_token",
+                          "enabled": false,
+                          "weight": 39.6699,
+                          "tags": [
+                            "tenant",
+                            "payload",
+                            "schema",
+                            "ingest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "vector_replica",
+                          "enabled": true,
+                          "weight": 97.2044,
+                          "tags": [
+                            "quota"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "payload_quota",
+                          "enabled": false,
+                          "weight": 56.6449,
+                          "tags": [
+                            "replica",
+                            "shard",
+                            "digest",
+                            "token"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "batch_commit",
+                  "depth": 2,
+                  "attributes": {
+                    "vector": "schema_batch",
+                    "schema": "lease_batch",
+                    "cursor": "index_replica",
+                    "digest": "batch_digest"
+                  },
+                  "children": [
+                    {
+                      "name": "cursor_policy",
+                      "depth": 1,
+                      "attributes": {
+                        "policy": "schema_segment",
+                        "window": "cursor_commit",
+                        "vector": "segment_retry",
+                        "retry": "window_ledger"
+                      },
+                      "children": [
+                        {
+                          "id": "quota_stream",
+                          "enabled": true,
+                          "weight": 13.1438,
+                          "tags": [
+                            "segment"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "retry_quota",
+                          "enabled": true,
+                          "weight": 92.7856,
+                          "tags": [
+                            "stream",
+                            "policy"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "batch_stream",
+                          "enabled": true,
+                          "weight": 32.6779,
+                          "tags": [
+                            "window"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "batch_retry",
+                      "depth": 1,
+                      "attributes": {
+                        "ledger": "batch_ledger",
+                        "lease": "index_offset",
+                        "window": "token_batch"
+                      },
+                      "children": [
+                        {
+                          "id": "window_quota",
+                          "enabled": true,
+                          "weight": 37.2174,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "digest_index",
+                          "enabled": false,
+                          "weight": 42.9644,
+                          "tags": [
+                            "cursor"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "offset_offset",
+                          "enabled": false,
+                          "weight": 41.3426,
+                          "tags": [
+                            "digest",
+                            "vector",
+                            "window",
+                            "bucket"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "cursor_region",
+                      "depth": 1,
+                      "attributes": {
+                        "token": "batch_token",
+                        "tenant": "index_lease",
+                        "shard": "vector_vector",
+                        "policy": "schema_ingest"
+                      },
+                      "children": [
+                        {
+                          "id": "ingest_replica",
+                          "enabled": false,
+                          "weight": 50.8011,
+                          "tags": [
+                            "offset",
+                            "tenant"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "segment_tenant",
+                          "enabled": true,
+                          "weight": 19.9949,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "digest_lease",
+                          "enabled": true,
+                          "weight": 0.673,
+                          "tags": [
+                            "tenant",
+                            "policy",
+                            "index",
+                            "region",
+                            "window"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "retry_payload",
+              "depth": 3,
+              "attributes": {
+                "batch": "window_ingest",
+                "segment": "vector_vector",
+                "offset": "tenant_schema",
+                "vector": "shard_offset"
+              },
+              "children": [
+                {
+                  "name": "token_offset",
+                  "depth": 2,
+                  "attributes": {
+                    "batch": "policy_tenant",
+                    "cursor": "replica_bucket",
+                    "offset": "policy_commit",
+                    "vector": "quota_commit"
+                  },
+                  "children": [
+                    {
+                      "name": "batch_ingest",
+                      "depth": 1,
+                      "attributes": {
+                        "digest": "tenant_segment",
+                        "window": "vector_segment",
+                        "offset": "cursor_vector",
+                        "cursor": "index_payload"
+                      },
+                      "children": [
+                        {
+                          "id": "vector_lease",
+                          "enabled": false,
+                          "weight": 64.7026,
+                          "tags": [
+                            "policy",
+                            "stream",
+                            "digest",
+                            "stream"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "region_retry",
+                          "enabled": false,
+                          "weight": 86.0675,
+                          "tags": [
+                            "replica",
+                            "batch"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "stream_batch",
+                          "enabled": true,
+                          "weight": 72.9859,
+                          "tags": [
+                            "payload",
+                            "vector",
+                            "ingest",
+                            "digest"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "schema_ingest",
+                      "depth": 1,
+                      "attributes": {
+                        "index": "payload_ledger",
+                        "lease": "digest_stream",
+                        "offset": "quota_stream",
+                        "retry": "ingest_window"
+                      },
+                      "children": [
+                        {
+                          "id": "digest_ledger",
+                          "enabled": true,
+                          "weight": 64.0391,
+                          "tags": [
+                            "commit",
+                            "lease",
+                            "index",
+                            "payload"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "vector_policy",
+                          "enabled": true,
+                          "weight": 18.1804,
+                          "tags": [
+                            "index"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "quota_commit",
+                          "enabled": true,
+                          "weight": 9.0802,
+                          "tags": [
+                            "policy",
+                            "bucket",
+                            "policy"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "schema_policy",
+                      "depth": 1,
+                      "attributes": {
+                        "tenant": "ledger_offset",
+                        "bucket": "ledger_lease",
+                        "schema": "lease_token",
+                        "payload": "shard_ledger"
+                      },
+                      "children": [
+                        {
+                          "id": "bucket_bucket",
+                          "enabled": true,
+                          "weight": 50.386,
+                          "tags": [
+                            "ledger",
+                            "vector"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "payload_offset",
+                          "enabled": false,
+                          "weight": 59.7481,
+                          "tags": [
+                            "digest",
+                            "digest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "region_window",
+                          "enabled": false,
+                          "weight": 87.5063,
+                          "tags": [
+                            "retry"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "bucket_replica",
+                  "depth": 2,
+                  "attributes": {
+                    "token": "stream_replica",
+                    "vector": "quota_segment",
+                    "segment": "retry_policy",
+                    "policy": "retry_batch"
+                  },
+                  "children": [
+                    {
+                      "name": "ingest_window",
+                      "depth": 1,
+                      "attributes": {
+                        "schema": "digest_shard",
+                        "batch": "quota_token",
+                        "payload": "digest_policy",
+                        "shard": "index_lease"
+                      },
+                      "children": [
+                        {
+                          "id": "shard_batch",
+                          "enabled": false,
+                          "weight": 19.7188,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "retry_segment",
+                          "enabled": true,
+                          "weight": 84.1392,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "cursor_cursor",
+                          "enabled": false,
+                          "weight": 0.5255,
+                          "tags": [
+                            "ingest",
+                            "index",
+                            "commit",
+                            "index",
+                            "payload"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "offset_tenant",
+                      "depth": 1,
+                      "attributes": {
+                        "window": "vector_stream",
+                        "replica": "cursor_index",
+                        "digest": "token_payload",
+                        "segment": "schema_token"
+                      },
+                      "children": [
+                        {
+                          "id": "bucket_commit",
+                          "enabled": true,
+                          "weight": 77.1648,
+                          "tags": [
+                            "schema",
+                            "retry",
+                            "lease"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "offset_bucket",
+                          "enabled": true,
+                          "weight": 16.6082,
+                          "tags": [],
+                          "note": null
+                        },
+                        {
+                          "id": "quota_digest",
+                          "enabled": true,
+                          "weight": 49.7343,
+                          "tags": [],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "tenant_commit",
+                      "depth": 1,
+                      "attributes": {
+                        "batch": "region_commit",
+                        "bucket": "vector_retry",
+                        "segment": "stream_vector"
+                      },
+                      "children": [
+                        {
+                          "id": "quota_index",
+                          "enabled": true,
+                          "weight": 25.3525,
+                          "tags": [
+                            "digest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "token_cursor",
+                          "enabled": false,
+                          "weight": 83.9719,
+                          "tags": [
+                            "batch",
+                            "digest"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "payload_token",
+                          "enabled": false,
+                          "weight": 85.9385,
+                          "tags": [
+                            "lease",
+                            "window",
+                            "commit",
+                            "lease",
+                            "stream"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "lease_policy",
+                  "depth": 2,
+                  "attributes": {
+                    "retry": "replica_retry",
+                    "index": "digest_batch",
+                    "lease": "schema_schema",
+                    "ingest": "commit_offset"
+                  },
+                  "children": [
+                    {
+                      "name": "schema_replica",
+                      "depth": 1,
+                      "attributes": {
+                        "ledger": "vector_tenant",
+                        "schema": "ledger_quota",
+                        "tenant": "policy_bucket",
+                        "region": "offset_vector"
+                      },
+                      "children": [
+                        {
+                          "id": "ledger_ingest",
+                          "enabled": false,
+                          "weight": 50.9642,
+                          "tags": [
+                            "region",
+                            "bucket",
+                            "schema",
+                            "tenant",
+                            "token"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "policy_batch",
+                          "enabled": true,
+                          "weight": 23.6366,
+                          "tags": [
+                            "ledger",
+                            "policy",
+                            "segment",
+                            "replica"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "quota_cursor",
+                          "enabled": true,
+                          "weight": 54.849,
+                          "tags": [],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "ingest_token",
+                      "depth": 1,
+                      "attributes": {
+                        "digest": "offset_segment",
+                        "commit": "replica_shard",
+                        "schema": "bucket_tenant",
+                        "policy": "quota_commit"
+                      },
+                      "children": [
+                        {
+                          "id": "batch_index",
+                          "enabled": false,
+                          "weight": 22.6006,
+                          "tags": [
+                            "batch",
+                            "schema",
+                            "quota",
+                            "bucket",
+                            "quota"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "tenant_commit",
+                          "enabled": false,
+                          "weight": 7.8171,
+                          "tags": [
+                            "ledger",
+                            "segment",
+                            "ledger"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "schema_vector",
+                          "enabled": true,
+                          "weight": 91.6537,
+                          "tags": [
+                            "bucket"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "replica_ledger",
+                      "depth": 1,
+                      "attributes": {
+                        "vector": "lease_retry",
+                        "lease": "payload_policy",
+                        "index": "stream_quota",
+                        "shard": "digest_ledger"
+                      },
+                      "children": [
+                        {
+                          "id": "ingest_retry",
+                          "enabled": false,
+                          "weight": 88.2098,
+                          "tags": [
+                            "ledger",
+                            "commit",
+                            "vector",
+                            "cursor",
+                            "replica"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "quota_replica",
+                          "enabled": false,
+                          "weight": 75.7161,
+                          "tags": [
+                            "tenant"
+                          ],
+                          "note": null
+                        },
+                        {
+                          "id": "quota_retry",
+                          "enabled": true,
+                          "weight": 57.6463,
+                          "tags": [
+                            "window",
+                            "schema",
+                            "quota",
+                            "shard",
+                            "region"
+                          ],
+                          "note": null
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "matrix": [
+    [
+      0.038399,
+      0.639465,
+      0.165466,
+      0.277775,
+      0.91378,
+      0.012296,
+      0.75385,
+      0.152971,
+      0.107472,
+      0.393629,
+      0.238369,
+      0.451731,
+      0.344222,
+      0.122427,
+      0.078048,
+      0.631409
+    ],
+    [
+      0.109126,
+      0.725413,
+      0.303056,
+      0.548615,
+      0.885316,
+      0.952038,
+      0.691652,
+      0.034469,
+      0.119109,
+      0.09613,
+      0.798098,
+      0.83223,
+      0.645462,
+      0.91454,
+      0.453885,
+      0.497479
+    ],
+    [
+      0.925451,
+      0.568814,
+      0.236249,
+      0.576438,
+      0.079913,
+      0.397571,
+      0.773927,
+      0.373696,
+      0.140657,
+      0.719809,
+      0.718223,
+      0.692127,
+      0.694984,
+      0.173123,
+      0.38633,
+      0.7418
+    ],
+    [
+      0.451971,
+      0.01127,
+      0.452096,
+      0.854147,
+      0.8058,
+      0.981364,
+      0.904763,
+      0.611906,
+      0.072621,
+      0.405856,
+      0.780041,
+      0.061093,
+      0.023075,
+      0.480162,
+      0.642145,
+      0.180715
+    ],
+    [
+      0.700469,
+      0.386537,
+      0.181895,
+      0.149974,
+      0.228215,
+      0.621324,
+      0.55362,
+      0.17211,
+      0.438774,
+      0.345615,
+      0.576401,
+      0.748028,
+      0.882088,
+      0.176983,
+      0.602031,
+      0.201829
+    ],
+    [
+      0.878386,
+      0.438701,
+      0.188026,
+      0.853186,
+      0.67548,
+      0.685176,
+      0.524104,
+      0.301239,
+      0.253898,
+      0.255776,
+      0.588464,
+      0.317487,
+      0.889055,
+      0.533003,
+      0.618931,
+      0.193383
+    ],
+    [
+      0.865521,
+      0.607397,
+      0.3607,
+      0.798538,
+      0.073194,
+      0.06241,
+      0.502883,
+      0.406124,
+      0.097301,
+      0.357536,
+      0.662704,
+      0.746067,
+      0.991807,
+      0.112721,
+      0.004952,
+      0.043046
+    ],
+    [
+      0.405002,
+      0.231128,
+      0.498345,
+      0.923332,
+      0.237751,
+      0.724441,
+      0.472021,
+      0.448226,
+      0.471865,
+      0.836915,
+      0.940536,
+      0.150876,
+      0.885456,
+      0.248057,
+      0.835332,
+      0.670367
+    ],
+    [
+      0.7347,
+      0.558731,
+      0.367851,
+      0.434301,
+      0.070604,
+      0.263877,
+      0.939713,
+      0.938504,
+      0.176958,
+      0.295883,
+      0.515099,
+      0.436313,
+      0.749713,
+      0.20305,
+      0.136957,
+      0.152642
+    ],
+    [
+      0.762307,
+      0.577821,
+      0.993175,
+      0.166045,
+      0.727516,
+      0.70382,
+      0.451025,
+      0.884384,
+      0.553123,
+      0.729576,
+      0.956344,
+      0.917288,
+      0.431861,
+      0.725804,
+      0.358993,
+      0.78057
+    ],
+    [
+      0.919086,
+      0.13871,
+      0.634372,
+      0.186133,
+      0.259301,
+      0.996426,
+      0.122848,
+      0.701684,
+      0.280349,
+      0.181106,
+      0.913421,
+      0.950205,
+      0.332928,
+      0.09592,
+      0.512435,
+      0.144963
+    ],
+    [
+      0.139242,
+      0.220373,
+      0.730271,
+      0.31501,
+      0.722258,
+      0.340336,
+      0.019505,
+      0.102493,
+      0.47181,
+      0.596853,
+      0.812634,
+      0.905264,
+      0.512053,
+      0.135557,
+      0.928967,
+      0.404415
+    ],
+    [
+      0.123172,
+      0.274403,
+      0.140339,
+      0.184651,
+      0.115612,
+      0.154306,
+      0.638874,
+      0.837549,
+      0.628093,
+      0.821712,
+      0.789218,
+      0.518865,
+      0.294904,
+      0.265587,
+      0.957422,
+      0.660548
+    ],
+    [
+      0.946607,
+      0.618608,
+      0.555176,
+      0.377899,
+      0.295879,
+      0.522962,
+      0.522789,
+      0.291747,
+      0.122237,
+      0.973562,
+      0.483379,
+      0.134099,
+      0.868631,
+      0.500731,
+      0.815011,
+      0.986339
+    ],
+    [
+      0.205994,
+      0.816373,
+      0.314412,
+      0.852135,
+      0.489204,
+      0.361202,
+      0.986529,
+      0.991488,
+      0.088341,
+      0.201919,
+      0.469934,
+      0.625944,
+      0.407706,
+      0.502962,
+      0.139537,
+      0.151372
+    ],
+    [
+      0.231205,
+      0.475454,
+      0.381267,
+      0.63436,
+      0.967346,
+      0.691932,
+      0.203472,
+      0.346597,
+      0.720513,
+      0.744241,
+      0.56311,
+      0.344383,
+      0.694209,
+      0.70959,
+      0.91259,
+      0.676951
+    ],
+    [
+      0.577722,
+      0.598984,
+      0.009655,
+      0.157302,
+      0.743274,
+      0.440864,
+      0.658463,
+      0.387553,
+      0.104434,
+      0.720997,
+      0.964102,
+      0.201212,
+      0.137731,
+      0.680481,
+      0.944646,
+      0.933878
+    ],
+    [
+      0.650569,
+      0.70659,
+      0.510066,
+      0.764213,
+      0.392287,
+      0.433128,
+      0.567085,
+      0.510967,
+      0.861542,
+      0.337231,
+      0.554828,
+      0.222912,
+      0.626161,
+      0.291896,
+      0.602353,
+      0.736266
+    ],
+    [
+      0.424269,
+      0.338869,
+      0.175823,
+      0.058589,
+      0.240197,
+      0.311805,
+      0.985298,
+      0.33074,
+      0.06689,
+      0.126902,
+      0.554091,
+      0.090845,
+      0.474054,
+      0.950099,
+      0.435338,
+      0.412101
+    ],
+    [
+      0.339939,
+      0.637341,
+      0.477247,
+      0.577904,
+      0.080245,
+      0.018647,
+      0.2667,
+      0.309975,
+      0.36439,
+      0.708421,
+      0.279621,
+      0.266279,
+      0.471454,
+      0.045445,
+      0.48273,
+      0.065828
+    ]
+  ],
+  "lookup": {
+    "offset_retry": {
+      "count": 0,
+      "ratio": 0.0
+    },
+    "vector_retry": {
+      "count": 1,
+      "ratio": 0.14285714285714285
+    },
+    "stream_tenant": {
+      "count": 2,
+      "ratio": 0.2857142857142857
+    },
+    "window_ingest": {
+      "count": 3,
+      "ratio": 0.42857142857142855
+    },
+    "payload_policy": {
+      "count": 4,
+      "ratio": 0.5714285714285714
+    },
+    "offset_cursor": {
+      "count": 5,
+      "ratio": 0.7142857142857143
+    },
+    "tenant_tenant": {
+      "count": 6,
+      "ratio": 0.8571428571428571
+    },
+    "stream_bucket": {
+      "count": 7,
+      "ratio": 1.0
+    },
+    "digest_policy": {
+      "count": 8,
+      "ratio": 1.1428571428571428
+    },
+    "commit_bucket": {
+      "count": 9,
+      "ratio": 1.2857142857142858
+    },
+    "payload_ledger": {
+      "count": 10,
+      "ratio": 1.4285714285714286
+    },
+    "policy_segment": {
+      "count": 49,
+      "ratio": 7.0
+    },
+    "ingest_cursor": {
+      "count": 12,
+      "ratio": 1.7142857142857142
+    },
+    "replica_segment": {
+      "count": 25,
+      "ratio": 3.5714285714285716
+    },
+    "quota_batch": {
+      "count": 14,
+      "ratio": 2.0
+    },
+    "lease_commit": {
+      "count": 15,
+      "ratio": 2.142857142857143
+    },
+    "bucket_region": {
+      "count": 16,
+      "ratio": 2.2857142857142856
+    },
+    "schema_cursor": {
+      "count": 17,
+      "ratio": 2.4285714285714284
+    },
+    "region_payload": {
+      "count": 18,
+      "ratio": 2.5714285714285716
+    },
+    "ingest_offset": {
+      "count": 19,
+      "ratio": 2.7142857142857144
+    },
+    "stream_policy": {
+      "count": 20,
+      "ratio": 2.857142857142857
+    },
+    "policy_commit": {
+      "count": 21,
+      "ratio": 3.0
+    },
+    "shard_ingest": {
+      "count": 22,
+      "ratio": 3.142857142857143
+    },
+    "ingest_replica": {
+      "count": 23,
+      "ratio": 3.2857142857142856
+    },
+    "commit_index": {
+      "count": 24,
+      "ratio": 3.4285714285714284
+    },
+    "replica_replica": {
+      "count": 26,
+      "ratio": 3.7142857142857144
+    },
+    "lease_retry": {
+      "count": 27,
+      "ratio": 3.857142857142857
+    },
+    "token_shard": {
+      "count": 28,
+      "ratio": 4.0
+    },
+    "segment_payload": {
+      "count": 29,
+      "ratio": 4.142857142857143
+    },
+    "quota_digest": {
+      "count": 30,
+      "ratio": 4.285714285714286
+    },
+    "region_vector": {
+      "count": 31,
+      "ratio": 4.428571428571429
+    },
+    "batch_offset": {
+      "count": 32,
+      "ratio": 4.571428571428571
+    },
+    "token_bucket": {
+      "count": 33,
+      "ratio": 4.714285714285714
+    },
+    "bucket_index": {
+      "count": 34,
+      "ratio": 4.857142857142857
+    },
+    "commit_digest": {
+      "count": 35,
+      "ratio": 5.0
+    },
+    "quota_payload": {
+      "count": 36,
+      "ratio": 5.142857142857143
+    },
+    "ingest_quota": {
+      "count": 37,
+      "ratio": 5.285714285714286
+    },
+    "offset_bucket": {
+      "count": 38,
+      "ratio": 5.428571428571429
+    },
+    "replica_shard": {
+      "count": 39,
+      "ratio": 5.571428571428571
+    },
+    "segment_offset": {
+      "count": 40,
+      "ratio": 5.714285714285714
+    },
+    "cursor_segment": {
+      "count": 41,
+      "ratio": 5.857142857142857
+    },
+    "replica_commit": {
+      "count": 42,
+      "ratio": 6.0
+    },
+    "token_ledger": {
+      "count": 43,
+      "ratio": 6.142857142857143
+    },
+    "index_commit": {
+      "count": 44,
+      "ratio": 6.285714285714286
+    },
+    "region_lease": {
+      "count": 45,
+      "ratio": 6.428571428571429
+    },
+    "cursor_bucket": {
+      "count": 46,
+      "ratio": 6.571428571428571
+    },
+    "bucket_lease": {
+      "count": 47,
+      "ratio": 6.714285714285714
+    },
+    "region_bucket": {
+      "count": 48,
+      "ratio": 6.857142857142857
+    },
+    "window_batch": {
+      "count": 50,
+      "ratio": 7.142857142857143
+    },
+    "quota_region": {
+      "count": 51,
+      "ratio": 7.285714285714286
+    },
+    "segment_region": {
+      "count": 52,
+      "ratio": 7.428571428571429
+    },
+    "retry_ledger": {
+      "count": 53,
+      "ratio": 7.571428571428571
+    },
+    "bucket_stream": {
+      "count": 54,
+      "ratio": 7.714285714285714
+    },
+    "ledger_bucket": {
+      "count": 55,
+      "ratio": 7.857142857142857
+    },
+    "ledger_digest": {
+      "count": 56,
+      "ratio": 8.0
+    },
+    "commit_ledger": {
+      "count": 57,
+      "ratio": 8.142857142857142
+    },
+    "token_ingest": {
+      "count": 58,
+      "ratio": 8.285714285714286
+    },
+    "region_shard": {
+      "count": 59,
+      "ratio": 8.428571428571429
+    }
+  }
+}

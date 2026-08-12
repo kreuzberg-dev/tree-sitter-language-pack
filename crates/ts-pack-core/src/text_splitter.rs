@@ -415,7 +415,9 @@ mod tests {
         // ~keep Brackets must balance: an unclosed run parses to one flat ERROR node, not a deep tree.
         let nesting = MAX_TREE_DEPTH + 200;
         let source = format!("{}1{}", "[".repeat(nesting), "]".repeat(nesting));
-        let Some(tree) = parse_deep_or_skip(&source) else { return };
+        let Some(tree) = parse_deep_or_skip(&source) else {
+            return;
+        };
 
         let (ranges, truncated) = collect_node_ranges(&tree.root_node());
         assert!(truncated > 0, "input deeper than the limit must report skipped nodes");
