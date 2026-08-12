@@ -1,7 +1,22 @@
+---
+id: fixture_dart_injections_query_unknown_language
+language: dart
+target: dart
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```dart title="Dart"
 import 'package:tree_sitter_language_pack/tree_sitter_language_pack.dart';
+import 'package:tree_sitter_language_pack/src/tree_sitter_language_pack_bridge_generated/frb_generated.dart' show RustLib;
 Future<void> main() async {
-  final result = await TreeSitterLanguagePackBridge.getInjectionsQuery('nonexistent_xyz');
+  await RustLib.init();
+  try {
+    final result = await TreeSitterLanguagePackBridge.getInjectionsQuery('nonexistent_xyz');
+  } finally {
+    RustLib.dispose();
+  }
 }
 
 ```

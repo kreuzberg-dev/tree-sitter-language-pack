@@ -1,3 +1,12 @@
+---
+id: fixture_go_rust_chunking_process
+language: go
+target: go
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```go title="Go"
 package main
 
@@ -23,6 +32,6 @@ fn delta() {}
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(result)
+	fmt.Printf("%+v\n", result)
 }
 ```

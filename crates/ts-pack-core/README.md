@@ -114,11 +114,23 @@ cargo add tree-sitter-language-pack
 ## Quick Start
 
 ```rust
-use tree_sitter_language_pack::{get_language, get_parser};
+use tree_sitter_language_pack::{ProcessConfig, get_parser, process};
 
-let mut parser = get_parser("python").expect("language available");
-let tree = parser.parse("def hello(): pass", None).unwrap();
-println!("{}", tree.root_node().to_sexp());
+fn main() -> Result<(), tree_sitter_language_pack::Error> {
+    // Parsers are downloaded on first use and cached for every later call.
+    let config = ProcessConfig::new("python").all();
+    let result = process("def hello():\n    print('world')\n", &config)?;
+    println!("Language: {}", result.language);
+    println!("Functions: {}", result.structure.len());
+    println!("Lines: {}", result.metrics.total_lines);
+
+    // Or drop down to the tree-sitter parser directly.
+    let mut parser = get_parser("python")?;
+    if let Some(tree) = parser.parse("def hello(): pass") {
+        println!("{}", tree.root_node().to_sexp());
+    }
+    Ok(())
+}
 ```
 
 ## Features

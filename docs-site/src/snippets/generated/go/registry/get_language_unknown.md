@@ -1,16 +1,26 @@
+---
+id: fixture_go_get_language_unknown
+language: go
+target: go
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```go title="Go"
 package main
 
 import (
 	"fmt"
 	tspack "github.com/xberg-io/tree-sitter-language-pack/packages/go"
+	"os"
 )
 
 func main() {
-	language, err := tspack.GetLanguage(`nonexistent_xyz`)
-	if err != nil {
-		panic(err)
+	_, err := tspack.GetLanguage(`nonexistent_xyz`)
+	if err == nil {
+		panic("expected call to fail")
 	}
-	fmt.Println(language)
+	fmt.Fprintf(os.Stderr, "Call failed as expected: %v\n", err)
 }
 ```

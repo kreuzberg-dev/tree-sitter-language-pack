@@ -1,3 +1,12 @@
+---
+id: fixture_go_process_rust_structure_name
+language: go
+target: go
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```go title="Go"
 package main
 
@@ -25,6 +34,6 @@ impl MyConfig {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(result)
+	fmt.Printf("%+v\n", result)
 }
 ```

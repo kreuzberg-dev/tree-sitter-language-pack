@@ -113,12 +113,16 @@ pip install tree-sitter-language-pack
 
 ## Quick Start
 
-```python
-from tree_sitter_language_pack import get_parser
+```python title="Python"
+from tree_sitter_language_pack import process
 
-parser = get_parser("python")
-tree = parser.parse(b"def hello(): pass")
-print(tree.root_node.sexp())
+def main() -> None:
+    source = "# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n"
+    config = {"language": "python"}
+    _ = process(source, config)
+
+main()
+
 ```
 
 ## Features

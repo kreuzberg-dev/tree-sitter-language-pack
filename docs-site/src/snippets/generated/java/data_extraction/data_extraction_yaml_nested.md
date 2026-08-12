@@ -1,3 +1,12 @@
+---
+id: fixture_java_data_extraction_yaml_nested
+language: java
+target: java
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```java title="Java"
 import io.xberg.treesitterlanguagepack.*;
 
@@ -6,6 +15,7 @@ public final class Example {
         var configJson = "{\"data_extraction\":true,\"language\":\"yaml\"}";
 var config = JsonUtil.fromJson(configJson, ProcessConfig.class);
         var result = io.xberg.treesitterlanguagepack.TreeSitterLanguagePack.process("server:\n  host: localhost\n  port: 8080\n", config);
+        System.out.println(result);
     }
 }
 

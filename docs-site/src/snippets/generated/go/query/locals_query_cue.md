@@ -1,3 +1,12 @@
+---
+id: fixture_go_locals_query_cue
+language: go
+target: go
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```go title="Go"
 package main
 
@@ -8,6 +17,6 @@ import (
 
 func main() {
 	result := tspack.GetLocalsQuery(`cue`)
-	fmt.Println(result)
+	fmt.Printf("%+v\n", result)
 }
 ```

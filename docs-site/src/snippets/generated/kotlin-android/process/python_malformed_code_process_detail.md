@@ -1,7 +1,19 @@
+---
+id: fixture_kotlin_android_python_malformed_code_process_detail
+language: kotlin
+target: kotlin_android
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```kotlin title="Kotlin (Android)"
 import io.xberg.tslp.android.*
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
-fun main() = kotlinx.coroutines.runBlocking {
+fun main() {
+    val mapper = jacksonObjectMapper()
+    val config = mapper.readValue("{\"diagnostics\":true,\"language\":\"python\"}", ProcessConfig::class.java)
     val result = TreeSitterLanguagePack.process("def broken(\n    return\nclass", config)
 }
 

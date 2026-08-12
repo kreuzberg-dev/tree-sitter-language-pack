@@ -1,3 +1,12 @@
+---
+id: fixture_java_smoke_pgn
+language: java
+target: java
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```java title="Java"
 import io.xberg.treesitterlanguagepack.*;
 
@@ -6,6 +15,7 @@ public final class Example {
         var configJson = "{\"language\":\"pgn\"}";
 var config = JsonUtil.fromJson(configJson, ProcessConfig.class);
         var result = io.xberg.treesitterlanguagepack.TreeSitterLanguagePack.process("1. e4 e5 *", config);
+        System.out.println(result);
     }
 }
 

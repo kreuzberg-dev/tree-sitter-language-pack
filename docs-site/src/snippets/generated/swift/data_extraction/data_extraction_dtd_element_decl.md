@@ -1,3 +1,12 @@
+---
+id: fixture_swift_data_extraction_dtd_element_decl
+language: swift
+target: swift
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```swift title="Swift"
 import TreeSitterLanguagePack
 

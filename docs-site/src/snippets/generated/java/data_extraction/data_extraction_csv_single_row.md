@@ -1,3 +1,12 @@
+---
+id: fixture_java_data_extraction_csv_single_row
+language: java
+target: java
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```java title="Java"
 import io.xberg.treesitterlanguagepack.*;
 
@@ -6,6 +15,7 @@ public final class Example {
         var configJson = "{\"data_extraction\":true,\"language\":\"csv\"}";
 var config = JsonUtil.fromJson(configJson, ProcessConfig.class);
         var result = io.xberg.treesitterlanguagepack.TreeSitterLanguagePack.process("x,y,z\n", config);
+        System.out.println(result);
     }
 }
 

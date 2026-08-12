@@ -1,3 +1,12 @@
+---
+id: fixture_java_smoke_json5
+language: java
+target: java
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```java title="Java"
 import io.xberg.treesitterlanguagepack.*;
 
@@ -6,6 +15,7 @@ public final class Example {
         var configJson = "{\"language\":\"json5\"}";
 var config = JsonUtil.fromJson(configJson, ProcessConfig.class);
         var result = io.xberg.treesitterlanguagepack.TreeSitterLanguagePack.process("x", config);
+        System.out.println(result);
     }
 }
 

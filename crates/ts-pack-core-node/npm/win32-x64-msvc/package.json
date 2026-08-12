@@ -7,19 +7,9 @@
     "url": "git+https://github.com/xberg-io/tree-sitter-language-pack.git"
   },
   "main": "ts-pack-core-node.win32-x64-msvc.node",
-  "files": [
-    "ts-pack-core-node.win32-x64-msvc.node"
-  ],
-  "os": [
-    "win32"
-  ],
-  "cpu": [
-    "x64"
-  ],
-  "engines": {
-    "node": ">= 22"
-  },
-  "publishConfig": {
-    "access": "public"
-  }
+  "files": ["ts-pack-core-node.win32-x64-msvc.node"],
+  "os": ["win32"],
+  "cpu": ["x64"],
+  "engines": { "node": ">= 22" },
+  "publishConfig": { "access": "public" }
 }

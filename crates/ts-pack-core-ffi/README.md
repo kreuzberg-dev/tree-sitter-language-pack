@@ -116,7 +116,36 @@ cargo build --release -p tree-sitter-language-pack-ffi
 
 ## Quick Start
 
-See the [language guide](https://docs.tree-sitter-language-pack.xberg.io) for `ffi`-specific usage.
+```c
+#include <stdio.h>
+#include "ts_pack.h"
+
+int main(void) {
+    TS_PACKProcessConfig *config = ts_pack_process_config_from_json("{\"language\":\"python\"}");
+    if (config == NULL) {
+        fprintf(stderr, "config error: %s\n", ts_pack_last_error_context());
+        return 1;
+    }
+
+    TS_PACKProcessResult *result = ts_pack_process("def hello():\n    print('world')\n", config);
+    ts_pack_process_config_free(config);
+    if (result == NULL) {
+        fprintf(stderr, "process error: %s\n", ts_pack_last_error_context());
+        return 1;
+    }
+
+    char *json = ts_pack_process_result_to_json(result);
+    ts_pack_process_result_free(result);
+    if (json == NULL) {
+        fprintf(stderr, "serialize error: %s\n", ts_pack_last_error_context());
+        return 1;
+    }
+
+    printf("%s\n", json);
+    ts_pack_free_string(json);
+    return 0;
+}
+```
 
 ## Features
 

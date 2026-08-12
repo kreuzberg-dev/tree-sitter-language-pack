@@ -2,48 +2,66 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Alef E2E Test Fixture",
   "description": "Schema for alef e2e test fixture files. Each file contains either a single fixture object or an array of fixtures.",
-  "oneOf": [
-    {
-      "$ref": "#/$defs/fixture"
-    },
-    {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/fixture"
-      }
-    }
-  ],
+  "oneOf": [{ "$ref": "#/$defs/fixture" }, { "type": "array", "items": { "$ref": "#/$defs/fixture" } }],
   "$defs": {
     "fixture": {
       "type": "object",
-      "required": [
-        "id",
-        "description"
-      ],
-      "additionalProperties": false,
+      "required": ["id", "description"],
       "properties": {
         "id": {
           "type": "string",
-          "pattern": "^[a-z][a-z0-9_]*$",
+          "pattern": "^[a-z0-9][a-z0-9_]*$",
           "description": "Unique snake_case identifier used as the test function name"
         },
         "category": {
           "type": "string",
           "description": "Test category. Defaults to parent directory name if omitted"
         },
-        "description": {
-          "type": "string",
-          "description": "Human-readable test description"
+        "description": { "type": "string", "description": "Human-readable test description" },
+        "docs": {
+          "type": "object",
+          "required": ["topic"],
+          "additionalProperties": false,
+          "properties": {
+            "topic": { "type": "string" },
+            "stem": { "type": "string" },
+            "paths": {
+              "type": "object",
+              "additionalProperties": { "type": "string" }
+            },
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "presentation": { "$ref": "#/$defs/docs_presentation" },
+            "coverage_exceptions": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "required": ["reason", "documentation"],
+                "additionalProperties": false,
+                "properties": {
+                  "reason": { "type": "string", "minLength": 1 },
+                  "documentation": { "type": "string", "minLength": 1 }
+                }
+              }
+            },
+            "side_effects": { "enum": ["safe", "network", "process", "install", "server"] }
+          }
+        },
+        "requirements": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^(feature|model|service|credential):[^:]+$" }
         },
         "tags": {
           "type": "array",
-          "items": {
-            "type": "string"
-          },
+          "items": { "type": "string" },
           "description": "Optional tags for filtering"
         },
-        "skip": {
-          "$ref": "#/$defs/skip"
+        "skip": { "$ref": "#/$defs/skip" },
+        "env": { "$ref": "#/$defs/env" },
+        "setup": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/setup_call" },
+          "description": "Setup calls executed before the main call"
         },
         "call": {
           "type": "string",
@@ -53,13 +71,147 @@
           "type": "object",
           "description": "Input data passed to the function under test. Fields map to args via [e2e.call.args] config"
         },
+        "preserve_input_urls": {
+          "type": "boolean",
+          "default": false,
+          "description": "Pass this fixture's declared URLs to the call verbatim instead of substituting the mock server address. mock_url and mock_url_list args otherwise ignore input.url/input.urls entirely, which silently rewrites the subject of any test whose point is the address itself (SSRF policy, scheme rejection, host parsing). Opt in per fixture; there is deliberately no absolute-URL heuristic"
+        },
+        "config": {
+          "description": "Optional fixture-level config mirrored into input.config before code generation"
+        },
+        "mock_response": { "$ref": "#/$defs/mock_response" },
+        "visitor": {
+          "type": "object",
+          "description": "Visitor callback specification for visitor-pattern tests"
+        },
+        "args": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/arg_mapping" },
+          "description": "Fixture-level argument mappings. When present, overrides the resolved call args"
+        },
+        "assertion_recipes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Assertion recipes enabled for domain-shaped assertion shortcuts and streaming pseudo-fields"
+        },
         "assertions": {
           "type": "array",
-          "items": {
-            "$ref": "#/$defs/assertion"
-          },
+          "items": { "$ref": "#/$defs/assertion" },
           "description": "List of assertions to check on the result"
+        },
+        "http": {
+          "type": "object",
+          "description": "HTTP server fixture specification"
         }
+      }
+    },
+    "docs_presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "call": { "type": "string" },
+        "input": {},
+        "args": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/arg_mapping" }
+        },
+        "files": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/docs_file_input" }
+        },
+        "operations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/docs_operation" }
+        }
+      }
+    },
+    "docs_file_input": {
+      "type": "object",
+      "required": ["field", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "field": { "type": "string" },
+        "path": { "type": "string" }
+      }
+    },
+    "docs_operation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["op", "path"],
+          "additionalProperties": false,
+          "properties": {
+            "op": { "const": "show" },
+            "path": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["op", "path", "item"],
+          "additionalProperties": false,
+          "properties": {
+            "op": { "const": "iterate" },
+            "path": { "type": "string" },
+            "item": { "type": "string" },
+            "fields": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "display": { "type": "boolean" },
+            "optional": { "type": "boolean" }
+          }
+        }
+      ]
+    },
+    "env": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "api_key_var": { "type": "string" }
+      }
+    },
+    "setup_call": {
+      "type": "object",
+      "required": ["call"],
+      "additionalProperties": false,
+      "properties": {
+        "call": { "type": "string" },
+        "input": {}
+      }
+    },
+    "mock_response": {
+      "type": "object",
+      "required": ["status"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "type": "integer", "minimum": 100, "maximum": 599 },
+        "body": {},
+        "stream_chunks": {
+          "type": "array",
+          "items": {}
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "arg_mapping": {
+      "type": "object",
+      "required": ["name", "field"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "field": { "type": "string" },
+        "type": { "type": "string" },
+        "arg_type": { "type": "string" },
+        "optional": { "type": "boolean" },
+        "owned": { "type": "boolean" },
+        "element_type": { "type": "string" },
+        "go_type": { "type": "string" },
+        "vec_inner_is_ref": { "type": "boolean" },
+        "trait_name": { "type": "string" },
+        "trait": { "type": "string" }
       }
     },
     "skip": {
@@ -68,22 +220,15 @@
       "properties": {
         "languages": {
           "type": "array",
-          "items": {
-            "type": "string"
-          },
+          "items": { "type": "string" },
           "description": "Languages to skip. Empty array means skip all"
         },
-        "reason": {
-          "type": "string",
-          "description": "Human-readable reason for skipping"
-        }
+        "reason": { "type": "string", "description": "Human-readable reason for skipping" }
       }
     },
     "assertion": {
       "type": "object",
-      "required": [
-        "type"
-      ],
+      "required": ["type"],
       "additionalProperties": false,
       "properties": {
         "type": {
@@ -120,31 +265,22 @@
           "type": "string",
           "description": "Dot-separated field path on the result object"
         },
-        "value": {
-          "description": "Expected value (type depends on assertion type)"
-        },
+        "value": { "description": "Expected value (type depends on assertion type)" },
         "values": {
           "type": "array",
           "description": "Expected values (for contains_all, contains_any, not_contains)"
         },
-        "method": {
-          "type": "string",
-          "description": "Method name to call on the result"
-        },
+        "method": { "type": "string", "description": "Method name to call on the result" },
         "check": {
           "type": "string",
           "description": "Assertion check type for the method result (equals, is_true, is_false, greater_than_or_equal, count_min)"
         },
-        "args": {
-          "type": "object",
-          "description": "Arguments to pass to the method call"
+        "args": { "description": "Arguments to pass to the method call" },
+        "return_type": {
+          "type": "string",
+          "description": "Return type hint for generated assertion code"
         }
       }
     }
-  },
-  "docs": {
-    "topic": "general",
-    "stem": null,
-    "title": "Schema for alef e2e test fixture files. Each file contains either a single fixture object or an array of fixtures."
   }
 }

@@ -113,12 +113,14 @@ npm install @xberg-io/tree-sitter-language-pack
 
 ## Quick Start
 
-```typescript
-import { getParser } from "@xberg-io/tree-sitter-language-pack";
+```typescript title="TypeScript"
+import { process } from "@xberg-io/tree-sitter-language-pack";
+function main() {
+  const result = process("# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n", { language: "python" });
+}
 
-const parser = getParser("python");
-const tree = parser.parse("def hello(): pass");
-console.log(tree.rootNode.toString());
+void main();
+
 ```
 
 ## Features

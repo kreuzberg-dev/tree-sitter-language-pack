@@ -1,9 +1,19 @@
+---
+id: fixture_java_folds_query_zig
+language: java
+target: java
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```java title="Java"
 import io.xberg.treesitterlanguagepack.*;
 
 public final class Example {
     public static void main(String[] args) throws Exception {
         var result = TreeSitterLanguagePack.getFoldsQuery("zig");
+        System.out.println(result);
     }
 }
 

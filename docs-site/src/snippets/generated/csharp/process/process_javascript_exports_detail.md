@@ -1,3 +1,12 @@
+---
+id: fixture_csharp_process_javascript_exports_detail
+language: csharp
+target: csharp
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```csharp title="C#"
 using TreeSitterLanguagePack;
 

@@ -1,0 +1,24 @@
+---
+id: fixture_ffi_locals_query_unknown_language
+language: c
+target: ffi
+level: typecheck
+requires: []
+side_effect: safe
+---
+
+```c title="C"
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "ts_pack.h"
+
+int main(void) {
+    char* result = ts_pack_get_locals_query("nonexistent_xyz");
+    if (result != NULL) { ts_pack_free_string(result); }
+    return EXIT_SUCCESS;
+}
+
+```

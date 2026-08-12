@@ -1,3 +1,12 @@
+---
+id: fixture_csharp_data_extraction_csv_rows
+language: csharp
+target: csharp
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```csharp title="C#"
 using TreeSitterLanguagePack;
 

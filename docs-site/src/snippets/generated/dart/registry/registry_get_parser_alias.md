@@ -1,7 +1,22 @@
+---
+id: fixture_dart_registry_get_parser_alias
+language: dart
+target: dart
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```dart title="Dart"
 import 'package:tree_sitter_language_pack/tree_sitter_language_pack.dart';
+import 'package:tree_sitter_language_pack/src/tree_sitter_language_pack_bridge_generated/frb_generated.dart' show RustLib;
 Future<void> main() async {
-  final parser = await TreeSitterLanguagePackBridge.getParser('shell');
+  await RustLib.init();
+  try {
+    final parser = await TreeSitterLanguagePackBridge.getParser('shell');
+  } finally {
+    RustLib.dispose();
+  }
 }
 
 ```

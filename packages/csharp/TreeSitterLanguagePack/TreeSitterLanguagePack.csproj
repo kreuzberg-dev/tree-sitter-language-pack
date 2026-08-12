@@ -42,9 +42,10 @@
            Text="packages/csharp/TreeSitterLanguagePack/runtime.json is missing. Render it from runtime.json.template (substituting {{VERSION}}) before packing TreeSitterLanguagePack.csproj." />
   </Target>
 
-  <!-- ~keep: TreeSitter.DotNet is required — TreeSitterLanguagePackConverter.cs (alef-generated) constructs
-       TreeSitter.Language directly around GetLanguage()'s native pointer. This is itself a bug (see
-       upstream report), but removing the reference breaks the build until the generator is fixed. -->
+  <ItemGroup>
+    <Compile Include="../src/**/*.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="TreeSitter.DotNet" Version="1.3.0" />
   </ItemGroup>

@@ -1,3 +1,12 @@
+---
+id: fixture_go_process_javascript_exports_count
+language: go
+target: go
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```go title="Go"
 package main
 
@@ -18,6 +27,6 @@ export default class App {}
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(result)
+	fmt.Printf("%+v\n", result)
 }
 ```

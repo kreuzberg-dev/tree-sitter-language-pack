@@ -1,0 +1,24 @@
+---
+id: fixture_ffi_download_cache_dir
+language: c
+target: ffi
+level: typecheck
+requires: []
+side_effect: safe
+---
+
+```c title="C"
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "ts_pack.h"
+
+int main(void) {
+    char* result = ts_pack_cache_dir();
+    ts_pack_free_string(result);
+    return EXIT_SUCCESS;
+}
+
+```

@@ -1,6 +1,12 @@
 // swift-format-ignore-file
 import RustBridgeC
 
+public func parserSetMaxSourceBytes(_ client: ParserRefMut, _ max_bytes: Optional<UInt>) -> () {
+    __swift_bridge__$parser_set_max_source_bytes(client.ptr, max_bytes.intoFfiRepr())
+}
+public func parserSetParseTimeoutMs(_ client: ParserRefMut, _ timeout_ms: Optional<UInt64>) -> () {
+    __swift_bridge__$parser_set_parse_timeout_ms(client.ptr, timeout_ms.intoFfiRepr())
+}
 public func parserSetLanguage<GenericIntoRustString: IntoRustString>(_ client: ParserRefMut, _ name: GenericIntoRustString) throws -> () {
     try { let val = __swift_bridge__$parser_set_language(client.ptr, { let rustString = name.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val != nil { throw RustString(ptr: val!) } else { return } }()
 }
@@ -18,9 +24,6 @@ public func treeRootNode(_ client: TreeRef) -> Node {
 }
 public func treeWalk(_ client: TreeRef) -> TreeCursor {
     TreeCursor(ptr: __swift_bridge__$tree_walk(client.ptr))
-}
-public func nodeClone(_ client: NodeRef) -> Node {
-    Node(ptr: __swift_bridge__$node_clone(client.ptr))
 }
 public func nodeKind(_ client: NodeRef) -> RustString {
     RustString(ptr: __swift_bridge__$node_kind(client.ptr))
@@ -108,6 +111,15 @@ public func processConfigMinimalFromJson<GenericIntoRustString: IntoRustString>(
 }
 public func processConfigWithDataExtractionFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString, _ enabled: Bool) throws -> RustString {
     try { let val = __swift_bridge__$process_config_with_data_extraction_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }(), enabled); if val.is_ok { return RustString(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func processConfigWithMaxSourceBytesFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString, _ max_bytes: Optional<UInt>) throws -> RustString {
+    try { let val = __swift_bridge__$process_config_with_max_source_bytes_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }(), max_bytes.intoFfiRepr()); if val.is_ok { return RustString(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func processConfigWithParseTimeoutMsFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString, _ timeout_ms: Optional<UInt64>) throws -> RustString {
+    try { let val = __swift_bridge__$process_config_with_parse_timeout_ms_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }(), timeout_ms.intoFfiRepr()); if val.is_ok { return RustString(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func processConfigValidateFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> RustString {
+    try { let val = __swift_bridge__$process_config_validate_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return RustString(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
 public func languageRegistryGetLanguage<GenericIntoRustString: IntoRustString>(_ client: LanguageRegistryRef, _ name: GenericIntoRustString) throws -> Language {
     try { let val = __swift_bridge__$language_registry_get_language(client.ptr, { let rustString = name.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return Language(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
@@ -207,6 +219,9 @@ public func downloadGroup<GenericIntoRustString: IntoRustString>(_ name: Generic
 }
 public func manifestLanguages() throws -> RustVec<RustString> {
     try { let val = __swift_bridge__$manifest_languages(); if val.is_ok { return RustVec(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func manifestGroups() throws -> RustVec<RustString> {
+    try { let val = __swift_bridge__$manifest_groups(); if val.is_ok { return RustVec(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
 public func downloadedLanguages() -> RustVec<RustString> {
     RustVec(ptr: __swift_bridge__$downloaded_languages())
@@ -2534,8 +2549,8 @@ public class ProcessConfig: ProcessConfigRefMut {
     }
 }
 extension ProcessConfig {
-    public convenience init<GenericIntoRustString: IntoRustString>(_ language: GenericIntoRustString, _ structure: Bool, _ imports: Bool, _ exports: Bool, _ comments: Bool, _ docstrings: Bool, _ symbols: Bool, _ diagnostics: Bool, _ chunk_max_size: Optional<UInt>, _ data_extraction: Bool) {
-        self.init(ptr: __swift_bridge__$ProcessConfig$new({ let rustString = language.intoRustString(); rustString.isOwned = false; return rustString.ptr }(), structure, imports, exports, comments, docstrings, symbols, diagnostics, chunk_max_size.intoFfiRepr(), data_extraction))
+    public convenience init<GenericIntoRustString: IntoRustString>(_ language: GenericIntoRustString, _ structure: Bool, _ imports: Bool, _ exports: Bool, _ comments: Bool, _ docstrings: Bool, _ symbols: Bool, _ diagnostics: Bool, _ chunk_max_size: Optional<UInt>, _ data_extraction: Bool, _ max_source_bytes: Optional<UInt>, _ parse_timeout_ms: Optional<UInt64>) {
+        self.init(ptr: __swift_bridge__$ProcessConfig$new({ let rustString = language.intoRustString(); rustString.isOwned = false; return rustString.ptr }(), structure, imports, exports, comments, docstrings, symbols, diagnostics, chunk_max_size.intoFfiRepr(), data_extraction, max_source_bytes.intoFfiRepr(), parse_timeout_ms.intoFfiRepr()))
     }
 }
 public class ProcessConfigRefMut: ProcessConfigRef {
@@ -2589,6 +2604,14 @@ extension ProcessConfigRef {
 
     public func dataExtraction() -> Bool {
         __swift_bridge__$ProcessConfig$data_extraction(ptr)
+    }
+
+    public func maxSourceBytes() -> Optional<UInt> {
+        __swift_bridge__$ProcessConfig$max_source_bytes(ptr).intoSwiftRepr()
+    }
+
+    public func parseTimeoutMs() -> Optional<UInt64> {
+        __swift_bridge__$ProcessConfig$parse_timeout_ms(ptr).intoSwiftRepr()
     }
 }
 extension ProcessConfig: Vectorizable {
@@ -3424,3 +3447,6 @@ extension Language: Vectorizable {
         __swift_bridge__$Vec_Language$len(vecPtr)
     }
 }
+
+
+

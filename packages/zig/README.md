@@ -108,9 +108,39 @@ Direct C FFI via @cImport, idiomatic error sets, optional types, and slice-based
 
 ## Installation
 
+Requires Zig 0.16+. Fetch the `1.14.3` package tarball from the [GitHub releases page](https://github.com/xberg-io/tree-sitter-language-pack/releases):
+
+```bash
+zig fetch --save <release-tarball-url>
+```
+
+Then add the dependency to your `build.zig`:
+
+```zig
+const tslp = b.dependency("tree_sitter_language_pack", .{
+    .target = target,
+    .optimize = optimize,
+});
+exe.root_module.addImport("tree_sitter_language_pack", tslp.module("tree_sitter_language_pack"));
+```
+
 ## Quick Start
 
-See the [language guide](https://docs.tree-sitter-language-pack.xberg.io) for `zig`-specific usage.
+```zig
+const std = @import("std");
+const tslp = @import("tree_sitter_language_pack");
+
+pub fn main() !void {
+    // `process` returns the result as owned JSON, allocated with the C allocator.
+    const result_json = try tslp.process(
+        "def hello():\n    print('world')\n",
+        "{\"language\":\"python\"}",
+    );
+    defer std.heap.c_allocator.free(result_json);
+
+    std.debug.print("{s}\n", .{result_json});
+}
+```
 
 ## Features
 

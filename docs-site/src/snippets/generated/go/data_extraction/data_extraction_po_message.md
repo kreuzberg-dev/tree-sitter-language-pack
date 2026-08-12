@@ -1,3 +1,12 @@
+---
+id: fixture_go_data_extraction_po_message
+language: go
+target: go
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```go title="Go"
 package main
 
@@ -18,6 +27,6 @@ msgstr "Hallo"
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(result)
+	fmt.Printf("%+v\n", result)
 }
 ```

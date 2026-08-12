@@ -1,3 +1,12 @@
+---
+id: fixture_python_error_handling_haskell_unterminated_block_comment
+language: python
+target: python
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```python title="Python"
 from tree_sitter_language_pack import process
 

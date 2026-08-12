@@ -1,3 +1,12 @@
+---
+id: fixture_go_java_class_process
+language: go
+target: go
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```go title="Go"
 package main
 
@@ -22,6 +31,6 @@ public class Greeter {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(result)
+	fmt.Printf("%+v\n", result)
 }
 ```

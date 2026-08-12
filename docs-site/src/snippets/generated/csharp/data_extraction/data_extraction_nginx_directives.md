@@ -1,3 +1,12 @@
+---
+id: fixture_csharp_data_extraction_nginx_directives
+language: csharp
+target: csharp
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```csharp title="C#"
 using TreeSitterLanguagePack;
 

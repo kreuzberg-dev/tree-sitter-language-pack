@@ -117,7 +117,19 @@ Pre-compiled tree-sitter grammars for 371 programming languages with Java bindin
 
 ## Quick Start
 
-See the [language guide](https://docs.tree-sitter-language-pack.xberg.io) for `java`-specific usage.
+```java title="Java"
+import io.xberg.treesitterlanguagepack.*;
+
+public final class Example {
+    public static void main(String[] args) throws Exception {
+        var configJson = "{\"language\":\"python\"}";
+var config = JsonUtil.fromJson(configJson, ProcessConfig.class);
+        var result = io.xberg.treesitterlanguagepack.TreeSitterLanguagePack.process("# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n", config);
+        System.out.println(result);
+    }
+}
+
+```
 
 ## Features
 

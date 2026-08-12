@@ -1,3 +1,12 @@
+---
+id: fixture_csharp_smoke_gren
+language: csharp
+target: csharp
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```csharp title="C#"
 using TreeSitterLanguagePack;
 

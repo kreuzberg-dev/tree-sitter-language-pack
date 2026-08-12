@@ -1,3 +1,12 @@
+---
+id: fixture_swift_registry_has_language_false
+language: swift
+target: swift
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```swift title="Swift"
 import TreeSitterLanguagePack
 

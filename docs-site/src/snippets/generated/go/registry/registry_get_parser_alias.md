@@ -1,3 +1,12 @@
+---
+id: fixture_go_registry_get_parser_alias
+language: go
+target: go
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```go title="Go"
 package main
 
@@ -11,6 +20,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(parser)
+	fmt.Printf("%+v\n", parser)
 }
 ```

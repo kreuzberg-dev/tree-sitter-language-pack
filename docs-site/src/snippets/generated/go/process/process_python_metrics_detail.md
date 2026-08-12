@@ -1,3 +1,12 @@
+---
+id: fixture_go_process_python_metrics_detail
+language: go
+target: go
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```go title="Go"
 package main
 
@@ -24,6 +33,6 @@ def world():
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(result)
+	fmt.Printf("%+v\n", result)
 }
 ```

@@ -113,7 +113,12 @@ dotnet add package XbergIo.TreeSitterLanguagePack
 
 ## Quick Start
 
-See the [language guide](https://docs.tree-sitter-language-pack.xberg.io) for `csharp`-specific usage.
+```csharp title="C#"
+using TreeSitterLanguagePack;
+
+var result = TreeSitterLanguagePackConverter.Process("# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n", new ProcessConfig { Language = "python" });
+
+```
 
 ## Features
 

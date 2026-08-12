@@ -1,3 +1,12 @@
+---
+id: fixture_java_smoke_gstlaunch
+language: java
+target: java
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```java title="Java"
 import io.xberg.treesitterlanguagepack.*;
 
@@ -6,6 +15,7 @@ public final class Example {
         var configJson = "{\"language\":\"gstlaunch\"}";
 var config = JsonUtil.fromJson(configJson, ProcessConfig.class);
         var result = io.xberg.treesitterlanguagepack.TreeSitterLanguagePack.process("fakesrc ! fakesink", config);
+        System.out.println(result);
     }
 }
 

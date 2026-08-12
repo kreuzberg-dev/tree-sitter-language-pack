@@ -1,3 +1,12 @@
+---
+id: fixture_csharp_process_rust_structure_name
+language: csharp
+target: csharp
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```csharp title="C#"
 using TreeSitterLanguagePack;
 

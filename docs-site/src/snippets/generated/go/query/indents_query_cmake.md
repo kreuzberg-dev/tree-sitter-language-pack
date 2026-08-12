@@ -1,3 +1,12 @@
+---
+id: fixture_go_indents_query_cmake
+language: go
+target: go
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```go title="Go"
 package main
 
@@ -8,6 +17,6 @@ import (
 
 func main() {
 	result := tspack.GetIndentsQuery(`cmake`)
-	fmt.Println(result)
+	fmt.Printf("%+v\n", result)
 }
 ```

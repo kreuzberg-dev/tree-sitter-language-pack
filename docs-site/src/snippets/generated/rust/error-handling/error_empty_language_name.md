@@ -1,3 +1,12 @@
+---
+id: fixture_rust_error_empty_language_name
+language: rust
+target: rust
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```rust title="Rust"
 use tree_sitter_language_pack::process;
 

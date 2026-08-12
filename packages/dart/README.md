@@ -108,9 +108,28 @@ Built with flutter_rust_bridge for isolate-safe Future APIs and Flutter-native t
 
 ## Installation
 
+```bash
+dart pub add tree_sitter_language_pack
+```
+
+Flutter projects use `flutter pub add tree_sitter_language_pack` instead.
+
 ## Quick Start
 
-See the [language guide](https://docs.tree-sitter-language-pack.xberg.io) for `dart`-specific usage.
+```dart title="Dart"
+import 'package:tree_sitter_language_pack/tree_sitter_language_pack.dart';
+import 'package:tree_sitter_language_pack/src/tree_sitter_language_pack_bridge_generated/frb_generated.dart' show RustLib;
+Future<void> main() async {
+  await RustLib.init();
+  try {
+    final _config = await createProcessConfigFromJson(json: '{"language":"python"}');
+    final result = await TreeSitterLanguagePackBridge.process('# A comment\ndef greet(name):\n    """Say hello."""\n    return f\'Hi {name}\'\n\nimport os\n', config: _config);
+  } finally {
+    RustLib.dispose();
+  }
+}
+
+```
 
 ## Features
 

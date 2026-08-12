@@ -108,9 +108,24 @@ Via swift-bridge for macOS, iOS, and Linux with native Swift types and async/awa
 
 ## Installation
 
+Requires Swift 6.0+. Add to your `Package.swift`:
+
+```swift
+.package(
+    url: "https://github.com/xberg-io/tree-sitter-language-pack",
+    exact: "1.14.3"
+)
+```
+
 ## Quick Start
 
-See the [language guide](https://docs.tree-sitter-language-pack.xberg.io) for `swift`-specific usage.
+```swift title="Swift"
+import TreeSitterLanguagePack
+
+let configObj = try TreeSitterLanguagePack.processConfigFromJson("{\"language\":\"python\"}")
+_ = try TreeSitterLanguagePack.process(source: "# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n", config: configObj)
+
+```
 
 ## Features
 

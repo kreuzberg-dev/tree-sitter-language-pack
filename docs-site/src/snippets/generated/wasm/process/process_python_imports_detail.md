@@ -1,3 +1,12 @@
+---
+id: fixture_wasm_process_python_imports_detail
+language: typescript
+target: wasm
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```typescript title="WebAssembly"
 import { process } from "@xberg-io/tree-sitter-language-pack-wasm";
 function main() {

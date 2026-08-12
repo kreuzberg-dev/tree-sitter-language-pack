@@ -1,13 +1,20 @@
+---
+id: fixture_zig_error_handling_unknown_language
+language: zig
+target: zig
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```zig title="Zig"
 const std = @import("std");
 const tree_sitter_language_pack = @import("tree_sitter_language_pack");
 
 pub fn main() !void {
-    const _result_json = tree_sitter_language_pack.process("", "{\"language\":\"nonexistent_xyz\"}") catch |err| {
-        std.debug.print("call failed as expected: {s}\n", .{@errorName(err)});
-        return;
-    };
-    _ = _result_json;
+    if (tree_sitter_language_pack.process("", "{\"language\":\"nonexistent_xyz\"}")) |_| {
+        return error.TestUnexpectedResult;
+    } else |err| { std.debug.print("call failed as expected: {s}\n", .{@errorName(err)}); }
 }
 
 ```

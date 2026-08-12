@@ -1,7 +1,19 @@
+---
+id: fixture_kotlin_android_data_extraction_nginx_directives
+language: kotlin
+target: kotlin_android
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```kotlin title="Kotlin (Android)"
 import io.xberg.tslp.android.*
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
-fun main() = kotlinx.coroutines.runBlocking {
+fun main() {
+    val mapper = jacksonObjectMapper()
+    val config = mapper.readValue("{\"data_extraction\":true,\"language\":\"nginx\"}", ProcessConfig::class.java)
     val result = TreeSitterLanguagePack.process("worker_processes 4;\nerror_log /var/log/nginx/error.log;\n", config)
 }
 

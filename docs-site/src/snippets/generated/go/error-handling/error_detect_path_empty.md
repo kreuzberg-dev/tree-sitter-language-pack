@@ -1,3 +1,12 @@
+---
+id: fixture_go_error_detect_path_empty
+language: go
+target: go
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```go title="Go"
 package main
 
@@ -8,6 +17,6 @@ import (
 
 func main() {
 	result := tspack.DetectLanguageFromPath(``)
-	fmt.Println(result)
+	fmt.Printf("%+v\n", result)
 }
 ```

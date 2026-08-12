@@ -144,7 +144,11 @@ Future<PlatformInt64> languageCount() =>
 ///
 /// **Errors:**
 ///
-/// Returns an error if the language is not found or parsing fails.
+/// Returns `Error.InvalidRange` if the config carries a zero-valued limit or
+/// the source exceeds `ProcessConfig.max_source_bytes`,
+/// `Error.ParseTimeout` if the parse exceeds
+/// `ProcessConfig.parse_timeout_ms`, `Error.LanguageNotFound` if the
+/// language is unknown, or `Error.ParseFailed` if parsing yields no tree.
 Future<ProcessResult> process({
   required String source,
   required ProcessConfig config,
@@ -217,19 +221,26 @@ Future<void> prefetch({required List<String> languages}) =>
 /// Returns an error if the manifest cannot be fetched or the bundle download fails.
 Future<PlatformInt64> downloadAll() => RustLib.instance.api.crateDownloadAll();
 
-/// Download every language in a named group (e.g. `"web"`, `"data"`).
+/// Download every language in a named group.
 ///
-/// Groups are defined in the remote manifest and let you ensure a curated
-/// set of related grammars in one call instead of listing each name to
-/// `download()`. Already-cached languages are skipped.
+/// Groups are defined by the remote manifest, not by this library, and let you
+/// ensure a curated set of related grammars in one call instead of listing each
+/// name to `download()`. Already-cached languages are skipped.
+///
+/// Call `manifest_groups` to discover the group names the manifest actually
+/// defines. The published manifest currently defines a single group, `"all"`;
+/// earlier revisions of this documentation advertised `"web"`, `"data"`, and
+/// `"systems"`, which the manifest has never contained, so every call following
+/// that example failed. Do not hardcode a group name without checking. ~keep
 ///
 /// Returns the total number of languages now available (statically compiled
 /// plus downloaded and cached).
 ///
 /// **Errors:**
 ///
-/// Returns an error if the manifest cannot be fetched, the group is unknown,
-/// or any constituent language fails to download.
+/// Returns `Error.Download` if the manifest cannot be fetched, if the group
+/// is unknown — the message lists the groups the manifest defines — or if any
+/// constituent language fails to download.
 Future<PlatformInt64> downloadGroup({required String name}) =>
     RustLib.instance.api.crateDownloadGroup(name: name);
 
@@ -244,6 +255,19 @@ Future<PlatformInt64> downloadGroup({required String name}) =>
 /// Returns an error if the manifest cannot be fetched.
 Future<List<String>> manifestLanguages() =>
     RustLib.instance.api.crateManifestLanguages();
+
+/// Return the names of every language group the remote manifest defines, sorted.
+///
+/// Group names are manifest data, not a compile-time constant of this library, so
+/// this is the only reliable way to learn what `download_group` and
+/// `PackConfig.groups` accept. The published manifest currently defines just
+/// `"all"`. ~keep
+///
+/// **Errors:**
+///
+/// Returns `Error.Download` if the manifest cannot be fetched.
+Future<List<String>> manifestGroups() =>
+    RustLib.instance.api.crateManifestGroups();
 
 /// Return languages that are already downloaded and cached locally.
 ///
@@ -349,9 +373,6 @@ abstract class Language implements RustOpaqueInterface {}
 abstract class LanguageRegistry implements RustOpaqueInterface {
   Future<List<String>> availableLanguages();
 
-  static Future<LanguageRegistry> default_() =>
-      RustLib.instance.api.crateLanguageRegistryDefault();
-
   Future<Language> getLanguage({required String name});
 
   Future<bool> hasLanguage({required String name});
@@ -379,8 +400,6 @@ abstract class Node implements RustOpaqueInterface {
   Future<Node?> childByFieldName({required String name});
 
   Future<PlatformInt64> childCount();
-
-  Future<Node> clone();
 
   Future<PlatformInt64> endByte();
 
@@ -417,8 +436,6 @@ abstract class Node implements RustOpaqueInterface {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Parser>>
 abstract class Parser implements RustOpaqueInterface {
-  static Future<Parser> default_() => RustLib.instance.api.crateParserDefault();
-
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
   static Future<Parser> newInstance() => RustLib.instance.api.crateParserNew();
 
@@ -429,6 +446,10 @@ abstract class Parser implements RustOpaqueInterface {
   Future<void> reset();
 
   Future<void> setLanguage({required String name});
+
+  Future<void> setMaxSourceBytes({PlatformInt64? maxBytes});
+
+  Future<void> setParseTimeoutMs({PlatformInt64? timeoutMs});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Tree>>
@@ -952,6 +973,14 @@ sealed class Error with _$Error {
   /// The tree-sitter parser returned no tree for the given source input.
   const factory Error.parseFailed() = Error_ParseFailed;
 
+  /// The parse was cancelled because it exceeded its configured wall-clock budget.
+  ///
+  /// Raised only when a budget is configured — see
+  /// [`ProcessConfig::parse_timeout_ms`](crate::ProcessConfig::parse_timeout_ms),
+  /// which defaults to `None`.
+  const factory Error.parseTimeout({required PlatformInt64 timeoutMs}) =
+      Error_ParseTimeout;
+
   /// A tree-sitter query could not be compiled or executed.
   const factory Error.queryError({required String field0}) = Error_QueryError;
 
@@ -1153,7 +1182,12 @@ class PackConfig {
   /// Each entry is a language name (e.g. `"python"`, `"rust"`).
   final List<String>? languages;
 
-  /// Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).
+  /// Language groups to pre-download.
+  ///
+  /// Group names come from the remote manifest, so the valid set is not fixed
+  /// by this crate; the published manifest currently defines only `"all"`.
+  /// Call [`manifest_groups`](crate::manifest_groups) to enumerate them.
+  /// An unknown name makes [`init`](crate::init) fail. ~keep
   final List<String>? groups;
 
   const PackConfig({this.cacheDir, this.languages, this.groups});
@@ -1176,7 +1210,20 @@ class Point {
   /// Zero-indexed row number.
   final PlatformInt64 row;
 
-  /// Zero-indexed column number, in UTF-16 code units.
+  /// Zero-indexed column, counted in **bytes** from the start of the row.
+  ///
+  /// This is `tree_sitter::Point::column` verbatim, and tree-sitter defines it
+  /// as a byte offset — not characters, and not UTF-16 code units. Measured on
+  /// a row of the form `x = '<c>'` where `<c>` is a single 4-byte character
+  /// (an emoji), the string node reports columns `4..10`, identical to its
+  /// byte range; the character columns would be `4..7` and the UTF-16 columns
+  /// `4..8`.
+  ///
+  /// Anything that builds LSP positions (UTF-16) or editor caret columns
+  /// (characters) from this field is silently wrong on every row containing a
+  /// non-ASCII byte, and must re-measure the row against the source text
+  /// instead. Earlier releases documented this field as UTF-16 code units;
+  /// that was never what the value contained. ~keep
   final PlatformInt64 column;
 
   const Point({required this.row, required this.column});
@@ -1237,6 +1284,11 @@ class ProcessConfig {
   final bool diagnostics;
 
   /// Maximum chunk size in bytes. `None` disables chunking.
+  ///
+  /// `Some(0)` is rejected by [`ProcessConfig::validate`] with
+  /// [`Error::InvalidRange`](crate::Error::InvalidRange). A zero-sized chunk
+  /// limit previously produced an empty chunk list and silently discarded the
+  /// whole source; use `None` to mean "do not chunk". ~keep
   final PlatformInt64? chunkMaxSize;
 
   /// Extract hierarchical key/value data tree from data-format files. Default: false.
@@ -1259,6 +1311,29 @@ class ProcessConfig {
   /// ```
   final bool dataExtraction;
 
+  /// Reject source longer than this many bytes instead of parsing it.
+  /// Default: `None` (unbounded).
+  ///
+  /// Tree-sitter allocates and walks proportionally to input size, so an
+  /// unbounded parse of attacker-supplied input is a denial-of-service vector.
+  /// The default stays unbounded for backward compatibility; services handling
+  /// untrusted input should opt in, e.g. with
+  /// [`RECOMMENDED_MAX_SOURCE_BYTES`]. ~keep
+  ///
+  /// Exceeding the limit fails the call with
+  /// [`Error::InvalidRange`](crate::Error::InvalidRange) — the source is never
+  /// silently truncated.
+  final PlatformInt64? maxSourceBytes;
+
+  /// Wall-clock budget for the parse step, in milliseconds.
+  /// Default: `None` (no timeout).
+  ///
+  /// Enforced through tree-sitter's parse progress callback, which the parser
+  /// invokes periodically; cancellation is therefore granular to that callback
+  /// interval rather than exact. A parse that exceeds the budget fails with
+  /// [`Error::ParseFailed`](crate::Error::ParseFailed). ~keep
+  final PlatformInt64? parseTimeoutMs;
+
   const ProcessConfig({
     required this.language,
     required this.structure,
@@ -1270,6 +1345,8 @@ class ProcessConfig {
     required this.diagnostics,
     this.chunkMaxSize,
     required this.dataExtraction,
+    this.maxSourceBytes,
+    this.parseTimeoutMs,
   });
 
   @override
@@ -1283,7 +1360,9 @@ class ProcessConfig {
       symbols.hashCode ^
       diagnostics.hashCode ^
       chunkMaxSize.hashCode ^
-      dataExtraction.hashCode;
+      dataExtraction.hashCode ^
+      maxSourceBytes.hashCode ^
+      parseTimeoutMs.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -1299,7 +1378,9 @@ class ProcessConfig {
           symbols == other.symbols &&
           diagnostics == other.diagnostics &&
           chunkMaxSize == other.chunkMaxSize &&
-          dataExtraction == other.dataExtraction;
+          dataExtraction == other.dataExtraction &&
+          maxSourceBytes == other.maxSourceBytes &&
+          parseTimeoutMs == other.parseTimeoutMs;
 }
 
 /// Complete analysis result from processing a source file.
@@ -1420,13 +1501,15 @@ class Span {
   /// Zero-indexed line number of the span's start.
   final PlatformInt64 startLine;
 
-  /// Zero-indexed column number of the span's start.
+  /// Zero-indexed column of the span's start, counted in **bytes** from the
+  /// start of the line — not characters, not UTF-16 code units. ~keep
   final PlatformInt64 startColumn;
 
   /// Zero-indexed line number of the span's end.
   final PlatformInt64 endLine;
 
-  /// Zero-indexed column number of the span's end.
+  /// Zero-indexed column of the span's end, counted in **bytes** from the
+  /// start of the line — not characters, not UTF-16 code units. ~keep
   final PlatformInt64 endColumn;
 
   const Span({

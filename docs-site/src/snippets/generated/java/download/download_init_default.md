@@ -1,3 +1,12 @@
+---
+id: fixture_java_download_init_default
+language: java
+target: java
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```java title="Java"
 import io.xberg.treesitterlanguagepack.*;
 

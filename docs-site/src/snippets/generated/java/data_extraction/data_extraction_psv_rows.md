@@ -1,3 +1,12 @@
+---
+id: fixture_java_data_extraction_psv_rows
+language: java
+target: java
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```java title="Java"
 import io.xberg.treesitterlanguagepack.*;
 
@@ -6,6 +15,7 @@ public final class Example {
         var configJson = "{\"data_extraction\":true,\"language\":\"psv\"}";
 var config = JsonUtil.fromJson(configJson, ProcessConfig.class);
         var result = io.xberg.treesitterlanguagepack.TreeSitterLanguagePack.process("a|b|c\n1|2|3\n", config);
+        System.out.println(result);
     }
 }
 

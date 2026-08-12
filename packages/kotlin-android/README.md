@@ -109,9 +109,28 @@ JVM consumers should use the canonical `io.xberg.treesitterlanguagepack:tree-sit
 
 ## Installation
 
+Add to your module's `build.gradle.kts`:
+
+```kotlin
+dependencies {
+    implementation("io.xberg.tslp.android:tree-sitter-language-pack-android:1.14.3")
+}
+```
+
 ## Quick Start
 
-See the [language guide](https://docs.tree-sitter-language-pack.xberg.io) for `kotlin_android`-specific usage.
+```kotlin
+import io.xberg.tslp.android.ProcessConfig
+import io.xberg.tslp.android.TreeSitterLanguagePack
+
+fun main() {
+    val config = ProcessConfig(language = "python")
+    val result = TreeSitterLanguagePack.process("def hello():\n    print('world')\n", config)
+
+    println("Language: ${result.language}")
+    println("Functions: ${result.structure.size}")
+}
+```
 
 ## Features
 

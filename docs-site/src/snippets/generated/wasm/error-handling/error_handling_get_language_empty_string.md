@@ -1,3 +1,12 @@
+---
+id: fixture_wasm_error_handling_get_language_empty_string
+language: typescript
+target: wasm
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```typescript title="WebAssembly"
 import { getLanguage } from "@xberg-io/tree-sitter-language-pack-wasm";
 function main() {

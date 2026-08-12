@@ -1,3 +1,12 @@
+---
+id: fixture_go_python_chunking_process_detail
+language: go
+target: go
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```go title="Go"
 package main
 
@@ -27,6 +36,6 @@ def delta():
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(result)
+	fmt.Printf("%+v\n", result)
 }
 ```

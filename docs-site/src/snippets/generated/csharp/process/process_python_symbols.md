@@ -1,3 +1,12 @@
+---
+id: fixture_csharp_process_python_symbols
+language: csharp
+target: csharp
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```csharp title="C#"
 using TreeSitterLanguagePack;
 

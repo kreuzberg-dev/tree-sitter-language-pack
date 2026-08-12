@@ -1,3 +1,12 @@
+---
+id: fixture_swift_config_minimal_python
+language: swift
+target: swift
+level: typecheck
+requires: []
+side_effect: safe
+---
+
 ```swift title="Swift"
 import TreeSitterLanguagePack
 
