@@ -150,9 +150,18 @@ tasks:
       - poly lint .
 
   lint:licenses:
-    desc: Verify all grammar repositories use permissive licenses (no GPL/AGPL/copyleft)
+    desc: Refresh sources/license_cache.json and verify grammar licenses (writes the cache)
     cmds:
       - uv run --no-sync python scripts/lint_grammar_licenses.py --update-cache
+
+  lint:licenses:check:
+    # Gate mode: no --update-cache, so sources/license_cache.json is never written and
+    # the working tree stays clean. A grammar whose repo is not already cached is
+    # resolved live via `gh api`, which is what makes a newly added copyleft grammar
+    # fail here rather than pass on a stale cache. Needs an authenticated `gh`. ~keep
+    desc: Verify all grammar repositories use permissive licenses (no GPL/AGPL/copyleft)
+    cmds:
+      - uv run --no-sync python scripts/lint_grammar_licenses.py
 
   check:
     desc: Run check-only validation

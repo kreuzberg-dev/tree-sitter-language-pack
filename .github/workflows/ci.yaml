@@ -75,8 +75,7 @@ jobs:
     timeout-minutes: 90
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Add swap space
         run: |
           sudo swapoff -a || true
@@ -87,7 +86,7 @@ jobs:
           free -h
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: "22"
 
@@ -95,12 +94,12 @@ jobs:
         run: npm install -g tree-sitter-cli@0.26.11
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v8.2.0
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
           enable-cache: true
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.14"
 
@@ -108,7 +107,7 @@ jobs:
         run: uv sync --no-install-project --no-install-workspace
 
       - name: Cache parsers
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: parsers
           key: parsers-${{ hashFiles('sources/language_definitions.json') }}
@@ -123,7 +122,7 @@ jobs:
           uv run --script scripts/clone_vendors.py
 
       - name: Upload parsers
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: language-parsers
           path: parsers
@@ -164,10 +163,9 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -192,12 +190,12 @@ jobs:
       # existing environment, so the sync is not optional. Mirrors the
       # clone-vendors job's setup. ~keep
       - name: Install uv
-        uses: astral-sh/setup-uv@v8.2.0
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
           enable-cache: true
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.14"
 
@@ -344,6 +342,57 @@ jobs:
             exit 1
           }
 
+  # Blocks PRs that introduce a grammar under a copyleft (GPL/AGPL/LGPL/MPL/EUPL/OSL)
+  # licence, or one whose licence cannot be resolved at all. This job does NOT need
+  # `parsers/`: the linter resolves every SPDX id from sources/language_definitions.json,
+  # the committed sources/license_cache.json, and the GitHub API — never from cloned
+  # grammar sources — so it runs standalone off a bare checkout and does not wait on
+  # clone-vendors. Deliberately no `--update-cache`: gate mode never writes the cache,
+  # and an entry missing from it is resolved live, which is exactly the path a newly
+  # added grammar takes. ~keep
+  licenses:
+    name: Grammar Licenses
+    if: github.repository == 'xberg-io/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        with:
+          enable-cache: true
+
+      - name: Setup Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.14"
+
+      - name: Install Python dependencies
+        run: uv sync --no-install-project --no-install-workspace
+
+      - name: Install Task
+        uses: xberg-io/actions/install-task@v1
+
+      - name: Verify grammar licenses are permissive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test -f sources/language_definitions.json || {
+            echo "::error::sources/language_definitions.json missing; gate would be vacuous"; exit 1; }
+          test -f sources/license_cache.json || {
+            echo "::error::sources/license_cache.json missing; gate would rebuild it and self-certify"; exit 1; }
+          gh auth status >/dev/null 2>&1 || {
+            echo "::error::gh is not authenticated; unresolvable grammars would be silently uncheckable"; exit 1; }
+          task lint:licenses:check
+
+      # The linter writes sources/license_cache.json only under --update-cache or when
+      # the cache is absent. Both are guarded above, so any diff here means the gate
+      # mutated tracked state and its own verdict cannot be trusted. ~keep
+      - name: Assert the gate did not rewrite the licence cache
+        run: git diff --exit-code -- sources/license_cache.json
+
   changes:
     name: Detect Changes
     if: github.repository == 'xberg-io/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
@@ -365,10 +414,9 @@ jobs:
       docker: ${{ steps.filter.outputs.docker }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Detect changes
-        uses: dorny/paths-filter@v4
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
           filters: |
@@ -446,10 +494,9 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -494,10 +541,9 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -513,7 +559,7 @@ jobs:
         run: cargo build --release --locked -p ts-pack-core-ffi
 
       - name: Upload FFI artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ffi-${{ matrix.os }}
           path: |
@@ -539,10 +585,9 @@ jobs:
             label: macos-arm64
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -556,7 +601,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12"
 
@@ -610,7 +655,7 @@ jobs:
 
       - name: Upload build log
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: parser-build-log-${{ matrix.label }}
           path: build.log
@@ -632,7 +677,7 @@ jobs:
           cd staging && tar -cf - . | zstd -3 -o "../dist/parsers-${{ matrix.label }}.tar.zst"
 
       - name: Upload e2e parser bundle
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: e2e-bundles-${{ matrix.label }}
           path: dist/parsers-${{ matrix.label }}.tar.zst
@@ -664,10 +709,9 @@ jobs:
             label: windows-aarch64
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -681,7 +725,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12"
 
@@ -717,7 +761,7 @@ jobs:
 
       - name: Upload build log
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: parser-build-log-${{ matrix.label }}
           path: build.log
@@ -762,10 +806,9 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -785,7 +828,7 @@ jobs:
         run: maturin build --release --out ../../dist
 
       - name: Upload wheel
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: wheel-${{ matrix.platform }}
           path: dist/*.whl
@@ -821,10 +864,9 @@ jobs:
       TSLP_LANGUAGES: "all"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download e2e parser bundle
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: e2e-bundles-${{ matrix.platform }}
           path: e2e-bundles
@@ -837,12 +879,12 @@ jobs:
         run: ./scripts/ci/prepare_e2e_manifest.sh
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Download wheel
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: wheel-${{ matrix.platform }}
           path: dist
@@ -883,10 +925,9 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -899,7 +940,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: "22"
 
@@ -911,7 +952,7 @@ jobs:
         run: napi build --release --platform --target ${{ matrix.target }}
 
       - name: Upload native module
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: node-${{ matrix.platform }}
           path: crates/ts-pack-core-node/*.node
@@ -939,10 +980,9 @@ jobs:
             platform: macos-arm64
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download e2e parser bundle
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: e2e-bundles-${{ matrix.platform == 'linux-x64' && 'linux-x86_64' || 'macos-arm64' }}
           path: e2e-bundles
@@ -960,7 +1000,7 @@ jobs:
           node-version: "22"
 
       - name: Download native module
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: node-${{ matrix.platform }}
           path: crates/ts-pack-core-node/
@@ -991,10 +1031,9 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -1036,7 +1075,7 @@ jobs:
           done
 
       - name: Upload WASM artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: wasm-pkg
           path: |
@@ -1055,7 +1094,7 @@ jobs:
           CARGO_PROFILE_RELEASE_CODEGEN_UNITS: "16"
 
       - name: Upload WASM Node.js artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: wasm-node-pkg
           path: |
@@ -1078,10 +1117,9 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download e2e parser bundle
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: e2e-bundles-linux-x86_64
           path: e2e-bundles
@@ -1094,13 +1132,13 @@ jobs:
         run: ./scripts/ci/prepare_e2e_manifest.sh
 
       - name: Download WASM Node.js artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: wasm-node-pkg
           path: crates/ts-pack-core-wasm/pkg/nodejs/
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: "22"
 
@@ -1128,10 +1166,9 @@ jobs:
       PROJECT_ROOT: ${{ github.workspace }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download e2e parser bundle
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: e2e-bundles-linux-x86_64
           path: e2e-bundles
@@ -1144,13 +1181,13 @@ jobs:
         run: ./scripts/ci/prepare_e2e_manifest.sh
 
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
 
       - name: Download FFI artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: ffi-ubuntu-latest
           path: ffi-artifacts
@@ -1175,7 +1212,7 @@ jobs:
             || (echo "ERROR: module path in go.mod is wrong" && exit 1)
 
       - name: Setup Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
         with:
           go-version: "1.26"
           cache-dependency-path: packages/go/go.sum
@@ -1226,10 +1263,9 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download e2e parser bundle
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: e2e-bundles-linux-x86_64
           path: e2e-bundles
@@ -1242,13 +1278,13 @@ jobs:
         run: ./scripts/ci/prepare_e2e_manifest.sh
 
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
 
       - name: Download FFI artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: ffi-ubuntu-latest
           path: ffi-artifacts
@@ -1261,7 +1297,7 @@ jobs:
           cp -r ffi-artifacts/crates/ts-pack-core-ffi/include/* crates/ts-pack-core-ffi/include/ 2>/dev/null || true
 
       - name: Setup Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
         with:
           distribution: "temurin"
           java-version: "25"
@@ -1279,7 +1315,7 @@ jobs:
 
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: java-unit-reports
           path: packages/java/target/surefire-reports
@@ -1309,7 +1345,7 @@ jobs:
 
       - name: Upload E2E test reports
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: java-e2e-reports
           path: e2e/java/target/surefire-reports
@@ -1339,10 +1375,9 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download e2e parser bundle
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: e2e-bundles-${{ matrix.os == 'ubuntu-latest' && 'linux-x86_64' || 'macos-arm64' }}
           path: e2e-bundles
@@ -1355,7 +1390,7 @@ jobs:
         run: ./scripts/ci/prepare_e2e_manifest.sh
 
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -1375,7 +1410,7 @@ jobs:
         run: cargo build --locked -p ts-pack-core-ffi --release
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -1438,10 +1473,9 @@ jobs:
       TSLP_LANGUAGES: "all"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download e2e parser bundle
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: e2e-bundles-linux-x86_64
           path: e2e-bundles
@@ -1454,7 +1488,7 @@ jobs:
         run: ./scripts/ci/prepare_e2e_manifest.sh
 
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -1467,7 +1501,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
           ruby-version: ${{ matrix.ruby-version }}
 
@@ -1511,11 +1545,10 @@ jobs:
       TSLP_LANGUAGES: "all"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download e2e parser bundle
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: e2e-bundles-linux-x86_64
           path: e2e-bundles
@@ -1529,7 +1562,7 @@ jobs:
         run: ./scripts/ci/prepare_e2e_manifest.sh
 
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -1546,7 +1579,7 @@ jobs:
         uses: xberg-io/actions/install-task@v1
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@2.37.1
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
         with:
           php-version: "8.4"
           extensions: ffi
@@ -1618,10 +1651,9 @@ jobs:
       TSLP_LANGUAGES: "all"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download e2e parser bundle
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: e2e-bundles-linux-x86_64
           path: e2e-bundles
@@ -1634,7 +1666,7 @@ jobs:
         run: ./scripts/ci/prepare_e2e_manifest.sh
 
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -1656,7 +1688,7 @@ jobs:
         uses: xberg-io/actions/install-task@v1
 
       - name: Cache Elixir dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: |
             packages/elixir/deps
@@ -1717,10 +1749,9 @@ jobs:
       LD_LIBRARY_PATH: ${{ github.workspace }}/target/release
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Download e2e parser bundle
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: e2e-bundles-linux-x86_64
           path: e2e-bundles
@@ -1733,7 +1764,7 @@ jobs:
         run: ./scripts/ci/prepare_e2e_manifest.sh
 
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: language-parsers
           path: parsers

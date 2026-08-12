@@ -1,0 +1,287 @@
+name: CI Sanitize
+
+# ASan/UBSan coverage over the hand-written C external scanners (~184 of the 371
+# grammars ship a `src/scanner.c`/`.cc`). This is not hypothetical: a heap buffer
+# overflow was found in 11 vendored scanners where a 256-byte input wrote 1025
+# bytes into a 1024-byte buffer. Tree-sitter's only bound there is a `ts_assert`,
+# which compiles out under NDEBUG, so a release build has no check at all.
+#
+# Scope, and why:
+#   * Instrumenting all 371 grammars on every push is not affordable — clone +
+#     `tree-sitter generate` alone is a 90-minute job, and ASan roughly triples
+#     C compile time. So the surface is split:
+#   * PR/push (`regression` mode): only the grammars under `patches/`, i.e. the
+#     scanners with a committed memory-safety fix. These are the ones a patch
+#     edit or a grammar-rev bump can silently regress, and they are the cheapest
+#     possible set. Triggered only when `patches/`, `build.rs` or the registry
+#     changes, so it costs nothing on unrelated PRs.
+#   * Nightly (`rotating` mode): the patched set PLUS one shard of the registry,
+#     rotated by day-of-year over SHARD_COUNT shards, so the whole external-scanner
+#     surface is swept every SHARD_COUNT days without any single run being long.
+#
+# Only the C is instrumented (`CFLAGS=-fsanitize=...` + `-Clink-arg=-fsanitize=...`),
+# not Rust. That keeps the job on the pinned stable toolchain instead of requiring
+# nightly `-Zsanitizer` + `-Zbuild-std`, and the scanners are the entire target
+# anyway — the Rust side is already covered by clippy and the normal test suite.
+#
+# Patches are applied by `patch_grammar_sources` in build.rs on the default path;
+# TSLP_SKIP_GRAMMAR_PATCHES is deliberately never set here, and the run asserts the
+# patch tree was found, so this job exercises the *patched* sources.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "patches/**"
+      - "crates/ts-pack-core/build.rs"
+      - "sources/language_definitions.json"
+      - ".github/workflows/ci-sanitize.yaml"
+  schedule:
+    # 03:17 UTC daily — off the top of the hour to avoid the Actions scheduling herd.
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+    inputs:
+      languages:
+        description: Comma-separated languages to sanitize (overrides mode selection)
+        required: false
+        type: string
+
+concurrency:
+  group: ci-sanitize-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: full
+  # Sanitizer aborts use a dedicated exit code so they are distinguishable from an
+  # ordinary non-zero exit (a parse error, a missing file, a panic). Without this a
+  # `|| true` anywhere in the driver would swallow a real finding. ~keep
+  SANITIZER_EXIT_CODE: "42"
+  SHARD_COUNT: "16"
+
+jobs:
+  sanitize-scanners:
+    name: ASan/UBSan external scanners
+    if: github.repository == 'xberg-io/tree-sitter-language-pack'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: "22"
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli@0.26.11
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        with:
+          enable-cache: true
+
+      - name: Setup Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.14"
+
+      - name: Install Python dependencies
+        run: uv sync --no-install-project --no-install-workspace
+
+      - name: Setup Rust
+        uses: xberg-io/actions/setup-rust@v1
+        with:
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      # `patches/*/` is the pinned regression set, so adding a patch automatically
+      # widens the per-PR gate with no workflow edit. The rotating shard is a stable
+      # slice of the sorted registry keyed on day-of-year, which sweeps the whole
+      # grammar surface over SHARD_COUNT days. ~keep
+      - name: Select languages
+        id: select
+        env:
+          OVERRIDE: ${{ inputs.languages }}
+        run: |
+          set -euo pipefail
+          test -d patches || { echo "::error::patches/ missing; the regression set would be empty"; exit 1; }
+
+          PATCHED=$(find patches -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | paste -sd, -)
+          test -n "$PATCHED" || { echo "::error::no patched grammars found under patches/"; exit 1; }
+
+          if [ -n "${OVERRIDE:-}" ]; then
+            MODE=override
+            LANGS="$OVERRIDE"
+          elif [ "${{ github.event_name }}" = "schedule" ]; then
+            MODE=rotating
+            # `date +%j` is zero-padded, and bash reads a leading zero as octal —
+            # `$(( 048 % 16 ))` is a hard syntax error, not a wrong number. ~keep
+            SHARD=$(( 10#$(date -u +%j) % SHARD_COUNT ))
+            ROTATED=$(python3 -c "
+          import json, sys
+          names = sorted(json.load(open('sources/language_definitions.json')))
+          shard, count = int(sys.argv[1]), int(sys.argv[2])
+          print(','.join(names[shard::count]))
+          " "$SHARD" "$SHARD_COUNT")
+            test -n "$ROTATED" || { echo "::error::shard $SHARD of $SHARD_COUNT is empty"; exit 1; }
+            LANGS="$PATCHED,$ROTATED"
+          else
+            MODE=regression
+            LANGS="$PATCHED"
+          fi
+
+          COUNT=$(echo "$LANGS" | tr ',' '\n' | sort -u | wc -l)
+          echo "mode=$MODE" >>"$GITHUB_OUTPUT"
+          echo "languages=$LANGS" >>"$GITHUB_OUTPUT"
+          echo "count=$COUNT" >>"$GITHUB_OUTPUT"
+          echo "::notice::sanitizing $COUNT language(s) in $MODE mode"
+
+      - name: Clone selected grammars
+        env:
+          TSLP_LANGUAGES: ${{ steps.select.outputs.languages }}
+          TSLP_GENERATE_CONCURRENCY: "2"
+        run: uv run --script scripts/clone_vendors.py
+
+      # A `cargo test` over zero compiled grammars is silently green, so the selected
+      # set must be proven on disk before anything is built. ~keep
+      - name: Assert every selected grammar was cloned
+        env:
+          LANGS: ${{ steps.select.outputs.languages }}
+        run: |
+          set -euo pipefail
+          missing=""
+          for lang in $(echo "$LANGS" | tr ',' ' '); do
+            test -f "parsers/$lang/src/parser.c" || missing="$missing $lang"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::selected grammars have no parser.c:$missing"; exit 1
+          fi
+
+      - name: Build ts-pack under ASan + UBSan
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: ${{ steps.select.outputs.languages }}
+          TSLP_LINK_MODE: static
+          # cc-rs appends CFLAGS to every scanner/parser translation unit; build.rs does
+          # not call `no_default_flags()`, so this is the supported injection point.
+          # `-fno-sanitize-recover=all` turns a UBSan diagnosis into a hard abort rather
+          # than a printed warning that a green exit code would hide. ~keep
+          CFLAGS: >-
+            -fsanitize=address,undefined
+            -fno-sanitize-recover=all
+            -fno-omit-frame-pointer
+            -fno-common
+            -g
+          RUSTFLAGS: -Clink-arg=-fsanitize=address,undefined -Cforce-frame-pointers=yes
+        run: cargo build --locked -p ts-pack-cli --bin ts-pack 2>&1 | tee build.log
+
+      # The single most important check in this job: it proves the CFLAGS above actually
+      # reached the compiler. If cc-rs ever stops forwarding CFLAGS, or build.rs starts
+      # calling `no_default_flags()`, every step below still exits 0 while checking
+      # nothing — a green gate that proves nothing. An uninstrumented binary has no
+      # `__asan_` symbols. ~keep
+      - name: Assert the binary is actually instrumented
+        run: |
+          set -euo pipefail
+          BIN=target/debug/ts-pack
+          test -x "$BIN" || { echo "::error::$BIN was not produced"; exit 1; }
+          if ! nm -C "$BIN" 2>/dev/null | grep -q '__asan_'; then
+            echo "::error::$BIN contains no __asan_ symbols — sanitizer flags did not take effect"
+            exit 1
+          fi
+          if ! nm -C "$BIN" 2>/dev/null | grep -q '__ubsan_'; then
+            echo "::error::$BIN contains no __ubsan_ symbols — UBSan did not take effect"
+            exit 1
+          fi
+          if grep -q 'TSLP_SKIP_GRAMMAR_PATCHES is set' build.log; then
+            echo "::error::grammar patches were skipped; this run would sanitize unpatched sources"
+            exit 1
+          fi
+          if grep -q 'grammar patch tree not found' build.log; then
+            echo "::error::patch tree was not located; patched sources were not exercised"
+            exit 1
+          fi
+
+      # Each selected grammar must be linked in and reachable, otherwise the parse
+      # sweep below would iterate over languages the binary cannot load and still
+      # report success on the ones it can. ~keep
+      - name: Assert every selected grammar is linked in
+        env:
+          LANGS: ${{ steps.select.outputs.languages }}
+          ASAN_OPTIONS: detect_leaks=0
+        run: |
+          set -euo pipefail
+          target/debug/ts-pack list >linked.txt
+          missing=""
+          for lang in $(echo "$LANGS" | tr ',' ' '); do
+            grep -qw -- "$lang" linked.txt || missing="$missing $lang"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::selected grammars are not linked into the binary:$missing"; exit 1
+          fi
+
+      # Length-escalating repetition is precisely the shape that found the 1025-byte
+      # write into a 1024-byte buffer: scanners size lookahead/token buffers with a
+      # fixed constant and then run past it on a long enough run of one construct.
+      # There is no upstream corpus in the parsers artifact (`test/corpus` is not
+      # vendored), so the inputs are synthesised. Leak detection is off — a leak in a
+      # scanner is not what this gate is for and tree-sitter arenas trip it broadly. ~keep
+      - name: Parse sweep under sanitizers
+        env:
+          LANGS: ${{ steps.select.outputs.languages }}
+          ASAN_OPTIONS: detect_leaks=0:abort_on_error=0:exitcode=42
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=42
+        run: |
+          set -uo pipefail
+          # Generated in Python rather than `printf | tr` so that backslash, quote and
+          # whitespace tokens survive shell quoting intact — those are exactly the
+          # characters scanners buffer, so silently dropping them would gut the sweep. ~keep
+          python3 - <<'GEN'
+          import os
+          os.makedirs("corpus", exist_ok=True)
+          # 1023/1025 and 4095/4097 straddle the 1 KiB and 4 KiB fixed-size buffers that
+          # tree-sitter scanners overwhelmingly use.
+          sizes = (1, 17, 129, 1023, 1025, 4095, 4097, 65537)
+          tokens = "#*`~-=\"'\\{([<$%& \t\n\r\x00\xff"
+          for n in sizes:
+              for i, tok in enumerate(tokens):
+                  with open(f"corpus/rep_{n}_{i:02d}.txt", "wb") as fh:
+                      fh.write((tok * n).encode("utf-8", "surrogateescape"))
+              with open(f"corpus/nest_{n}.txt", "wb") as fh:
+                  fh.write(b"{[(" * n + b")]}" * n)
+          GEN
+          FILES=$(find corpus -type f | sort)
+          test -n "$FILES" || { echo "::error::corpus is empty; the sweep would be vacuous"; exit 1; }
+
+          runs=0
+          failures=0
+          for lang in $(echo "$LANGS" | tr ',' ' '); do
+            for f in $FILES; do
+              runs=$((runs + 1))
+              target/debug/ts-pack parse "$f" --language "$lang" >/dev/null 2>sweep.err
+              rc=$?
+              if [ "$rc" = "$SANITIZER_EXIT_CODE" ] || grep -qE 'ERROR: (Address|Leak)Sanitizer|runtime error:' sweep.err; then
+                failures=$((failures + 1))
+                echo "::error::sanitizer fired on $lang with $f"
+                cat sweep.err
+              fi
+            done
+          done
+
+          echo "::notice::$runs parse invocations across ${{ steps.select.outputs.count }} language(s)"
+          test "$runs" -gt 0 || { echo "::error::zero parses ran; the sweep proved nothing"; exit 1; }
+          test "$failures" -eq 0 || { echo "::error::$failures sanitizer findings"; exit 1; }
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sanitize-build-log-${{ github.run_id }}
+          path: build.log
+          retention-days: 7
+          if-no-files-found: warn
