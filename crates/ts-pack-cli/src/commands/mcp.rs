@@ -161,6 +161,34 @@ pub struct CleanCacheResult {
     pub status: String,
 }
 
+/// Maximum accepted length of a language or group name.
+const MAX_NAME_LEN: usize = 64;
+
+/// Allowlist pattern for language and group names.
+const NAME_PATTERN: &str = "^[a-z0-9_]+$";
+
+/// Reject any name that is not on the `^[a-z0-9_]+$` allowlist.
+///
+/// Mirrors `validate_definition_keys` in `ts-pack-core/build.rs`: these names become
+/// filesystem paths and shared-library names, so an MCP client must not be able to
+/// smuggle separators or traversal segments through them. ~keep
+fn validate_name(kind: &str, name: &str) -> Result<(), rmcp::ErrorData> {
+    let valid = !name.is_empty()
+        && name.len() <= MAX_NAME_LEN
+        && name
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_');
+    if valid {
+        return Ok(());
+    }
+
+    let shown: String = name.chars().take(MAX_NAME_LEN).collect();
+    Err(rmcp::ErrorData::invalid_params(
+        format!("Invalid {kind} name '{shown}': must match {NAME_PATTERN} and be at most {MAX_NAME_LEN} characters"),
+        None,
+    ))
+}
+
 use rmcp::{
     RoleServer, ServerHandler,
     handler::server::{
@@ -201,6 +229,8 @@ impl TsPackMcp {
         )
     )]
     async fn parse(&self, Parameters(params): Parameters<ParseParams>) -> Result<CallToolResult, rmcp::ErrorData> {
+        validate_name("language", &params.language)?;
+
         // ~keep Grammar loading and parsing are CPU-bound and touch the filesystem;
         // ~keep run them on the blocking pool so the async runtime stays responsive.
         tokio::task::spawn_blocking(move || {
@@ -250,6 +280,8 @@ impl TsPackMcp {
         )
     )]
     async fn process(&self, Parameters(params): Parameters<ProcessParams>) -> Result<CallToolResult, rmcp::ErrorData> {
+        validate_name("language", &params.language)?;
+
         // ~keep The code-intelligence pipeline is CPU-bound; keep it off the async runtime.
         tokio::task::spawn_blocking(move || {
             use tree_sitter_language_pack::{ProcessConfig, process};
@@ -396,6 +428,8 @@ impl TsPackMcp {
         )
     )]
     async fn info(&self, Parameters(params): Parameters<InfoParams>) -> Result<Json<InfoResult>, rmcp::ErrorData> {
+        validate_name("language", &params.language)?;
+
         tokio::task::spawn_blocking(move || {
             use tree_sitter_language_pack::{cache_dir, downloaded_languages, has_language};
 
@@ -434,6 +468,13 @@ impl TsPackMcp {
         &self,
         Parameters(params): Parameters<DownloadParams>,
     ) -> Result<Json<DownloadResult>, rmcp::ErrorData> {
+        for language in params.languages.iter().flatten() {
+            validate_name("language", language)?;
+        }
+        for group in params.groups.iter().flatten() {
+            validate_name("group", group)?;
+        }
+
         // ~keep Downloads perform network I/O and cache writes; keep them off the runtime.
         tokio::task::spawn_blocking(move || {
             use tree_sitter_language_pack::{clean_cache, download, download_all, download_group};
@@ -565,6 +606,7 @@ impl TsPackMcp {
             }
             other if other.starts_with(Self::LANGUAGE_URI_PREFIX) => {
                 let name = &other[Self::LANGUAGE_URI_PREFIX.len()..];
+                validate_name("language", name)?;
                 let cache = cache_dir().map_err(|e| rmcp::ErrorData::internal_error(e.to_string(), None))?;
                 serde_json::json!({
                     "language": name,
@@ -751,6 +793,124 @@ impl ServerHandler for TsPackMcp {
     }
 }
 
+/// Environment variable carrying the bearer token the HTTP transport requires.
+const AUTH_TOKEN_ENV: &str = "TS_PACK_MCP_AUTH_TOKEN";
+
+/// Environment variable carrying extra comma-separated allowed `Origin` values.
+const ALLOWED_ORIGINS_ENV: &str = "TS_PACK_MCP_ALLOWED_ORIGINS";
+
+/// Request guard for the HTTP transport: `Origin` allowlist plus optional bearer auth.
+#[derive(Clone)]
+struct HttpGuard {
+    allowed_origins: std::sync::Arc<Vec<String>>,
+    auth_token: Option<std::sync::Arc<String>>,
+}
+
+impl HttpGuard {
+    /// Build a guard whose allowlist covers the loopback origins for `port`, plus any
+    /// origin listed in `extra_origins` (comma-separated).
+    fn new(port: u16, extra_origins: Option<&str>, auth_token: Option<String>) -> Self {
+        let mut allowed_origins = vec![
+            format!("http://127.0.0.1:{port}"),
+            format!("http://localhost:{port}"),
+            format!("http://[::1]:{port}"),
+        ];
+        if let Some(extra) = extra_origins {
+            allowed_origins.extend(
+                extra
+                    .split(',')
+                    .map(str::trim)
+                    .filter(|origin| !origin.is_empty())
+                    .map(str::to_string),
+            );
+        }
+
+        Self {
+            allowed_origins: std::sync::Arc::new(allowed_origins),
+            auth_token: auth_token
+                .map(|token| token.trim().to_string())
+                .filter(|token| !token.is_empty())
+                .map(std::sync::Arc::new),
+        }
+    }
+
+    fn from_env(port: u16) -> Self {
+        Self::new(
+            port,
+            std::env::var(ALLOWED_ORIGINS_ENV).ok().as_deref(),
+            std::env::var(AUTH_TOKEN_ENV).ok(),
+        )
+    }
+
+    fn is_origin_allowed(&self, origin: &str) -> bool {
+        self.allowed_origins.iter().any(|allowed| allowed == origin)
+    }
+
+    /// Accept the request when no token is configured, otherwise require an exact match.
+    fn is_token_valid(&self, presented: Option<&str>) -> bool {
+        let Some(expected) = self.auth_token.as_deref() else {
+            return true;
+        };
+        let Some(presented) = presented else {
+            return false;
+        };
+        constant_time_eq(expected.as_bytes(), presented.as_bytes())
+    }
+}
+
+/// Compare two byte strings without an early exit on the first differing byte. ~keep
+fn constant_time_eq(left: &[u8], right: &[u8]) -> bool {
+    if left.len() != right.len() {
+        return false;
+    }
+    let mut difference = 0u8;
+    for (a, b) in left.iter().zip(right.iter()) {
+        difference |= a ^ b;
+    }
+    difference == 0
+}
+
+/// Reject cross-origin and unauthenticated requests before they reach the MCP service.
+///
+/// A browser page on another origin can otherwise reach a loopback-bound server via DNS
+/// rebinding; the `Origin` allowlist is the defence the MCP transport spec prescribes.
+/// Non-browser clients send no `Origin` at all, so an absent header is not a rejection. ~keep
+async fn guard_http_request(
+    axum::extract::State(guard): axum::extract::State<HttpGuard>,
+    request: axum::extract::Request,
+    next: axum::middleware::Next,
+) -> axum::response::Response {
+    use axum::response::IntoResponse;
+
+    let origin = request
+        .headers()
+        .get(axum::http::header::ORIGIN)
+        .map(|value| value.to_str().unwrap_or_default().to_string());
+    if let Some(ref origin) = origin
+        && !guard.is_origin_allowed(origin)
+    {
+        tracing::warn!(%origin, "rejected MCP HTTP request: Origin is not in the allowlist");
+        return (axum::http::StatusCode::FORBIDDEN, "Origin not allowed").into_response();
+    }
+
+    let token = request
+        .headers()
+        .get(axum::http::header::AUTHORIZATION)
+        .and_then(|value| value.to_str().ok())
+        .and_then(|value| value.strip_prefix("Bearer "))
+        .map(str::to_string);
+    if !guard.is_token_valid(token.as_deref()) {
+        tracing::warn!("rejected MCP HTTP request: missing or invalid bearer token");
+        return (
+            axum::http::StatusCode::UNAUTHORIZED,
+            "Missing or invalid bearer token",
+        )
+            .into_response();
+    }
+
+    next.run(request).await
+}
+
 /// Run the MCP server with the given transport.
 pub async fn run(args: McpArgs) -> Result<(), String> {
     use rmcp::ServiceExt;
@@ -784,9 +944,26 @@ pub async fn run(args: McpArgs) -> Result<(), String> {
                 Default::default(),
             );
 
-            let router = axum::Router::new().nest_service("/mcp", http_service);
+            let guard = HttpGuard::from_env(args.port);
+            if !addr.ip().is_loopback() {
+                tracing::warn!(
+                    address = %addr,
+                    auth_env = AUTH_TOKEN_ENV,
+                    origins_env = ALLOWED_ORIGINS_ENV,
+                    "MCP HTTP transport is bound to a non-loopback address; configure a bearer token \
+                     and the Origin allowlist before exposing it"
+                );
+            }
 
-            tracing::info!("starting ts-pack MCP server (HTTP transport) on {addr}");
+            let router = axum::Router::new()
+                .nest_service("/mcp", http_service)
+                .layer(axum::middleware::from_fn_with_state(guard.clone(), guard_http_request));
+
+            tracing::info!(
+                auth_required = guard.auth_token.is_some(),
+                allowed_origins = guard.allowed_origins.len(),
+                "starting ts-pack MCP server (HTTP transport) on {addr}"
+            );
             let listener = tokio::net::TcpListener::bind(addr)
                 .await
                 .map_err(|e| format!("failed to bind MCP HTTP {addr}: {e}"))?;
@@ -803,6 +980,94 @@ pub async fn run(args: McpArgs) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn should_accept_names_on_the_allowlist() {
+        for name in ["python", "c_sharp", "html", "tsx", "php2"] {
+            assert!(validate_name("language", name).is_ok(), "'{name}' should be accepted");
+        }
+    }
+
+    #[test]
+    fn should_reject_names_outside_the_allowlist() {
+        for name in [
+            "",
+            "Python",
+            "../../etc/passwd",
+            "py thon",
+            "py/thon",
+            "py-thon",
+            "py.thon",
+            "py\0thon",
+            "py;rm -rf /",
+        ] {
+            assert!(
+                validate_name("language", name).is_err(),
+                "'{name}' should be rejected"
+            );
+        }
+        let too_long = "a".repeat(MAX_NAME_LEN + 1);
+        assert!(validate_name("language", &too_long).is_err(), "over-long name rejected");
+    }
+
+    #[tokio::test]
+    async fn should_reject_parse_with_a_traversal_language_name() {
+        let server = TsPackMcp::new();
+        let result = server
+            .parse(Parameters(ParseParams {
+                source: "x = 1".to_string(),
+                language: "../../etc/passwd".to_string(),
+                format: None,
+            }))
+            .await;
+        assert!(result.is_err(), "traversal language name is rejected");
+    }
+
+    #[test]
+    fn should_reject_resource_uri_with_an_invalid_language_name() {
+        let server = TsPackMcp::new();
+        assert!(server.read_resource_inner("ts-pack://language/../secrets").is_err());
+    }
+
+    #[test]
+    fn should_allow_only_loopback_origins_by_default() {
+        let guard = HttpGuard::new(8011, None, None);
+        assert!(guard.is_origin_allowed("http://127.0.0.1:8011"));
+        assert!(guard.is_origin_allowed("http://localhost:8011"));
+        assert!(!guard.is_origin_allowed("http://evil.example.com"));
+        assert!(!guard.is_origin_allowed("http://127.0.0.1:9999"));
+    }
+
+    #[test]
+    fn should_allow_extra_configured_origins() {
+        let guard = HttpGuard::new(8011, Some("https://ide.example.com, https://other.example.com"), None);
+        assert!(guard.is_origin_allowed("https://ide.example.com"));
+        assert!(guard.is_origin_allowed("https://other.example.com"));
+        assert!(!guard.is_origin_allowed("https://nope.example.com"));
+    }
+
+    #[test]
+    fn should_accept_any_token_when_none_is_configured() {
+        let guard = HttpGuard::new(8011, None, None);
+        assert!(guard.is_token_valid(None));
+        assert!(guard.is_token_valid(Some("anything")));
+    }
+
+    #[test]
+    fn should_require_the_exact_token_when_one_is_configured() {
+        let guard = HttpGuard::new(8011, None, Some("s3cret".to_string()));
+        assert!(guard.is_token_valid(Some("s3cret")));
+        assert!(!guard.is_token_valid(Some("s3cre")));
+        assert!(!guard.is_token_valid(Some("wrong")));
+        assert!(!guard.is_token_valid(None));
+    }
+
+    #[test]
+    fn should_treat_a_blank_configured_token_as_unset() {
+        let guard = HttpGuard::new(8011, None, Some("   ".to_string()));
+        assert!(guard.auth_token.is_none());
+        assert!(guard.is_token_valid(None));
+    }
 
     #[test]
     fn test_tool_router_has_all_tools() {

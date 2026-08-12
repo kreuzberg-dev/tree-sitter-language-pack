@@ -248,18 +248,8 @@ fn run() -> Result<(), String> {
             println!("Known:       {known}");
             println!("Downloaded:  {is_downloaded}");
             if is_downloaded {
-                let lib_name = format!("tree_sitter_{language}");
-                let (prefix, ext) = if cfg!(target_os = "macos") {
-                    ("lib", "dylib")
-                } else if cfg!(target_os = "windows") {
-                    ("", "dll")
-                } else {
-                    ("lib", "so")
-                };
-                println!(
-                    "Cache path:  {}",
-                    cache.join(format!("{prefix}{lib_name}.{ext}")).display()
-                );
+                let lib_name = tree_sitter_language_pack::registry::library_file_name(&language);
+                println!("Cache path:  {}", cache.join(lib_name).display());
             } else {
                 println!("Cache dir:   {}", cache.display());
             }
