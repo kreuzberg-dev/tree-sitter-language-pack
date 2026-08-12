@@ -64,6 +64,26 @@ Measures the three detection entry points:
 
 All three are near-zero cost (hash table or memchr scan).
 
+## Parsing is serialized process-wide
+
+`crates/ts-pack-core/src/parse.rs` holds a process-wide `PARSE_LOCK` (a `static Mutex<()>` at
+line 12) that every parse acquires before running (line 24). A handful of third-party external
+scanners keep process-global state, so parser execution is serialized to keep them correct.
+
+The practical effect depends on how much work happens *outside* the lock:
+
+- `process()` with a **minimal** config reaches only **0.69x** at 8 threads — that is, it is
+  *slower* than single-threaded, because nearly all the work is inside the lock and threads
+  pay contention on top of it.
+- `process()` with **all** analysis features enabled reaches **5.11x** at 8 threads, because
+  the AST-walking extraction passes run outside the lock and parallelize normally.
+
+So: parallelism helps when you enable real extraction work, and hurts when you do not. If you
+only need raw trees, one thread is usually the fastest configuration.
+
+Only 2 of the 371 grammars (`jsonnet` and `properties`) actually require this serialization;
+the lock is global because it is applied before the grammar is known.
+
 ## Reading Criterion output
 
 Criterion prints mean, standard deviation, and change vs. the previous run. A result

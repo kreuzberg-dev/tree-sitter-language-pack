@@ -53,7 +53,7 @@ The build takes several minutes — it compiles every grammar in `sources/langua
 
 ```bash
 docker run --rm ts-pack --version
-docker run --rm ts-pack list | wc -l
+docker run --rm ts-pack list | wc -l   # → 379 (377 language names, plus a blank line and the "377 language(s)" total)
 ```
 
 ## Use in CI
@@ -91,8 +91,9 @@ COPY --from=builder /build/target/release/ts-pack /usr/local/bin/ts-pack
 ENTRYPOINT ["ts-pack"]
 ```
 
-Run `uv run scripts/clone_vendors.py --languages python,javascript,typescript`
-first to fetch the needed grammar sources.
+Run `TSLP_LANGUAGES=python,javascript,typescript uv run scripts/clone_vendors.py` first to
+fetch just those grammar sources — the script takes no command-line flags, only the
+`TSLP_LANGUAGES` environment variable.
 
 ## Multi-arch
 

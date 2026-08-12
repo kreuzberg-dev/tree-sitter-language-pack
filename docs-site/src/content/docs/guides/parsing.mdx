@@ -81,8 +81,12 @@ let params = func
     .child_by_field_name("parameters")
     .ok_or("missing parameters")?;
 
-println!("{}", name.utf8_text(b"def add(a, b):\n    return a + b")?);   // "add"
-println!("{}", params.utf8_text(b"def add(a, b):\n    return a + b")?); // "(a, b)"
+// `Node` is a zero-copy view: slice your own source bytes with `byte_range()`.
+let source = "def add(a, b):\n    return a + b";
+let name_range = name.byte_range();
+let params_range = params.byte_range();
+println!("{}", &source[name_range.start..name_range.end]);     // "add"
+println!("{}", &source[params_range.start..params_range.end]); // "(a, b)"
 # Ok::<(), Box<dyn std::error::Error>>(())
 ```
 
@@ -90,13 +94,14 @@ Field names are grammar-specific. To discover them, run `ts-pack parse file.py` 
 
 ## Named vs. anonymous nodes
 
-Named nodes carry semantic meaning (`identifier`, `call_expression`, `string`). Anonymous nodes are punctuation and keywords (`(`, `)`, `def`, `:`). Use `named_children` when you want semantic nodes and no punctuation tokens.
+Named nodes carry semantic meaning (`identifier`, `call_expression`, `string`). Anonymous nodes are punctuation and keywords (`(`, `)`, `def`, `:`). Iterate `named_child(i)` over `named_child_count()` when you want semantic nodes and no punctuation tokens.
 
 ```rust
-let cursor = &mut root.walk();
-for child in root.named_children(cursor) {
+for i in 0..root.named_child_count() {
+    let child = root.named_child(i as u32).ok_or("missing named child")?;
     println!("{}", child.kind());
 }
+# Ok::<(), Box<dyn std::error::Error>>(())
 ```
 
 ## Syntax errors
@@ -125,7 +130,8 @@ println!("{}", tree.root_node().has_error()); // true
 | `end_byte()`          | Byte offset in source                                |
 | `child_count()`       | All children including anonymous nodes               |
 | `named_child_count()` | Named children only                                  |
-| `utf8_text(source)`   | Raw source text for this node decoded as UTF-8       |
+| `byte_range()`        | `ByteRange { start, end }` — slice your own source   |
+| `named_child(i)`      | The i-th named child, or `None`                      |
 | `has_error()`         | True if any error nodes exist in this subtree        |
 | `is_named()`          | False for anonymous nodes like `(` or `def`          |
 | `parent()`            | Enclosing node, or `None` for the root               |

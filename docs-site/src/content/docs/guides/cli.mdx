@@ -51,6 +51,7 @@ ts-pack --version
 | [`process`](#ts-pack-process)         | Run code intelligence on a file           |
 | [`cache-dir`](#ts-pack-cache-dir)     | Print the cache directory path            |
 | [`init`](#ts-pack-init)               | Create a `language-pack.toml` config file |
+| [`mcp`](/guides/mcp-server/)          | Run the MCP server for AI agents          |
 | [`completions`](#ts-pack-completions) | Generate shell completions                |
 
 ---
@@ -120,7 +121,7 @@ ts-pack list [OPTIONS]
 | Flag              | Description                                           |
 | ----------------- | ----------------------------------------------------- |
 | `--downloaded`    | Show only locally cached parsers                      |
-| `--manifest`      | Show all languages from the remote manifest (default) |
+| `--manifest`      | Show all languages from the remote manifest            |
 | `--filter <text>` | Filter by substring                                   |
 
 ```bash
@@ -149,7 +150,7 @@ Output when the parser has downloaded:
 Language:    python
 Known:       true
 Downloaded:  true
-Cache path:  /home/user/.cache/tree-sitter-language-pack/libtree_sitter_python.so
+Cache path:  /home/user/.cache/tree-sitter-language-pack/v1.14.3/libs/libtree_sitter_python.so
 ```
 
 Before the parser downloads, `Cache path` shows the cache directory instead.
@@ -240,7 +241,7 @@ Print the effective cache directory path.
 
 ```bash
 ts-pack cache-dir
-# /home/user/.cache/tree-sitter-language-pack
+# /home/user/.cache/tree-sitter-language-pack/v1.14.3/libs
 
 # Use in scripts
 CACHE=$(ts-pack cache-dir)

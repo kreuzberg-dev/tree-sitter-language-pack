@@ -40,8 +40,22 @@ cargo binstall ts-pack-cli
 
 ```bash title="Verify"
 ts-pack --version
-ts-pack list | wc -l   # → 371
+ts-pack list           # language names, then a blank line and an "N language(s)" total
 ```
+
+:::note[`list` shows what is available *locally*, and that depends on how you installed]
+`ts-pack list` reports the grammars this binary can parse right now — those compiled into it,
+plus any already in your download cache, plus their aliases. That differs by install method:
+
+- **Homebrew and `cargo binstall`** fetch the prebuilt release binary, which has all 371
+  grammars statically linked. `ts-pack list` prints 377 names (371 grammars + 6 aliases), so
+  `ts-pack list | wc -l` is 379 — the 377 names, a blank line, and the `377 language(s)` total.
+- **`cargo install ts-pack-cli`** compiles from source on your machine with no grammars linked
+  in, so a fresh install prints `0 language(s)` until you run `ts-pack download --all`.
+
+`ts-pack list --manifest` lists all 371 downloadable grammars in either case, without touching
+the cache.
+:::
 
 </div>
 
@@ -60,6 +74,18 @@ See the [MCP Server guide](/guides/mcp-server/) for integration with Claude Code
 ## Language Bindings
 
 Tree-sitter-language-pack is available for every major ecosystem. All packages share the same version and API surface.
+
+:::caution[What `language_count()` counts]
+`language_count()` returns the parsers **available to this process right now** — grammars
+compiled into the build, grammars already in the download cache, and their aliases. It is not
+a constant `371`; that is the number of grammars in the remote manifest.
+
+Most published packages (Python, Node.js, Go, Elixir, Zig) compile no grammars in and fetch
+them on demand, so `language_count()` starts at `0` and grows as you download. The C FFI and
+C# packages ship with all 371 linked in; the WebAssembly package ships a fixed 31-grammar
+subset and cannot download more. The verify snippets below confirm the native library loads
+and links — they are not a grammar count.
+:::
 
 <div class="lang-picker" markdown>
 [Python](#python)
@@ -113,7 +139,7 @@ Verify:
 
 ```python
 import tree_sitter_language_pack as tslp
-print(tslp.language_count())  # 371
+print(tslp.language_count())  # parsers available locally (0 on a fresh install)
 ```
 
 ---
@@ -150,7 +176,7 @@ Verify:
 
 ```javascript
 const tslp = require("@xberg-io/tree-sitter-language-pack");
-console.log(tslp.languageCount()); // 371
+console.log(tslp.languageCount()); // parsers available locally (0 on a fresh install)
 ```
 
 ---
@@ -181,7 +207,7 @@ Verify:
 
 ```rust
 fn main() {
-    println!("{}", tree_sitter_language_pack::language_count()); // 371
+    println!("{}", tree_sitter_language_pack::language_count()); // parsers available locally
 }
 ```
 
@@ -199,7 +225,7 @@ go get github.com/xberg-io/tree-sitter-language-pack/packages/go
 import tslp "github.com/xberg-io/tree-sitter-language-pack/packages/go"
 
 func main() {
-    fmt.Println(tslp.LanguageCount()) // 371
+    fmt.Println(tslp.LanguageCount()) // parsers available locally
 }
 ```
 
@@ -216,7 +242,7 @@ Requires JDK 25+ (uses Panama FFM API).
 <dependency>
     <groupId>io.xberg.treesitterlanguagepack</groupId>
     <artifactId>tree-sitter-language-pack</artifactId>
-    <version>1.12.5</version>
+    <version>1.14.3</version>
 </dependency>
 ```
 
@@ -225,7 +251,7 @@ Requires JDK 25+ (uses Panama FFM API).
 
 ```kotlin
 dependencies {
-    implementation("io.xberg.treesitterlanguagepack:tree-sitter-language-pack:1.12.5")
+    implementation("io.xberg.treesitterlanguagepack:tree-sitter-language-pack:1.14.3")
 }
 ```
 
@@ -234,7 +260,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'io.xberg.treesitterlanguagepack:tree-sitter-language-pack:1.12.5'
+    implementation 'io.xberg.treesitterlanguagepack:tree-sitter-language-pack:1.14.3'
 }
 ```
 
@@ -248,19 +274,19 @@ import io.xberg.treesitterlanguagepack.TreeSitterLanguagePack;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println(TreeSitterLanguagePack.languageCount()); // 371
+        System.out.println(TreeSitterLanguagePack.languageCount()); // parsers available locally
     }
 }
 ```
 
 ---
 
-### C
+### C\#
 
 Requires .NET 10.
 
 ```bash
-dotnet add package XbergIo.TreeSitterLanguagePack --version 1.12.5
+dotnet add package XbergIo.TreeSitterLanguagePack --version 1.14.3
 ```
 
 Verify:
@@ -268,7 +294,7 @@ Verify:
 ```csharp
 using TreeSitterLanguagePack;
 
-Console.WriteLine(TreeSitterLanguagePackConverter.LanguageCount()); // 371
+Console.WriteLine(TreeSitterLanguagePackConverter.LanguageCount()); // parsers available locally
 ```
 
 The NuGet package includes native runtime assets for Windows, Linux, and macOS.
@@ -290,7 +316,7 @@ gem install tree_sitter_language_pack
 <TabItem label="Gemfile">
 
 ```ruby
-gem "tree_sitter_language_pack", "~> 1.9"
+gem "tree_sitter_language_pack", "~> 1.14"
 ```
 
 ```bash
@@ -305,7 +331,7 @@ Verify:
 ```ruby
 require "tree_sitter_language_pack"
 
-puts TreeSitterLanguagePack.language_count # 371
+puts TreeSitterLanguagePack.language_count # parsers available locally
 ```
 
 ---
@@ -320,7 +346,7 @@ Requires Elixir 1.14+ and OTP 25+.
 ```elixir
 defp deps do
   [
-    {:tree_sitter_language_pack, "~> 1.9"}
+    {:tree_sitter_language_pack, "~> 1.14"}
   ]
 end
 ```
@@ -335,7 +361,7 @@ mix deps.get
 Verify:
 
 ```elixir
-IO.puts TreeSitterLanguagePack.language_count() # 371
+IO.puts TreeSitterLanguagePack.language_count() # parsers available locally
 ```
 
 ---
@@ -364,7 +390,7 @@ composer require xberg-io/tree-sitter-language-pack
 {
     "require": {
         "mlocati/php-extension-installer": "^2.0",
-        "xberg-io/tree-sitter-language-pack": "^1.9"
+        "xberg-io/tree-sitter-language-pack": "^1.14"
     }
 }
 ```
@@ -376,7 +402,7 @@ Verify:
 
 ```php
 <?php
-echo \ts_pack_language_count(); // 371
+echo \Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi::languageCount(); // parsers available locally
 ```
 
 ---
@@ -396,7 +422,7 @@ dart pub add tree_sitter_language_pack
 Requires Android minSdk 21 and Java 17 bytecode.
 
 ```kotlin
-implementation("io.xberg.tslp.android:tree-sitter-language-pack-android:1.12.5")
+implementation("io.xberg.tslp.android:tree-sitter-language-pack-android:1.14.3")
 ```
 
 This is an Android AAR. Kotlin/JVM users should use the Java artifact.
@@ -410,7 +436,7 @@ Requires Swift 6.0+.
 ```swift
 .package(
     url: "https://github.com/xberg-io/tree-sitter-language-pack",
-    exact: "1.12.5"
+    exact: "1.14.3"
 )
 ```
 
@@ -450,8 +476,8 @@ npm install @xberg-io/tree-sitter-language-pack-wasm
 
 ```html
 <script type="module">
-  import { availableLanguages, parseString } from "https://cdn.jsdelivr.net/npm/@xberg-io/tree-sitter-language-pack-wasm/+esm";
-  console.log(availableLanguages());
+  import { availableLanguages, languageCount } from "https://cdn.jsdelivr.net/npm/@xberg-io/tree-sitter-language-pack-wasm/+esm";
+  console.log(languageCount(), availableLanguages());
 </script>
 ```
 
@@ -459,8 +485,8 @@ npm install @xberg-io/tree-sitter-language-pack-wasm
 <TabItem label="Deno">
 
 ```typescript
-import { availableLanguages, parseString } from "npm:@xberg-io/tree-sitter-language-pack-wasm";
-console.log(availableLanguages());
+import { availableLanguages, languageCount } from "npm:@xberg-io/tree-sitter-language-pack-wasm";
+console.log(languageCount(), availableLanguages());
 ```
 
 </TabItem>

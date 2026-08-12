@@ -202,7 +202,7 @@ download_all()
 ```typescript
 import { downloadAll } from "@xberg-io/tree-sitter-language-pack";
 
-await downloadAll();
+downloadAll();
 ```
 
 </TabItem>
@@ -236,9 +236,9 @@ ts-pack list --downloaded
 <TabItem label="Python">
 
 ```python
-from tree_sitter_language_pack import init
+from tree_sitter_language_pack import PackConfig, init
 
-init({"groups": ["web", "data"]})
+init(PackConfig(groups=["web", "data"]))
 ```
 
 </TabItem>
@@ -247,7 +247,7 @@ init({"groups": ["web", "data"]})
 ```typescript
 import { init } from "@xberg-io/tree-sitter-language-pack";
 
-await init({ groups: ["web", "data"] });
+init({ groups: ["web", "data"] });
 ```
 
 </TabItem>
@@ -318,7 +318,7 @@ init()
 </Tabs>
 
 :::note[Cache location]
-Parsers cache to `~/.cache/tree-sitter-language-pack/` on Linux/macOS and `%LOCALAPPDATA%\tree-sitter-language-pack\` on Windows. Override with `cache_dir` in `language-pack.toml` or the programmatic API. See [Download Model](/concepts/download-model/) for full details.
+Parsers cache to `<cache>/tree-sitter-language-pack/v{version}/libs` — where `<cache>` is `~/.cache` on Linux, `~/Library/Caches` on macOS, and `%LOCALAPPDATA%` on Windows. Override with `cache_dir` in `language-pack.toml` or the programmatic API. See [Download Model](/concepts/download-model/) for full details.
 :::
 
 ---
@@ -557,7 +557,7 @@ import { readFileSync } from "fs";
 
 const source = readFileSync("large_module.ts", "utf8");
 
-const result = await process(source, {
+const result = process(source, {
   language: "typescript",
   chunkMaxSize: 1500,
   structure: true,

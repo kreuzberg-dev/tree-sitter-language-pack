@@ -19,7 +19,7 @@ The `ts-pack` binary is published to every major registry. Install it with which
 
 ```bash
 # Homebrew
-brew install xberg-io/tap/ts-pack
+brew install xberg-io/homebrew-tap/ts-pack
 
 # npm (Node.js)
 npm install -g @xberg-io/ts-pack-cli
@@ -184,18 +184,28 @@ Extract code intelligence: structure, imports, exports, symbols, docstrings, com
 |-----------|------|-------------|
 | `source` | string | Source code to analyze |
 | `language` | string | Language name |
-| `all` | boolean | Extract all intelligence fields (default: false) |
-| `chunk_size` | integer | Split output into chunks for LLMs (optional) |
-| `chunk_overlap` | integer | Overlap between chunks in tokens (optional) |
+| `all` | boolean | Enable every analysis feature; overrides the individual flags when true |
+| `structure` | boolean | Extract structural items (default: true) |
+| `imports` | boolean | Extract import statements (default: true) |
+| `exports` | boolean | Extract export statements (default: true) |
+| `comments` | boolean | Extract comments (default: false) |
+| `symbols` | boolean | Extract symbol definitions (default: false) |
+| `docstrings` | boolean | Extract docstrings (default: false) |
+| `diagnostics` | boolean | Include parse diagnostics (default: false) |
+| `data_extraction` | boolean | Hierarchical data extraction for data formats (default: false) |
+| `chunk_max_size` | integer | Maximum chunk size in bytes; omit to disable chunking |
+
+There is no `chunk_overlap` parameter — chunks never overlap.
 
 **`detect_language`**
 
-Identify language from file path or source code.
+Identify language from a file path, source content, or both. Both parameters are optional;
+supply at least one.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `path` | string | File path (e.g., `main.rs`) — optional |
-| `source` | string | Source code — optional, used if path unclear |
+| `path` | string | File path or name, used for extension-based detection — optional |
+| `content` | string | Source content, used for content-based detection — optional |
 
 </TabItem>
 <TabItem label="Languages & Discovery">
@@ -206,16 +216,16 @@ Enumerate available, downloaded, or manifest languages.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `filter` | string | One of: `available` (default), `downloaded`, `manifest` |
-| `query` | string | Filter by name or pattern (optional) |
+| `source` | string | Which set to query: `available` (default), `downloaded`, or `manifest` |
+| `filter` | string | Substring filter applied to the result — optional |
 
 **`info`**
 
-Get status of a specific language (available, downloaded, extensions, aliases).
+Get status of a specific language (known to this build, downloaded, cache directory).
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `name` | string | Language name (e.g., `python`) |
+| `language` | string | Language name (e.g., `python`) |
 
 **`download`**
 
@@ -224,26 +234,24 @@ Fetch language parsers for offline use.
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `languages` | array | List of language names — optional |
-| `groups` | string | Download a group: `web`, `systems`, `data`, `all` — optional |
-| `fresh` | boolean | Force fresh download (ignore cache) |
+| `all` | boolean | Download every available language — optional |
+| `groups` | array | Named groups to download: `web`, `systems`, `scripting`, `data`, `jvm`, `functional` — optional |
+| `fresh` | boolean | Clean the cache before downloading (default: false) |
 
 </TabItem>
 <TabItem label="Cache & Configuration">
 
 **`cache_dir`**
 
-Retrieve the local cache directory where parsers are stored.
+Retrieve the local cache directory where parsers are stored. Takes no parameters.
 
-Returns: path to the cache (e.g., `~/.ts-pack-cache`)
+Returns `{ "cache_dir": "<cache>/tree-sitter-language-pack/v{version}/libs" }`.
 
 **`clean_cache`**
 
-Delete cached parsers.
+Delete **all** cached parsers. Takes no parameters — there is no per-language variant.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `all` | boolean | Delete all cached parsers (default: false) |
-| `languages` | array | Delete parsers for specific languages — optional |
+Returns `{ "cache_dir": "…", "status": "cleared" }`.
 
 </TabItem>
 </Tabs>
@@ -262,12 +270,18 @@ The MCP server includes a built-in prompt template:
 
 **`analyze-code`**
 
-Analyzes source code by detecting its language, extracting code intelligence, and formatting results for readability. Use this when you want the agent to understand code structure without manual language specification.
+Returns a user message instructing the agent to call the `process` tool with `all=true`, then
+summarize the design, key entry points, and any issues. The prompt does not take the source
+code itself — the agent supplies it when it calls `process`.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `source` | string | Source code to analyze |
-| `focus` | string | What to extract: `all`, `structure`, `imports`, `exports`, `symbols` (default: `all`) |
+| Parameter  | Type   | Required | Description                                                             |
+| ---------- | ------ | -------- | ----------------------------------------------------------------------- |
+| `language` | string | Yes      | Language name. Supports argument completion against the language list.  |
+| `focus`    | string | No       | Free-form area to emphasize, e.g. `security` or `public API`.           |
+
+`focus` is not a closed enum — whatever string you pass is appended to the prompt as
+"Pay particular attention to: …". Omitting `language` falls back to the literal phrase
+"the file's language".
 
 ## Using the Plugin Instead
 

@@ -27,10 +27,10 @@ sequenceDiagram
         Core-->>App: Parser
     else not cached
         Core->>Remote: GET parsers.json
-        Remote-->>Core: manifest with download URL
-        Core->>Remote: GET python-linux-x64.so
-        Remote-->>Core: binary bytes
-        Core->>Cache: write python.so
+        Remote-->>Core: manifest with platform bundle URL
+        Core->>Remote: GET parsers-linux-x86_64.tar.zst
+        Remote-->>Core: bundle bytes
+        Core->>Cache: extract python.so
         Cache-->>Core: python.so
         Core-->>App: Parser
     end
@@ -49,13 +49,16 @@ The flow in detail:
 
 ## Cache Directory
 
-The default cache location is platform-specific:
+Parser libraries live under `<cache>/tree-sitter-language-pack/v{version}/libs`, where
+`{version}` is the package version — so upgrading the package starts from a clean parser
+set rather than reusing binaries built for an older release. The platform-specific
+`<cache>` base:
 
-| Platform | Default Path                                                                        |
-| -------- | ----------------------------------------------------------------------------------- |
-| Linux    | `$XDG_CACHE_HOME/tree-sitter-language-pack` or `~/.cache/tree-sitter-language-pack` |
-| macOS    | `~/Library/Caches/tree-sitter-language-pack`                                        |
-| Windows  | `%LOCALAPPDATA%\tree-sitter-language-pack`                                          |
+| Platform | `<cache>` base                          | Resulting parser directory                                        |
+| -------- | --------------------------------------- | ----------------------------------------------------------------- |
+| Linux    | `$XDG_CACHE_HOME` or `~/.cache`         | `~/.cache/tree-sitter-language-pack/v1.14.3/libs`                 |
+| macOS    | `~/Library/Caches`                      | `~/Library/Caches/tree-sitter-language-pack/v1.14.3/libs`         |
+| Windows  | `%LOCALAPPDATA%`                        | `%LOCALAPPDATA%\tree-sitter-language-pack\v1.14.3\libs`           |
 
 You can override it programmatically:
 
@@ -102,22 +105,26 @@ ts-pack cache-dir           # show current cache dir
 
 The manifest is a JSON file (`parsers.json`) hosted on each GitHub release. It has one bundle per platform (each bundle contains every grammar for that target), plus per-language metadata and group definitions:
 
+Platform keys are `{os}-{arch}`, where `os` is `linux`, `macos`, or `windows` and `arch` is
+the Rust target arch name (`x86_64`, `aarch64`) — except on macOS, where `aarch64` is spelled
+`arm64`.
+
 ```json
 {
-  "version": "1.12.5",
+  "version": "1.14.3",
   "platforms": {
-    "linux-x64": {
-      "url": "https://github.com/.../parsers-linux-x64.tar.zst",
+    "linux-x86_64": {
+      "url": "https://github.com/.../parsers-linux-x86_64.tar.zst",
       "sha256": "…",
       "size": 12345678
     },
-    "linux-arm64": {
-      "url": "https://github.com/.../parsers-linux-arm64.tar.zst",
+    "linux-aarch64": {
+      "url": "https://github.com/.../parsers-linux-aarch64.tar.zst",
       "sha256": "…",
       "size": 12345678
     },
-    "macos-x64": {
-      "url": "https://github.com/.../parsers-macos-x64.tar.zst",
+    "macos-x86_64": {
+      "url": "https://github.com/.../parsers-macos-x86_64.tar.zst",
       "sha256": "…",
       "size": 12345678
     },
@@ -126,8 +133,8 @@ The manifest is a JSON file (`parsers.json`) hosted on each GitHub release. It h
       "sha256": "…",
       "size": 12345678
     },
-    "windows-x64": {
-      "url": "https://github.com/.../parsers-windows-x64.zip",
+    "windows-x86_64": {
+      "url": "https://github.com/.../parsers-windows-x86_64.zip",
       "sha256": "…",
       "size": 12345678
     }
@@ -157,7 +164,7 @@ For production, CI, or offline environments, download parsers explicitly rather 
 <TabItem label="Python">
 
 ```python
-from tree_sitter_language_pack import download, download_all, init
+from tree_sitter_language_pack import PackConfig, download, download_all, init
 
 # Download specific languages
 download(["python", "javascript", "typescript", "rust"])
@@ -166,7 +173,7 @@ download(["python", "javascript", "typescript", "rust"])
 download_all()
 
 # Configure + download in one call
-init(["python", "javascript"])
+init(PackConfig(languages=["python", "javascript"]))
 ```
 
 </TabItem>
@@ -176,20 +183,20 @@ init(["python", "javascript"])
 import { download, downloadAll, init } from "@xberg-io/tree-sitter-language-pack";
 
 // Download specific languages
-await download(["python", "javascript", "typescript", "rust"]);
+download(["python", "javascript", "typescript", "rust"]);
 
 // Download everything
-await downloadAll();
+downloadAll();
 
 // Configure + download in one call
-await init(["python", "javascript"]);
+init({ languages: ["python", "javascript"] });
 ```
 
 </TabItem>
 <TabItem label="Rust">
 
 ```rust
-use tree_sitter_language_pack::{download, download_all, init};
+use tree_sitter_language_pack::{PackConfig, download, download_all, init};
 
 // Download specific languages
 download(&["python", "javascript", "rust"])?;
@@ -198,7 +205,10 @@ download(&["python", "javascript", "rust"])?;
 download_all()?;
 
 // Configure + download in one call
-init(&["python", "javascript"])?;
+init(&PackConfig {
+    languages: Some(vec!["python".to_string(), "javascript".to_string()]),
+    ..Default::default()
+})?;
 ```
 
 </TabItem>

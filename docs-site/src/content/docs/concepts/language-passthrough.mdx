@@ -160,24 +160,31 @@ For opaque-handle bindings, use the high-level `process()` function or the packa
 ```ruby
 require "tree_sitter_language_pack"
 
-# Use getParser() to get a pre-configured parser
+# Use get_parser() to get a pre-configured parser
 parser = TreeSitterLanguagePack.get_parser("python")
 
-# Or use process() for structured analysis
-result = TreeSitterLanguagePack.process(source, { language: "python" })
+# process() takes a ProcessConfig, not a Hash
+config = TreeSitterLanguagePack::ProcessConfig.new(language: "python")
+result = TreeSitterLanguagePack.process(source, config)
 ```
 
 </TabItem>
 <TabItem label="PHP">
 
 ```php
-use TreeSitterLanguagePack\TreeSitterLanguagePack;
+use Tree\Sitter\Language\Pack\ProcessConfig;
+use Tree\Sitter\Language\Pack\TreeSitterLanguagePack;
 
 // Use getParser() for a pre-configured parser
 $parser = TreeSitterLanguagePack::getParser("python");
 
-// Or use process() for structured analysis
-$result = TreeSitterLanguagePack::process($source, ["language" => "python"]);
+// process() takes a ProcessConfig object, not an array
+$config = ProcessConfig::from_json(json_encode(["language" => "python"]));
+$result = TreeSitterLanguagePack::process($source, $config);
+
+// TreeSitterLanguagePack delegates to the native extension class
+// Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi, which you may also call directly:
+echo TreeSitterLanguagePackApi::languageCount();
 ```
 
 </TabItem>
@@ -251,7 +258,10 @@ A passthrough binding returns the ecosystem's standard tree-sitter `Language`, s
 
 ## ABI Compatibility Window
 
-The language pack is compiled at tree-sitter **ABI 14**, which is stable across:
+The language pack is compiled at tree-sitter **ABI 14**, with 16 exceptions built at ABI 15
+because no upstream ABI 14 grammar exists (`abl`, `cpp`, `csharp`, `fsharp`, `fortran`,
+`gnuplot`, `haxe`, `jai`, `lean`, `perl`, `postgres`, `razor`, `scala`, `slang`,
+`systemverilog`, `zsh`) — those 16 require a tree-sitter runtime >=0.25. ABI 14 is stable across:
 
 - Tree-sitter runtime versions 0.21 through 0.26
 - All host package versions listed in the table above

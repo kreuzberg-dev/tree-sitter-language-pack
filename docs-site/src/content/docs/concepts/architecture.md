@@ -127,7 +127,11 @@ The WebAssembly package is the exception: it uses a curated static parser subset
 
 ## ABI Compatibility
 
-All 371 bundled grammars are compiled at tree-sitter **ABI version 14**, with one exception: Perl uses ABI 15 (no upstream ABI 14 grammar available).
+Bundled grammars are compiled at tree-sitter **ABI version 14**, with 16 exceptions at ABI 15
+whose committed `parser.c` is too large to regenerate: `abl`, `cpp`, `csharp`, `fsharp`,
+`fortran`, `gnuplot`, `haxe`, `jai`, `lean`, `perl`, `postgres`, `razor`, `scala`, `slang`,
+`systemverilog`, and `zsh`. Those 16 require a tree-sitter runtime >=0.25; see
+[Languages](/languages/#abi-compatibility).
 
 ABI 14 is accepted by tree-sitter runtimes spanning versions 0.21 through 0.26, and by the following host tree-sitter packages (used via host-native Language passthrough):
 
@@ -159,7 +163,6 @@ tree-sitter-language-pack/
 │   └── ts-pack-core-ffi/   # C FFI for native-package consumers
 ├── packages/
 │   ├── python/             # Python package wrapper
-│   ├── typescript/         # TypeScript / Node.js package
 │   ├── ruby/               # Ruby gem (Magnus NIF)
 │   ├── elixir/             # Elixir package (Rustler NIF)
 │   ├── php/                # PHP Composer package
@@ -169,18 +172,20 @@ tree-sitter-language-pack/
 │   ├── dart/               # Dart / Flutter package
 │   ├── kotlin-android/     # Android AAR package
 │   ├── swift/              # SwiftPM package
-│   ├── zig/                # Zig package
-│   └── wasm/               # WebAssembly npm package
-├── sources/
-│   └── language_definitions.json  # Grammar source registry
-└── scripts/
-    └── generate_readme.py  # README sync tooling
+│   └── zig/                # Zig package
+├── docs-site/              # Astro / Starlight documentation site
+├── fixtures/               # JSON fixtures driving the generated e2e suites
+├── e2e/                    # Generated per-language e2e suites (do not edit)
+└── sources/
+    └── language_definitions.json  # Grammar source registry
 ```
 
-Documentation snippets under `docs/snippets/` are discovered, validated, and
-audited by `alef snippets` (see `task docs:snippets:check`). The legacy
-`tools/snippet-runner` Rust crate was retired in favour of this shared
-capability.
+The Node.js and WebAssembly packages have no `packages/` directory — they are published
+directly from `crates/ts-pack-core-node` and `crates/ts-pack-core-wasm`.
+
+Documentation snippets under `docs-site/src/snippets/` are discovered, validated, and
+audited by `alef snippets`. The legacy `tools/snippet-runner` Rust crate was retired in
+favour of this shared capability.
 
 ---
 

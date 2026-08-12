@@ -55,7 +55,7 @@ import { readFileSync } from "fs";
 
 const source = readFileSync("src/service.ts", "utf8");
 
-const result = await process(source, {
+const result = process(source, {
   language: "typescript",
   chunkMaxSize: 1000,
   structure: true,
@@ -96,14 +96,18 @@ ts-pack process src/service.py --chunk-size 1000 \
 
 ## Chunk fields
 
-| Field        | Type        | Description                                    |
-| ------------ | ----------- | ---------------------------------------------- |
-| `content`    | str         | Source code text for this chunk                |
-| `start_byte` | int         | Start byte offset in source                    |
-| `end_byte`   | int         | End byte offset in source                      |
-| `start_line` | int         | First line (1-indexed)                         |
-| `end_line`   | int         | Last line (1-indexed)                          |
-| `node_types` | `list[str]` | Top-level tree-sitter node types in this chunk |
+| Field        | Type           | Description                                            |
+| ------------ | -------------- | ------------------------------------------------------ |
+| `content`    | str            | Source code text for this chunk                        |
+| `start_byte` | int            | Inclusive start byte offset in source                  |
+| `end_byte`   | int            | Exclusive end byte offset in source                    |
+| `start_line` | int            | First line (**zero-indexed**)                          |
+| `end_line`   | int            | Last line (**zero-indexed**)                           |
+| `metadata`   | `ChunkContext` | Chunk metadata — see below                             |
+
+`metadata` (`ChunkContext`) carries `language`, `chunk_index`, `total_chunks`, `node_types`,
+`context_path`, `symbols_defined`, `comments`, `docstrings`, and `has_error_nodes`. Note that
+`node_types` lives on `chunk.metadata.node_types`, not on the chunk itself.
 
 ## How it works
 
@@ -121,7 +125,7 @@ The result: functions are never split unless they're individually too large, dec
 
 ## Structure metadata with chunks
 
-When `structure=True` is also set, each chunk's `node_types` field shows what kind of code it contains. This is useful for metadata-enriched vector store ingestion:
+When `structure=True` is also set, each chunk's `metadata.node_types` field shows what kind of code it contains. This is useful for metadata-enriched vector store ingestion:
 
 ```python
 config = ProcessConfig(
@@ -140,7 +144,7 @@ for chunk in result.chunks:
             "language": "python",
             "start_line": chunk.start_line,
             "end_line": chunk.end_line,
-            "node_types": chunk.node_types,
+            "node_types": chunk.metadata.node_types,
             "size_bytes": chunk.end_byte - chunk.start_byte,
         }
     })
@@ -192,7 +196,7 @@ def chunk_repository(repo_path: str, chunk_size: int = 800) -> list[dict]:
                     "start_line": chunk.start_line,
                     "end_line": chunk.end_line,
                     "language": language,
-                    "node_types": chunk.node_types,
+                    "node_types": chunk.metadata.node_types,
                     "size_bytes": chunk.end_byte - chunk.start_byte,
                 })
     return chunks

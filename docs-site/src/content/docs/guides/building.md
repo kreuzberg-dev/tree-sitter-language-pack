@@ -33,7 +33,10 @@ The Cargo workspace contains the following crates:
 | `crates/ts-pack-core-wasm` | WebAssembly bindings (wasm-bindgen)           |
 | `crates/ts-pack-core-ffi`  | C-compatible FFI library (cbindgen)           |
 
-Language-specific packages live under `packages/`: `python/`, `typescript/`, `ruby/`, `elixir/`, `php/`, `go/`, `java/`, `csharp/`, and `wasm/`.
+Language-specific packages live under `packages/`: `python/`, `ruby/`, `elixir/`, `php/`,
+`go/`, `java/`, `csharp/`, `dart/`, `kotlin-android/`, `swift/`, and `zig/`. The Node.js and
+WebAssembly packages are published straight from `crates/ts-pack-core-node` and
+`crates/ts-pack-core-wasm` and have no `packages/` directory.
 
 ## Cargo features
 
@@ -44,7 +47,7 @@ The core library (`tree-sitter-language-pack`) has four features:
 | `dynamic-loading` | Yes     | Load parser `.so`/`.dylib`/`.dll` files at runtime               |
 | `download`        | Yes     | Download parsers from GitHub releases; implies `dynamic-loading` |
 | `serde`           | No      | `Serialize`/`Deserialize` on public types                        |
-| `config`          | No      | Read `language-pack.toml` config files; implies `serde`          |
+| `config`          | No      | Read `language-pack.toml` config files; enables `dep:serde`      |
 
 To use the library without the download machinery (for example in a Wasm target or with statically compiled parsers):
 
@@ -97,6 +100,19 @@ Override the directory `build.rs` searches for `sources/language_definitions.jso
 
 Path to the WASI sysroot when cross-compiling for `wasm32-wasi`. Used by `build.rs` when targeting that architecture.
 
+### Grammar-source and wasm gates
+
+| Variable                     | Effect                                                                                          |
+| ---------------------------- | ----------------------------------------------------------------------------------------------- |
+| `TSLP_OFFLINE`               | Any non-empty, non-`0` value stops `build.rs` from downloading the parser-source bundle          |
+| `TSLP_SOURCE_BUNDLE_URL`     | Override the `parser-sources-{version}.tar.zst` release-asset URL                                |
+| `TSLP_ALLOW_FAILED_GRAMMARS` | `1` downgrades grammar compile failures from a hard error to a warning — local debugging only    |
+| `TSLP_WASM_MAX_PARSER_BYTES` | `wasm32` only: `parser.c` size gate in bytes; `0` disables the gate                              |
+| `TSLP_WASM_SKIP_GRAMMARS`    | `wasm32` only: comma-separated grammars to skip, replacing the default list (empty disables it)  |
+
+`TSLP_MSVC_PATCH` is **not** an environment variable — it is a marker comment `build.rs`
+writes into sources it patches for MSVC, so patched files are recognised on later builds.
+
 ## How build.rs works
 
 `build.rs` (in `crates/ts-pack-core/`) runs every time environment variables or source files change. It does these steps:
@@ -109,7 +125,8 @@ Path to the WASI sysroot when cross-compiling for `wasm32-wasi`. Used by `build.
    - `registry_generated.rs` — the language registry (name → parser function)
    - `extensions_generated.rs` — file extension to language name mapping
    - `ambiguities_generated.rs` — ambiguous extension lookup table
-   - Query files for highlights, injections, and locals
+   - Query files for all six bundled query kinds: `highlights.scm`, `injections.scm`,
+     `locals.scm`, `tags.scm`, `indents.scm`, and `folds.scm`
 
 The build embeds these generated files via `include!()` macros in `src/registry.rs` and `src/extensions.rs`.
 
@@ -125,8 +142,11 @@ This runs `scripts/clone_vendors.py`, which checks out the correct revision for 
 
 To clone a specific language:
 
+The script has no command-line flags; select a subset with the `TSLP_LANGUAGES` environment
+variable (names not in `sources/language_definitions.json` are ignored with a warning):
+
 ```bash
-python3 scripts/clone_vendors.py --languages python,rust
+TSLP_LANGUAGES=python,rust python scripts/clone_vendors.py
 ```
 
 ## Building the CLI

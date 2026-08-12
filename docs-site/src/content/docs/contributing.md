@@ -49,8 +49,9 @@ task build           # build Rust core + bindings
 task test            # run all test suites
 task lint            # run all linters (clippy, ruff, oxlint, rubocop, …)
 task format          # auto-format all code
-task generate:e2e    # regenerate e2e test suites from fixtures
-task test:e2e        # run e2e tests
+task e2e:generate    # regenerate e2e test suites from fixtures
+task e2e:test        # run e2e tests
+task alef:sync       # regenerate the alef-managed bindings and docs
 ```
 
 Run `task --list` to see all available tasks.
@@ -116,30 +117,52 @@ ts-pack parse example.mylang --language mylang
 
 ### 4. Add test fixtures
 
-Add at least one fixture under `fixtures/` (the e2e suite consumes them) and a runnable snippet under `docs/snippets/<lang>/`:
+Add at least one fixture under `fixtures/` (the e2e suite consumes them) and, if the language
+needs one, a runnable snippet under `docs-site/src/snippets/<lang>/`.
+
+A fixture file holds either a **single JSON object** or an **array** of them, grouped into a
+per-category directory — for example `fixtures/process/python_intel.json`. Only `id` and
+`description` are required, `additionalProperties` is `false`, the payload goes under `input`,
+and `assertions` is a list of typed assertion objects, not a map of booleans. See
+`fixtures/schema.json` for the full assertion-type enum.
 
 ```json
-[
-  {
-    "id": "mylang_basic_parse",
-    "category": "basic",
-    "description": "Parse a simple mylang file",
-    "language": "mylang",
+{
+  "id": "mylang_function_process",
+  "description": "Intel: extract structure from a mylang function definition",
+  "category": "process",
+  "tags": ["intel"],
+  "input": {
     "source_code": "// example mylang source",
-    "assertions": {
-      "tree_not_null": true,
-      "has_error_nodes": false
+    "config": {
+      "language": "mylang"
+    }
+  },
+  "assertions": [
+    {
+      "type": "equals",
+      "field": "language",
+      "value": "mylang"
     },
-    "tags": ["smoke"]
-  }
-]
+    {
+      "type": "count_min",
+      "field": "structure",
+      "value": 1
+    },
+    {
+      "type": "equals",
+      "field": "metrics.error_count",
+      "value": 0
+    }
+  ]
+}
 ```
 
 Then regenerate and run e2e tests:
 
 ```bash
-task generate:e2e
-task test:e2e
+task e2e:generate
+task e2e:test
 ```
 
 ### 5. Open a pull request
@@ -165,17 +188,24 @@ Binding changes must:
 
 - **Not add logic that belongs in the Rust core.** Bindings are pure translation layers.
 - **Have test coverage** in the binding's native test suite.
-- **Follow the existing API surface** documented in `docs/api-mapping.yaml`.
+- **Follow the existing API surface** — most binding surfaces are alef-generated; regenerate
+  them with `task alef:sync` rather than hand-editing generated files.
 
 ## Documentation
 
 Doc fixes and new guides follow the same workflow as code changes:
 
 1. Fork and create a branch.
-2. Edit files under `docs/`.
-3. Preview locally with `zensical serve`.
+2. Edit files under `docs-site/src/content/docs/`. Runnable snippets live in
+   `docs-site/src/snippets/<lang>/`.
+3. Preview locally with `pnpm --dir docs-site dev` (the site is Astro / Starlight).
 4. Run `task lint` if you touch any scripted checks.
 5. Open a pull request.
+
+:::caution[Generated reference pages]
+Everything under `docs-site/src/content/docs/reference/` is alef-generated from the Rust
+source. Fix the doc comments upstream and run `task alef:sync` — do not edit those pages.
+:::
 
 :::tip[Quick edits]
 :::
@@ -217,9 +247,9 @@ Keep commits **small and focused**. Each commit should represent one logical cha
 
 - [ ] `task test` passes
 - [ ] `task lint` passes (zero warnings)
-- [ ] New language has runnable snippets under `docs/snippets/<lang>/` (validated via `task docs:snippets:check`)
-- [ ] `task generate:e2e && task test:e2e` passes
-- [ ] `task sync-versions` run if any manifest was bumped
+- [ ] New language has runnable snippets under `docs-site/src/snippets/<lang>/`
+- [ ] `task e2e:generate && task e2e:test` passes
+- [ ] `task version:sync` run if any manifest was bumped
 - [ ] PR description explains the change and links related issues
 
 ## Getting help

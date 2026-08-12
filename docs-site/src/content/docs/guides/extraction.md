@@ -5,7 +5,7 @@ description: "Custom extraction queries are not part of the public API — use p
 
 ## Extraction queries
 
-Custom query execution helpers are not exported by the Rust crate or generated language bindings in v1.9.
+Custom query execution helpers are not exported by the Rust crate or the generated language bindings.
 
 Use [`process()`](/guides/intelligence/) for supported code intelligence fields such as structure, imports, exports, comments, docstrings, symbols, diagnostics, metrics, and chunks. The implementation extracts these fields with manual AST traversal in the Rust core.
 
@@ -17,6 +17,8 @@ Bundled query helper functions return query source strings only; they do not exe
 | `get_injections_query(language)` | `injections.scm` source, when bundled |
 | `get_locals_query(language)` | `locals.scm` source, when bundled |
 | `get_tags_query(language)` | `tags.scm` source, when bundled |
+| `get_indents_query(language)` | `indents.scm` source, when bundled |
+| `get_folds_query(language)` | `folds.scm` source, when bundled |
 
 If you need custom extraction, call [`get_parser()`](/guides/parsing/), parse the source with `Parser.parse(&str)` or `Parser.parse_bytes(&[u8])`, then walk the tree manually or run tree-sitter query APIs in your host language.
 

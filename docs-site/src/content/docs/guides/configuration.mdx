@@ -13,6 +13,18 @@ Downloaded parser binaries go in the cache directory. The default:
 
 You can customize the cache location, pre-download languages on startup, and wire up automatic discovery through a TOML file, the programmatic API, or CLI commands.
 
+## Runtime environment variables
+
+These are read at runtime by the downloader.
+
+| Variable                                 | Description                                                                                              |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR`    | Base directory for the parser cache; overrides the platform cache directory                                |
+| `TREE_SITTER_LANGUAGE_PACK_MANIFEST_URL` | Override the `parsers.json` manifest URL (`http(s)://` or `file://`) for mirrors and air-gapped installs   |
+| `TREE_SITTER_LANGUAGE_PACK_TLS_ROOTS`    | `platform` (default) or `webpki` — see [TLS trust store](#tls-trust-store)                                  |
+
+The cache base is resolved in layers: `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR` (when set and non-empty), else the platform cache directory, else the system temporary directory. The last resort keeps downloads working on hosts where the platform reports no cache directory (some Windows CI and conda-forge runners); it logs a `WARN` because a temp-dir cache is not guaranteed to persist between runs.
+
 ## Language-pack.toml
 
 Create `language-pack.toml` in your project root:
@@ -70,34 +82,34 @@ cache_dir = ".cache/tree-sitter"
 <Tabs syncKey="lang">
 <TabItem label="Python">
 
+`init()` and `configure()` take a single optional `PackConfig`; there are no keyword arguments.
+
 ```python
-from tree_sitter_language_pack import init, configure, PackConfig
-from pathlib import Path
+from tree_sitter_language_pack import PackConfig, configure, init
 
 # Pre-download specific languages
-init(languages=["python", "javascript", "rust"])
+init(PackConfig(languages=["python", "javascript", "rust"]))
 
 # Download by language group
-init(groups=["web"])      # JavaScript, TypeScript, HTML, CSS
-init(groups=["systems"])  # C, C++, Rust, Go
-init(groups=["data"])     # Python, R, SQL, JSON
+init(PackConfig(groups=["web"]))      # JavaScript, TypeScript, HTML, CSS
+init(PackConfig(groups=["systems"]))  # C, C++, Rust, Go
+init(PackConfig(groups=["data"]))     # Python, R, SQL, JSON
 
 # Combine languages and groups
-init(languages=["python"], groups=["web", "systems"])
+init(PackConfig(languages=["python"], groups=["web", "systems"]))
 
 # Set custom cache directory (call before first parse)
-configure(cache_dir="/opt/ts-pack-cache")
+configure(PackConfig(cache_dir="/opt/ts-pack-cache"))
 
-# Load from language-pack.toml
-config = PackConfig.from_toml_file(Path("language-pack.toml"))
-if config.languages:
-    init(languages=config.languages)
-
-# Discover in current dir and parents
-config = PackConfig.discover()
-if config and config.languages:
-    init(languages=config.languages)
+# With no argument, init() applies an empty PackConfig
+init()
 ```
+
+:::note[TOML loading is Rust-only]
+`PackConfig::from_toml_file()` and `PackConfig::discover()` exist only on the Rust
+`PackConfig` (behind the `config` feature). They are not exported to Python or any other
+binding — the CLI (`ts-pack download`) reads `language-pack.toml` on your behalf.
+:::
 
 </TabItem>
 <TabItem label="Node.js">
@@ -105,9 +117,9 @@ if config and config.languages:
 ```typescript
 import { init, configure, PackConfig } from "@xberg-io/tree-sitter-language-pack";
 
-await init({ languages: ["python", "javascript", "rust"] });
-await init({ groups: ["web"] });
-await configure({ cacheDir: "/opt/ts-pack-cache" });
+init({ languages: ["python", "javascript", "rust"] });
+init({ groups: ["web"] });
+configure({ cacheDir: "/opt/ts-pack-cache" });
 ```
 
 </TabItem>
@@ -146,7 +158,12 @@ if let Some(config) = PackConfig::discover() {
 | `TSLP_LINK_MODE` | `dynamic` (default), `static`, or `both`                          |
 | `PROJECT_ROOT`   | Override directory search for `sources/language_definitions.json` |
 | `WASI_SYSROOT`   | WASI sysroot path for `wasm32-wasi` cross-compilation             |
-| `TSLP_BUILD`     | Set to `1` to force rebuild of the Elixir NIF native extension    |
+| `TSLP_OFFLINE`   | Set to a non-empty, non-`0` value to refuse downloading the parser-source bundle |
+| `TSLP_SOURCE_BUNDLE_URL` | Override the URL of the `parser-sources-{version}.tar.zst` release asset |
+| `TSLP_ALLOW_FAILED_GRAMMARS` | Set to `1` to downgrade grammar compile failures to warnings (local debugging only) |
+| `TSLP_WASM_MAX_PARSER_BYTES` | `wasm32` only: `parser.c` size gate in bytes; `0` disables the gate |
+| `TSLP_WASM_SKIP_GRAMMARS` | `wasm32` only: comma-separated grammars to skip; replaces the default skip list (empty disables it) |
+| `TREE_SITTER_LANGUAGE_PACK_BUILD` | Set to `1` or `true` to force a rebuild of the Elixir NIF native extension |
 
 ## CLI commands
 
