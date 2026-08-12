@@ -11,6 +11,8 @@ pub(crate) mod extract;
 pub mod intelligence;
 #[cfg(test)]
 mod legacy;
+#[cfg(test)]
+mod test_support;
 pub mod types;
 pub(crate) mod walk;
 
@@ -65,12 +67,8 @@ fn parse_source(
     registry: &crate::LanguageRegistry,
 ) -> Result<(tree_sitter::Language, tree_sitter::Tree), crate::Error> {
     let lang = registry.get_language(&config.language)?;
-    let tree = crate::parse::parse_with_language_limited(
-        &config.language,
-        &lang,
-        source.as_bytes(),
-        config.parse_timeout_ms,
-    )?;
+    let tree =
+        crate::parse::parse_with_language_limited(&config.language, &lang, source.as_bytes(), config.parse_timeout_ms)?;
     Ok((lang, tree))
 }
 
@@ -135,9 +133,22 @@ mod tests {
         ),
     ];
 
-    fn first_lang(registry: &LanguageRegistry) -> Option<String> {
-        let langs = registry.available_languages();
-        langs.into_iter().next()
+    /// The grammar every non-language-specific test in this module uses.
+    ///
+    /// ~keep Naming it matters: picking `available_languages().first()` makes the
+    /// ~keep test measure whichever grammar happens to sort first, and skip
+    /// ~keep invisibly in a default build that links none.
+    const DEFAULT_TEST_LANGUAGE: &str = "python";
+
+    /// Whether `language` is linked into this build, reporting a skip if not.
+    fn has_grammar(registry: &LanguageRegistry, language: &str, test_name: &str) -> bool {
+        match registry.get_language(language) {
+            Ok(_) => true,
+            Err(error) => {
+                eprintln!("SKIPPED {test_name}: grammar '{language}' is not available: {error}");
+                false
+            }
+        }
     }
 
     fn parse(source: &str, language: &str, registry: &LanguageRegistry) -> tree_sitter::Tree {
@@ -304,9 +315,12 @@ mod tests {
     #[test]
     fn test_process_returns_intelligence() {
         let registry = LanguageRegistry::new();
-        let Some(lang) = first_lang(&registry) else { return };
+        let lang = DEFAULT_TEST_LANGUAGE;
+        if !has_grammar(&registry, lang, "test_process_returns_intelligence") {
+            return;
+        }
         let source = "x";
-        let config = ProcessConfig::new(&lang).all();
+        let config = ProcessConfig::new(lang).all();
         let result = super::process(source, &config, &registry);
         assert!(result.is_ok(), "process should succeed for available language");
         let intel = result.unwrap();
@@ -318,9 +332,12 @@ mod tests {
     #[test]
     fn test_process_with_chunking() {
         let registry = LanguageRegistry::new();
-        let Some(lang) = first_lang(&registry) else { return };
+        let lang = DEFAULT_TEST_LANGUAGE;
+        if !has_grammar(&registry, lang, "test_process_with_chunking") {
+            return;
+        }
         let source = "x";
-        let config = ProcessConfig::new(&lang).all().with_chunking(1000);
+        let config = ProcessConfig::new(lang).all().with_chunking(1000);
         let result = super::process(source, &config, &registry);
         assert!(result.is_ok());
         let intel = result.unwrap();
@@ -340,8 +357,11 @@ mod tests {
     #[test]
     fn test_process_empty_source() {
         let registry = LanguageRegistry::new();
-        let Some(lang) = first_lang(&registry) else { return };
-        let config = ProcessConfig::new(&lang);
+        let lang = DEFAULT_TEST_LANGUAGE;
+        if !has_grammar(&registry, lang, "test_process_empty_source") {
+            return;
+        }
+        let config = ProcessConfig::new(lang);
         let result = super::process("", &config, &registry);
         assert!(result.is_ok(), "empty source should parse without error");
         let intel = result.unwrap();
@@ -351,7 +371,7 @@ mod tests {
     #[test]
     fn test_process_with_small_chunk_size() {
         let registry = LanguageRegistry::new();
-        if registry.get_language("python").is_err() {
+        if !has_grammar(&registry, "python", "test_process_with_small_chunk_size") {
             return;
         }
         let source = "def foo():\n    pass\ndef bar():\n    pass\n";

@@ -92,9 +92,16 @@ fn node_text<'a>(node: &Node, source: &'a str) -> &'a str {
     &source[start..end]
 }
 
+/// Shortest string that can carry both an opening and a closing quote.
+const MIN_QUOTED_LEN: usize = 2;
+
 /// Strip one layer of surrounding quotes from a string (JSON, YAML, etc.).
 fn strip_quotes(s: &str) -> &str {
     let s = s.trim();
+    // ~keep A truncated file yields lone quote tokens (`msgstr "`); `1..len-1` would be `1..0`.
+    if s.len() < MIN_QUOTED_LEN {
+        return s;
+    }
     if (s.starts_with('"') && s.ends_with('"')) || (s.starts_with('\'') && s.ends_with('\'')) {
         &s[1..s.len() - 1]
     } else {
@@ -1197,18 +1204,46 @@ fn extract_dtd(root: &Node, source: &str) -> Option<DataNode> {
 mod tests {
     use super::*;
 
-    fn parse(source: &str, lang: &str) -> Option<(tree_sitter::Language, tree_sitter::Tree)> {
-        let registry = crate::LanguageRegistry::new();
-        let language = registry.get_language(lang).ok()?;
-        let mut parser = tree_sitter::Parser::new();
-        parser.set_language(&language).ok()?;
-        let tree = parser.parse(source, None)?;
-        Some((language, tree))
+    // ~keep A missing grammar reports `SKIPPED` on stderr; see `intel::test_support`.
+    fn parse(source: &str, lang: &str) -> Option<tree_sitter::Tree> {
+        crate::intel::test_support::parse_or_skip(source, lang)
     }
 
+    /// Extract, or skip when the grammar is missing.
+    ///
+    /// ~keep A present grammar that yields no data tree is a defect, not a skip:
+    /// ~keep it fails here instead of leaving the caller's `else { return }` silent.
     fn extract(source: &str, lang: &str) -> Option<DataNode> {
-        let (_, tree) = parse(source, lang)?;
-        extract_data(&tree.root_node(), source, lang)
+        let tree = parse(source, lang)?;
+        let extracted = extract_data(&tree.root_node(), source, lang);
+        assert!(
+            extracted.is_some(),
+            "'{lang}' is loaded but produced no data tree for {source:?}"
+        );
+        extracted
+    }
+
+    #[test]
+    fn should_not_panic_when_a_quoted_token_is_unterminated() {
+        assert_eq!(strip_quotes("\""), "\"", "a lone quote has nothing to strip");
+        assert_eq!(strip_quotes("'"), "'");
+        assert_eq!(strip_quotes(""), "");
+        assert_eq!(strip_quotes("\"\""), "");
+        assert_eq!(strip_quotes("\"a\""), "a");
+        assert_eq!(strip_quotes("bare"), "bare");
+    }
+
+    #[test]
+    fn should_extract_a_truncated_po_file_without_panicking() {
+        let source = "msgid \"a\"\nmsgstr \"\n";
+        let Some(tree) = parse(source, "po") else {
+            return;
+        };
+        let extracted = extract_data(&tree.root_node(), source, "po");
+        assert!(
+            extracted.is_some(),
+            "a truncated translation file must still yield a data tree"
+        );
     }
 
     #[test]
@@ -1309,26 +1344,11 @@ mod tests {
 
     #[test]
     fn test_unsupported_language_returns_none() {
-        let result = extract_data(
-            &{
-                let registry = crate::LanguageRegistry::new();
-                let lang = match registry.get_language("python") {
-                    Ok(l) => l,
-                    Err(_) => return,
-                };
-                let mut parser = tree_sitter::Parser::new();
-                if parser.set_language(&lang).is_err() {
-                    return;
-                }
-                match parser.parse("x = 1", None) {
-                    Some(t) => t,
-                    None => return,
-                }
-            }
-            .root_node(),
-            "x = 1",
-            "python",
-        );
+        let source = "x = 1";
+        let Some(tree) = parse(source, "python") else {
+            return;
+        };
+        let result = extract_data(&tree.root_node(), source, "python");
         assert!(result.is_none(), "python should return None for data extraction");
     }
 }

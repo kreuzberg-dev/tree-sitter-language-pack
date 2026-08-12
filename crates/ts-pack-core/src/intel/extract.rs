@@ -14,12 +14,14 @@
 //! imports (which prunes Elixir `quote` bodies) — reproduce that shape with
 //! depth-keyed scopes instead of recursion.
 
+use std::collections::BTreeSet;
+
 use tree_sitter::Node;
 
 use super::elixir;
 use super::intelligence::{
-    comment_at, diagnostic_at, docstring_at, export_at, import_at, resolve_structure_name, span_from_node,
-    structure_kind_at, symbol_at,
+    apply_comment_lines, comment_at, diagnostic_at, docstring_at, export_at, import_at, is_comment_node,
+    mark_comment_rows, resolve_structure_name, span_from_node, structure_kind_at, symbol_at,
 };
 use super::types::*;
 use super::walk::{Descend, walk_bounded, warn_if_truncated};
@@ -59,8 +61,10 @@ impl Wanted {
 /// results into `out`.
 ///
 /// `out.metrics` is expected to already carry the line-level metrics from
-/// [`super::intelligence::compute_line_metrics`]; the tree-derived fields are
-/// filled in here. If the tree is deeper than
+/// [`super::intelligence::compute_line_metrics`]; the tree-derived fields —
+/// including `comment_lines`, which needs the grammar's comment nodes rather
+/// than a language-blind line prefix — are filled in here. If the tree is deeper
+/// than
 /// [`super::walk::MAX_TREE_DEPTH`] the results are truncated and a WARN is
 /// emitted; no error is returned.
 pub(crate) fn extract_all(root: &Node<'_>, source: &str, language: &str, wanted: Wanted, out: &mut ProcessResult) {
@@ -77,6 +81,9 @@ struct Collector<'a> {
     node_count: usize,
     error_count: usize,
     max_depth: usize,
+    /// Rows the AST says a comment occupies. Collected unconditionally: it feeds
+    /// `FileMetrics`, which every `process()` call returns.
+    comment_rows: BTreeSet<usize>,
     comments: Vec<CommentInfo>,
     docstrings: Vec<DocstringInfo>,
     exports: Vec<ExportInfo>,
@@ -95,6 +102,7 @@ impl<'a> Collector<'a> {
             node_count: 0,
             error_count: 0,
             max_depth: 0,
+            comment_rows: BTreeSet::new(),
             comments: Vec::new(),
             docstrings: Vec::new(),
             exports: Vec::new(),
@@ -110,6 +118,9 @@ impl<'a> Collector<'a> {
         self.max_depth = self.max_depth.max(depth);
         if node.is_error() || node.is_missing() {
             self.error_count += 1;
+        }
+        if is_comment_node(node) {
+            mark_comment_rows(node, self.source, &mut self.comment_rows);
         }
 
         if self.wanted.comments
@@ -150,6 +161,7 @@ impl<'a> Collector<'a> {
         out.metrics.node_count = self.node_count;
         out.metrics.error_count = self.error_count;
         out.metrics.max_depth = self.max_depth;
+        apply_comment_lines(&mut out.metrics, self.source, &self.comment_rows);
         out.comments = self.comments;
         out.docstrings = self.docstrings;
         out.exports = self.exports;

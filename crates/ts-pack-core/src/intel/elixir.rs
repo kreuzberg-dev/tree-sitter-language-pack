@@ -235,18 +235,9 @@ mod tests {
     use super::super::intelligence::extract_intelligence;
     use super::super::types::*;
 
-    /// Helper: parse source using the global registry (avoids Language lifetime issues).
-    fn parse_with_language(source: &str, lang_name: &str) -> Option<(tree_sitter::Language, tree_sitter::Tree)> {
-        let registry = crate::LanguageRegistry::new();
-        let lang = registry.get_language(lang_name).ok()?;
-        let mut parser = tree_sitter::Parser::new();
-        parser.set_language(&lang).ok()?;
-        let tree = parser.parse(source, None)?;
-        Some((lang, tree))
-    }
-
+    // ~keep A missing grammar reports `SKIPPED` on stderr; see `intel::test_support`.
     fn parse_or_skip(source: &str, lang_name: &str) -> Option<tree_sitter::Tree> {
-        parse_with_language(source, lang_name).map(|(_, tree)| tree)
+        crate::intel::test_support::parse_or_skip(source, lang_name)
     }
 
     fn collect_names(items: &[StructureItem]) -> Vec<&str> {

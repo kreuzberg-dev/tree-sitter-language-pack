@@ -95,12 +95,9 @@ pub(crate) fn warn_if_truncated(truncated: usize, operation: &'static str, langu
 mod tests {
     use super::*;
 
+    // ~keep A missing grammar reports `SKIPPED` on stderr; see `intel::test_support`.
     fn parse_or_skip(source: &str, language: &str) -> Option<tree_sitter::Tree> {
-        let registry = crate::LanguageRegistry::new();
-        let lang = registry.get_language(language).ok()?;
-        let mut parser = tree_sitter::Parser::new();
-        parser.set_language(&lang).ok()?;
-        parser.parse(source, None)
+        crate::intel::test_support::parse_or_skip(source, language)
     }
 
     #[test]

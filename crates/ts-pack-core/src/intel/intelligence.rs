@@ -7,6 +7,8 @@
 // ~keep `extract_intelligence` remains public even though `intel::process` drives `extract` directly.
 #![allow(dead_code)]
 
+use std::collections::BTreeSet;
+
 use super::extract::Wanted;
 use super::types::*;
 
@@ -54,31 +56,26 @@ fn go_type_spec_symbol_kind(node: &tree_sitter::Node) -> SymbolKind {
 /// Line-level metrics, which are derived from the source text alone.
 ///
 /// The tree-derived fields (`node_count`, `error_count`, `max_depth`) are left
-/// at zero here and filled in by [`super::extract::extract_all`], which is the
-/// only traversal of the tree.
+/// at zero here, and `comment_lines` at zero, because a comment cannot be
+/// recognised from a line prefix without knowing the language: `#` opens a C
+/// preprocessor directive, a Markdown heading and a YAML block-scalar line just
+/// as often as it opens a comment. [`super::extract::extract_all`] — the only
+/// traversal of the tree — fills all four in from the AST via
+/// [`apply_comment_lines`].
 pub(crate) fn compute_line_metrics(source: &str) -> FileMetrics {
     let mut total_lines = 0usize;
     let mut blank_lines = 0;
-    let mut comment_lines = 0;
     for line in source.lines() {
         total_lines += 1;
-        let trimmed = line.trim();
-        if trimmed.is_empty() {
+        if line.trim().is_empty() {
             blank_lines += 1;
-        } else if trimmed.starts_with("//")
-            || trimmed.starts_with('#')
-            || trimmed.starts_with("/*")
-            || trimmed.starts_with('*')
-        {
-            comment_lines += 1;
         }
     }
-    let code_lines = total_lines.saturating_sub(blank_lines + comment_lines);
 
     FileMetrics {
         total_lines,
-        code_lines,
-        comment_lines,
+        code_lines: total_lines.saturating_sub(blank_lines),
+        comment_lines: 0,
         blank_lines,
         total_bytes: source.len(),
         node_count: 0,
@@ -87,15 +84,73 @@ pub(crate) fn compute_line_metrics(source: &str) -> FileMetrics {
     }
 }
 
+/// Node kinds that grammars in this pack use for comments.
+const COMMENT_NODE_KINDS: &[&str] = &[
+    "comment",
+    "line_comment",
+    "block_comment",
+    "doc_comment",
+    "documentation_comment",
+];
+
+/// Whether `node` is a comment node in its grammar.
+pub(super) fn is_comment_node(node: &tree_sitter::Node) -> bool {
+    COMMENT_NODE_KINDS.contains(&node.kind())
+}
+
+/// Record the source rows that a comment `node` occupies.
+///
+/// The comment's own first row counts only when nothing but whitespace precedes
+/// it, so a trailing `x = 1; // note` stays a code line. Every later row of a
+/// block comment is wholly inside the comment and always counts.
+pub(super) fn mark_comment_rows(node: &tree_sitter::Node, source: &str, rows: &mut BTreeSet<usize>) {
+    let start = node.start_position();
+    let end = node.end_position();
+    if line_prefix_is_blank(source, node.start_byte(), start.column) {
+        rows.insert(start.row);
+    }
+    for row in (start.row + 1)..=end.row {
+        rows.insert(row);
+    }
+}
+
+/// Whether only whitespace precedes the byte at `start_byte` on its own line.
+///
+/// ~keep `tree_sitter::Point::column` is a byte offset within the row, so
+/// ~keep subtracting it from the start byte lands on the row's first byte.
+fn line_prefix_is_blank(source: &str, start_byte: usize, column: usize) -> bool {
+    let line_start = start_byte.saturating_sub(column);
+    source
+        .get(line_start..start_byte)
+        .is_some_and(|prefix| prefix.trim().is_empty())
+}
+
+/// Fill `metrics.comment_lines` from the rows the AST reported as comment rows,
+/// and re-derive `code_lines` from them.
+///
+/// A blank row inside a block comment stays a blank line, as it was before the
+/// count moved to the AST.
+pub(super) fn apply_comment_lines(metrics: &mut FileMetrics, source: &str, comment_rows: &BTreeSet<usize>) {
+    let comment_lines = source
+        .lines()
+        .enumerate()
+        .filter(|(row, line)| comment_rows.contains(row) && !line.trim().is_empty())
+        .count();
+    metrics.comment_lines = comment_lines;
+    metrics.code_lines = metrics.total_lines.saturating_sub(metrics.blank_lines + comment_lines);
+}
+
 /// Classify `node` as a comment, if it is one.
 pub(super) fn comment_at(node: &tree_sitter::Node, source: &str) -> Option<CommentInfo> {
-    let kind = node.kind();
-    if !matches!(
-        kind,
-        "comment" | "line_comment" | "block_comment" | "doc_comment" | "documentation_comment"
-    ) {
+    if !is_comment_node(node) {
         return None;
     }
+    // ~keep tree-sitter-rust nests a `doc_comment` inside the `line_comment`/`block_comment`
+    // ~keep that delimits it; reporting both would emit one comment twice.
+    if node.parent().is_some_and(|parent| is_comment_node(&parent)) {
+        return None;
+    }
+    let kind = node.kind();
     let text = node_text(node, source).to_string();
     let comment_kind = if kind == "doc_comment" || kind == "documentation_comment" {
         CommentKind::Doc
@@ -124,27 +179,56 @@ pub(super) fn comment_at(node: &tree_sitter::Node, source: &str) -> Option<Comme
 /// Only Python has a dedicated docstring form; every other language's doc
 /// comments are already captured by [`comment_at`].
 pub(super) fn docstring_at(node: &tree_sitter::Node, source: &str, language: &str) -> Option<DocstringInfo> {
-    if language != "python" || node.kind() != "expression_statement" {
+    if language != "python" {
         return None;
     }
-    let child = node.child(0)?;
-    if child.kind() != "string" && child.kind() != "concatenated_string" {
-        return None;
-    }
-    let parent = node.parent()?;
-    if parent.kind() != "block" && parent.kind() != "module" {
-        return None;
-    }
+    let (string_node, body) = python_docstring_parts(node)?;
     Some(DocstringInfo {
-        text: node_text(&child, source).to_string(),
+        text: node_text(&string_node, source).to_string(),
         format: DocstringFormat::PythonTripleQuote,
-        span: span_from_node(&child),
-        associated_item: parent.parent().and_then(|gp| {
-            gp.child_by_field_name("name")
+        span: span_from_node(&string_node),
+        associated_item: body.parent().and_then(|item| {
+            item.child_by_field_name("name")
                 .map(|n| node_text(&n, source).to_string())
         }),
         parsed_sections: Vec::new(),
     })
+}
+
+/// The string node of a Python docstring and the `block`/`module` holding it.
+///
+/// ~keep `expression_statement` is declared a *supertype* in this pack's
+/// ~keep tree-sitter-python grammar, so it is hidden and a docstring appears as a
+/// ~keep bare `string` directly under the block. The wrapped shape is still
+/// ~keep accepted, for grammars that expose the statement node; the two forms are
+/// ~keep disjoint (a wrapped string's parent is the statement, not the block), so
+/// ~keep no docstring is reported twice.
+fn python_docstring_parts<'tree>(
+    node: &tree_sitter::Node<'tree>,
+) -> Option<(tree_sitter::Node<'tree>, tree_sitter::Node<'tree>)> {
+    let parent = node.parent()?;
+    if !is_python_body(&parent) {
+        return None;
+    }
+    if is_python_string(node) {
+        return Some((*node, parent));
+    }
+    if node.kind() != "expression_statement" {
+        return None;
+    }
+    let child = node.child(0)?;
+    if !is_python_string(&child) {
+        return None;
+    }
+    Some((child, parent))
+}
+
+fn is_python_string(node: &tree_sitter::Node) -> bool {
+    matches!(node.kind(), "string" | "concatenated_string")
+}
+
+fn is_python_body(node: &tree_sitter::Node) -> bool {
+    matches!(node.kind(), "block" | "module")
 }
 
 /// Classify `node` as an import for the language-neutral matcher.
@@ -157,7 +241,9 @@ pub(super) fn import_at(node: &tree_sitter::Node, source: &str, language: &str) 
         "python" => kind == "import_statement" || kind == "import_from_statement",
         "javascript" | "typescript" | "tsx" => kind == "import_statement",
         "rust" => kind == "use_declaration",
-        "go" => kind == "import_declaration" || kind == "import_spec",
+        // ~keep Go nests `import_spec` inside `import_declaration`; matching both counted
+        // ~keep every import twice and the enclosing block a third time.
+        "go" => kind == "import_spec",
         "java" | "kotlin" => kind == "import_declaration",
         _ => false,
     };
@@ -183,19 +269,87 @@ pub(super) fn export_at(node: &tree_sitter::Node, source: &str, language: &str) 
     if !is_export {
         return None;
     }
-    let export_kind = if node.child_by_field_name("default").is_some() {
+    let export_kind = if has_default_keyword(node) {
         ExportKind::Default
     } else if node.child_by_field_name("source").is_some() {
         ExportKind::ReExport
     } else {
         ExportKind::Named
     };
-    let text = node_text(node, source);
     Some(ExportInfo {
-        name: text.lines().next().unwrap_or("").to_string(),
+        name: export_name(node, source),
         kind: export_kind,
         span: span_from_node(node),
     })
+}
+
+/// Whether an `export_statement` carries the `default` keyword.
+///
+/// ~keep tree-sitter-javascript spells `default` as an anonymous token, not a
+/// ~keep field, so `child_by_field_name("default")` never matched and
+/// ~keep `ExportKind::Default` was unreachable. Only direct children are scanned:
+/// ~keep `export { default as x }` keeps the token inside the export specifier.
+fn has_default_keyword(node: &tree_sitter::Node) -> bool {
+    let mut cursor = node.walk();
+    node.children(&mut cursor).any(|child| child.kind() == "default")
+}
+
+/// Resolve the name an `export_statement` exports.
+///
+/// The statement itself has no `name` field: the name lives on the exported
+/// declaration, on the specifiers of an export clause, or — for `export * from
+/// '…'` — nowhere at all, where the statement text is the only identifier
+/// available.
+fn export_name(node: &tree_sitter::Node, source: &str) -> String {
+    if let Some(declaration) = node.child_by_field_name("declaration")
+        && let Some(name) = declared_name(&declaration, source)
+    {
+        return name;
+    }
+    if let Some(value) = node.child_by_field_name("value") {
+        return first_line(node_text(&value, source));
+    }
+    let specifiers = export_specifier_names(node, source);
+    if !specifiers.is_empty() {
+        return specifiers.join(", ");
+    }
+    first_line(node_text(node, source))
+}
+
+fn first_line(text: &str) -> String {
+    text.lines().next().unwrap_or("").to_string()
+}
+
+/// The declared name of `declaration`, looking through the `variable_declarator`
+/// that `const`/`let`/`var` declarations interpose.
+fn declared_name(declaration: &tree_sitter::Node, source: &str) -> Option<String> {
+    if let Some(name) = declaration.child_by_field_name("name") {
+        return Some(node_text(&name, source).to_string());
+    }
+    let mut cursor = declaration.walk();
+    let declarator = declaration
+        .named_children(&mut cursor)
+        .find(|child| child.kind() == "variable_declarator")?;
+    let name = declarator.child_by_field_name("name")?;
+    Some(node_text(&name, source).to_string())
+}
+
+/// The exported names of an `export { a, b }` clause, in source order.
+fn export_specifier_names(node: &tree_sitter::Node, source: &str) -> Vec<String> {
+    let mut cursor = node.walk();
+    let Some(clause) = node
+        .named_children(&mut cursor)
+        .find(|child| child.kind() == "export_clause")
+    else {
+        return Vec::new();
+    };
+    let mut clause_cursor = clause.walk();
+    clause
+        .named_children(&mut clause_cursor)
+        .filter(|child| child.kind() == "export_specifier")
+        .filter_map(|child| child.child_by_field_name("name"))
+        .map(|name| node_text(&name, source).to_string())
+        .collect()
 }
 
 /// Classify `node` as a top-level structure item for the language-neutral
@@ -294,18 +448,9 @@ pub(super) fn resolve_structure_name(node: &tree_sitter::Node, source: &str) -> 
 mod tests {
     use super::*;
 
-    /// Helper: parse source using the global registry (avoids Language lifetime issues).
-    fn parse_with_language(source: &str, lang_name: &str) -> Option<(tree_sitter::Language, tree_sitter::Tree)> {
-        let registry = crate::LanguageRegistry::new();
-        let lang = registry.get_language(lang_name).ok()?;
-        let mut parser = tree_sitter::Parser::new();
-        parser.set_language(&lang).ok()?;
-        let tree = parser.parse(source, None)?;
-        Some((lang, tree))
-    }
-
+    // ~keep A missing grammar reports `SKIPPED` on stderr; see `intel::test_support`.
     fn parse_or_skip(source: &str, lang_name: &str) -> Option<tree_sitter::Tree> {
-        parse_with_language(source, lang_name).map(|(_, tree)| tree)
+        crate::intel::test_support::parse_or_skip(source, lang_name)
     }
 
     #[test]
@@ -449,6 +594,141 @@ mod tests {
     }
 
     #[test]
+    fn should_count_each_go_import_once() {
+        let source = "package main\n\nimport (\n\t\"fmt\"\n\t\"os\"\n)\n";
+        let Some(tree) = parse_or_skip(source, "go") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "go", &tree);
+
+        let sources: Vec<&str> = intel.imports.iter().map(|i| i.source.as_str()).collect();
+        assert_eq!(
+            sources,
+            vec!["\"fmt\"", "\"os\""],
+            "an import block must yield one entry per spec, not one per spec plus the block"
+        );
+    }
+
+    #[test]
+    fn should_count_a_single_go_import_once() {
+        let source = "package main\n\nimport \"fmt\"\n";
+        let Some(tree) = parse_or_skip(source, "go") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "go", &tree);
+
+        let sources: Vec<&str> = intel.imports.iter().map(|i| i.source.as_str()).collect();
+        assert_eq!(sources, vec!["\"fmt\""]);
+    }
+
+    #[test]
+    fn should_resolve_javascript_export_kinds_and_names() {
+        let source = "const helper = 2;\nexport const alpha = 1;\nexport default function beta() {}\nexport function gamma() {}\nexport { helper };\nexport * from './other.js';\n";
+        let Some(tree) = parse_or_skip(source, "javascript") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "javascript", &tree);
+
+        assert_eq!(intel.exports.len(), 5, "every export statement must be reported once");
+        let names: Vec<&str> = intel.exports.iter().take(4).map(|e| e.name.as_str()).collect();
+        assert_eq!(
+            names,
+            vec!["alpha", "beta", "gamma", "helper"],
+            "the name must be the exported binding, not the whole statement"
+        );
+        let kinds: Vec<&ExportKind> = intel.exports.iter().map(|e| &e.kind).collect();
+        assert_eq!(
+            kinds,
+            vec![
+                &ExportKind::Named,
+                &ExportKind::Default,
+                &ExportKind::Named,
+                &ExportKind::Named,
+                &ExportKind::ReExport,
+            ]
+        );
+    }
+
+    #[test]
+    fn should_not_count_string_content_as_comment_lines() {
+        let source = "text = \"\"\"\n# not a comment\n* not a comment\n// not a comment\n\"\"\"\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(intel.metrics.total_lines, 5);
+        assert_eq!(
+            intel.metrics.comment_lines, 0,
+            "a line prefix inside a string literal is not a comment"
+        );
+        assert_eq!(intel.metrics.code_lines, 5);
+    }
+
+    #[test]
+    fn should_not_count_a_yaml_block_scalar_line_as_a_comment() {
+        let source = "script: |\n  # not a comment\n  echo hi\n";
+        let Some(tree) = parse_or_skip(source, "yaml") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "yaml", &tree);
+
+        assert_eq!(intel.metrics.total_lines, 3);
+        assert_eq!(
+            intel.metrics.comment_lines, 0,
+            "a `#` inside a block scalar is data, not a comment"
+        );
+        assert_eq!(intel.metrics.code_lines, 3);
+    }
+
+    #[test]
+    fn should_count_a_trailing_comment_line_as_code() {
+        let source = "# leading\nx = 1  # trailing\n\n# another\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(intel.metrics.total_lines, 4);
+        assert_eq!(intel.metrics.blank_lines, 1);
+        assert_eq!(intel.metrics.comment_lines, 2, "only the two whole-line comments count");
+        assert_eq!(intel.metrics.code_lines, 1);
+    }
+
+    #[test]
+    fn should_count_every_line_of_a_multi_line_block_comment() {
+        let source = "/* first\n   second\n   third */\nfn main() {}\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+
+        assert_eq!(intel.metrics.total_lines, 4);
+        assert_eq!(intel.metrics.comment_lines, 3, "a block comment covers all of its rows");
+        assert_eq!(intel.metrics.code_lines, 1);
+    }
+
+    #[test]
+    fn should_report_a_rust_doc_comment_once() {
+        let source = "/// Documented\nfn documented() {}\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+
+        assert_eq!(
+            intel.comments.len(),
+            1,
+            "the grammar nests `doc_comment` inside `line_comment`; only the outer node is a comment"
+        );
+        assert_eq!(intel.comments[0].kind, CommentKind::Doc);
+        // ~keep `text` is the raw node text. Whether a line comment's token includes its
+        // ~keep trailing newline is grammar-dependent (tree-sitter-rust's does), so the
+        // ~keep assertion trims rather than baking one grammar's token boundary in.
+        assert_eq!(intel.comments[0].text.trim_end(), "/// Documented");
+    }
+
+    #[test]
     fn test_extract_symbols() {
         let source = "fn alpha() {}\nfn beta() {}\n";
         let Some(tree) = parse_or_skip(source, "rust") else {
@@ -529,16 +809,56 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "Python grammar node types vary across versions; needs grammar-aware matching"]
-    fn test_extract_python_docstrings() {
+    fn should_extract_a_python_function_docstring_with_its_text() {
         let source = "def greet():\n    \"\"\"Say hello.\"\"\"\n    pass\n";
         let Some(tree) = parse_or_skip(source, "python") else {
             return;
         };
         let intel = extract_intelligence(source, "python", &tree);
 
-        assert!(!intel.docstrings.is_empty(), "should find python docstring");
-        assert_eq!(intel.docstrings[0].format, DocstringFormat::PythonTripleQuote);
+        assert_eq!(intel.docstrings.len(), 1, "should find exactly one python docstring");
+        let docstring = &intel.docstrings[0];
+        assert_eq!(docstring.text, "\"\"\"Say hello.\"\"\"");
+        assert_eq!(docstring.format, DocstringFormat::PythonTripleQuote);
+        assert_eq!(docstring.associated_item.as_deref(), Some("greet"));
+        assert_eq!(docstring.span.start_line, 1);
+    }
+
+    #[test]
+    fn should_extract_module_and_class_docstrings_without_duplicating_them() {
+        let source = "\"\"\"Module doc.\"\"\"\n\n\nclass Widget:\n    \"\"\"Widget doc.\"\"\"\n\n    def render(self):\n        \"\"\"Render doc.\"\"\"\n        return 1\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        let texts: Vec<&str> = intel.docstrings.iter().map(|d| d.text.as_str()).collect();
+        assert_eq!(
+            texts,
+            vec![
+                "\"\"\"Module doc.\"\"\"",
+                "\"\"\"Widget doc.\"\"\"",
+                "\"\"\"Render doc.\"\"\""
+            ],
+            "one docstring per module, class and function, in source order"
+        );
+        let owners: Vec<Option<&str>> = intel.docstrings.iter().map(|d| d.associated_item.as_deref()).collect();
+        assert_eq!(owners, vec![None, Some("Widget"), Some("render")]);
+    }
+
+    #[test]
+    fn should_not_report_a_nested_string_expression_as_a_docstring() {
+        let source = "def greet():\n    if True:\n        pass\n    return \"not a docstring\"\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert!(
+            intel.docstrings.is_empty(),
+            "a returned string is not a docstring; got {:?}",
+            intel.docstrings
+        );
     }
 
     #[test]

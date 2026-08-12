@@ -10,9 +10,11 @@
 //! They are deliberately recursive: that is the defect [`super::walk`] fixes,
 //! and the oracle only ever runs on small, shallow test inputs.
 
+use std::collections::BTreeSet;
+
 use super::intelligence::{
-    comment_at, diagnostic_at, docstring_at, export_at, import_at, resolve_structure_name, span_from_node,
-    structure_kind_at, symbol_at,
+    apply_comment_lines, comment_at, diagnostic_at, docstring_at, export_at, import_at, is_comment_node,
+    mark_comment_rows, resolve_structure_name, span_from_node, structure_kind_at, symbol_at,
 };
 use super::types::*;
 
@@ -24,10 +26,13 @@ pub(super) fn extract_intelligence(source: &str, language: &str, tree: &tree_sit
     let mut error_count = 0;
     let mut max_depth = 0;
     count_nodes(&root, 0, &mut node_count, &mut error_count, &mut max_depth);
+    let mut comment_rows = BTreeSet::new();
+    collect_comment_rows(&root, source, &mut comment_rows);
     let mut metrics = super::intelligence::compute_line_metrics(source);
     metrics.node_count = node_count;
     metrics.error_count = error_count;
     metrics.max_depth = max_depth;
+    apply_comment_lines(&mut metrics, source, &comment_rows);
 
     let mut structure = Vec::new();
     collect_structure(&root, source, language, &mut structure);
@@ -70,6 +75,16 @@ fn count_nodes(node: &tree_sitter::Node, depth: usize, count: &mut usize, errors
     let mut cursor = node.walk();
     for child in node.children(&mut cursor) {
         count_nodes(&child, depth + 1, count, errors, max_depth);
+    }
+}
+
+fn collect_comment_rows(node: &tree_sitter::Node, source: &str, rows: &mut BTreeSet<usize>) {
+    if is_comment_node(node) {
+        mark_comment_rows(node, source, rows);
+    }
+    let mut cursor = node.walk();
+    for child in node.children(&mut cursor) {
+        collect_comment_rows(&child, source, rows);
     }
 }
 

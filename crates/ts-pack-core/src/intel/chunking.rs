@@ -1,6 +1,7 @@
 use memchr::memchr_iter;
 use tree_sitter::{Language, Tree};
 
+use super::intelligence::comment_at;
 use super::types::*;
 use super::walk::{Descend, walk_bounded, warn_if_truncated};
 
@@ -72,19 +73,6 @@ pub fn chunk_source(
     chunks
 }
 
-fn span_from_node(node: &tree_sitter::Node) -> Span {
-    let s = node.start_position();
-    let e = node.end_position();
-    Span {
-        start_byte: node.start_byte(),
-        end_byte: node.end_byte(),
-        start_line: s.row,
-        start_column: s.column,
-        end_line: e.row,
-        end_column: e.column,
-    }
-}
-
 fn node_text<'a>(node: &tree_sitter::Node, source: &'a str) -> &'a str {
     &source[node.start_byte()..node.end_byte()]
 }
@@ -120,6 +108,43 @@ fn collect_chunk_metadata(
     })
 }
 
+/// Node kinds whose `name` is a symbol definition.
+const DEFINITION_NODE_KINDS: &[&str] = &[
+    "function_definition",
+    "function_declaration",
+    "function_item",
+    "class_definition",
+    "class_declaration",
+    "struct_item",
+    "struct_definition",
+    "enum_item",
+    "enum_declaration",
+    "method_definition",
+    "method_declaration",
+    "trait_item",
+    "impl_item",
+];
+
+/// Whether `node` lies wholly inside the chunk.
+///
+/// ~keep The root spans the whole file, so treating it as contained would make
+/// ~keep every top-level item a *nested* node and leave `node_types` empty for a
+/// ~keep single-chunk file. It is deliberately never contained.
+fn is_contained(node: &tree_sitter::Node, chunk_start: usize, chunk_end: usize) -> bool {
+    node.parent().is_some() && node.start_byte() >= chunk_start && node.end_byte() <= chunk_end
+}
+
+/// Whether `node` is one of the chunk's outermost nodes — contained in it, but
+/// with a parent that is not. This is what `ChunkContext::node_types` documents:
+/// the kinds that appear at the top level of the chunk.
+fn is_chunk_top_level(node: &tree_sitter::Node, chunk_start: usize, chunk_end: usize) -> bool {
+    node.is_named()
+        && is_contained(node, chunk_start, chunk_end)
+        && node
+            .parent()
+            .is_none_or(|parent| !is_contained(&parent, chunk_start, chunk_end))
+}
+
 /// Record one node's contribution to a chunk's metadata.
 pub(super) fn record_chunk_node(
     node: &tree_sitter::Node,
@@ -127,15 +152,11 @@ pub(super) fn record_chunk_node(
     chunk_start: usize,
     chunk_end: usize,
     collector: &mut MetadataCollector<'_>,
-    depth: usize,
+    _depth: usize,
 ) {
     let kind = node.kind();
 
-    if depth <= 1
-        && node.start_byte() >= chunk_start
-        && node.end_byte() <= chunk_end
-        && !collector.node_types.iter().any(|t| t == kind)
-    {
+    if is_chunk_top_level(node, chunk_start, chunk_end) && !collector.node_types.iter().any(|t| t == kind) {
         collector.node_types.push(kind.to_string());
     }
 
@@ -143,74 +164,54 @@ pub(super) fn record_chunk_node(
         *collector.has_errors = true;
     }
 
-    let is_definition = matches!(
-        kind,
-        "function_definition"
-            | "function_declaration"
-            | "function_item"
-            | "class_definition"
-            | "class_declaration"
-            | "struct_item"
-            | "struct_definition"
-            | "enum_item"
-            | "enum_declaration"
-            | "method_definition"
-            | "method_declaration"
-            | "trait_item"
-            | "impl_item"
-    );
-    if is_definition {
-        let name_node = node
-            .child_by_field_name("name")
-            .or_else(|| node.child_by_field_name("declarator"))
-            .or_else(|| node.child_by_field_name("binding"));
-        if let Some(name_node) = name_node {
-            let name = node_text(&name_node, source).to_string();
-            collector.symbols.push(name.clone());
-            if node.start_byte() < chunk_start {
-                collector.context_path.push(name);
-            }
-        }
+    if DEFINITION_NODE_KINDS.contains(&kind) {
+        record_definition_name(node, source, chunk_start, chunk_end, collector);
     }
 
-    if (kind == "comment" || kind == "line_comment" || kind == "block_comment")
-        && node.start_byte() >= chunk_start
-        && node.end_byte() <= chunk_end
+    if is_contained(node, chunk_start, chunk_end)
+        && let Some(comment) = comment_at(node, source)
     {
-        let text = node_text(node, source).to_string();
-        let comment_kind = if kind == "block_comment" {
-            CommentKind::Block
-        } else if kind == "doc_comment"
-            || kind == "documentation_comment"
-            || text.starts_with("///")
-            || text.starts_with("//!")
-            || text.starts_with("/**")
-            || text.starts_with("/*!")
-        {
-            CommentKind::Doc
-        } else {
-            CommentKind::Line
-        };
-        collector.comments.push(CommentInfo {
-            text,
-            kind: comment_kind,
-            span: span_from_node(node),
-            associated_node: node.next_named_sibling().map(|n| n.kind().to_string()),
-        });
+        collector.comments.push(comment);
+    }
+}
+
+/// Attribute a definition's name to the chunk that holds it.
+///
+/// A definition only *overlaps* a chunk when the splitter cut its body across
+/// chunk boundaries; every one of those fragments used to claim the name in
+/// `symbols_defined`. The name is a symbol of the chunk only when the whole
+/// definition fits inside it, and enclosing context otherwise.
+fn record_definition_name(
+    node: &tree_sitter::Node,
+    source: &str,
+    chunk_start: usize,
+    chunk_end: usize,
+    collector: &mut MetadataCollector<'_>,
+) {
+    let name_node = node
+        .child_by_field_name("name")
+        .or_else(|| node.child_by_field_name("declarator"))
+        .or_else(|| node.child_by_field_name("binding"));
+    let Some(name_node) = name_node else { return };
+    let name = node_text(&name_node, source).to_string();
+
+    if node.start_byte() < chunk_start {
+        collector.context_path.push(name);
+        return;
+    }
+    if node.end_byte() <= chunk_end {
+        collector.symbols.push(name);
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::intel::test_support::parse_with_language_or_skip;
 
+    // ~keep A missing grammar reports `SKIPPED` on stderr; see `intel::test_support`.
     fn parse_with(source: &str, lang_name: &str) -> Option<(tree_sitter::Language, tree_sitter::Tree)> {
-        let registry = crate::LanguageRegistry::new();
-        let lang = registry.get_language(lang_name).ok()?;
-        let mut parser = tree_sitter::Parser::new();
-        parser.set_language(&lang).ok()?;
-        let tree = parser.parse(source, None)?;
-        Some((lang, tree))
+        parse_with_language_or_skip(source, lang_name)
     }
 
     #[test]
@@ -276,6 +277,75 @@ mod tests {
         assert!(
             !chunks[0].metadata.comments.is_empty(),
             "should extract comment metadata"
+        );
+    }
+
+    /// A class whose body the splitter has to cut across several chunks.
+    const SPLIT_CLASS_SOURCE: &str = "class Big:\n    def alpha(self):\n        return 1\n\n    def beta(self):\n        return 2\n\n    def gamma(self):\n        return 3\n";
+
+    #[test]
+    fn should_record_top_level_node_types_for_a_single_chunk_file() {
+        let source = "# lead\ndef foo():\n    pass\n";
+        let Some((lang, tree)) = parse_with(source, "python") else {
+            return;
+        };
+        let chunks = chunk_source(source, "python", 10000, &lang, &tree);
+
+        assert_eq!(chunks.len(), 1);
+        assert_eq!(
+            chunks[0].metadata.node_types,
+            vec!["comment".to_string(), "function_definition".to_string()],
+            "the chunk's top level is the file's top-level items, not the root node"
+        );
+    }
+
+    #[test]
+    fn should_record_node_types_for_chunks_of_a_split_definition() {
+        let Some((lang, tree)) = parse_with(SPLIT_CLASS_SOURCE, "python") else {
+            return;
+        };
+        let chunks = chunk_source(SPLIT_CLASS_SOURCE, "python", 40, &lang, &tree);
+
+        assert!(
+            chunks.len() >= 3,
+            "the sample must actually split; got {}",
+            chunks.len()
+        );
+        let with_types = chunks.iter().filter(|c| !c.metadata.node_types.is_empty()).count();
+        assert!(
+            with_types >= 2,
+            "chunks inside a split definition must still report node types; {with_types} of {} did",
+            chunks.len()
+        );
+    }
+
+    #[test]
+    fn should_not_claim_a_split_definition_as_defined_by_every_chunk() {
+        let Some((lang, tree)) = parse_with(SPLIT_CLASS_SOURCE, "python") else {
+            return;
+        };
+        let chunks = chunk_source(SPLIT_CLASS_SOURCE, "python", 40, &lang, &tree);
+
+        assert!(
+            chunks.len() >= 3,
+            "the sample must actually split; got {}",
+            chunks.len()
+        );
+        let claiming: Vec<usize> = chunks
+            .iter()
+            .enumerate()
+            .filter(|(_, c)| c.metadata.symbols_defined.iter().any(|s| s == "Big"))
+            .map(|(index, _)| index)
+            .collect();
+        assert!(
+            claiming.is_empty(),
+            "no chunk contains the whole class, so none defines it; chunks {claiming:?} claimed it"
+        );
+        assert!(
+            chunks
+                .iter()
+                .any(|c| c.metadata.context_path.iter().any(|s| s == "Big")),
+            "chunks after the first must record the class as enclosing context"
         );
     }
 
