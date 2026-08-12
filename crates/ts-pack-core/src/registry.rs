@@ -897,4 +897,36 @@ mod tests {
         assert_eq!(deserialized.metrics.total_lines, intel.metrics.total_lines);
         assert_eq!(deserialized.metrics.total_bytes, intel.metrics.total_bytes);
     }
+
+    #[cfg(any(feature = "dynamic-loading", feature = "download"))]
+    #[test]
+    fn should_resolve_every_alias_to_a_stable_canonical_name() {
+        // ~keep The download manifest is keyed by canonical name only, so any caller
+        // taking user input must resolve before consulting it. `download` shipped
+        // without doing so and rejected `shell` as an unknown language.
+        for &(alias, target) in LANGUAGE_ALIASES {
+            assert_eq!(
+                resolve_alias(alias),
+                target,
+                "alias '{alias}' must resolve to '{target}'"
+            );
+            assert_eq!(
+                resolve_alias(target),
+                target,
+                "canonical name '{target}' must be a fixed point, or resolving twice would corrupt it"
+            );
+            assert!(
+                !LANGUAGE_ALIASES.iter().any(|&(a, _)| a == target),
+                "alias target '{target}' must not itself be an alias — resolution is single-pass"
+            );
+        }
+    }
+
+    #[cfg(any(feature = "dynamic-loading", feature = "download"))]
+    #[test]
+    fn should_leave_unknown_and_canonical_names_untouched() {
+        assert_eq!(resolve_alias("rust"), "rust");
+        assert_eq!(resolve_alias("definitely_not_a_language"), "definitely_not_a_language");
+        assert_eq!(resolve_alias(""), "");
+    }
 }

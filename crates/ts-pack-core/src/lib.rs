@@ -457,8 +457,11 @@ fn configure_inner(config: &PackConfig) -> Result<(), Error> {
 
 /// Download specific languages to the local cache.
 ///
-/// Returns the number of requested languages available after the call. Already
+/// Returns the number of distinct languages available after the call. Already
 /// compiled or cached languages are included in the count.
+///
+/// Aliases are resolved before counting, so `["shell", "bash"]` names one
+/// language and returns 1.
 ///
 /// # Errors
 ///
@@ -489,13 +492,17 @@ fn download_inner(names: &[&str]) -> Result<usize, Error> {
     ensure_cache_registered()?;
     let cache_dir = effective_cache_dir()?;
     let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
-    let unavailable: Vec<&str> = names
+    // ~keep The manifest is keyed by canonical name only, so an alias like `shell`
+    // must be resolved before it reaches `ensure_languages` — otherwise it 404s as
+    // an unknown language. `prefetch` already does this; `download` did not.
+    let resolved: Vec<&str> = names.iter().map(|n| crate::registry::resolve_alias(n)).collect();
+    let unavailable: Vec<&str> = resolved
         .iter()
         .copied()
         .filter(|name| !REGISTRY.has_language(name))
         .collect();
     dm.ensure_languages(&unavailable)?;
-    let unique: std::collections::BTreeSet<&str> = names.iter().copied().collect();
+    let unique: std::collections::BTreeSet<&str> = resolved.iter().copied().collect();
     Ok(unique.len())
 }
 

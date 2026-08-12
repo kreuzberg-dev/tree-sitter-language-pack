@@ -407,9 +407,10 @@ impl DownloadManager {
         for name in &missing {
             if !manifest.languages.contains_key(*name) {
                 return Err(Error::Download(format!(
-                    "Language '{}' not available for download. Available groups: {:?}",
+                    "Language '{}' is not in the download manifest, which lists {} language(s). \
+                     Call `manifest_languages()` to enumerate the names that exist.",
                     name,
-                    manifest.groups.keys().collect::<Vec<_>>()
+                    manifest.languages.len()
                 )));
             }
         }
