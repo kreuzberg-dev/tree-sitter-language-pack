@@ -12,7 +12,6 @@ on:
       - "crates/ts-pack-cli/**"
       - "crates/ts-pack-core/**"
       - "test_apps/cli/**"
-      - "test_apps/fixtures/**"
   pull_request:
     branches: [main]
     paths:
@@ -24,10 +23,6 @@ on:
       - "crates/ts-pack-cli/**"
       - "crates/ts-pack-core/**"
       - "test_apps/cli/**"
-      - "test_apps/fixtures/**"
-  workflow_run:
-    workflows: ["Publish Release"]
-    types: [completed]
   workflow_dispatch:
 
 concurrency:

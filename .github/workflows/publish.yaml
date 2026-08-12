@@ -1837,15 +1837,14 @@ jobs:
           # Walking the archives is the only source of truth.
           PARSER_EXTS = ('.so', '.dylib', '.dll')
 
-          # Reverse map for the handful of grammars whose C symbol differs
-          # from the language id. Must stay in sync with C_SYMBOL_OVERRIDES
-          # in crates/ts-pack-core/src/registry.rs.
-          C_SYMBOL_REVERSE = {
-              'c_sharp': 'csharp',
-              'embedded_template': 'embeddedtemplate',
-              'nu': 'nushell',
-              'vb_dotnet': 'vb',
-          }
+          # Reverse map for the handful of grammars whose C symbol differs from
+          # the language id. Derived from the same source of truth that
+          # crates/ts-pack-core/build.rs uses to emit C_SYMBOL_OVERRIDES into
+          # OUT_DIR/registry_generated.rs, so the two can never drift. Hardcoding
+          # it here previously dropped apache_avro->avro and TSQL->tsql, which
+          # shipped those two keyed by symbol name and undownloadable.
+          defs = json.load(open('sources/language_definitions.json'))
+          C_SYMBOL_REVERSE = {d['c_symbol']: name for name, d in defs.items() if d.get('c_symbol')}
 
           def normalise_lib_name(base):
               # Strip extension.
@@ -1927,7 +1926,6 @@ jobs:
           # advertised-but-dropped grammars. We do not fail here because
           # the cargo build step (with TSLP_ALLOW_FAILED_GRAMMARS unset)
           # is the canonical fail-fast point; this is informational.
-          defs = json.load(open('sources/language_definitions.json'))
           dropped = sorted(set(defs.keys()) - intersection)
           if dropped:
               print(f'NOTE: registry lists {len(dropped)} grammar(s) not present in archives: {dropped}')
@@ -1967,11 +1965,12 @@ jobs:
 
   upload-go-release:
     name: Upload Go FFI to GitHub Release
-    needs: [prepare, validate-versions, build-go-ffi]
+    needs: [prepare, validate-versions, build-go-ffi, e2e-go]
     if: |
       always() &&
       needs.prepare.outputs.dry_run != 'true' &&
-      needs.prepare.outputs.release_go == 'true'
+      needs.prepare.outputs.release_go == 'true' &&
+      needs.e2e-go.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -2006,11 +2005,12 @@ jobs:
 
   upload-c-ffi-release:
     name: Upload C FFI to GitHub Release
-    needs: [prepare, validate-versions, build-c-ffi]
+    needs: [prepare, validate-versions, build-c-ffi, e2e-c]
     if: |
       always() &&
       needs.prepare.outputs.dry_run != 'true' &&
-      needs.prepare.outputs.release_c_ffi == 'true'
+      needs.prepare.outputs.release_c_ffi == 'true' &&
+      needs.e2e-c.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -2044,12 +2044,13 @@ jobs:
 
   upload-elixir-release:
     name: Upload Elixir NIFs to GitHub Release
-    needs: [prepare, validate-versions, build-elixir-nifs]
+    needs: [prepare, validate-versions, build-elixir-nifs, e2e-elixir]
     if: |
       always() &&
       needs.prepare.outputs.dry_run != 'true' &&
       needs.prepare.outputs.release_elixir == 'true' &&
-      needs.build-elixir-nifs.result == 'success'
+      needs.build-elixir-nifs.result == 'success' &&
+      needs.e2e-elixir.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -2088,12 +2089,429 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           assets: "*.tar.gz"
 
+  # ---------------------------------------------------------------------------
+  # E2E gates.
+  #
+  # Cross-workflow `needs:` does not exist in GitHub Actions, so a language's
+  # test suite has to run inside this workflow to be able to block its own
+  # publish job. Each gate mirrors its publish job's `release_*` guard so the
+  # two are skipped and run together.
+  #
+  # Wiring a gate takes BOTH halves: add it to the publish job's `needs:` AND
+  # add `needs.<gate>.result == 'success'` to the publish job's `if:`. Every
+  # publish job below opens with `always()`, which cancels the default
+  # skip-on-failed-dependency behaviour — with `always()` present, `needs:`
+  # alone gates nothing. ~keep
+  # ---------------------------------------------------------------------------
+
+  e2e-rust:
+    name: E2E gate — Rust
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_crates == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-rust
+      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/install-alef@v1
+      - name: Run Rust E2E tests
+        run: task rust:e2e:test
+
+  e2e-python:
+    name: E2E gate — Python
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_python == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-python
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v8.2.0
+      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/install-alef@v1
+      - name: Run Python E2E tests
+        run: task python:e2e:test
+
+  e2e-node:
+    name: E2E gate — Node
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_node == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-node
+      - uses: xberg-io/actions/setup-node-workspace@v1
+        with:
+          node-version: "22"
+      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/install-alef@v1
+      - name: Run Node E2E tests
+        run: task node:e2e:test
+
+  e2e-wasm:
+    name: E2E gate — WASM
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_wasm == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-wasm
+      - name: Install wasi-sdk
+        uses: xberg-io/actions/install-wasi-sdk@v1
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/install-alef@v1
+      - name: Run WASM E2E tests
+        run: task wasm:e2e:test
+
+  e2e-ruby:
+    name: E2E gate — Ruby
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_ruby == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-ruby
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/install-alef@v1
+      - name: Run Ruby E2E tests
+        run: task ruby:e2e:test
+
+  e2e-java:
+    name: E2E gate — Java
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_java == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-java
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+      - uses: xberg-io/actions/setup-maven@v1
+      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/install-alef@v1
+      - name: Run Java E2E tests
+        run: task java:e2e:test
+
+  e2e-elixir:
+    name: E2E gate — Elixir
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_elixir == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,bash"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-elixir
+      - uses: xberg-io/actions/setup-elixir@v1
+        with:
+          elixir-version: "1.17"
+          otp-version: "27.2"
+      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/install-alef@v1
+      - name: Install Elixir dependencies
+        run: task elixir:deps
+      - name: Run Elixir E2E tests
+        run: task elixir:e2e:test
+
+  e2e-php:
+    name: E2E gate — PHP
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_php == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-php
+      - uses: shivammathur/setup-php@2.37.1
+        with:
+          php-version: "8.4"
+          extensions: ffi
+          tools: composer
+      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/install-alef@v1
+      - name: Run PHP E2E tests
+        run: task php:e2e:test
+
+  e2e-csharp:
+    name: E2E gate — C#
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_csharp == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-csharp
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/install-alef@v1
+      - name: Run C# E2E tests
+        run: task csharp:e2e:test
+
+  e2e-go:
+    name: E2E gate — Go
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_go == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-go
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.26"
+          cache-dependency-path: packages/go/go.sum
+      - name: Verify go.mod placement
+        run: |
+          test -f packages/go/go.mod || (echo "ERROR: go.mod missing at packages/go/go.mod" && exit 1)
+      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/install-alef@v1
+      - name: Run Go E2E tests
+        run: task go:e2e:test
+
+  e2e-cli:
+    name: E2E gate — CLI
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_homebrew == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-cli
+      - name: Build CLI (release)
+        run: cargo build --release --locked -p ts-pack-cli
+      - name: Verify CLI binary exists
+        run: |
+          test -f target/release/ts-pack
+      - name: Smoke test — version
+        run: ./target/release/ts-pack --version
+      - name: Smoke test — help
+        run: ./target/release/ts-pack --help
+      - name: Run CLI smoke test script
+        run: |
+          chmod +x test_apps/cli/smoke_test.sh
+          TS_PACK_BIN=./target/release/ts-pack test_apps/cli/smoke_test.sh
+      - name: Run grammar test (static subset)
+        run: |
+          chmod +x test_apps/cli/test_all_grammars.sh
+          TS_PACK_BIN=./target/release/ts-pack \
+            TS_PACK_LANGUAGES="python,rust,javascript,typescript,go,html,css,json" \
+            test_apps/cli/test_all_grammars.sh
+
+  e2e-plugin:
+    name: E2E gate — agent plugin bundles
+    needs: [prepare]
+    if: ${{ needs.prepare.outputs.release_node == 'true' || needs.prepare.outputs.release_python == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - uses: xberg-io/actions/install-task@v1
+      - name: Install ai-rulez
+        run: pipx install ai-rulez
+      # The plugin has no test suite. `plugin:verify` is the only failable check
+      # that exists for it: it re-derives every generated bundle from
+      # plugin/.ai-rulez and compares byte content + BLAKE3 provenance, so it goes
+      # red whenever a bundle was hand-edited or left stale. ~keep
+      - name: Verify plugin bundles match source
+        run: task plugin:verify
+
+  e2e-c:
+    name: E2E gate — C FFI
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_c_ffi == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
+      LD_LIBRARY_PATH: ${{ github.workspace }}/target/release
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-c
+      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/install-alef@v1
+      - name: Run C E2E tests
+        run: task c:e2e:test
+
   publish-crates:
     name: Publish Rust crates
-    needs: [prepare, validate-versions, clone-vendors, check-registries, build-parser-sources]
+    needs: [prepare, validate-versions, clone-vendors, check-registries, build-parser-sources, e2e-rust]
     if: |
       always() &&
       needs.prepare.outputs.release_crates == 'true' &&
+      needs.e2e-rust.result == 'success' &&
       needs.validate-versions.result == 'success' &&
       needs.clone-vendors.result == 'success' &&
       needs.build-parser-sources.result == 'success' &&
@@ -2131,11 +2549,12 @@ jobs:
 
   publish-pypi:
     name: Publish Python to PyPI
-    needs: [prepare, validate-versions, check-registries, build-python-wheels, build-python-sdist]
+    needs: [prepare, validate-versions, check-registries, build-python-wheels, build-python-sdist, e2e-python]
     if: |
       always() &&
       needs.prepare.outputs.release_python == 'true' &&
       needs.build-python-wheels.result == 'success' &&
+      needs.e2e-python.result == 'success' &&
       needs.build-python-sdist.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).pypi != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
@@ -2180,11 +2599,12 @@ jobs:
 
   publish-node:
     name: Publish Node.js to npm
-    needs: [prepare, validate-versions, check-registries, build-node-native]
+    needs: [prepare, validate-versions, check-registries, build-node-native, e2e-node]
     if: |
       always() &&
       needs.prepare.outputs.release_node == 'true' &&
       needs.build-node-native.result == 'success' &&
+      needs.e2e-node.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).npm != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -2274,11 +2694,12 @@ jobs:
 
   publish-wasm:
     name: Publish WASM to npm
-    needs: [prepare, validate-versions, check-registries, build-wasm, publish-node]
+    needs: [prepare, validate-versions, check-registries, build-wasm, publish-node, e2e-wasm]
     if: |
       always() &&
       needs.prepare.outputs.release_wasm == 'true' &&
       needs.build-wasm.result == 'success' &&
+      needs.e2e-wasm.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results)['npm-wasm'] != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -2343,11 +2764,12 @@ jobs:
 
   publish-rubygems:
     name: Publish Ruby gems
-    needs: [prepare, validate-versions, check-registries, build-ruby-gem]
+    needs: [prepare, validate-versions, check-registries, build-ruby-gem, e2e-ruby]
     if: |
       always() &&
       needs.prepare.outputs.release_ruby == 'true' &&
       needs.build-ruby-gem.result == 'success' &&
+      needs.e2e-ruby.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).rubygems != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -2428,11 +2850,12 @@ jobs:
 
   publish-maven:
     name: Publish Maven package
-    needs: [prepare, validate-versions, check-registries, build-java-package]
+    needs: [prepare, validate-versions, check-registries, build-java-package, e2e-java]
     if: |
       always() &&
       needs.prepare.outputs.release_java == 'true' &&
       needs.build-java-package.result == 'success' &&
+      needs.e2e-java.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).maven != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -2635,12 +3058,13 @@ jobs:
 
   upload-php-pie-release:
     name: Upload PHP PIE binaries to GitHub Release
-    needs: [prepare, validate-versions, build-php-extension]
+    needs: [prepare, validate-versions, build-php-extension, e2e-php]
     if: |
       always() &&
       needs.prepare.outputs.dry_run != 'true' &&
       needs.prepare.outputs.release_php == 'true' &&
-      needs.build-php-extension.result == 'success'
+      needs.build-php-extension.result == 'success' &&
+      needs.e2e-php.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -2672,11 +3096,12 @@ jobs:
 
   publish-packagist:
     name: Publish PHP to Packagist
-    needs: [prepare, validate-versions, check-registries, build-php-extension]
+    needs: [prepare, validate-versions, check-registries, build-php-extension, e2e-php]
     if: |
       always() &&
       needs.prepare.outputs.release_php == 'true' &&
       needs.build-php-extension.result == 'success' &&
+      needs.e2e-php.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).packagist != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -2707,11 +3132,12 @@ jobs:
 
   publish-nuget:
     name: Publish C# to NuGet
-    needs: [prepare, validate-versions, check-registries, build-csharp-package]
+    needs: [prepare, validate-versions, check-registries, build-csharp-package, e2e-csharp]
     if: |
       always() &&
       needs.prepare.outputs.release_csharp == 'true' &&
       needs.build-csharp-package.result == 'success' &&
+      needs.e2e-csharp.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).nuget != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -2885,9 +3311,41 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  # Test gates for the four bindings whose e2e suites CI never executed.
+  # GitHub Actions cannot express a `needs:` on a job in another workflow, so
+  # the gate has to live in this workflow; these jobs re-run the same
+  # `.task/*.yml` e2e entrypoints that ci-e2e.yaml runs on PRs, against the
+  # release ref. ~keep
+  e2e-dart:
+    name: E2E gate — Dart
+    needs: [prepare, validate-versions, clone-vendors, check-registries]
+    if: ${{ needs.prepare.outputs.release_dart == 'true' && (fromJson(needs.check-registries.outputs.results).pub != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "mojo,nim,norg"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-dart
+      - uses: dart-lang/setup-dart@v1.7.2
+      - uses: xberg-io/actions/install-task@v1
+      - name: Run Dart E2E tests
+        run: task dart:e2e:test
+
   trigger-pubdev:
     name: Trigger pub.dev publish workflow
-    needs: [prepare, check-registries, assemble-dart-package]
+    needs: [prepare, check-registries, assemble-dart-package, e2e-dart]
     if: |
       needs.prepare.outputs.release_dart == 'true' &&
       needs.assemble-dart-package.result == 'success' &&
@@ -2974,9 +3432,38 @@ jobs:
           path: packages/swift
           retention-days: 14
 
+  e2e-swift:
+    name: E2E gate — Swift
+    needs: [prepare, validate-versions, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_swift == 'true' }}
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "mojo,nim,norg"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-swift
+      - uses: xberg-io/actions/install-task@v1
+      # Targets e2e/swift_e2e via .task/swift.yml. alef.toml's swift `e2e`
+      # command is a duplicate of its unit-test `command` and does not reach
+      # the e2e suite. ~keep
+      - name: Run Swift E2E tests
+        run: task swift:e2e:test
+
   update-swift-package-manifest:
     name: Update Swift Package.swift manifest with version and checksum
-    needs: [prepare, build-swift-artifactbundle]
+    needs: [prepare, build-swift-artifactbundle, e2e-swift]
     if: ${{ needs.prepare.outputs.release_swift == 'true' }}
     runs-on: ubuntu-latest
     steps:
@@ -3118,9 +3605,39 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  e2e-zig:
+    name: E2E gate — Zig
+    needs: [prepare, validate-versions, clone-vendors, check-registries]
+    if: ${{ needs.prepare.outputs.release_zig == 'true' && (fromJson(needs.check-registries.outputs.results).zig != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-zig
+      - uses: xberg-io/actions/setup-zig@v1
+        with:
+          version: "0.16.0"
+      - uses: xberg-io/actions/install-task@v1
+      # Runs e2e/zig. `packages/zig` has no test blocks, so `zig build test`
+      # there passes without semantically analysing the generated module. ~keep
+      - name: Run Zig E2E tests
+        run: task zig:e2e:test
+
   publish-zig:
     name: Publish Zig package metadata to GitHub Release
-    needs: [prepare, check-registries, build-zig-package]
+    needs: [prepare, check-registries, build-zig-package, e2e-zig]
     if: ${{ needs.prepare.outputs.release_zig == 'true' && needs.prepare.outputs.dry_run != 'true' && (fromJson(needs.check-registries.outputs.results).zig != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -3194,9 +3711,42 @@ jobs:
           path: dist/android-natives/${{ matrix.abi }}/
           if-no-files-found: error
 
+  e2e-kotlin-android:
+    name: E2E gate — Kotlin Android
+    needs: [prepare, check-registries, clone-vendors]
+    if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && (fromJson(needs.check-registries.outputs.results).maven-kotlin-android != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+      - uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-e2e-kotlin-android
+      - uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: "17"
+      - uses: xberg-io/actions/setup-gradle@v1
+      # The generated suite is the host JVM `test` source set; src/androidTest
+      # is not wired into any source set and is not executed. ~keep
+      - name: Run Kotlin Android E2E tests
+        working-directory: e2e/kotlin_android
+        run: gradle test --no-daemon
+
   publish-kotlin-android:
     name: Publish kotlin-android (Maven Central via Gradle)
-    needs: [prepare, check-registries, build-kotlin-android-natives]
+    needs: [prepare, check-registries, build-kotlin-android-natives, e2e-kotlin-android]
     if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && needs.prepare.outputs.dry_run != 'true' && (fromJson(needs.check-registries.outputs.results).maven-kotlin-android != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -3330,10 +3880,11 @@ jobs:
 
   upload-cli-release:
     name: Upload CLI binaries to GitHub Release
-    needs: [prepare, build-cli]
+    needs: [prepare, build-cli, e2e-cli]
     if: |
       needs.prepare.outputs.dry_run != 'true' &&
-      needs.build-cli.result == 'success'
+      needs.build-cli.result == 'success' &&
+      needs.e2e-cli.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -3914,8 +4465,8 @@ jobs:
 
   publish-plugin-opencode:
     name: Publish OpenCode plugin to npm
-    needs: [prepare]
-    if: ${{ !cancelled() && needs.prepare.outputs.release_node == 'true' }}
+    needs: [prepare, e2e-plugin]
+    if: ${{ !cancelled() && needs.prepare.outputs.release_node == 'true' && needs.e2e-plugin.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -3952,8 +4503,8 @@ jobs:
 
   publish-plugin-hermes:
     name: Publish Hermes plugin to PyPI
-    needs: [prepare]
-    if: ${{ !cancelled() && needs.prepare.outputs.release_python == 'true' }}
+    needs: [prepare, e2e-plugin]
+    if: ${{ !cancelled() && needs.prepare.outputs.release_python == 'true' && needs.e2e-plugin.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: pypi

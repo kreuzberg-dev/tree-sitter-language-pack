@@ -27,9 +27,6 @@ on:
       - "sources/**"
       - "scripts/clone_vendors.py"
       - ".github/workflows/ci-rust.yaml"
-  workflow_run:
-    workflows: ["Publish Release"]
-    types: [completed]
   workflow_dispatch:
 
 concurrency:

@@ -7,7 +7,6 @@ on:
       - "crates/ts-pack-core/**"
       - "crates/ts-pack-cli/**"
       - "sources/language_definitions.json"
-      - "test_apps/fixtures/all_grammars.json"
       - "test_apps/cli/**"
       - "docker/**"
       - ".dockerignore"
@@ -20,17 +19,16 @@ on:
       - "crates/ts-pack-core/**"
       - "crates/ts-pack-cli/**"
       - "sources/language_definitions.json"
-      - "test_apps/fixtures/all_grammars.json"
       - "test_apps/cli/**"
       - "docker/**"
       - ".dockerignore"
       - ".github/workflows/ci-docker.yaml"
       - "Cargo.toml"
       - "Cargo.lock"
-  workflow_run:
-    workflows: ["Publish Release"]
-    types: [completed]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ci-docker-${{ github.ref }}

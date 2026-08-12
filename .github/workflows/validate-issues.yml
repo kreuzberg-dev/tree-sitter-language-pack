@@ -4,6 +4,13 @@ on:
   issues:
     types: [opened, edited]
 
+# Matches the permissions reusable-validate-issues.yml declares. A called workflow's
+# token is capped by the caller's, so these cannot be narrowed further without
+# breaking issue labelling. ~keep
+permissions:
+  issues: write
+  repository-projects: write
+
 concurrency:
   group: validate-issues-${{ github.event.issue.number }}
   cancel-in-progress: true

@@ -35,9 +35,6 @@ on:
       - "package.json"
       - "pyproject.toml"
       - ".github/workflows/ci-e2e.yaml"
-  workflow_run:
-    workflows: ["Publish Release"]
-    types: [completed]
   workflow_dispatch:
 
 concurrency:
@@ -209,6 +206,10 @@ jobs:
       ruby: ${{ steps.filter.outputs.ruby }}
       php: ${{ steps.filter.outputs.php }}
       elixir: ${{ steps.filter.outputs.elixir }}
+      dart: ${{ steps.filter.outputs.dart }}
+      kotlin_android: ${{ steps.filter.outputs.kotlin_android }}
+      swift: ${{ steps.filter.outputs.swift }}
+      zig: ${{ steps.filter.outputs.zig }}
       docker: ${{ steps.filter.outputs.docker }}
     steps:
       - name: Checkout
@@ -271,6 +272,25 @@ jobs:
             elixir:
               - 'packages/elixir/**'
               - 'e2e/elixir/**'
+              - 'fixtures/**'
+            dart:
+              - 'packages/dart/**'
+              - 'e2e/dart/**'
+              - 'fixtures/**'
+            kotlin_android:
+              - 'crates/tree-sitter-language-pack-jni/**'
+              - 'packages/kotlin-android/**'
+              - 'e2e/kotlin_android/**'
+              - 'fixtures/**'
+            swift:
+              - 'packages/swift/**'
+              - 'e2e/swift_e2e/**'
+              - 'scripts/setup-swift-bridge.sh'
+              - 'fixtures/**'
+            zig:
+              - 'crates/ts-pack-core-ffi/**'
+              - 'packages/zig/**'
+              - 'e2e/zig/**'
               - 'fixtures/**'
             docker:
               - 'Dockerfile*'
@@ -1338,3 +1358,257 @@ jobs:
 
       - name: Build and run C E2E tests
         run: task c:e2e:test
+
+  test-dart:
+    name: Test Dart
+    if: |
+      github.repository == 'xberg-io/tree-sitter-language-pack' &&
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name == 'workflow_dispatch' ||
+       needs.changes.outputs.dart == 'true' ||
+       needs.changes.outputs.core == 'true')
+    needs: [changes, clone-vendors, build-e2e-bundles]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "mojo,nim,norg"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Download e2e parser bundle
+        uses: actions/download-artifact@v8
+        with:
+          name: e2e-bundles-linux-x86_64
+          path: e2e-bundles
+
+      - name: Wire e2e manifest
+        shell: bash
+        env:
+          PLATFORM_LABEL: linux-x86_64
+          BUNDLE_DIR: ${{ github.workspace }}/e2e-bundles
+        run: ./scripts/ci/prepare_e2e_manifest.sh
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: xberg-io/actions/setup-rust@v1
+        with:
+          components: ""
+          use-sccache: "false"
+          cache-key-prefix: e2e-dart
+          install-llvm-cov: "false"
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1.7.2
+
+      - name: Install Task
+        uses: xberg-io/actions/install-task@v1
+
+      # e2e/dart depends on packages/dart by path, and packages/dart/lib is
+      # alef-generated and committed, so no flutter_rust_bridge codegen run is
+      # needed here — `dart:e2e:test` builds the Rust cdylib and runs the
+      # generated suite under e2e/dart. ~keep
+      - name: Run Dart E2E tests
+        run: task dart:e2e:test
+
+  test-kotlin-android:
+    name: Test Kotlin Android
+    if: |
+      github.repository == 'xberg-io/tree-sitter-language-pack' &&
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name == 'workflow_dispatch' ||
+       needs.changes.outputs.kotlin_android == 'true' ||
+       needs.changes.outputs.core == 'true')
+    needs: [changes, clone-vendors, build-e2e-bundles]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,gherkin"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Download e2e parser bundle
+        uses: actions/download-artifact@v8
+        with:
+          name: e2e-bundles-linux-x86_64
+          path: e2e-bundles
+
+      - name: Wire e2e manifest
+        shell: bash
+        env:
+          PLATFORM_LABEL: linux-x86_64
+          BUNDLE_DIR: ${{ github.workspace }}/e2e-bundles
+        run: ./scripts/ci/prepare_e2e_manifest.sh
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: xberg-io/actions/setup-rust@v1
+        with:
+          components: ""
+          use-sccache: "false"
+          cache-key-prefix: e2e-kotlin-android
+          install-llvm-cov: "false"
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      # No Android NDK here: e2e/kotlin_android's generated suite is a host JVM
+      # unit-test source set, so nothing cross-compiles. The runner's
+      # preinstalled Android SDK is enough for the com.android.library plugin
+      # to configure. ~keep
+      - name: Setup Gradle
+        uses: xberg-io/actions/setup-gradle@v1
+
+      # The generated suite lives in src/test (host JVM unit tests); the
+      # build.gradle.kts `buildHostJni`/`copyHostJni` tasks build and stage
+      # libts_pack_jni for it, so `gradle test` needs no emulator. The
+      # src/androidTest tree is NOT wired into any source set and is not
+      # executed by this job. ~keep
+      - name: Run Kotlin Android E2E tests
+        working-directory: e2e/kotlin_android
+        run: gradle test --no-daemon
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kotlin-android-e2e-reports
+          path: e2e/kotlin_android/build/reports/tests
+          if-no-files-found: ignore
+          retention-days: 7
+
+  test-swift:
+    name: Test Swift
+    if: |
+      github.repository == 'xberg-io/tree-sitter-language-pack' &&
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name == 'workflow_dispatch' ||
+       needs.changes.outputs.swift == 'true' ||
+       needs.changes.outputs.core == 'true')
+    needs: [changes, clone-vendors, build-e2e-bundles]
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "mojo,nim,norg"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Download e2e parser bundle
+        uses: actions/download-artifact@v8
+        with:
+          name: e2e-bundles-macos-arm64
+          path: e2e-bundles
+
+      - name: Wire e2e manifest
+        shell: bash
+        env:
+          PLATFORM_LABEL: macos-arm64
+          BUNDLE_DIR: ${{ github.workspace }}/e2e-bundles
+        run: ./scripts/ci/prepare_e2e_manifest.sh
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: xberg-io/actions/setup-rust@v1
+        with:
+          components: ""
+          use-sccache: "false"
+          cache-key-prefix: e2e-swift
+          install-llvm-cov: "false"
+
+      - name: Install Task
+        uses: xberg-io/actions/install-task@v1
+
+      # `alef.toml` sets the swift `e2e` command byte-identical to its unit-test
+      # `command` (`cd packages/swift && swift test`), so `alef test --e2e` never
+      # reaches the e2e suite. `.task/swift.yml:104` is the only invocation that
+      # actually runs `e2e/swift_e2e`, so this job goes through Task.
+      # `e2e/swift/` is a dead orphan (Package.swift with no Tests/) and is not
+      # referenced here. ~keep
+      - name: Run Swift E2E tests
+        run: task swift:e2e:test
+
+  test-zig:
+    name: Test Zig
+    if: |
+      github.repository == 'xberg-io/tree-sitter-language-pack' &&
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name == 'workflow_dispatch' ||
+       needs.changes.outputs.zig == 'true' ||
+       needs.changes.outputs.core == 'true' ||
+       needs.changes.outputs.ffi == 'true')
+    needs: [changes, clone-vendors, build-e2e-bundles]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      TSLP_LINK_MODE: static
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Download e2e parser bundle
+        uses: actions/download-artifact@v8
+        with:
+          name: e2e-bundles-linux-x86_64
+          path: e2e-bundles
+
+      - name: Wire e2e manifest
+        shell: bash
+        env:
+          PLATFORM_LABEL: linux-x86_64
+          BUNDLE_DIR: ${{ github.workspace }}/e2e-bundles
+        run: ./scripts/ci/prepare_e2e_manifest.sh
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: xberg-io/actions/setup-rust@v1
+        with:
+          components: ""
+          use-sccache: "false"
+          cache-key-prefix: e2e-zig
+          install-llvm-cov: "false"
+
+      - name: Setup Zig
+        uses: xberg-io/actions/setup-zig@v1
+        with:
+          version: "0.16.0"
+
+      - name: Install Task
+        uses: xberg-io/actions/install-task@v1
+
+      # `zig:e2e:test` runs `e2e/zig`'s suite. `packages/zig` deliberately has
+      # no test blocks, so `zig build test` there is a no-op that never
+      # semantically analyses the generated module — it is not a substitute. ~keep
+      - name: Run Zig E2E tests
+        run: task zig:e2e:test
