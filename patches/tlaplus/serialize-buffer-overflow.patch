@@ -1,0 +1,23 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -1840,6 +1840,20 @@
+     ) {
+       unsigned offset = 0;
+       unsigned copied = 0;
++
++      // The runtime hands us exactly TREE_SITTER_SERIALIZATION_BUFFER_SIZE
++      // bytes and only ts_assert()s the returned length, which is a no-op under
++      // NDEBUG. enclosing_contexts is unbounded, so measure first and drop the
++      // state (return 0) rather than overrun the buffer; deserialize() already
++      // handles a zero-length state by resetting. ~keep
++      unsigned required = sizeof(nest_address) + sizeof(unsigned);
++      for (unsigned i = 0; i < this->enclosing_contexts.size; i++) {
++        required += sizeof(unsigned) + array_get(&this->enclosing_contexts, i)->size;
++      }
++      required += scanner_serialized_size(&this->current_context);
++      if (required > TREE_SITTER_SERIALIZATION_BUFFER_SIZE) {
++        return 0;
++      }
+ 
+       // First write number of enclosing contexts (guaranteed to be >= 1)
+       nest_address const context_depth = this->enclosing_contexts.size + 1;

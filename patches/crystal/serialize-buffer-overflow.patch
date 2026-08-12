@@ -1,0 +1,40 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -2121,14 +2121,24 @@
+     memcpy(&buffer[offset], state->literals.contents, literal_content_size);
+     offset += literal_content_size;
+ 
+-    // It's safe to cast the heredoc count into a char since it will always be
+-    // less than MAX_HEREDOC_COUNT.
+-    buffer[offset++] = (char)state->heredocs.size;
++    // MAX_HEREDOC_COUNT heredocs each carrying a MAX_HEREDOC_WORD_SIZE
++    // identifier is 16 * 258 bytes -- four times the serialization buffer. The
++    // runtime only ts_assert()s the returned length and that assert is compiled
++    // out under NDEBUG, so the count is back-patched to the number that
++    // actually fit. deserialize() reads exactly that many. ~keep
++    const size_t heredoc_count_offset = offset;
++    buffer[offset++] = 0;
+ 
+     // Heredoc are serialized one at a time, with their identifier buffers inlined.
++    uint8_t serialized_heredocs = 0;
+     for (uint8_t i = 0; i < state->heredocs.size; i++) {
+         Heredoc *heredoc = array_get(&state->heredocs, i);
+ 
++        if (offset + 3 + heredoc->identifier.size >
++            TREE_SITTER_SERIALIZATION_BUFFER_SIZE) {
++            break;
++        }
++
+         buffer[offset++] = (char)heredoc->allow_escapes;
+         buffer[offset++] = (char)heredoc->started;
+ 
+@@ -2138,7 +2148,9 @@
+ 
+         memcpy(&buffer[offset], heredoc->identifier.contents, heredoc->identifier.size);
+         offset += heredoc->identifier.size;
++        serialized_heredocs++;
+     }
++    buffer[heredoc_count_offset] = (char)serialized_heredocs;
+ 
+     assert(offset <= TREE_SITTER_SERIALIZATION_BUFFER_SIZE);
+ 

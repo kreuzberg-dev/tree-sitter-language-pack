@@ -1,0 +1,15 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -166,9 +166,11 @@
+     buffer[i++] = (char)indent_count;
+ 
+     // Write indentation stack data (starting from index 1)
++    // Reserve one byte: the org-section count byte below is written
++    // unconditionally, so this loop must stop one short of the buffer end. ~keep
+     uint32_t iter = 1;
+     for (; iter < scanner->indent_length_stack.length
+-           && i < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
++           && i + 1 < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
+          ++iter) {
+         buffer[i++] = (char)scanner->indent_length_stack.data[iter];
+     }

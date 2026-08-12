@@ -1,0 +1,39 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -3177,14 +3177,34 @@
+   buffer[size++] = (char)s->indent;
+   buffer[size++] = (char)s->state;
+ 
+-  buffer[size++] = (char)s->open_blocks->size;
+-  for (size_t i = 0; i < s->open_blocks->size; ++i) {
++  // tree-sitter's serialization buffer is exactly
++  // TREE_SITTER_SERIALIZATION_BUFFER_SIZE bytes and the only bound check in the
++  // runtime is a ts_assert(), which is a no-op under NDEBUG. open_blocks and
++  // open_inline grow without bound, so cap both. Truncated state costs
++  // deep-nesting fidelity on an incremental re-parse, not heap integrity.
++  // deserialize() reads exactly the block count written here and then consumes
++  // inlines until `length`, so a truncated form round-trips. ~keep
++  const unsigned djot_ser_limit = TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
++  size_t block_count = s->open_blocks->size;
++  if (block_count > (djot_ser_limit - size - 1) / 2) {
++    block_count = (djot_ser_limit - size - 1) / 2;
++  }
++  // The count is written as a single byte, so more than UINT8_MAX blocks would
++  // wrap and desynchronise deserialize()'s block/inline split. ~keep
++  if (block_count > UINT8_MAX) {
++    block_count = UINT8_MAX;
++  }
++  buffer[size++] = (char)block_count;
++  for (size_t i = 0; i < block_count; ++i) {
+     Block *b = *array_get(s->open_blocks, i);
+     buffer[size++] = (char)b->type;
+     buffer[size++] = (char)b->data;
+   }
+ 
+   for (size_t i = 0; i < s->open_inline->size; ++i) {
++    if (size + 2 > djot_ser_limit) {
++      break;
++    }
+     Inline *x = *array_get(s->open_inline, i);
+     buffer[size++] = (char)x->type;
+     buffer[size++] = (char)x->data;

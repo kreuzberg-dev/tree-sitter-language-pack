@@ -1,0 +1,28 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -139,11 +139,22 @@
+   // This serializes the stack pointer too, but that's fine as long as we don't
+   // use it when deserializing, and desirable so we don't have to think about
+   // struct layout rules.
++  // The indent stack grows without bound, and the runtime's only length check
++  // is a ts_assert() that compiles out under NDEBUG. Cap the stack to what fits
++  // and serialize a struct copy carrying the truncated stack_len, so that
++  // deserialize() reads back a consistent (length, stack_len) pair. ~keep
+   struct scanner *scanner = payload;
+-  memcpy(buffer, scanner, sizeof(struct scanner));
++  struct scanner truncated = *scanner;
++  const size_t max_stack_len =
++      (TREE_SITTER_SERIALIZATION_BUFFER_SIZE - sizeof(struct scanner)) /
++      sizeof(int);
++  if (truncated.stack_len > max_stack_len) {
++    truncated.stack_len = max_stack_len;
++  }
++  memcpy(buffer, &truncated, sizeof(struct scanner));
+   memcpy(buffer + sizeof(struct scanner), scanner->stack,
+-         sizeof(int) * scanner->stack_len);
+-  return sizeof(struct scanner) + sizeof(int) * scanner->stack_len;
++         sizeof(int) * truncated.stack_len);
++  return sizeof(struct scanner) + sizeof(int) * truncated.stack_len;
+ }
+ 
+ void tree_sitter_koka_external_scanner_deserialize(void *payload,

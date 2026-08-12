@@ -1,0 +1,50 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -176,15 +176,27 @@
+ 	assert(self->len > 0, "vec_u32_pop: empty vec");
+ 	return self->vec[self->len--];
+ }
+-static size_t vec_u32_serialize(struct vec_u32* self, char* buffer) {
++// `capacity` is the number of bytes left in tree-sitter's fixed serialization
++// buffer. The runtime only ts_assert()s the returned length and that assert is
++// compiled out under NDEBUG, so the bound has to be enforced here. The length
++// prefix is written truncated, which is exactly what vec_u32_deserialize reads
++// back, so a truncated vector round-trips. ~keep
++static size_t vec_u32_serialize(struct vec_u32* self, char* buffer, size_t capacity) {
+ 	assert(self != NULL, "vec_u32_serialize");
+ 	size_t written = 0;
+-	memcpy(buffer, &self->len, sizeof self->len);
+-	written += sizeof self->len;
+-	if (self->len > 0) {
+-		memcpy(buffer + written, self->vec, self->len * sizeof(uint32_t));
+-		written += self->len * sizeof(uint32_t);
++	if (capacity < sizeof self->len) {
++		return 0;
+ 	}
++	uint32_t len = self->len;
++	if (len > (capacity - sizeof self->len) / sizeof(uint32_t)) {
++		len = (uint32_t)((capacity - sizeof self->len) / sizeof(uint32_t));
++	}
++	memcpy(buffer, &len, sizeof len);
++	written += sizeof len;
++	if (len > 0) {
++		memcpy(buffer + written, self->vec, len * sizeof(uint32_t));
++		written += len * sizeof(uint32_t);
++	}
+ 	return written;
+ }
+ static size_t vec_u32_deserialize(struct vec_u32* self, const char* buffer) {
+@@ -348,8 +360,11 @@
+ ) {
+ 	struct scanner* self = payload;
+ 	size_t written = 0;
+-	written += vec_u32_serialize(&self->indentation, buffer + written);
+-	written += vec_u32_serialize(&self->containers, buffer + written);
++	// Four trailing scalar bytes are written after the two vectors; keep room.
++	const size_t trailing = 4;
++	size_t budget = TREE_SITTER_SERIALIZATION_BUFFER_SIZE - trailing;
++	written += vec_u32_serialize(&self->indentation, buffer + written, budget - written);
++	written += vec_u32_serialize(&self->containers, buffer + written, budget - written);
+ 	buffer[written++] = self->immediate;
+ 	buffer[written++] = self->heading_level;
+ 	buffer[written++] = self->line_start;

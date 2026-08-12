@@ -1,0 +1,44 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -408,16 +408,36 @@
+ 
+   Scanner* scanner = (Scanner*)payload;
+ 
+-  const uint32_t num_indents = scanner->indents.len;
+-  *((uint32_t*)write_ptr) = num_indents;
++  // tree-sitter guarantees only TREE_SITTER_SERIALIZATION_BUFFER_SIZE bytes
++  // here and the runtime's length check is a ts_assert(), compiled out under
++  // NDEBUG. Both vectors grow without bound, so cap each to what fits. The
++  // counts written below are the truncated counts, which is what deserialize()
++  // reads back, so the truncated form round-trips. ~keep
++  const size_t koto_indent_size = sizeof(scanner->indents.data[0]);
++  // Reserve: two count words, the quote bytes, and the two trailing flags.
++  const size_t koto_reserved = 2 * sizeof(uint32_t) + 2;
++  uint32_t num_indents = scanner->indents.len;
++  if (num_indents > (TREE_SITTER_SERIALIZATION_BUFFER_SIZE - koto_reserved) /
++                        koto_indent_size) {
++    num_indents = (uint32_t)((TREE_SITTER_SERIALIZATION_BUFFER_SIZE -
++                              koto_reserved) /
++                             koto_indent_size);
++  }
++  memcpy(write_ptr, &num_indents, sizeof(uint32_t));
+   write_ptr += sizeof(uint32_t);
+ 
+-  const unsigned indents_size = num_indents * sizeof(scanner->indents.data[0]);
++  const unsigned indents_size = num_indents * koto_indent_size;
+   memcpy(write_ptr, scanner->indents.data, indents_size);
+   write_ptr += indents_size;
+ 
+-  const uint32_t num_quotes = scanner->quotes.len;
+-  *((uint32_t*)write_ptr) = num_quotes;
++  const size_t koto_used = (size_t)(write_ptr - buffer);
++  uint32_t num_quotes = scanner->quotes.len;
++  if (num_quotes >
++      TREE_SITTER_SERIALIZATION_BUFFER_SIZE - koto_used - sizeof(uint32_t) - 2) {
++    num_quotes = (uint32_t)(TREE_SITTER_SERIALIZATION_BUFFER_SIZE - koto_used -
++                            sizeof(uint32_t) - 2);
++  }
++  memcpy(write_ptr, &num_quotes, sizeof(uint32_t));
+   write_ptr += sizeof(uint32_t);
+ 
+   memcpy(write_ptr, scanner->quotes.data, num_quotes);

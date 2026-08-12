@@ -315,6 +315,7 @@ jobs:
           paths: |
             parsers
             sources
+            patches
           excludes: |
             parsers/*/grammar.js
             parsers/*/grammar.json
@@ -555,6 +556,7 @@ jobs:
           paths: |
             parsers
             sources
+            patches
           excludes: |
             parsers/*/grammar.js
             parsers/*/grammar.json
