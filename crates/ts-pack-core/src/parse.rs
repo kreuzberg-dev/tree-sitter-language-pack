@@ -48,7 +48,9 @@ pub(crate) fn parse_with_language_limited(
     timeout_ms: Option<u64>,
 ) -> Result<tree_sitter::Tree, Error> {
     // ~keep Some third-party scanners keep process-global state, so parser execution is serialized.
-    let _guard = PARSE_LOCK.lock().map_err(|e| Error::LockPoisoned(e.to_string()))?;
+    let _guard = PARSE_LOCK
+        .lock()
+        .unwrap_or_else(|poisoned| crate::recover_poisoned_lock("parse", poisoned));
     PARSER_CACHE.with(|cache| {
         let mut cache = cache.borrow_mut();
         if let Some(parser) = cache.get_mut(language_name) {
@@ -74,7 +76,13 @@ pub(crate) fn run_parse(
     // ~keep Same reader `tree_sitter::Parser::parse` builds internally. The chunk-callback entry
     // ~keep point is the only one that also takes `ParseOptions`, which carries the cancellation
     // ~keep hook; `set_timeout_micros` no longer exists in tree-sitter 0.26.
-    let mut read = |offset: usize, _: tree_sitter::Point| if offset < len { &source[offset..] } else { Default::default() };
+    let mut read = |offset: usize, _: tree_sitter::Point| {
+        if offset < len {
+            &source[offset..]
+        } else {
+            Default::default()
+        }
+    };
 
     let deadline = match timeout_ms {
         Some(budget_ms) => Instant::now().checked_add(Duration::from_millis(budget_ms)),
@@ -175,6 +183,39 @@ mod tests {
         assert!(
             after >= before + 2,
             "different languages should create separate cache entries"
+        );
+    }
+
+    #[test]
+    fn should_keep_parsing_after_a_panic_poisons_the_parse_lock() {
+        if skip_if_no_languages() {
+            return;
+        }
+        let langs = crate::available_languages();
+        let first = &langs[0];
+        let language = crate::get_language(first).expect("language should be loadable");
+
+        // ~keep PARSE_LOCK guards no data (it only serializes third-party scanner global
+        // ~keep state), so poisoning it should never brick parsing. Poisoning is process-wide
+        // ~keep and sticky (std::sync::Mutex never un-poisons), which is safe to do here only
+        // ~keep because every acquisition site recovers via `recover_poisoned_lock` — this
+        // ~keep test leaves PARSE_LOCK poisoned for the rest of the process on purpose, and
+        // ~keep every sibling test that parses afterward exercises that same recovery path.
+        let poison_result = std::panic::catch_unwind(|| {
+            let _guard = PARSE_LOCK.lock().expect("PARSE_LOCK should not already be poisoned");
+            panic!("intentional panic to poison PARSE_LOCK for this test");
+        });
+        assert!(poison_result.is_err(), "the intentional panic should have unwound");
+        assert!(
+            PARSE_LOCK.is_poisoned(),
+            "PARSE_LOCK should be poisoned after the panic"
+        );
+
+        let tree = parse_with_language_limited(first, &language, b"x", None);
+        assert!(
+            tree.is_ok(),
+            "parse_with_language_limited must recover a poisoned PARSE_LOCK instead of failing forever, got: {:?}",
+            tree.err()
         );
     }
 }

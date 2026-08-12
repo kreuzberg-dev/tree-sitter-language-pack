@@ -64,8 +64,6 @@ pub mod registry;
 pub(crate) mod text_splitter;
 
 #[cfg(feature = "config")]
-pub(crate) mod config;
-#[cfg(feature = "config")]
 pub(crate) mod definitions;
 /// Download manager for fetching pre-built parser shared libraries from GitHub releases.
 #[cfg(feature = "download")]
@@ -97,8 +95,43 @@ use std::sync::{Mutex, RwLock};
 
 static REGISTRY: LazyLock<LanguageRegistry> = LazyLock::new(LanguageRegistry::new);
 
+/// Recover a poisoned `Mutex<()>` guard, logging a WARN instead of propagating.
+///
+/// Restricted to locks proven to guard no data — `DOWNLOAD_CACHE_LOCK`,
+/// `LANGUAGE_LOAD_LOCK`, and `PARSE_LOCK` serialize side effects only, so a panic
+/// while one is held can never leave protected state half-written. Poisoning there
+/// buys nothing but an unrecoverable failure: every later call through the same
+/// lock — including `clean_cache`, the natural recovery path — would return
+/// `LockPoisoned` forever, requiring a process restart. The `Mutex<()>` parameter
+/// type is deliberate: it is a compile error to reuse this on a lock that guards
+/// real data. ~keep
+pub(crate) fn recover_poisoned_lock<'a>(
+    lock_name: &str,
+    poisoned: std::sync::PoisonError<std::sync::MutexGuard<'a, ()>>,
+) -> std::sync::MutexGuard<'a, ()> {
+    tracing::warn!(
+        lock = lock_name,
+        "recovered a poisoned lock after a panicking critical section"
+    );
+    poisoned.into_inner()
+}
+
+/// Cache directory most recently registered with `REGISTRY.add_extra_libs_dir`.
+///
+/// Compared by path, not by a boolean flag: `ensure_cache_registered` recomputes
+/// `effective_cache_dir()` fresh on every call and only skips re-registration when
+/// it exactly matches what was last registered here. A boolean "have we registered
+/// something" flag cannot express that — a racing `configure()` can flip it back to
+/// "not registered" and reset `CUSTOM_CACHE_DIR` in between another thread's read of
+/// the flag and its read of the cache dir, so that thread registers the OLD path and
+/// then marks registration done, permanently hiding the new directory. Comparing
+/// actual paths under one lock closes that window. Poisoning is recovered rather
+/// than propagated: the only mutation is a full `Option` overwrite performed after
+/// `add_extra_libs_dir` returns, so a panic here leaves the previous, still-coherent
+/// value in place — propagating would reintroduce the same permanent-failure mode
+/// this type replaces `CACHE_REGISTERED` to fix. ~keep
 #[cfg(feature = "download")]
-static CACHE_REGISTERED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static REGISTERED_CACHE_DIR: LazyLock<RwLock<Option<std::path::PathBuf>>> = LazyLock::new(|| RwLock::new(None));
 
 #[cfg(feature = "download")]
 static CUSTOM_CACHE_DIR: LazyLock<RwLock<Option<std::path::PathBuf>>> = LazyLock::new(|| RwLock::new(None));
@@ -139,7 +172,7 @@ pub fn get_language(name: &str) -> Result<Language, Error> {
         }
         let _cache_guard = DOWNLOAD_CACHE_LOCK
             .lock()
-            .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+            .unwrap_or_else(|poisoned| recover_poisoned_lock("download_cache", poisoned));
         // ~keep Double-check under the lock: another thread may have downloaded it.
         if let Ok(lang) = REGISTRY.get_language(name) {
             return Ok(lang);
@@ -339,13 +372,27 @@ pub fn process(source: &str, config: &ProcessConfig) -> Result<ProcessResult, Er
 
 #[cfg(feature = "download")]
 fn ensure_cache_registered() -> Result<(), Error> {
-    if CACHE_REGISTERED.load(std::sync::atomic::Ordering::Acquire) {
+    let cache_dir = effective_cache_dir()?;
+    // ~keep Fast path: a read lock is far cheaper than the write lock plus the
+    // ~keep `add_extra_libs_dir` call below, and "already registered" is the common case.
+    {
+        let registered = REGISTERED_CACHE_DIR
+            .read()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        if registered.as_deref() == Some(cache_dir.as_path()) {
+            return Ok(());
+        }
+    }
+    let mut registered = REGISTERED_CACHE_DIR
+        .write()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    // ~keep Double-check under the write lock: another thread may have registered this
+    // ~keep exact path while we were computing `cache_dir` or waiting for the lock.
+    if registered.as_deref() == Some(cache_dir.as_path()) {
         return Ok(());
     }
-    let cache_dir = effective_cache_dir()?;
-    // ~keep `add_extra_libs_dir` uses interior mutability; no outer write lock is needed.
-    REGISTRY.add_extra_libs_dir(cache_dir);
-    CACHE_REGISTERED.store(true, std::sync::atomic::Ordering::Release);
+    REGISTRY.try_add_extra_libs_dir(cache_dir.clone())?;
+    *registered = Some(cache_dir);
     Ok(())
 }
 
@@ -387,7 +434,7 @@ fn effective_cache_dir() -> Result<std::path::PathBuf, Error> {
 pub fn init(config: &PackConfig) -> Result<(), Error> {
     let _cache_guard = DOWNLOAD_CACHE_LOCK
         .lock()
-        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        .unwrap_or_else(|poisoned| recover_poisoned_lock("download_cache", poisoned));
     configure_inner(config)?;
     if let Some(ref languages) = config.languages {
         let refs: Vec<&str> = languages.iter().map(String::as_str).collect();
@@ -438,7 +485,7 @@ pub fn init(config: &PackConfig) -> Result<(), Error> {
 pub fn configure(config: &PackConfig) -> Result<(), Error> {
     let _cache_guard = DOWNLOAD_CACHE_LOCK
         .lock()
-        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        .unwrap_or_else(|poisoned| recover_poisoned_lock("download_cache", poisoned));
     configure_inner(config)
 }
 
@@ -449,8 +496,11 @@ fn configure_inner(config: &PackConfig) -> Result<(), Error> {
             .write()
             .map_err(|e| Error::LockPoisoned(e.to_string()))?;
         *custom = Some(dir.clone());
-        // ~keep Old cache directories remain registered; per-path scanning and dedup make that acceptable.
-        CACHE_REGISTERED.store(false, std::sync::atomic::Ordering::Release);
+        // ~keep No explicit re-registration reset needed: `ensure_cache_registered` always
+        // ~keep recomputes `effective_cache_dir()` fresh and compares it against
+        // ~keep `REGISTERED_CACHE_DIR` by path, so the very next call anywhere registers this
+        // ~keep new directory on its own. Old cache directories remain registered alongside
+        // ~keep it; per-path scanning and dedup in `add_extra_libs_dir` make that acceptable.
     }
     Ok(())
 }
@@ -481,7 +531,7 @@ fn configure_inner(config: &PackConfig) -> Result<(), Error> {
 pub fn download(names: &[&str]) -> Result<usize, Error> {
     let _cache_guard = DOWNLOAD_CACHE_LOCK
         .lock()
-        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        .unwrap_or_else(|poisoned| recover_poisoned_lock("download_cache", poisoned));
     let count = download_inner(names)?;
     tracing::info!(count, "ensured languages");
     Ok(count)
@@ -532,7 +582,7 @@ fn download_inner(names: &[&str]) -> Result<usize, Error> {
 pub fn prefetch(languages: &[&str]) -> Result<(), Error> {
     let _cache_guard = DOWNLOAD_CACHE_LOCK
         .lock()
-        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        .unwrap_or_else(|poisoned| recover_poisoned_lock("download_cache", poisoned));
     ensure_cache_registered()?;
 
     let resolved: Vec<&str> = languages.iter().map(|n| crate::registry::resolve_alias(n)).collect();
@@ -603,7 +653,7 @@ pub fn prefetch(languages: &[&str]) -> Result<(), Error> {
 pub fn download_all() -> Result<usize, Error> {
     let _cache_guard = DOWNLOAD_CACHE_LOCK
         .lock()
-        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        .unwrap_or_else(|poisoned| recover_poisoned_lock("download_cache", poisoned));
     ensure_cache_registered()?;
     let cache_dir = effective_cache_dir()?;
     let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
@@ -649,7 +699,7 @@ pub fn download_all() -> Result<usize, Error> {
 pub fn download_group(name: &str) -> Result<usize, Error> {
     let _cache_guard = DOWNLOAD_CACHE_LOCK
         .lock()
-        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        .unwrap_or_else(|poisoned| recover_poisoned_lock("download_cache", poisoned));
     ensure_cache_registered()?;
     let cache_dir = effective_cache_dir()?;
     let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
@@ -763,11 +813,13 @@ pub fn downloaded_languages() -> Vec<String> {
 pub fn clean_cache() -> Result<(), Error> {
     let _cache_guard = DOWNLOAD_CACHE_LOCK
         .lock()
-        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        .unwrap_or_else(|poisoned| recover_poisoned_lock("download_cache", poisoned));
     let cache_dir = effective_cache_dir()?;
     let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
     dm.clean_cache()?;
-    CACHE_REGISTERED.store(false, std::sync::atomic::Ordering::Release);
+    // ~keep No registration reset needed: the cache directory path is unchanged, it is
+    // ~keep already registered in `extra_lib_dirs`, and directory contents are scanned
+    // ~keep live on every call rather than cached at registration time.
     tracing::info!("cleared parser cache");
     Ok(())
 }
@@ -850,5 +902,83 @@ mod tests {
         assert!(config.cache_dir.is_none());
         assert!(config.languages.is_none());
         assert!(config.groups.is_none());
+    }
+
+    #[cfg(feature = "download")]
+    #[test]
+    fn should_keep_configuring_after_a_panic_poisons_the_download_cache_lock() {
+        // ~keep DOWNLOAD_CACHE_LOCK guards no data (it only serializes the
+        // ~keep read-download-register sequence), so poisoning it should never brick every
+        // ~keep subsequent call. Poisoning is process-wide and sticky (std::sync::Mutex never
+        // ~keep un-poisons); safe to leave poisoned for the rest of the process here only
+        // ~keep because every acquisition site recovers via `recover_poisoned_lock`. This test
+        // ~keep does not set `cache_dir`, so unlike a reconfiguration test it cannot corrupt
+        // ~keep any sibling test's view of the cache directory.
+        let poison_result = std::panic::catch_unwind(|| {
+            let _guard = DOWNLOAD_CACHE_LOCK
+                .lock()
+                .expect("DOWNLOAD_CACHE_LOCK should not already be poisoned");
+            panic!("intentional panic to poison DOWNLOAD_CACHE_LOCK for this test");
+        });
+        assert!(poison_result.is_err(), "the intentional panic should have unwound");
+        assert!(
+            DOWNLOAD_CACHE_LOCK.is_poisoned(),
+            "DOWNLOAD_CACHE_LOCK should be poisoned after the panic"
+        );
+
+        let result = configure(&PackConfig {
+            cache_dir: None,
+            languages: None,
+            groups: None,
+        });
+        assert!(
+            result.is_ok(),
+            "configure must recover a poisoned DOWNLOAD_CACHE_LOCK instead of failing forever, got: {result:?}"
+        );
+    }
+
+    #[cfg(feature = "download")]
+    #[test]
+    #[ignore = "mutates the process-wide CUSTOM_CACHE_DIR/REGISTERED_CACHE_DIR statics; run \
+                alone, e.g. `cargo test -- --ignored --test-threads=1`, not inside the default \
+                parallel suite"]
+    fn should_register_the_new_cache_dir_after_configure_changes_it() {
+        // ~keep Regression for item 1: the old `CACHE_REGISTERED` boolean could get stuck
+        // ~keep `true` forever after a race with `configure()`, permanently registering only
+        // ~keep the OLD cache dir. The path-CAS fix in `ensure_cache_registered` compares the
+        // ~keep actual registered path on every call, so the very next call anywhere after a
+        // ~keep reconfiguration observes and registers the new path — this asserts exactly
+        // ~keep that, deterministically, without needing to reproduce the original race.
+        let first_dir = std::env::temp_dir().join("tslp-item1-regression-first");
+        let second_dir = std::env::temp_dir().join("tslp-item1-regression-second");
+
+        configure(&PackConfig {
+            cache_dir: Some(first_dir.clone()),
+            languages: None,
+            groups: None,
+        })
+        .expect("configure should accept the first cache dir");
+        let _ = has_language("definitely_not_a_real_language_xyz");
+        {
+            let registered = REGISTERED_CACHE_DIR.read().expect("read lock should not be poisoned");
+            assert_eq!(registered.as_deref(), Some(first_dir.as_path()));
+        }
+
+        configure(&PackConfig {
+            cache_dir: Some(second_dir.clone()),
+            languages: None,
+            groups: None,
+        })
+        .expect("configure should accept the second cache dir");
+        let _ = has_language("definitely_not_a_real_language_xyz");
+        {
+            let registered = REGISTERED_CACHE_DIR.read().expect("read lock should not be poisoned");
+            assert_eq!(
+                registered.as_deref(),
+                Some(second_dir.as_path()),
+                "reconfiguring the cache dir must be observed by the very next call, \
+                 not stuck on the old path forever"
+            );
+        }
     }
 }

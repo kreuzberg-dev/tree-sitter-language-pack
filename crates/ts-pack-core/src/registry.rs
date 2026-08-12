@@ -194,6 +194,15 @@ mod dynamic {
 
     use crate::error::Error;
 
+    // ~keep INVARIANT: nothing in this crate ever removes or clears an entry from this
+    // ~keep map — the only mutation site is the guarded `insert` in
+    // ~keep `language_from_process_library` below. That single guarantee is what lets a
+    // ~keep `Language` (which borrows function pointers out of the loaded
+    // ~keep `libloading::Library`) outlive the `LanguageRegistry` scope that produced it:
+    // ~keep the `Library` stays alive in this process-wide map for the remaining life of
+    // ~keep the process, so the code a `Language` points into is never unloaded out from
+    // ~keep under it. Adding a `remove`/`clear` here would reintroduce a use-after-free.
+    // ~keep See `should_keep_loaded_libraries_present_after_the_owning_registry_is_dropped`.
     static LOADED_LIBRARIES: LazyLock<RwLock<HashMap<PathBuf, libloading::Library>>> =
         LazyLock::new(|| RwLock::new(HashMap::new()));
 
@@ -411,16 +420,60 @@ impl LanguageRegistry {
     /// Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
     /// mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
     /// immutable while the directory list is updated.
+    ///
+    /// A poisoned lock is reported as a WARN and the directory is not registered.
+    /// Callers that must distinguish "registered" from "could not register" — the
+    /// download cache registration does, because recording success after a failed
+    /// registration hides the cache directory permanently — should use
+    /// [`Self::try_add_extra_libs_dir`] instead. This signature stays infallible to
+    /// keep the public API source-compatible. ~keep
     #[cfg_attr(alef, alef(skip))]
     #[cfg(feature = "dynamic-loading")]
     pub fn add_extra_libs_dir(&self, dir: PathBuf) {
-        if let Ok(mut dirs) = self.extra_lib_dirs.write()
-            && !dirs.contains(&dir)
-        {
+        if let Err(error) = self.try_add_extra_libs_dir(dir) {
+            tracing::warn!(%error, "failed to register an extra library directory; it will not be searched");
+        }
+    }
+
+    /// Add an additional directory to search for dynamic libraries, reporting failure.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::LockPoisoned`] if the write lock is poisoned. Unlike the
+    /// read side ([`Self::extra_lib_dirs_snapshot`]), this does not recover and
+    /// retry: a caller registering a directory needs to know registration did not
+    /// happen, or it can silently believe a cache directory is searched when it
+    /// never was. ~keep
+    #[cfg(feature = "dynamic-loading")]
+    pub(crate) fn try_add_extra_libs_dir(&self, dir: PathBuf) -> Result<(), Error> {
+        let mut dirs = self
+            .extra_lib_dirs
+            .write()
+            .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        if !dirs.contains(&dir) {
             let mut new_dirs = (**dirs).clone();
             new_dirs.push(dir);
             *dirs = Arc::new(new_dirs);
         }
+        Ok(())
+    }
+
+    /// Snapshot the extra library-search directories, recovering a poisoned lock.
+    ///
+    /// `extra_lib_dirs` only ever grows (see [`Self::add_extra_libs_dir`]) — no site
+    /// removes or clears it — so a write-side panic can only interrupt the
+    /// clone-then-push before it replaces the shared `Arc`, leaving the previous,
+    /// still-coherent list of directories in place. Poisoning therefore carries no
+    /// risk of a torn read here, and treating it as fatal would report a language as
+    /// absent solely because some earlier, unrelated directory registration
+    /// panicked. ~keep
+    #[cfg(feature = "dynamic-loading")]
+    fn extra_lib_dirs_snapshot(&self) -> Arc<Vec<PathBuf>> {
+        let dirs = self.extra_lib_dirs.read().unwrap_or_else(|poisoned| {
+            tracing::warn!("recovered a poisoned extra_lib_dirs lock (append-only data, safe to reuse)");
+            poisoned.into_inner()
+        });
+        Arc::clone(&dirs)
     }
 
     /// Get a tree-sitter [`Language`] by name.
@@ -451,7 +504,7 @@ impl LanguageRegistry {
             // ~keep Serialize only loads of not-yet-loaded libraries.
             let _guard = LANGUAGE_LOAD_LOCK
                 .lock()
-                .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+                .unwrap_or_else(|poisoned| crate::recover_poisoned_lock("language_load", poisoned));
             // ~keep Double-check under the lock; another thread may have loaded it.
             if let Some(lang) = self.dynamic_loader.get_cached(name)? {
                 return Ok(lang);
@@ -471,11 +524,7 @@ impl LanguageRegistry {
                 }
             }
 
-            let extra_dirs: Arc<Vec<PathBuf>> = self
-                .extra_lib_dirs
-                .read()
-                .map(|dirs| Arc::clone(&dirs))
-                .unwrap_or_default();
+            let extra_dirs: Arc<Vec<PathBuf>> = self.extra_lib_dirs_snapshot();
             // ~keep A real load failure (truncated, wrong-architecture, or ABI-mismatched library)
             // ~keep must not be flattened into `LanguageNotFound`: that reports "your cached parser
             // ~keep is corrupt" as "no such language" and sends callers after the wrong bug.
@@ -522,11 +571,7 @@ impl LanguageRegistry {
                 seen.insert(Cow::Owned(name));
             }
 
-            let extra_dirs: Arc<Vec<PathBuf>> = self
-                .extra_lib_dirs
-                .read()
-                .map(|dirs| Arc::clone(&dirs))
-                .unwrap_or_default();
+            let extra_dirs: Arc<Vec<PathBuf>> = self.extra_lib_dirs_snapshot();
             for extra_dir in extra_dirs.iter() {
                 let Ok(entries) = std::fs::read_dir(extra_dir) else {
                     continue;
@@ -636,11 +681,7 @@ impl LanguageRegistry {
                 return true;
             }
 
-            let extra_dirs: Arc<Vec<PathBuf>> = self
-                .extra_lib_dirs
-                .read()
-                .map(|dirs| Arc::clone(&dirs))
-                .unwrap_or_default();
+            let extra_dirs: Arc<Vec<PathBuf>> = self.extra_lib_dirs_snapshot();
             for extra_dir in extra_dirs.iter() {
                 if lib_path_in(extra_dir, name).exists() {
                     return true;
@@ -762,7 +803,9 @@ mod tests {
         }
 
         let registry = LanguageRegistry::new();
-        registry.add_extra_libs_dir(dir.path().to_path_buf());
+        registry
+            .try_add_extra_libs_dir(dir.path().to_path_buf())
+            .expect("registering an extra libs dir should succeed");
         let langs = registry.available_languages();
 
         for (symbol, language) in [
@@ -809,6 +852,76 @@ mod tests {
             Ok(_) => panic!("a truncated library must not load successfully"),
             Err(error) => panic!("a present-but-unloadable library must report DynamicLoad, got: {error}"),
         }
+    }
+
+    #[cfg(feature = "dynamic-loading")]
+    #[test]
+    fn should_recover_a_poisoned_read_but_propagate_a_poisoned_write_of_extra_lib_dirs() {
+        // ~keep A fresh, local `LanguageRegistry` — this test never touches process-wide
+        // ~keep statics, so it is safe to run in any order and in parallel with every
+        // ~keep other test in the suite.
+        let registry = LanguageRegistry::new();
+
+        // ~keep Poison `extra_lib_dirs` by panicking while holding its write guard.
+        let dirs_arc = Arc::clone(&registry.extra_lib_dirs);
+        let poison_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            let _guard = dirs_arc.write().expect("lock should not already be poisoned");
+            panic!("intentional panic to poison extra_lib_dirs for this test");
+        }));
+        assert!(poison_result.is_err(), "the intentional panic should have unwound");
+        assert!(
+            registry.extra_lib_dirs.is_poisoned(),
+            "extra_lib_dirs should be poisoned after the panic"
+        );
+
+        // ~keep Item 4: the read side recovers — `extra_lib_dirs` only ever grows, so a
+        // ~keep poisoned read is still coherent, and reporting a language absent because of
+        // ~keep an unrelated panic elsewhere would be a wrong answer, not a safe failure.
+        let snapshot = registry.extra_lib_dirs_snapshot();
+        assert!(
+            snapshot.is_empty(),
+            "no directories were ever registered, so the recovered snapshot must be empty"
+        );
+
+        // ~keep Item 2: the write side propagates instead of silently doing nothing — a
+        // ~keep caller registering a cache directory must be able to tell registration failed.
+        let result = registry.try_add_extra_libs_dir(PathBuf::from("/tmp/should-not-be-registered"));
+        assert!(
+            matches!(result, Err(Error::LockPoisoned(_))),
+            "try_add_extra_libs_dir must surface a poisoned lock as an error, got: {result:?}"
+        );
+    }
+
+    #[cfg(all(feature = "dynamic-loading", not(target_arch = "wasm32")))]
+    #[test]
+    fn should_keep_loading_dynamic_languages_after_a_panic_poisons_the_language_load_lock() {
+        let registry = LanguageRegistry::new();
+        let Some(language_name) = registry.dynamic_loader.dynamic_names.first().copied() else {
+            return;
+        };
+
+        // ~keep LANGUAGE_LOAD_LOCK guards no data (it only serializes not-yet-loaded dynamic
+        // ~keep library loads), so poisoning it should never brick `get_language`. Poisoning
+        // ~keep is process-wide and sticky, which is safe here only because every acquisition
+        // ~keep site recovers via `recover_poisoned_lock`; this test leaves the lock poisoned
+        // ~keep for the rest of the process on purpose.
+        let poison_result = std::panic::catch_unwind(|| {
+            let _guard = LANGUAGE_LOAD_LOCK
+                .lock()
+                .expect("LANGUAGE_LOAD_LOCK should not already be poisoned");
+            panic!("intentional panic to poison LANGUAGE_LOAD_LOCK for this test");
+        });
+        assert!(poison_result.is_err(), "the intentional panic should have unwound");
+        assert!(
+            LANGUAGE_LOAD_LOCK.is_poisoned(),
+            "LANGUAGE_LOAD_LOCK should be poisoned after the panic"
+        );
+
+        let result = registry.get_language(language_name);
+        assert!(
+            result.is_ok(),
+            "get_language must recover a poisoned LANGUAGE_LOAD_LOCK instead of failing forever, got: {result:?}"
+        );
     }
 
     #[cfg(feature = "download")]
@@ -933,6 +1046,38 @@ mod tests {
             "second registry must reuse the cached library rather than evict it"
         );
         assert_eq!(first_language.abi_version(), second_language.abi_version());
+    }
+
+    #[cfg(all(feature = "dynamic-loading", not(target_arch = "wasm32")))]
+    #[test]
+    fn should_keep_loaded_libraries_present_after_the_owning_registry_is_dropped() {
+        // ~keep LOADED_LIBRARIES has exactly one mutation site — the guarded `insert` in
+        // ~keep `language_from_process_library` — and no `remove`/`clear` anywhere in the
+        // ~keep crate. That absence is the invariant that lets a `Language` (which borrows
+        // ~keep code out of the loaded `libloading::Library`) outlive the `LanguageRegistry`
+        // ~keep scope that produced it. This test cannot observe the absence of a `remove`
+        // ~keep call directly, so it asserts the externally visible consequence instead:
+        // ~keep dropping every registry that loaded a library must never shrink the map.
+        let registry = LanguageRegistry::new();
+        let Some(language_name) = registry.dynamic_loader.dynamic_names.first().copied() else {
+            return;
+        };
+        let lib_path = lib_path_in(&registry.dynamic_loader.libs_dir, language_name);
+        let Ok(_language) = registry.get_language(language_name) else {
+            return;
+        };
+        assert!(
+            dynamic::library_is_loaded_for_tests(&lib_path),
+            "library should be loaded after get_language"
+        );
+
+        drop(registry);
+
+        assert!(
+            dynamic::library_is_loaded_for_tests(&lib_path),
+            "LOADED_LIBRARIES must retain the entry after every owning registry is dropped \
+             — nothing in this crate removes from it"
+        );
     }
 
     #[test]
