@@ -38,7 +38,7 @@ pub(crate) fn c_symbol_for(name: &str) -> &str {
 
 /// Reverse lookup: given a c_symbol (e.g. "c_sharp"), return the language name ("csharp").
 /// If no override matches, returns the input as-is.
-#[cfg(any(all(feature = "dynamic-loading", not(target_arch = "wasm32")), feature = "download",))]
+#[cfg(any(feature = "dynamic-loading", feature = "download"))]
 #[inline(always)]
 pub(crate) fn lang_name_for_symbol(symbol: &str) -> &str {
     for &(lang, sym) in C_SYMBOL_OVERRIDES {
@@ -47,6 +47,47 @@ pub(crate) fn lang_name_for_symbol(symbol: &str) -> &str {
         }
     }
     symbol
+}
+
+/// Platform-specific filename of a language's parser shared library,
+/// e.g. `"csharp"` -> `libtree_sitter_c_sharp.dylib` on macOS.
+///
+/// Applies the `c_symbol` override, so callers must never build this name by
+/// interpolating the language id directly — the two differ for the grammars
+/// listed in `C_SYMBOL_OVERRIDES`. ~keep
+///
+/// Rust-only: bindings address parsers by language name, never by file path.
+#[cfg(any(feature = "dynamic-loading", feature = "download"))]
+#[cfg_attr(alef, alef(skip))]
+pub fn library_file_name(language: &str) -> String {
+    let symbol = c_symbol_for(language);
+    let (prefix, ext) = if cfg!(target_os = "macos") {
+        ("lib", "dylib")
+    } else if cfg!(target_os = "windows") {
+        ("", "dll")
+    } else {
+        ("lib", "so")
+    };
+    format!("{prefix}tree_sitter_{symbol}.{ext}")
+}
+
+/// Inverse of [`library_file_name`]: recover the language name from a parser
+/// shared-library filename, e.g. `libtree_sitter_c_sharp.dylib` -> `"csharp"`.
+///
+/// Returns `None` when the filename is not a parser library. Accepts both the
+/// `tree_sitter_` and `tree-sitter-` infixes because the two producers (build
+/// script and release archives) differ. ~keep
+#[cfg(any(feature = "dynamic-loading", feature = "download"))]
+pub(crate) fn lang_name_from_lib_filename(filename: &str) -> Option<String> {
+    let name = filename.strip_prefix("lib").unwrap_or(filename);
+    let name = name
+        .strip_prefix("tree_sitter_")
+        .or_else(|| name.strip_prefix("tree-sitter-"))?;
+    let name = name
+        .strip_suffix(".so")
+        .or_else(|| name.strip_suffix(".dylib"))
+        .or_else(|| name.strip_suffix(".dll"))?;
+    Some(lang_name_for_symbol(name).to_string())
 }
 
 #[inline(always)]
@@ -61,15 +102,7 @@ pub(crate) fn resolve_alias(name: &str) -> &str {
 
 #[cfg(feature = "dynamic-loading")]
 fn lib_path_in(dir: &std::path::Path, name: &str) -> PathBuf {
-    let lib_name = format!("tree_sitter_{}", c_symbol_for(name));
-    let (prefix, ext) = if cfg!(target_os = "macos") {
-        ("lib", "dylib")
-    } else if cfg!(target_os = "windows") {
-        ("", "dll")
-    } else {
-        ("lib", "so")
-    };
-    dir.join(format!("{prefix}{lib_name}.{ext}"))
+    dir.join(library_file_name(name))
 }
 
 #[cfg(all(feature = "dynamic-loading", target_arch = "wasm32"))]
@@ -392,12 +425,28 @@ impl LanguageRegistry {
                 .read()
                 .map(|dirs| Arc::clone(&dirs))
                 .unwrap_or_default();
+            // ~keep A real load failure (truncated, wrong-architecture, or ABI-mismatched library)
+            // ~keep must not be flattened into `LanguageNotFound`: that reports "your cached parser
+            // ~keep is corrupt" as "no such language" and sends callers after the wrong bug.
+            let mut load_failure: Option<Error> = None;
             for extra_dir in extra_dirs.iter() {
-                if self.dynamic_loader.load_from_dir(name, extra_dir).is_ok()
-                    && let Some(lang) = self.dynamic_loader.get_cached(name)?
-                {
-                    return Ok(lang);
+                match self.dynamic_loader.load_from_dir(name, extra_dir) {
+                    Ok(language) => return Ok(language),
+                    // ~keep Simply absent from this directory: keep searching the remaining ones.
+                    Err(Error::LanguageNotFound(_)) => {}
+                    Err(error) => {
+                        tracing::warn!(
+                            language = name,
+                            dir = %extra_dir.display(),
+                            error = %error,
+                            "parser library found but could not be loaded"
+                        );
+                        load_failure = Some(error);
+                    }
                 }
+            }
+            if let Some(error) = load_failure {
+                return Err(error);
             }
         }
 
@@ -431,17 +480,11 @@ impl LanguageRegistry {
             for extra_dir in extra_dirs.iter() {
                 if let Ok(entries) = std::fs::read_dir(extra_dir) {
                     for entry in entries.flatten() {
-                        let filename = entry.file_name();
-                        let name = filename.to_string_lossy();
-                        let stripped = name.strip_prefix("lib").unwrap_or(&name);
-                        if let Some(lang) = stripped.strip_prefix("tree_sitter_") {
-                            let lang = lang
-                                .strip_suffix(".so")
-                                .or_else(|| lang.strip_suffix(".dylib"))
-                                .or_else(|| lang.strip_suffix(".dll"));
-                            if let Some(lang) = lang {
-                                owned.push(lang.to_string());
-                            }
+                        // ~keep Must map the C symbol back to the language id, otherwise the
+                        // ~keep list reports `c_sharp`/`TSQL`/`apache_avro` instead of the
+                        // ~keep documented names and inflates `language_count()`.
+                        if let Some(lang) = lang_name_from_lib_filename(&entry.file_name().to_string_lossy()) {
+                            owned.push(lang);
                         }
                     }
                 }
@@ -463,29 +506,40 @@ impl LanguageRegistry {
         langs
     }
 
-    /// Check whether a parser is statically compiled into this build.
+    /// Check whether this language can be parsed right now, without downloading.
     ///
-    /// Returns `true` only when the grammar was compiled in at build time
-    /// (i.e. it appears in the `STATIC_LANGUAGES` table). This is independent
-    /// of the extension-to-language mapping: [`crate::detect_language_from_extension`]
-    /// consults the static ext table for all 371 grammars regardless of which
-    /// parsers are compiled in.
+    /// Resolves aliases, then answers from exactly the lookup
+    /// [`get_language`](Self::get_language) performs: the statically compiled
+    /// table, the already-loaded dynamic grammars, and the parser shared
+    /// libraries present in the primary and extra (download-cache) library
+    /// directories. It never performs network I/O.
     ///
-    /// Use this when you need to distinguish "we know the language name" from
-    /// "we can actually parse files in that language right now".
+    /// A previous implementation consulted only the statically compiled table.
+    /// That table is empty in every build that does not set `TSLP_LANGUAGES`,
+    /// so the function answered `false` for languages this registry parses
+    /// perfectly well. ~keep
+    ///
+    /// Contrast [`has_language`](Self::has_language), which is also `true` for a
+    /// grammar that is merely *known to the manifest* and would have to be
+    /// downloaded first. The pair distinguishes "we can parse it offline, now"
+    /// from "we recognise the name".
+    ///
+    /// The first `true` answer for a dynamic grammar loads its shared library:
+    /// loading is the only way to know the grammar is usable, since a truncated
+    /// or wrong-architecture library exists on disk but cannot parse. Loads are
+    /// cached process-wide, so repeat calls are cheap. ~keep
     ///
     /// ```no_run
     /// use tree_sitter_language_pack::{detect_language_from_extension, LanguageRegistry};
     ///
     /// let registry = LanguageRegistry::new();
-    /// // Extension detection uses the static table — independent of compiled parsers.
+    /// // Extension detection uses the static ext table for all 371 grammars.
     /// let lang = detect_language_from_extension("feature"); // always returns Some("gherkin")
-    /// // Parser availability depends on which grammars were compiled in.
+    /// // Parser availability depends on what is compiled in or cached on disk.
     /// let can_parse = lang.map(|name| registry.has_parser(name)).unwrap_or(false);
     /// ```
     pub fn has_parser(&self, name: &str) -> bool {
-        let name = resolve_alias(name);
-        self.static_lookup.contains_key(name)
+        self.get_language(name).is_ok()
     }
 
     /// Check whether a language is available by name or alias.
@@ -533,11 +587,25 @@ impl LanguageRegistry {
     }
 
     /// Parse source code and extract file intelligence based on config in a single pass.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::InvalidRange`] if the config is invalid (see
+    /// [`ProcessConfig::validate`](crate::ProcessConfig::validate)) or if the source
+    /// exceeds the configured
+    /// [`max_source_bytes`](crate::ProcessConfig::max_source_bytes);
+    /// [`Error::LanguageNotFound`] if the language is unknown; or
+    /// [`Error::ParseFailed`] if parsing produces no tree.
     pub fn process(
         &self,
         source: &str,
         config: &crate::process_config::ProcessConfig,
     ) -> Result<crate::intel::types::ProcessResult, Error> {
+        // ~keep Reject bad limits before parsing: a zero chunk size used to return an empty
+        // ~keep chunk list and `Ok(())`, silently dropping the entire source.
+        config.validate()?;
+        config.check_source_size(source.len())?;
+
         let resolved_lang = resolve_alias(&config.language);
         if resolved_lang != config.language.as_ref() {
             let mut resolved_config = config.clone();
@@ -564,6 +632,81 @@ mod tests {
         let registry = LanguageRegistry::new();
         let langs = registry.available_languages();
         langs.into_iter().next()
+    }
+
+    #[cfg(any(feature = "dynamic-loading", feature = "download"))]
+    #[test]
+    fn lib_filename_maps_c_symbol_back_to_language_name() {
+        assert_eq!(
+            lang_name_from_lib_filename("libtree_sitter_c_sharp.so").as_deref(),
+            Some("csharp")
+        );
+        assert_eq!(
+            lang_name_from_lib_filename("libtree_sitter_TSQL.dylib").as_deref(),
+            Some("tsql")
+        );
+        assert_eq!(
+            lang_name_from_lib_filename("tree_sitter_apache_avro.dll").as_deref(),
+            Some("avro")
+        );
+        assert_eq!(
+            lang_name_from_lib_filename("libtree-sitter-nu.so").as_deref(),
+            Some("nushell")
+        );
+        assert_eq!(
+            lang_name_from_lib_filename("libtree_sitter_rust.so").as_deref(),
+            Some("rust")
+        );
+        assert_eq!(lang_name_from_lib_filename("README.md"), None);
+        assert_eq!(lang_name_from_lib_filename("libtree_sitter_rust.txt"), None);
+    }
+
+    #[cfg(any(feature = "dynamic-loading", feature = "download"))]
+    #[test]
+    fn library_file_name_applies_the_c_symbol_override() {
+        assert!(
+            library_file_name("csharp").contains("tree_sitter_c_sharp."),
+            "{}",
+            library_file_name("csharp")
+        );
+        assert!(
+            library_file_name("rust").contains("tree_sitter_rust."),
+            "{}",
+            library_file_name("rust")
+        );
+    }
+
+    #[cfg(feature = "dynamic-loading")]
+    #[test]
+    fn available_languages_reports_language_names_not_c_symbols_for_extra_dirs() {
+        let dir = tempfile::Builder::new()
+            .prefix("tslp-extra-libs-")
+            .tempdir()
+            .expect("temporary libs directory should be created");
+        for symbol in ["c_sharp", "TSQL", "apache_avro", "embedded_template", "nu", "vb_dotnet"] {
+            std::fs::write(dir.path().join(format!("libtree_sitter_{symbol}.so")), b"")
+                .expect("stub parser library should be written");
+        }
+
+        let registry = LanguageRegistry::new();
+        registry.add_extra_libs_dir(dir.path().to_path_buf());
+        let langs = registry.available_languages();
+
+        for (symbol, language) in [
+            ("c_sharp", "csharp"),
+            ("TSQL", "tsql"),
+            ("apache_avro", "avro"),
+            ("embedded_template", "embeddedtemplate"),
+            ("nu", "nushell"),
+            ("vb_dotnet", "vb"),
+        ] {
+            assert!(langs.iter().any(|l| l == language), "missing language name {language}");
+            assert!(
+                !langs.iter().any(|l| l == symbol),
+                "leaked raw C symbol {symbol} into available_languages()"
+            );
+        }
+        assert_eq!(registry.language_count(), langs.len());
     }
 
     #[test]

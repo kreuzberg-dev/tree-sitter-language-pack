@@ -60,7 +60,12 @@ pub struct PackConfig {
     #[cfg_attr(any(feature = "config", feature = "download"), serde(default))]
     pub languages: Option<Vec<String>>,
 
-    /// Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).
+    /// Language groups to pre-download.
+    ///
+    /// Group names come from the remote manifest, so the valid set is not fixed
+    /// by this crate; the published manifest currently defines only `"all"`.
+    /// Call [`manifest_groups`](crate::manifest_groups) to enumerate them.
+    /// An unknown name makes [`init`](crate::init) fail. ~keep
     #[cfg_attr(any(feature = "config", feature = "download"), serde(default))]
     pub groups: Option<Vec<String>>,
 }

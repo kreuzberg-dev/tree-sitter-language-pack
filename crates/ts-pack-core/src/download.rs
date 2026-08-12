@@ -25,6 +25,7 @@ const CACHE_REMOVE_RETRY_DELAY: Duration = Duration::from_millis(10);
 const HTTP_TIMEOUT: Duration = Duration::from_secs(60);
 const TLS_ROOTS_ENV: &str = "TREE_SITTER_LANGUAGE_PACK_TLS_ROOTS";
 const MANIFEST_URL_ENV: &str = "TREE_SITTER_LANGUAGE_PACK_MANIFEST_URL";
+const CACHE_DIR_ENV: &str = "TREE_SITTER_LANGUAGE_PACK_CACHE_DIR";
 const LOCK_FILE_NAME: &str = ".download.lock";
 
 /// Resolve the URL used to fetch the parser manifest.
@@ -41,6 +42,39 @@ fn resolve_manifest_url(version: &str) -> String {
         return url;
     }
     format!("{GITHUB_RELEASE_BASE}/v{version}/parsers.json")
+}
+
+/// Pick the base directory that the parser cache is rooted in, in priority order.
+///
+/// Split from [`resolve_cache_base`] so every branch — including the one where
+/// the platform reports no cache directory — is reachable from unit tests
+/// without mutating process-global environment state. ~keep
+fn cache_base_from(env_override: Option<&str>, system_cache_dir: Option<PathBuf>) -> PathBuf {
+    if let Some(dir) = env_override
+        && !dir.trim().is_empty()
+    {
+        return PathBuf::from(dir);
+    }
+    if let Some(dir) = system_cache_dir {
+        return dir;
+    }
+    // ~keep Windows conda-forge runners report no cache dir (no %LOCALAPPDATA%);
+    // ~keep degrading to the temp dir keeps downloads working instead of hard-failing (#176).
+    let fallback = std::env::temp_dir();
+    tracing::warn!(
+        fallback = %fallback.display(),
+        env_var = CACHE_DIR_ENV,
+        "no system cache directory; falling back to the temporary directory (cache will not persist)"
+    );
+    fallback
+}
+
+/// Resolve the base directory for the parser cache.
+///
+/// Layered: the `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR` env var (if set and
+/// non-empty), else the platform cache directory, else the temporary directory.
+fn resolve_cache_base() -> PathBuf {
+    cache_base_from(std::env::var(CACHE_DIR_ENV).ok().as_deref(), dirs::cache_dir())
 }
 
 /// Read a `file://` URL as a UTF-8 string.
@@ -287,10 +321,15 @@ impl DownloadManager {
     }
 
     /// Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
+    ///
+    /// The base is resolved in layers: the `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR`
+    /// environment variable (if set and non-empty), else the platform cache
+    /// directory, else the temporary directory. The last resort means this never
+    /// fails on platforms where `dirs::cache_dir()` returns `None`; the `Result`
+    /// is retained for API compatibility.
     #[cfg_attr(alef, alef(skip))]
     pub fn default_cache_dir(version: &str) -> Result<PathBuf, Error> {
-        let base = dirs::cache_dir()
-            .ok_or_else(|| Error::Download("Could not determine system cache directory".to_string()))?;
+        let base = resolve_cache_base();
         Ok(base
             .join("tree-sitter-language-pack")
             .join(format!("v{version}"))
@@ -309,28 +348,13 @@ impl DownloadManager {
         if let Ok(entries) = fs::read_dir(&self.cache_dir) {
             for entry in entries.flatten() {
                 let name = entry.file_name().to_string_lossy().into_owned();
-                if let Some(lang) = Self::lang_from_lib_filename(&name) {
+                if let Some(lang) = crate::registry::lang_name_from_lib_filename(&name) {
                     langs.push(lang);
                 }
             }
         }
         langs.sort();
         langs
-    }
-
-    /// Extract language name from a shared library filename.
-    ///
-    /// Reverses the `c_symbol_for` mapping: e.g. `libtree_sitter_c_sharp.dylib` → `"csharp"`.
-    fn lang_from_lib_filename(filename: &str) -> Option<String> {
-        let name = filename.strip_prefix("lib").unwrap_or(filename);
-        let name = name
-            .strip_prefix("tree_sitter_")
-            .or_else(|| name.strip_prefix("tree-sitter-"))?;
-        let name = name
-            .strip_suffix(".so")
-            .or_else(|| name.strip_suffix(".dylib"))
-            .or_else(|| name.strip_suffix(".dll"))?;
-        Some(crate::registry::lang_name_for_symbol(name).to_string())
     }
 
     /// Ensure the specified languages are available in the cache.
@@ -979,6 +1003,42 @@ mod tests {
 
         let encoder = builder.into_inner().expect("tar builder should finish");
         encoder.finish().expect("zstd encoder should finish")
+    }
+
+    #[test]
+    fn cache_base_prefers_env_override_over_system_cache_dir() {
+        let base = cache_base_from(Some("/custom/cache"), Some(PathBuf::from("/system/cache")));
+        assert_eq!(base, PathBuf::from("/custom/cache"));
+    }
+
+    #[test]
+    fn cache_base_falls_through_when_env_override_is_empty() {
+        for empty in ["", "   "] {
+            let base = cache_base_from(Some(empty), Some(PathBuf::from("/system/cache")));
+            assert_eq!(base, PathBuf::from("/system/cache"), "{empty:?} must not win");
+        }
+    }
+
+    #[test]
+    fn cache_base_uses_system_cache_dir_when_env_override_is_absent() {
+        let base = cache_base_from(None, Some(PathBuf::from("/system/cache")));
+        assert_eq!(base, PathBuf::from("/system/cache"));
+    }
+
+    #[test]
+    fn cache_base_falls_back_to_temp_dir_when_no_system_cache_dir() {
+        assert_eq!(cache_base_from(None, None), std::env::temp_dir());
+        assert_eq!(cache_base_from(Some(""), None), std::env::temp_dir());
+    }
+
+    #[test]
+    fn default_cache_dir_succeeds_and_is_rooted_at_the_resolved_base() {
+        let dir = DownloadManager::default_cache_dir("9.9.9").expect("default cache dir must not fail");
+        assert!(
+            dir.ends_with("tree-sitter-language-pack/v9.9.9/libs"),
+            "{}",
+            dir.display()
+        );
     }
 
     #[test]

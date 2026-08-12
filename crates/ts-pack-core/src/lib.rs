@@ -221,29 +221,38 @@ pub fn available_languages() -> Vec<String> {
     REGISTRY.available_languages()
 }
 
-/// Check whether a parser is statically compiled into this build.
+/// Check whether this language can be parsed right now, without downloading.
 ///
-/// Returns `true` only when the grammar was compiled in at build time.
-/// This is independent of the extension-to-language name mapping:
-/// [`detect_language_from_extension`] consults the static ext table for all
-/// 371 grammars regardless of which parsers are compiled in.
+/// Answers from the same lookup [`get_parser`] performs — statically compiled
+/// grammars, already-loaded dynamic grammars, and parser shared libraries
+/// present in the library and download-cache directories — but never fetches
+/// anything over the network.
 ///
-/// Use this to distinguish "we know the language name" from "we can actually
-/// parse files in that language right now". Callers that want only names that
-/// are parseable can chain the two checks:
+/// Use it to distinguish "we recognise this name" ([`has_language`], which is
+/// also `true` for a grammar that still has to be downloaded) from "parsing this
+/// will work offline, now". It is likewise independent of the
+/// extension-to-language mapping: [`detect_language_from_extension`] consults
+/// the static ext table for all 371 grammars regardless of what is installed.
+///
+/// The first `true` answer for a dynamic grammar loads its shared library, since
+/// loading is the only way to know it is usable; loads are cached process-wide,
+/// so repeat calls are cheap. ~keep
 ///
 /// ```no_run
 /// use tree_sitter_language_pack::{detect_language_from_extension, has_parser};
 ///
 /// if let Some(lang) = detect_language_from_extension("feature") {
 ///     if has_parser(lang) {
-///         // load the parser and parse
+///         // the gherkin parser is installed — parse without touching the network
 ///     } else {
-///         // we know it's gherkin but no parser is compiled in
+///         // we know it's gherkin, but the parser still has to be downloaded
 ///     }
 /// }
 /// ```
 pub fn has_parser(name: &str) -> bool {
+    // ~keep Register the download cache first, or installed-but-unregistered parsers read as absent.
+    #[cfg(feature = "download")]
+    let _ = ensure_cache_registered();
     REGISTRY.has_parser(name)
 }
 
@@ -294,7 +303,11 @@ pub fn language_count() -> usize {
 ///
 /// # Errors
 ///
-/// Returns an error if the language is not found or parsing fails.
+/// Returns [`Error::InvalidRange`] if the config carries a zero-valued limit or
+/// the source exceeds [`ProcessConfig::max_source_bytes`],
+/// [`Error::ParseTimeout`] if the parse exceeds
+/// [`ProcessConfig::parse_timeout_ms`], [`Error::LanguageNotFound`] if the
+/// language is unknown, or [`Error::ParseFailed`] if parsing yields no tree.
 ///
 /// # Example
 ///
@@ -313,6 +326,10 @@ pub fn language_count() -> usize {
     fields(language = %config.language, source_bytes = source.len())
 )]
 pub fn process(source: &str, config: &ProcessConfig) -> Result<ProcessResult, Error> {
+    // ~keep Validate before the download below, so a bad config fails without any network I/O.
+    config.validate()?;
+    config.check_source_size(source.len())?;
+
     // ~keep Trigger auto-download here; `REGISTRY.process()` does not perform the download fallback.
     #[cfg(feature = "download")]
     get_language(&config.language)?;
@@ -589,27 +606,36 @@ pub fn download_all() -> Result<usize, Error> {
     Ok(count)
 }
 
-/// Download every language in a named group (e.g. `"web"`, `"data"`).
+/// Download every language in a named group.
 ///
-/// Groups are defined in the remote manifest and let you ensure a curated
-/// set of related grammars in one call instead of listing each name to
-/// [`download()`]. Already-cached languages are skipped.
+/// Groups are defined by the remote manifest, not by this crate, and let you
+/// ensure a curated set of related grammars in one call instead of listing each
+/// name to [`download()`]. Already-cached languages are skipped.
+///
+/// Call [`manifest_groups`] to discover the group names the manifest actually
+/// defines. The published manifest currently defines a single group, `"all"`;
+/// earlier revisions of this documentation advertised `"web"`, `"data"`, and
+/// `"systems"`, which the manifest has never contained, so every call following
+/// that example failed. Do not hardcode a group name without checking. ~keep
 ///
 /// Returns the total number of languages now available (statically compiled
 /// plus downloaded and cached).
 ///
 /// # Errors
 ///
-/// Returns an error if the manifest cannot be fetched, the group is unknown,
-/// or any constituent language fails to download.
+/// Returns [`Error::Download`] if the manifest cannot be fetched, if the group
+/// is unknown — the message lists the groups the manifest defines — or if any
+/// constituent language fails to download.
 ///
 /// # Example
 ///
 /// ```no_run
-/// use tree_sitter_language_pack::download_group;
+/// use tree_sitter_language_pack::{download_group, manifest_groups};
 ///
-/// let count = download_group("web").unwrap();
-/// println!("{} languages available", count);
+/// let group = manifest_groups()?.into_iter().next().expect("manifest defines no groups");
+/// let count = download_group(&group)?;
+/// println!("{count} languages available");
+/// # Ok::<(), tree_sitter_language_pack::Error>(())
 /// ```
 #[cfg(feature = "download")]
 #[tracing::instrument(level = "info", skip_all, fields(group = name))]
@@ -652,6 +678,37 @@ pub fn manifest_languages() -> Result<Vec<String>, Error> {
     let mut langs: Vec<String> = manifest.languages.keys().cloned().collect();
     langs.sort_unstable();
     Ok(langs)
+}
+
+/// Return the names of every language group the remote manifest defines, sorted.
+///
+/// Group names are manifest data, not a compile-time constant of this crate, so
+/// this is the only reliable way to learn what [`download_group`] and
+/// [`PackConfig::groups`] accept. The published manifest currently defines just
+/// `"all"`. ~keep
+///
+/// # Errors
+///
+/// Returns [`Error::Download`] if the manifest cannot be fetched.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::manifest_groups;
+///
+/// for group in manifest_groups()? {
+///     println!("{group}");
+/// }
+/// # Ok::<(), tree_sitter_language_pack::Error>(())
+/// ```
+#[cfg(feature = "download")]
+pub fn manifest_groups() -> Result<Vec<String>, Error> {
+    let cache_dir = effective_cache_dir()?;
+    let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+    let manifest = dm.fetch_manifest()?;
+    let mut groups: Vec<String> = manifest.groups.keys().cloned().collect();
+    groups.sort_unstable();
+    Ok(groups)
 }
 
 /// Return languages that are already downloaded and cached locally.

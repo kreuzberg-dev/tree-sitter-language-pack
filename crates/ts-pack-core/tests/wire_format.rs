@@ -274,6 +274,8 @@ fn process_config_shape() {
         diagnostics: false,
         chunk_max_size: None,
         data_extraction: false,
+        max_source_bytes: None,
+        parse_timeout_ms: None,
     });
 }
 

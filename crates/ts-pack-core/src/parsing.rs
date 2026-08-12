@@ -22,7 +22,20 @@ use crate::error::Error;
 pub struct Point {
     /// Zero-indexed row number.
     pub row: usize,
-    /// Zero-indexed column number, in UTF-16 code units.
+    /// Zero-indexed column, counted in **bytes** from the start of the row.
+    ///
+    /// This is `tree_sitter::Point::column` verbatim, and tree-sitter defines it
+    /// as a byte offset — not characters, and not UTF-16 code units. Measured on
+    /// a row of the form `x = '<c>'` where `<c>` is a single 4-byte character
+    /// (an emoji), the string node reports columns `4..10`, identical to its
+    /// byte range; the character columns would be `4..7` and the UTF-16 columns
+    /// `4..8`.
+    ///
+    /// Anything that builds LSP positions (UTF-16) or editor caret columns
+    /// (characters) from this field is silently wrong on every row containing a
+    /// non-ASCII byte, and must re-measure the row against the source text
+    /// instead. Earlier releases documented this field as UTF-16 code units;
+    /// that was never what the value contained. ~keep
     pub column: usize,
 }
 
@@ -69,17 +82,46 @@ pub struct ByteRange {
 /// ```
 pub struct Parser {
     inner: tree_sitter::Parser,
+    max_source_bytes: Option<usize>,
+    timeout_ms: Option<u64>,
 }
 
 impl Parser {
-    /// Construct a new parser with no language set.
+    /// Construct a new parser with no language set and no parse limits.
     ///
-    /// Call [`Parser::set_language`] before parsing.
+    /// Call [`Parser::set_language`] before parsing. Limits are opt-in via
+    /// [`set_max_source_bytes`](Self::set_max_source_bytes) and
+    /// [`set_parse_timeout_ms`](Self::set_parse_timeout_ms); both default to
+    /// unbounded so that existing callers are unaffected. ~keep
     #[must_use]
     pub fn new() -> Self {
         Self {
             inner: tree_sitter::Parser::new(),
+            max_source_bytes: None,
+            timeout_ms: None,
         }
+    }
+
+    /// Refuse to parse sources longer than `max_bytes`.
+    ///
+    /// `None` (the default) means no limit. Over-limit input makes
+    /// [`parse`](Self::parse) and [`parse_bytes`](Self::parse_bytes) return
+    /// `None` after emitting a `WARN`; input is never silently truncated.
+    ///
+    /// See [`RECOMMENDED_MAX_SOURCE_BYTES`](crate::process_config::RECOMMENDED_MAX_SOURCE_BYTES).
+    pub fn set_max_source_bytes(&mut self, max_bytes: Option<usize>) {
+        self.max_source_bytes = max_bytes;
+    }
+
+    /// Cancel a parse that exceeds `timeout_ms` milliseconds of wall clock.
+    ///
+    /// `None` (the default) means no budget. Cancellation runs through
+    /// tree-sitter's parse progress callback, so it is granular to that
+    /// callback's interval rather than exact.
+    ///
+    /// See [`RECOMMENDED_PARSE_TIMEOUT_MS`](crate::process_config::RECOMMENDED_PARSE_TIMEOUT_MS).
+    pub fn set_parse_timeout_ms(&mut self, timeout_ms: Option<u64>) {
+        self.timeout_ms = timeout_ms;
     }
 
     /// Configure the parser to use the language identified by name (e.g. `"python"`).
@@ -98,18 +140,40 @@ impl Parser {
             .map_err(|e| Error::ParserSetup(format!("{e}")))
     }
 
-    /// Parse a UTF-8 source string. Returns `None` if parsing was cancelled
-    /// or no language is set.
+    /// Parse a UTF-8 source string.
+    ///
+    /// Returns `None` if no language is set, if the parse was cancelled by the
+    /// configured [timeout](Self::set_parse_timeout_ms), or if the source
+    /// exceeds the configured [size limit](Self::set_max_source_bytes). Each
+    /// non-parse outcome is logged, so an empty result is never silent.
     #[must_use]
     pub fn parse(&mut self, source: &str) -> Option<Tree> {
-        self.inner.parse(source, None).map(|t| Tree(Arc::new(t)))
+        self.parse_bytes(source.as_bytes())
     }
 
-    /// Parse a raw byte slice. Returns `None` if parsing was cancelled or
-    /// no language is set.
+    /// Parse a raw byte slice.
+    ///
+    /// Same outcomes as [`parse`](Self::parse).
     #[must_use]
     pub fn parse_bytes(&mut self, source: &[u8]) -> Option<Tree> {
-        self.inner.parse(source, None).map(|t| Tree(Arc::new(t)))
+        if let Some(limit) = self.max_source_bytes
+            && source.len() > limit
+        {
+            tracing::warn!(
+                source_bytes = source.len(),
+                limit,
+                "source exceeds the configured max_source_bytes; refusing to parse"
+            );
+            return None;
+        }
+
+        match crate::parse::run_parse(&mut self.inner, source, self.timeout_ms) {
+            Ok(tree) => Some(Tree(Arc::new(tree))),
+            Err(error) => {
+                tracing::debug!(error = %error, "parse produced no tree");
+                None
+            }
+        }
     }
 
     /// Reset internal state. The next call to [`parse`](Self::parse) will

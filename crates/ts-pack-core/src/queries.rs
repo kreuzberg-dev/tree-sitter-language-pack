@@ -2,8 +2,14 @@
 //!
 //! Queries are embedded from `parsers/{lang}/queries/*.scm` at build time.
 //! Not all languages have queries — returns `None` for languages without bundled queries.
+//!
+//! Every accessor resolves language aliases (e.g. `"shell"` → `"bash"`,
+//! `"makefile"` → `"make"`) before lookup, so it agrees with
+//! [`crate::get_query`] and [`crate::get_language`] for all aliased names. ~keep
 
 include!(concat!(env!("OUT_DIR"), "/queries_generated.rs"));
+
+use crate::registry::resolve_alias;
 
 /// Get the highlights query for a language, if bundled.
 ///
@@ -22,7 +28,7 @@ include!(concat!(env!("OUT_DIR"), "/queries_generated.rs"));
 /// assert!(missing.is_none());
 /// ```
 pub fn get_highlights_query(language: &str) -> Option<&'static str> {
-    get_highlights_query_impl(language)
+    get_highlights_query_impl(resolve_alias(language))
 }
 
 /// Get the injections query for a language, if bundled.
@@ -41,7 +47,7 @@ pub fn get_highlights_query(language: &str) -> Option<&'static str> {
 /// assert!(missing.is_none());
 /// ```
 pub fn get_injections_query(language: &str) -> Option<&'static str> {
-    get_injections_query_impl(language)
+    get_injections_query_impl(resolve_alias(language))
 }
 
 /// Get the locals query for a language, if bundled.
@@ -60,7 +66,7 @@ pub fn get_injections_query(language: &str) -> Option<&'static str> {
 /// assert!(missing.is_none());
 /// ```
 pub fn get_locals_query(language: &str) -> Option<&'static str> {
-    get_locals_query_impl(language)
+    get_locals_query_impl(resolve_alias(language))
 }
 
 /// Get the tags query for a language, if bundled.
@@ -79,7 +85,7 @@ pub fn get_locals_query(language: &str) -> Option<&'static str> {
 /// assert!(missing.is_none());
 /// ```
 pub fn get_tags_query(language: &str) -> Option<&'static str> {
-    get_tags_query_impl(language)
+    get_tags_query_impl(resolve_alias(language))
 }
 
 /// Get the indents query for a language, if bundled.
@@ -98,7 +104,7 @@ pub fn get_tags_query(language: &str) -> Option<&'static str> {
 /// assert!(missing.is_none());
 /// ```
 pub fn get_indents_query(language: &str) -> Option<&'static str> {
-    get_indents_query_impl(language)
+    get_indents_query_impl(resolve_alias(language))
 }
 
 /// Get the folds query for a language, if bundled.
@@ -117,5 +123,5 @@ pub fn get_indents_query(language: &str) -> Option<&'static str> {
 /// assert!(missing.is_none());
 /// ```
 pub fn get_folds_query(language: &str) -> Option<&'static str> {
-    get_folds_query_impl(language)
+    get_folds_query_impl(resolve_alias(language))
 }

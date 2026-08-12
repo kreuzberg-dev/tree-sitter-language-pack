@@ -5,7 +5,16 @@ use thiserror::Error;
 /// Covers language lookup failures, parse errors, query errors, and I/O issues.
 /// Feature-gated variants are included when `config`, `download`, or related
 /// features are enabled.
+/// # Matching on `Error`
+///
+/// The set of variants is not stable: new failure modes are added in minor
+/// releases, and `Io`, `Json`, and `Toml` exist only under certain feature
+/// combinations, so the variant set a downstream crate sees depends on which
+/// features it enables. Downstream `match`es must therefore carry a `_` arm;
+/// `#[non_exhaustive]` makes the compiler enforce that instead of letting a
+/// feature change silently break a build. ~keep
 #[derive(Debug, Error)]
+#[non_exhaustive]
 pub enum Error {
     /// The requested language name (or alias) was not found in the registry.
     #[error("Language '{0}' not found")]
@@ -34,6 +43,17 @@ pub enum Error {
     /// The tree-sitter parser returned no tree for the given source input.
     #[error("Parse failed: parsing returned no tree")]
     ParseFailed,
+
+    /// The parse was cancelled because it exceeded its configured wall-clock budget.
+    ///
+    /// Raised only when a budget is configured — see
+    /// [`ProcessConfig::parse_timeout_ms`](crate::ProcessConfig::parse_timeout_ms),
+    /// which defaults to `None`.
+    #[error("Parse cancelled: exceeded the configured budget of {timeout_ms} ms")]
+    ParseTimeout {
+        /// The configured wall-clock budget, in milliseconds.
+        timeout_ms: u64,
+    },
 
     /// A tree-sitter query could not be compiled or executed.
     #[error("Query error: {0}")]
