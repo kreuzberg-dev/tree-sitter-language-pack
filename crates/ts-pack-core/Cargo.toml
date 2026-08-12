@@ -90,6 +90,12 @@ duplicated_attributes = "allow"
 print_stdout = "deny"
 print_stderr = "deny"
 dbg_macro = "deny"
+# A panic in this crate aborts the host process across every binding (Python, Node,
+# Ruby, PHP, ...), so `unwrap`/`expect` in library code is a hard error rather than a
+# style nit. Test modules opt back in locally with `#![allow(clippy::unwrap_used,
+# clippy::expect_used)]`, mirroring the print family's exemption above. ~keep
+unwrap_used = "deny"
+expect_used = "deny"
 
 [lints.rust]
 unsafe_code = "allow"

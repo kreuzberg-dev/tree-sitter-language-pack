@@ -1,6 +1,11 @@
 // Build scripts run before the crate compiles and cannot route through `tracing`; stderr is
 // their diagnostic channel (stdout is reserved for `cargo:` directives, exempt natively). ~keep
 #![allow(clippy::print_stderr)]
+// A build script is not the library: it links no host process, so an unrecoverable
+// condition here should abort the build loudly rather than be threaded through a
+// `Result` no caller can act on. The crate-wide `unwrap_used`/`expect_used` deny
+// exists to stop a panic taking down a PHP or Python host, which build.rs cannot do. ~keep
+#![allow(clippy::unwrap_used, clippy::expect_used)]
 
 use serde::Deserialize;
 use sha2::{Digest, Sha256};

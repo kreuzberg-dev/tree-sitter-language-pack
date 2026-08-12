@@ -114,7 +114,7 @@ pub struct ProcessConfig {
     /// Enforced through tree-sitter's parse progress callback, which the parser
     /// invokes periodically; cancellation is therefore granular to that callback
     /// interval rather than exact. A parse that exceeds the budget fails with
-    /// [`Error::ParseFailed`](crate::Error::ParseFailed). ~keep
+    /// [`Error::ParseTimeout`](crate::Error::ParseTimeout). ~keep
     #[cfg_attr(feature = "serde", serde(default))]
     pub parse_timeout_ms: Option<u64>,
 }

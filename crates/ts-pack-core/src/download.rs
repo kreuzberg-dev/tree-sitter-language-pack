@@ -89,6 +89,26 @@ fn read_file_url(url: &str) -> Result<String, Error> {
     fs::read_to_string(path).map_err(|e| Error::Download(format!("Failed to read manifest from {url}: {e}")))
 }
 
+/// Number of hex characters in a SHA-256 digest (32 bytes x 2 hex chars/byte). ~keep
+const SHA256_HEX_LEN: usize = 64;
+
+/// Reject a manifest-supplied `sha256` value that is not a well-formed 64-character
+/// hex digest before it is used to build a cache path.
+///
+/// The manifest is untrusted input (fetched over HTTP, or read from a `file://`
+/// URL a caller controls), so a hostile or corrupt `sha256` — e.g. containing
+/// `../` — must never reach a path join: `load_verified_cached_bundle` both reads
+/// and, on a hash mismatch, unlinks whatever path it resolves to. Mirrors the
+/// equivalent guard in `build.rs` for the parser-source tarball checksum. ~keep
+fn validate_sha256_hex(sha256: &str) -> Result<(), Error> {
+    if sha256.len() == SHA256_HEX_LEN && sha256.bytes().all(|b| b.is_ascii_hexdigit()) {
+        return Ok(());
+    }
+    Err(Error::Download(format!(
+        "Manifest sha256 '{sha256}' is not a well-formed {SHA256_HEX_LEN}-character hex digest"
+    )))
+}
+
 /// Sibling tmp path for atomic writes: `<dest_dir>/.<name>.tmp.<pid>.<seq>`.
 /// Lives in the same directory as `dest` so `fs::rename` stays on the same
 /// filesystem (cross-FS rename returns `EXDEV`).
@@ -113,7 +133,8 @@ fn sibling_tmp_path(dest: &Path) -> Result<PathBuf, Error> {
 /// version, the new version, or no file — never partial bytes.
 fn atomic_write(dest: &Path, data: &[u8]) -> Result<(), Error> {
     if let Some(parent) = dest.parent() {
-        fs::create_dir_all(parent)?;
+        fs::create_dir_all(parent)
+            .map_err(|e| Error::Download(format!("Failed to create directory {}: {e}", parent.display())))?;
     }
     let tmp = sibling_tmp_path(dest)?;
     let write_result = (|| -> io::Result<()> {
@@ -141,7 +162,8 @@ fn atomic_write(dest: &Path, data: &[u8]) -> Result<(), Error> {
 /// surfaces flush errors at a clear call site before the sync.
 fn atomic_copy_from_reader<R: Read>(dest: &Path, src: &mut R) -> Result<(), Error> {
     if let Some(parent) = dest.parent() {
-        fs::create_dir_all(parent)?;
+        fs::create_dir_all(parent)
+            .map_err(|e| Error::Download(format!("Failed to create directory {}: {e}", parent.display())))?;
     }
     let tmp = sibling_tmp_path(dest)?;
     let copy_result = (|| -> io::Result<()> {
@@ -344,6 +366,16 @@ impl DownloadManager {
     }
 
     /// List languages that are already downloaded and cached.
+    ///
+    /// Returns canonical names only, derived one-to-one from the on-disk cache
+    /// filenames. Aliases (e.g. `"shell"` for `"bash"`) are a naming-layer
+    /// concept resolved by [`crate::registry::resolve_alias`] at lookup time —
+    /// there is no separate on-disk artifact for an alias — so this list would
+    /// have to duplicate the alias table `registry.rs` keeps private in order to
+    /// also report them. Contrast with the user-facing
+    /// [`LanguageRegistry::available_languages`](crate::LanguageRegistry::available_languages),
+    /// which does include aliases because it answers "what name can I ask for",
+    /// not "what file is on disk".
     pub fn installed_languages(&self) -> Vec<String> {
         let mut langs = Vec::new();
         if let Ok(entries) = fs::read_dir(&self.cache_dir) {
@@ -361,6 +393,11 @@ impl DownloadManager {
     /// Ensure the specified languages are available in the cache.
     /// Downloads the platform bundle if any requested languages are missing.
     ///
+    /// Accepts language names or aliases (e.g. `"shell"` resolves to `"bash"`)
+    /// interchangeably — every name is resolved to its canonical form before the
+    /// cache and manifest are consulted, since the manifest is keyed by
+    /// canonical name only.
+    ///
     /// Cross-process safety: acquires the `.download.lock` file lock for the
     /// mutation window only. Readers are never blocked — the fast path returns
     /// immediately if all languages are already cached.
@@ -370,8 +407,13 @@ impl DownloadManager {
     /// application layer or use a local-FS cache path.
     #[cfg_attr(alef, alef(skip))]
     pub fn ensure_languages(&self, names: &[&str]) -> Result<(), Error> {
+        // ~keep Resolve aliases once at the boundary: the manifest is keyed by canonical
+        // ~keep name only, and `resolve_alias` is a single-pass fixed point (pinned by a
+        // ~keep test in registry.rs), so every name downstream can be treated as canonical.
+        let resolved: Vec<&str> = names.iter().map(|name| crate::registry::resolve_alias(name)).collect();
+
         // ~keep Fast path is lock-free so readers never block on writers.
-        let missing: Vec<&str> = names.iter().filter(|name| !self.is_cached(name)).copied().collect();
+        let missing: Vec<&str> = resolved.iter().filter(|name| !self.is_cached(name)).copied().collect();
         if missing.is_empty() {
             return Ok(());
         }
@@ -379,7 +421,7 @@ impl DownloadManager {
         // ~keep Acquire the cross-process lock only for the mutation window; avoid TOCTOU retry loops.
         let mut lock = DownloadCacheLock::open(self.version_cache_dir()?)?;
         let _guard = lock.lock_exclusive()?;
-        self.ensure_languages_locked(names)
+        self.ensure_languages_locked(&resolved)
     }
 
     /// Inner implementation of `ensure_languages`; caller must hold the
@@ -460,13 +502,20 @@ impl DownloadManager {
     }
 
     /// Check if a language library is already in the cache.
+    ///
+    /// Accepts a language name or alias; resolution happens in [`Self::lib_path`].
     fn is_cached(&self, name: &str) -> bool {
         self.lib_path(name).exists()
     }
 
     /// Get the expected path for a language's shared library in the cache.
+    ///
+    /// Accepts a language name or alias (e.g. `"shell"` resolves to `"bash"`
+    /// before the C symbol lookup), so every public entry point on this type
+    /// agrees on the same path for an alias and its canonical target.
     #[cfg_attr(alef, alef(skip))]
     pub fn lib_path(&self, name: &str) -> PathBuf {
+        let name = crate::registry::resolve_alias(name);
         let lib_name = format!("tree_sitter_{}", crate::registry::c_symbol_for(name));
         let (prefix, ext) = if cfg!(target_os = "macos") {
             ("lib", "dylib")
@@ -500,7 +549,12 @@ impl DownloadManager {
         if !manifest_path.exists() {
             return Ok(None);
         }
-        let data = fs::read_to_string(&manifest_path)?;
+        let data = fs::read_to_string(&manifest_path).map_err(|e| {
+            Error::Download(format!(
+                "Failed to read cached manifest {}: {e}",
+                manifest_path.display()
+            ))
+        })?;
         let manifest: ParserManifest = serde_json::from_str(&data)?;
         if manifest.version == self.version {
             Ok(Some(manifest))
@@ -603,7 +657,13 @@ impl DownloadManager {
     }
 
     /// Return the cache path for a verified platform bundle archive.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Download`] if `sha256` is not a well-formed 64-character
+    /// hex digest — see [`validate_sha256_hex`].
     fn bundle_cache_path(&self, platform_key: &str, sha256: &str) -> Result<PathBuf, Error> {
+        validate_sha256_hex(sha256)?;
         Ok(self
             .version_cache_dir()?
             .join("bundles")
@@ -646,13 +706,19 @@ impl DownloadManager {
             return Ok(None);
         }
 
-        let data = fs::read(cache_path)?;
+        let data = fs::read(cache_path)
+            .map_err(|e| Error::Download(format!("Failed to read cached bundle {}: {e}", cache_path.display())))?;
         let actual_hash = Self::sha256_hex(&data);
         if actual_hash == expected_sha256 {
             return Ok(Some(data));
         }
 
-        fs::remove_file(cache_path)?;
+        fs::remove_file(cache_path).map_err(|e| {
+            Error::Download(format!(
+                "Failed to remove corrupt cached bundle {}: {e}",
+                cache_path.display()
+            ))
+        })?;
         Ok(None)
     }
 
@@ -691,7 +757,12 @@ impl DownloadManager {
     /// write to the same cache directory simultaneously. Exposing this method
     /// publicly would allow callers to bypass the lock entirely.
     pub(crate) fn extract_languages(&self, archive_data: &[u8], names: &[&str]) -> Result<(), Error> {
-        fs::create_dir_all(&self.cache_dir)?;
+        fs::create_dir_all(&self.cache_dir).map_err(|e| {
+            Error::Download(format!(
+                "Failed to create cache directory {}: {e}",
+                self.cache_dir.display()
+            ))
+        })?;
 
         let decoder = zstd::Decoder::new(archive_data)
             .map_err(|e| Error::Download(format!("Failed to decompress archive: {}", e)))?;
@@ -826,7 +897,12 @@ impl DownloadManager {
     /// verification is performed. Returns the count of files now present in the cache dir.
     /// Caller must hold the `.download.lock` cross-process exclusive lock.
     fn extract_all_libs(&self, archive_data: &[u8]) -> Result<usize, Error> {
-        fs::create_dir_all(&self.cache_dir)?;
+        fs::create_dir_all(&self.cache_dir).map_err(|e| {
+            Error::Download(format!(
+                "Failed to create cache directory {}: {e}",
+                self.cache_dir.display()
+            ))
+        })?;
 
         let (lib_prefix, lib_ext) = if cfg!(target_os = "macos") {
             ("lib", "dylib")
@@ -974,6 +1050,10 @@ impl DownloadManager {
 
 #[cfg(test)]
 mod tests {
+    // ~keep Test assertions legitimately use unwrap/expect; production code stays
+    // ~keep covered by the crate-wide `unwrap_used`/`expect_used` deny in Cargo.toml.
+    #![allow(clippy::unwrap_used, clippy::expect_used)]
+
     use std::sync::Arc;
 
     use super::*;
@@ -1048,15 +1128,105 @@ mod tests {
         let temp_dir = temp_cache_dir();
         let cache_dir = temp_dir.path().join("libs");
         let manager = manager_for_temp_dir(&temp_dir);
+        let sha256 = "a".repeat(64);
 
         let path = manager
-            .bundle_cache_path("macos-arm64", "abc123")
+            .bundle_cache_path("macos-arm64", &sha256)
             .expect("bundle cache path should resolve");
 
         assert_eq!(
             path,
-            cache_dir.parent().unwrap().join("bundles/macos-arm64-abc123.tar.zst")
+            cache_dir
+                .parent()
+                .unwrap()
+                .join(format!("bundles/macos-arm64-{sha256}.tar.zst"))
         );
+    }
+
+    #[test]
+    fn should_reject_bundle_cache_path_when_sha256_is_not_hex() {
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+
+        let error = manager
+            .bundle_cache_path("macos-arm64", "not-a-valid-sha")
+            .expect_err("non-hex sha256 must be rejected");
+
+        assert!(
+            matches!(error, Error::Download(_)),
+            "unexpected error variant: {error:?}"
+        );
+    }
+
+    #[test]
+    fn should_reject_bundle_cache_path_when_sha256_is_a_path_traversal_attempt() {
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+
+        let error = manager
+            .bundle_cache_path("macos-arm64", "../../../home/user/.ssh/id_ed25519")
+            .expect_err("path-traversal sha256 must be rejected");
+
+        assert!(
+            matches!(error, Error::Download(_)),
+            "unexpected error variant: {error:?}"
+        );
+    }
+
+    #[test]
+    fn should_reject_bundle_cache_path_when_sha256_is_shorter_than_64_chars() {
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+        let short_sha = "a".repeat(63);
+
+        let error = manager
+            .bundle_cache_path("macos-arm64", &short_sha)
+            .expect_err("short sha256 must be rejected");
+
+        assert!(
+            matches!(error, Error::Download(_)),
+            "unexpected error variant: {error:?}"
+        );
+    }
+
+    #[test]
+    fn should_accept_bundle_cache_path_when_sha256_is_well_formed_hex() {
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+        let sha256 = "0123456789abcdef".repeat(4);
+
+        let path = manager
+            .bundle_cache_path("macos-arm64", &sha256)
+            .expect("well-formed hex sha256 should be accepted");
+
+        assert!(path.ends_with(format!("bundles/macos-arm64-{sha256}.tar.zst")));
+    }
+
+    #[test]
+    fn should_return_same_path_when_lib_path_is_given_an_alias() {
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+
+        assert_eq!(
+            manager.lib_path("shell"),
+            manager.lib_path("bash"),
+            "alias and canonical name must resolve to the same cache path"
+        );
+    }
+
+    #[test]
+    fn should_report_cached_when_is_cached_is_given_an_alias_for_a_cached_language() {
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+        let canonical_path = manager.lib_path("bash");
+        fs::create_dir_all(canonical_path.parent().unwrap()).expect("cache dir should be created");
+        fs::write(&canonical_path, b"stub-library-bytes").expect("stub library should be written");
+
+        assert!(
+            manager.is_cached("shell"),
+            "alias lookup must see the file cached under the canonical name"
+        );
+        assert!(manager.is_cached("bash"), "canonical lookup must see the same file");
     }
 
     #[test]
@@ -1082,13 +1252,14 @@ mod tests {
     fn verified_bundle_cache_removes_hash_mismatch() {
         let temp_dir = temp_cache_dir();
         let manager = manager_for_temp_dir(&temp_dir);
+        let expected_sha256 = "0".repeat(64);
         let cache_path = manager
-            .bundle_cache_path("macos-arm64", "expected-hash")
+            .bundle_cache_path("macos-arm64", &expected_sha256)
             .expect("bundle cache path should resolve");
         fs::create_dir_all(cache_path.parent().unwrap()).expect("bundle cache directory should be created");
         fs::write(&cache_path, b"corrupt archive bytes").expect("bundle cache file should be written");
 
-        let cached = DownloadManager::load_verified_cached_bundle(&cache_path, "expected-hash")
+        let cached = DownloadManager::load_verified_cached_bundle(&cache_path, &expected_sha256)
             .expect("corrupt cache should be removed");
 
         assert_eq!(cached, None);

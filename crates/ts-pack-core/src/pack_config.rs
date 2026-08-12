@@ -88,7 +88,8 @@ impl PackConfig {
     #[cfg_attr(alef, alef(skip))]
     #[cfg(feature = "config")]
     pub fn from_toml_file(path: &std::path::Path) -> Result<Self, crate::error::Error> {
-        let content = std::fs::read_to_string(path)?;
+        let content = std::fs::read_to_string(path)
+            .map_err(|e| crate::error::Error::Config(format!("Failed to read {}: {e}", path.display())))?;
         toml::from_str(&content)
             .map_err(|e| crate::error::Error::Config(format!("Failed to parse {}: {e}", path.display())))
     }
@@ -99,26 +100,40 @@ impl PackConfig {
     /// 2. `$XDG_CONFIG_HOME/tree-sitter-language-pack/config.toml`
     /// 3. `~/.config/tree-sitter-language-pack/config.toml`
     ///
-    /// Returns `None` if no configuration file is found.
+    /// Returns `Ok(None)` if no candidate file exists at any searched location.
+    ///
+    /// Search stops at the first *existing* candidate. If that file exists but
+    /// fails to read or parse, this returns `Err` naming the offending path
+    /// rather than silently treating it as "no config" and falling through to a
+    /// different candidate further up the search order — that would make a
+    /// broken `language-pack.toml` indistinguishable from an absent one, and
+    /// silently discard the user's cache directory and pre-download list. ~keep
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if a candidate configuration file exists but cannot be
+    /// read or is not valid TOML.
     ///
     /// # Example
     ///
     /// ```no_run
     /// use tree_sitter_language_pack::PackConfig;
     ///
-    /// if let Some(config) = PackConfig::discover() {
-    ///     println!("Found config with {:?} languages", config.languages);
+    /// match PackConfig::discover() {
+    ///     Ok(Some(config)) => println!("Found config with {:?} languages", config.languages),
+    ///     Ok(None) => println!("No config file found"),
+    ///     Err(e) => eprintln!("language-pack.toml found but invalid: {e}"),
     /// }
     /// ```
     #[cfg_attr(alef, alef(skip))]
     #[cfg(feature = "config")]
-    pub fn discover() -> Option<Self> {
+    pub fn discover() -> Result<Option<Self>, crate::error::Error> {
         if let Ok(cwd) = std::env::current_dir() {
             let mut dir: &std::path::Path = cwd.as_path();
             for _ in 0..10 {
                 let candidate = dir.join("language-pack.toml");
                 if candidate.exists() {
-                    return Self::from_toml_file(&candidate).ok();
+                    return Self::from_toml_file(&candidate).map(Some);
                 }
                 match dir.parent() {
                     Some(parent) => dir = parent,
@@ -130,10 +145,72 @@ impl PackConfig {
         if let Some(config_dir) = dirs::config_dir() {
             let candidate = config_dir.join("tree-sitter-language-pack").join("config.toml");
             if candidate.exists() {
-                return Self::from_toml_file(&candidate).ok();
+                return Self::from_toml_file(&candidate).map(Some);
             }
         }
 
-        None
+        Ok(None)
+    }
+}
+
+#[cfg(all(test, feature = "config"))]
+mod tests {
+    // ~keep Test assertions legitimately use unwrap/expect; production code stays
+    // ~keep covered by the crate-wide `unwrap_used`/`expect_used` deny in Cargo.toml.
+    #![allow(clippy::unwrap_used, clippy::expect_used)]
+
+    use super::*;
+
+    // ~keep `discover()` reads the process-wide current directory, which cannot be
+    // ~keep mutated safely in a parallel test run (test-independence). Its search-stop
+    // ~keep and error-propagation behaviour is exercised through `from_toml_file`
+    // ~keep instead, which is exactly what `discover()` delegates to at each candidate.
+    #[test]
+    fn should_return_err_naming_the_path_when_config_file_is_malformed_toml() {
+        let temp_dir = tempfile::Builder::new()
+            .prefix("tslp-pack-config-")
+            .tempdir()
+            .expect("temp dir should be created");
+        let path = temp_dir.path().join("language-pack.toml");
+        std::fs::write(&path, "this is not [ valid toml").expect("malformed file should be written");
+
+        let error = PackConfig::from_toml_file(&path).expect_err("malformed TOML must not silently succeed");
+
+        let message = error.to_string();
+        assert!(
+            message.contains(&path.display().to_string()),
+            "error must name the offending path; got: {message}"
+        );
+    }
+
+    #[test]
+    fn should_return_err_naming_the_path_when_config_file_is_missing() {
+        let temp_dir = tempfile::Builder::new()
+            .prefix("tslp-pack-config-")
+            .tempdir()
+            .expect("temp dir should be created");
+        let path = temp_dir.path().join("missing.toml");
+
+        let error = PackConfig::from_toml_file(&path).expect_err("missing file must error, not silently produce None");
+
+        let message = error.to_string();
+        assert!(
+            message.contains(&path.display().to_string()),
+            "error must name the missing path; got: {message}"
+        );
+    }
+
+    #[test]
+    fn should_return_ok_when_config_file_is_well_formed_toml() {
+        let temp_dir = tempfile::Builder::new()
+            .prefix("tslp-pack-config-")
+            .tempdir()
+            .expect("temp dir should be created");
+        let path = temp_dir.path().join("language-pack.toml");
+        std::fs::write(&path, "languages = [\"python\", \"rust\"]\n").expect("config file should be written");
+
+        let config = PackConfig::from_toml_file(&path).expect("well-formed config should parse");
+
+        assert_eq!(config.languages, Some(vec!["python".to_string(), "rust".to_string()]));
     }
 }

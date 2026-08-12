@@ -185,14 +185,17 @@ fn run() -> Result<(), String> {
                 println!("Ensured {count} languages.");
             } else {
                 match PackConfig::discover() {
-                    Some(config) => {
+                    Ok(Some(config)) => {
                         tree_sitter_language_pack::init(&config).map_err(|e| e.to_string())?;
                         println!("Initialized from discovered config.");
                     }
-                    None => {
+                    Ok(None) => {
                         return Err("No languages specified and no language-pack.toml found. \
                              Use --all, --groups, or specify language names."
                             .to_string());
+                    }
+                    Err(error) => {
+                        return Err(format!("Failed to load the discovered config: {error}"));
                     }
                 }
             }
