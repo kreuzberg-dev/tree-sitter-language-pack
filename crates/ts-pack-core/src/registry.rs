@@ -117,6 +117,26 @@ fn lib_path_in(dir: &std::path::Path, name: &str) -> PathBuf {
     dir.join(library_file_name(name))
 }
 
+/// Run-time override for the directory holding dynamically loadable parsers.
+#[cfg(feature = "dynamic-loading")]
+const LIBS_DIR_ENV: &str = "TREE_SITTER_LANGUAGE_PACK_LIBS_DIR";
+
+/// Directory searched for dynamically loadable parser libraries.
+///
+/// `LIBS_DIR` is baked in by `build.rs` as an absolute `OUT_DIR` path, so it cannot
+/// survive the artifact being moved — copied into a container image, shipped inside a
+/// wheel or gem, or relocated after `cargo build`. Nothing emitted at build time can
+/// resolve at run time, so the override has to come from the environment. ~keep
+///
+/// Falls back to the baked path, which remains correct for an in-place build tree.
+#[cfg(feature = "dynamic-loading")]
+fn resolve_libs_dir() -> PathBuf {
+    match std::env::var(LIBS_DIR_ENV) {
+        Ok(dir) if !dir.trim().is_empty() => PathBuf::from(dir),
+        _ => PathBuf::from(LIBS_DIR),
+    }
+}
+
 #[cfg(all(feature = "dynamic-loading", target_arch = "wasm32"))]
 mod dynamic {
     //! wasm32 stub: shared-library loading is unsupported on wasm32-unknown-unknown.
@@ -305,8 +325,17 @@ mod dynamic {
     }
 
     #[cfg(test)]
-    pub(super) fn loaded_library_count_for_tests() -> usize {
-        LOADED_LIBRARIES.read().map(|libs| libs.len()).unwrap_or_default()
+    /// Whether one specific library path is present in the process-wide load cache.
+    ///
+    /// Scoped to a single path on purpose: the total count is shared with every other
+    /// test that loads a grammar, so comparing global snapshots across two points in
+    /// time races under `cargo test`'s default parallelism. ~keep
+    #[cfg(test)]
+    pub(super) fn library_is_loaded_for_tests(path: &Path) -> bool {
+        LOADED_LIBRARIES
+            .read()
+            .map(|libs| libs.contains_key(path))
+            .unwrap_or(false)
     }
 }
 
@@ -355,7 +384,7 @@ impl LanguageRegistry {
         Self {
             static_lookup,
             #[cfg(feature = "dynamic-loading")]
-            dynamic_loader: dynamic::DynamicLoader::new(PathBuf::from(LIBS_DIR), DYNAMIC_LANGUAGE_NAMES.to_vec()),
+            dynamic_loader: dynamic::DynamicLoader::new(resolve_libs_dir(), DYNAMIC_LANGUAGE_NAMES.to_vec()),
             #[cfg(feature = "dynamic-loading")]
             extra_lib_dirs: Arc::new(std::sync::RwLock::new(Arc::new(Vec::new()))),
         }
@@ -428,8 +457,18 @@ impl LanguageRegistry {
                 return Ok(lang);
             }
 
+            // ~keep A name in the build-time `DYNAMIC_LANGUAGE_NAMES` list may still be absent from
+            // ~keep `libs_dir` once the artifact has been relocated. Returning here unconditionally
+            // ~keep made that a hard `LanguageNotFound` even when the download cache — registered as
+            // ~keep an extra dir below — held that exact parser. Fall through on `LanguageNotFound`
+            // ~keep only; any other error is a real load failure and must propagate rather than be
+            // ~keep retried against unrelated directories.
             if self.dynamic_loader.dynamic_names.contains(&name) || self.dynamic_loader.lib_file_exists(name) {
-                return self.dynamic_loader.load(name);
+                match self.dynamic_loader.load(name) {
+                    Ok(language) => return Ok(language),
+                    Err(Error::LanguageNotFound(_)) => {}
+                    Err(error) => return Err(error),
+                }
             }
 
             let extra_dirs: Arc<Vec<PathBuf>> = self
@@ -743,6 +782,35 @@ mod tests {
         assert_eq!(registry.language_count(), langs.len());
     }
 
+    #[cfg(all(feature = "dynamic-loading", not(target_arch = "wasm32")))]
+    #[test]
+    fn should_distinguish_an_absent_library_from_an_unloadable_one() {
+        // ~keep get_language falls through to the extra lib dirs on LanguageNotFound ONLY, so that a
+        // ~keep relocated build can still be satisfied by the download cache. If `load` ever reports an
+        // ~keep absent file as DynamicLoad — or an unloadable one as LanguageNotFound — that fallthrough
+        // ~keep silently stops working and a corrupt parser starts reading as "no such language".
+        let dir = tempfile::Builder::new()
+            .prefix("tslp-load-semantics-")
+            .tempdir()
+            .expect("temporary libs directory should be created");
+        let loader = super::dynamic::DynamicLoader::new(dir.path().to_path_buf(), vec!["python"]);
+
+        match loader.load("python") {
+            Err(Error::LanguageNotFound(_)) => {}
+            Ok(_) => panic!("an absent library must not load successfully"),
+            Err(error) => panic!("an absent library must report LanguageNotFound, got: {error}"),
+        }
+
+        std::fs::write(super::lib_path_in(dir.path(), "python"), b"not a shared library")
+            .expect("stub parser library should be written");
+
+        match loader.load("python") {
+            Err(Error::DynamicLoad(_)) => {}
+            Ok(_) => panic!("a truncated library must not load successfully"),
+            Err(error) => panic!("a present-but-unloadable library must report DynamicLoad, got: {error}"),
+        }
+    }
+
     #[cfg(feature = "download")]
     #[test]
     fn known_languages_is_sorted() {
@@ -840,21 +908,30 @@ mod tests {
         };
         drop(registry);
 
-        let before = dynamic::loaded_library_count_for_tests();
         let first = LanguageRegistry::new();
+        let lib_path = lib_path_in(&first.dynamic_loader.libs_dir, language_name);
         let first_language = first
             .get_language(language_name)
             .expect("first registry should load dynamic language");
-        let after_first = dynamic::loaded_library_count_for_tests();
+        assert!(
+            dynamic::library_is_loaded_for_tests(&lib_path),
+            "first registry should have populated the process-wide cache for {}",
+            lib_path.display()
+        );
 
         let second = LanguageRegistry::new();
         let second_language = second
             .get_language(language_name)
             .expect("second registry should reuse process-loaded dynamic library");
-        let after_second = dynamic::loaded_library_count_for_tests();
 
-        assert!(after_first >= before);
-        assert_eq!(after_first, after_second);
+        // ~keep Asserted per-path, not on the global library count. LOADED_LIBRARIES is keyed by
+        // ~keep path, so a redundant dlopen would REPLACE the same key and leave the count
+        // ~keep unchanged — the previous count comparison could not observe the property this test
+        // ~keep is named for, and raced with every other test that loads a grammar.
+        assert!(
+            dynamic::library_is_loaded_for_tests(&lib_path),
+            "second registry must reuse the cached library rather than evict it"
+        );
         assert_eq!(first_language.abi_version(), second_language.abi_version());
     }
 
