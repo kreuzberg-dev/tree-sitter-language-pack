@@ -5,7 +5,8 @@
 use std::ops::Range;
 
 use memchr::memchr;
-use tree_sitter::TreeCursor;
+
+use crate::intel::walk::{Descend, MAX_TREE_DEPTH, walk_bounded};
 
 /// Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
 /// Returns a list of `(start_byte, end_byte)` ranges.
@@ -36,6 +37,9 @@ use tree_sitter::TreeCursor;
 /// exceeds that limit).
 #[cfg_attr(alef, alef(skip))]
 pub fn split_code(source: &str, tree: &tree_sitter::Tree, max_chunk_size: usize) -> Vec<(usize, usize)> {
+    // ~keep `max_chunk_size == 0` is unreachable through `process()`: `ProcessConfig::validate`
+    // ~keep rejects it with `InvalidRange` rather than letting it silently discard the source.
+    // ~keep The guard stays as a defence for direct in-crate callers.
     if source.is_empty() || max_chunk_size == 0 {
         return Vec::new();
     }
@@ -44,7 +48,17 @@ pub fn split_code(source: &str, tree: &tree_sitter::Tree, max_chunk_size: usize)
         return vec![(0, source.len())];
     }
 
-    let node_ranges = collect_node_ranges(tree.walk());
+    let root = tree.root_node();
+    let (node_ranges, truncated) = collect_node_ranges(&root);
+    if truncated > 0 {
+        tracing::warn!(
+            target: "ts_pack::intel",
+            operation = "text_splitter::split_code",
+            max_depth = MAX_TREE_DEPTH,
+            skipped_nodes = truncated,
+            "AST deeper than the traversal depth limit; splits below the limit fall back to line boundaries"
+        );
+    }
 
     let max_depth = node_ranges.iter().map(|nr| nr.depth).max().unwrap_or(0);
 
@@ -82,41 +96,25 @@ struct NodeRange {
 /// Walk the tree depth-first and collect every node (except the root) with its
 /// depth and byte range. This mirrors the `CursorOffsets` iterator from
 /// text-splitter.
-fn collect_node_ranges(cursor: TreeCursor<'_>) -> Vec<NodeRange> {
+///
+/// Returns the ranges plus the number of nodes dropped for sitting deeper than
+/// [`MAX_TREE_DEPTH`]. That cap is what bounds `split_recursive` below: it
+/// recurses once per distinct depth level, so an unbounded AST depth is an
+/// unbounded native stack, and a Rust stack overflow aborts the process in a way
+/// `catch_unwind` at the FFI boundary cannot contain. ~keep
+fn collect_node_ranges(root: &tree_sitter::Node<'_>) -> (Vec<NodeRange>, usize) {
     let mut ranges = Vec::new();
-    let mut cursor = cursor;
-
-    if !cursor.goto_first_child() {
-        return ranges;
-    }
-
-    ranges.push(NodeRange {
-        depth: cursor.depth() as usize,
-        range: cursor.node().byte_range(),
-    });
-
-    loop {
-        if cursor.goto_first_child() {
+    let truncated = walk_bounded(root, |node, depth| {
+        // ~keep Depth 0 is the root; split boundaries only ever come from its descendants.
+        if depth > 0 {
             ranges.push(NodeRange {
-                depth: cursor.depth() as usize,
-                range: cursor.node().byte_range(),
+                depth,
+                range: node.byte_range(),
             });
-            continue;
         }
-
-        loop {
-            if cursor.goto_next_sibling() {
-                ranges.push(NodeRange {
-                    depth: cursor.depth() as usize,
-                    range: cursor.node().byte_range(),
-                });
-                break;
-            }
-            if !cursor.goto_parent() {
-                return ranges;
-            }
-        }
-    }
+        Descend::Children
+    });
+    (ranges, truncated)
 }
 
 /// Recursively split the region `[region_start, region_end)` of `source` into
@@ -305,6 +303,20 @@ mod tests {
         parser.parse(source, None)
     }
 
+    /// Parse with a grammar that actually nests bracket expressions.
+    ///
+    /// `test_parser` takes whichever language sorts first, and most grammars
+    /// flatten a bare `[[[...]]]` run into a shallow ERROR node — so a depth
+    /// test built on it silently measures nothing. ~keep
+    fn parse_deep_or_skip(source: &str) -> Option<tree_sitter::Tree> {
+        let language = ["json", "javascript", "python"]
+            .iter()
+            .find_map(|name| crate::get_language(name).ok())?;
+        let mut parser = tree_sitter::Parser::new();
+        parser.set_language(&language).ok()?;
+        parser.parse(source, None)
+    }
+
     #[test]
     fn empty_source_returns_empty_vec() {
         if let Some(tree) = parse_or_skip("x") {
@@ -387,7 +399,8 @@ mod tests {
     fn collect_node_ranges_depth_first() {
         let source = "fn main() {\n    let x = 5;\n}";
         if let Some(tree) = parse_or_skip(source) {
-            let ranges = collect_node_ranges(tree.walk());
+            let (ranges, truncated) = collect_node_ranges(&tree.root_node());
+            assert_eq!(truncated, 0, "a shallow tree must not truncate");
             for nr in &ranges {
                 assert!(nr.range.start <= source.len());
                 assert!(nr.range.end <= source.len());
@@ -395,6 +408,27 @@ mod tests {
                 assert!(nr.depth >= 1);
             }
         }
+    }
+
+    #[test]
+    fn should_bound_collected_depth_so_splitting_deep_input_cannot_overflow_the_stack() {
+        // ~keep Brackets must balance: an unclosed run parses to one flat ERROR node, not a deep tree.
+        let nesting = MAX_TREE_DEPTH + 200;
+        let source = format!("{}1{}", "[".repeat(nesting), "]".repeat(nesting));
+        let Some(tree) = parse_deep_or_skip(&source) else { return };
+
+        let (ranges, truncated) = collect_node_ranges(&tree.root_node());
+        assert!(truncated > 0, "input deeper than the limit must report skipped nodes");
+        assert_eq!(
+            ranges.iter().map(|nr| nr.depth).max(),
+            Some(MAX_TREE_DEPTH),
+            "collected depth must stop exactly at the limit"
+        );
+
+        // ~keep `split_recursive` recurses once per depth level; before the cap this aborted.
+        let chunks = split_code(&source, &tree, 64);
+        let joined: String = chunks.iter().map(|&(s, e)| &source[s..e]).collect();
+        assert_eq!(joined, source, "chunks must still cover the entire source");
     }
 
     #[test]

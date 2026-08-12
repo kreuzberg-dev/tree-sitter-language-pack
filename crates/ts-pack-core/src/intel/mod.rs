@@ -7,8 +7,12 @@
 pub mod chunking;
 pub(crate) mod data_extraction;
 pub(crate) mod elixir;
+pub(crate) mod extract;
 pub mod intelligence;
+#[cfg(test)]
+mod legacy;
 pub mod types;
+pub(crate) mod walk;
 
 pub use types::*;
 
@@ -20,36 +24,27 @@ pub fn process(
     config: &ProcessConfig,
     registry: &crate::LanguageRegistry,
 ) -> Result<ProcessResult, crate::Error> {
-    let (lang, tree) = parse_source(source, &config.language, registry)?;
+    let (lang, tree) = parse_source(source, config, registry)?;
     let root = tree.root_node();
 
     let mut result = ProcessResult {
         language: config.language.as_ref().to_string(),
-        metrics: intelligence::compute_metrics(source, &root),
+        metrics: intelligence::compute_line_metrics(source),
         ..Default::default()
     };
 
-    if config.structure {
-        result.structure = intelligence::extract_structure(&root, source, &config.language);
-    }
-    if config.imports {
-        result.imports = intelligence::extract_imports(&root, source, &config.language);
-    }
-    if config.exports {
-        result.exports = intelligence::extract_exports(&root, source, &config.language);
-    }
-    if config.comments {
-        result.comments = intelligence::extract_comments(&root, source, &config.language);
-    }
-    if config.docstrings {
-        result.docstrings = intelligence::extract_docstrings(&root, source, &config.language);
-    }
-    if config.symbols {
-        result.symbols = intelligence::extract_symbols(&root, source, &config.language);
-    }
-    if config.diagnostics {
-        result.diagnostics = intelligence::extract_diagnostics(&root, source);
-    }
+    // ~keep All enabled extractors share one depth-bounded walk; see `intel::extract`.
+    let wanted = extract::Wanted {
+        structure: config.structure,
+        imports: config.imports,
+        exports: config.exports,
+        comments: config.comments,
+        docstrings: config.docstrings,
+        symbols: config.symbols,
+        diagnostics: config.diagnostics,
+    };
+    extract::extract_all(&root, source, &config.language, wanted, &mut result);
+
     if let Some(max_size) = config.chunk_max_size {
         result.chunks = chunking::chunk_source(source, &config.language, max_size, &lang, &tree);
     }
@@ -66,22 +61,244 @@ pub fn process(
 /// every call.
 fn parse_source(
     source: &str,
-    language: &str,
+    config: &ProcessConfig,
     registry: &crate::LanguageRegistry,
 ) -> Result<(tree_sitter::Language, tree_sitter::Tree), crate::Error> {
-    let lang = registry.get_language(language)?;
-    let tree = crate::parse::parse_with_language(language, &lang, source.as_bytes())?;
+    let lang = registry.get_language(&config.language)?;
+    let tree = crate::parse::parse_with_language_limited(
+        &config.language,
+        &lang,
+        source.as_bytes(),
+        config.parse_timeout_ms,
+    )?;
     Ok((lang, tree))
 }
 
 #[cfg(test)]
 mod tests {
+    // ~keep These tests report a skip on stderr rather than passing silently when no grammar loads.
+    #![allow(clippy::print_stderr)]
+
     use crate::LanguageRegistry;
     use crate::process_config::ProcessConfig;
+
+    use super::walk::MAX_TREE_DEPTH;
+
+    /// Source samples chosen to exercise every extractor and every non-uniform
+    /// walk shape: nested structure bodies, Ruby module/class/method nesting,
+    /// Elixir `quote` pruning and compact `do:` bodies, JS exports, Python
+    /// docstrings, and error recovery.
+    const EQUIVALENCE_CORPUS: &[(&str, &str)] = &[
+        (
+            "python",
+            "import os\nfrom sys import path\n\n\"\"\"Module doc.\"\"\"\n\nclass Widget:\n    \"\"\"Widget doc.\"\"\"\n\n    def render(self):\n        # inline\n        def inner():\n            pass\n        return inner\n\ndef top():\n    pass\n",
+        ),
+        ("python", "def :\n    pass\nclass ???:\n"),
+        (
+            "rust",
+            "//! Crate doc\nuse std::collections::HashMap;\nuse std::io;\n\n/// Documented\npub struct Config { pub name: String }\n\ntrait Render { fn render(&self); }\n\nimpl Render for Config {\n    /// method doc\n    fn render(&self) {\n        let x = 5;\n        const Y: u8 = 1;\n    }\n}\n\nmod inner {\n    enum Kind { A, B }\n    fn helper() {}\n}\n",
+        ),
+        (
+            "ruby",
+            "module Outer\n  # a comment\n  class Widget\n    def call\n      true\n    end\n\n    def self.build\n      new\n    end\n  end\nend\n",
+        ),
+        (
+            "elixir",
+            "defmodule Calc do\n  import Enum\n  alias Foo.Bar\n\n  defstruct [do: (def fake, do: 1)]\n\n  defmacro gen do\n    quote do\n      import Should.Not.Appear\n      def generated, do: :ok\n    end\n  end\n\n  def add(a, b), do: a + b\n\n  defp helper(x) do\n    x * 2\n  end\n\n  defmodule Inner do\n    def f, do: 1\n  end\nend\n",
+        ),
+        ("elixir", "defmodule M, [do: (def f, do: 1)]\n"),
+        (
+            "javascript",
+            "import fs from 'node:fs';\nexport default function main() {}\nexport { a, b };\nexport * from './other.js';\nclass Thing {\n  method() {\n    const arrow = () => 1;\n    return arrow;\n  }\n}\n",
+        ),
+        // ~keep A matched node descends into its `body` only: the arrow functions in the
+        // ~keep parameter list and the heritage clause must not become nested items.
+        (
+            "javascript",
+            "function outer(cb = () => 1, fallback = () => 2) {\n  const inner = () => 3;\n  return inner;\n}\nclass Sub extends mixin(() => 4) {\n  method(handler = () => 5) {}\n}\n",
+        ),
+        (
+            "typescript",
+            "import type { A } from './a';\nexport interface Shape { x: number }\ntype Alias = string;\nexport class Impl implements Shape {\n  x = 1;\n  method(): void {}\n}\n",
+        ),
+        (
+            "go",
+            "package main\n\nimport (\n\t\"fmt\"\n\t\"os\"\n)\n\ntype User struct{}\ntype Service interface{}\ntype ID string\n\nfunc main() {\n\tfmt.Println(os.Args)\n}\n",
+        ),
+        (
+            "java",
+            "package com.example;\n\nimport java.util.List;\n\n/** doc */\npublic class Widget {\n    enum Kind { A }\n    interface Inner {}\n    public void run() {}\n}\n",
+        ),
+        (
+            "kotlin",
+            "package foo.bar\n\nimport kotlin.math.abs\n\nclass Widget {\n    fun run() {}\n}\n",
+        ),
+    ];
 
     fn first_lang(registry: &LanguageRegistry) -> Option<String> {
         let langs = registry.available_languages();
         langs.into_iter().next()
+    }
+
+    fn parse(source: &str, language: &str, registry: &LanguageRegistry) -> tree_sitter::Tree {
+        let lang = registry
+            .get_language(language)
+            .unwrap_or_else(|e| panic!("grammar '{language}' must be loadable: {e}"));
+        let mut parser = tree_sitter::Parser::new();
+        parser.set_language(&lang).expect("language must be settable");
+        parser.parse(source, None).expect("source must parse")
+    }
+
+    /// The single bounded traversal must produce exactly what the eight
+    /// independent recursive walks produced, for every extractor.
+    #[test]
+    fn should_match_the_reference_walks_on_normal_input() {
+        let registry = LanguageRegistry::new();
+        if registry.available_languages().is_empty() {
+            eprintln!("SKIPPED should_match_the_reference_walks_on_normal_input: no grammars available");
+            return;
+        }
+
+        let mut checked = 0usize;
+        for (language, source) in EQUIVALENCE_CORPUS {
+            let tree = parse(source, language, &registry);
+            let actual = super::intelligence::extract_intelligence(source, language, &tree);
+            let expected = super::legacy::extract_intelligence(source, language, &tree);
+
+            assert_eq!(actual.metrics, expected.metrics, "metrics differ for {language}");
+            assert_eq!(actual.structure, expected.structure, "structure differs for {language}");
+            assert_eq!(actual.imports, expected.imports, "imports differ for {language}");
+            assert_eq!(actual.exports, expected.exports, "exports differ for {language}");
+            assert_eq!(actual.comments, expected.comments, "comments differ for {language}");
+            assert_eq!(
+                actual.docstrings, expected.docstrings,
+                "docstrings differ for {language}"
+            );
+            assert_eq!(actual.symbols, expected.symbols, "symbols differ for {language}");
+            assert_eq!(
+                actual.diagnostics, expected.diagnostics,
+                "diagnostics differ for {language}"
+            );
+            checked += 1;
+        }
+
+        assert_eq!(
+            checked,
+            EQUIVALENCE_CORPUS.len(),
+            "every corpus entry must have been compared, not skipped"
+        );
+    }
+
+    /// Chunk metadata comes from the same bounded walk and must also be unchanged.
+    #[test]
+    fn should_match_the_reference_chunk_metadata_walk() {
+        let registry = LanguageRegistry::new();
+        if registry.get_language("python").is_err() {
+            eprintln!("SKIPPED should_match_the_reference_chunk_metadata_walk: no python grammar");
+            return;
+        }
+        let source =
+            "# lead\ndef alpha():\n    \"\"\"doc\"\"\"\n    pass\n\nclass Beta:\n    def gamma(self):\n        pass\n";
+        let config = ProcessConfig::new("python").all().with_chunking(30);
+        let result = super::process(source, &config, &registry).expect("process must succeed");
+
+        assert!(result.chunks.len() >= 2, "the sample must actually split into chunks");
+        let tree = parse(source, "python", &registry);
+        let root = tree.root_node();
+
+        for chunk in &result.chunks {
+            let mut node_types = Vec::new();
+            let mut symbols = Vec::new();
+            let mut comments = Vec::new();
+            let mut docstrings = Vec::new();
+            let mut has_errors = false;
+            let mut context_path = Vec::new();
+            let mut collector = super::chunking::MetadataCollector {
+                node_types: &mut node_types,
+                symbols: &mut symbols,
+                comments: &mut comments,
+                docstrings: &mut docstrings,
+                has_errors: &mut has_errors,
+                context_path: &mut context_path,
+            };
+            super::legacy::collect_chunk_metadata(&root, source, chunk.start_byte, chunk.end_byte, &mut collector, 0);
+
+            assert_eq!(chunk.metadata.node_types, node_types, "node_types differ");
+            assert_eq!(chunk.metadata.symbols_defined, symbols, "symbols differ");
+            assert_eq!(chunk.metadata.comments, comments, "comments differ");
+            assert_eq!(chunk.metadata.has_error_nodes, has_errors, "error flag differs");
+            assert_eq!(chunk.metadata.context_path, context_path, "context_path differs");
+        }
+    }
+
+    /// A 50,000-level nesting used to abort the process with a stack overflow
+    /// that `catch_unwind` could not contain. It must now return a truncated
+    /// result (WARN-level, degraded but continuing).
+    ///
+    /// The brackets must be balanced: an unclosed run of `[` parses to a single
+    /// flat ERROR node in the Python grammar (measured `max_depth` 1), so it
+    /// never reproduced the overflow in the first place.
+    #[test]
+    fn should_truncate_instead_of_aborting_on_deeply_nested_input() {
+        let registry = LanguageRegistry::new();
+        if registry.get_language("python").is_err() {
+            eprintln!("SKIPPED should_truncate_instead_of_aborting_on_deeply_nested_input: no python grammar");
+            return;
+        }
+        const NESTING: usize = 50_000;
+        let source = format!("{}1{}", "[".repeat(NESTING), "]".repeat(NESTING));
+        // ~keep Chunking is on deliberately: `text_splitter::collect_node_ranges` is now depth-
+        // ~keep bounded too, so this input must survive the chunking path as well as the walk.
+        let config = ProcessConfig::new("python").all().with_chunking(4096);
+
+        let result = super::process(&source, &config, &registry).expect("deep input must not error");
+
+        assert_eq!(
+            result.metrics.max_depth, MAX_TREE_DEPTH,
+            "the walk must stop at the depth limit rather than following the tree"
+        );
+        // ~keep The full tree has at least one node per nesting level; a bounded walk sees far fewer.
+        assert!(
+            result.metrics.node_count < NESTING,
+            "a truncated walk must not have visited the whole tree; visited {} of >{NESTING} nodes",
+            result.metrics.node_count
+        );
+        assert_eq!(
+            result.metrics.total_bytes,
+            source.len(),
+            "metrics still describe the file"
+        );
+    }
+
+    /// Data extraction keeps its own per-format recursion, so it needs its own
+    /// deep-input regression.
+    #[test]
+    fn should_truncate_deeply_nested_data_instead_of_aborting() {
+        let registry = LanguageRegistry::new();
+        if registry.get_language("json").is_err() {
+            eprintln!("SKIPPED should_truncate_deeply_nested_data_instead_of_aborting: no json grammar");
+            return;
+        }
+        let depth = 20_000;
+        let source = format!("{}1{}", "[".repeat(depth), "]".repeat(depth));
+        let config = ProcessConfig::new("json").all().with_data_extraction(true);
+
+        let result = super::process(&source, &config, &registry).expect("deep JSON must not error");
+
+        let mut node = result.data.as_ref().expect("json must yield a data tree");
+        let mut levels = 1usize;
+        while let Some(child) = node.children.first() {
+            node = child;
+            levels += 1;
+        }
+        assert!(
+            levels <= MAX_TREE_DEPTH + 1,
+            "data tree must be truncated at the depth limit; got {levels} levels"
+        );
+        assert!(
+            levels > MAX_TREE_DEPTH / 2,
+            "the input must actually have reached the limit, not stopped early; got {levels} levels"
+        );
     }
 
     #[test]

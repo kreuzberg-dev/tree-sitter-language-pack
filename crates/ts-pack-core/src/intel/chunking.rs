@@ -2,6 +2,7 @@ use memchr::memchr_iter;
 use tree_sitter::{Language, Tree};
 
 use super::types::*;
+use super::walk::{Descend, walk_bounded, warn_if_truncated};
 
 /// Chunk source code and produce rich metadata per chunk.
 ///
@@ -19,8 +20,9 @@ pub fn chunk_source(
     let root = tree.root_node();
 
     let newline_positions: Vec<usize> = memchr_iter(b'\n', source.as_bytes()).collect();
+    let mut truncated = 0usize;
 
-    raw_chunks
+    let chunks: Vec<CodeChunk> = raw_chunks
         .into_iter()
         .enumerate()
         .map(|(idx, (start_byte, end_byte))| {
@@ -43,7 +45,7 @@ pub fn chunk_source(
                 has_errors: &mut has_error_nodes,
                 context_path: &mut context_path,
             };
-            collect_chunk_metadata(&root, source, start_byte, end_byte, &mut collector, 0);
+            truncated += collect_chunk_metadata(&root, source, start_byte, end_byte, &mut collector);
 
             CodeChunk {
                 content: content.to_string(),
@@ -64,7 +66,10 @@ pub fn chunk_source(
                 },
             }
         })
-        .collect()
+        .collect();
+
+    warn_if_truncated(truncated, "intel::chunking", language);
+    chunks
 }
 
 fn span_from_node(node: &tree_sitter::Node) -> Span {
@@ -85,16 +90,38 @@ fn node_text<'a>(node: &tree_sitter::Node, source: &'a str) -> &'a str {
 }
 
 #[allow(dead_code)]
-struct MetadataCollector<'a> {
-    node_types: &'a mut Vec<String>,
-    symbols: &'a mut Vec<String>,
-    comments: &'a mut Vec<CommentInfo>,
-    docstrings: &'a mut Vec<DocstringInfo>,
-    has_errors: &'a mut bool,
-    context_path: &'a mut Vec<String>,
+pub(super) struct MetadataCollector<'a> {
+    pub(super) node_types: &'a mut Vec<String>,
+    pub(super) symbols: &'a mut Vec<String>,
+    pub(super) comments: &'a mut Vec<CommentInfo>,
+    pub(super) docstrings: &'a mut Vec<DocstringInfo>,
+    pub(super) has_errors: &'a mut bool,
+    pub(super) context_path: &'a mut Vec<String>,
 }
 
+/// Collect metadata for one chunk from the nodes that overlap it.
+///
+/// Returns the number of nodes dropped because the tree was deeper than the
+/// traversal limit. Nodes that do not overlap the chunk prune their subtree,
+/// exactly as the previous recursive early return did.
 fn collect_chunk_metadata(
+    root: &tree_sitter::Node,
+    source: &str,
+    chunk_start: usize,
+    chunk_end: usize,
+    collector: &mut MetadataCollector<'_>,
+) -> usize {
+    walk_bounded(root, |node, depth| {
+        if node.end_byte() <= chunk_start || node.start_byte() >= chunk_end {
+            return Descend::Skip;
+        }
+        record_chunk_node(node, source, chunk_start, chunk_end, collector, depth);
+        Descend::Children
+    })
+}
+
+/// Record one node's contribution to a chunk's metadata.
+pub(super) fn record_chunk_node(
     node: &tree_sitter::Node,
     source: &str,
     chunk_start: usize,
@@ -102,10 +129,6 @@ fn collect_chunk_metadata(
     collector: &mut MetadataCollector<'_>,
     depth: usize,
 ) {
-    if node.end_byte() <= chunk_start || node.start_byte() >= chunk_end {
-        return;
-    }
-
     let kind = node.kind();
 
     if depth <= 1
@@ -174,11 +197,6 @@ fn collect_chunk_metadata(
             span: span_from_node(node),
             associated_node: node.next_named_sibling().map(|n| n.kind().to_string()),
         });
-    }
-
-    let mut cursor = node.walk();
-    for child in node.children(&mut cursor) {
-        collect_chunk_metadata(&child, source, chunk_start, chunk_end, collector, depth + 1);
     }
 }
 

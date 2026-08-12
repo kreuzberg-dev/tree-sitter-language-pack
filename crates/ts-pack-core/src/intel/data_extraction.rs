@@ -23,6 +23,21 @@
 use tree_sitter::Node;
 
 use super::types::{DataAttribute, DataNode, DataNodeKind, Span};
+use super::walk::{MAX_TREE_DEPTH, warn_if_truncated};
+
+/// Whether `depth` has reached the traversal limit, in which case `node`'s
+/// subtree is dropped and counted.
+///
+/// These per-format builders mirror the shape of the data they produce, so they
+/// stay recursive; the guard is what keeps the recursion off the stack cliff.
+/// See [`super::walk`] for how [`MAX_TREE_DEPTH`] was chosen.
+fn depth_exceeded(node: &Node, depth: usize, truncated: &mut usize) -> bool {
+    if depth < MAX_TREE_DEPTH {
+        return false;
+    }
+    *truncated += node.descendant_count();
+    true
+}
 
 /// Extract a hierarchical data tree from a parsed data-format source file.
 ///
@@ -36,23 +51,26 @@ use super::types::{DataAttribute, DataNode, DataNodeKind, Span};
 /// * `source` — The original source text (used for byte-range slices).
 /// * `language` — Language name as recognised by the registry (e.g. `"json"`).
 pub(crate) fn extract_data(root: &Node, source: &str, language: &str) -> Option<DataNode> {
-    match language {
-        "json" | "hjson" | "json5" => extract_json(root, source),
-        "toml" => extract_toml(root, source),
+    let truncated = &mut 0usize;
+    let extracted = match language {
+        "json" | "hjson" | "json5" => extract_json(root, source, truncated),
+        "toml" => extract_toml(root, source, truncated),
         "properties" => extract_properties(root, source),
-        "hcl" | "hocon" => extract_hcl(root, source),
-        "kdl" => extract_kdl(root, source),
-        "cue" => extract_cue(root, source),
-        "yaml" => extract_yaml(root, source),
-        "ini" | "editorconfig" => extract_ini(root, source),
+        "hcl" | "hocon" => extract_hcl(root, source, truncated),
+        "kdl" => extract_kdl(root, source, truncated),
+        "cue" => extract_cue(root, source, truncated),
+        "yaml" => extract_yaml(root, source, truncated),
+        "ini" | "editorconfig" => extract_ini(root, source, truncated),
         "csv" | "psv" => extract_csv(root, source),
         "po" => extract_po(root, source),
-        "nginx" => extract_nginx(root, source),
-        "caddy" => extract_caddy(root, source),
-        "xml" => extract_xml(root, source),
+        "nginx" => extract_nginx(root, source, truncated),
+        "caddy" => extract_caddy(root, source, truncated),
+        "xml" => extract_xml(root, source, truncated),
         "dtd" => extract_dtd(root, source),
         _ => None,
-    }
+    };
+    warn_if_truncated(*truncated, "intel::data_extraction", language);
+    extracted
 }
 
 fn span_from_node(node: &Node) -> Span {
@@ -90,10 +108,10 @@ fn named_child_of_kind<'a>(node: &Node<'a>, kind: &str) -> Option<Node<'a>> {
     node.named_children(&mut cursor).find(|c| c.kind() == kind)
 }
 
-fn extract_json(root: &Node, source: &str) -> Option<DataNode> {
+fn extract_json(root: &Node, source: &str, truncated: &mut usize) -> Option<DataNode> {
     let mut cursor = root.walk();
     for child in root.named_children(&mut cursor) {
-        let node = json_value_node(&child, source, None);
+        let node = json_value_node(&child, source, None, 0, truncated);
         if node.is_some() {
             return node;
         }
@@ -108,10 +126,19 @@ fn extract_json(root: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn json_value_node(node: &Node, source: &str, key: Option<String>) -> Option<DataNode> {
+fn json_value_node(
+    node: &Node,
+    source: &str,
+    key: Option<String>,
+    depth: usize,
+    truncated: &mut usize,
+) -> Option<DataNode> {
+    if depth_exceeded(node, depth, truncated) {
+        return None;
+    }
     match node.kind() {
         "object" => {
-            let children = json_object_children(node, source);
+            let children = json_object_children(node, source, depth + 1, truncated);
             Some(DataNode {
                 kind: DataNodeKind::KeyValue,
                 key,
@@ -122,7 +149,7 @@ fn json_value_node(node: &Node, source: &str, key: Option<String>) -> Option<Dat
             })
         }
         "array" => {
-            let children = json_array_children(node, source);
+            let children = json_array_children(node, source, depth + 1, truncated);
             Some(DataNode {
                 kind: DataNodeKind::Sequence,
                 key,
@@ -138,7 +165,7 @@ fn json_value_node(node: &Node, source: &str, key: Option<String>) -> Option<Dat
                 .map(|n| strip_quotes(node_text(&n, source)).to_string());
             let v_node = node.child_by_field_name("value");
             if let Some(v) = v_node {
-                json_value_node(&v, source, k)
+                json_value_node(&v, source, k, depth + 1, truncated)
             } else {
                 None
             }
@@ -155,12 +182,12 @@ fn json_value_node(node: &Node, source: &str, key: Option<String>) -> Option<Dat
     }
 }
 
-fn json_object_children(node: &Node, source: &str) -> Vec<DataNode> {
+fn json_object_children(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Vec<DataNode> {
     let mut result = Vec::new();
     let mut cursor = node.walk();
     for child in node.named_children(&mut cursor) {
         if child.kind() == "pair"
-            && let Some(n) = json_value_node(&child, source, None)
+            && let Some(n) = json_value_node(&child, source, None, depth, truncated)
         {
             result.push(n);
         }
@@ -168,20 +195,20 @@ fn json_object_children(node: &Node, source: &str) -> Vec<DataNode> {
     result
 }
 
-fn json_array_children(node: &Node, source: &str) -> Vec<DataNode> {
+fn json_array_children(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Vec<DataNode> {
     let mut result = Vec::new();
     let mut cursor = node.walk();
     for (idx, child) in node.named_children(&mut cursor).enumerate() {
         let key = Some(idx.to_string());
-        if let Some(n) = json_value_node(&child, source, key) {
+        if let Some(n) = json_value_node(&child, source, key, depth, truncated) {
             result.push(n);
         }
     }
     result
 }
 
-fn extract_toml(root: &Node, source: &str) -> Option<DataNode> {
-    let children = toml_body_children(root, source);
+fn extract_toml(root: &Node, source: &str, truncated: &mut usize) -> Option<DataNode> {
+    let children = toml_body_children(root, source, 0, truncated);
     Some(DataNode {
         kind: DataNodeKind::KeyValue,
         key: None,
@@ -192,23 +219,26 @@ fn extract_toml(root: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn toml_body_children(node: &Node, source: &str) -> Vec<DataNode> {
+fn toml_body_children(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Vec<DataNode> {
     let mut result = Vec::new();
+    if depth_exceeded(node, depth, truncated) {
+        return result;
+    }
     let mut cursor = node.walk();
     for child in node.named_children(&mut cursor) {
         match child.kind() {
             "pair" => {
-                if let Some(n) = toml_pair_node(&child, source) {
+                if let Some(n) = toml_pair_node(&child, source, depth + 1, truncated) {
                     result.push(n);
                 }
             }
             "table" => {
-                if let Some(n) = toml_table_node(&child, source) {
+                if let Some(n) = toml_table_node(&child, source, depth + 1, truncated) {
                     result.push(n);
                 }
             }
             "table_array_element" => {
-                if let Some(n) = toml_table_array_node(&child, source) {
+                if let Some(n) = toml_table_array_node(&child, source, depth + 1, truncated) {
                     result.push(n);
                 }
             }
@@ -218,7 +248,10 @@ fn toml_body_children(node: &Node, source: &str) -> Vec<DataNode> {
     result
 }
 
-fn toml_pair_node(node: &Node, source: &str) -> Option<DataNode> {
+fn toml_pair_node(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Option<DataNode> {
+    if depth_exceeded(node, depth, truncated) {
+        return None;
+    }
     let mut cursor = node.walk();
     let named: Vec<Node> = node.named_children(&mut cursor).collect();
     if named.is_empty() {
@@ -237,13 +270,22 @@ fn toml_pair_node(node: &Node, source: &str) -> Option<DataNode> {
         });
     }
     let val_node = &named[named.len() - 1];
-    toml_value_node(val_node, source, Some(key))
+    toml_value_node(val_node, source, Some(key), depth + 1, truncated)
 }
 
-fn toml_value_node(node: &Node, source: &str, key: Option<String>) -> Option<DataNode> {
+fn toml_value_node(
+    node: &Node,
+    source: &str,
+    key: Option<String>,
+    depth: usize,
+    truncated: &mut usize,
+) -> Option<DataNode> {
+    if depth_exceeded(node, depth, truncated) {
+        return None;
+    }
     match node.kind() {
         "inline_table" => {
-            let children = toml_body_children(node, source);
+            let children = toml_body_children(node, source, depth + 1, truncated);
             Some(DataNode {
                 kind: DataNodeKind::KeyValue,
                 key,
@@ -257,7 +299,7 @@ fn toml_value_node(node: &Node, source: &str, key: Option<String>) -> Option<Dat
             let mut result = Vec::new();
             let mut cursor = node.walk();
             for (idx, child) in node.named_children(&mut cursor).enumerate() {
-                if let Some(n) = toml_value_node(&child, source, Some(idx.to_string())) {
+                if let Some(n) = toml_value_node(&child, source, Some(idx.to_string()), depth + 1, truncated) {
                     result.push(n);
                 }
             }
@@ -281,7 +323,10 @@ fn toml_value_node(node: &Node, source: &str, key: Option<String>) -> Option<Dat
     }
 }
 
-fn toml_table_node(node: &Node, source: &str) -> Option<DataNode> {
+fn toml_table_node(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Option<DataNode> {
+    if depth_exceeded(node, depth, truncated) {
+        return None;
+    }
     let mut cursor = node.walk();
     let named: Vec<Node> = node.named_children(&mut cursor).collect();
     if named.is_empty() {
@@ -291,7 +336,7 @@ fn toml_table_node(node: &Node, source: &str) -> Option<DataNode> {
     let children: Vec<DataNode> = named[1..]
         .iter()
         .filter(|c| c.kind() == "pair")
-        .filter_map(|c| toml_pair_node(c, source))
+        .filter_map(|c| toml_pair_node(c, source, depth + 1, truncated))
         .collect();
     Some(DataNode {
         kind: DataNodeKind::KeyValue,
@@ -303,7 +348,10 @@ fn toml_table_node(node: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn toml_table_array_node(node: &Node, source: &str) -> Option<DataNode> {
+fn toml_table_array_node(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Option<DataNode> {
+    if depth_exceeded(node, depth, truncated) {
+        return None;
+    }
     let mut cursor = node.walk();
     let named: Vec<Node> = node.named_children(&mut cursor).collect();
     if named.is_empty() {
@@ -313,7 +361,7 @@ fn toml_table_array_node(node: &Node, source: &str) -> Option<DataNode> {
     let children: Vec<DataNode> = named[1..]
         .iter()
         .filter(|c| c.kind() == "pair")
-        .filter_map(|c| toml_pair_node(c, source))
+        .filter_map(|c| toml_pair_node(c, source, depth + 1, truncated))
         .collect();
     Some(DataNode {
         kind: DataNodeKind::Sequence,
@@ -360,8 +408,8 @@ fn properties_property_node(node: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn extract_hcl(root: &Node, source: &str) -> Option<DataNode> {
-    let children = hcl_body_children(root, source);
+fn extract_hcl(root: &Node, source: &str, truncated: &mut usize) -> Option<DataNode> {
+    let children = hcl_body_children(root, source, 0, truncated);
     Some(DataNode {
         kind: DataNodeKind::KeyValue,
         key: None,
@@ -372,8 +420,11 @@ fn extract_hcl(root: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn hcl_body_children(node: &Node, source: &str) -> Vec<DataNode> {
+fn hcl_body_children(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Vec<DataNode> {
     let mut result = Vec::new();
+    if depth_exceeded(node, depth, truncated) {
+        return result;
+    }
     let mut cursor = node.walk();
     for child in node.named_children(&mut cursor) {
         match child.kind() {
@@ -383,12 +434,12 @@ fn hcl_body_children(node: &Node, source: &str) -> Vec<DataNode> {
                 }
             }
             "block" => {
-                if let Some(n) = hcl_block_node(&child, source) {
+                if let Some(n) = hcl_block_node(&child, source, depth + 1, truncated) {
                     result.push(n);
                 }
             }
             "body" => {
-                result.extend(hcl_body_children(&child, source));
+                result.extend(hcl_body_children(&child, source, depth + 1, truncated));
             }
             "pair" => {
                 if let Some(n) = hocon_pair_node(&child, source) {
@@ -419,7 +470,10 @@ fn hcl_attribute_node(node: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn hcl_block_node(node: &Node, source: &str) -> Option<DataNode> {
+fn hcl_block_node(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Option<DataNode> {
+    if depth_exceeded(node, depth, truncated) {
+        return None;
+    }
     let mut cursor = node.walk();
     let named: Vec<Node> = node.named_children(&mut cursor).collect();
     if named.is_empty() {
@@ -438,7 +492,7 @@ fn hcl_block_node(node: &Node, source: &str) -> Option<DataNode> {
     let children = named
         .iter()
         .filter(|n| n.kind() == "body")
-        .flat_map(|body| hcl_body_children(body, source))
+        .flat_map(|body| hcl_body_children(body, source, depth + 1, truncated))
         .collect();
     Some(DataNode {
         kind: DataNodeKind::KeyValue,
@@ -468,8 +522,8 @@ fn hocon_pair_node(node: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn extract_kdl(root: &Node, source: &str) -> Option<DataNode> {
-    let children = kdl_node_children(root, source);
+fn extract_kdl(root: &Node, source: &str, truncated: &mut usize) -> Option<DataNode> {
+    let children = kdl_node_children(root, source, 0, truncated);
     Some(DataNode {
         kind: DataNodeKind::KeyValue,
         key: None,
@@ -480,12 +534,15 @@ fn extract_kdl(root: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn kdl_node_children(node: &Node, source: &str) -> Vec<DataNode> {
+fn kdl_node_children(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Vec<DataNode> {
     let mut result = Vec::new();
+    if depth_exceeded(node, depth, truncated) {
+        return result;
+    }
     let mut cursor = node.walk();
     for child in node.named_children(&mut cursor) {
         if child.kind() == "node"
-            && let Some(n) = kdl_single_node(&child, source)
+            && let Some(n) = kdl_single_node(&child, source, depth + 1, truncated)
         {
             result.push(n);
         }
@@ -493,7 +550,10 @@ fn kdl_node_children(node: &Node, source: &str) -> Vec<DataNode> {
     result
 }
 
-fn kdl_single_node(node: &Node, source: &str) -> Option<DataNode> {
+fn kdl_single_node(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Option<DataNode> {
+    if depth_exceeded(node, depth, truncated) {
+        return None;
+    }
     let key = node
         .child_by_field_name("name")
         .map(|n| node_text(&n, source).to_string())
@@ -516,7 +576,7 @@ fn kdl_single_node(node: &Node, source: &str) -> Option<DataNode> {
 
     let sub_children = node
         .child_by_field_name("children")
-        .map(|block| kdl_node_children(&block, source))
+        .map(|block| kdl_node_children(&block, source, depth + 1, truncated))
         .unwrap_or_default();
 
     Some(DataNode {
@@ -529,8 +589,8 @@ fn kdl_single_node(node: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn extract_cue(root: &Node, source: &str) -> Option<DataNode> {
-    let children = cue_body_children(root, source);
+fn extract_cue(root: &Node, source: &str, truncated: &mut usize) -> Option<DataNode> {
+    let children = cue_body_children(root, source, 0, truncated);
     Some(DataNode {
         kind: DataNodeKind::KeyValue,
         key: None,
@@ -541,8 +601,11 @@ fn extract_cue(root: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn cue_body_children(node: &Node, source: &str) -> Vec<DataNode> {
+fn cue_body_children(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Vec<DataNode> {
     let mut result = Vec::new();
+    if depth_exceeded(node, depth, truncated) {
+        return result;
+    }
     let mut cursor = node.walk();
     for child in node.named_children(&mut cursor) {
         match child.kind() {
@@ -552,7 +615,7 @@ fn cue_body_children(node: &Node, source: &str) -> Vec<DataNode> {
                 }
             }
             "struct_lit" | "source_file" => {
-                result.extend(cue_body_children(&child, source));
+                result.extend(cue_body_children(&child, source, depth + 1, truncated));
             }
             _ => {}
         }
@@ -584,8 +647,8 @@ fn cue_field_node(node: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn extract_yaml(root: &Node, source: &str) -> Option<DataNode> {
-    let children = yaml_children(root, source);
+fn extract_yaml(root: &Node, source: &str, truncated: &mut usize) -> Option<DataNode> {
+    let children = yaml_children(root, source, 0, truncated);
     Some(DataNode {
         kind: DataNodeKind::KeyValue,
         key: None,
@@ -596,28 +659,31 @@ fn extract_yaml(root: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn yaml_children(node: &Node, source: &str) -> Vec<DataNode> {
+fn yaml_children(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Vec<DataNode> {
     let mut result = Vec::new();
+    if depth_exceeded(node, depth, truncated) {
+        return result;
+    }
     let mut cursor = node.walk();
     for child in node.named_children(&mut cursor) {
         match child.kind() {
             "block_mapping_pair" | "flow_pair" => {
-                if let Some(n) = yaml_mapping_pair(&child, source) {
+                if let Some(n) = yaml_mapping_pair(&child, source, depth + 1, truncated) {
                     result.push(n);
                 }
             }
             "block_mapping" | "flow_mapping" => {
-                result.extend(yaml_children(&child, source));
+                result.extend(yaml_children(&child, source, depth + 1, truncated));
             }
             "block_sequence" => {
-                let items = yaml_sequence_items(&child, source);
+                let items = yaml_sequence_items(&child, source, depth + 1, truncated);
                 result.extend(items);
             }
             "document" | "block_node" | "flow_node" => {
-                result.extend(yaml_children(&child, source));
+                result.extend(yaml_children(&child, source, depth + 1, truncated));
             }
             "stream" => {
-                result.extend(yaml_children(&child, source));
+                result.extend(yaml_children(&child, source, depth + 1, truncated));
             }
             _ => {}
         }
@@ -625,7 +691,10 @@ fn yaml_children(node: &Node, source: &str) -> Vec<DataNode> {
     result
 }
 
-fn yaml_mapping_pair(node: &Node, source: &str) -> Option<DataNode> {
+fn yaml_mapping_pair(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Option<DataNode> {
+    if depth_exceeded(node, depth, truncated) {
+        return None;
+    }
     let key_node = node.child_by_field_name("key");
     let val_node = node.child_by_field_name("value");
 
@@ -637,7 +706,7 @@ fn yaml_mapping_pair(node: &Node, source: &str) -> Option<DataNode> {
     if let Some(val) = val_node {
         let val_kind = val.kind();
         if val_kind == "block_node" || val_kind == "flow_node" {
-            let sub = yaml_children(&val, source);
+            let sub = yaml_children(&val, source, depth + 1, truncated);
             if !sub.is_empty() {
                 return Some(DataNode {
                     kind: DataNodeKind::KeyValue,
@@ -670,12 +739,15 @@ fn yaml_mapping_pair(node: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn yaml_sequence_items(node: &Node, source: &str) -> Vec<DataNode> {
+fn yaml_sequence_items(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Vec<DataNode> {
     let mut result = Vec::new();
+    if depth_exceeded(node, depth, truncated) {
+        return result;
+    }
     let mut cursor = node.walk();
     for (idx, child) in node.named_children(&mut cursor).enumerate() {
         if child.kind() == "block_sequence_item" {
-            let sub = yaml_children(&child, source);
+            let sub = yaml_children(&child, source, depth + 1, truncated);
             let value = if sub.is_empty() {
                 let mut c2 = child.walk();
                 child
@@ -698,8 +770,8 @@ fn yaml_sequence_items(node: &Node, source: &str) -> Vec<DataNode> {
     result
 }
 
-fn extract_ini(root: &Node, source: &str) -> Option<DataNode> {
-    let children = ini_top_children(root, source);
+fn extract_ini(root: &Node, source: &str, truncated: &mut usize) -> Option<DataNode> {
+    let children = ini_top_children(root, source, 0, truncated);
     Some(DataNode {
         kind: DataNodeKind::KeyValue,
         key: None,
@@ -710,8 +782,11 @@ fn extract_ini(root: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn ini_top_children(node: &Node, source: &str) -> Vec<DataNode> {
+fn ini_top_children(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Vec<DataNode> {
     let mut result = Vec::new();
+    if depth_exceeded(node, depth, truncated) {
+        return result;
+    }
     let mut cursor = node.walk();
     for child in node.named_children(&mut cursor) {
         match child.kind() {
@@ -726,7 +801,7 @@ fn ini_top_children(node: &Node, source: &str) -> Vec<DataNode> {
                 }
             }
             "preamble" => {
-                result.extend(ini_top_children(&child, source));
+                result.extend(ini_top_children(&child, source, depth + 1, truncated));
             }
             _ => {}
         }
@@ -869,8 +944,8 @@ fn po_message_node(node: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn extract_nginx(root: &Node, source: &str) -> Option<DataNode> {
-    let children = nginx_body_children(root, source);
+fn extract_nginx(root: &Node, source: &str, truncated: &mut usize) -> Option<DataNode> {
+    let children = nginx_body_children(root, source, 0, truncated);
     Some(DataNode {
         kind: DataNodeKind::KeyValue,
         key: None,
@@ -881,8 +956,11 @@ fn extract_nginx(root: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn nginx_body_children(node: &Node, source: &str) -> Vec<DataNode> {
+fn nginx_body_children(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Vec<DataNode> {
     let mut result = Vec::new();
+    if depth_exceeded(node, depth, truncated) {
+        return result;
+    }
     let mut cursor = node.walk();
     for child in node.named_children(&mut cursor) {
         match child.kind() {
@@ -892,7 +970,7 @@ fn nginx_body_children(node: &Node, source: &str) -> Vec<DataNode> {
                 }
             }
             "block" | "http" | "events" | "server" | "location" | "map" | "if" => {
-                result.extend(nginx_body_children(&child, source));
+                result.extend(nginx_body_children(&child, source, depth + 1, truncated));
             }
             _ => {}
         }
@@ -923,8 +1001,8 @@ fn nginx_directive_node(node: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn extract_caddy(root: &Node, source: &str) -> Option<DataNode> {
-    let children = caddy_body_children(root, source);
+fn extract_caddy(root: &Node, source: &str, truncated: &mut usize) -> Option<DataNode> {
+    let children = caddy_body_children(root, source, 0, truncated);
     Some(DataNode {
         kind: DataNodeKind::KeyValue,
         key: None,
@@ -935,8 +1013,11 @@ fn extract_caddy(root: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn caddy_body_children(node: &Node, source: &str) -> Vec<DataNode> {
+fn caddy_body_children(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Vec<DataNode> {
     let mut result = Vec::new();
+    if depth_exceeded(node, depth, truncated) {
+        return result;
+    }
     let mut cursor = node.walk();
     for child in node.named_children(&mut cursor) {
         let kind = child.kind();
@@ -945,7 +1026,7 @@ fn caddy_body_children(node: &Node, source: &str) -> Vec<DataNode> {
                 result.push(n);
             }
         } else if kind == "server" || kind == "route" || kind == "block" {
-            result.extend(caddy_body_children(&child, source));
+            result.extend(caddy_body_children(&child, source, depth + 1, truncated));
         }
     }
     result
@@ -981,8 +1062,8 @@ fn caddy_directive_node(node: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn extract_xml(root: &Node, source: &str) -> Option<DataNode> {
-    let children = xml_node_children(root, source);
+fn extract_xml(root: &Node, source: &str, truncated: &mut usize) -> Option<DataNode> {
+    let children = xml_node_children(root, source, 0, truncated);
     Some(DataNode {
         kind: DataNodeKind::Element,
         key: None,
@@ -993,18 +1074,21 @@ fn extract_xml(root: &Node, source: &str) -> Option<DataNode> {
     })
 }
 
-fn xml_node_children(node: &Node, source: &str) -> Vec<DataNode> {
+fn xml_node_children(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Vec<DataNode> {
     let mut result = Vec::new();
+    if depth_exceeded(node, depth, truncated) {
+        return result;
+    }
     let mut cursor = node.walk();
     for child in node.named_children(&mut cursor) {
         match child.kind() {
             "element" => {
-                if let Some(n) = xml_element_node(&child, source) {
+                if let Some(n) = xml_element_node(&child, source, depth + 1, truncated) {
                     result.push(n);
                 }
             }
             "document" | "content" => {
-                result.extend(xml_node_children(&child, source));
+                result.extend(xml_node_children(&child, source, depth + 1, truncated));
             }
             _ => {}
         }
@@ -1012,7 +1096,10 @@ fn xml_node_children(node: &Node, source: &str) -> Vec<DataNode> {
     result
 }
 
-fn xml_element_node(node: &Node, source: &str) -> Option<DataNode> {
+fn xml_element_node(node: &Node, source: &str, depth: usize, truncated: &mut usize) -> Option<DataNode> {
+    if depth_exceeded(node, depth, truncated) {
+        return None;
+    }
     let mut cursor = node.walk();
     let named: Vec<Node> = node.named_children(&mut cursor).collect();
 
@@ -1043,7 +1130,7 @@ fn xml_element_node(node: &Node, source: &str) -> Option<DataNode> {
     let children: Vec<DataNode> = named
         .iter()
         .filter(|c| c.kind() == "content")
-        .flat_map(|content| xml_node_children(content, source))
+        .flat_map(|content| xml_node_children(content, source, depth + 1, truncated))
         .collect();
 
     Some(DataNode {

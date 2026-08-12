@@ -8,12 +8,15 @@
 //! helpers it needs; [`super::intelligence`] keeps the generic, language-neutral
 //! tree walk and calls in here for the Elixir arms.
 //!
-//! Entry points: [`collect_structure_call`] (the structure walk's Elixir arm)
-//! and [`collect_import_call`] (the import walk's Elixir arm). Both return
-//! `true` when they have fully handled the node, signalling the caller to stop
-//! its own descent.
+//! Entry points: [`definition`] (the structure walk's Elixir arm),
+//! [`import_directive`] (the import walk's Elixir arm), and [`is_quote_call`],
+//! which both walks use to prune quoted bodies. All three classify a single
+//! node and never walk themselves; descent belongs to
+//! [`super::extract`]'s single bounded traversal.
 
-use super::intelligence::{collect_imports, collect_structure, node_text, span_from_node};
+use tree_sitter::Node;
+
+use super::intelligence::{node_text, span_from_node};
 use super::types::*;
 
 /// Classify an Elixir definition `call` by its macro keyword. Elixir
@@ -175,90 +178,56 @@ fn elixir_callable_name(call: &tree_sitter::Node, source: &str) -> Option<String
     None
 }
 
-/// Handle the Elixir arm of the structure walk for `node`.
-///
-/// Returns `true` when `node` is Elixir-significant and has been fully handled
-/// (a `quote` block to skip, or a definition `call` that was emitted), in which
-/// case the caller must not descend further. Returns `false` for a non-Elixir
-/// node so the generic walk takes over. Body recursion routes back through
-/// [`super::intelligence::collect_structure`] so nested items use the same
-/// language-neutral walk.
-pub(super) fn collect_structure_call(
-    node: &tree_sitter::Node,
-    source: &str,
-    language: &str,
-    items: &mut Vec<StructureItem>,
-) -> bool {
-    // ~keep A `quote` block body is generated AST, not real structure.
-    if is_quote(node, source) {
-        return true;
-    }
-
-    // ~keep Elixir definitions are `call` nodes; dispatch on macro keyword and recurse into real bodies.
-    // ~keep Leaf forms like `defstruct` have field defaults, so do not treat `do:` values as bodies.
-    if let Some((sk, name, visibility, has_body)) = elixir_definition(node, source) {
-        let body = if has_body {
-            elixir_definition_body(node, source)
-        } else {
-            None
-        };
-        let body_span = body.as_ref().map(span_from_node);
-        let mut children = Vec::new();
-        if let Some(body) = body {
-            collect_structure(&body, source, language, &mut children);
-        }
-        items.push(StructureItem {
-            kind: sk,
-            name,
-            visibility,
-            span: span_from_node(node),
-            children,
-            decorators: Vec::new(),
-            doc_comment: None,
-            signature: None,
-            body_span,
-        });
-        return true;
-    }
-
-    false
+/// An Elixir definition `call` resolved into the fields the structure walk
+/// needs, with `body` already narrowed to the node the walk may descend into.
+pub(super) struct ElixirDefinition<'tree> {
+    pub kind: StructureKind,
+    pub name: Option<String>,
+    pub visibility: Option<String>,
+    pub body: Option<Node<'tree>>,
 }
 
-/// Handle the Elixir arm of the import walk for a `call` node.
+/// Whether `node` is a `quote` block whose body must not be walked. Public to
+/// the intel module because both the structure and the import walk prune on it.
+pub(super) fn is_quote_call(node: &Node, source: &str) -> bool {
+    is_quote(node, source)
+}
+
+/// Classify `node` as an Elixir definition for the structure walk.
 ///
-/// Elixir `import`/`alias`/`require`/`use` are `call` nodes; dispatch on the
-/// target keyword. A `quote` block's body is generated AST, so its directives
-/// are not real imports - do not descend into it. Descent into the call's
-/// children routes back through [`super::intelligence::collect_imports`] so the
-/// generic walk continues underneath. Returns `true` once the `call` node has
-/// been fully handled.
-pub(super) fn collect_import_call(
-    node: &tree_sitter::Node,
-    source: &str,
-    language: &str,
-    imports: &mut Vec<ImportInfo>,
-) -> bool {
-    if is_quote(node, source) {
-        return true;
+/// Returns `None` for a node the generic, language-neutral matcher should
+/// handle instead. Leaf forms like `defstruct` carry field defaults rather than
+/// a `do`-body, so their `body` is `None` and nothing beneath them is descended.
+pub(super) fn definition<'tree>(node: &Node<'tree>, source: &str) -> Option<ElixirDefinition<'tree>> {
+    let (kind, name, visibility, has_body) = elixir_definition(node, source)?;
+    let body = if has_body {
+        elixir_definition_body(node, source)
+    } else {
+        None
+    };
+    Some(ElixirDefinition {
+        kind,
+        name,
+        visibility,
+        body,
+    })
+}
+
+/// Classify an Elixir `call` node as an `import`/`alias`/`require`/`use`
+/// directive. Returns `None` for every other call, which the walk descends into
+/// normally.
+pub(super) fn import_directive(node: &Node, source: &str) -> Option<ImportInfo> {
+    let target = node.child_by_field_name("target")?;
+    if target.kind() != "identifier" || !matches!(node_text(&target, source), "import" | "alias" | "require" | "use") {
+        return None;
     }
-    if let Some(target) = node.child_by_field_name("target")
-        && target.kind() == "identifier"
-        && matches!(node_text(&target, source), "import" | "alias" | "require" | "use")
-    {
-        let text = node_text(node, source);
-        imports.push(ImportInfo {
-            source: text.to_string(),
-            items: Vec::new(),
-            alias: None,
-            is_wildcard: false,
-            span: span_from_node(node),
-        });
-    }
-    let mut cursor = node.walk();
-    for child in node.children(&mut cursor) {
-        collect_imports(&child, source, language, imports);
-    }
-    true
+    Some(ImportInfo {
+        source: node_text(node, source).to_string(),
+        items: Vec::new(),
+        alias: None,
+        is_wildcard: false,
+        span: span_from_node(node),
+    })
 }
 
 #[cfg(test)]

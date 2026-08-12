@@ -102,11 +102,13 @@ pub struct Span {
     pub end_byte: usize,
     /// Zero-indexed line number of the span's start.
     pub start_line: usize,
-    /// Zero-indexed column number of the span's start.
+    /// Zero-indexed column of the span's start, counted in **bytes** from the
+    /// start of the line — not characters, not UTF-16 code units. ~keep
     pub start_column: usize,
     /// Zero-indexed line number of the span's end.
     pub end_line: usize,
-    /// Zero-indexed column number of the span's end.
+    /// Zero-indexed column of the span's end, counted in **bytes** from the
+    /// start of the line — not characters, not UTF-16 code units. ~keep
     pub end_column: usize,
 }
 
