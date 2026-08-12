@@ -34,8 +34,10 @@ import { Content as SnipTypeScript } from "../../snippets/generated/typescript/p
 import { Content as SnipRust } from "../../snippets/generated/rust/parsing/parsing_python_function.md";
 
 {/* Snippets come from the generated corpus. Rust uses the `parsing` fixture rather than
-    `process/config_all_python.md` because the generated Rust config_all snippet has an
-    unterminated raw string literal. */}
+    `process/config_all_python.md` only to keep the landing page's example short. Note the
+    generated Rust target currently does not compile at all — the emitter closes `fn main()`
+    twice in every one of its 521 snippets — so both candidates are equally broken until the
+    upstream snippet emitter is fixed. Reported upstream; do not paper over it here. */}
 
 ## Why tree-sitter-language-pack
 

@@ -33,7 +33,8 @@ enum Commands {
         /// Download all available languages
         #[arg(long)]
         all: bool,
-        /// Download language groups (comma-separated: web,systems,scripting,data,jvm,functional)
+        /// Download language groups (comma-separated). The manifest currently defines
+        /// exactly one group, `all`; enumerate the real names with `manifest_groups()`.
         #[arg(long, value_delimiter = ',')]
         groups: Vec<String>,
         /// Clean cache before downloading (fresh download)

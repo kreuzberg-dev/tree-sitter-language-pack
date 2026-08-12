@@ -21,14 +21,14 @@ prefetch, reproducible builds, or to reclaim space.
 ```bash
 ts-pack download python rust typescript   # specific languages
 ts-pack download --all                    # every available language
-ts-pack download --groups web,systems     # by group
+ts-pack download --groups all             # by group
 ts-pack download python --fresh           # clean cache first, then download
 ```
 
-Available groups: `web`, `systems`, `scripting`, `data`, `jvm`,
-`functional` (comma-separated for `--groups`). Run `download` in your CI
-setup step so later `parse`/`process` calls hit the cache instead of the
-network.
+The manifest currently defines exactly one group, `all`. Group names are
+manifest data, not a fixed list — enumerate them with `manifest_groups()`
+rather than hardcoding. Run `download` in your CI setup step so later
+`parse`/`process` calls hit the cache instead of the network.
 
 ## Inspect
 

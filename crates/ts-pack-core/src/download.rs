@@ -253,7 +253,8 @@ pub struct ParserManifest {
     pub platforms: HashMap<String, PlatformBundle>,
     /// Per-language metadata, keyed by language name.
     pub languages: HashMap<String, LanguageInfo>,
-    /// Named language groups (e.g., `"web"`, `"systems"`), each mapping to a list of language names.
+    /// Named language groups, each mapping to a list of language names. The published
+    /// manifest currently defines exactly one group, `"all"`.
     pub groups: HashMap<String, Vec<String>>,
 }
 

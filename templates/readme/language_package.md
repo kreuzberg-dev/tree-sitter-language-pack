@@ -59,8 +59,13 @@
 
 ## Features
 
+{% if language == "wasm" %}
+- **Curated grammar subset** — a fixed set of common web and mainstream grammars is compiled into the bundle. A full 371-grammar wasm build is impractical: the parser sources total ~1.7 GB and the largest grammars exhaust the wasm32 clang backend.
+- **Self-contained bundle** — grammars ship inside the module. There is no runtime download and no local cache; wasm32 has no dynamic loading.
+{% else %}
 - **371 languages** — pre-compiled tree-sitter grammars covering every major programming language and many minor ones.
 - **On-demand download + cache** — parsers fetched at first use; subsequent runs hit the local cache.
+{% endif %}
 - **Code intelligence** — extract functions, classes, imports, exports, symbols, docstrings, and diagnostics with one API.
 - **Syntax-aware chunking** — semantic chunks for RAG/LLM pipelines.
 - **Polyglot bindings** — native APIs across 15 languages: Rust, Python, TypeScript/Node.js, Go, Java, C#, Ruby, PHP, Elixir, WebAssembly, Dart, Kotlin, Swift, Zig, and C/C++ via [alef](https://github.com/xberg-io/alef).

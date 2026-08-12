@@ -97,7 +97,8 @@ pub struct DownloadParams {
     pub languages: Option<Vec<String>>,
     /// Download all available languages.
     pub all: Option<bool>,
-    /// Named groups to download (e.g. `"web"`, `"systems"`, `"scripting"`, `"data"`, `"jvm"`, `"functional"`).
+    /// Named groups to download. The manifest currently defines exactly one group,
+    /// `"all"`; call `manifest_groups` to enumerate the names that actually exist.
     pub groups: Option<Vec<String>>,
     /// Clean the cache before downloading for a fresh fetch. Default: false.
     pub fresh: Option<bool>,

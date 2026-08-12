@@ -198,7 +198,7 @@ locally. For offline or CI runs, prefetch:
 ```bash
 ts-pack download python rust typescript   # specific languages
 ts-pack download --all                    # everything
-ts-pack download --groups web,systems     # by group
+ts-pack download --groups all             # by group (see manifest_groups())
 ts-pack list --downloaded                 # what is cached
 ts-pack cache-dir                         # where the cache lives
 ts-pack clean --force                     # wipe the cache
