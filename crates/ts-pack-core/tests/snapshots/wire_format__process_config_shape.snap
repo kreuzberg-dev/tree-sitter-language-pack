@@ -1,6 +1,7 @@
 ---
 source: crates/ts-pack-core/tests/wire_format.rs
-expression: "ProcessConfig\n{\n    language: std::borrow::Cow::Borrowed(\"python\"), structure: true, imports:\n    true, exports: true, comments: false, docstrings: false, symbols: false,\n    diagnostics: false, chunk_max_size: None, data_extraction: false,\n}"
+assertion_line: 266
+expression: "ProcessConfig\n{\n    language: std::borrow::Cow::Borrowed(\"python\"), structure: true, imports:\n    true, exports: true, comments: false, docstrings: false, symbols: false,\n    diagnostics: false, chunk_max_size: None, data_extraction: false,\n    max_source_bytes: None, parse_timeout_ms: None,\n}"
 ---
 {
   "language": "python",
@@ -12,5 +13,7 @@ expression: "ProcessConfig\n{\n    language: std::borrow::Cow::Borrowed(\"python
   "symbols": false,
   "diagnostics": false,
   "chunk_max_size": null,
-  "data_extraction": false
+  "data_extraction": false,
+  "max_source_bytes": null,
+  "parse_timeout_ms": null
 }
