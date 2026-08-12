@@ -117,8 +117,10 @@ ts-pack parse example.mylang --language mylang
 
 ### 4. Add test fixtures
 
-Add at least one fixture under `fixtures/` (the e2e suite consumes them) and, if the language
-needs one, a runnable snippet under `docs-site/src/snippets/<lang>/`.
+Add at least one fixture under `fixtures/`. Fixtures are the single source for both the e2e
+suites and the documentation snippet corpus — `task e2e:generate` renders each fixture into
+`docs-site/src/snippets/generated/<lang>/<category>/<id>.md` for all 14 bindings. Do not
+hand-write snippets; add a fixture instead.
 
 A fixture file holds either a **single JSON object** or an **array** of them, grouped into a
 per-category directory — for example `fixtures/process/python_intel.json`. Only `id` and
@@ -181,7 +183,9 @@ task e2e:test
 ## Improving bindings
 
 Binding improvements (better error messages, idiomatic APIs, new methods) are
-welcome. Each binding lives in `crates/ts-pack-<language>/`. See the
+welcome. Compiled binding crates live under `crates/` (`ts-pack-core-py`, `ts-pack-core-node`,
+`ts-pack-core-php`, `ts-pack-core-wasm`, `ts-pack-core-ffi`, `tree-sitter-language-pack-jni`);
+the host-language packages they feed live under `packages/`. See the
 [Architecture](/concepts/architecture/) page for the full crate layout.
 
 Binding changes must:
@@ -196,8 +200,9 @@ Binding changes must:
 Doc fixes and new guides follow the same workflow as code changes:
 
 1. Fork and create a branch.
-2. Edit files under `docs-site/src/content/docs/`. Runnable snippets live in
-   `docs-site/src/snippets/<lang>/`.
+2. Edit files under `docs-site/src/content/docs/`. Runnable snippets are generated from
+   `fixtures/` into `docs-site/src/snippets/generated/<lang>/` — change the fixture and
+   rerun `task e2e:generate`, never edit a generated snippet.
 3. Preview locally with `pnpm --dir docs-site dev` (the site is Astro / Starlight).
 4. Run `task lint` if you touch any scripted checks.
 5. Open a pull request.
@@ -247,7 +252,8 @@ Keep commits **small and focused**. Each commit should represent one logical cha
 
 - [ ] `task test` passes
 - [ ] `task lint` passes (zero warnings)
-- [ ] New language has runnable snippets under `docs-site/src/snippets/<lang>/`
+- [ ] New language has at least one fixture under `fixtures/`, with the regenerated snippets
+      under `docs-site/src/snippets/generated/` committed alongside it
 - [ ] `task e2e:generate && task e2e:test` passes
 - [ ] `task version:sync` run if any manifest was bumped
 - [ ] PR description explains the change and links related issues

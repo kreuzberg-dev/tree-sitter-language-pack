@@ -75,4 +75,48 @@ git clone https://github.com/xberg-io/tree-sitter-language-pack
 cargo build --release -p tree-sitter-language-pack-ffi
 ```
 
+{% elif language == "dart" %}
+
+```bash
+dart pub add tree_sitter_language_pack
+```
+
+Flutter projects use `flutter pub add tree_sitter_language_pack` instead.
+
+{% elif language == "kotlin_android" %}
+Add to your module's `build.gradle.kts`:
+
+```kotlin
+dependencies {
+    implementation("io.xberg.tslp.android:tree-sitter-language-pack-android:{{ version }}")
+}
+```
+
+{% elif language == "swift" %}
+Requires Swift 6.0+. Add to your `Package.swift`:
+
+```swift
+.package(
+    url: "https://github.com/xberg-io/tree-sitter-language-pack",
+    exact: "{{ version }}"
+)
+```
+
+{% elif language == "zig" %}
+Requires Zig 0.16+. Fetch the `{{ version }}` package tarball from the [GitHub releases page](https://github.com/xberg-io/tree-sitter-language-pack/releases):
+
+```bash
+zig fetch --save <release-tarball-url>
+```
+
+Then add the dependency to your `build.zig`:
+
+```zig
+const tslp = b.dependency("tree_sitter_language_pack", .{
+    .target = target,
+    .optimize = optimize,
+});
+exe.root_module.addImport("tree_sitter_language_pack", tslp.module("tree_sitter_language_pack"));
+```
+
 {% endif %}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/xberg-io/tree-sitter-language-pack/packages/go"
+	tspack "github.com/xberg-io/tree-sitter-language-pack/packages/go"
 )
 
 func main() {
@@ -21,9 +21,6 @@ func main() {
 	root := tree.RootNode()
 	defer root.Free()
 
-	kind := root.Kind()
-	if kind != nil {
-		fmt.Println("Root:", *kind)
-	}
+	fmt.Println("Root:", root.Kind())
 }
 ```
