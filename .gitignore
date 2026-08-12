@@ -43,7 +43,14 @@ packages/csharp/**/runtimes/
 # Go vendored FFI artifacts
 packages/go/include/*
 !packages/go/include/ts_pack.h
-packages/go/lib/
+# Staging dir written by `task go:vendor` / `go run ./cmd/setup`. The leading dot
+# matters — the old `packages/go/lib/` rule matched nothing and let 203 MB of
+# compiled archives get committed. ~keep
+packages/go/.lib/
+
+# Compiled object files and static archives are always build output
+*.a
+*.o
 
 # Elixir build artifacts
 crates/ts-pack-elixir/deps/
@@ -179,6 +186,15 @@ e2e/c/ffi/
 
 packages/zig/zig-pkg/
 e2e/zig/zig-pkg/
+packages/zig/.zig-global-cache/
+
+# Scratch files `alef verify` writes and does not always clean up. ~keep
+.tmp*.rb
+.tmp*.php
+erl_crash.dump
+# The `*.Cache` rule above only matches this on case-insensitive filesystems
+# (macOS); CI runs on Linux, so spell it out. ~keep
+.phpunit.result.cache
 
 
 # Alef-generated skills are source-controlled; other agent-local state stays ignored.
