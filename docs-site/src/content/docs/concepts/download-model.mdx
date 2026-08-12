@@ -4,6 +4,14 @@ description: "How tree-sitter-language-pack downloads, caches, and manages parse
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { Content as Snip_python_configure_cache_dir } from "../../../snippets/generated/python/download/download_configure_custom_dir.md";
+import { Content as Snip_typescript_configure_cache_dir } from "../../../snippets/generated/typescript/download/download_configure_custom_dir.md";
+import { Content as Snip_rust_configure_cache_dir } from "../../../snippets/generated/rust/download/download_configure_custom_dir.md";
+import { Content as Snip_python_download_multiple } from "../../../snippets/generated/python/download/download_multiple_languages.md";
+import { Content as Snip_typescript_download_multiple } from "../../../snippets/generated/typescript/download/download_multiple_languages.md";
+import { Content as Snip_rust_download_multiple } from "../../../snippets/generated/rust/download/download_multiple_languages.md";
+
+{/* Alef-generated corpus: docs-site/src/snippets/generated/`language`/download/`fixture-id`.md */}
 
 Native tree-sitter-language-pack runtimes fetch parsers on first use and cache them locally. This keeps install sizes small and gives you control over which languages are available.
 
@@ -65,29 +73,17 @@ You can override it programmatically:
 <Tabs syncKey="lang">
 <TabItem label="Python">
 
-```python
-from tree_sitter_language_pack import configure, PackConfig
-
-configure(PackConfig(cache_dir="/custom/path"))
-```
+<Snip_python_configure_cache_dir />
 
 </TabItem>
 <TabItem label="Node.js">
 
-```typescript
-import { configure } from "@xberg-io/tree-sitter-language-pack";
-
-configure({ cacheDir: "/custom/path" });
-```
+<Snip_typescript_configure_cache_dir />
 
 </TabItem>
 <TabItem label="Rust">
 
-```rust
-use tree_sitter_language_pack::{configure, PackConfig};
-
-configure(PackConfig { cache_dir: Some("/custom/path".into()), ..Default::default() })?;
-```
+<Snip_rust_configure_cache_dir />
 
 </TabItem>
 <TabItem label="CLI">
@@ -140,19 +136,24 @@ the Rust target arch name (`x86_64`, `aarch64`) — except on macOS, where `aarc
     }
   },
   "languages": {
-    "python": { "group": "scripting", "size": 524288 },
-    "rust": { "group": "systems", "size": 786432 },
-    "javascript": { "group": "web", "size": 458752 }
+    "python": { "group": "all", "size": 524288 },
+    "rust": { "group": "all", "size": 786432 },
+    "javascript": { "group": "all", "size": 458752 }
   },
   "groups": {
-    "scripting": ["python", "ruby", "lua", "perl", "..."],
-    "systems": ["rust", "c", "cpp", "go", "..."],
-    "web": ["javascript", "typescript", "html", "css", "..."]
+    "all": ["python", "rust", "javascript", "..."]
   }
 }
 ```
 
 The manifest caches locally alongside the parser binaries and refreshes on version upgrades. See `ParserManifest` in `crates/ts-pack-core/src/download.rs` for the authoritative schema.
+
+:::caution[`all` is the only group the manifest defines]
+Group names are manifest data, not a constant of any binding. The published manifest emits a
+single group, `"all"`. Earlier revisions of this page advertised `web`, `systems`, and
+`scripting`, which the manifest has never contained — `download_group("web")` fails. Call
+`manifest_groups()` to enumerate the names that actually exist.
+:::
 
 ---
 
@@ -163,53 +164,17 @@ For production, CI, or offline environments, download parsers explicitly rather 
 <Tabs syncKey="lang">
 <TabItem label="Python">
 
-```python
-from tree_sitter_language_pack import PackConfig, download, download_all, init
-
-# Download specific languages
-download(["python", "javascript", "typescript", "rust"])
-
-# Download all 371 parsers
-download_all()
-
-# Configure + download in one call
-init(PackConfig(languages=["python", "javascript"]))
-```
+<Snip_python_download_multiple />
 
 </TabItem>
 <TabItem label="Node.js">
 
-```typescript
-import { download, downloadAll, init } from "@xberg-io/tree-sitter-language-pack";
-
-// Download specific languages
-download(["python", "javascript", "typescript", "rust"]);
-
-// Download everything
-downloadAll();
-
-// Configure + download in one call
-init({ languages: ["python", "javascript"] });
-```
+<Snip_typescript_download_multiple />
 
 </TabItem>
 <TabItem label="Rust">
 
-```rust
-use tree_sitter_language_pack::{PackConfig, download, download_all, init};
-
-// Download specific languages
-download(&["python", "javascript", "rust"])?;
-
-// Download everything
-download_all()?;
-
-// Configure + download in one call
-init(&PackConfig {
-    languages: Some(vec!["python".to_string(), "javascript".to_string()]),
-    ..Default::default()
-})?;
-```
+<Snip_rust_download_multiple />
 
 </TabItem>
 <TabItem label="CLI">

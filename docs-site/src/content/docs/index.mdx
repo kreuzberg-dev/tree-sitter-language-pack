@@ -29,9 +29,13 @@ hero:
 ---
 
 import { Card, CardGrid, LinkCard, Tabs, TabItem } from "@astrojs/starlight/components";
-import { Content as SnipPython } from "../../snippets/python/quickstart.md";
-import { Content as SnipTypeScript } from "../../snippets/typescript/quickstart.md";
-import { Content as SnipRust } from "../../snippets/rust/quickstart.md";
+import { Content as SnipPython } from "../../snippets/generated/python/process/config_all_python.md";
+import { Content as SnipTypeScript } from "../../snippets/generated/typescript/process/config_all_python.md";
+import { Content as SnipRust } from "../../snippets/generated/rust/parsing/parsing_python_function.md";
+
+{/* Snippets come from the generated corpus. Rust uses the `parsing` fixture rather than
+    `process/config_all_python.md` because the generated Rust config_all snippet has an
+    unterminated raw string literal. */}
 
 ## Why tree-sitter-language-pack
 

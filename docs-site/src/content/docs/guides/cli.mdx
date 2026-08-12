@@ -67,7 +67,7 @@ ts-pack download [LANGUAGES...] [OPTIONS]
 | Flag                | Description                                                                                     |
 | ------------------- | ----------------------------------------------------------------------------------------------- |
 | `--all`             | Download all 371 parsers                                                                        |
-| `--groups <groups>` | Download by group (comma-separated: `web`, `systems`, `scripting`, `data`, `jvm`, `functional`) |
+| `--groups <groups>` | Download by group (comma-separated). Only manifest-defined names are accepted; the published manifest defines exactly one, `all`. |
 | `--fresh`           | Clear the cache before downloading                                                              |
 
 ```bash
@@ -81,7 +81,7 @@ ts-pack download --all
 ts-pack download python --fresh
 
 # Download a group
-ts-pack download --groups web,systems
+ts-pack download --groups all
 
 # Download whatever languages-pack.toml specifies (if one is found)
 ts-pack download

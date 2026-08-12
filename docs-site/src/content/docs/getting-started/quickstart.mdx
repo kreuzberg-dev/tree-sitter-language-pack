@@ -5,49 +5,49 @@ description: "Parse your first file with tree-sitter-language-pack in under 5 mi
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 import { Content as Snip_cli_download } from "../../../snippets/cli/download.md";
-import { Content as Snip_python_download } from "../../../snippets/python/download.md";
-import { Content as Snip_typescript_download } from "../../../snippets/typescript/download.md";
-import { Content as Snip_ruby_download } from "../../../snippets/ruby/download.md";
-import { Content as Snip_php_download } from "../../../snippets/php/download.md";
-import { Content as Snip_go_download } from "../../../snippets/go/download.md";
-import { Content as Snip_java_download } from "../../../snippets/java/download.md";
-import { Content as Snip_csharp_download } from "../../../snippets/csharp/download.md";
-import { Content as Snip_elixir_download } from "../../../snippets/elixir/download.md";
-import { Content as Snip_dart_download } from "../../../snippets/dart/download.md";
-import { Content as Snip_swift_download } from "../../../snippets/swift/download.md";
-import { Content as Snip_zig_download } from "../../../snippets/zig/download.md";
-import { Content as Snip_kotlin_android_download } from "../../../snippets/kotlin-android/download.md";
-import { Content as Snip_wasm_download } from "../../../snippets/wasm/download.md";
-import { Content as Snip_rust_download } from "../../../snippets/rust/download.md";
+import { Content as Snip_python_download } from "../../../snippets/generated/python/download/download_single_language.md";
+import { Content as Snip_typescript_download } from "../../../snippets/generated/typescript/download/download_single_language.md";
+import { Content as Snip_ruby_download } from "../../../snippets/generated/ruby/download/download_single_language.md";
+import { Content as Snip_php_download } from "../../../snippets/generated/php/download/download_single_language.md";
+import { Content as Snip_go_download } from "../../../snippets/generated/go/download/download_single_language.md";
+import { Content as Snip_java_download } from "../../../snippets/generated/java/download/download_single_language.md";
+import { Content as Snip_csharp_download } from "../../../snippets/generated/csharp/download/download_single_language.md";
+import { Content as Snip_elixir_download } from "../../../snippets/generated/elixir/download/download_single_language.md";
+import { Content as Snip_dart_download } from "../../../snippets/generated/dart/download/download_single_language.md";
+import { Content as Snip_swift_download } from "../../../snippets/generated/swift/download/download_single_language.md";
+import { Content as Snip_zig_download } from "../../../snippets/generated/zig/download/download_single_language.md";
+import { Content as Snip_kotlin_android_download } from "../../../snippets/generated/kotlin-android/download/download_single_language.md";
+import { Content as Snip_wasm_download } from "../../../snippets/generated/wasm/download/download_single_language.md";
+import { Content as Snip_rust_download } from "../../../snippets/generated/rust/download/download_single_language.md";
 import { Content as Snip_cli_quickstart } from "../../../snippets/cli/quickstart.md";
-import { Content as Snip_python_quickstart } from "../../../snippets/python/quickstart.md";
-import { Content as Snip_typescript_quickstart } from "../../../snippets/typescript/quickstart.md";
-import { Content as Snip_ruby_quickstart } from "../../../snippets/ruby/quickstart.md";
-import { Content as Snip_php_quickstart } from "../../../snippets/php/quickstart.md";
-import { Content as Snip_go_quickstart } from "../../../snippets/go/quickstart.md";
-import { Content as Snip_java_quickstart } from "../../../snippets/java/quickstart.md";
-import { Content as Snip_csharp_quickstart } from "../../../snippets/csharp/quickstart.md";
-import { Content as Snip_elixir_quickstart } from "../../../snippets/elixir/quickstart.md";
-import { Content as Snip_dart_quickstart } from "../../../snippets/dart/quickstart.md";
-import { Content as Snip_swift_quickstart } from "../../../snippets/swift/quickstart.md";
+import { Content as Snip_python_quickstart } from "../../../snippets/generated/python/parsing/parsing_python_function.md";
+import { Content as Snip_typescript_quickstart } from "../../../snippets/generated/typescript/parsing/parsing_python_function.md";
+import { Content as Snip_ruby_quickstart } from "../../../snippets/generated/ruby/parsing/parsing_python_function.md";
+import { Content as Snip_php_quickstart } from "../../../snippets/generated/php/parsing/parsing_python_function.md";
+import { Content as Snip_go_quickstart } from "../../../snippets/generated/go/parsing/parsing_python_function.md";
+import { Content as Snip_java_quickstart } from "../../../snippets/generated/java/parsing/parsing_python_function.md";
+import { Content as Snip_csharp_quickstart } from "../../../snippets/generated/csharp/parsing/parsing_python_function.md";
+import { Content as Snip_elixir_quickstart } from "../../../snippets/generated/elixir/parsing/parsing_python_function.md";
+import { Content as Snip_dart_quickstart } from "../../../snippets/generated/dart/parsing/parsing_python_function.md";
+import { Content as Snip_swift_quickstart } from "../../../snippets/generated/swift/parsing/parsing_python_function.md";
 import { Content as Snip_zig_quickstart } from "../../../snippets/zig/quickstart.md";
 import { Content as Snip_kotlin_android_quickstart } from "../../../snippets/kotlin-android/quickstart.md";
-import { Content as Snip_wasm_quickstart } from "../../../snippets/wasm/quickstart.md";
-import { Content as Snip_rust_quickstart } from "../../../snippets/rust/quickstart.md";
+import { Content as Snip_wasm_quickstart } from "../../../snippets/generated/wasm/parsing/parsing_python_function.md";
+import { Content as Snip_rust_quickstart } from "../../../snippets/generated/rust/parsing/parsing_python_function.md";
 import { Content as Snip_cli_process } from "../../../snippets/cli/process.md";
-import { Content as Snip_python_process } from "../../../snippets/python/process.md";
-import { Content as Snip_typescript_process } from "../../../snippets/typescript/process.md";
-import { Content as Snip_ruby_process } from "../../../snippets/ruby/process.md";
-import { Content as Snip_php_process } from "../../../snippets/php/process.md";
-import { Content as Snip_go_process } from "../../../snippets/go/process.md";
-import { Content as Snip_java_process } from "../../../snippets/java/process.md";
-import { Content as Snip_csharp_process } from "../../../snippets/csharp/process.md";
-import { Content as Snip_elixir_process } from "../../../snippets/elixir/process.md";
-import { Content as Snip_dart_process } from "../../../snippets/dart/process.md";
-import { Content as Snip_swift_process } from "../../../snippets/swift/process.md";
+import { Content as Snip_python_process } from "../../../snippets/generated/python/process/config_all_python.md";
+import { Content as Snip_typescript_process } from "../../../snippets/generated/typescript/process/config_all_python.md";
+import { Content as Snip_ruby_process } from "../../../snippets/generated/ruby/process/config_all_python.md";
+import { Content as Snip_php_process } from "../../../snippets/generated/php/process/config_all_python.md";
+import { Content as Snip_go_process } from "../../../snippets/generated/go/process/config_all_python.md";
+import { Content as Snip_java_process } from "../../../snippets/generated/java/process/config_all_python.md";
+import { Content as Snip_csharp_process } from "../../../snippets/generated/csharp/process/config_all_python.md";
+import { Content as Snip_elixir_process } from "../../../snippets/generated/elixir/process/config_all_python.md";
+import { Content as Snip_dart_process } from "../../../snippets/generated/dart/process/config_all_python.md";
+import { Content as Snip_swift_process } from "../../../snippets/generated/swift/process/config_all_python.md";
 import { Content as Snip_zig_process } from "../../../snippets/zig/process.md";
 import { Content as Snip_kotlin_android_process } from "../../../snippets/kotlin-android/process.md";
-import { Content as Snip_wasm_process } from "../../../snippets/wasm/process.md";
+import { Content as Snip_wasm_process } from "../../../snippets/generated/wasm/process/config_all_python.md";
 import { Content as Snip_rust_process } from "../../../snippets/rust/process.md";
 
 This guide walks you from install to parsing, code intelligence, and LLM chunking.
@@ -219,48 +219,34 @@ download_all()?;
 
 ### By language group
 
-Groups bundle related languages: `web`, `systems`, `scripting`, `data`, `jvm`, `functional`.
+Group names are manifest data, not a compile-time constant. The published manifest currently
+defines exactly one group, `"all"` — there is no `web`, `data`, or `systems` group, and passing
+one fails. Enumerate the real names with `manifest_groups()` before calling `download_group()`.
 
 <Tabs syncKey="lang">
-<TabItem label="CLI">
-
-```bash
-# Download all web languages (HTML, CSS, JS, TS, Vue, Svelte, …)
-ts-pack download --groups web,data
-
-# See what's cached
-ts-pack list --downloaded
-```
-
-</TabItem>
 <TabItem label="Python">
 
 ```python
-from tree_sitter_language_pack import PackConfig, init
+from tree_sitter_language_pack import download_group, manifest_groups
 
-init(PackConfig(groups=["web", "data"]))
-```
+for group in manifest_groups():
+    print(group)  # currently prints just: all
 
-</TabItem>
-<TabItem label="Node.js">
-
-```typescript
-import { init } from "@xberg-io/tree-sitter-language-pack";
-
-init({ groups: ["web", "data"] });
+download_group("all")
 ```
 
 </TabItem>
 <TabItem label="Rust">
 
 ```rust
-use tree_sitter_language_pack::{PackConfig, init};
+use tree_sitter_language_pack::{download_group, manifest_groups};
 
-let config = PackConfig {
-    groups: Some(vec!["web".into(), "data".into()]),
-    ..Default::default()
-};
-init(&config)?;
+let group = manifest_groups()?
+    .into_iter()
+    .next()
+    .expect("manifest defines no groups");
+let count = download_group(&group)?;
+println!("{count} languages available");
 ```
 
 </TabItem>
@@ -290,7 +276,7 @@ Declare which languages your project needs in a `language-pack.toml`:
 
 ```toml title="language-pack.toml"
 languages = ["python", "javascript", "rust", "go"]
-# groups = ["web", "systems"]
+# groups = ["all"]   # only names returned by manifest_groups() are accepted
 # cache_dir = "/tmp/parsers"
 ```
 
@@ -325,7 +311,8 @@ Parsers cache to `<cache>/tree-sitter-language-pack/v{version}/libs` — where `
 
 ## 3. Parse Code
 
-Build a concrete syntax tree from source code.
+Run the parser over a source string. `process()` parses the source and returns the result;
+if the language is not cached yet it is downloaded on this first call.
 
 <Tabs syncKey="lang">
 <TabItem label="CLI">
@@ -554,6 +541,15 @@ for i, chunk in enumerate(result.chunks):
 ```typescript
 import { process } from "@xberg-io/tree-sitter-language-pack";
 import { readFileSync } from "fs";
+
+{/* Generated corpus: docs-site/src/snippets/generated/`language`/`category`/`fixture-id`.md.
+    Hand-written imports remain only where the generated corpus cannot supply the snippet:
+      - cli/*            no generated/cli directory exists (the CLI is not an alef binding target)
+      - zig/quickstart   generated/zig/parsing/parsing_python_function.md binds an unused const
+      - zig/process      generated/zig/process/config_all_python.md binds an unused const
+      - kotlin-android/* generated kotlin-android snippets reference an undefined `config`
+      - rust/process     generated/rust/process/config_all_python.md has an unterminated raw string
+    Repoint each of these at the generated corpus once the generator output compiles. */}
 
 const source = readFileSync("large_module.ts", "utf8");
 

@@ -33,8 +33,9 @@ Create `language-pack.toml` in your project root:
 # language-pack.toml
 languages = ["python", "javascript", "typescript", "rust"]
 
-# Optional: language groups (web, systems, data, jvm, functional, scripting)
-# groups = ["web", "systems"]
+# Optional: language groups. Only names the remote manifest defines are accepted,
+# and it currently defines exactly one: "all". Enumerate with manifest_groups().
+# groups = ["all"]
 
 # Optional: custom cache directory
 # cache_dir = ".cache/ts-pack"
@@ -90,13 +91,12 @@ from tree_sitter_language_pack import PackConfig, configure, init
 # Pre-download specific languages
 init(PackConfig(languages=["python", "javascript", "rust"]))
 
-# Download by language group
-init(PackConfig(groups=["web"]))      # JavaScript, TypeScript, HTML, CSS
-init(PackConfig(groups=["systems"]))  # C, C++, Rust, Go
-init(PackConfig(groups=["data"]))     # Python, R, SQL, JSON
+# Download by language group. manifest_groups() lists the names that exist;
+# the published manifest defines only "all".
+init(PackConfig(groups=["all"]))
 
 # Combine languages and groups
-init(PackConfig(languages=["python"], groups=["web", "systems"]))
+init(PackConfig(languages=["python"], groups=["all"]))
 
 # Set custom cache directory (call before first parse)
 configure(PackConfig(cache_dir="/opt/ts-pack-cache"))
@@ -118,7 +118,7 @@ binding — the CLI (`ts-pack download`) reads `language-pack.toml` on your beha
 import { init, configure, PackConfig } from "@xberg-io/tree-sitter-language-pack";
 
 init({ languages: ["python", "javascript", "rust"] });
-init({ groups: ["web"] });
+init({ groups: ["all"] }); // "all" is the only group the manifest defines
 configure({ cacheDir: "/opt/ts-pack-cache" });
 ```
 
@@ -211,7 +211,7 @@ ts-pack download --all
 ts-pack download --fresh
 
 # By group
-ts-pack download --groups web,systems
+ts-pack download --groups all
 ```
 
 ### `ts-pack list`

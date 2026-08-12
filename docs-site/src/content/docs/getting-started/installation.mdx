@@ -4,6 +4,20 @@ description: "Install tree-sitter-language-pack in Python, Node.js, Rust, Go, Ja
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { Content as Verify_python } from "../../../snippets/generated/python/registry/registry_language_count.md";
+import { Content as Verify_typescript } from "../../../snippets/generated/typescript/registry/registry_language_count.md";
+import { Content as Verify_rust } from "../../../snippets/generated/rust/registry/registry_language_count.md";
+import { Content as Verify_go } from "../../../snippets/generated/go/registry/registry_language_count.md";
+import { Content as Verify_java } from "../../../snippets/generated/java/registry/registry_language_count.md";
+import { Content as Verify_csharp } from "../../../snippets/generated/csharp/registry/registry_language_count.md";
+import { Content as Verify_ruby } from "../../../snippets/generated/ruby/registry/registry_language_count.md";
+import { Content as Verify_elixir } from "../../../snippets/generated/elixir/registry/registry_language_count.md";
+import { Content as Verify_php } from "../../../snippets/generated/php/registry/registry_language_count.md";
+import { Content as Verify_dart } from "../../../snippets/generated/dart/registry/registry_language_count.md";
+import { Content as Verify_kotlin_android } from "../../../snippets/generated/kotlin-android/registry/registry_language_count.md";
+import { Content as Verify_swift } from "../../../snippets/generated/swift/registry/registry_language_count.md";
+import { Content as Verify_zig } from "../../../snippets/generated/zig/registry/registry_language_count.md";
+import { Content as Verify_wasm } from "../../../snippets/generated/wasm/registry/registry_language_count.md";
 
 ## Install using the CLI
 
@@ -137,10 +151,7 @@ poetry add tree-sitter-language-pack
 
 Verify:
 
-```python
-import tree_sitter_language_pack as tslp
-print(tslp.language_count())  # parsers available locally (0 on a fresh install)
-```
+<Verify_python />
 
 ---
 
@@ -174,10 +185,7 @@ yarn add @xberg-io/tree-sitter-language-pack
 
 Verify:
 
-```javascript
-const tslp = require("@xberg-io/tree-sitter-language-pack");
-console.log(tslp.languageCount()); // parsers available locally (0 on a fresh install)
-```
+<Verify_typescript />
 
 ---
 
@@ -205,11 +213,7 @@ tree-sitter-language-pack = "1"
 
 Verify:
 
-```rust
-fn main() {
-    println!("{}", tree_sitter_language_pack::language_count()); // parsers available locally
-}
-```
+<Verify_rust />
 
 ---
 
@@ -221,13 +225,9 @@ Requires Go 1.26+. The binding uses cgo and links against the pre-compiled C FFI
 go get github.com/xberg-io/tree-sitter-language-pack/packages/go
 ```
 
-```go
-import tslp "github.com/xberg-io/tree-sitter-language-pack/packages/go"
+Verify:
 
-func main() {
-    fmt.Println(tslp.LanguageCount()) // parsers available locally
-}
-```
+<Verify_go />
 
 ---
 
@@ -269,15 +269,7 @@ dependencies {
 
 Verify:
 
-```java
-import io.xberg.treesitterlanguagepack.TreeSitterLanguagePack;
-
-public class Main {
-    public static void main(String[] args) {
-        System.out.println(TreeSitterLanguagePack.languageCount()); // parsers available locally
-    }
-}
-```
+<Verify_java />
 
 ---
 
@@ -291,11 +283,7 @@ dotnet add package XbergIo.TreeSitterLanguagePack --version 1.14.3
 
 Verify:
 
-```csharp
-using TreeSitterLanguagePack;
-
-Console.WriteLine(TreeSitterLanguagePackConverter.LanguageCount()); // parsers available locally
-```
+<Verify_csharp />
 
 The NuGet package includes native runtime assets for Windows, Linux, and macOS.
 
@@ -328,11 +316,7 @@ bundle install
 
 Verify:
 
-```ruby
-require "tree_sitter_language_pack"
-
-puts TreeSitterLanguagePack.language_count # parsers available locally
-```
+<Verify_ruby />
 
 ---
 
@@ -360,9 +344,7 @@ mix deps.get
 
 Verify:
 
-```elixir
-IO.puts TreeSitterLanguagePack.language_count() # parsers available locally
-```
+<Verify_elixir />
 
 ---
 
@@ -400,10 +382,7 @@ composer require xberg-io/tree-sitter-language-pack
 
 Verify:
 
-```php
-<?php
-echo \Tree\Sitter\Language\Pack\TreeSitterLanguagePackApi::languageCount(); // parsers available locally
-```
+<Verify_php />
 
 ---
 
@@ -414,6 +393,10 @@ Requires Dart 3.11+.
 ```bash
 dart pub add tree_sitter_language_pack
 ```
+
+Verify:
+
+<Verify_dart />
 
 ---
 
@@ -426,6 +409,10 @@ implementation("io.xberg.tslp.android:tree-sitter-language-pack-android:1.14.3")
 ```
 
 This is an Android AAR. Kotlin/JVM users should use the Java artifact.
+
+Verify:
+
+<Verify_kotlin_android />
 
 ---
 
@@ -440,6 +427,10 @@ Requires Swift 6.0+.
 )
 ```
 
+Verify:
+
+<Verify_swift />
+
 ---
 
 ### Zig
@@ -451,6 +442,10 @@ zig fetch --save <release tarball url>
 ```
 
 The package name is `tree_sitter_language_pack`.
+
+Verify:
+
+<Verify_zig />
 
 ---
 
@@ -486,11 +481,18 @@ npm install @xberg-io/tree-sitter-language-pack-wasm
 
 ```typescript
 import { availableLanguages, languageCount } from "npm:@xberg-io/tree-sitter-language-pack-wasm";
+
+{/* Verify snippets come from the alef-generated corpus (fixture `registry_language_count`).
+    Node.js reuses the TypeScript rendering; there is no generated corpus for the CLI. */}
 console.log(languageCount(), availableLanguages());
 ```
 
 </TabItem>
 </Tabs>
+
+Verify:
+
+<Verify_wasm />
 
 The WASM package is a static curated subset of parsers compiled into the module. It does not expose the native download/cache helpers.
 
