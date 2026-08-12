@@ -12,6 +12,17 @@ minimumReleaseAgeExclude:
   # pnpm 11+ matches these as name-only globs (the `pkg@version` form is not
   - "@xberg-io/tree-sitter-language-pack-*"
 
+overrides:
+  # vite is transitive (vitest -> vite); vitest's own range still resolves the
+  # advisory-affected 7.3.3. Forcing >=7.3.6 clears GHSA-fx2h-pf6j-xcff and
+  # GHSA-v6wh-96g9-6wx3, and pulls patched esbuild/postcss/nanoid with it. ~keep
+  vite: "^7.3.6"
+  # postcss/esbuild reach us only through vite, and vite's own ranges still
+  # accept the affected releases. postcss >=8.5.26 also drags nanoid to
+  # >=3.3.17, clearing GHSA-28wg-ghj8-5hjv and GHSA-2v37-7h3g-55p8. ~keep
+  postcss: "^8.5.26"
+  esbuild: "^0.28.1"
+
 sharedWorkspaceLockfile: true
 autoInstallPeers: true
 hoist: true

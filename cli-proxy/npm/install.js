@@ -170,13 +170,23 @@ function expectedDigest(text, assetName) {
   return null;
 }
 
-async function verifyOrWarn(archiveBuf, archiveName, checksums) {
+async function verifyArchive(archiveBuf, archiveName, checksums) {
   if (!checksums) {
-    process.stderr.write(
-      `WARNING: no SHA256SUMS asset found for ${archiveName}; ` +
-        `installing over HTTPS without checksum verification.\n`,
+    // A release with no SHA256SUMS asset is exactly what an attacker who can
+    // influence the asset list would produce, and npm buries stderr warnings.
+    // The other two failure modes here already throw, so failing open only on
+    // the absent-file case made the weakest link the one that stayed quiet.
+    if (process.env.TS_PACK_CLI_ALLOW_UNVERIFIED === "1") {
+      process.stderr.write(
+        `WARNING: no SHA256SUMS asset found for ${archiveName}; installing unverified ` +
+          `because TS_PACK_CLI_ALLOW_UNVERIFIED=1 is set.\n`,
+      );
+      return;
+    }
+    throw new Error(
+      `no SHA256SUMS asset found in the release for ${archiveName} — refusing to install an ` +
+        `unverified binary. Set TS_PACK_CLI_ALLOW_UNVERIFIED=1 to override.`,
     );
-    return;
   }
   const sumsText = (await httpGetBuffer(checksums.browser_download_url)).toString("utf8");
   const expected = expectedDigest(sumsText, archiveName);
@@ -351,7 +361,7 @@ export async function main() {
   process.stderr.write(`Downloading ${BIN_NAME} ${tag} asset ${archive.name}...\n`);
 
   const archiveBuf = await httpGetBuffer(archive.browser_download_url);
-  await verifyOrWarn(archiveBuf, archive.name, checksums);
+  await verifyArchive(archiveBuf, archive.name, checksums);
 
   const stageDir = fs.mkdtempSync(path.join(os.tmpdir(), `${PKG_NAME}-dl-`));
   try {

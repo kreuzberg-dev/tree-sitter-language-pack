@@ -1,11 +1,6 @@
 [workspace]
 members = ["crates/*", "packages/dart/rust", "packages/swift/rust"]
 exclude = [
-    "crates/tree-sitter-language-pack-ffi",
-    "crates/tree-sitter-language-pack-wasm",
-    "crates/ts-pack-elixir",
-    "crates/ts-pack-java",
-    "crates/ts-pack-node",
     "e2e/rust",
     "packages/elixir/native/tree_sitter_language_pack_nif",
     "packages/ruby/ext/ts_pack_core_rb/native",

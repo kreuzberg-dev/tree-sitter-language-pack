@@ -860,7 +860,6 @@ jobs:
         working-directory: packages/java
         run: mvn test
         env:
-          TSPACK_LIB_PATH: ${{ github.workspace }}/target/release/libts_pack_core_ffi.so
 
       - name: Upload test reports
         if: always()
@@ -886,7 +885,6 @@ jobs:
         working-directory: e2e/java
         run: mvn test
         env:
-          TSPACK_LIB_PATH: ${{ github.workspace }}/target/release/libts_pack_core_ffi.so
           MAVEN_OPTS: "--enable-native-access=ALL-UNNAMED -Dsun.misc.unsafe.memory.access=allow"
 
       - name: Upload E2E test reports
@@ -967,7 +965,6 @@ jobs:
             echo "LD_LIBRARY_PATH=${{ github.workspace }}/target/release:${LD_LIBRARY_PATH:-}"
             echo "DYLD_LIBRARY_PATH=${{ github.workspace }}/target/release:${DYLD_LIBRARY_PATH:-}"
             echo "DYLD_FALLBACK_LIBRARY_PATH=${{ github.workspace }}/target/release:${DYLD_FALLBACK_LIBRARY_PATH:-}"
-            echo "TSPACK_FFI_DIR=${{ github.workspace }}/target/release"
           } >> "$GITHUB_ENV"
 
       - name: Stage native library into runtimes/
