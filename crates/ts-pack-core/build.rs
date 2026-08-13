@@ -58,9 +58,14 @@ fn find_project_root() -> PathBuf {
 
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
+    // ~keep `parsers/` is gitignored and only materializes once `ensure_parser_sources`
+    // runs later in this same build script invocation, so it cannot be used to detect the
+    // workspace root on a fresh checkout (find_project_root runs first). `patches/` is
+    // committed and is the same directory `patch_grammar_sources` needs immediately after,
+    // so it is a stable, always-present workspace-root marker.
     let mut dir = manifest_dir.as_path();
     loop {
-        if dir.join("sources/language_definitions.json").exists() && dir.join("parsers").exists() {
+        if dir.join("sources/language_definitions.json").exists() && dir.join("patches").is_dir() {
             return dir.to_path_buf();
         }
         match dir.parent() {
