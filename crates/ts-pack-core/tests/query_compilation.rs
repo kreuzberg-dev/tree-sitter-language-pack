@@ -22,6 +22,28 @@ use tree_sitter_language_pack::{LanguageRegistry, QueryKind, get_query};
 const OVERLAY_TAGS_LANGUAGES: [&str; 9] =
     ["dart", "java", "kotlin", "php", "scala", "cpp", "swift", "csharp", "ruby"];
 
+/// Queries that fail to compile because of a defect in the query file UPSTREAM ships, not in
+/// this repo's selection or overlays. Each was traced to the upstream commit that introduced it,
+/// and in each case we are already pinned at upstream HEAD with no better candidate to select.
+///
+/// This list is enforced in BOTH directions: an entry that starts compiling fails the test just
+/// as loudly as an unlisted failure. A known-failures list nobody is forced to revisit is how a
+/// gate rots into a green light that checks nothing. ~keep
+const KNOWN_UPSTREAM_BROKEN: [(&str, QueryKind, &str); 5] = [
+    ("brightscript", QueryKind::Highlights, "upstream added the `(m) @keyword` query line and the grammar.js `m` rule in one commit but never re-ran `tree-sitter generate`, so their committed parser has no `m` node"),
+    ("flatbuffers", QueryKind::Highlights, "upstream typo: grammar.js defines `enum_val_decl`, the query says `enumval_decl`"),
+    ("hurl", QueryKind::Highlights, "upstream renamed the option field to `option_key:` and wrote the query against `key:` in the same commit"),
+    ("solidity", QueryKind::Highlights, "upstream query text is malformed s-expression syntax; vendored bytes are identical to upstream and no patch of ours touches it"),
+    ("vhdl", QueryKind::Highlights, "upstream query expects an `integer` child inside `integer_decimal`, which `token(...)` collapses to a childless token"),
+];
+
+fn known_upstream_breakage(language: &str, kind: QueryKind) -> Option<&'static str> {
+    KNOWN_UPSTREAM_BROKEN
+        .iter()
+        .find(|(lang, broken_kind, _)| *lang == language && *broken_kind == kind)
+        .map(|(_, _, reason)| *reason)
+}
+
 const ALL_QUERY_KINDS: [QueryKind; 6] = [
     QueryKind::Highlights,
     QueryKind::Injections,
@@ -47,13 +69,22 @@ impl std::fmt::Display for QueryFailure {
 /// Compiles every bundled query kind for `language`, returning the count of queries that
 /// actually compiled (kind bundled and `Query::new` succeeded) and appending any compile
 /// failure to `failures`. A bundled-but-absent kind (`Ok(None)`) is not a failure.
-fn compile_all_kinds_for(language: &str, failures: &mut Vec<QueryFailure>) -> usize {
+fn compile_all_kinds_for(
+    language: &str,
+    failures: &mut Vec<QueryFailure>,
+    repaired: &mut Vec<String>,
+) -> usize {
     let mut compiled = 0usize;
     for kind in ALL_QUERY_KINDS {
-        match get_query(language, kind) {
-            Ok(Some(_)) => compiled += 1,
-            Ok(None) => {}
-            Err(error) => failures.push(QueryFailure {
+        let known = known_upstream_breakage(language, kind);
+        match (get_query(language, kind), known) {
+            // ~keep Upstream fixed it, or a pin bump pulled the fix in. Say so and demand the
+            // ~keep entry be deleted, rather than letting the list quietly outlive the defect.
+            (Ok(_), Some(reason)) => repaired.push(format!("{language} / {kind:?} — listed as: {reason}")),
+            (Ok(Some(_)), None) => compiled += 1,
+            (Ok(None), None) => {}
+            (Err(_), Some(_)) => {}
+            (Err(error), None) => failures.push(QueryFailure {
                 language: language.to_string(),
                 kind,
                 error: error.to_string(),
@@ -79,10 +110,21 @@ fn should_compile_every_bundled_query_for_every_language_built_into_this_binary(
     );
 
     let mut failures: Vec<QueryFailure> = Vec::new();
+    let mut repaired: Vec<String> = Vec::new();
     let mut total_compiled = 0usize;
     for language in &languages {
-        total_compiled += compile_all_kinds_for(language, &mut failures);
+        total_compiled += compile_all_kinds_for(language, &mut failures, &mut repaired);
     }
+
+    assert!(
+        repaired.is_empty(),
+        "{} quer{} listed in KNOWN_UPSTREAM_BROKEN now compile(s). Upstream fixed this (or a pin \
+         bump pulled the fix in) — delete the entr{} so the list keeps meaning what it says:\n{}",
+        repaired.len(),
+        if repaired.len() == 1 { "y" } else { "ies" },
+        if repaired.len() == 1 { "y" } else { "ies" },
+        repaired.join("\n")
+    );
 
     assert!(
         total_compiled > 0,
