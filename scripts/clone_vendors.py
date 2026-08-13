@@ -29,6 +29,12 @@ GENERATE_CONCURRENCY = int(os.environ.get("TSLP_GENERATE_CONCURRENCY", "3"))
 LANGUAGES_FILTER = set(os.environ.get("TSLP_LANGUAGES", "").split(",")) if os.environ.get("TSLP_LANGUAGES") else set()
 GENERATE_TIMEOUT = int(os.environ.get("TSLP_GENERATE_TIMEOUT", "480"))
 MIN_COMPATIBLE_ABI = int(os.environ.get("TSLP_MIN_COMPATIBLE_ABI", "13"))
+# ~keep Ceiling on what the vendored `tree-sitter` crate can *load*, independent of any
+# grammar's requested generation target (`abi_version`, which defaults to 14). Grammars
+# exempted from regeneration ship whatever ABI upstream already committed, not a
+# regenerated one, so their compatibility bound is the runtime's load ceiling, not the
+# generation target. 15 matches tree-sitter 0.26's supported LANGUAGE_VERSION range.
+MAX_COMPATIBLE_ABI = int(os.environ.get("TSLP_MAX_COMPATIBLE_ABI", "15"))
 ABI_EXEMPT_PARSER_BYTES = int(os.environ.get("TSLP_ABI_EXEMPT_PARSER_BYTES", str(24 * 1024 * 1024)))
 
 CACHE_MANIFEST_FILE = parsers_directory / ".cache_manifest.json"
@@ -274,16 +280,30 @@ def _committed_parser_abi(target_dir: Path) -> int | None:
 def _should_regenerate(language_name: str, directory: str | None) -> bool:
     """Whether a `generate: true` grammar should actually be regenerated.
 
-    Monster grammars whose committed parser.c exceeds ABI_EXEMPT_PARSER_BYTES are
-    exempt: regenerating them to the target ABI needs infeasible RAM/time on CI,
-    so they ship their committed parser.c as-is (a documented ABI-15 exception).
+    Monster grammars whose freshly-cloned parser.c exceeds ABI_EXEMPT_PARSER_BYTES are
+    exempt: regenerating them needs infeasible RAM/time on CI, so they ship that
+    parser.c as-is — but only when its own committed ABI still falls within
+    `[MIN_COMPATIBLE_ABI, MAX_COMPATIBLE_ABI]`, the range the vendored `tree-sitter`
+    crate can actually load. A grammar bump can land a new upstream rev whose
+    parser.c both crosses the size threshold AND carries an ABI the runtime cannot
+    load, in the same change; without this check the size branch alone decided the
+    outcome and shipped that unloadable parser.c unregenerated and unvalidated —
+    silently mixing ABI versions into the pack, so the bump would appear to succeed
+    while producing a broken or stale parser. Raise instead of exempting so the bump
+    fails loudly and needs a human, the same contract `handle_generate`'s timeout
+    fallback already enforces for its own ABI check. ~keep
 
     Args:
         language_name: The grammar name.
         directory: Optional subdirectory within the cloned repo.
 
     Returns:
-        True to regenerate, False to keep the committed parser.c.
+        True to regenerate, False to keep the already-cloned parser.c.
+
+    Raises:
+        RuntimeError: The parser.c is too large to regenerate and its own ABI falls
+            outside the range the runtime can load, so neither path can produce a
+            valid parser.
     """
     if ABI_EXEMPT_PARSER_BYTES <= 0:
         return True
@@ -296,16 +316,25 @@ def _should_regenerate(language_name: str, directory: str | None) -> bool:
         size = (target_dir / "src" / "parser.c").stat().st_size
     except OSError:
         return True
-    if size > ABI_EXEMPT_PARSER_BYTES:
-        abi = _committed_parser_abi(target_dir)
-        print(
-            f"Skipping regeneration of {language_name}: committed parser.c is "
-            f"{size / 1_000_000:.0f} MB (ABI {abi}) — too large to regenerate to ABI 14 "
-            f"on standard runners; shipping committed parser.c as-is.",
-            flush=True,
+    if size <= ABI_EXEMPT_PARSER_BYTES:
+        return True
+
+    abi = _committed_parser_abi(target_dir)
+    if abi is None or not (MIN_COMPATIBLE_ABI <= abi <= MAX_COMPATIBLE_ABI):
+        raise RuntimeError(
+            f"{language_name}: parser.c is {size / 1_000_000:.0f} MB — too large to regenerate "
+            f"on standard runners — and its own ABI ({abi}) is outside the range "
+            f"[{MIN_COMPATIBLE_ABI}, {MAX_COMPATIBLE_ABI}] the runtime can load, so it cannot ship "
+            "as-is either. Raise TSLP_ABI_EXEMPT_PARSER_BYTES to force regeneration, or pin this "
+            "grammar to a revision whose committed parser.c is within the loadable ABI range."
         )
-        return False
-    return True
+    print(
+        f"Skipping regeneration of {language_name}: committed parser.c is "
+        f"{size / 1_000_000:.0f} MB (ABI {abi}) — too large to regenerate on standard runners; "
+        "shipping committed parser.c as-is.",
+        flush=True,
+    )
+    return False
 
 
 async def _run_generate_with_timeout(cmd: list[str], cwd: str) -> None:
@@ -676,11 +705,12 @@ async def process_repo(
             rev=language_definition.get("rev"),
         )
     directory = language_definition.get("directory")
+    abi_version = language_definition.get("abi_version", 14)
     if language_definition.get("generate", False) and _should_regenerate(language_name, directory):
         await handle_generate(
             language_name=language_name,
             directory=directory,
-            abi_version=language_definition.get("abi_version", 14),
+            abi_version=abi_version,
             generate_semaphore=generate_semaphore,
         )
     await move_src_folder(language_name=language_name, directory=directory)
