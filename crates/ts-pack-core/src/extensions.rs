@@ -74,16 +74,30 @@ fn detect_compound_extension(file_name: &str) -> Option<&'static str> {
 /// The `-S` flag accepted by some `env` implementations is skipped automatically.
 /// Version suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.
 ///
-/// Returns `None` when content does not start with `#!`, the shebang is
-/// malformed, or the interpreter is not recognised.
+/// A leading UTF-8 BOM (`U+FEFF`) is skipped before the `#!` check, so a
+/// BOM-prefixed script is still detected by its shebang.
+///
+/// Returns `None` when content does not start with `#!` (after stripping a
+/// leading BOM), the shebang is malformed, or the interpreter is not recognised.
 ///
 /// ```
 /// use tree_sitter_language_pack::detect_language_from_content;
 /// assert_eq!(detect_language_from_content("#!/usr/bin/env python3\npass"), Some("python"));
 /// assert_eq!(detect_language_from_content("#!/bin/bash\necho hi"), Some("bash"));
 /// assert_eq!(detect_language_from_content("no shebang here"), None);
+/// assert_eq!(
+///     detect_language_from_content("\u{FEFF}#!/usr/bin/env python3\npass"),
+///     Some("python")
+/// );
 /// ```
 pub fn detect_language_from_content(content: &str) -> Option<&'static str> {
+    // ~keep A leading BOM is common in files saved by Windows-oriented tools and must
+    // ~keep not hide the shebang from this scan. This is the only BOM-sensitive spot in
+    // ~keep the crate: tree-sitter parsing itself already tolerates a leading BOM as
+    // ~keep insignificant trivia rather than an error (verified empirically against this
+    // ~keep pack's compiled python/rust/go/javascript grammars), so byte offsets reported
+    // ~keep elsewhere need no adjustment and this function returns no offsets to begin with.
+    let content = content.strip_prefix('\u{FEFF}').unwrap_or(content);
     if !content.starts_with("#!") {
         return None;
     }
@@ -349,6 +363,25 @@ mod tests {
     #[test]
     fn test_empty_content() {
         assert_eq!(detect_language_from_content(""), None);
+    }
+
+    #[test]
+    fn test_shebang_with_leading_bom() {
+        assert_eq!(
+            detect_language_from_content("\u{FEFF}#!/usr/bin/env python3\npass"),
+            Some("python"),
+            "a leading UTF-8 BOM must not hide the shebang line"
+        );
+        assert_eq!(
+            detect_language_from_content("\u{FEFF}#!/bin/bash\necho hi"),
+            Some("bash")
+        );
+    }
+
+    #[test]
+    fn test_bom_only_content_is_not_a_shebang() {
+        assert_eq!(detect_language_from_content("\u{FEFF}no shebang here"), None);
+        assert_eq!(detect_language_from_content("\u{FEFF}"), None);
     }
 
     #[test]

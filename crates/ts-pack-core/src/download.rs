@@ -233,7 +233,37 @@ pub(crate) fn ensure_secure_cache_dir(path: &Path) -> Result<(), Error> {
 }
 
 /// Windows fallback: plain recursive creation. ACL-based ownership hardening is a
-/// known follow-up here, not a silently-claimed guarantee — see #101 H2. ~keep
+/// known follow-up here, not a silently-claimed guarantee — see #101 H2.
+///
+/// Deliberately still unimplemented as of task #109: this crate has no Windows
+/// security-API dependency (`windows-sys`/`windows`) today, adding one requires
+/// editing `Cargo.toml` (out of scope for that task), and a Windows ACL check
+/// cannot be written with confidence on a host that cannot compile or run it —
+/// a check that wrongly *refuses* a legitimate cache directory would hard-break
+/// every Windows user, which is worse than this known gap. A Windows-hosted
+/// implementer closing this out needs to, mirroring `verify_owner_and_perms`
+/// and `CACHE_DIR_MODE` above:
+/// - Add `windows-sys` (or `windows`) under
+///   `[target.'cfg(windows)'.dependencies]` in `Cargo.toml`, pulling in the
+///   `Win32_Security` and `Win32_Storage_FileSystem` feature sets.
+/// - Resolve the current process's user SID via
+///   `OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, ...)` +
+///   `GetTokenInformation(TokenUser)` — the Windows analogue of `getuid()`.
+/// - Resolve `path`'s owner SID via `GetNamedSecurityInfoW(path,
+///   SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION,
+///   ...)` and compare it to the process SID with `EqualSid`; refuse on
+///   mismatch, mirroring the uid check in `verify_owner_and_perms`.
+/// - Inspect the DACL that call also returns (e.g. via
+///   `GetEffectiveRightsFromAclW` for `Everyone`/`Authenticated Users`/other
+///   well-known non-owner principals) and refuse if any non-owner principal
+///   holds a write-capable access right, mirroring `GROUP_OTHER_WRITABLE_MASK`.
+/// - When `path` does not yet exist, create it with a DACL that denies
+///   non-owner write from the start (e.g. build a `SECURITY_ATTRIBUTES` for
+///   `CreateDirectoryW`, or call `SetNamedSecurityInfoW` immediately after),
+///   for parity with `CACHE_DIR_MODE` on Unix.
+/// - Land this behind Windows-hosted CI integration tests exercising both the
+///   accept and refuse paths (mirroring the `#[cfg(unix)]` tests below) before
+///   relying on it — nothing here can be verified blind. ~keep
 #[cfg(not(unix))]
 pub(crate) fn ensure_secure_cache_dir(path: &Path) -> Result<(), Error> {
     fs::create_dir_all(path)

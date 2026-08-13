@@ -658,7 +658,7 @@ pub(super) fn symbol_at(node: &tree_sitter::Node, source: &str) -> Option<Symbol
         type_annotation: node
             .child_by_field_name("type")
             .map(|n| node_text(&n, source).to_string()),
-        doc: None,
+        doc: doc_comment_at(node, source),
     })
 }
 
@@ -1251,6 +1251,42 @@ mod tests {
                 .iter()
                 .any(|s| { s.kind == SymbolKind::Type && s.name == "ID" })
         );
+    }
+
+    #[test]
+    fn should_populate_symbol_doc_from_an_immediately_preceding_doc_comment() {
+        let source = "/// Documented function.\nfn documented() {}\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+
+        let symbol = intel
+            .symbols
+            .iter()
+            .find(|s| s.name == "documented")
+            .expect("the documented function should be extracted as a symbol");
+        assert_eq!(
+            symbol.doc.as_deref(),
+            Some("/// Documented function."),
+            "SymbolInfo.doc must reuse doc_comment_at rather than stay hard-coded None"
+        );
+    }
+
+    #[test]
+    fn should_leave_symbol_doc_none_for_a_symbol_with_no_preceding_doc_comment() {
+        let source = "fn undocumented() {}\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+
+        let symbol = intel
+            .symbols
+            .iter()
+            .find(|s| s.name == "undocumented")
+            .expect("the undocumented function should be extracted as a symbol");
+        assert_eq!(symbol.doc, None);
     }
 
     #[test]

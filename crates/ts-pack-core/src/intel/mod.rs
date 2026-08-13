@@ -403,6 +403,43 @@ mod tests {
         assert_eq!(intel.chunks[0].metadata.language, lang);
     }
 
+    /// A leading UTF-8 BOM is never stripped before parsing (`parse_source` calls
+    /// `source.as_bytes()` on the exact `&str` the caller passed in), so every span
+    /// this crate returns must already index correctly into that same original
+    /// buffer, BOM included. This is the property that would silently break if a
+    /// future change stripped the BOM at the parse boundary without adding its
+    /// byte length back into every reported offset.
+    #[test]
+    fn should_index_symbol_spans_into_the_original_bom_prefixed_source() {
+        let registry = LanguageRegistry::new();
+        if !has_grammar(
+            &registry,
+            "rust",
+            "should_index_symbol_spans_into_the_original_bom_prefixed_source",
+        ) {
+            return;
+        }
+        let source = "\u{FEFF}fn alpha() {}\n";
+        let config = ProcessConfig::new("rust").all();
+        let result = super::process(source, &config, &registry).expect("BOM-prefixed source must still parse");
+
+        assert_eq!(
+            result.metrics.error_count, 0,
+            "a leading BOM must not be reported as a parse error"
+        );
+
+        let symbol = result
+            .symbols
+            .iter()
+            .find(|s| s.name == "alpha")
+            .expect("the alpha function must be extracted as a symbol");
+        assert_eq!(
+            &source[symbol.span.start_byte..symbol.span.end_byte],
+            "fn alpha() {}",
+            "span byte offsets must slice the exact source the caller passed in, BOM included"
+        );
+    }
+
     #[test]
     fn test_process_invalid_language() {
         let registry = LanguageRegistry::new();

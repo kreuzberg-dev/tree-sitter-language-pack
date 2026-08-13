@@ -511,7 +511,16 @@ pub struct SymbolInfo {
     /// Explicit type annotation, if present in the source.
     pub type_annotation: Option<String>,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
-    /// Documentation comment associated with this symbol.
+    /// Documentation comment immediately preceding this symbol, resolved by
+    /// the same walk [`StructureItem::doc_comment`] uses (see
+    /// [`super::intelligence::doc_comment_at`]) — never hard-coded `None`.
+    ///
+    /// Populated for Rust (`///`/`//!`), Java (`/** */`), and JavaScript/
+    /// TypeScript (`/** */`) — the languages whose comment classification
+    /// recognizes a doc-kind comment. `None` for every other language (e.g.
+    /// Python, Go, Ruby, which have no doc-kind comment classification), and
+    /// also `None` when a symbol in a supported language simply has no doc
+    /// comment immediately above it.
     pub doc: Option<String>,
 }
 
