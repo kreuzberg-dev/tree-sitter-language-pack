@@ -542,34 +542,64 @@ def _score_editor_query(parts: tuple[str, ...], path_str: str) -> int | None:
     return None
 
 
-def _is_foreign_grammar_query(candidate: Path, directory: str | None) -> bool:
-    """Report whether a candidate belongs to a *different* grammar in the same monorepo.
+def _is_foreign_grammar_query(
+    candidate: Path,
+    directory: str | None,
+    language_name: str | None = None,
+    scoped_subdirs: frozenset[str] = frozenset(),
+) -> bool:
+    """Report whether a candidate is scoped to a *different* language than the one we want.
 
-    Only meaningful when `directory` is set, i.e. the language is one grammar among
-    several in a shared repository. Such a repo lays its queries out in one of three
-    ways: `<grammar>/queries/<file>`, `queries/<grammar>/<file>`, or a single shared
-    `queries/<file>` at the root. The first two are grammar-scoped, so a candidate
-    scoped to some *other* grammar is never a valid substitute — its node types belong
-    to a different language. The shared root layout is not scoped to anything and stays
-    eligible as a fallback. ~keep
+    Two layouts scope a query file to a specific grammar: `<grammar>/queries/<file>` and
+    `queries/<grammar>/<file>`. A candidate scoped to some *other* grammar is never a valid
+    substitute — its node types belong to a different language, so it either fails to compile
+    or, worse, silently produces captures keyed to the wrong grammar.
+
+    This is not limited to monorepos declaring `directory`. Several single-grammar repos vendor
+    nvim-treesitter's whole `runtime/queries/<language>/` bundle for unrelated editor-plugin
+    reasons, which puts dozens of other languages' query files in scope. `leo` acquired its
+    `locals` from `runtime/queries/m68k/` and its `indents` from `runtime/queries/ocaml/` that
+    way — every candidate tied on score and traversal order decided it. So the scoped-to-another
+    -language test applies whenever we know the name we are looking for, `directory` or not.
+
+    A repo-root `queries/<file>` is scoped to nothing and stays eligible as a fallback. ~keep
 
     Args:
         candidate: The candidate query file path (relative to the repo root).
         directory: Optional grammar subdirectory within the repo.
+        language_name: The language being vendored, used when the repo scopes by language name.
+        scoped_subdirs: Every `<x>` seen in a `queries/<x>/<file>` candidate in this repo.
 
     Returns:
         True if the candidate is scoped to a different grammar and must not be used.
     """
-    if not directory:
+    parts = candidate.parts
+    if len(parts) < 3:
         return False
 
-    dir_last = directory.split("/")[-1]
-    parts = candidate.parts
+    # ~keep `<x>/queries/<file>`: only a monorepo declaring `directory` scopes queries this
+    # ~keep way. Repos that embed another grammar as a submodule use the same shape without
+    # ~keep meaning "different language" — arduino/cuda/ispc pull tree-sitter-cpp and -c in,
+    # ~keep and those queries do apply, since those grammars are supersets. So this clause
+    # ~keep stays keyed on `directory`, not on the language name.
+    if parts[-2] == "queries":
+        return bool(directory) and parts[-3] != directory.split("/")[-1]
 
-    if len(parts) >= 3 and parts[-2] == "queries" and parts[-3] != dir_last:
-        return True
+    if parts[-3] != "queries" or _get_editor_score(parts[-2]):
+        return False
 
-    return len(parts) >= 3 and parts[-3] == "queries" and parts[-2] != dir_last
+    # ~keep `queries/<x>/<file>`: whether `<x>` means "a different language" depends on how
+    # ~keep many such subdirectories the repo has. One means the repo simply scopes its own
+    # ~keep queries under a name that need not equal ours — nushell ships `queries/nu/`, and
+    # ~keep rejecting it on a name mismatch loses that grammar's only queries. Several means
+    # ~keep it is a per-language bundle: leo vendors nvim-treesitter's whole `runtime/queries/`
+    # ~keep tree, and took its locals from m68k and its indents from ocaml purely on traversal
+    # ~keep order. Only then is a non-matching name evidence of the wrong language.
+    if len(scoped_subdirs) <= 1:
+        return False
+
+    own_names = {name for name in (directory.split("/")[-1] if directory else None, language_name) if name}
+    return parts[-2] not in own_names
 
 
 def _score_query_candidate(candidate: Path, directory: str | None) -> int:
@@ -649,6 +679,15 @@ async def _discover_and_copy_queries(
         if filename in query_types:
             all_scm_files[filename].append(scm_file)
 
+    scoped_subdirs = frozenset(
+        candidate.relative_to(vendor_repo).parts[-2]
+        for candidates in all_scm_files.values()
+        for candidate in candidates
+        if len(candidate.relative_to(vendor_repo).parts) >= 3
+        and candidate.relative_to(vendor_repo).parts[-3] == "queries"
+        and not _get_editor_score(candidate.relative_to(vendor_repo).parts[-2])
+    )
+
     has_own_queries_dir = bool(directory) and any(
         _score_query_candidate(candidate.relative_to(vendor_repo), directory) == 1
         for candidates in all_scm_files.values()
@@ -665,7 +704,11 @@ async def _discover_and_copy_queries(
         # ~keep the language, so a repo-root `queries/` sat at `<lang>/queries/<file>` and
         # ~keep scored as if it were the grammar's own directory, tying with the real one.
         relative = [(candidate, candidate.relative_to(vendor_repo)) for candidate in candidates]
-        eligible = [(c, r) for c, r in relative if not _is_foreign_grammar_query(r, directory)]
+        eligible = [
+            (c, r)
+            for c, r in relative
+            if not _is_foreign_grammar_query(r, directory, language_name, scoped_subdirs)
+        ]
         if not eligible:
             print(f"Skipping {language_name} {query_type}: only other grammars in this repo provide it")
             continue
