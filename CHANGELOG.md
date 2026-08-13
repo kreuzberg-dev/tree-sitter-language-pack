@@ -7,10 +7,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.0] - 2026-08-13
+
+This release ships the Rust crates only. The language bindings are held back pending generator
+fixes and will follow; they skip the crates once regenerated.
+
+### Changed
+
+- **`PackConfig.cache_dir` is a base directory, not the final library path.** The crate now
+  appends `tree-sitter-language-pack/v{version}/libs` to it, exactly as it does to the platform
+  default, so `cache_dir = "/tmp/parsers"` resolves to
+  `/tmp/parsers/tree-sitter-language-pack/v{version}/libs/`. Earlier releases used the configured
+  path verbatim, which put the manifest, bundles and lock file in that directory's *parent* and let
+  a cache built by one crate version be reused by another. If you set `cache_dir`, your parsers
+  will be re-downloaded once into the new location.
+- **Query results change for roughly fifteen languages**, because they were being served another
+  grammar's queries. `_score_query_candidate` had an unreachable preference branch, so for grammars
+  vendored from a monorepo the winner was decided by filesystem traversal order: `cfml` took all
+  five of its query files from sibling grammars, `psv` and `tsv` took CSV's, and `dtd` took XML's.
+  `leo` took its `locals` from **m68k** and its `indents` from **ocaml**. Affected: apex, bsl,
+  cedarschema, cfml, dtd, fsharp_signature, leo, markdown, ocaml_interface, postgres, psv, sflog,
+  soql, sosl, tsv, xml, ziggy_schema. If you hold golden files for any of these, regenerate rather
+  than trust them — several previously returned plausible-but-wrong captures rather than an error.
+- `sflog`, `soql` and `sosl` now ship **fewer** query files. Upstream never wrote the missing kinds
+  for them; what they had belonged to a sibling grammar.
+
+  Known and not yet fixed in this release: `templ` still receives Go's `highlights` and `tags`,
+  which reach it through tree-sitter-templ's own npm dependency on tree-sitter-go. They compile,
+  because templ embeds Go, so no gate catches them. A fix is written but is being held until its
+  effect on every grammar with npm dependencies has been measured.
+- All 46 out-of-date grammars refreshed to upstream HEAD. Two carry parse-tree *shape* changes for
+  previously-valid source rather than merely new syntax: `al` (3.2.1 → 4.0.1: dangling-else binding,
+  operator precedence, statement-terminator restructuring) and `scala` (operator precedence and
+  associativity per SLS 6.12.3). Node types are unchanged in both, so queries still compile.
+
 ### Added
 
+- `PackConfig::try_discover()`, which distinguishes "no config file" (`Ok(None)`) from "config file
+  found but unreadable or malformed" (`Err`, naming the path). `discover()` keeps its infallible
+  signature and now warns instead of silently returning `None`.
+- Windows cache-directory hardening: the cache is verified to sit under `%LOCALAPPDATA%`, which
+  Windows already restricts to the owning user, and warns when it does not. Advisory only — it
+  never refuses.
+- Always-on `tracing` spans and events across the parse and intelligence pipelines.
 - Documentation snippets are generated from the complete E2E fixture corpus and checked for
   fixture-by-language coverage parity in local tasks and CI.
+
+### Fixed
+
+- `get_query` returned an error for **dart** and **php** `tags`: both hand-written overlays named
+  node types their grammars do not have, and nothing ever compiled them. `ocaml_interface`
+  highlights likewise, where upstream ships one shared query set written for the implementation
+  grammar.
+- Intelligence extractors no longer drop a module docstring that follows a shebang or licence
+  header, fabricate docstrings, or miscount comment rows. `SymbolInfo.doc` is populated.
+- Shebang detection works on files that begin with a UTF-8 BOM.
+- A cache-registration race could leave the process wedged; a panic inside a critical section no
+  longer poisons a lock permanently.
+- `DownloadManager` resolves language aliases, and configuration errors are reported rather than
+  discarded.
+- Only grammars whose external scanner actually keeps global state are serialised during parsing —
+  measured at 1 of 199 — instead of a single global parse lock.
+- Dynamic-loading builds are relocatable.
+- Dart: the native loader downloads and caches the library again on a cold cache. It only read
+  the versioned cache and then threw a `StateError`, even though `nativeDownloadAndCacheLibrary()`
+  was defined and exported for exactly that case. The loader also now searches for the
+  `_dart`-suffixed cdylib that is actually built, opens every candidate by absolute path (a
+  hardened runtime rejects a relative `dlopen`), and names the real environment variable in its
+  error message instead of printing the identifier `$nativeLibDirEnv` literally. Fixed upstream in
+  alef 0.55.6.
+
+  Behavior change: an unresolvable native now throws a descriptive `StateError` naming the asset
+  URL and the download command, where it previously returned `null` and let flutter_rust_bridge
+  attempt its own relative-path `dlopen`.
 
 ### Fixed
 

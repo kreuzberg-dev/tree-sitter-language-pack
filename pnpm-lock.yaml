@@ -18,31 +18,6 @@ importers:
       '@napi-rs/cli':
         specifier: ^3.7.3
         version: 3.8.5(@emnapi/runtime@1.11.2)(@types/node@26.2.0)(node-addon-api@8.9.1)
-    optionalDependencies:
-      '@xberg-io/tree-sitter-language-pack-darwin-arm64':
-        specifier: 1.14.3
-        version: 1.14.3
-      '@xberg-io/tree-sitter-language-pack-darwin-x64':
-        specifier: 1.14.3
-        version: 1.14.3
-      '@xberg-io/tree-sitter-language-pack-linux-arm64-gnu':
-        specifier: 1.14.3
-        version: 1.14.3
-      '@xberg-io/tree-sitter-language-pack-linux-arm64-musl':
-        specifier: 1.14.3
-        version: 1.14.3
-      '@xberg-io/tree-sitter-language-pack-linux-x64-gnu':
-        specifier: 1.14.3
-        version: 1.14.3
-      '@xberg-io/tree-sitter-language-pack-linux-x64-musl':
-        specifier: 1.14.3
-        version: 1.14.3
-      '@xberg-io/tree-sitter-language-pack-win32-arm64-msvc':
-        specifier: 1.14.3
-        version: 1.14.3
-      '@xberg-io/tree-sitter-language-pack-win32-x64-msvc':
-        specifier: 1.14.3
-        version: 1.14.3
 
   e2e/node:
     devDependencies:
@@ -968,58 +943,6 @@ packages:
 
   '@vitest/utils@4.1.10':
     resolution: {integrity: sha512-fy9am/HWxbaGt/Sawrp90vt6Y6jQwf1RX77cz3uwoJwJVMli/e1IEwRPnMNJ7vKfPTwo0diXifkpPvwH9v7nGA==}
-
-  '@xberg-io/tree-sitter-language-pack-darwin-arm64@1.14.3':
-    resolution: {integrity: sha512-oDBV9BwNi65MW18TOsc6vcg0kea9fUY2X4UAGqrBUQk+qUnMxXVf8UksxOuWZWYUqPZ8T/nt6evcOUccRsXzwg==}
-    engines: {node: '>= 22'}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@xberg-io/tree-sitter-language-pack-darwin-x64@1.14.3':
-    resolution: {integrity: sha512-MO5xyfdqRmStVJ1egcoNWAe1REUOvuiZbd/DMdc5LzyvtuuGtqGoEz72l64hpxFgXtK54GizxVEZfOycvO81Ng==}
-    engines: {node: '>= 22'}
-    cpu: [x64]
-    os: [darwin]
-
-  '@xberg-io/tree-sitter-language-pack-linux-arm64-gnu@1.14.3':
-    resolution: {integrity: sha512-gWIOSWbZCjpcBDR+8f2zQOMu18UZyxxFw5a0/a4XC2AFqtyvjrT6kl/gR/vaK8Dl0ByebfmtQxvpEYqDFf8vAQ==}
-    engines: {node: '>= 22'}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@xberg-io/tree-sitter-language-pack-linux-arm64-musl@1.14.3':
-    resolution: {integrity: sha512-2PxjFuGb3Q8SPS1kQ1ytOR5ES8DkivSe7Lj0XY8NYOLTkormPurBWVeeCECYHL2kelmljtyWLUoUyY2Tc4V6uA==}
-    engines: {node: '>= 22'}
-    cpu: [arm64]
-    os: [linux]
-    libc: [musl]
-
-  '@xberg-io/tree-sitter-language-pack-linux-x64-gnu@1.14.3':
-    resolution: {integrity: sha512-xttCXKwECcEm0NNdcOv9+OCyOAX7CceitMvwoI1rc+B1cmRnvMuZKTMsr0SCSxy8QITCBb+EqNnuKlTfwuXlOA==}
-    engines: {node: '>= 22'}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@xberg-io/tree-sitter-language-pack-linux-x64-musl@1.14.3':
-    resolution: {integrity: sha512-eiKLoyAxzc35jWytqtQdrk7k8WHyxm1ubQj6DlJx3f8330y2i2Y2KLeOej5zphFURiQQclm+ZH8BNm+hW2mxdQ==}
-    engines: {node: '>= 22'}
-    cpu: [x64]
-    os: [linux]
-    libc: [musl]
-
-  '@xberg-io/tree-sitter-language-pack-win32-arm64-msvc@1.14.3':
-    resolution: {integrity: sha512-ALAlgYGXYIXuUbHWH8ue9MFxCvj4pYCjnvKv4A51c3r0hwbaupM8TrMFUQNL7ODnay5e+F+pLxvMw2QwI9JoZw==}
-    engines: {node: '>= 22'}
-    cpu: [arm64]
-    os: [win32]
-
-  '@xberg-io/tree-sitter-language-pack-win32-x64-msvc@1.14.3':
-    resolution: {integrity: sha512-bIZVZuNu1QMWJ0mZ9AU2dpVb+//V/a80w5C6cEKXMKEEyzKfbju3400GCUgP5kpaVlJ4Bh4EQwSJMHAMnHhyZg==}
-    engines: {node: '>= 22'}
-    cpu: [x64]
-    os: [win32]
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -2014,30 +1937,6 @@ snapshots:
       '@vitest/pretty-format': 4.1.10
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.1
-
-  '@xberg-io/tree-sitter-language-pack-darwin-arm64@1.14.3':
-    optional: true
-
-  '@xberg-io/tree-sitter-language-pack-darwin-x64@1.14.3':
-    optional: true
-
-  '@xberg-io/tree-sitter-language-pack-linux-arm64-gnu@1.14.3':
-    optional: true
-
-  '@xberg-io/tree-sitter-language-pack-linux-arm64-musl@1.14.3':
-    optional: true
-
-  '@xberg-io/tree-sitter-language-pack-linux-x64-gnu@1.14.3':
-    optional: true
-
-  '@xberg-io/tree-sitter-language-pack-linux-x64-musl@1.14.3':
-    optional: true
-
-  '@xberg-io/tree-sitter-language-pack-win32-arm64-msvc@1.14.3':
-    optional: true
-
-  '@xberg-io/tree-sitter-language-pack-win32-x64-msvc@1.14.3':
-    optional: true
 
   argparse@2.0.1: {}
 
