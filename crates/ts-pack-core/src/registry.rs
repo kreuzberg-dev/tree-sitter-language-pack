@@ -112,6 +112,22 @@ pub(crate) fn resolve_alias(name: &str) -> &str {
     name
 }
 
+/// Reverse lookup: every alias that resolves to `target` (the inverse of
+/// [`resolve_alias`]).
+///
+/// The only entry point for this direction of the lookup, so callers that need
+/// to report aliases alongside a canonical name — e.g.
+/// [`crate::download::DownloadManager::installed_languages`] — never need their
+/// own copy of `LANGUAGE_ALIASES`. There is exactly one alias table; keeping a
+/// second copy elsewhere would let the two drift. ~keep
+#[cfg(any(feature = "dynamic-loading", feature = "download"))]
+pub(crate) fn aliases_for(target: &str) -> Vec<&'static str> {
+    LANGUAGE_ALIASES
+        .iter()
+        .filter_map(|&(alias, canonical)| (canonical == target).then_some(alias))
+        .collect()
+}
+
 #[cfg(feature = "dynamic-loading")]
 fn lib_path_in(dir: &std::path::Path, name: &str) -> PathBuf {
     dir.join(library_file_name(name))
@@ -1150,5 +1166,29 @@ mod tests {
         assert_eq!(resolve_alias("rust"), "rust");
         assert_eq!(resolve_alias("definitely_not_a_language"), "definitely_not_a_language");
         assert_eq!(resolve_alias(""), "");
+    }
+
+    #[cfg(any(feature = "dynamic-loading", feature = "download"))]
+    #[test]
+    fn should_report_every_alias_that_resolves_to_a_canonical_target() {
+        assert_eq!(aliases_for("bash"), vec!["shell"]);
+        assert_eq!(aliases_for("starlark"), vec!["bazel"]);
+        assert_eq!(
+            aliases_for("definitely_not_a_language"),
+            Vec::<&str>::new(),
+            "a target with no alias must report an empty list, not panic"
+        );
+    }
+
+    #[cfg(any(feature = "dynamic-loading", feature = "download"))]
+    #[test]
+    fn should_agree_with_resolve_alias_for_every_alias_in_the_table() {
+        // ~keep aliases_for is the reverse of resolve_alias; every alias must round-trip.
+        for &(alias, target) in LANGUAGE_ALIASES {
+            assert!(
+                aliases_for(target).contains(&alias),
+                "aliases_for({target:?}) must contain {alias:?}"
+            );
+        }
     }
 }

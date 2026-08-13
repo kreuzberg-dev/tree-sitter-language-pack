@@ -27,6 +27,18 @@ const TLS_ROOTS_ENV: &str = "TREE_SITTER_LANGUAGE_PACK_TLS_ROOTS";
 const MANIFEST_URL_ENV: &str = "TREE_SITTER_LANGUAGE_PACK_MANIFEST_URL";
 const CACHE_DIR_ENV: &str = "TREE_SITTER_LANGUAGE_PACK_CACHE_DIR";
 const LOCK_FILE_NAME: &str = ".download.lock";
+/// Absolute ceiling on a downloaded platform-bundle archive, applied on top of
+/// the manifest-declared [`PlatformBundle::size`] so a compromised or malformed
+/// manifest cannot itself request an unbounded read. 2 GiB comfortably covers
+/// every compiled-grammar bundle this crate has published; a legitimate bundle
+/// that grows past it fails cleanly instead of exhausting memory. See #101 L1. ~keep
+const MAX_BUNDLE_DOWNLOAD_BYTES: u64 = 2 * 1024 * 1024 * 1024;
+
+/// Cap a bundle download at the manifest-declared size, itself bounded by
+/// [`MAX_BUNDLE_DOWNLOAD_BYTES`].
+fn bundle_read_cap(expected_size: u64) -> u64 {
+    expected_size.min(MAX_BUNDLE_DOWNLOAD_BYTES)
+}
 
 /// Resolve the URL used to fetch the parser manifest.
 ///
@@ -49,31 +61,35 @@ fn resolve_manifest_url(version: &str) -> String {
 /// Split from [`resolve_cache_base`] so every branch — including the one where
 /// the platform reports no cache directory — is reachable from unit tests
 /// without mutating process-global environment state. ~keep
-fn cache_base_from(env_override: Option<&str>, system_cache_dir: Option<PathBuf>) -> PathBuf {
+fn cache_base_from(env_override: Option<&str>, system_cache_dir: Option<PathBuf>) -> Result<PathBuf, Error> {
     if let Some(dir) = env_override
         && !dir.trim().is_empty()
     {
-        return PathBuf::from(dir);
+        return Ok(PathBuf::from(dir));
     }
     if let Some(dir) = system_cache_dir {
-        return dir;
+        return Ok(dir);
     }
-    // ~keep Windows conda-forge runners report no cache dir (no %LOCALAPPDATA%);
-    // ~keep degrading to the temp dir keeps downloads working instead of hard-failing (#176).
-    let fallback = std::env::temp_dir();
-    tracing::warn!(
-        fallback = %fallback.display(),
-        env_var = CACHE_DIR_ENV,
-        "no system cache directory; falling back to the temporary directory (cache will not persist)"
-    );
-    fallback
+    // ~keep #176 used to degrade to `std::env::temp_dir()` here (Windows conda-forge
+    // ~keep runners with no %LOCALAPPDATA%; Unix units/containers with no $HOME or
+    // ~keep $XDG_CACHE_HOME report no cache dir either). `temp_dir()` is world-writable
+    // ~keep on most platforms, and this cache is later searched for shared libraries this
+    // ~keep process dlopens — falling back to it lets any local user plant a payload this
+    // ~keep process will load and execute. Fail closed instead. See #101 H2. ~keep
+    Err(Error::Download(format!(
+        "Could not determine a cache directory: the platform reported none (no $HOME or \
+         $XDG_CACHE_HOME on Unix, no %LOCALAPPDATA% on Windows). Set {CACHE_DIR_ENV} to an \
+         explicit, private directory, or point HOME/XDG_CACHE_HOME (Unix) / LOCALAPPDATA \
+         (Windows) at one."
+    )))
 }
 
 /// Resolve the base directory for the parser cache.
 ///
 /// Layered: the `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR` env var (if set and
-/// non-empty), else the platform cache directory, else the temporary directory.
-fn resolve_cache_base() -> PathBuf {
+/// non-empty), else the platform cache directory. No longer falls back to the
+/// temporary directory — see [`cache_base_from`].
+fn resolve_cache_base() -> Result<PathBuf, Error> {
     cache_base_from(std::env::var(CACHE_DIR_ENV).ok().as_deref(), dirs::cache_dir())
 }
 
@@ -107,6 +123,140 @@ fn validate_sha256_hex(sha256: &str) -> Result<(), Error> {
     Err(Error::Download(format!(
         "Manifest sha256 '{sha256}' is not a well-formed {SHA256_HEX_LEN}-character hex digest"
     )))
+}
+
+/// Characters permitted in a crate version string: ASCII alphanumerics plus
+/// `.`, `-`, `+` (a semver-ish charset).
+fn is_valid_version_char(c: char) -> bool {
+    c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '+')
+}
+
+/// Reject a version string that is empty, contains a path-traversal sequence, or
+/// contains a character outside the semver-ish allowlist.
+///
+/// `version` is interpolated into both a manifest/bundle URL
+/// ([`resolve_manifest_url`]) and a filesystem path ([`DownloadManager::default_cache_dir`],
+/// and — via `self.version_cache_dir()` — the `remove_dir_all` target of
+/// [`DownloadManager::clean_cache`]). [`DownloadManager::new`] is reachable directly
+/// from every language binding's constructor with a caller-supplied version string,
+/// so this must fail closed rather than trust the input. See #101 M2. ~keep
+fn validate_version(version: &str) -> Result<(), Error> {
+    if version.is_empty() || version.contains("..") || !version.chars().all(is_valid_version_char) {
+        return Err(Error::Download(format!(
+            "Invalid version '{version}': must be a non-empty string of ASCII alphanumerics, \
+             '.', '-', or '+' only, and must not contain '..'"
+        )));
+    }
+    Ok(())
+}
+
+/// Unix permission bits applied to every directory this crate creates directly:
+/// owner read/write/execute only.
+#[cfg(unix)]
+const CACHE_DIR_MODE: u32 = 0o700;
+
+/// Bitmask for the Unix "group can write" and "other can write" permission bits.
+#[cfg(unix)]
+const GROUP_OTHER_WRITABLE_MASK: u32 = 0o022;
+
+// ~keep Declared directly via a raw `extern "C"` block rather than pulling in the
+// ~keep `libc`/`nix` crate for a single already-linked libc syscall.
+#[cfg(unix)]
+unsafe extern "C" {
+    fn getuid() -> u32;
+}
+
+/// Verify that an existing `path` is owned by the current process's uid and is not
+/// group- or other-writable.
+///
+/// This is the check that closes #101 H2: every directory this crate ever dlopens
+/// a shared library out of (registered as an `extra_lib_dir` in `registry.rs`), or
+/// writes an unverified manifest/bundle into, must be private to this process's
+/// user — otherwise another local user (or a process inheriting a shared, insecure
+/// `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR`) can plant a payload this process will
+/// trust. ~keep
+#[cfg(unix)]
+fn verify_owner_and_perms(path: &Path) -> Result<(), Error> {
+    use std::os::unix::fs::{MetadataExt, PermissionsExt};
+
+    let metadata = fs::metadata(path)
+        .map_err(|e| Error::Download(format!("Failed to stat cache directory {}: {e}", path.display())))?;
+
+    // SAFETY: getuid() takes no arguments, performs no I/O, and cannot fail.
+    let current_uid = unsafe { getuid() };
+    if metadata.uid() != current_uid {
+        return Err(Error::Download(format!(
+            "Refusing to use cache directory {} because it is owned by uid {}, not the current \
+             process's uid {}. Set {CACHE_DIR_ENV} to a directory this process owns.",
+            path.display(),
+            metadata.uid(),
+            current_uid
+        )));
+    }
+
+    let mode = metadata.permissions().mode();
+    if mode & GROUP_OTHER_WRITABLE_MASK != 0 {
+        return Err(Error::Download(format!(
+            "Refusing to use cache directory {} because it is group- or other-writable (mode {:o}). \
+             Run `chmod 700 {}` or set {CACHE_DIR_ENV} to a private directory.",
+            path.display(),
+            mode & 0o777,
+            path.display()
+        )));
+    }
+
+    Ok(())
+}
+
+/// Create `path` (and any missing ancestors) as an owner-only (`0700`) directory,
+/// or verify that a pre-existing `path` is still owner-only. See
+/// [`verify_owner_and_perms`]. Used for every directory this crate creates under
+/// the resolved cache base (`DownloadCacheLock::open`, `extract_languages`,
+/// `extract_all_libs`).
+#[cfg(unix)]
+pub(crate) fn ensure_secure_cache_dir(path: &Path) -> Result<(), Error> {
+    use std::os::unix::fs::DirBuilderExt;
+
+    if !path.exists() {
+        fs::DirBuilder::new()
+            .recursive(true)
+            .mode(CACHE_DIR_MODE)
+            .create(path)
+            .map_err(|e| {
+                Error::Download(format!(
+                    "Failed to create cache directory {} with owner-only (0700) permissions: {e}",
+                    path.display()
+                ))
+            })?;
+    }
+    verify_owner_and_perms(path)
+}
+
+/// Windows fallback: plain recursive creation. ACL-based ownership hardening is a
+/// known follow-up here, not a silently-claimed guarantee — see #101 H2. ~keep
+#[cfg(not(unix))]
+pub(crate) fn ensure_secure_cache_dir(path: &Path) -> Result<(), Error> {
+    fs::create_dir_all(path)
+        .map_err(|e| Error::Download(format!("Failed to create cache directory {}: {e}", path.display())))
+}
+
+/// Verify a cache directory's ownership/permissions if it already exists; a
+/// missing directory has nothing to verify (nothing here would be dlopened).
+///
+/// Used at dlopen-search-path registration time (`ensure_cache_registered` in
+/// `lib.rs`), which must not have the side effect of creating a directory just
+/// because a read-only query (`has_language`, `available_languages`, ...) ran.
+#[cfg(unix)]
+pub(crate) fn verify_cache_dir_if_present(path: &Path) -> Result<(), Error> {
+    if !path.exists() {
+        return Ok(());
+    }
+    verify_owner_and_perms(path)
+}
+
+#[cfg(not(unix))]
+pub(crate) fn verify_cache_dir_if_present(_path: &Path) -> Result<(), Error> {
+    Ok(())
 }
 
 /// Sibling tmp path for atomic writes: `<dest_dir>/.<name>.tmp.<pid>.<seq>`.
@@ -203,8 +353,9 @@ impl DownloadCacheLock {
     /// Open (or create) the lock file under `cache_dir`. Does not block; the
     /// returned value must be locked via [`Self::lock_exclusive`].
     pub(crate) fn open(cache_dir: &Path) -> Result<Self, Error> {
-        fs::create_dir_all(cache_dir)
-            .map_err(|e| Error::CacheLock(format!("create cache dir {}: {e}", cache_dir.display())))?;
+        // ~keep Propagate `ensure_secure_cache_dir`'s error as-is: it already names the
+        // ~keep concrete reason (missing HOME/XDG_CACHE_HOME, wrong owner, group/other-writable).
+        ensure_secure_cache_dir(cache_dir)?;
         let lock_path = cache_dir.join(LOCK_FILE_NAME);
         let file = OpenOptions::new()
             .read(true)
@@ -312,7 +463,15 @@ pub struct DownloadManager {
 
 impl DownloadManager {
     /// Create a new download manager for the given version.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Download`] if `version` is empty, contains a path
+    /// separator or `..`, or contains a character outside `[A-Za-z0-9.+-]` — see
+    /// [`validate_version`] — or if no cache directory can be resolved (see
+    /// [`Self::default_cache_dir`]).
     pub fn new(version: &str) -> Result<Self, Error> {
+        validate_version(version)?;
         let cache_dir = Self::default_cache_dir(version)?;
         Ok(Self::with_cache_dir_and_tls(version, cache_dir, None))
     }
@@ -347,16 +506,39 @@ impl DownloadManager {
     ///
     /// The base is resolved in layers: the `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR`
     /// environment variable (if set and non-empty), else the platform cache
-    /// directory, else the temporary directory. The last resort means this never
-    /// fails on platforms where `dirs::cache_dir()` returns `None`; the `Result`
-    /// is retained for API compatibility.
+    /// directory.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Download`] if `version` fails [`validate_version`], or if
+    /// no cache directory can be resolved — the platform reported none and
+    /// `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR` is unset (see [`resolve_cache_base`]).
+    /// This crate no longer falls back to the temporary directory for this: see
+    /// #101 H2.
     #[cfg_attr(alef, alef(skip))]
     pub fn default_cache_dir(version: &str) -> Result<PathBuf, Error> {
-        let base = resolve_cache_base();
-        Ok(base
-            .join("tree-sitter-language-pack")
+        validate_version(version)?;
+        let base = resolve_cache_base()?;
+        Ok(Self::cache_dir_from_base(&base, version))
+    }
+
+    /// Append the crate-owned `tree-sitter-language-pack/v{version}/libs` suffix to `base`.
+    ///
+    /// Shared by [`Self::default_cache_dir`] (`base` = the resolved platform/env
+    /// cache directory) and by `effective_cache_dir` in `lib.rs` (`base` = a
+    /// caller-supplied [`crate::pack_config::PackConfig::cache_dir`]), so a custom
+    /// cache directory is always treated as a BASE, never as the final libs path.
+    ///
+    /// Before this helper existed, a custom `cache_dir` was forwarded to
+    /// [`Self::with_cache_dir`] verbatim, so [`Self::version_cache_dir`]
+    /// (`self.cache_dir.parent()`) resolved to the *parent* of the caller's
+    /// configured directory — `manifest.json`, `bundles/`, and `.download.lock`
+    /// all ended up outside it, and `clean_cache` removed sibling directories the
+    /// caller never configured. See #101 H1. ~keep
+    pub(crate) fn cache_dir_from_base(base: &Path, version: &str) -> PathBuf {
+        base.join("tree-sitter-language-pack")
             .join(format!("v{version}"))
-            .join("libs"))
+            .join("libs")
     }
 
     /// Return the path to the libs cache directory.
@@ -367,26 +549,44 @@ impl DownloadManager {
 
     /// List languages that are already downloaded and cached.
     ///
-    /// Returns canonical names only, derived one-to-one from the on-disk cache
-    /// filenames. Aliases (e.g. `"shell"` for `"bash"`) are a naming-layer
-    /// concept resolved by [`crate::registry::resolve_alias`] at lookup time —
-    /// there is no separate on-disk artifact for an alias — so this list would
-    /// have to duplicate the alias table `registry.rs` keeps private in order to
-    /// also report them. Contrast with the user-facing
-    /// [`LanguageRegistry::available_languages`](crate::LanguageRegistry::available_languages),
-    /// which does include aliases because it answers "what name can I ask for",
-    /// not "what file is on disk".
+    /// Derived from the on-disk cache filenames, one canonical name per file, plus
+    /// every alias that resolves to it (via [`crate::registry::aliases_for`]) — so
+    /// this list agrees with the user-facing
+    /// [`LanguageRegistry::available_languages`](crate::LanguageRegistry::available_languages)
+    /// about which names are "available"; both report `"shell"` once `bash` is
+    /// cached, for example. A previous version reported canonical names only,
+    /// which could never agree with `available_languages()`. See #107.
+    ///
+    /// Returns an empty list if the cache directory does not exist. If it exists
+    /// but cannot be read (e.g. a permission error), also returns an empty list —
+    /// changing this to a `Result` would be a breaking change across every
+    /// language binding — but logs a `tracing::warn!` so the failure is not
+    /// silently indistinguishable from "nothing installed". ~keep
     pub fn installed_languages(&self) -> Vec<String> {
         let mut langs = Vec::new();
-        if let Ok(entries) = fs::read_dir(&self.cache_dir) {
-            for entry in entries.flatten() {
-                let name = entry.file_name().to_string_lossy().into_owned();
-                if let Some(lang) = crate::registry::lang_name_from_lib_filename(&name) {
-                    langs.push(lang);
+        match fs::read_dir(&self.cache_dir) {
+            Ok(entries) => {
+                for entry in entries.flatten() {
+                    let name = entry.file_name().to_string_lossy().into_owned();
+                    if let Some(lang) = crate::registry::lang_name_from_lib_filename(&name) {
+                        for alias in crate::registry::aliases_for(&lang) {
+                            langs.push(alias.to_string());
+                        }
+                        langs.push(lang);
+                    }
                 }
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => {
+                tracing::warn!(
+                    cache_dir = %self.cache_dir.display(),
+                    %error,
+                    "failed to list the download cache directory; reporting no languages installed"
+                );
             }
         }
         langs.sort();
+        langs.dedup();
         langs
     }
 
@@ -686,7 +886,7 @@ impl DownloadManager {
             return Ok(data);
         }
 
-        let data = self.download_bundle(&bundle.url)?;
+        let data = self.download_bundle(&bundle.url, bundle.size)?;
         let actual_hash = Self::sha256_hex(&data);
         if actual_hash != bundle.sha256 {
             return Err(Error::ChecksumMismatch {
@@ -722,25 +922,44 @@ impl DownloadManager {
         Ok(None)
     }
 
-    /// Download a bundle archive from the given URL.
-    fn download_bundle(&self, url: &str) -> Result<Vec<u8>, Error> {
+    /// Download a bundle archive from the given URL, reading at most
+    /// [`bundle_read_cap`]`(expected_size)` bytes.
+    ///
+    /// `expected_size` comes from the manifest's [`PlatformBundle::size`] — an
+    /// untrusted, network-fetched value — so the cap it produces is itself
+    /// clamped to [`MAX_BUNDLE_DOWNLOAD_BYTES`]. Without a cap, a hostile or
+    /// malfunctioning server could stream an unbounded response and exhaust
+    /// process memory before [`Self::sha256_hex`] ever runs over the data. See
+    /// #101 L1. ~keep
+    fn download_bundle(&self, url: &str, expected_size: u64) -> Result<Vec<u8>, Error> {
         if let Some(path) = url.strip_prefix("file://") {
             return fs::read(path).map_err(|e| Error::Download(format!("Failed to read bundle from {url}: {e}")));
         }
 
-        tracing::info!(url, "downloading parser bundle");
+        tracing::info!(url, expected_size, "downloading parser bundle");
         let response = self
             .agent
             .get(url)
             .call()
             .map_err(|e| Error::Download(format!("Failed to download {}: {}", url, e)))?;
 
+        let cap = bundle_read_cap(expected_size);
         let mut data = Vec::new();
+        // ~keep Read one byte past `cap` so an oversized body is detected explicitly
+        // ~keep below instead of being silently truncated and left to a confusing
+        // ~keep checksum-mismatch error.
         response
             .into_body()
             .into_reader()
+            .take(cap.saturating_add(1))
             .read_to_end(&mut data)
             .map_err(|e| Error::Download(format!("Failed to read download body: {}", e)))?;
+
+        if data.len() as u64 > cap {
+            return Err(Error::Download(format!(
+                "Downloaded bundle from {url} exceeds the expected size of {cap} bytes; aborting"
+            )));
+        }
 
         Ok(data)
     }
@@ -757,12 +976,7 @@ impl DownloadManager {
     /// write to the same cache directory simultaneously. Exposing this method
     /// publicly would allow callers to bypass the lock entirely.
     pub(crate) fn extract_languages(&self, archive_data: &[u8], names: &[&str]) -> Result<(), Error> {
-        fs::create_dir_all(&self.cache_dir).map_err(|e| {
-            Error::Download(format!(
-                "Failed to create cache directory {}: {e}",
-                self.cache_dir.display()
-            ))
-        })?;
+        ensure_secure_cache_dir(&self.cache_dir)?;
 
         let decoder = zstd::Decoder::new(archive_data)
             .map_err(|e| Error::Download(format!("Failed to decompress archive: {}", e)))?;
@@ -896,13 +1110,15 @@ impl DownloadManager {
     /// Files are matched by extension (`.so`, `.dylib`, `.dll`) — no per-language
     /// verification is performed. Returns the count of files now present in the cache dir.
     /// Caller must hold the `.download.lock` cross-process exclusive lock.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Download`] if extraction fails, or if the final on-disk
+    /// count cannot be read — a previous version swallowed that count failure as
+    /// `0`, silently reporting "nothing extracted" after a successful extraction.
+    /// See #107. ~keep
     fn extract_all_libs(&self, archive_data: &[u8]) -> Result<usize, Error> {
-        fs::create_dir_all(&self.cache_dir).map_err(|e| {
-            Error::Download(format!(
-                "Failed to create cache directory {}: {e}",
-                self.cache_dir.display()
-            ))
-        })?;
+        ensure_secure_cache_dir(&self.cache_dir)?;
 
         let (lib_prefix, lib_ext) = if cfg!(target_os = "macos") {
             ("lib", "dylib")
@@ -945,16 +1161,18 @@ impl DownloadManager {
         }
 
         let count = fs::read_dir(&self.cache_dir)
-            .map(|entries| {
-                entries
-                    .flatten()
-                    .filter(|e| {
-                        let name = e.file_name().to_string_lossy().into_owned();
-                        name.ends_with(&format!(".{lib_ext}"))
-                    })
-                    .count()
+            .map_err(|e| {
+                Error::Download(format!(
+                    "Extraction succeeded but failed to count cached libraries in {}: {e}",
+                    self.cache_dir.display()
+                ))
+            })?
+            .flatten()
+            .filter(|e| {
+                let name = e.file_name().to_string_lossy().into_owned();
+                name.ends_with(&format!(".{lib_ext}"))
             })
-            .unwrap_or(0);
+            .count();
 
         Ok(count)
     }
@@ -1089,28 +1307,44 @@ mod tests {
 
     #[test]
     fn cache_base_prefers_env_override_over_system_cache_dir() {
-        let base = cache_base_from(Some("/custom/cache"), Some(PathBuf::from("/system/cache")));
+        let base = cache_base_from(Some("/custom/cache"), Some(PathBuf::from("/system/cache")))
+            .expect("an explicit override must resolve");
         assert_eq!(base, PathBuf::from("/custom/cache"));
     }
 
     #[test]
     fn cache_base_falls_through_when_env_override_is_empty() {
         for empty in ["", "   "] {
-            let base = cache_base_from(Some(empty), Some(PathBuf::from("/system/cache")));
+            let base = cache_base_from(Some(empty), Some(PathBuf::from("/system/cache")))
+                .expect("a blank override must fall through, not fail");
             assert_eq!(base, PathBuf::from("/system/cache"), "{empty:?} must not win");
         }
     }
 
     #[test]
     fn cache_base_uses_system_cache_dir_when_env_override_is_absent() {
-        let base = cache_base_from(None, Some(PathBuf::from("/system/cache")));
+        let base = cache_base_from(None, Some(PathBuf::from("/system/cache"))).expect("system cache dir must resolve");
         assert_eq!(base, PathBuf::from("/system/cache"));
     }
 
     #[test]
-    fn cache_base_falls_back_to_temp_dir_when_no_system_cache_dir() {
-        assert_eq!(cache_base_from(None, None), std::env::temp_dir());
-        assert_eq!(cache_base_from(Some(""), None), std::env::temp_dir());
+    fn should_error_instead_of_falling_back_to_temp_dir_when_no_cache_dir_is_available() {
+        // ~keep Regression for #101 H2: this used to silently degrade to
+        // ~keep `std::env::temp_dir()`, a world-writable directory this crate then
+        // ~keep dlopens shared libraries out of. It must fail closed instead.
+        for (env_override, label) in [(None, "absent"), (Some(""), "blank")] {
+            let error = cache_base_from(env_override, None)
+                .expect_err(&format!("a {label} override with no system cache dir must fail closed"));
+            assert!(
+                matches!(error, Error::Download(_)),
+                "unexpected error variant: {error:?}"
+            );
+            let message = error.to_string();
+            assert!(
+                message.contains(CACHE_DIR_ENV),
+                "error must name the override env var so the user knows how to fix it: {message}"
+            );
+        }
     }
 
     #[test]
@@ -1121,6 +1355,65 @@ mod tests {
             "{}",
             dir.display()
         );
+    }
+
+    #[test]
+    fn cache_dir_from_base_appends_the_version_and_libs_suffix() {
+        let base = PathBuf::from("/configured/base");
+        let dir = DownloadManager::cache_dir_from_base(&base, "9.9.9");
+        assert_eq!(dir, base.join("tree-sitter-language-pack/v9.9.9/libs"));
+    }
+
+    #[test]
+    fn should_root_version_cache_dir_under_the_configured_base_not_its_parent() {
+        // ~keep Regression for #101 H1: a custom `cache_dir` used to be forwarded
+        // ~keep verbatim, so `version_cache_dir()` (`self.cache_dir.parent()`)
+        // ~keep resolved OUTSIDE the caller's configured directory entirely.
+        let temp_dir = temp_cache_dir();
+        let base = temp_dir.path().join("configured-base");
+        let libs_dir = DownloadManager::cache_dir_from_base(&base, "9.9.9");
+        let manager = DownloadManager::with_cache_dir("9.9.9", libs_dir.clone());
+
+        let version_dir = manager
+            .version_cache_dir()
+            .expect("version cache dir should resolve")
+            .to_path_buf();
+
+        assert!(
+            version_dir.starts_with(&base),
+            "manifest/bundles/lock directory {} must live under the configured base {}",
+            version_dir.display(),
+            base.display()
+        );
+        assert_eq!(version_dir, base.join("tree-sitter-language-pack/v9.9.9"));
+        assert_eq!(libs_dir, version_dir.join("libs"));
+    }
+
+    #[test]
+    fn should_reject_new_when_version_is_empty() {
+        let error = validate_version("").expect_err("empty version must be rejected");
+        assert!(matches!(error, Error::Download(_)));
+    }
+
+    #[test]
+    fn should_reject_new_when_version_contains_a_path_separator() {
+        for version in ["1.0/../etc", "a/b", "a\\b"] {
+            let error = validate_version(version).expect_err(&format!("{version:?} must be rejected"));
+            assert!(matches!(error, Error::Download(_)), "{version:?}: {error:?}");
+        }
+    }
+
+    #[test]
+    fn should_reject_new_when_version_contains_dot_dot() {
+        let error = validate_version("..").expect_err("'..' must be rejected");
+        assert!(matches!(error, Error::Download(_)));
+    }
+
+    #[test]
+    fn should_accept_new_when_version_is_a_well_formed_semver_ish_string() {
+        for version in ["1.2.3", "1.2.3-rc.1", "1.2.3+build.7", "test", "concurrent-test"] {
+            validate_version(version).unwrap_or_else(|e| panic!("{version:?} should be accepted, got {e:?}"));
+        }
     }
 
     #[test]
@@ -1227,6 +1520,169 @@ mod tests {
             "alias lookup must see the file cached under the canonical name"
         );
         assert!(manager.is_cached("bash"), "canonical lookup must see the same file");
+    }
+
+    #[test]
+    fn should_report_no_languages_installed_when_cache_dir_is_absent() {
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+        assert_eq!(manager.installed_languages(), Vec::<String>::new());
+    }
+
+    #[test]
+    fn should_report_alias_alongside_canonical_name_when_cache_contains_the_canonical_library() {
+        // ~keep Regression for #107: `installed_languages()` used to report canonical
+        // ~keep names only, so it could never agree with `available_languages()`.
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+        let canonical_path = manager.lib_path("bash");
+        fs::create_dir_all(canonical_path.parent().unwrap()).expect("cache dir should be created");
+        fs::write(&canonical_path, b"stub-library-bytes").expect("stub library should be written");
+
+        let installed = manager.installed_languages();
+
+        assert_eq!(
+            installed,
+            vec!["bash".to_string(), "shell".to_string()],
+            "must report both the canonical name and every alias that resolves to it"
+        );
+    }
+
+    #[cfg(unix)]
+    /// Whether the current test process is running as root, which bypasses Unix
+    /// discretionary access control entirely. Permission-denial regression tests
+    /// below must skip (not fail) under root, since `read_dir`/`stat` cannot be
+    /// made to fail for root by revoking permission bits.
+    fn running_as_root_for_tests() -> bool {
+        // SAFETY: getuid() takes no arguments, performs no I/O, and cannot fail.
+        unsafe { getuid() == 0 }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn should_report_no_languages_installed_when_cache_dir_cannot_be_read() {
+        use std::os::unix::fs::PermissionsExt;
+        if running_as_root_for_tests() {
+            return;
+        }
+
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+        let canonical_path = manager.lib_path("python");
+        fs::create_dir_all(canonical_path.parent().unwrap()).expect("cache dir should be created");
+        fs::write(&canonical_path, b"stub").expect("stub library should be written");
+        fs::set_permissions(manager.cache_dir(), fs::Permissions::from_mode(0o300))
+            .expect("removing read permission should succeed");
+
+        let installed = manager.installed_languages();
+
+        fs::set_permissions(manager.cache_dir(), fs::Permissions::from_mode(0o700))
+            .expect("restoring permissions should succeed");
+
+        assert_eq!(
+            installed,
+            Vec::<String>::new(),
+            "an unreadable cache dir must degrade to an empty result, not panic"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn should_return_an_error_when_the_final_library_count_scan_cannot_read_the_cache_dir() {
+        use std::os::unix::fs::PermissionsExt;
+        if running_as_root_for_tests() {
+            return;
+        }
+
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+        fs::create_dir_all(manager.cache_dir()).expect("cache dir should be created");
+        // ~keep Empty archive: the extraction phase is a no-op, so a failure can only
+        // ~keep come from the trailing recount scan this regression targets.
+        let archive = compressed_tar(&[]);
+        fs::set_permissions(manager.cache_dir(), fs::Permissions::from_mode(0o300))
+            .expect("removing read permission should succeed");
+
+        let result = manager.extract_all_libs(&archive);
+
+        fs::set_permissions(manager.cache_dir(), fs::Permissions::from_mode(0o700))
+            .expect("restoring permissions should succeed");
+
+        let error = result.expect_err(
+            "a successful (no-op) extraction phase must not silently report 0 when the recount itself fails",
+        );
+        assert!(
+            matches!(error, Error::Download(_)),
+            "unexpected error variant: {error:?}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn should_create_new_cache_dir_with_owner_only_permissions() {
+        use std::os::unix::fs::PermissionsExt;
+        let temp_dir = temp_cache_dir();
+        let target = temp_dir.path().join("secure-cache");
+
+        ensure_secure_cache_dir(&target).expect("secure creation should succeed");
+
+        let mode = fs::metadata(&target)
+            .expect("metadata should read")
+            .permissions()
+            .mode();
+        assert_eq!(
+            mode & 0o777,
+            0o700,
+            "cache dir must be created owner-only, got {mode:o}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn should_reject_existing_cache_dir_that_is_group_or_other_writable() {
+        use std::os::unix::fs::PermissionsExt;
+        if running_as_root_for_tests() {
+            return;
+        }
+
+        let temp_dir = temp_cache_dir();
+        let target = temp_dir.path().join("loose-cache");
+        fs::create_dir_all(&target).expect("dir should be created");
+        fs::set_permissions(&target, fs::Permissions::from_mode(0o770)).expect("chmod should succeed");
+
+        let error = ensure_secure_cache_dir(&target).expect_err("group-writable cache dir must be refused");
+        assert!(matches!(error, Error::Download(_)));
+        assert!(error.to_string().contains("writable"), "{error}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn should_accept_existing_cache_dir_that_is_already_owner_only() {
+        use std::os::unix::fs::PermissionsExt;
+        let temp_dir = temp_cache_dir();
+        let target = temp_dir.path().join("already-secure");
+        fs::create_dir_all(&target).expect("dir should be created");
+        fs::set_permissions(&target, fs::Permissions::from_mode(0o700)).expect("chmod should succeed");
+
+        ensure_secure_cache_dir(&target).expect("owner-only pre-existing dir should be accepted");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn verify_cache_dir_if_present_is_a_noop_when_the_directory_is_absent() {
+        let temp_dir = temp_cache_dir();
+        let missing = temp_dir.path().join("does-not-exist");
+        verify_cache_dir_if_present(&missing).expect("a missing directory has nothing to verify");
+    }
+
+    #[test]
+    fn bundle_read_cap_uses_the_declared_size_when_under_the_ceiling() {
+        assert_eq!(bundle_read_cap(1024), 1024);
+    }
+
+    #[test]
+    fn bundle_read_cap_clamps_to_the_absolute_ceiling_when_declared_size_is_larger() {
+        assert_eq!(bundle_read_cap(u64::MAX), MAX_BUNDLE_DOWNLOAD_BYTES);
     }
 
     #[test]
@@ -1614,6 +2070,15 @@ mod tests {
         let manager = manager_for_temp_dir(&temp_dir);
         let libs_dir = manager.cache_dir();
         fs::create_dir_all(libs_dir).expect("libs dir should be created");
+        // ~keep Pin the mode explicitly rather than relying on the ambient umask: the
+        // ~keep later `extract_languages` call runs `ensure_secure_cache_dir`, which
+        // ~keep refuses a group/other-writable directory (#101 H2) — a umask of 0 would
+        // ~keep otherwise make this test environment-dependent.
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(libs_dir, fs::Permissions::from_mode(0o700)).expect("chmod should succeed");
+        }
 
         // ~keep Dot-prefixed orphan temp files must not pass `lang_from_lib_filename`.
         let orphan = libs_dir.join(".libtree_sitter_python.dylib.tmp.99999.0");

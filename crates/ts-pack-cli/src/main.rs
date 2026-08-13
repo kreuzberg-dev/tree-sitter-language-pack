@@ -114,7 +114,7 @@ enum Commands {
     CacheDir,
     /// Create a language-pack.toml config file
     Init {
-        /// Cache directory
+        /// Base directory for the parser cache (a versioned subdirectory is created under it)
         #[arg(long)]
         cache_dir: Option<String>,
         /// Languages to include (comma-separated)

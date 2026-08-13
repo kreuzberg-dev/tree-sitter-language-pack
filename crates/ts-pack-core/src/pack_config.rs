@@ -48,9 +48,20 @@ pub enum TlsRootsMode {
     derive(serde::Serialize, serde::Deserialize)
 )]
 pub struct PackConfig {
-    /// Override default cache directory.
+    /// Override the BASE directory the parser cache lives under.
     ///
-    /// Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
+    /// This is a base, not the final library path: the crate appends
+    /// `tree-sitter-language-pack/v{version}/libs` to it, exactly as it does to the
+    /// platform default. So `cache_dir = "/tmp/my-parsers"` resolves to
+    /// `/tmp/my-parsers/tree-sitter-language-pack/v{version}/libs/`.
+    ///
+    /// The suffix is not cosmetic. It keeps the whole cache tree — manifest, bundles
+    /// and lock file included — inside a directory this crate owns and versions.
+    /// Earlier releases used this path verbatim, which put those files in the
+    /// configured directory's PARENT and let a cache built by one crate version be
+    /// reused by another. ~keep
+    ///
+    /// Default base: the platform cache dir, e.g. `~/.cache` on Linux.
     #[cfg_attr(any(feature = "config", feature = "download"), serde(default))]
     pub cache_dir: Option<PathBuf>,
 

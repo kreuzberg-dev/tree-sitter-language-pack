@@ -98,13 +98,15 @@ static REGISTRY: LazyLock<LanguageRegistry> = LazyLock::new(LanguageRegistry::ne
 /// Recover a poisoned `Mutex<()>` guard, logging a WARN instead of propagating.
 ///
 /// Restricted to locks proven to guard no data — `DOWNLOAD_CACHE_LOCK`,
-/// `LANGUAGE_LOAD_LOCK`, and `PARSE_LOCK` serialize side effects only, so a panic
-/// while one is held can never leave protected state half-written. Poisoning there
-/// buys nothing but an unrecoverable failure: every later call through the same
-/// lock — including `clean_cache`, the natural recovery path — would return
-/// `LockPoisoned` forever, requiring a process restart. The `Mutex<()>` parameter
-/// type is deliberate: it is a compile error to reuse this on a lock that guards
-/// real data. ~keep
+/// `LANGUAGE_LOAD_LOCK`, and the per-language locks in `parse::STATEFUL_SCANNER_LOCKS`
+/// (one `Mutex<()>` per grammar whose external scanner keeps mutable process-global
+/// state, e.g. `properties`; see `parse::lock_for_stateful_scanner`) all serialize
+/// side effects only, so a panic while one is held can never leave protected state
+/// half-written. Poisoning there buys nothing but an unrecoverable failure: every
+/// later call through the same lock — including `clean_cache`, the natural recovery
+/// path — would return `LockPoisoned` forever, requiring a process restart. The
+/// `Mutex<()>` parameter type is deliberate: it is a compile error to reuse this on
+/// a lock that guards real data. ~keep
 pub(crate) fn recover_poisoned_lock<'a>(
     lock_name: &str,
     poisoned: std::sync::PoisonError<std::sync::MutexGuard<'a, ()>>,
@@ -119,17 +121,38 @@ pub(crate) fn recover_poisoned_lock<'a>(
 /// Cache directory most recently registered with `REGISTRY.add_extra_libs_dir`.
 ///
 /// Compared by path, not by a boolean flag: `ensure_cache_registered` recomputes
-/// `effective_cache_dir()` fresh on every call and only skips re-registration when
-/// it exactly matches what was last registered here. A boolean "have we registered
-/// something" flag cannot express that — a racing `configure()` can flip it back to
-/// "not registered" and reset `CUSTOM_CACHE_DIR` in between another thread's read of
-/// the flag and its read of the cache dir, so that thread registers the OLD path and
-/// then marks registration done, permanently hiding the new directory. Comparing
-/// actual paths under one lock closes that window. Poisoning is recovered rather
-/// than propagated: the only mutation is a full `Option` overwrite performed after
-/// `add_extra_libs_dir` returns, so a panic here leaves the previous, still-coherent
-/// value in place — propagating would reintroduce the same permanent-failure mode
-/// this type replaces `CACHE_REGISTERED` to fix. ~keep
+/// `effective_cache_dir()` fresh — once for its lock-free fast-path check, and again
+/// after acquiring the write lock — and only skips re-registration when the current
+/// value exactly matches what was last registered here. A boolean "have we
+/// registered something" flag cannot express that — a racing `configure()` can flip
+/// it back to "not registered" and reset `CUSTOM_CACHE_DIR` in between another
+/// thread's read of the flag and its read of the cache dir, so that thread registers
+/// the OLD path and then marks registration done, permanently hiding the new
+/// directory.
+///
+/// The write-lock re-read is what actually closes that window. An earlier version
+/// computed `cache_dir` once, before ever taking the write lock, and the "double
+/// check under the write lock" compared against that same pre-lock snapshot — a
+/// `configure()` racing in between the initial read and the lock acquisition could
+/// still make the write path register a directory that was already stale by the
+/// time it ran. Re-reading `effective_cache_dir()` a second time, after the write
+/// lock is held, compares against current state instead of a snapshot. This is safe
+/// against deadlock: `effective_cache_dir()` takes only `CUSTOM_CACHE_DIR`'s own,
+/// separate read lock, and nothing in this crate acquires `CUSTOM_CACHE_DIR` while
+/// waiting on `REGISTERED_CACHE_DIR` in the other order (`configure_inner` only ever
+/// touches `CUSTOM_CACHE_DIR`), so there is no lock-order cycle between the two.
+///
+/// `extra_lib_dirs` in `registry.rs` is append-only and never pruned (see its own
+/// doc comment), so repeated reconfiguration under concurrent load accumulates one
+/// entry per distinct directory ever registered here — harmless for correctness (a
+/// stale entry is just an extra, permission-checked-once, miss-on-lookup search
+/// path) but worth knowing before treating reconfiguration as free.
+///
+/// Poisoning is recovered rather than propagated: the only mutation is a full
+/// `Option` overwrite performed after `add_extra_libs_dir` returns, so a panic here
+/// leaves the previous, still-coherent value in place — propagating would
+/// reintroduce the same permanent-failure mode this type replaces `CACHE_REGISTERED`
+/// to fix. ~keep
 #[cfg(feature = "download")]
 static REGISTERED_CACHE_DIR: LazyLock<RwLock<Option<std::path::PathBuf>>> = LazyLock::new(|| RwLock::new(None));
 
@@ -386,11 +409,19 @@ fn ensure_cache_registered() -> Result<(), Error> {
     let mut registered = REGISTERED_CACHE_DIR
         .write()
         .unwrap_or_else(|poisoned| poisoned.into_inner());
-    // ~keep Double-check under the write lock: another thread may have registered this
-    // ~keep exact path while we were computing `cache_dir` or waiting for the lock.
+    // ~keep Re-read rather than reuse the snapshot computed above: a concurrent
+    // ~keep `configure()` can change `CUSTOM_CACHE_DIR` between that read and this lock
+    // ~keep acquisition, and comparing against the stale value would register the OLD
+    // ~keep directory. Safe against deadlock — see `REGISTERED_CACHE_DIR`'s doc comment.
+    let cache_dir = effective_cache_dir()?;
     if registered.as_deref() == Some(cache_dir.as_path()) {
         return Ok(());
     }
+    // ~keep Verify (never create) before ever registering this path as a dlopen search
+    // ~keep directory: a pre-existing directory that is attacker-owned or group/other-
+    // ~keep writable must never be trusted just because it sits at the resolved cache
+    // ~keep path. See #101 H2. ~keep
+    crate::download::verify_cache_dir_if_present(&cache_dir)?;
     REGISTRY.try_add_extra_libs_dir(cache_dir.clone())?;
     *registered = Some(cache_dir);
     Ok(())
@@ -402,7 +433,14 @@ fn effective_cache_dir() -> Result<std::path::PathBuf, Error> {
         .read()
         .map_err(|e| Error::LockPoisoned(e.to_string()))?;
     match custom.as_ref() {
-        Some(dir) => Ok(dir.clone()),
+        // ~keep `PackConfig::cache_dir` / `configure()` is a BASE directory, not the
+        // ~keep final libs path: apply the same `tree-sitter-language-pack/v{version}/libs`
+        // ~keep suffix `default_cache_dir` applies to the platform cache dir, so
+        // ~keep `DownloadManager::version_cache_dir()` (`self.cache_dir.parent()`) always
+        // ~keep resolves to a directory this crate owns. Before this, a custom `cache_dir`
+        // ~keep was used verbatim and `manifest.json`/`bundles/`/`.download.lock` all ended
+        // ~keep up in its *parent* instead. See #101 H1. ~keep
+        Some(dir) => Ok(DownloadManager::cache_dir_from_base(dir, env!("CARGO_PKG_VERSION"))),
         None => DownloadManager::default_cache_dir(env!("CARGO_PKG_VERSION")),
     }
 }
@@ -462,6 +500,13 @@ pub fn init(config: &PackConfig) -> Result<(), Error> {
 /// [`get_language`] or any download function. Changing the cache dir
 /// after languages have been registered has no effect on already-loaded
 /// languages.
+///
+/// `PackConfig::cache_dir` is a BASE directory, not the final libs path: this
+/// crate appends `tree-sitter-language-pack/v{version}/libs` to it, the same
+/// suffix applied to the platform default cache directory. In the example below,
+/// files actually land under `/tmp/my-parsers/tree-sitter-language-pack/v{version}/libs/`,
+/// never directly in `/tmp/my-parsers/`. Call [`cache_dir`] to read back the
+/// resolved, fully-suffixed path.
 ///
 /// # Errors
 ///
@@ -826,12 +871,19 @@ pub fn clean_cache() -> Result<(), Error> {
 
 /// Return the effective cache directory path.
 ///
-/// This is either the custom path set via [`configure`] / [`init`] or the
-/// default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
+/// This is `{base}/tree-sitter-language-pack/v{version}/libs/`, where `{base}` is
+/// either the custom BASE directory set via [`configure`] / [`init`]
+/// (`PackConfig::cache_dir`) or the platform default cache directory — both are
+/// suffixed identically, so a custom `cache_dir` is never used as the final libs
+/// path. The default resolves to `~/.cache/tree-sitter-language-pack/v{version}/libs/`
+/// on a typical Unix system.
 ///
 /// # Errors
 ///
-/// Returns an error if the system cache directory cannot be determined.
+/// Returns an error if no cache directory can be resolved: `version` is somehow
+/// invalid, or (with no custom `cache_dir` configured) the platform reports none
+/// and `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR` is unset. This crate no longer falls
+/// back to the temporary directory for the latter case — see #101 H2.
 ///
 /// # Example
 ///
@@ -949,11 +1001,14 @@ mod tests {
         // ~keep actual registered path on every call, so the very next call anywhere after a
         // ~keep reconfiguration observes and registers the new path — this asserts exactly
         // ~keep that, deterministically, without needing to reproduce the original race.
-        let first_dir = std::env::temp_dir().join("tslp-item1-regression-first");
-        let second_dir = std::env::temp_dir().join("tslp-item1-regression-second");
+        let first_base = std::env::temp_dir().join("tslp-item1-regression-first");
+        let second_base = std::env::temp_dir().join("tslp-item1-regression-second");
+        // ~keep `cache_dir` is a BASE directory (#101 H1): the registered path is suffixed.
+        let first_dir = DownloadManager::cache_dir_from_base(&first_base, env!("CARGO_PKG_VERSION"));
+        let second_dir = DownloadManager::cache_dir_from_base(&second_base, env!("CARGO_PKG_VERSION"));
 
         configure(&PackConfig {
-            cache_dir: Some(first_dir.clone()),
+            cache_dir: Some(first_base.clone()),
             languages: None,
             groups: None,
         })
@@ -965,7 +1020,7 @@ mod tests {
         }
 
         configure(&PackConfig {
-            cache_dir: Some(second_dir.clone()),
+            cache_dir: Some(second_base.clone()),
             languages: None,
             groups: None,
         })
@@ -980,5 +1035,40 @@ mod tests {
                  not stuck on the old path forever"
             );
         }
+    }
+
+    #[cfg(feature = "download")]
+    #[test]
+    #[ignore = "mutates the process-wide CUSTOM_CACHE_DIR static; run alone, e.g. \
+                `cargo test -- --ignored --test-threads=1`, not inside the default parallel suite"]
+    fn should_root_effective_cache_dir_under_the_configured_base_when_cache_dir_is_custom() {
+        // ~keep Regression for #101 H1: `PackConfig::cache_dir` used to be forwarded
+        // ~keep verbatim, so `DownloadManager::version_cache_dir()`
+        // ~keep (`self.cache_dir.parent()`) resolved OUTSIDE the caller's configured
+        // ~keep directory entirely — `manifest.json`, `bundles/`, and `.download.lock` all
+        // ~keep ended up in the *parent* of whatever the caller configured.
+        let base = std::env::temp_dir().join("tslp-h1-regression-base");
+
+        configure(&PackConfig {
+            cache_dir: Some(base.clone()),
+            languages: None,
+            groups: None,
+        })
+        .expect("configure should accept a custom base directory");
+
+        let dir = effective_cache_dir().expect("effective cache dir should resolve");
+
+        assert!(
+            dir.starts_with(&base),
+            "effective cache dir {} must live under the configured base {}",
+            dir.display(),
+            base.display()
+        );
+        assert_eq!(
+            dir,
+            base.join("tree-sitter-language-pack")
+                .join(format!("v{}", env!("CARGO_PKG_VERSION")))
+                .join("libs")
+        );
     }
 }

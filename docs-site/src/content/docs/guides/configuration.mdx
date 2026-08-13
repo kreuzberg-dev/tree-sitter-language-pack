@@ -139,8 +139,9 @@ let config = PackConfig {
 // Load from file
 let config = PackConfig::from_toml_file(Path::new("language-pack.toml"))?;
 
-// Discover in parent directories
-if let Some(config) = PackConfig::discover() {
+// Discover in parent directories. `Ok(None)` means no config file was found;
+// `Err` means one was found but could not be read or parsed, and names the path.
+if let Some(config) = PackConfig::discover()? {
     println!("Found languages: {:?}", config.languages);
 }
 ```
