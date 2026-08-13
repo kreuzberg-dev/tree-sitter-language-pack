@@ -24,4 +24,7 @@
 
 ; Function / method calls
 (function_call_expression function: (name) @name) @reference.call
-(method_call_expression name: (name) @name) @reference.call
+; ~keep: method_call_expression does not exist in this grammar pin; member_call_expression
+; is the equivalent node (see parsers/php/src/node-types.json and the vendored
+; parsers/php/queries/tags.scm, which uses the same node type).
+(member_call_expression name: (name) @name) @reference.call
