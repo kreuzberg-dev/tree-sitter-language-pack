@@ -4,7 +4,7 @@
     "extensions": ["p", "cls", "w"],
     "generate": true,
     "repo": "https://github.com/usagi-coffee/tree-sitter-abl",
-    "rev": "91fa8c37df4e02ccc2894bef53e0bdeedb0efbd0"
+    "rev": "70a6eaeaf16a98a8bacac821e8ff50d226817712"
   },
   "actionscript": {
     "extensions": ["as"],
@@ -15,7 +15,7 @@
     "branch": "master",
     "extensions": ["ada", "adb", "ads"],
     "repo": "https://github.com/briot/tree-sitter-ada",
-    "rev": "6b58259a08b1a22ba0247a7ce30be384db618da6"
+    "rev": "dd5fa4cdb3aba91abc687aa68fb1431396fce6a6"
   },
   "agda": {
     "branch": "master",
@@ -229,7 +229,7 @@
   "clarity": {
     "extensions": ["clar"],
     "repo": "https://github.com/xlittlerag/tree-sitter-clarity",
-    "rev": "1436da3946359fcd7ac2d81917aaa78ef1e01755"
+    "rev": "f3b7520fa336e877fc7bb180902e325d465da052"
   },
   "clojure": {
     "branch": "master",
@@ -376,7 +376,7 @@
     "extensions": ["diff", "patch"],
     "generate": true,
     "repo": "https://github.com/tree-sitter-grammars/tree-sitter-diff",
-    "rev": "1a24d30d9b2b0bbf8420e229164462f410fb3ad0"
+    "rev": "0400db1417a28145bec93001f1ee1411155a7363"
   },
   "djot": {
     "extensions": ["dj"],
@@ -442,7 +442,7 @@
     "extensions": ["el"],
     "generate": true,
     "repo": "https://github.com/Wilfred/tree-sitter-elisp",
-    "rev": "29b4e49275f4a947ce17c8533bc20a1f97768c70"
+    "rev": "d7f9ae238b4e0e085e95b7206578f84124864f15"
   },
   "elixir": {
     "extensions": ["ex", "exs"],
@@ -951,7 +951,7 @@
     "extensions": ["tex"],
     "generate": true,
     "repo": "https://github.com/latex-lsp/tree-sitter-latex",
-    "rev": "7e0ecdc02926c7b9b2e0c76003d4fe7b0944f957"
+    "rev": "fa8df448fc2c0192a8c2f8cfc97de53cb2b4ecb9"
   },
   "lean": {
     "abi_version": 14,
@@ -998,7 +998,7 @@
   "luadoc": {
     "extensions": [],
     "repo": "https://github.com/tree-sitter-grammars/tree-sitter-luadoc",
-    "rev": "873612aadd3f684dd4e631bdf42ea8990c57634e"
+    "rev": "4d04632a3a398b78af52e83be074883e722f40be"
   },
   "luap": {
     "extensions": [],
@@ -1102,7 +1102,7 @@
     "extensions": ["ncl"],
     "generate": true,
     "repo": "https://github.com/nickel-lang/tree-sitter-nickel",
-    "rev": "cbbfa80e7d064c81cec7e808d9a062b4afe05e00"
+    "rev": "fd65591d3c7812b0e3e733506f3f08a354a38ea6"
   },
   "nim": {
     "extensions": ["nim", "nims"],
@@ -1158,7 +1158,7 @@
     "extensions": ["ml"],
     "generate": true,
     "repo": "https://github.com/tree-sitter/tree-sitter-ocaml",
-    "rev": "527d62ef0f24ce0d97fbedf004921d75d0a7e086"
+    "rev": "b40028552b03e291ac43b59b51908d56effa597b"
   },
   "ocaml_interface": {
     "abi_version": 14,
@@ -1167,7 +1167,7 @@
     "extensions": ["mli"],
     "generate": true,
     "repo": "https://github.com/tree-sitter/tree-sitter-ocaml",
-    "rev": "527d62ef0f24ce0d97fbedf004921d75d0a7e086"
+    "rev": "b40028552b03e291ac43b59b51908d56effa597b"
   },
   "ocamllex": {
     "abi_version": 14,
@@ -1298,7 +1298,7 @@
     "extensions": ["proto"],
     "generate": true,
     "repo": "https://github.com/coder3101/tree-sitter-proto",
-    "rev": "cf8e4eba6e5b4afb9eb16c9178bba3d2504b46c2"
+    "rev": "5a256fe3b6be3bd2ea4d03e1213d847c7093c2e1"
   },
   "prql": {
     "extensions": ["prql"],
@@ -1445,7 +1445,7 @@
     "extensions": ["robot"],
     "generate": true,
     "repo": "https://github.com/Hubro/tree-sitter-robot",
-    "rev": "3de13dcc7559223c97e6b703217bbf728e20e169"
+    "rev": "baecd7a465d9df7262238effbe23036733842437"
   },
   "roc": {
     "abi_version": 14,
@@ -1554,7 +1554,7 @@
   "sourcepawn": {
     "extensions": ["sp", "inc"],
     "repo": "https://github.com/nilshelmig/tree-sitter-sourcepawn",
-    "rev": "5a8fdd446b516c81e218245c12129c6ad4bccfa2"
+    "rev": "fdf31136774c5d182344305e7f3605d77fa4084f"
   },
   "sparql": {
     "abi_version": 14,
@@ -1737,7 +1737,7 @@
   "twig": {
     "extensions": ["twig"],
     "repo": "https://github.com/gbprod/tree-sitter-twig",
-    "rev": "0afd9a6d808944e65a7be393e31868b85345735f"
+    "rev": "f9cb122b42894a38bef0fb2783be1ad9885f2ed7"
   },
   "typescript": {
     "directory": "typescript",
@@ -1867,7 +1867,7 @@
     "extensions": ["wit"],
     "generate": true,
     "repo": "https://github.com/bytecodealliance/tree-sitter-wit",
-    "rev": "da195e4e3a670187abdddee948a115dbe30ebc21"
+    "rev": "cdf07263b136054b413cab449ac7a1d059c27542"
   },
   "x86asm": {
     "extensions": [],
@@ -1956,12 +1956,12 @@
   "bpftrace": {
     "extensions": ["bt"],
     "repo": "https://github.com/sgruszka/tree-sitter-bpftrace",
-    "rev": "11453f5e4be5026b2b18d4b53f893ded972011ce"
+    "rev": "ce507ff578efa222c694bb05399c76b3a8590454"
   },
   "cypher": {
     "extensions": ["cypher", "cql"],
     "repo": "https://github.com/taekwombo/tree-sitter-cypher",
-    "rev": "fd6c44af569431e51f251a15e2ebb2efb11ff983"
+    "rev": "d8782e3a8908bcce9652077e57bff5753d2debc1"
   },
   "cython": {
     "extensions": ["pyx", "pxd", "pxi"],
