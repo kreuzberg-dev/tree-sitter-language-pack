@@ -1,3 +1,26 @@
+"""Clone, generate and vendor the pinned upstream tree-sitter grammars.
+
+Trust model — read before running this against a grammar entry you have not reviewed.
+
+Every `rev` in `sources/language_definitions.json` is validated as a full 40-hex commit SHA
+against an allowlist of `github.com`/`gitlab.com` (`_vendor_sources.validate_rev` and
+`validate_repo_url`), enforced both at load time and again in `clone_repository`. That makes a
+refresh *reproducible*: the same pins fetch the same bytes. It does not make it *safe*. A commit
+pinned by SHA can contain anything, and pinning is not review.
+
+For entries with `generate: true`, `tree-sitter generate` evaluates the upstream repository's
+`grammar.js` as JavaScript under Node, with the full privileges of whoever ran this script, and
+that `grammar.js` may `require()` anything present in `node_modules`. `--ignore-scripts` on the
+npm step blocks install-time lifecycle scripts, which is a different and narrower vector; it does
+not constrain `grammar.js` itself.
+
+The highest-privilege context this runs in is therefore a maintainer's own machine during a pin
+bump — CI jobs that invoke this script hold only `contents: read` and reference no secrets. Treat
+adding or bumping a grammar as running that project's build tooling, because that is what it is:
+review the diff of `grammar.js` and any new dependency, or run the refresh in a disposable
+sandbox.
+"""
+
 import asyncio
 import hashlib
 import os
@@ -414,7 +437,12 @@ async def handle_generate(
         print(f"Generating {language_name} using tree-sitter-cli")
         npm_root = vendor_directory / language_name
         if which("npm") and (npm_root / "package.json").exists():
-            npm_args = ["install", "--no-audit", "--no-fund", "--ignore-scripts"]
+            # ~keep `npm ci` installs exactly the committed lock file; `npm install` re-resolves
+            # ~keep semver ranges, so the same pinned grammar rev could pull different transitive
+            # ~keep dependencies on different days. Fall back only when upstream ships no lock
+            # ~keep file, where `ci` refuses to run at all.
+            npm_subcommand = "ci" if (npm_root / "package-lock.json").exists() else "install"
+            npm_args = [npm_subcommand, "--no-audit", "--no-fund", "--ignore-scripts"]
             npm_cmd = ["cmd", "/c", "npm", *npm_args] if platform.system() == "Windows" else ["npm", *npm_args]
             try:
                 await run_process(npm_cmd, cwd=str(npm_root), check=False)
