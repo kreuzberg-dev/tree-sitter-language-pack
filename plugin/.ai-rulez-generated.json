@@ -1,6 +1,6 @@
 {
   "schema_version": "v1",
-  "source_hash": "blake3:f19fdee2014b13646970aa570031360cc5226348e4bf4531beb251df5179bc83",
+  "source_hash": "blake3:89d0826793b70070885c53ed63dc780628d47b3037a08e308c2d6c69895fc069",
   "outputs": {
     ".claude-plugin/plugin.json": {
       "content_hash": "blake3:0c5fbd41c6c2e97daa57f4f885920adfcb6af52dafa029b94a22aebb995f0d30"
@@ -21,13 +21,13 @@
       "content_hash": "blake3:dd570b2c1cb806fd7004f737dadfefde3bef71ae1ba233bbaae8121d744b5f0b"
     },
     ".cursor-plugin/skills/managing-parsers/SKILL.md": {
-      "content_hash": "blake3:c0ab2356e3949d3254c34b6e428f035fa5ba6b58174fc921d8c3624223073073"
+      "content_hash": "blake3:53d41dddeaa1a575e46096a98399ceeac7825a5ee9fef412f92b032680924b3c"
     },
     ".cursor-plugin/skills/parsing-source/SKILL.md": {
       "content_hash": "blake3:9033e2c6803385f116531b227b5f1274b5ec6fc035cd2ebf562f5eaf1f1c17fb"
     },
     ".cursor-plugin/skills/tree-sitter-language-pack/SKILL.md": {
-      "content_hash": "blake3:c99a14efb0ced309164eaaad3227d4f70c06ef10d7527fd54ef046f2489c0c87"
+      "content_hash": "blake3:acf2620bd0cc3aa6cd470abd32dc6479160b83099ae3de5fc3f658e8e823e1aa"
     },
     ".cursor-plugin/skills/using-the-mcp-server/SKILL.md": {
       "content_hash": "blake3:4c8c2a57d4c5fa03c6ff57dee5175b3229dcc0af0338d8e31901473b2d46a542"
@@ -57,13 +57,13 @@
       "content_hash": "blake3:dd570b2c1cb806fd7004f737dadfefde3bef71ae1ba233bbaae8121d744b5f0b"
     },
     ".hermes/package/src/tree_sitter_language_pack_hermes_plugin/skills/managing-parsers/SKILL.md": {
-      "content_hash": "blake3:c0ab2356e3949d3254c34b6e428f035fa5ba6b58174fc921d8c3624223073073"
+      "content_hash": "blake3:53d41dddeaa1a575e46096a98399ceeac7825a5ee9fef412f92b032680924b3c"
     },
     ".hermes/package/src/tree_sitter_language_pack_hermes_plugin/skills/parsing-source/SKILL.md": {
       "content_hash": "blake3:9033e2c6803385f116531b227b5f1274b5ec6fc035cd2ebf562f5eaf1f1c17fb"
     },
     ".hermes/package/src/tree_sitter_language_pack_hermes_plugin/skills/tree-sitter-language-pack/SKILL.md": {
-      "content_hash": "blake3:c99a14efb0ced309164eaaad3227d4f70c06ef10d7527fd54ef046f2489c0c87"
+      "content_hash": "blake3:acf2620bd0cc3aa6cd470abd32dc6479160b83099ae3de5fc3f658e8e823e1aa"
     },
     ".hermes/package/src/tree_sitter_language_pack_hermes_plugin/skills/using-the-mcp-server/SKILL.md": {
       "content_hash": "blake3:4c8c2a57d4c5fa03c6ff57dee5175b3229dcc0af0338d8e31901473b2d46a542"
@@ -87,13 +87,13 @@
       "content_hash": "blake3:dd570b2c1cb806fd7004f737dadfefde3bef71ae1ba233bbaae8121d744b5f0b"
     },
     ".hermes/plugins/tree-sitter-language-pack/skills/managing-parsers/SKILL.md": {
-      "content_hash": "blake3:c0ab2356e3949d3254c34b6e428f035fa5ba6b58174fc921d8c3624223073073"
+      "content_hash": "blake3:53d41dddeaa1a575e46096a98399ceeac7825a5ee9fef412f92b032680924b3c"
     },
     ".hermes/plugins/tree-sitter-language-pack/skills/parsing-source/SKILL.md": {
       "content_hash": "blake3:9033e2c6803385f116531b227b5f1274b5ec6fc035cd2ebf562f5eaf1f1c17fb"
     },
     ".hermes/plugins/tree-sitter-language-pack/skills/tree-sitter-language-pack/SKILL.md": {
-      "content_hash": "blake3:c99a14efb0ced309164eaaad3227d4f70c06ef10d7527fd54ef046f2489c0c87"
+      "content_hash": "blake3:acf2620bd0cc3aa6cd470abd32dc6479160b83099ae3de5fc3f658e8e823e1aa"
     },
     ".hermes/plugins/tree-sitter-language-pack/skills/using-the-mcp-server/SKILL.md": {
       "content_hash": "blake3:4c8c2a57d4c5fa03c6ff57dee5175b3229dcc0af0338d8e31901473b2d46a542"
@@ -102,7 +102,7 @@
       "content_hash": "blake3:d0ee058aa58bdfe1904a62afcf5dcd54a31fb0525850e382f16cb50f51e622bf"
     },
     ".opencode/plugins/tree-sitter-language-pack.js": {
-      "content_hash": "blake3:55763c024f2adf05101a8d29929a985bb7a57a7fc549b94f3b12c196bef6cbe2"
+      "content_hash": "blake3:22d84b89b01d054cd550760e43b4e8fbcfed01b4118be59c11d24da2c2e2d7d5"
     },
     "assets/icon.svg": {
       "content_hash": "blake3:b0abe59064a94924a573822a11881a4f0627adea28c258f542abd97b88fa436d"
@@ -129,13 +129,13 @@
       "content_hash": "blake3:dd570b2c1cb806fd7004f737dadfefde3bef71ae1ba233bbaae8121d744b5f0b"
     },
     "skills/managing-parsers/SKILL.md": {
-      "content_hash": "blake3:c0ab2356e3949d3254c34b6e428f035fa5ba6b58174fc921d8c3624223073073"
+      "content_hash": "blake3:53d41dddeaa1a575e46096a98399ceeac7825a5ee9fef412f92b032680924b3c"
     },
     "skills/parsing-source/SKILL.md": {
       "content_hash": "blake3:9033e2c6803385f116531b227b5f1274b5ec6fc035cd2ebf562f5eaf1f1c17fb"
     },
     "skills/tree-sitter-language-pack/SKILL.md": {
-      "content_hash": "blake3:c99a14efb0ced309164eaaad3227d4f70c06ef10d7527fd54ef046f2489c0c87"
+      "content_hash": "blake3:acf2620bd0cc3aa6cd470abd32dc6479160b83099ae3de5fc3f658e8e823e1aa"
     },
     "skills/using-the-mcp-server/SKILL.md": {
       "content_hash": "blake3:4c8c2a57d4c5fa03c6ff57dee5175b3229dcc0af0338d8e31901473b2d46a542"

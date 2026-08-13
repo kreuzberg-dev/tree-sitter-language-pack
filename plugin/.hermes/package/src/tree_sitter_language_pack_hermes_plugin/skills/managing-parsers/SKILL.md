@@ -9,8 +9,8 @@ description: >-
 
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-Content-Hash: blake3:c0ab2356e3949d3254c34b6e428f035fa5ba6b58174fc921d8c3624223073073
-Source-Hash: blake3:f19fdee2014b13646970aa570031360cc5226348e4bf4531beb251df5179bc83
+Content-Hash: blake3:53d41dddeaa1a575e46096a98399ceeac7825a5ee9fef412f92b032680924b3c
+Source-Hash: blake3:89d0826793b70070885c53ed63dc780628d47b3037a08e308c2d6c69895fc069
 Schema-Version: v1
 -->
 
@@ -28,14 +28,14 @@ prefetch, reproducible builds, or to reclaim space.
 ```bash
 ts-pack download python rust typescript   # specific languages
 ts-pack download --all                    # every available language
-ts-pack download --groups web,systems     # by group
+ts-pack download --groups all             # by group
 ts-pack download python --fresh           # clean cache first, then download
 ```
 
-Available groups: `web`, `systems`, `scripting`, `data`, `jvm`,
-`functional` (comma-separated for `--groups`). Run `download` in your CI
-setup step so later `parse`/`process` calls hit the cache instead of the
-network.
+The manifest currently defines exactly one group, `all`. Group names are
+manifest data, not a fixed list — enumerate them with `manifest_groups()`
+rather than hardcoding. Run `download` in your CI setup step so later
+`parse`/`process` calls hit the cache instead of the network.
 
 ## Inspect
 

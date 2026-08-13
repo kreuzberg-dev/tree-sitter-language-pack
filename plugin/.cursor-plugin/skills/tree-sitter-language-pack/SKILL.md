@@ -16,8 +16,8 @@ metadata:
 
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-Content-Hash: blake3:c99a14efb0ced309164eaaad3227d4f70c06ef10d7527fd54ef046f2489c0c87
-Source-Hash: blake3:f19fdee2014b13646970aa570031360cc5226348e4bf4531beb251df5179bc83
+Content-Hash: blake3:acf2620bd0cc3aa6cd470abd32dc6479160b83099ae3de5fc3f658e8e823e1aa
+Source-Hash: blake3:89d0826793b70070885c53ed63dc780628d47b3037a08e308c2d6c69895fc069
 Schema-Version: v1
 -->
 
@@ -205,7 +205,7 @@ locally. For offline or CI runs, prefetch:
 ```bash
 ts-pack download python rust typescript   # specific languages
 ts-pack download --all                    # everything
-ts-pack download --groups web,systems     # by group
+ts-pack download --groups all             # by group (see manifest_groups())
 ts-pack list --downloaded                 # what is cached
 ts-pack cache-dir                         # where the cache lives
 ts-pack clean --force                     # wipe the cache
