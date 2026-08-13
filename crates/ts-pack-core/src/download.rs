@@ -232,42 +232,109 @@ pub(crate) fn ensure_secure_cache_dir(path: &Path) -> Result<(), Error> {
     verify_owner_and_perms(path)
 }
 
-/// Windows fallback: plain recursive creation. ACL-based ownership hardening is a
-/// known follow-up here, not a silently-claimed guarantee — see #101 H2.
+/// `%LOCALAPPDATA%` (e.g. `C:\Users\<user>\AppData\Local`) is the environment
+/// variable Windows populates with the current user's per-profile cache root,
+/// and the value `dirs::cache_dir()` resolves to on this platform. Windows
+/// creates this directory at profile creation with a DACL granting full
+/// control only to the owning user, `SYSTEM`, and `Administrators` — no other
+/// principal, including other standard users on the same machine, has access
+/// by default. Referenced by [`ensure_secure_cache_dir`]'s `#[cfg(windows)]`
+/// implementation. ~keep
+#[cfg(windows)]
+const WINDOWS_PROFILE_CACHE_ENV: &str = "LOCALAPPDATA";
+
+/// Windows equivalent of Unix's [`ensure_secure_cache_dir`]/[`verify_owner_and_perms`]
+/// pair: judgement call for #109, recorded here rather than left implicit.
 ///
-/// Deliberately still unimplemented as of task #109: this crate has no Windows
-/// security-API dependency (`windows-sys`/`windows`) today, adding one requires
-/// editing `Cargo.toml` (out of scope for that task), and a Windows ACL check
-/// cannot be written with confidence on a host that cannot compile or run it —
-/// a check that wrongly *refuses* a legitimate cache directory would hard-break
-/// every Windows user, which is worse than this known gap. A Windows-hosted
-/// implementer closing this out needs to, mirroring `verify_owner_and_perms`
-/// and `CACHE_DIR_MODE` above:
-/// - Add `windows-sys` (or `windows`) under
-///   `[target.'cfg(windows)'.dependencies]` in `Cargo.toml`, pulling in the
-///   `Win32_Security` and `Win32_Storage_FileSystem` feature sets.
-/// - Resolve the current process's user SID via
-///   `OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, ...)` +
-///   `GetTokenInformation(TokenUser)` — the Windows analogue of `getuid()`.
-/// - Resolve `path`'s owner SID via `GetNamedSecurityInfoW(path,
-///   SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION,
-///   ...)` and compare it to the process SID with `EqualSid`; refuse on
-///   mismatch, mirroring the uid check in `verify_owner_and_perms`.
-/// - Inspect the DACL that call also returns (e.g. via
-///   `GetEffectiveRightsFromAclW` for `Everyone`/`Authenticated Users`/other
-///   well-known non-owner principals) and refuse if any non-owner principal
-///   holds a write-capable access right, mirroring `GROUP_OTHER_WRITABLE_MASK`.
-/// - When `path` does not yet exist, create it with a DACL that denies
-///   non-owner write from the start (e.g. build a `SECURITY_ATTRIBUTES` for
-///   `CreateDirectoryW`, or call `SetNamedSecurityInfoW` immediately after),
-///   for parity with `CACHE_DIR_MODE` on Unix.
-/// - Land this behind Windows-hosted CI integration tests exercising both the
-///   accept and refuse paths (mirroring the `#[cfg(unix)]` tests below) before
-///   relying on it — nothing here can be verified blind. ~keep
-#[cfg(not(unix))]
+/// Considered three options: (a) full DACL manipulation via `windows-sys`
+/// (resolve the process token's owner SID, resolve `path`'s owner SID via
+/// `GetNamedSecurityInfoW`, compare with `EqualSid`, walk the DACL for
+/// non-owner write access via `GetEffectiveRightsFromAclW`, and refuse or
+/// repair on mismatch — mirroring `verify_owner_and_perms`'s uid/mode checks
+/// bit-for-bit); (b) rely on the fact that the default cache directory
+/// already lives under `%LOCALAPPDATA%` (see [`WINDOWS_PROFILE_CACHE_ENV`]),
+/// which Windows itself ACLs to the owning user by profile default, and skip
+/// bespoke ACL code entirely; (c) detect-and-warn without attempting repair.
+///
+/// Went with (b), plus the detection half of (c) for the one gap (b) leaves
+/// open. Reasoning:
+/// - `windows-sys` is already resolved into this workspace's `Cargo.lock`
+///   transitively — `fd-lock` (an existing, non-optional-once-`download`-is-on
+///   dependency of this very module) depends on `windows-sys 0.59` for its
+///   Windows `LockFileEx` backend — so option (a) would not add a *new*
+///   third-party dependency to the graph, only new feature flags
+///   (`Win32_Security`, `Win32_Security_Authorization`) and new unsafe FFI
+///   surface in this crate.
+/// - Despite that, (a) was rejected: this repo has no Windows host to compile
+///   or run that FFI against, and both of its failure directions are worse
+///   than the gap it would close — a subtly wrong SID/ACE comparison that
+///   never refuses anything ships a false guarantee ("we harden Windows
+///   ACLs") while protecting nothing, and a check that wrongly *does* refuse
+///   hard-breaks every Windows user's cache. Either outcome is worse than an
+///   honestly documented, narrower mitigation.
+/// - `CreateDirectoryW` (what `fs::create_dir_all` calls) is passed no
+///   explicit security descriptor here, so a newly created cache directory
+///   under `%LOCALAPPDATA%` inherits that parent's restrictive DACL
+///   unchanged — the real protection is Windows' own per-profile default,
+///   not anything this function does.
+/// - The one way a caller defeats that inherited protection is pointing
+///   `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR` outside the profile root (a shared
+///   drive, `C:\Temp`, a redirected/roaming profile share). That's a plain
+///   path-containment check against `%LOCALAPPDATA%` — no Win32 API needed —
+///   so it's implemented as an advisory [`tracing::warn!`] via
+///   [`warn_if_outside_profile_cache_root`], never a hard refusal (a false
+///   positive here must not be able to hard-break startup, unlike Unix's
+///   refusal which is backed by a real permission-bit read).
+#[cfg(windows)]
+pub(crate) fn ensure_secure_cache_dir(path: &Path) -> Result<(), Error> {
+    fs::create_dir_all(path)
+        .map_err(|e| Error::Download(format!("Failed to create cache directory {}: {e}", path.display())))?;
+    warn_if_outside_profile_cache_root(path);
+    Ok(())
+}
+
+/// Plain recursive creation for targets that are neither Unix nor Windows
+/// (e.g. wasm32, where this crate's `download` feature has no real-filesystem
+/// notion of a private cache directory to harden). Unchanged by #109.
+#[cfg(not(any(unix, windows)))]
 pub(crate) fn ensure_secure_cache_dir(path: &Path) -> Result<(), Error> {
     fs::create_dir_all(path)
         .map_err(|e| Error::Download(format!("Failed to create cache directory {}: {e}", path.display())))
+}
+
+/// Pure containment check backing [`warn_if_outside_profile_cache_root`].
+///
+/// Split out the same way [`cache_base_from`] is split from
+/// [`resolve_cache_base`]: so the decision is reachable from unit tests
+/// without mutating the process-global `%LOCALAPPDATA%` environment variable.
+#[cfg(windows)]
+fn is_outside_profile_cache_root(path: &Path, profile_root: &str) -> bool {
+    !path.starts_with(profile_root)
+}
+
+/// Advisory-only companion to [`ensure_secure_cache_dir`]'s Windows path: warns
+/// (never refuses) when `path` is not nested under the current user's
+/// `%LOCALAPPDATA%`, the one location Windows guarantees is private to this
+/// user by default. Silent when `%LOCALAPPDATA%` is unset or empty — nothing
+/// to compare against, and this check must not be able to block startup.
+#[cfg(windows)]
+fn warn_if_outside_profile_cache_root(path: &Path) {
+    let Ok(profile_root) = std::env::var(WINDOWS_PROFILE_CACHE_ENV) else {
+        return;
+    };
+    if profile_root.trim().is_empty() {
+        return;
+    }
+    if is_outside_profile_cache_root(path, &profile_root) {
+        tracing::warn!(
+            cache_dir = %path.display(),
+            profile_root = %profile_root,
+            "cache directory is outside the current user's {WINDOWS_PROFILE_CACHE_ENV} profile \
+             directory, which Windows protects from other local users by default; verify this \
+             location's permissions manually, or set {CACHE_DIR_ENV} to a directory under \
+             {WINDOWS_PROFILE_CACHE_ENV}"
+        );
+    }
 }
 
 /// Verify a cache directory's ownership/permissions if it already exists; a
@@ -284,7 +351,18 @@ pub(crate) fn verify_cache_dir_if_present(path: &Path) -> Result<(), Error> {
     verify_owner_and_perms(path)
 }
 
-#[cfg(not(unix))]
+/// Windows companion to the `#[cfg(unix)]` overload above: same advisory
+/// check as [`ensure_secure_cache_dir`], run without creating anything. Never
+/// returns an error — see [`warn_if_outside_profile_cache_root`].
+#[cfg(windows)]
+pub(crate) fn verify_cache_dir_if_present(path: &Path) -> Result<(), Error> {
+    if path.exists() {
+        warn_if_outside_profile_cache_root(path);
+    }
+    Ok(())
+}
+
+#[cfg(not(any(unix, windows)))]
 pub(crate) fn verify_cache_dir_if_present(_path: &Path) -> Result<(), Error> {
     Ok(())
 }
@@ -1703,6 +1781,69 @@ mod tests {
         let temp_dir = temp_cache_dir();
         let missing = temp_dir.path().join("does-not-exist");
         verify_cache_dir_if_present(&missing).expect("a missing directory has nothing to verify");
+    }
+
+    // ~keep Windows-gated: exercises `ensure_secure_cache_dir`/`verify_cache_dir_if_present`'s
+    // ~keep `#[cfg(windows)]` bodies and the pure `is_outside_profile_cache_root` helper they
+    // ~keep call. Cannot compile or run on this (or any non-Windows) host — see #109 report.
+    #[cfg(windows)]
+    #[test]
+    fn is_outside_profile_cache_root_flags_a_path_not_nested_under_the_profile_root() {
+        assert!(is_outside_profile_cache_root(
+            Path::new(r"D:\Shared\tree-sitter-language-pack"),
+            r"C:\Users\alice\AppData\Local"
+        ));
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn is_outside_profile_cache_root_accepts_a_path_nested_under_the_profile_root() {
+        assert!(!is_outside_profile_cache_root(
+            Path::new(r"C:\Users\alice\AppData\Local\tree-sitter-language-pack\v9.9.9\libs"),
+            r"C:\Users\alice\AppData\Local"
+        ));
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn should_create_new_cache_dir_under_windows() {
+        let temp_dir = temp_cache_dir();
+        let target = temp_dir.path().join("secure-cache");
+
+        ensure_secure_cache_dir(&target).expect("directory creation should succeed");
+
+        assert!(target.is_dir(), "cache dir must exist after creation");
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn ensure_secure_cache_dir_accepts_an_already_existing_directory_under_windows() {
+        let temp_dir = temp_cache_dir();
+        let target = temp_dir.path().join("already-there");
+        fs::create_dir_all(&target).expect("dir should be created");
+
+        ensure_secure_cache_dir(&target).expect("a pre-existing directory should be accepted, never refused");
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn verify_cache_dir_if_present_is_a_noop_when_the_directory_is_absent_under_windows() {
+        let temp_dir = temp_cache_dir();
+        let missing = temp_dir.path().join("does-not-exist");
+        verify_cache_dir_if_present(&missing).expect("a missing directory has nothing to verify");
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn verify_cache_dir_if_present_never_refuses_an_existing_directory_under_windows() {
+        // ~keep Regression guard: the Windows path is advisory-only by design (see
+        // ~keep `ensure_secure_cache_dir`'s doc comment) — it must never return `Err`,
+        // ~keep unlike the Unix overload it mirrors.
+        let temp_dir = temp_cache_dir();
+        let target = temp_dir.path().join("present");
+        fs::create_dir_all(&target).expect("dir should be created");
+
+        verify_cache_dir_if_present(&target).expect("Windows verification must never refuse");
     }
 
     #[test]
