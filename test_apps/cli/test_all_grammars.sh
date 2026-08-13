@@ -6,9 +6,11 @@ set -euo pipefail
 BIN="${TS_PACK_BIN:-ts-pack}"
 LANGUAGES="${TS_PACK_LANGUAGES:-python,rust,javascript,typescript,go,html,css,json}"
 
+IFS=',' read -ra LANG_LIST <<< "$LANGUAGES"
+
 echo "=== grammar parse test ==="
 echo "Binary: $BIN"
-echo "Languages: $LANGUAGES"
+echo "Languages: ${#LANG_LIST[@]}"
 
 # Minimal source snippets for each supported language.
 declare -A SOURCES
@@ -28,7 +30,6 @@ SOURCES[wolfram]='x = 1'
 PASS=0
 FAIL=0
 
-IFS=',' read -ra LANG_LIST <<< "$LANGUAGES"
 for lang in "${LANG_LIST[@]}"; do
   if [[ -v SOURCES[$lang] ]]; then
     src="${SOURCES[$lang]}"

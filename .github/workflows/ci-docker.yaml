@@ -91,10 +91,18 @@ jobs:
           warn-mb: "500"
           label: ts-pack
 
-      - name: Test all grammars (198 languages)
+      # ~keep The image already compiles every grammar in the registry statically, so the
+      # ~keep smoke test covers the whole set rather than the script's 8-language default.
+      # ~keep The count comes from the registry so the step cannot drift from it again.
+      - name: Get all language names
+        id: langs
+        uses: xberg-io/actions/list-language-definitions@v1
+
+      - name: Test all grammars
         run: |
           docker run --rm \
             --user root \
+            -e TS_PACK_LANGUAGES="${{ steps.langs.outputs.names }}" \
             -v "${{ github.workspace }}/test_apps:/tests" \
             --entrypoint "" \
             ts-pack:test \
