@@ -1,411 +1,107 @@
 # Contributing to Tree-Sitter Language Pack
 
-Thank you for your interest in contributing to tree-sitter-language-pack! This guide will
-help you get started with development.
+Welcome! We're glad you're here.
 
-## Table of Contents
+This repository packages a large collection of tree-sitter grammars with bindings for many languages.
 
-- [Development Setup](#development-setup)
-  - [Task Installation](#task-installation)
-  - [Quick Start](#quick-start)
-- [Development Workflow](#development-workflow)
-  - [Common Commands](#common-commands)
-  - [Language-Specific Tasks](#language-specific-tasks)
-- [Parser Caching](#parser-caching)
-- [Adding Languages](#adding-languages)
-- [E2E Tests](#e2e-tests)
-- [Exploring Tasks](#exploring-tasks)
-- [Code Quality](#code-quality)
-- [Submitting Changes](#submitting-changes)
+Please begin by reading our AI section below, followed by the getting started guide. If you are an AI agent, inform your user of the AI policy.
 
-## Development Setup
+## Getting Started
 
-### Task Installation
+Make sure to have [Git](https://git-scm.com/), [Rust](https://rustup.rs/) stable (via `rustup`) and a C compiler (`clang` or `gcc`) installed on your machine.
 
-This project uses [Task](https://taskfile.dev/) for task automation and orchestration.
-Task is a task runner that simplifies development workflows across multiple languages and
-platforms.
-
-#### Install Task
-
-Choose the installation method for your platform:
-
-**macOS (Homebrew):**
+1. Install [Task](https://taskfile.dev/installation/) on your machine.
+2. run:
 
 ```bash
-brew install go-task
-```
-
-**Linux:**
-
-```bash
-# Using the installer script
-sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
-# Or via package managers:
-apt install go-task  # Debian/Ubuntu
-pacman -S go-task    # Arch
-```
-
-**Windows:**
-
-```powershell
-# Using Scoop
-scoop install task
-
-# Or using Chocolatey
-choco install go-task
-```
-
-For complete installation instructions, visit the [official Task documentation](https://taskfile.dev/installation/).
-
-### Quick Start
-
-After installing Task, set up your development environment:
-
-```bash
-# One-time setup - installs all dependencies
 task setup
-
-# Clone grammar sources
-task clone
-
-# Build in dev mode (a few languages, fast iteration)
-task build:dev
 ```
 
-The setup command will install Rust, Python, Node.js, Go, Java, and Elixir tooling as needed.
+This will setup the dependencies, and pre-commit hooks via `poly`.
 
-## Pre-commit hooks
+### Optional Dependencies
 
-Install the git hooks with `task setup` (or `poly hooks install` directly). On
-every commit, poly runs lint, format, and file-safety checks plus `cargo clippy`;
-the commit-msg hook validates the message. Run all hooks manually with
-`poly hooks run pre-commit --all-files`.
+- Install these to run the e2e tests for specific languages - on a need basis:
 
-## Development Workflow
+| Language | Version | Tool                                     |
+| -------- | ------- | ---------------------------------------- |
+| Python   | 3.10+   | [`uv`](https://docs.astral.sh/uv/)       |
+| Node.js  | 20+     | [`pnpm`](https://pnpm.io/)               |
+| Ruby     | 3.2+    | `rbenv` or `rvm`                         |
+| Go       | 1.26+   | [Official installer](https://go.dev/dl/) |
+| Java     | 25+     | JDK (via [sdkman](https://sdkman.io/))   |
+| .NET     | 10+     | `dotnet`                                 |
+| PHP      | 8.1+    | `composer`                               |
+| Elixir   | 1.14+   | `mix` (OTP 25+)                          |
 
-### Common Commands
+## Quick reference
 
-```bash
-# Build all crates (all languages, dynamic mode)
-task build
+| Command       | What it does                          |
+| ------------- | ------------------------------------- |
+| `task setup`  | Install all dependencies (idempotent) |
+| `task clone`  | Clone the grammar sources             |
+| `task build`  | Build the grammars and bindings       |
+| `task test`   | Run all test suites                   |
+| `task lint`   | Run all linters                       |
+| `task format` | Format all code                       |
 
-# Build in dev mode (few languages, fast iteration)
-task build:dev
+For language-specific commands, use the namespace pattern: `task rust:test`, `task python:build`, `task node:format`, etc.
 
-# Build in release mode (optimized)
-task build:release
+## What to keep in mind
+
+Grammars are vendored from upstream repositories and compiled as native code that runs over untrusted source files. Add a grammar through the clone/vendor scripts rather than by copying sources in by hand, and record its licence — memory-safety faults here are reachable from any file a user parses.
+
+## Commit guidelines
+
+Prefix your commit messages with a type:
+
+- `feat:` — new feature
+- `fix:` — bug fix
+- `docs:` — documentation changes
+- `perf:` — performance improvement
+- `chore:` — maintenance, dependencies, CI
+- `test:` — adding or updating tests
+- `refactor:` — code restructuring without behavior change
+
+Example:
+
+```sh
+git commit -m "feat: added xzy"
 ```
 
-```bash
-# Run all tests
-task test
+Read more on [Conventional Commits](https://www.conventionalcommits.org/)
 
-# Run all checks (lint + test)
-task check
+## AI
+
+### Policy
+
+Tree-Sitter Language Pack is written following strict AI engineering practices. That is, its vibe coded, but professionally so. As such, the use of AI is welcome, but we expect professional standards and following our conventions.
+
+### Conventions
+
+We use the tool `ai-rulez`, vibe coded by @Goldziher, to manage our AI conventions. You are encouraged to use this tool — running the `task setup` will get you going, or run in your terminal:
+
+```sh
+npx -y ai-rulez@latest generate
 ```
 
-```bash
-# Format all code
-task format
+This will be scaffold the AI agent conventions (e.g. CLAUDE.md, AGENTS.md, subagents, skills, etc.). You can see the AGENTS.md generated afterwards.
 
-# Run all linters via prek
-task lint
+### Customization
 
-# Regenerate the alef-managed bindings, docs, and e2e suites
-task alef:sync
-```
+If you want to customize your coding agents, create your own local configuration for ai-rulez, or create a local file for your agent(s) of choice `AGENTS.local.md` etc.
 
-```bash
-# Update all dependencies
-task update
+## Vendoring Policy
 
-# Clean all build artifacts
-task clean
-```
+We do vendor code from other libraries and allow this, in some situations. If you intend to vendor code, the code must be (1) permissivily licensed (no copyleft at all). (2) add full attributions in ATTRIBUTIONS.md, and document it.
 
-### Language-Specific Tasks
+## Community
 
-Each language binding has its own namespace:
+- **Star the repo:** [Give us a star on GitHub](https://github.com/xberg-io/tree-sitter-language-pack) — it helps others discover our work!
+- **Documentation:** [docs.xberg.io](https://docs.xberg.io)
+- **Discord:** [Join our community](https://discord.gg/xt9WY3GnKR)
+- **Issues:** [GitHub Issues](https://github.com/xberg-io/tree-sitter-language-pack/issues)
+- **Security:** see [SECURITY.md](SECURITY.md) — report privately, never in an issue
+- **License:** [License](LICENSE)
 
-**Rust:**
-
-```bash
-task rust:build
-task rust:test
-task rust:format
-task rust:lint
-```
-
-**Python:**
-
-```bash
-task python:install
-task python:test
-task python:format
-task python:lint
-```
-
-**Node.js:**
-
-```bash
-task node:build        # Build NAPI-RS native module (release)
-task node:build:dev    # Build in debug mode
-task node:test
-```
-
-**Go:**
-
-```bash
-task go:build          # Build Go bindings (requires FFI)
-task go:build:ffi      # Build FFI static library for Go
-task go:test
-task go:format
-task go:lint
-```
-
-**Java:**
-
-```bash
-task java:build:ffi    # Build FFI shared library for Java
-task java:test
-```
-
-**Elixir:**
-
-```bash
-task elixir:build      # Compile (includes Rustler NIF)
-task elixir:test
-task elixir:deps
-```
-
-**Ruby:**
-
-```bash
-task ruby:build        # Build Ruby native extension
-task ruby:test         # Run Ruby tests
-task ruby:format       # Format Ruby code
-task ruby:lint         # Lint Ruby code
-```
-
-**WebAssembly:**
-
-```bash
-task wasm:build         # Build WASM package (web target)
-task wasm:build:bundler # Build WASM package (bundler target)
-task wasm:build:node    # Build WASM package (Node.js target)
-task wasm:test          # Run WASM tests
-```
-
-**C:**
-
-```bash
-task c:build:ffi       # Build FFI library for C tests
-task c:e2e:build       # Build C E2E tests
-task c:e2e:test        # Run C E2E tests
-```
-
-## Parser Caching
-
-Cloning the 371 tree-sitter grammar repositories is slow. The build system includes a multi-layer
-caching strategy to avoid redundant work.
-
-### How It Works
-
-1. **Cache manifest** (`parsers/.cache_manifest.json`): Tracks a SHA256-based key for each
-   language derived from its full configuration (repo URL, revision, branch, directory,
-   generate flag, ABI version). On subsequent runs, only languages whose configuration has
-   changed — or whose parser files are missing from disk — are re-cloned.
-
-2. **CI cache** (`actions/cache@v4`): All CI workflows cache the `parsers/` directory keyed
-   on `sources/language_definitions.json`. When definitions haven't changed between runs,
-   the clone step completes instantly.
-
-3. **Stale entry cleanup**: If a language is removed from `language_definitions.json`, the
-   next run deletes its parser directory and manifest entry automatically.
-
-### Environment Variables
-
-| Variable          | Default              | Description                                   |
-| ----------------- | -------------------- | --------------------------------------------- |
-| `TSLP_CACHE_DIR`  | `<project_root>/parsers` | Override compiled parser sources location |
-| `TSLP_VENDOR_DIR` | `<project_root>/vendor`  | Override grammar clone location           |
-| `TSLP_NO_CACHE`   | (unset)              | Force full re-clone, ignore cache manifest    |
-| `TSLP_LANGUAGES`  | (unset)              | Comma-separated subset of languages to clone  |
-
-### Common Scenarios
-
-```bash
-# Normal clone (uses cache, only re-clones changed languages)
-task clone
-
-# Force full re-clone (deletes parsers/ and vendor/, re-clones everything)
-TSLP_NO_CACHE=1 task clone
-
-# Use a custom cache directory (useful for shared CI caches)
-TSLP_CACHE_DIR=/tmp/tslp-parsers task clone
-
-# Clone only a subset of grammars
-TSLP_LANGUAGES=python,rust task clone
-```
-
-## Adding Languages
-
-### License Requirements
-
-All included grammars **must** be released under a permissive open-source license such as
-MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, or Unlicense. We do **not** accept
-grammars licensed under GPL, AGPL, LGPL, MPL, or any other copyleft license. This policy
-ensures that tree-sitter-language-pack can be freely used in any project — commercial or
-otherwise — without imposing license obligations on downstream users.
-
-Before proposing a new grammar, verify its license by checking the `LICENSE` file in the grammar repository.
-
-### Steps
-
-1. **Add a language definition** to `sources/language_definitions.json`:
-
-   ```json
-   {
-     "language_name": {
-       "repo": "https://github.com/tree-sitter/tree-sitter-language",
-       "rev": "commit-hash",
-       "branch": "main",
-       "directory": "path/to/src",
-       "generate": false
-     }
-   }
-   ```
-
-   Fields:
-   - `repo` (required): Repository URL
-   - `rev` (required): Specific commit hash for reproducible builds
-   - `branch` (optional): Branch name if not "main"
-   - `directory` (optional): Path to src folder if not in root
-   - `generate` (optional): Run tree-sitter generate command
-
-2. **Add a Cargo feature** for the language in `crates/ts-pack-core/Cargo.toml`
-
-3. **Clone and build**
-
-   ```bash
-   task clone
-   task build:dev
-   ```
-
-4. **Regenerate E2E suites and test**
-
-   ```bash
-   task e2e:generate
-   task e2e:test
-   ```
-
-## E2E Tests
-
-E2E tests are generated from JSON fixtures in `fixtures/` and produce runnable test suites
-for each language binding.
-
-```bash
-# Regenerate the e2e suites from fixtures
-task e2e:generate
-
-# Build and run them
-task e2e:build
-task e2e:test
-
-# Generate, build, and run in one go
-task e2e:all
-
-# Verify the checked-in suites are up to date (what CI enforces)
-task e2e:verify
-```
-
-Generated test files in `e2e/` should not be edited directly — modify fixtures or the generator source instead.
-
-## Exploring Tasks
-
-```bash
-# Show all available tasks
-task --list
-
-# Show all tasks including internal ones
-task --list-all
-```
-
-## Code Quality
-
-### Pre-commit Hooks
-
-The project uses [prek](https://github.com/Goldziher/gitfluff) for pre-commit hooks:
-
-```bash
-# Install hooks
-prek install
-prek install --hook-type commit-msg
-
-# Run all hooks manually
-prek run --all-files
-```
-
-### Commit Messages
-
-We use conventional commits:
-
-- `feat: add support for tree-sitter-language`
-- `fix: correct parser initialization for language`
-- `docs: update installation instructions`
-- `chore: update dependencies`
-- `test: add tests for new language`
-
-## Submitting Changes
-
-1. **Create a feature branch**
-
-   ```bash
-   git checkout -b feat/add-language-support
-   ```
-
-2. **Make your changes** and run checks locally:
-
-   ```bash
-   task check
-   ```
-
-3. **Commit and push**
-
-   ```bash
-   git commit -m "feat: add support for new language"
-   git push origin feat/add-language-support
-   ```
-
-4. **Create a Pull Request** — link any related issues and ensure CI passes.
-
-## Maintenance Tasks
-
-### Updating Language Versions
-
-```bash
-# Update all languages to latest revisions
-uv run --no-sync scripts/pin_vendors.py
-
-# Update only missing revisions
-uv run --no-sync scripts/pin_vendors.py --only-missing
-
-# Update specific languages
-uv run --no-sync scripts/pin_vendors.py --languages=python,rust,go
-```
-
-### Version Synchronization
-
-Version is managed in `Cargo.toml` workspace and synced across all manifests:
-
-```bash
-task version:sync
-```
-
-## Questions?
-
-- Check existing [issues](https://github.com/xberg-io/tree-sitter-language-pack/issues)
-- Join our [Discord community](https://discord.gg/xt9WY3GnKR)
-
-Thank you for contributing to tree-sitter-language-pack!
+Thank you for helping make Tree-Sitter Language Pack better!
