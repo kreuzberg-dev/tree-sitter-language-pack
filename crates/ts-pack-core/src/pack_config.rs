@@ -111,14 +111,44 @@ impl PackConfig {
     /// 2. `$XDG_CONFIG_HOME/tree-sitter-language-pack/config.toml`
     /// 3. `~/.config/tree-sitter-language-pack/config.toml`
     ///
-    /// Returns `Ok(None)` if no candidate file exists at any searched location.
+    /// Returns `None` if no candidate file exists at any searched location, or
+    /// if a candidate exists but cannot be read or parsed. In the latter case a
+    /// `tracing::warn!` names the offending path before this returns `None`.
+    /// Callers that need to distinguish "no config" from "broken config" — the
+    /// CLI does, because it reports a malformed file to the user by path —
+    /// should use [`Self::try_discover`] instead. This signature stays
+    /// infallible to keep the public API source-compatible. ~keep
     ///
-    /// Search stops at the first *existing* candidate. If that file exists but
-    /// fails to read or parse, this returns `Err` naming the offending path
-    /// rather than silently treating it as "no config" and falling through to a
-    /// different candidate further up the search order — that would make a
-    /// broken `language-pack.toml` indistinguishable from an absent one, and
-    /// silently discard the user's cache directory and pre-download list. ~keep
+    /// # Example
+    ///
+    /// ```no_run
+    /// use tree_sitter_language_pack::PackConfig;
+    ///
+    /// if let Some(config) = PackConfig::discover() {
+    ///     println!("Found config with {:?} languages", config.languages);
+    /// }
+    /// ```
+    #[cfg_attr(alef, alef(skip))]
+    #[cfg(feature = "config")]
+    pub fn discover() -> Option<Self> {
+        match Self::try_discover() {
+            Ok(config) => config,
+            Err(error) => {
+                tracing::warn!(%error, "discovered language-pack.toml could not be loaded; treating as absent");
+                None
+            }
+        }
+    }
+
+    /// Discover configuration, reporting a broken candidate file as an error.
+    ///
+    /// Searches the same locations as [`Self::discover`]. Search stops at the
+    /// first *existing* candidate. If that file exists but fails to read or
+    /// parse, this returns `Err` naming the offending path rather than
+    /// silently treating it as "no config" and falling through to a different
+    /// candidate further up the search order — that would make a broken
+    /// `language-pack.toml` indistinguishable from an absent one, and silently
+    /// discard the user's cache directory and pre-download list. ~keep
     ///
     /// # Errors
     ///
@@ -130,7 +160,7 @@ impl PackConfig {
     /// ```no_run
     /// use tree_sitter_language_pack::PackConfig;
     ///
-    /// match PackConfig::discover() {
+    /// match PackConfig::try_discover() {
     ///     Ok(Some(config)) => println!("Found config with {:?} languages", config.languages),
     ///     Ok(None) => println!("No config file found"),
     ///     Err(e) => eprintln!("language-pack.toml found but invalid: {e}"),
@@ -138,7 +168,7 @@ impl PackConfig {
     /// ```
     #[cfg_attr(alef, alef(skip))]
     #[cfg(feature = "config")]
-    pub fn discover() -> Result<Option<Self>, crate::error::Error> {
+    pub fn try_discover() -> Result<Option<Self>, crate::error::Error> {
         if let Ok(cwd) = std::env::current_dir() {
             let mut dir: &std::path::Path = cwd.as_path();
             for _ in 0..10 {
@@ -172,10 +202,72 @@ mod tests {
 
     use super::*;
 
-    // ~keep `discover()` reads the process-wide current directory, which cannot be
-    // ~keep mutated safely in a parallel test run (test-independence). Its search-stop
-    // ~keep and error-propagation behaviour is exercised through `from_toml_file`
-    // ~keep instead, which is exactly what `discover()` delegates to at each candidate.
+    // ~keep `discover()`/`try_discover()` read the process-wide current directory,
+    // ~keep which cannot be mutated by more than one test at a time in a parallel test
+    // ~keep run (test-independence). `CWD_LOCK` serializes the two tests below against
+    // ~keep each other, and `CwdOverride` restores the original directory on drop —
+    // ~keep even if an assertion panics — so no other test in this binary observes the
+    // ~keep temporary directory change.
+    static CWD_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+    struct CwdOverride {
+        original: std::path::PathBuf,
+        _guard: std::sync::MutexGuard<'static, ()>,
+    }
+
+    impl CwdOverride {
+        fn new(dir: &std::path::Path) -> Self {
+            let guard = CWD_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+            let original = std::env::current_dir().expect("current dir should be readable");
+            std::env::set_current_dir(dir).expect("current dir should be settable");
+            Self { original, _guard: guard }
+        }
+    }
+
+    impl Drop for CwdOverride {
+        fn drop(&mut self) {
+            std::env::set_current_dir(&self.original).expect("original current dir should be restorable");
+        }
+    }
+
+    #[test]
+    fn should_return_err_naming_the_path_when_try_discover_finds_malformed_toml() {
+        let temp_dir = tempfile::Builder::new()
+            .prefix("tslp-pack-config-discover-")
+            .tempdir()
+            .expect("temp dir should be created");
+        let path = temp_dir.path().join("language-pack.toml");
+        std::fs::write(&path, "this is not [ valid toml").expect("malformed file should be written");
+        let _cwd = CwdOverride::new(temp_dir.path());
+
+        let error = PackConfig::try_discover().expect_err("malformed TOML must not silently succeed");
+
+        let message = error.to_string();
+        assert!(
+            message.contains(&path.display().to_string()),
+            "error must name the offending path; got: {message}"
+        );
+    }
+
+    #[test]
+    fn should_return_none_when_discover_finds_malformed_toml() {
+        let temp_dir = tempfile::Builder::new()
+            .prefix("tslp-pack-config-discover-")
+            .tempdir()
+            .expect("temp dir should be created");
+        let path = temp_dir.path().join("language-pack.toml");
+        std::fs::write(&path, "this is not [ valid toml").expect("malformed file should be written");
+        let _cwd = CwdOverride::new(temp_dir.path());
+
+        let config = PackConfig::discover();
+
+        assert!(
+            config.is_none(),
+            "a malformed config file must be reported via a warning and treated as absent, \
+             not silently accepted; got: {config:?}"
+        );
+    }
+
     #[test]
     fn should_return_err_naming_the_path_when_config_file_is_malformed_toml() {
         let temp_dir = tempfile::Builder::new()

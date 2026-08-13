@@ -184,7 +184,7 @@ fn run() -> Result<(), String> {
                 let count = tree_sitter_language_pack::download(&refs).map_err(|e| e.to_string())?;
                 println!("Ensured {count} languages.");
             } else {
-                match PackConfig::discover() {
+                match PackConfig::try_discover() {
                     Ok(Some(config)) => {
                         tree_sitter_language_pack::init(&config).map_err(|e| e.to_string())?;
                         println!("Initialized from discovered config.");

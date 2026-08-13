@@ -106,9 +106,10 @@ init()
 ```
 
 :::note[TOML loading is Rust-only]
-`PackConfig::from_toml_file()` and `PackConfig::discover()` exist only on the Rust
-`PackConfig` (behind the `config` feature). They are not exported to Python or any other
-binding — the CLI (`ts-pack download`) reads `language-pack.toml` on your behalf.
+`PackConfig::from_toml_file()`, `PackConfig::discover()`, and `PackConfig::try_discover()`
+exist only on the Rust `PackConfig` (behind the `config` feature). They are not exported to
+Python or any other binding — the CLI (`ts-pack download`) reads `language-pack.toml` on your
+behalf.
 :::
 
 </TabItem>
@@ -139,10 +140,19 @@ let config = PackConfig {
 // Load from file
 let config = PackConfig::from_toml_file(Path::new("language-pack.toml"))?;
 
-// Discover in parent directories. `Ok(None)` means no config file was found;
-// `Err` means one was found but could not be read or parsed, and names the path.
-if let Some(config) = PackConfig::discover()? {
+// Discover in parent directories. `None` means no config file was found, or one
+// was found but could not be read or parsed (a warning names the path in that case).
+if let Some(config) = PackConfig::discover() {
     println!("Found languages: {:?}", config.languages);
+}
+
+// `try_discover()` distinguishes "no config" from "broken config" instead of
+// collapsing both into `None`: `Ok(None)` means no config file was found,
+// `Err` means one was found but could not be read or parsed, and names the path.
+match PackConfig::try_discover() {
+    Ok(Some(config)) => println!("Found languages: {:?}", config.languages),
+    Ok(None) => println!("No config file found"),
+    Err(e) => eprintln!("language-pack.toml found but invalid: {e}"),
 }
 ```
 
