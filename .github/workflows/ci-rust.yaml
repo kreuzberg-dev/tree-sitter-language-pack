@@ -130,5 +130,11 @@ jobs:
       - name: Run workspace tests
         run: cargo test --locked --workspace --exclude ts-pack-core-wasm
 
+      # required-features tests (wire_format, concurrent_download) aren't built by the
+      # default-feature run above; wire_format pins the wire shape every binding
+      # deserializer depends on. See .task/rust.yml test:feature-gated.
+      - name: Run feature-gated tests
+        run: task rust:test:feature-gated
+
       - name: Run Rust E2E tests
         run: task rust:e2e:test

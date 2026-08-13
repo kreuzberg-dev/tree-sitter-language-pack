@@ -51,6 +51,7 @@ tasks:
       TSLP_LINK_MODE: "{{.LINK_MODE}}"
     cmds:
       - cargo test --locked --workspace --exclude ts-pack-core-php --exclude ts-pack-core-wasm
+      - task: test:feature-gated
 
   test:quick:
     desc: Run tests with a small set of languages
@@ -60,6 +61,20 @@ tasks:
       TSLP_LINK_MODE: "{{.LINK_MODE}}"
     cmds:
       - cargo test --locked --workspace --exclude ts-pack-core-php --exclude ts-pack-core-wasm
+      - task: test:feature-gated
+
+  # ~keep `wire_format` and `concurrent_download` carry `required-features` in
+  # ~keep crates/ts-pack-core/Cargo.toml, so the default-feature `cargo test` runs
+  # ~keep above never build or run them. `wire_format` pins the serialized wire
+  # ~keep shape every binding's hand-written deserializer depends on — it must run
+  # ~keep on every test invocation, not just when someone remembers `--features`.
+  test:feature-gated:
+    desc: Run tests gated behind non-default Cargo features (wire_format, concurrent_download)
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LINK_MODE: "{{.LINK_MODE}}"
+    cmds:
+      - cargo test --locked -p tree-sitter-language-pack --features test-internals,serde,config
 
   lint:
     desc: Auto-fix Rust code linting (cargo fmt + clippy)
