@@ -493,11 +493,29 @@ env_shims = [
   "strcmp",
 ]
 features = ["serde", "config", "dynamic-loading"]
+# ~keep `languages` drives alef's e2e skip logic only (unsupported languages get
+# `.skip("not in WASM's static language set")`); it does NOT control what the wasm
+# build actually compiles. The real compile set is `WASM_DEFAULT_LANGUAGES` in
+# `crates/ts-pack-core/build.rs` (filtered by `language_definitions.json` and the
+# wasm32 skip-list/parser-size gate) because `.task/wasm.yml` never sets
+# `TSLP_LANGUAGES`, so build.rs falls through to that constant. This list must
+# mirror build.rs's actual output — keep it in sync by hand when that constant or
+# its skip-list changes, or the e2e skip logic will drift silently (as it had:
+# this list previously included "zig", which build.rs's wasm default never ships,
+# and was missing over a dozen languages build.rs does ship).
 languages = [
-  "python",
   "javascript",
   "typescript",
   "tsx",
+  "html",
+  "css",
+  "scss",
+  "json",
+  "yaml",
+  "toml",
+  "xml",
+  "markdown",
+  "python",
   "rust",
   "go",
   "java",
@@ -506,25 +524,34 @@ languages = [
   "csharp",
   "ruby",
   "php",
-  "html",
-  "css",
-  "json",
-  "yaml",
-  "toml",
-  "markdown",
   "bash",
-  "sql",
   "lua",
-  "scala",
   "kotlin",
   "swift",
+  "scala",
+  "dart",
+  "elixir",
+  "haskell",
+  "r",
+  "sql",
+  "graphql",
   "dockerfile",
+  "make",
+  "cmake",
+  "hcl",
+  "proto",
   "vue",
   "svelte",
-  "elixir",
+  "regex",
+  "ini",
+  "objc",
+  "julia",
+  "ocaml",
   "erlang",
-  "haskell",
-  "zig",
+  "clojure",
+  "groovy",
+  "powershell",
+  "nix",
 ]
 
 [crates.ffi]
