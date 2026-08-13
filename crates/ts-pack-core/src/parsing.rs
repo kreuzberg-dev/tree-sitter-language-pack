@@ -84,6 +84,7 @@ pub struct Parser {
     inner: tree_sitter::Parser,
     max_source_bytes: Option<usize>,
     timeout_ms: Option<u64>,
+    language_name: Option<String>,
 }
 
 impl Parser {
@@ -99,6 +100,7 @@ impl Parser {
             inner: tree_sitter::Parser::new(),
             max_source_bytes: None,
             timeout_ms: None,
+            language_name: None,
         }
     }
 
@@ -137,7 +139,9 @@ impl Parser {
         let language = crate::get_language(name)?;
         self.inner
             .set_language(&language)
-            .map_err(|e| Error::ParserSetup(format!("{e}")))
+            .map_err(|e| Error::ParserSetup(format!("{e}")))?;
+        self.language_name = Some(name.to_string());
+        Ok(())
     }
 
     /// Parse a UTF-8 source string.
@@ -146,6 +150,15 @@ impl Parser {
     /// configured [timeout](Self::set_parse_timeout_ms), or if the source
     /// exceeds the configured [size limit](Self::set_max_source_bytes). Each
     /// non-parse outcome is logged, so an empty result is never silent.
+    ///
+    /// # Concurrency
+    ///
+    /// Parsing runs fully in parallel across threads for almost every language — no lock is
+    /// taken. The exception is the small set of grammars whose external scanner keeps mutable
+    /// process-global state (currently just `properties`): parses of that language are
+    /// serialized against each other through an internal per-language lock, so that concurrent
+    /// threads can't corrupt shared scanner state. Every other language is unaffected by that
+    /// lock and never waits on it.
     #[must_use]
     pub fn parse(&mut self, source: &str) -> Option<Tree> {
         self.parse_bytes(source.as_bytes())
@@ -153,7 +166,8 @@ impl Parser {
 
     /// Parse a raw byte slice.
     ///
-    /// Same outcomes as [`parse`](Self::parse).
+    /// Same outcomes as [`parse`](Self::parse), including the concurrency behaviour documented
+    /// there.
     #[must_use]
     pub fn parse_bytes(&mut self, source: &[u8]) -> Option<Tree> {
         if let Some(limit) = self.max_source_bytes
@@ -166,6 +180,11 @@ impl Parser {
             );
             return None;
         }
+
+        let _guard = self
+            .language_name
+            .as_deref()
+            .and_then(crate::parse::lock_for_stateful_scanner);
 
         match crate::parse::run_parse(&mut self.inner, source, self.timeout_ms) {
             Ok(tree) => Some(Tree(Arc::new(tree))),

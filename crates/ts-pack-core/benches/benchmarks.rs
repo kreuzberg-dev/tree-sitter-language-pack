@@ -21,9 +21,12 @@
 //!   pipeline stage is attributable instead of averaged away.
 //! - `chunking` — `process` with and without chunking; the splitter is private, so
 //!   its cost is only observable as the delta between the two.
-//! - `concurrency` — the same work at 1/2/4/8 threads on both paths. `process`
-//!   serializes on `PARSE_LOCK` (two grammars keep mutable process-global scanner
-//!   state); `parse_bytes` does not. The gap between the curves is that lock.
+//! - `concurrency` — the same work at 1/2/4/8 threads on both paths. Both `process`
+//!   and `parse_bytes` parse fully in parallel across threads, except for the small
+//!   set of grammars whose external scanner keeps mutable process-global state
+//!   (currently just `properties`), whose parses serialize on a per-language lock.
+//!   None of `BENCH_LANGUAGES` are in that set, so both curves are expected to scale
+//!   together here.
 
 #![allow(clippy::print_stdout, clippy::print_stderr)]
 
