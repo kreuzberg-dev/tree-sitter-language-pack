@@ -1095,7 +1095,7 @@
     "extensions": ["conf", "nginx"],
     "generate": true,
     "repo": "https://github.com/opa-oz/tree-sitter-nginx",
-    "rev": "47ade644d754cce57974aac44d2c9450e823d4f4"
+    "rev": "fff03e9cc1910124426331759df196ee0f46b478"
   },
   "nickel": {
     "abi_version": 14,
@@ -1616,7 +1616,7 @@
     "extensions": ["swift"],
     "generate": true,
     "repo": "https://github.com/alex-pinkus/tree-sitter-swift",
-    "rev": "28fe3a8a85586aa297524fe6164140b9521dcaff"
+    "rev": "85d1773baf6e53de3722f2035fd3a9e7b03bf8d9"
   },
   "systemverilog": {
     "abi_version": 14,
