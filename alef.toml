@@ -855,6 +855,12 @@ e2e = "cd e2e/c && make clean && make && DYLD_LIBRARY_PATH=../../target/release 
 [crates.test.kotlin_android]
 precondition = "command -v gradle >/dev/null 2>&1"
 before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg cargo build --release -p ts-pack-core-ffi"
+# ~keep Without this key `alef test --e2e` skipped kotlin_android entirely and CI at
+# ~keep ci-e2e.yaml was its only runner. `gradle test` is a host-JVM run needing no emulator:
+# ~keep build.gradle.kts stages libts_pack_jni via buildHostJni/copyHostJni, and e2e/kotlin_android
+# ~keep has 9 unit tests under src/test/. No package-level `command` is set on purpose —
+# ~keep packages/kotlin-android/src/test holds no tests, so it would gate on an empty run.
+e2e = "cd e2e/kotlin_android && gradle test --no-daemon"
 
 [crates.test.swift]
 precondition = "command -v swift >/dev/null 2>&1"
@@ -863,7 +869,11 @@ before = [
   "bash scripts/setup-swift-bridge.sh",
 ]
 command = "cd packages/swift && swift test"
-e2e = "cd packages/swift && swift test"
+# ~keep `e2e` must point at e2e/swift_e2e, not packages/swift: when it duplicated `command`,
+# ~keep `alef test --e2e` re-ran the unit suite and never executed the 11 e2e test files, so CI
+# ~keep had to bypass alef via `task swift:e2e:test`. `e2e/swift/` is a dead orphan (a
+# ~keep Package.swift with no Tests/) and is deliberately not referenced.
+e2e = "cd e2e/swift_e2e && swift test"
 
 [crates.test.dart]
 precondition = "command -v dart >/dev/null 2>&1"
