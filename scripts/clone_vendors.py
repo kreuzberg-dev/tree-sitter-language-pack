@@ -542,10 +542,40 @@ def _score_editor_query(parts: tuple[str, ...], path_str: str) -> int | None:
     return None
 
 
+def _is_foreign_grammar_query(candidate: Path, directory: str | None) -> bool:
+    """Report whether a candidate belongs to a *different* grammar in the same monorepo.
+
+    Only meaningful when `directory` is set, i.e. the language is one grammar among
+    several in a shared repository. Such a repo lays its queries out in one of three
+    ways: `<grammar>/queries/<file>`, `queries/<grammar>/<file>`, or a single shared
+    `queries/<file>` at the root. The first two are grammar-scoped, so a candidate
+    scoped to some *other* grammar is never a valid substitute — its node types belong
+    to a different language. The shared root layout is not scoped to anything and stays
+    eligible as a fallback. ~keep
+
+    Args:
+        candidate: The candidate query file path (relative to the repo root).
+        directory: Optional grammar subdirectory within the repo.
+
+    Returns:
+        True if the candidate is scoped to a different grammar and must not be used.
+    """
+    if not directory:
+        return False
+
+    dir_last = directory.split("/")[-1]
+    parts = candidate.parts
+
+    if len(parts) >= 3 and parts[-2] == "queries" and parts[-3] != dir_last:
+        return True
+
+    return len(parts) >= 3 and parts[-3] == "queries" and parts[-2] != dir_last
+
+
 def _score_query_candidate(candidate: Path, directory: str | None) -> int:
     """Score a query file candidate for priority selection.
 
-    Lower score = higher priority. Scores: 1 (<dir>/queries), 2 (root queries),
+    Lower score = higher priority. Scores: 1 (grammar-scoped queries), 2 (root queries),
     3 (generic nested), 4-6 (editor-flavored), 100 (fallback).
 
     Args:
@@ -560,9 +590,15 @@ def _score_query_candidate(candidate: Path, directory: str | None) -> int:
 
     if directory:
         dir_last = directory.split("/")[-1]
-        for i, part in enumerate(parts):
-            if part == dir_last and parts[i + 1 : i + 2] == ("queries",) and i + 2 == len(parts):
-                return 1
+        # ~keep `parts` ends with the filename, so the two grammar-scoped layouts both put
+        # ~keep it last: `<grammar>/queries/<file>` and `queries/<grammar>/<file>`. The old
+        # ~keep check asked for `i + 2 == len(parts)`, which is one short and never held, so
+        # ~keep this branch was dead: every sibling grammar's queries tied at score 2 and the
+        # ~keep winner was whichever rglob happened to reach first.
+        if len(parts) >= 3 and parts[-3] == dir_last and parts[-2] == "queries":
+            return 1
+        if len(parts) >= 3 and parts[-3] == "queries" and parts[-2] == dir_last:
+            return 1
 
     if "queries" in parts and len(parts) == parts.index("queries") + 2:
         return 2
@@ -613,12 +649,37 @@ async def _discover_and_copy_queries(
         if filename in query_types:
             all_scm_files[filename].append(scm_file)
 
+    has_own_queries_dir = bool(directory) and any(
+        _score_query_candidate(candidate.relative_to(vendor_repo), directory) == 1
+        for candidates in all_scm_files.values()
+        for candidate in candidates
+    )
+
     for query_type in query_types:
         candidates = all_scm_files[query_type]
         if not candidates:
             continue
 
-        scored = [(candidate, _score_query_candidate(candidate, directory)) for candidate in candidates]
+        # ~keep Score on the repo-relative path, which is the contract the scorer documents.
+        # ~keep Absolute paths broke it: the vendor checkout directory is itself named after
+        # ~keep the language, so a repo-root `queries/` sat at `<lang>/queries/<file>` and
+        # ~keep scored as if it were the grammar's own directory, tying with the real one.
+        relative = [(candidate, candidate.relative_to(vendor_repo)) for candidate in candidates]
+        eligible = [(c, r) for c, r in relative if not _is_foreign_grammar_query(r, directory)]
+        if not eligible:
+            print(f"Skipping {language_name} {query_type}: only other grammars in this repo provide it")
+            continue
+
+        # ~keep When upstream gives this grammar its own queries directory, that directory is
+        # ~keep authoritative: a kind missing from it is missing deliberately, and the repo-root
+        # ~keep set belongs to the sibling grammar. Falling back to root regardless is how
+        # ~keep fsharp_signature ended up with fsharp's locals/indents, which name node types
+        # ~keep the signature grammar does not have and so fail to compile.
+        if has_own_queries_dir and all(_score_query_candidate(rel, directory) != 1 for _, rel in eligible):
+            print(f"Skipping {language_name} {query_type}: not provided by {directory}/queries")
+            continue
+
+        scored = [(candidate, _score_query_candidate(rel, directory)) for candidate, rel in eligible]
         scored.sort(key=lambda x: x[1])
         best_candidate = scored[0][0]
 
