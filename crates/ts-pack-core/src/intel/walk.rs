@@ -64,10 +64,19 @@ where
         }
 
         loop {
+            // ~keep Checked before `goto_next_sibling`, not after: at depth 0 we are
+            // ~keep back at the caller's `root` itself, and `root`'s own siblings (if
+            // ~keep it is not the tree's real root) belong to a wider subtree the
+            // ~keep caller never asked to walk. `TreeCursor::goto_next_sibling` is not
+            // ~keep scoped to the node it was created from, so without this check first
+            // ~keep the walk would leak into them.
+            if depth == 0 {
+                return truncated;
+            }
             if cursor.goto_next_sibling() {
                 break;
             }
-            if depth == 0 || !cursor.goto_parent() {
+            if !cursor.goto_parent() {
                 return truncated;
             }
             depth -= 1;
@@ -137,6 +146,39 @@ mod tests {
 
         assert_eq!(count, 1, "skipping the root must visit only the root");
         assert_eq!(truncated, 0, "an explicit skip is not a truncation");
+    }
+
+    #[test]
+    fn should_not_walk_past_a_non_root_nodes_own_subtree() {
+        let Some(tree) = parse_or_skip("fn a() {} fn b() {}", "rust") else {
+            return;
+        };
+        let root = tree.root_node();
+        let first_item = root.named_child(0).expect("source must have a first top-level item");
+        assert!(
+            first_item.next_sibling().is_some(),
+            "test setup needs a following sibling for the bug to be reachable"
+        );
+
+        let mut visited = Vec::new();
+        let truncated = walk_bounded(&first_item, |node, depth| {
+            visited.push((node.id(), depth));
+            Descend::Children
+        });
+
+        assert_eq!(truncated, 0);
+        assert_eq!(
+            visited.len(),
+            first_item.descendant_count(),
+            "walk must visit exactly the subtree rooted at the passed-in node, not its siblings"
+        );
+        assert_eq!(visited[0], (first_item.id(), 0), "the passed-in node is depth 0");
+        assert!(
+            visited
+                .iter()
+                .all(|&(id, _)| id != first_item.next_sibling().unwrap().id()),
+            "the sibling of a non-root node must never be visited"
+        );
     }
 
     #[test]

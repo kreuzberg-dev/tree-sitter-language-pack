@@ -255,12 +255,39 @@ pub struct StructureItem {
     pub children: Vec<StructureItem>,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     /// Decorator or attribute names applied to the item.
+    ///
+    /// **Reserved: not yet populated.** Always empty, for every language.
+    /// Recognising a decorator requires per-language grammar knowledge (a
+    /// Python `decorated_definition` wrapper, Java/C# annotations, Rust
+    /// attributes each have a different shape), which no extractor here
+    /// implements yet. The field is kept rather than removed so a consumer's
+    /// deserializer does not need updating once it is.
     pub decorators: Vec<String>,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     /// Documentation comment attached to the item, if any.
+    ///
+    /// The text of the comment (or run of comments) immediately preceding
+    /// the item, with no blank line in between, when that comment is
+    /// classified as a doc comment. Multiple adjacent single-line doc
+    /// comments (Rust `///`) are joined with `\n` in source order.
+    ///
+    /// Populated for Rust (`///`/`//!`), Java (`/** */`), and JavaScript/
+    /// TypeScript (`/** */`). `None` for every other language, and for a
+    /// preceding comment that is not in doc-comment form (a plain `#`
+    /// comment in Python, Ruby, or Elixir) — Python's docstring convention is
+    /// captured separately, as [`DocstringInfo`], not through this field.
     pub doc_comment: Option<String>,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     /// Full signature text of the item (e.g., function parameters and return type).
+    ///
+    /// The item's own source text from its start up to the start of its body
+    /// (see [`StructureItem::body_span`]), trimmed of trailing whitespace —
+    /// for example `fn add(a: i32, b: i32) -> i32` for a Rust function whose
+    /// body is `{ a + b }`. `None` only when that text is empty, which does
+    /// not happen for any item [`StructureKind`] currently reports. Populated
+    /// for every language and kind this crate extracts structure for, since
+    /// it is derived from `body_span`'s boundary rather than per-language
+    /// syntax.
     pub signature: Option<String>,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     /// Source span covering only the body of the item, if distinct from the declaration.
@@ -343,6 +370,13 @@ pub struct DocstringInfo {
     pub associated_item: Option<String>,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     /// Parsed sections of the docstring (Args, Returns, Raises, etc.).
+    ///
+    /// **Reserved: not yet populated.** Always empty, for every
+    /// [`DocstringFormat`]. Parsing a docstring body into sections requires
+    /// implementing each convention's own layout (Google/NumPy/reST style
+    /// for Python, `@param`/`@returns` for JSDoc/Javadoc, and so on), which
+    /// no extractor here does yet. The field is kept rather than removed so
+    /// a consumer's deserializer does not need updating once it is.
     pub parsed_sections: Vec<DocSection>,
 }
 
@@ -366,11 +400,37 @@ pub struct ImportInfo {
     pub source: String,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     /// Specific names imported from the source module.
+    ///
+    /// For `import a, b` / `from m import a, b`, every entry's base name
+    /// (never the alias). For a JavaScript/TypeScript named-imports clause
+    /// (`import { a, b as c } from 'm'`), every specifier's original name.
+    ///
+    /// Populated for Python and JavaScript/TypeScript only. Always empty for
+    /// every other language this crate recognises import statements for —
+    /// Rust, Go, Java, Kotlin, and Elixir (`import`/`alias`/`require`/`use`)
+    /// — and for a JS/TS namespace import (`import * as ns`) or default
+    /// import (`import x from 'm'`), neither of which names individual items.
     pub items: Vec<String>,
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none", default))]
     /// Alias assigned to the import (e.g., `import numpy as np`).
+    ///
+    /// Populated for Python's single-name form (`import numpy as np`,
+    /// `from m import a as b`) and JavaScript/TypeScript's namespace form
+    /// (`import * as ns from 'm'`) or a named-imports clause naming exactly
+    /// one specifier (`import { a as b } from 'm'`). `None` for Rust, Go,
+    /// Java, Kotlin, and Elixir (which has its own `as:` alias option on
+    /// `alias` directives, not yet extracted here) — and for a Python
+    /// statement that aliases several names at once (`import os, sys as s`),
+    /// where there is no single alias to report for the statement as a
+    /// whole, so only `items` is populated for it.
     pub alias: Option<String>,
     /// Whether this is a wildcard import (e.g., `import *` or `use foo::*`).
+    ///
+    /// Detected from the syntax tree — a dedicated wildcard node
+    /// (`wildcard_import` in Python, `use_wildcard` in Rust) or a bare `*`
+    /// token outside of string-literal content — not by searching the
+    /// import's source text for a `*` character, so a glob in an import path
+    /// string (`import a from './glob*.js'`) is not mistaken for one.
     pub is_wildcard: bool,
     /// Source span covering the import statement.
     pub span: Span,
@@ -495,7 +555,11 @@ pub struct CodeChunk {
     pub end_byte: usize,
     /// Zero-indexed start line of this chunk.
     pub start_line: usize,
-    /// Zero-indexed end line of this chunk.
+    /// Zero-indexed row of the last byte actually included in this chunk
+    /// (inclusive — the same row a `Span::end_line` would report for a node
+    /// ending on that byte). Computed the same way regardless of whether the
+    /// source has a trailing newline: it is always the row of `end_byte - 1`,
+    /// never a phantom row past the file's real content.
     pub end_line: usize,
     /// Contextual metadata about this chunk.
     pub metadata: ChunkContext,
@@ -520,6 +584,10 @@ pub struct ChunkContext {
     /// Comments contained within this chunk.
     pub comments: Vec<CommentInfo>,
     /// Docstrings contained within this chunk.
+    ///
+    /// Populated only for Python — the same language for which
+    /// [`ProcessResult::docstrings`] is populated, and by the same
+    /// classifier. Always empty for every other language.
     pub docstrings: Vec<DocstringInfo>,
     /// Whether this chunk contains any tree-sitter error nodes.
     pub has_error_nodes: bool,

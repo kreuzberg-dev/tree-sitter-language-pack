@@ -280,11 +280,20 @@ mod tests {
                 has_errors: &mut has_errors,
                 context_path: &mut context_path,
             };
-            super::legacy::collect_chunk_metadata(&root, source, chunk.start_byte, chunk.end_byte, &mut collector, 0);
+            super::legacy::collect_chunk_metadata(
+                &root,
+                source,
+                "python",
+                chunk.start_byte,
+                chunk.end_byte,
+                &mut collector,
+                0,
+            );
 
             assert_eq!(chunk.metadata.node_types, node_types, "node_types differ");
             assert_eq!(chunk.metadata.symbols_defined, symbols, "symbols differ");
             assert_eq!(chunk.metadata.comments, comments, "comments differ");
+            assert_eq!(chunk.metadata.docstrings, docstrings, "docstrings differ");
             assert_eq!(chunk.metadata.has_error_nodes, has_errors, "error flag differs");
             assert_eq!(chunk.metadata.context_path, context_path, "context_path differs");
         }

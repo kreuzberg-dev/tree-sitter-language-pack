@@ -20,8 +20,9 @@ use tree_sitter::Node;
 
 use super::elixir;
 use super::intelligence::{
-    apply_comment_lines, comment_at, diagnostic_at, docstring_at, export_at, import_at, is_comment_node,
-    mark_comment_rows, resolve_structure_name, span_from_node, structure_kind_at, symbol_at,
+    apply_comment_lines, comment_at, diagnostic_at, doc_comment_at, docstring_at, export_at, import_at,
+    is_comment_node, mark_comment_rows, resolve_structure_name, span_from_node, structure_kind_at, structure_signature,
+    symbol_at,
 };
 use super::types::*;
 use super::walk::{Descend, walk_bounded, warn_if_truncated};
@@ -306,6 +307,7 @@ impl StructureScope {
                 self.push(
                     node,
                     depth,
+                    source,
                     definition.kind,
                     definition.name,
                     definition.visibility,
@@ -317,19 +319,22 @@ impl StructureScope {
         if let Some(kind) = structure_kind_at(node, language) {
             let name = resolve_structure_name(node, source);
             let body = node.child_by_field_name("body");
-            self.push(node, depth, kind, name, None, body);
+            self.push(node, depth, source, kind, name, None, body);
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn push(
         &mut self,
         node: &Node<'_>,
         depth: usize,
+        source: &str,
         kind: StructureKind,
         name: Option<String>,
         visibility: Option<String>,
         body: Option<Node<'_>>,
     ) {
+        let signature = structure_signature(node, source, body.as_ref());
         self.open.push(OpenItem {
             depth,
             body_id: body.as_ref().map(Node::id),
@@ -341,8 +346,8 @@ impl StructureScope {
                 span: span_from_node(node),
                 children: Vec::new(),
                 decorators: Vec::new(),
-                doc_comment: None,
-                signature: None,
+                doc_comment: doc_comment_at(node, source),
+                signature,
                 body_span: body.as_ref().map(span_from_node),
             },
             children: Vec::new(),

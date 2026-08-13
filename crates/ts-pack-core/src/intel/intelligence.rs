@@ -11,6 +11,7 @@ use std::collections::BTreeSet;
 
 use super::extract::Wanted;
 use super::types::*;
+use super::walk::{Descend, walk_bounded};
 
 /// Extract all intelligence from a parsed source file.
 pub fn extract_intelligence(source: &str, language: &str, tree: &tree_sitter::Tree) -> ProcessResult {
@@ -107,15 +108,34 @@ pub(super) fn is_comment_node(node: &tree_sitter::Node) -> bool {
 /// column, so `*/ fn main() {}` leaves that row as code.
 pub(super) fn mark_comment_rows(node: &tree_sitter::Node, source: &str, rows: &mut BTreeSet<usize>) {
     let start = node.start_position();
-    let end = node.end_position();
     if line_prefix_is_blank(source, node.start_byte(), start.column) {
         rows.insert(start.row);
     }
-    for row in (start.row + 1)..end.row {
+    let (content_end_byte, content_end_row) = comment_content_end(node, source);
+    for row in (start.row + 1)..content_end_row {
         rows.insert(row);
     }
-    if end.row > start.row && line_suffix_is_blank(source, node.end_byte()) {
-        rows.insert(end.row);
+    if content_end_row > start.row && line_suffix_is_blank(source, content_end_byte) {
+        rows.insert(content_end_row);
+    }
+}
+
+/// The byte offset and row of the end of a comment's own real content,
+/// excluding a trailing newline the comment's token swallowed.
+///
+/// ~keep tree-sitter-rust's `line_comment` token matches through and
+/// ~keep including the newline that ends it, so `node.end_byte()` and
+/// ~keep `node.end_position()` point at the *next* line, not the comment's
+/// ~keep own closing row. Treating that as the comment's closing row made
+/// ~keep `mark_comment_rows` inspect the unrelated following line and, when
+/// ~keep that line was blank, wrongly record it as a comment row.
+fn comment_content_end(node: &tree_sitter::Node, source: &str) -> (usize, usize) {
+    let end_byte = node.end_byte();
+    let end_row = node.end_position().row;
+    if end_byte > node.start_byte() && source.as_bytes().get(end_byte - 1) == Some(&b'\n') {
+        (end_byte - 1, end_row.saturating_sub(1))
+    } else {
+        (end_byte, end_row)
     }
 }
 
@@ -225,6 +245,16 @@ pub(super) fn docstring_at(node: &tree_sitter::Node, source: &str, language: &st
 /// ~keep body": only the body's first statement counts. Without this check
 /// ~keep any stray string statement later in the body — `"stray"` after real
 /// ~keep code — was reported as a second, fabricated docstring.
+///
+/// ~keep "First statement" is not `named_child(0)`: comments are `extra`
+/// ~keep nodes (see `parsers/python/src/node-types.json`), spliced into the
+/// ~keep named-child list at their lexical position rather than kept out of
+/// ~keep it, so a leading shebang-adjacent or license comment makes
+/// ~keep `named_child(0)` the comment, not the docstring — dropping every
+/// ~keep real docstring that follows a leading comment. `is_comment_node`
+/// ~keep (used for the same purpose in `mark_comment_rows`) is reused here
+/// ~keep rather than re-deriving "is this an extra" from `is_extra()`, so a
+/// ~keep future grammar-specific extra never has to be taught to two places.
 fn python_docstring_parts<'tree>(
     node: &tree_sitter::Node<'tree>,
 ) -> Option<(tree_sitter::Node<'tree>, tree_sitter::Node<'tree>)> {
@@ -232,7 +262,11 @@ fn python_docstring_parts<'tree>(
     if !is_python_body(&parent) {
         return None;
     }
-    if parent.named_child(0).map(|first| first.id()) != Some(node.id()) {
+    let mut cursor = parent.walk();
+    let first_statement = parent
+        .named_children(&mut cursor)
+        .find(|child| !is_comment_node(child))?;
+    if first_statement.id() != node.id() {
         return None;
     }
     if is_python_string(node) {
@@ -290,13 +324,109 @@ pub(super) fn import_at(node: &tree_sitter::Node, source: &str, language: &str) 
         return None;
     }
     let text = node_text(node, source);
+    let (items, alias) = match language {
+        "python" => python_import_items_and_alias(node, source),
+        "javascript" | "typescript" | "tsx" => js_import_items_and_alias(node, source),
+        _ => (Vec::new(), None),
+    };
     Some(ImportInfo {
         source: text.to_string(),
-        items: Vec::new(),
-        alias: None,
-        is_wildcard: text.contains('*'),
+        items,
+        alias,
+        is_wildcard: has_wildcard_token(node),
         span: span_from_node(node),
     })
+}
+
+/// The `(name, alias)` pair for one entry of a Python `import_statement` or
+/// `import_from_statement`'s `_import_list` — a bare `dotted_name`, or an
+/// `aliased_import` with `name` and `alias` fields.
+fn python_import_entries(node: &tree_sitter::Node, source: &str) -> Vec<(String, Option<String>)> {
+    let mut cursor = node.walk();
+    node.children_by_field_name("name", &mut cursor)
+        .map(|entry| {
+            if entry.kind() == "aliased_import" {
+                let name = entry
+                    .child_by_field_name("name")
+                    .map(|n| node_text(&n, source).to_string())
+                    .unwrap_or_default();
+                let alias = entry
+                    .child_by_field_name("alias")
+                    .map(|n| node_text(&n, source).to_string());
+                (name, alias)
+            } else {
+                (node_text(&entry, source).to_string(), None)
+            }
+        })
+        .collect()
+}
+
+/// `items`/`alias` for a Python import statement.
+///
+/// `items` lists every imported name (`import a, b` or `from m import a, b`).
+/// `alias` is populated only for the single-name form (`import numpy as np`,
+/// `from m import a as b`) — a statement that aliases several names at once
+/// has no single alias to report, so `alias` stays `None` and only `items`
+/// is populated for it.
+fn python_import_items_and_alias(node: &tree_sitter::Node, source: &str) -> (Vec<String>, Option<String>) {
+    let entries = python_import_entries(node, source);
+    let alias = if let [(_, alias)] = entries.as_slice() {
+        alias.clone()
+    } else {
+        None
+    };
+    let items = entries.into_iter().map(|(name, _)| name).collect();
+    (items, alias)
+}
+
+/// `items`/`alias` for a JavaScript/TypeScript `import_statement`.
+///
+/// A namespace import (`import * as ns from 'm'`) has no named items; it
+/// aliases the whole module, so it populates `alias` only. A named-imports
+/// clause (`import { a, b as c } from 'm'`) populates `items` with each
+/// specifier's original name; `alias` is populated only when the clause
+/// names exactly one specifier, for the same reason as the Python case
+/// above. A default import (`import fs from 'm'`) is not represented in
+/// either field.
+fn js_import_items_and_alias(node: &tree_sitter::Node, source: &str) -> (Vec<String>, Option<String>) {
+    let mut cursor = node.walk();
+    let Some(clause) = node
+        .named_children(&mut cursor)
+        .find(|child| child.kind() == "import_clause")
+    else {
+        return (Vec::new(), None);
+    };
+    let mut items = Vec::new();
+    let mut alias = None;
+    let mut clause_cursor = clause.walk();
+    for child in clause.named_children(&mut clause_cursor) {
+        match child.kind() {
+            "namespace_import" => {
+                if let Some(identifier) = child.named_child(0) {
+                    alias = Some(node_text(&identifier, source).to_string());
+                }
+            }
+            "named_imports" => {
+                let mut spec_cursor = child.walk();
+                let specifiers: Vec<_> = child
+                    .named_children(&mut spec_cursor)
+                    .filter(|specifier| specifier.kind() == "import_specifier")
+                    .collect();
+                for specifier in &specifiers {
+                    if let Some(name) = specifier.child_by_field_name("name") {
+                        items.push(node_text(&name, source).to_string());
+                    }
+                }
+                if let [specifier] = specifiers.as_slice() {
+                    alias = specifier
+                        .child_by_field_name("alias")
+                        .map(|n| node_text(&n, source).to_string());
+                }
+            }
+            _ => {}
+        }
+    }
+    (items, alias)
 }
 
 /// Classify `node` as an export, if the language has export statements.
@@ -410,6 +540,101 @@ pub(super) fn structure_kind_at(node: &tree_sitter::Node, language: &str) -> Opt
         "impl_item" => Some(StructureKind::Impl),
         _ => None,
     }
+}
+
+/// The doc comment immediately preceding `node`, if any.
+///
+/// Walks backward over adjacent [`CommentKind::Doc`] siblings — no blank
+/// line between one comment and the next, nor between the last comment and
+/// `node` itself — and joins them in source order. This captures both the
+/// single-node block forms (Javadoc, JSDoc `/** ... */`) and multi-line `///`
+/// blocks, which tree-sitter-rust represents as one sibling node per line.
+///
+/// Populated for Rust (`///`/`//!`), Java (`/** */`), and JavaScript/
+/// TypeScript (`/** */`) — the languages whose [`comment_at`] already
+/// classifies a comment as `Doc`. Plain `#`-style comments (Python, Ruby,
+/// Elixir) are never classified `Doc`, so this is always `None` there; a
+/// Python docstring is captured separately, as [`DocstringInfo`].
+pub(super) fn doc_comment_at(node: &tree_sitter::Node, source: &str) -> Option<String> {
+    let mut lines = Vec::new();
+    let mut boundary_row = node.start_position().row;
+    let mut current = node.prev_named_sibling();
+    while let Some(sibling) = current {
+        let Some(comment) = comment_at(&sibling, source) else {
+            break;
+        };
+        // ~keep Gap detection uses the comment's real last content row, from
+        // ~keep `comment_content_end`, not `comment.span.end_line`: a comment
+        // ~keep token that swallows its own trailing newline (tree-sitter-rust's
+        // ~keep does) reports `end_line` one row past its real content, which
+        // ~keep would make an adjacent doc comment look like it had a blank-line
+        // ~keep gap before it and a genuine gap look adjacent.
+        let (_, content_end_row) = comment_content_end(&sibling, source);
+        if comment.kind != CommentKind::Doc || boundary_row.saturating_sub(content_end_row) > 1 {
+            break;
+        }
+        boundary_row = sibling.start_position().row;
+        // ~keep Trimming drops that same swallowed newline from the joined text,
+        // ~keep so a multi-line `///` block does not pick up a doubled blank line
+        // ~keep at each join point.
+        lines.push(comment.text.trim_end().to_string());
+        current = sibling.prev_named_sibling();
+    }
+    if lines.is_empty() {
+        return None;
+    }
+    lines.reverse();
+    Some(lines.join("\n"))
+}
+
+/// The signature text of a structure item: everything from the start of
+/// `node` up to the start of its `body`, trimmed of trailing whitespace.
+///
+/// For an item with no body (e.g. a unit struct `struct Foo;`), the whole
+/// item's text is the signature. Populated for every language
+/// [`structure_kind_at`] and [`super::elixir::definition`] recognise, since
+/// both already resolve `body` before constructing a [`StructureItem`].
+pub(super) fn structure_signature(
+    node: &tree_sitter::Node,
+    source: &str,
+    body: Option<&tree_sitter::Node>,
+) -> Option<String> {
+    let end = body.map_or_else(|| node.end_byte(), tree_sitter::Node::start_byte);
+    let text = source.get(node.start_byte()..end)?.trim_end();
+    if text.is_empty() { None } else { Some(text.to_string()) }
+}
+
+/// Node kinds whose text is string content rather than syntax, so a literal
+/// `*` inside them (e.g. a glob in an import path string) must not be
+/// mistaken for a wildcard-import token.
+const STRING_LIKE_NODE_KINDS: &[&str] = &[
+    "string",
+    "string_literal",
+    "interpreted_string_literal",
+    "raw_string_literal",
+    "template_string",
+    "concatenated_string",
+];
+
+/// Whether `node`'s subtree contains a bare wildcard glyph — a standalone `*`
+/// token, or a dedicated wildcard node (`wildcard_import` in Python,
+/// `use_wildcard` in Rust) — outside of any string-literal content.
+///
+/// Import specifiers are shallow, grammar-bounded subtrees (not
+/// user-controlled nesting), so the bounded walk here never truncates.
+pub(super) fn has_wildcard_token(node: &tree_sitter::Node) -> bool {
+    let mut found = false;
+    walk_bounded(node, |candidate, _depth| {
+        if STRING_LIKE_NODE_KINDS.contains(&candidate.kind()) {
+            return Descend::Skip;
+        }
+        if matches!(candidate.kind(), "*" | "wildcard_import" | "use_wildcard") {
+            found = true;
+            return Descend::Skip;
+        }
+        Descend::Children
+    });
+    found
 }
 
 /// Classify `node` as a symbol, if it is a named declaration.
@@ -661,6 +886,220 @@ mod tests {
     }
 
     #[test]
+    fn should_populate_items_and_alias_for_a_single_name_python_import() {
+        let source = "import numpy as np\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(intel.imports.len(), 1);
+        assert_eq!(intel.imports[0].items, vec!["numpy".to_string()]);
+        assert_eq!(intel.imports[0].alias.as_deref(), Some("np"));
+    }
+
+    #[test]
+    fn should_populate_items_without_an_alias_for_a_python_from_import() {
+        let source = "from sys import path\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(intel.imports.len(), 1);
+        assert_eq!(intel.imports[0].items, vec!["path".to_string()]);
+        assert_eq!(intel.imports[0].alias, None);
+    }
+
+    #[test]
+    fn should_leave_alias_none_for_a_python_import_naming_several_modules() {
+        let source = "import os, sys as s\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(intel.imports.len(), 1);
+        assert_eq!(
+            intel.imports[0].items,
+            vec!["os".to_string(), "sys".to_string()],
+            "items lists every entry's base name, aliased or not"
+        );
+        assert_eq!(
+            intel.imports[0].alias, None,
+            "a statement aliasing one of several names has no single alias to report"
+        );
+    }
+
+    #[test]
+    fn should_populate_alias_for_a_javascript_namespace_import() {
+        let source = "import * as ns from 'mod';\n";
+        let Some(tree) = parse_or_skip(source, "javascript") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "javascript", &tree);
+
+        assert_eq!(intel.imports.len(), 1);
+        assert_eq!(intel.imports[0].items, Vec::<String>::new());
+        assert_eq!(intel.imports[0].alias.as_deref(), Some("ns"));
+    }
+
+    #[test]
+    fn should_populate_items_for_javascript_named_imports() {
+        let source = "import { a, b as c } from 'mod';\n";
+        let Some(tree) = parse_or_skip(source, "javascript") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "javascript", &tree);
+
+        assert_eq!(intel.imports.len(), 1);
+        assert_eq!(intel.imports[0].items, vec!["a".to_string(), "b".to_string()]);
+        assert_eq!(
+            intel.imports[0].alias, None,
+            "more than one specifier has no single alias to report"
+        );
+    }
+
+    #[test]
+    fn should_leave_items_and_alias_empty_for_a_javascript_default_import() {
+        let source = "import fs from 'node:fs';\n";
+        let Some(tree) = parse_or_skip(source, "javascript") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "javascript", &tree);
+
+        assert_eq!(intel.imports.len(), 1);
+        assert_eq!(intel.imports[0].items, Vec::<String>::new());
+        assert_eq!(intel.imports[0].alias, None);
+    }
+
+    #[test]
+    fn should_flag_a_python_wildcard_import() {
+        let source = "from pkg import *\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(intel.imports.len(), 1);
+        assert!(intel.imports[0].is_wildcard);
+    }
+
+    #[test]
+    fn should_flag_a_rust_glob_use_as_wildcard() {
+        let source = "use std::collections::*;\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+
+        assert_eq!(intel.imports.len(), 1);
+        assert!(intel.imports[0].is_wildcard);
+    }
+
+    #[test]
+    fn should_not_flag_a_glob_character_inside_an_import_path_string_as_wildcard() {
+        let source = "import a from './glob*.js';\n";
+        let Some(tree) = parse_or_skip(source, "javascript") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "javascript", &tree);
+
+        assert_eq!(intel.imports.len(), 1);
+        assert!(
+            !intel.imports[0].is_wildcard,
+            "a `*` inside the source path string is not a wildcard-import token"
+        );
+    }
+
+    #[test]
+    fn should_populate_a_rust_function_signature_up_to_its_body() {
+        let source = "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+
+        assert_eq!(intel.structure.len(), 1);
+        assert_eq!(
+            intel.structure[0].signature.as_deref(),
+            Some("fn add(a: i32, b: i32) -> i32")
+        );
+    }
+
+    #[test]
+    fn should_populate_a_doc_comment_for_a_documented_rust_function() {
+        let source = "/// Adds two numbers.\nfn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+
+        assert_eq!(intel.structure.len(), 1);
+        assert_eq!(intel.structure[0].doc_comment.as_deref(), Some("/// Adds two numbers."));
+    }
+
+    #[test]
+    fn should_join_a_multiline_rust_doc_comment_in_source_order() {
+        let source = "/// Line one.\n/// Line two.\nfn add() {}\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+
+        assert_eq!(intel.structure.len(), 1);
+        assert_eq!(
+            intel.structure[0].doc_comment.as_deref(),
+            Some("/// Line one.\n/// Line two.")
+        );
+    }
+
+    #[test]
+    fn should_leave_doc_comment_none_when_a_blank_line_separates_the_comment() {
+        let source = "/// Unrelated doc comment.\n\nfn add() {}\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "rust", &tree);
+
+        assert_eq!(intel.structure.len(), 1);
+        assert_eq!(
+            intel.structure[0].doc_comment, None,
+            "a blank line breaks the association between a doc comment and the item after it"
+        );
+    }
+
+    #[test]
+    fn should_leave_decorators_reserved_and_empty_for_a_python_decorated_function() {
+        let source = "@staticmethod\ndef f():\n    pass\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert!(!intel.structure.is_empty(), "should still find the function item");
+        assert!(
+            intel.structure.iter().all(|item| item.decorators.is_empty()),
+            "decorators is reserved and must stay empty until implemented"
+        );
+    }
+
+    #[test]
+    fn should_leave_parsed_sections_reserved_and_empty_for_a_python_docstring() {
+        let source = "def f(x):\n    \"\"\"Do a thing.\n\n    Args:\n        x: a value.\n    \"\"\"\n    pass\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(intel.docstrings.len(), 1);
+        assert!(
+            intel.docstrings[0].parsed_sections.is_empty(),
+            "parsed_sections is reserved and must stay empty until implemented"
+        );
+    }
+
+    #[test]
     fn should_resolve_javascript_export_kinds_and_names() {
         let source = "const helper = 2;\nexport const alpha = 1;\nexport default function beta() {}\nexport function gamma() {}\nexport { helper };\nexport * from './other.js';\n";
         let Some(tree) = parse_or_skip(source, "javascript") else {
@@ -897,6 +1336,109 @@ mod tests {
             intel.docstrings.is_empty(),
             "a returned string is not a docstring; got {:?}",
             intel.docstrings
+        );
+    }
+
+    #[test]
+    fn should_report_a_module_docstring_after_a_shebang_line() {
+        let source = "#!/usr/bin/env python3\n\"\"\"Module doc.\"\"\"\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(
+            intel.docstrings.len(),
+            1,
+            "a leading shebang must not hide the module docstring; got {:?}",
+            intel.docstrings
+        );
+        assert_eq!(intel.docstrings[0].text, "\"\"\"Module doc.\"\"\"");
+    }
+
+    #[test]
+    fn should_report_a_module_docstring_after_leading_license_comments() {
+        let source = "# Copyright 2026 Example Corp.\n# SPDX-License-Identifier: Apache-2.0\n\"\"\"Module doc.\"\"\"\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(
+            intel.docstrings.len(),
+            1,
+            "leading license comments must not hide the module docstring; got {:?}",
+            intel.docstrings
+        );
+        assert_eq!(intel.docstrings[0].text, "\"\"\"Module doc.\"\"\"");
+    }
+
+    #[test]
+    // ~keep This case does NOT exercise the leading-comment bug, and is kept as a shape
+    // ~keep guard rather than a regression test. Measured tree for this exact source:
+    // ~keep (function_definition ... (comment) body: (block (string ...) (pass_statement)))
+    // ~keep — the comment attaches to `function_definition`, NOT to the `block`, so the
+    // ~keep block's first named child was already the docstring and the old
+    // ~keep `named_child(0)` check passed here too. Verified by dumping the s-expression.
+    // ~keep Only the MODULE-level tests above discriminate, because there a comment is a
+    // ~keep direct child of `module`. This test pins that attachment shape: if a grammar
+    // ~keep update ever moves the comment inside the block, it starts failing and tells us.
+    fn should_report_a_function_docstring_after_a_leading_comment_in_its_body() {
+        let source = "def greet():\n    # set up\n    \"\"\"Doc.\"\"\"\n    pass\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(
+            intel.docstrings.len(),
+            1,
+            "a leading comment inside the body must not hide the function docstring; got {:?}",
+            intel.docstrings
+        );
+        assert_eq!(intel.docstrings[0].text, "\"\"\"Doc.\"\"\"");
+        assert_eq!(intel.docstrings[0].associated_item.as_deref(), Some("greet"));
+    }
+
+    #[test]
+    fn should_still_report_exactly_one_docstring_when_a_stray_string_follows_it() {
+        let source = "def greet():\n    \"\"\"Real doc.\"\"\"\n    name = \"cafe\"\n    \"stray string\"\n";
+        let Some(tree) = parse_or_skip(source, "python") else {
+            return;
+        };
+        let intel = extract_intelligence(source, "python", &tree);
+
+        assert_eq!(
+            intel.docstrings.len(),
+            1,
+            "the skip-extras fix must not resurrect the fabricated stray docstring; got {:?}",
+            intel.docstrings
+        );
+        assert_eq!(intel.docstrings[0].text, "\"\"\"Real doc.\"\"\"");
+        assert_eq!(intel.docstrings[0].associated_item.as_deref(), Some("greet"));
+    }
+
+    #[test]
+    fn should_not_mark_a_blank_line_after_a_newline_swallowing_comment_as_a_comment_row() {
+        let source = "// comment\n\nfn main() {}\n";
+        let Some(tree) = parse_or_skip(source, "rust") else {
+            return;
+        };
+        let root = tree.root_node();
+        let comment = root.named_child(0).expect("source must start with a comment node");
+        assert_eq!(
+            comment.kind(),
+            "line_comment",
+            "test setup must target the comment node"
+        );
+
+        let mut rows = BTreeSet::new();
+        mark_comment_rows(&comment, source, &mut rows);
+
+        assert_eq!(
+            rows,
+            BTreeSet::from([0]),
+            "the blank row after the comment must not be reported as a comment row"
         );
     }
 

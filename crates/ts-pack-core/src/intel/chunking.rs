@@ -1,7 +1,7 @@
 use memchr::memchr_iter;
 use tree_sitter::{Language, Tree};
 
-use super::intelligence::comment_at;
+use super::intelligence::{comment_at, docstring_at};
 use super::types::*;
 use super::walk::{Descend, walk_bounded, warn_if_truncated};
 
@@ -29,7 +29,7 @@ pub fn chunk_source(
         .map(|(idx, (start_byte, end_byte))| {
             let content = &source[start_byte..end_byte];
             let start_line = newline_positions.partition_point(|&pos| pos < start_byte);
-            let end_line = newline_positions.partition_point(|&pos| pos < end_byte);
+            let end_line = chunk_end_line(&newline_positions, start_byte, end_byte);
 
             let mut node_types = Vec::new();
             let mut symbols_defined = Vec::new();
@@ -46,7 +46,7 @@ pub fn chunk_source(
                 has_errors: &mut has_error_nodes,
                 context_path: &mut context_path,
             };
-            truncated += collect_chunk_metadata(&root, source, start_byte, end_byte, &mut collector);
+            truncated += collect_chunk_metadata(&root, source, language, start_byte, end_byte, &mut collector);
 
             CodeChunk {
                 content: content.to_string(),
@@ -81,11 +81,27 @@ pub fn chunk_source(
     chunks
 }
 
+/// The zero-indexed row of a chunk's last included byte.
+///
+/// ~keep `end_byte` is exclusive, so computing its row directly counts the
+/// ~keep newline the chunk itself ends on when the source has a trailing
+/// ~keep newline, landing one row past the chunk's actual last content row —
+/// ~keep but not when the source has no trailing newline, since then there is
+/// ~keep no such newline to count. Rows a chunk with identical content would
+/// ~keep report would then differ by one depending on a byte outside the
+/// ~keep chunk entirely. Computing the row of `end_byte - 1` instead — the
+/// ~keep last byte actually in the chunk — is immune to what comes after it.
+fn chunk_end_line(newline_positions: &[usize], start_byte: usize, end_byte: usize) -> usize {
+    if end_byte <= start_byte {
+        return newline_positions.partition_point(|&pos| pos < start_byte);
+    }
+    newline_positions.partition_point(|&pos| pos < end_byte - 1)
+}
+
 fn node_text<'a>(node: &tree_sitter::Node, source: &'a str) -> &'a str {
     &source[node.start_byte()..node.end_byte()]
 }
 
-#[allow(dead_code)]
 pub(super) struct MetadataCollector<'a> {
     pub(super) node_types: &'a mut Vec<String>,
     pub(super) symbols: &'a mut Vec<String>,
@@ -93,6 +109,26 @@ pub(super) struct MetadataCollector<'a> {
     pub(super) docstrings: &'a mut Vec<DocstringInfo>,
     pub(super) has_errors: &'a mut bool,
     pub(super) context_path: &'a mut Vec<String>,
+}
+
+/// Whether `node` lies entirely outside `[chunk_start, chunk_end)` and its
+/// subtree should be pruned from this chunk's walk.
+///
+/// A zero-width node (tree-sitter's synthetic `MISSING` nodes) needs an
+/// inclusive test at both boundaries: the ordinary half-open test excludes a
+/// zero-width node sitting exactly on `chunk_start` (`end_byte <=
+/// chunk_start` is trivially true when `start_byte == end_byte ==
+/// chunk_start`) as well as one sitting exactly on `chunk_end`, dropping it
+/// from *every* chunk rather than attributing it to a neighbour. Letting it
+/// belong to both chunks adjacent to the boundary is the safe direction: a
+/// caller that skips a `MISSING` node still sees `has_error_nodes` from an
+/// ordinary error node elsewhere, but a caller that needs it can never
+/// recover a node this excluded outright.
+fn is_outside_chunk(node: &tree_sitter::Node, chunk_start: usize, chunk_end: usize) -> bool {
+    if node.start_byte() == node.end_byte() {
+        return node.start_byte() < chunk_start || node.start_byte() > chunk_end;
+    }
+    node.end_byte() <= chunk_start || node.start_byte() >= chunk_end
 }
 
 /// Collect metadata for one chunk from the nodes that overlap it.
@@ -103,15 +139,16 @@ pub(super) struct MetadataCollector<'a> {
 fn collect_chunk_metadata(
     root: &tree_sitter::Node,
     source: &str,
+    language: &str,
     chunk_start: usize,
     chunk_end: usize,
     collector: &mut MetadataCollector<'_>,
 ) -> usize {
     walk_bounded(root, |node, depth| {
-        if node.end_byte() <= chunk_start || node.start_byte() >= chunk_end {
+        if is_outside_chunk(node, chunk_start, chunk_end) {
             return Descend::Skip;
         }
-        record_chunk_node(node, source, chunk_start, chunk_end, collector, depth);
+        record_chunk_node(node, source, language, chunk_start, chunk_end, collector, depth);
         Descend::Children
     })
 }
@@ -157,6 +194,7 @@ fn is_chunk_top_level(node: &tree_sitter::Node, chunk_start: usize, chunk_end: u
 pub(super) fn record_chunk_node(
     node: &tree_sitter::Node,
     source: &str,
+    language: &str,
     chunk_start: usize,
     chunk_end: usize,
     collector: &mut MetadataCollector<'_>,
@@ -176,10 +214,13 @@ pub(super) fn record_chunk_node(
         record_definition_name(node, source, chunk_start, chunk_end, collector);
     }
 
-    if is_contained(node, chunk_start, chunk_end)
-        && let Some(comment) = comment_at(node, source)
-    {
-        collector.comments.push(comment);
+    if is_contained(node, chunk_start, chunk_end) {
+        if let Some(comment) = comment_at(node, source) {
+            collector.comments.push(comment);
+        }
+        if let Some(docstring) = docstring_at(node, source, language) {
+            collector.docstrings.push(docstring);
+        }
     }
 }
 
@@ -369,6 +410,83 @@ mod tests {
         assert!(
             chunks[0].metadata.has_error_nodes,
             "invalid source should set has_error_nodes"
+        );
+    }
+
+    #[test]
+    fn should_populate_docstrings_for_a_python_docstring_inside_a_chunk() {
+        let source = "def foo():\n    \"\"\"Say hello.\"\"\"\n    pass\n";
+        let Some((lang, tree)) = parse_with(source, "python") else {
+            return;
+        };
+        let chunks = chunk_source(source, "python", 10000, &lang, &tree);
+
+        assert_eq!(chunks.len(), 1);
+        assert_eq!(
+            chunks[0].metadata.docstrings.len(),
+            1,
+            "should extract docstring metadata"
+        );
+        assert_eq!(chunks[0].metadata.docstrings[0].text, "\"\"\"Say hello.\"\"\"");
+    }
+
+    #[test]
+    fn should_report_the_same_end_line_regardless_of_a_trailing_newline() {
+        let with_newline = "line0\nline1\nline2\n";
+        let without_newline = "line0\nline1\nline2";
+
+        let Some((lang_with, tree_with)) = parse_with(with_newline, "python") else {
+            return;
+        };
+        let Some((lang_without, tree_without)) = parse_with(without_newline, "python") else {
+            return;
+        };
+
+        let chunks_with = chunk_source(with_newline, "python", 10000, &lang_with, &tree_with);
+        let chunks_without = chunk_source(without_newline, "python", 10000, &lang_without, &tree_without);
+
+        assert_eq!(chunks_with.len(), 1);
+        assert_eq!(chunks_without.len(), 1);
+        assert_eq!(
+            chunks_with[0].end_line, 2,
+            "end_line is the row of the last byte actually in the chunk"
+        );
+        assert_eq!(
+            chunks_with[0].end_line, chunks_without[0].end_line,
+            "a trailing newline in the source must not change end_line for identical content"
+        );
+    }
+
+    #[test]
+    fn should_attribute_a_zero_width_missing_node_to_a_chunk_on_either_side_of_its_boundary() {
+        let source = "x = (1";
+        let Some((_, tree)) = parse_with(source, "python") else {
+            return;
+        };
+        let root = tree.root_node();
+
+        fn find_missing<'tree>(node: tree_sitter::Node<'tree>) -> Option<tree_sitter::Node<'tree>> {
+            if node.is_missing() {
+                return Some(node);
+            }
+            let mut cursor = node.walk();
+            node.children(&mut cursor).find_map(find_missing)
+        }
+        let Some(missing) = find_missing(root) else {
+            // ~keep A grammar version might recover differently; this test only
+            // ~keep proves something when it actually produces a MISSING node.
+            return;
+        };
+        assert_eq!(missing.start_byte(), missing.end_byte(), "MISSING nodes are zero-width");
+        let boundary = missing.start_byte();
+
+        assert!(
+            !is_outside_chunk(&missing, 0, boundary),
+            "a chunk ending exactly at the MISSING node's position must still include it"
+        );
+        assert!(
+            !is_outside_chunk(&missing, boundary, source.len()),
+            "a chunk starting exactly at the MISSING node's position must still include it"
         );
     }
 }

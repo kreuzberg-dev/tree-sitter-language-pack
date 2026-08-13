@@ -13,8 +13,9 @@
 use std::collections::BTreeSet;
 
 use super::intelligence::{
-    apply_comment_lines, comment_at, diagnostic_at, docstring_at, export_at, import_at, is_comment_node,
-    mark_comment_rows, resolve_structure_name, span_from_node, structure_kind_at, symbol_at,
+    apply_comment_lines, comment_at, diagnostic_at, doc_comment_at, docstring_at, export_at, import_at,
+    is_comment_node, mark_comment_rows, resolve_structure_name, span_from_node, structure_kind_at, structure_signature,
+    symbol_at,
 };
 use super::types::*;
 
@@ -161,8 +162,8 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
             span: span_from_node(node),
             children,
             decorators: Vec::new(),
-            doc_comment: None,
-            signature: None,
+            doc_comment: doc_comment_at(node, source),
+            signature: structure_signature(node, source, body.as_ref()),
             body_span,
         });
     } else {
@@ -190,6 +191,7 @@ fn collect_structure_call(
     if let Some(body) = definition.body {
         collect_structure(&body, source, language, &mut children);
     }
+    let signature = structure_signature(node, source, definition.body.as_ref());
     items.push(StructureItem {
         kind: definition.kind,
         name: definition.name,
@@ -197,8 +199,8 @@ fn collect_structure_call(
         span: span_from_node(node),
         children,
         decorators: Vec::new(),
-        doc_comment: None,
-        signature: None,
+        doc_comment: doc_comment_at(node, source),
+        signature,
         body_span,
     });
     true
@@ -225,9 +227,18 @@ fn collect_diagnostics(node: &tree_sitter::Node, source: &str, diagnostics: &mut
 }
 
 /// The original per-chunk metadata walk, recursive and unbounded.
+///
+/// ~keep This reproduces the pre-fix boundary test too (a half-open range
+/// ~keep with no zero-width exception), not just the pre-fix recursion: a
+/// ~keep zero-width `MISSING` node sitting exactly on `chunk_start`/`chunk_end`
+/// ~keep is a second, independent defect from the one this module exists to
+/// ~keep reproduce, so it is covered by its own dedicated regression test
+/// ~keep (`chunking::tests::should_attribute_a_zero_width_missing_node_to_a_chunk_on_either_side_of_its_boundary`)
+/// ~keep rather than through this equivalence oracle.
 pub(super) fn collect_chunk_metadata(
     node: &tree_sitter::Node,
     source: &str,
+    language: &str,
     chunk_start: usize,
     chunk_end: usize,
     collector: &mut super::chunking::MetadataCollector<'_>,
@@ -236,9 +247,9 @@ pub(super) fn collect_chunk_metadata(
     if node.end_byte() <= chunk_start || node.start_byte() >= chunk_end {
         return;
     }
-    super::chunking::record_chunk_node(node, source, chunk_start, chunk_end, collector, depth);
+    super::chunking::record_chunk_node(node, source, language, chunk_start, chunk_end, collector, depth);
     let mut cursor = node.walk();
     for child in node.children(&mut cursor) {
-        collect_chunk_metadata(&child, source, chunk_start, chunk_end, collector, depth + 1);
+        collect_chunk_metadata(&child, source, language, chunk_start, chunk_end, collector, depth + 1);
     }
 }
