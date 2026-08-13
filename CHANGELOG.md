@@ -81,20 +81,6 @@ fixes and will follow; they skip the crates once regenerated.
   URL and the download command, where it previously returned `null` and let flutter_rust_bridge
   attempt its own relative-path `dlopen`.
 
-### Fixed
-
-- Dart: the native loader downloads and caches the library again on a cold cache. It only read
-  the versioned cache and then threw a `StateError`, even though `nativeDownloadAndCacheLibrary()`
-  was defined and exported for exactly that case. The loader also now searches for the
-  `_dart`-suffixed cdylib that is actually built, opens every candidate by absolute path (a
-  hardened runtime rejects a relative `dlopen`), and names the real environment variable in its
-  error message instead of printing the identifier `$nativeLibDirEnv` literally. Fixed upstream in
-  alef 0.55.6.
-
-  Behavior change: an unresolvable native now throws a descriptive `StateError` naming the asset
-  URL and the download command, where it previously returned `null` and let flutter_rust_bridge
-  attempt its own relative-path `dlopen`.
-
 ## [1.14.3] - 2026-08-05
 
 ### Fixed
