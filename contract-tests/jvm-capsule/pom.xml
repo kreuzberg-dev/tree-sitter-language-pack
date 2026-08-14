@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.xberg.tslp.contracttests</groupId>
+    <artifactId>jvm-capsule-contract</artifactId>
+    <version>0.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>jvm-capsule-contract</name>
+    <description>
+        Standalone, hand-authored regression test for the JVM capsule-ownership contract declared in
+        alef.toml ([crates.java.capsule_types.Language] and [crates.kotlin_android.capsule_types.Language]).
+        This module is NOT part of the packages/java or packages/kotlin-android Maven/Gradle projects — both
+        of those are alef-generated (see .gitattributes linguist-generated entries) and get overwritten by
+        `alef generate`. This module lives outside every alef output/e2e/test_apps path on purpose so it
+        survives regeneration. See contract-tests/jvm-capsule/src/test/java/.../CapsuleOwnershipContractTest.java
+        for the rationale.
+    </description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>21</maven.compiler.release>
+        <junit.version>6.1.3</junit.version>
+        <!--
+             These two versions MUST match alef.toml's
+             [crates.java.capsule_types.Language].package_version and
+             [crates.kotlin_android.capsule_types.Language].package_version exactly.
+             Bumping either pin in alef.toml without bumping it here — or bumping it here
+             without re-running this test — defeats the point of this module.
+        -->
+        <jtreesitter.version>0.26.1</jtreesitter.version>
+        <ktreesitter.version>0.25.0</ktreesitter.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.tree-sitter</groupId>
+            <artifactId>jtreesitter</artifactId>
+            <version>${jtreesitter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--
+             ktreesitter is published as a Kotlin Multiplatform module; Maven (unlike Gradle) cannot
+             resolve Gradle Module Metadata variants, so the plain-JVM artifact is consumed directly
+             under its `-jvm` classifier artifact id. Class shape was verified identical to the
+             android variant used by packages/kotlin-android.
+        -->
+        <dependency>
+            <groupId>io.github.tree-sitter</groupId>
+            <artifactId>ktreesitter-jvm</artifactId>
+            <version>${ktreesitter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.6</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>

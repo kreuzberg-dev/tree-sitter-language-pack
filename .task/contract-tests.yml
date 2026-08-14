@@ -1,0 +1,12 @@
+version: "3"
+
+tasks:
+  jvm-capsule:
+    desc: >
+      Run the JVM capsule-ownership contract test (contract-tests/jvm-capsule). Guards
+      alef.toml's [crates.java.capsule_types.Language] and
+      [crates.kotlin_android.capsule_types.Language] host_destructor = "none" pins against
+      jtreesitter/ktreesitter releases that add a destructor to Language.
+    dir: contract-tests/jvm-capsule
+    cmds:
+      - mvn test

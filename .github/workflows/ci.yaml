@@ -437,6 +437,8 @@ jobs:
               - 'e2e/java/**'
               - 'crates/ts-pack-core-ffi/**'
               - 'fixtures/**'
+              - 'contract-tests/jvm-capsule/**'
+              - 'alef.toml'
             csharp:
               - 'packages/csharp/**'
               - 'e2e/csharp/**'
@@ -1311,6 +1313,22 @@ jobs:
         with:
           name: java-unit-reports
           path: packages/java/target/surefire-reports
+          if-no-files-found: ignore
+          retention-days: 7
+
+      # Standalone module, not alef-generated — see contract-tests/jvm-capsule/pom.xml. Guards the
+      # capsule-ownership pins in alef.toml's [crates.java.capsule_types.Language] and
+      # [crates.kotlin_android.capsule_types.Language] against upstream jtreesitter/ktreesitter
+      # releases that add a destructor.
+      - name: Run JVM capsule-ownership contract test
+        run: mvn -f contract-tests/jvm-capsule/pom.xml test
+
+      - name: Upload capsule-contract test reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: jvm-capsule-contract-reports
+          path: contract-tests/jvm-capsule/target/surefire-reports
           if-no-files-found: ignore
           retention-days: 7
 

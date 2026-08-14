@@ -39,6 +39,8 @@ includes:
     taskfile: .task/plugin.yml
   test-apps:
     taskfile: .task/test-apps.yml
+  contract-tests:
+    taskfile: .task/contract-tests.yml
   _e2e_wf:
     taskfile: .task/workflows/e2e.yml
 
