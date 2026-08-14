@@ -226,7 +226,7 @@ jobs:
         uses: xberg-io/actions/install-alef@v1
 
       - name: Install poly
-        uses: Goldziher/poly@9f99bfcdfb147937b012f93a5a2598a84c8af6cd # v0.21.0
+        uses: Goldziher/poly@v0
 
       - name: Verify binding API parity
         run: alef verify
@@ -1233,7 +1233,7 @@ jobs:
         uses: xberg-io/actions/install-alef@v1
 
       - name: Install poly
-        uses: Goldziher/poly@9f99bfcdfb147937b012f93a5a2598a84c8af6cd # v0.21.0
+        uses: Goldziher/poly@v0
 
       - name: Generate Go E2E tests
         run: task go:e2e:generate
@@ -1731,7 +1731,7 @@ jobs:
         uses: xberg-io/actions/install-alef@v1
 
       - name: Install poly
-        uses: Goldziher/poly@9f99bfcdfb147937b012f93a5a2598a84c8af6cd # v0.21.0
+        uses: Goldziher/poly@v0
 
       - name: Generate Elixir E2E tests
         run: task elixir:e2e:generate
@@ -1794,7 +1794,7 @@ jobs:
         uses: xberg-io/actions/install-alef@v1
 
       - name: Install poly
-        uses: Goldziher/poly@9f99bfcdfb147937b012f93a5a2598a84c8af6cd # v0.21.0
+        uses: Goldziher/poly@v0
 
       - name: Generate C E2E tests
         run: task c:e2e:generate
