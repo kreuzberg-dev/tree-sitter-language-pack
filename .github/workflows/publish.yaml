@@ -4146,14 +4146,20 @@ jobs:
           set -euo pipefail
           cd packages/go
 
-          # Map alef-emitted platform labels to .lib directory names.
+          # ~keep The .lib directory name IS the alef platform label — binding.go's cgo LDFLAGS
+          # ~keep (-L${SRCDIR}/.lib/linux-aarch64 …) and cmd/setup's platformDir() both derive it
+          # ~keep from src/publish/platform.rs::go_java_platform(). This map used to translate the
+          # ~keep labels into Go GOARCH spellings (linux-amd64, linux-arm64, …), which matched
+          # ~keep neither consumer: 5 of 6 platforms staged libraries into a directory cgo never
+          # ~keep searches, so the published module could not link without running cmd/setup first.
+          # ~keep Keep this an identity map. See #178 for the same drift on the Java side.
           declare -A PLATFORM_MAP=(
-            [linux-x86_64]="linux-amd64"
-            [linux-aarch64]="linux-arm64"
+            [linux-x86_64]="linux-x86_64"
+            [linux-aarch64]="linux-aarch64"
             [macos-arm64]="macos-arm64"
-            [macos-x86_64]="macos-amd64"
-            [windows-x86_64]="windows-amd64"
-            [windows-aarch64]="windows-arm64"
+            [macos-x86_64]="macos-x86_64"
+            [windows-x86_64]="windows-x86_64"
+            [windows-aarch64]="windows-aarch64"
           )
 
           shopt -s nullglob
