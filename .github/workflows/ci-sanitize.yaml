@@ -164,14 +164,37 @@ jobs:
           # not call `no_default_flags()`, so this is the supported injection point.
           # `-fno-sanitize-recover=all` turns a UBSan diagnosis into a hard abort rather
           # than a printed warning that a green exit code would hide. ~keep
-          CFLAGS: >-
+          # Target-scoped, NOT bare CFLAGS/RUSTFLAGS. With an explicit --target, cargo builds
+          # host build scripts with HOST settings, so they stay uninstrumented. Bare CFLAGS
+          # instruments every cc-rs crate in the graph including ring and zstd-sys, whose
+          # objects then land in a build script that cargo executes mid-build — and an
+          # instrumented binary run without the ASan runtime preloaded aborts on startup,
+          # failing the build before any grammar is ever parsed. ~keep
+          CFLAGS_x86_64_unknown_linux_gnu: >-
             -fsanitize=address,undefined
             -fno-sanitize-recover=all
             -fno-omit-frame-pointer
             -fno-common
             -g
-          RUSTFLAGS: -Clink-arg=-fsanitize=address,undefined -Cforce-frame-pointers=yes
-        run: cargo build --locked -p ts-pack-cli --bin ts-pack 2>&1 | tee build.log
+          CC_x86_64_unknown_linux_gnu: cc
+          # rustc links with `-nodefaultlibs`, which suppresses exactly the libraries the
+          # `-fsanitize=` driver flag exists to add, so the sanitizer runtimes have to be
+          # named explicitly or the link fails on undefined __asan_/__ubsan_ symbols. ~keep
+          CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS: >-
+            -Clink-arg=-fsanitize=address,undefined
+            -Clink-arg=-lasan
+            -Clink-arg=-lubsan
+            -Cforce-frame-pointers=yes
+        # `| tee` without pipefail reports tee's exit status, so a failed build was scored
+        # as a successful step; the link has been broken and green since rust-lld became
+        # the default linker. ~keep
+        run: |
+          set -o pipefail
+          cargo build --locked --target x86_64-unknown-linux-gnu -p ts-pack-cli --bin ts-pack 2>&1 | tee build.log
+          # libasan must be first in the initial library list or it disables itself at
+          # startup — the binary still carries __asan_ symbols, so only a runtime check
+          # can tell the difference. Resolved once here for every step that runs it. ~keep
+          echo "ASAN_RUNTIME=$(cc -print-file-name=libasan.so)" >>"$GITHUB_ENV"
 
       # The single most important check in this job: it proves the CFLAGS above actually
       # reached the compiler. If cc-rs ever stops forwarding CFLAGS, or build.rs starts
@@ -181,7 +204,7 @@ jobs:
       - name: Assert the binary is actually instrumented
         run: |
           set -euo pipefail
-          BIN=target/debug/ts-pack
+          BIN=target/x86_64-unknown-linux-gnu/debug/ts-pack
           test -x "$BIN" || { echo "::error::$BIN was not produced"; exit 1; }
           if ! nm -C "$BIN" 2>/dev/null | grep -q '__asan_'; then
             echo "::error::$BIN contains no __asan_ symbols — sanitizer flags did not take effect"
@@ -199,6 +222,33 @@ jobs:
             echo "::error::patch tree was not located; patched sources were not exercised"
             exit 1
           fi
+          # Symbol presence is necessary but NOT sufficient: when libasan is not first in
+          # the initial library list it prints a warning and disables itself, leaving a
+          # binary that still passes every `nm` check above and detects nothing. The only
+          # honest test is to plant a fault and require the sanitizer to catch it. ~keep
+          cat >/tmp/asan_selftest.c <<'C'
+          #include <stdlib.h>
+          #include <string.h>
+          int main(void) {
+              char *p = malloc(4);
+              memcpy(p, "12345678", 8);
+              int n = p[0];
+              free(p);
+              return n;
+          }
+          C
+          cc -fsanitize=address -fno-omit-frame-pointer -g /tmp/asan_selftest.c -o /tmp/asan_selftest
+          if LD_PRELOAD="$ASAN_RUNTIME" /tmp/asan_selftest 2>/tmp/asan_selftest.err; then
+            echo "::error::ASan positive control did NOT trap a deliberate heap overflow — the"
+            echo "::error::sanitizer is inert and this whole job proves nothing. Output follows:"
+            cat /tmp/asan_selftest.err
+            exit 1
+          fi
+          if ! grep -q 'heap-buffer-overflow' /tmp/asan_selftest.err; then
+            echo "::error::ASan positive control failed, but not with a heap-buffer-overflow report"
+            cat /tmp/asan_selftest.err
+            exit 1
+          fi
 
       # Each selected grammar must be linked in and reachable, otherwise the parse
       # sweep below would iterate over languages the binary cannot load and still
@@ -207,9 +257,10 @@ jobs:
         env:
           LANGS: ${{ steps.select.outputs.languages }}
           ASAN_OPTIONS: detect_leaks=0
+          LD_PRELOAD: ${{ env.ASAN_RUNTIME }}
         run: |
           set -euo pipefail
-          target/debug/ts-pack list >linked.txt
+          target/x86_64-unknown-linux-gnu/debug/ts-pack list >linked.txt
           missing=""
           for lang in $(echo "$LANGS" | tr ',' ' '); do
             grep -qw -- "$lang" linked.txt || missing="$missing $lang"
@@ -229,6 +280,7 @@ jobs:
           LANGS: ${{ steps.select.outputs.languages }}
           ASAN_OPTIONS: detect_leaks=0:abort_on_error=0:exitcode=42
           UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=42
+          LD_PRELOAD: ${{ env.ASAN_RUNTIME }}
         run: |
           set -uo pipefail
           # Generated in Python rather than `printf | tr` so that backslash, quote and
@@ -256,7 +308,7 @@ jobs:
           for lang in $(echo "$LANGS" | tr ',' ' '); do
             for f in $FILES; do
               runs=$((runs + 1))
-              target/debug/ts-pack parse "$f" --language "$lang" >/dev/null 2>sweep.err
+              target/x86_64-unknown-linux-gnu/debug/ts-pack parse "$f" --language "$lang" >/dev/null 2>sweep.err
               rc=$?
               if [ "$rc" = "$SANITIZER_EXIT_CODE" ] || grep -qE 'ERROR: (Address|Leak)Sanitizer|runtime error:' sweep.err; then
                 failures=$((failures + 1))
