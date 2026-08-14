@@ -2497,7 +2497,7 @@ jobs:
 
   publish-crates:
     name: Publish Rust crates
-    needs: [prepare, validate-versions, clone-vendors, check-registries, build-parser-sources, e2e-rust]
+    needs: [prepare, validate-versions, clone-vendors, check-registries, build-parser-sources, e2e-rust, finalize-github-release]
     if: |
       always() &&
       needs.prepare.outputs.release_crates == 'true' &&
@@ -2505,6 +2505,7 @@ jobs:
       needs.validate-versions.result == 'success' &&
       needs.clone-vendors.result == 'success' &&
       needs.build-parser-sources.result == 'success' &&
+      needs.finalize-github-release.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).cratesio != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -4258,12 +4259,117 @@ jobs:
           git push origin "refs/tags/packages/go/v${{ needs.prepare.outputs.version }}"
           echo "Go module tag pushed successfully"
 
+  finalize-github-release:
+    name: Publish GitHub release from draft
+    needs:
+      - prepare
+      - upload-parser-binaries
+      - upload-go-release
+      - upload-c-ffi-release
+      - update-swift-package-manifest
+      - stage-go-ffi-libraries
+      - upload-cli-release
+      - verify-binstall
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
+        id: app-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: xberg-io
+
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      # crates.io publishes are irreversible (yank-only) and ts-pack-core/build.rs
+      # downloads parsers.json + platform tarballs from THIS release by URL at
+      # `cargo build` time. Publishing crates.io before every asset it needs is
+      # uploaded AND the release is public is guaranteed breakage for any consumer
+      # resolving that version in the gap (#177). This job is the single gate
+      # publish-crates waits on: it checks every asset-upload job's actual RESULT
+      # (not just that it was scheduled — a bare `needs:` edge gates nothing once a
+      # job opens with always(), see the e2e-gate comment above), then publishes the
+      # draft release, so crates.io always goes last.
+      #
+      # upload-elixir-release and upload-php-pie-release are deliberately NOT in
+      # `needs:` here: build-elixir-nifs and build-php-extension already require
+      # publish-crates to succeed first (their release builds resolve the crate from
+      # crates.io, not from a workspace path), so those two asset uploads structurally
+      # happen AFTER crates.io publish. Requiring them here would be a real `needs:`
+      # cycle (finalize-github-release -> upload-elixir-release -> build-elixir-nifs ->
+      # publish-crates -> finalize-github-release), not just an ordering preference —
+      # GitHub Actions rejects the workflow outright if that edge is added. Elixir/PHP
+      # assets land on the release after it is already public, same as before this fix.
+      # ~keep
+      - name: Verify release assets are complete
+        if: needs.prepare.result == 'success'
+        env:
+          RESULT_UPLOAD_PARSERS: ${{ needs.upload-parser-binaries.result }}
+          RESULT_UPLOAD_GO: ${{ needs.upload-go-release.result }}
+          RESULT_UPLOAD_C_FFI: ${{ needs.upload-c-ffi-release.result }}
+          RESULT_SWIFT_MANIFEST: ${{ needs.update-swift-package-manifest.result }}
+          RESULT_STAGE_GO_FFI: ${{ needs.stage-go-ffi-libraries.result }}
+          RESULT_UPLOAD_CLI: ${{ needs.upload-cli-release.result }}
+          RESULT_VERIFY_BINSTALL: ${{ needs.verify-binstall.result }}
+          RELEASE_GO: ${{ needs.prepare.outputs.release_go }}
+          RELEASE_C_FFI: ${{ needs.prepare.outputs.release_c_ffi }}
+          RELEASE_SWIFT: ${{ needs.prepare.outputs.release_swift }}
+        run: |
+          failed=0
+
+          require_success() {
+            local name="$1" result="$2"
+            if [[ "$result" != "success" ]]; then
+              echo "::error::Required release-asset job '$name' finished with '$result' — refusing to publish an incomplete release."
+              failed=1
+            fi
+          }
+
+          require_success_when_enabled() {
+            local name="$1" result="$2" enabled="$3"
+            if [[ "$enabled" == "true" && "$result" != "success" ]]; then
+              echo "::error::Release-asset job '$name' is enabled but finished with '$result' — refusing to publish an incomplete release."
+              failed=1
+            fi
+          }
+
+          require_success "parser-binaries" "$RESULT_UPLOAD_PARSERS"
+          require_success "cli-binaries" "$RESULT_UPLOAD_CLI"
+          require_success "binstall-verify" "$RESULT_VERIFY_BINSTALL"
+          require_success_when_enabled "go-ffi" "$RESULT_UPLOAD_GO" "$RELEASE_GO"
+          require_success_when_enabled "go-ffi-stage" "$RESULT_STAGE_GO_FFI" "$RELEASE_GO"
+          require_success_when_enabled "c-ffi" "$RESULT_UPLOAD_C_FFI" "$RELEASE_C_FFI"
+          require_success_when_enabled "swift-manifest" "$RESULT_SWIFT_MANIFEST" "$RELEASE_SWIFT"
+
+          if [[ "$failed" -eq 1 ]]; then
+            exit 1
+          fi
+          echo "All release-asset upload jobs are complete."
+
+      - name: Finalize release (publish from draft)
+        if: needs.prepare.result == 'success'
+        uses: xberg-io/actions/finalize-release@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          go-module-path: ""
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          token: ${{ steps.app-token.outputs.token }}
+
   release-finalize:
-    name: Finalize release
+    name: Aggregate release status
     needs:
       - prepare
       - validate-versions
       - check-registries
+      - finalize-github-release
       - upload-parser-binaries
       - upload-go-release
       - upload-c-ffi-release
@@ -4289,33 +4395,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
-        id: app-token
-        with:
-          app-id: ${{ secrets.BOT_APP_ID }}
-          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-          owner: xberg-io
-
-      - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Finalize release (publish from draft)
-        if: needs.prepare.result == 'success'
-        uses: xberg-io/actions/finalize-release@v1
-        with:
-          tag: ${{ needs.prepare.outputs.tag }}
-          go-module-path: ""
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
-          token: ${{ steps.app-token.outputs.token }}
-
       - name: Aggregate release status
         if: always()
         env:
           CHECK_RESULTS: ${{ needs.check-registries.outputs.results }}
           RESULT_VALIDATE: ${{ needs.validate-versions.result }}
+          RESULT_FINALIZE_RELEASE: ${{ needs.finalize-github-release.result }}
           RESULT_PUBLISH_CRATES: ${{ needs.publish-crates.result }}
           RESULT_PUBLISH_PYPI: ${{ needs.publish-pypi.result }}
           RESULT_PUBLISH_NODE: ${{ needs.publish-node.result }}
@@ -4342,6 +4427,12 @@ jobs:
               echo "| version-check | **FAILED** |"
             else
               echo "| version-check | passed |"
+            fi
+
+            if [[ "$RESULT_FINALIZE_RELEASE" != "success" ]]; then
+              echo "| github-release | **FAILED** |"
+            else
+              echo "| github-release | published |"
             fi
 
             declare -A results
