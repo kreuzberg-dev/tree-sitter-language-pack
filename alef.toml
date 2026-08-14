@@ -655,6 +655,9 @@ host_type = "io.github.treesitter.jtreesitter.Language"
 package = "io.github.tree-sitter:jtreesitter"
 package_version = "0.26.1"
 construct_expr = "new io.github.treesitter.jtreesitter.Language({ptr})"
+pointer_ownership = "borrowed_static"
+host_destructor = "none"
+abi_compatible = true
 
 [crates.csharp]
 namespace = "TreeSitterLanguagePack"
@@ -684,6 +687,9 @@ host_type = "io.github.treesitter.ktreesitter.Language"
 package = "io.github.tree-sitter:ktreesitter"
 package_version = "0.25.0"
 construct_expr = "io.github.treesitter.ktreesitter.Language({ptr})"
+pointer_ownership = "borrowed_static"
+host_destructor = "none"
+abi_compatible = true
 
 [crates.swift]
 module_name = "TreeSitterLanguagePack"
