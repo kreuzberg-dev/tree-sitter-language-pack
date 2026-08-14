@@ -666,6 +666,9 @@ host_type = "TreeSitter.Language"
 package = "TreeSitter.DotNet"
 package_version = "1.3.0"
 construct_expr = "new TreeSitter.Language({ptr})"
+pointer_ownership = "borrowed_static"
+host_destructor = "abi_noop"
+abi_compatible = true
 
 [crates.dart]
 pubspec_name = "tree_sitter_language_pack"
