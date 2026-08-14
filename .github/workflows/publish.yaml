@@ -2497,7 +2497,15 @@ jobs:
 
   publish-crates:
     name: Publish Rust crates
-    needs: [prepare, validate-versions, clone-vendors, check-registries, build-parser-sources, e2e-rust, finalize-github-release]
+    needs: [
+      prepare,
+      validate-versions,
+      clone-vendors,
+      check-registries,
+      build-parser-sources,
+      e2e-rust,
+      finalize-github-release,
+    ]
     if: |
       always() &&
       needs.prepare.outputs.release_crates == 'true' &&
