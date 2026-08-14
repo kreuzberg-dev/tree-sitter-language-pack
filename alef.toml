@@ -252,7 +252,7 @@ replace = '${1}{version}'
 
 [[workspace.sync.text_replacements]]
 path = "alef.toml"
-search = '(\[crates\.e2e\.registry\.packages\.java\]\s+group_id = "io.xberg.treesitterlanguagepack"\s+artifact_id = "tree-sitter-language-pack"\s+version = ")[^"]*'
+search = '(\[crates\.e2e\.registry\.packages\.java\]\s+name = "io.xberg.treesitterlanguagepack:tree-sitter-language-pack"\s+version = ")[^"]*'
 replace = '${1}{version}'
 
 [[workspace.sync.text_replacements]]
@@ -510,8 +510,6 @@ features = ["serde", "config", "download"]
 [[crates.source_crates]]
 name = "tree-sitter-language-pack"
 sources = ["crates/ts-pack-core/src/lib.rs"]
-workspace_root = "."
-features = ["serde", "config", "download"]
 
 [crates.python]
 module_name = "_native"
@@ -1546,8 +1544,7 @@ module = "github.com/xberg-io/tree-sitter-language-pack/packages/go"
 version = "v1.15.1"
 
 [crates.e2e.registry.packages.java]
-group_id = "io.xberg.treesitterlanguagepack"
-artifact_id = "tree-sitter-language-pack"
+name = "io.xberg.treesitterlanguagepack:tree-sitter-language-pack"
 version = "1.15.1"
 
 [crates.e2e.registry.packages.csharp]
