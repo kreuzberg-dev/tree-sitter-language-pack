@@ -852,7 +852,6 @@ jobs:
       - name: Run Java unit tests
         working-directory: packages/java
         run: mvn test
-        env:
 
       - name: Upload test reports
         if: always()
