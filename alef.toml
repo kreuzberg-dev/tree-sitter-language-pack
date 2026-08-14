@@ -231,6 +231,81 @@ path = "test_apps/zig/build.zig.zon"
 search = "download/v[0-9.]+/tree-sitter-language-pack-zig-v[0-9.]+"
 replace = "download/v{version}/tree-sitter-language-pack-zig-v{version}"
 
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.rust\]\s+name = "tree-sitter-language-pack"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.python\]\s+name = "tree-sitter-language-pack"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.node\]\s+name = "@xberg-io/tree-sitter-language-pack"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.go\]\s+module = "github.com/xberg-io/tree-sitter-language-pack/packages/go"\s+version = "v)[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.java\]\s+group_id = "io.xberg.treesitterlanguagepack"\s+artifact_id = "tree-sitter-language-pack"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.csharp\]\s+name = "TreeSitterLanguagePack"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.ruby\]\s+name = "tree_sitter_language_pack"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.c\]\s+name = "tree-sitter-language-pack-ffi"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.wasm\]\s+name = "@xberg-io/tree-sitter-language-pack-wasm"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.elixir\]\s+name = "tree_sitter_language_pack"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.php\]\s+name = "xberg-io/tree-sitter-language-pack"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.zig\]\s+name = "tree_sitter_language_pack"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.swift\]\s+name = "TreeSitterLanguagePack"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.dart\]\s+name = "tree_sitter_language_pack"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "alef.toml"
+search = '(\[crates\.e2e\.registry\.packages\.kotlin_android\]\s+name = "io.xberg.tslp.android:tree-sitter-language-pack-android"\s+version = ")[^"]*'
+replace = '${1}{version}'
+
 [workspace.poly]
 exclude = [
   "**/_generated/**",
@@ -1457,52 +1532,52 @@ github_repo = "https://github.com/xberg-io/tree-sitter-language-pack"
 
 [crates.e2e.registry.packages.rust]
 name = "tree-sitter-language-pack"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.python]
 name = "tree-sitter-language-pack"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.node]
 name = "@xberg-io/tree-sitter-language-pack"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.go]
 module = "github.com/xberg-io/tree-sitter-language-pack/packages/go"
-version = "v1.14.3"
+version = "v1.15.0"
 
 [crates.e2e.registry.packages.java]
 group_id = "io.xberg.treesitterlanguagepack"
 artifact_id = "tree-sitter-language-pack"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.csharp]
 name = "TreeSitterLanguagePack"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.ruby]
 name = "tree_sitter_language_pack"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.c]
 name = "tree-sitter-language-pack-ffi"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.wasm]
 name = "@xberg-io/tree-sitter-language-pack-wasm"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.elixir]
 name = "tree_sitter_language_pack"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.php]
 name = "xberg-io/tree-sitter-language-pack"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.zig]
 name = "tree_sitter_language_pack"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.zig.platform_hashes]
 "aarch64-apple-darwin" = "STALE_HASH_REGENERATE"
@@ -1513,15 +1588,15 @@ version = "1.14.3"
 
 [crates.e2e.registry.packages.swift]
 name = "TreeSitterLanguagePack"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.dart]
 name = "tree_sitter_language_pack"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.packages.kotlin_android]
 name = "io.xberg.tslp.android:tree-sitter-language-pack-android"
-version = "1.14.3"
+version = "1.15.0"
 
 [crates.e2e.registry.run.jni]
 precondition = "command -v gradle >/dev/null 2>&1"
