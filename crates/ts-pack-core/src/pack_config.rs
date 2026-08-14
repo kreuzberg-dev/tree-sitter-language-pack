@@ -220,7 +220,10 @@ mod tests {
             let guard = CWD_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
             let original = std::env::current_dir().expect("current dir should be readable");
             std::env::set_current_dir(dir).expect("current dir should be settable");
-            Self { original, _guard: guard }
+            Self {
+                original,
+                _guard: guard,
+            }
         }
     }
 

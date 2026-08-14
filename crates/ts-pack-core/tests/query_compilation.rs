@@ -19,8 +19,9 @@ use tree_sitter_language_pack::{LanguageRegistry, QueryKind, get_query};
 /// vendored file (see `crates/ts-pack-core/build.rs::effective_query_path`). A grammar
 /// bump cannot regenerate these — they must be hand-fixed, so their compile failures
 /// are asserted separately from the bulk sweep. ~keep
-const OVERLAY_TAGS_LANGUAGES: [&str; 9] =
-    ["dart", "java", "kotlin", "php", "scala", "cpp", "swift", "csharp", "ruby"];
+const OVERLAY_TAGS_LANGUAGES: [&str; 9] = [
+    "dart", "java", "kotlin", "php", "scala", "cpp", "swift", "csharp", "ruby",
+];
 
 /// Queries that fail to compile because of a defect in the query file UPSTREAM ships, not in
 /// this repo's selection or overlays. Each was traced to the upstream commit that introduced it,
@@ -30,10 +31,26 @@ const OVERLAY_TAGS_LANGUAGES: [&str; 9] =
 /// as loudly as an unlisted failure. A known-failures list nobody is forced to revisit is how a
 /// gate rots into a green light that checks nothing. ~keep
 const KNOWN_UPSTREAM_BROKEN: [(&str, QueryKind, &str); 4] = [
-    ("flatbuffers", QueryKind::Highlights, "upstream typo: grammar.js defines `enum_val_decl`, the query says `enumval_decl`"),
-    ("hurl", QueryKind::Highlights, "upstream renamed the option field to `option_key:` and wrote the query against `key:` in the same commit"),
-    ("solidity", QueryKind::Highlights, "upstream query text is malformed s-expression syntax; vendored bytes are identical to upstream and no patch of ours touches it"),
-    ("vhdl", QueryKind::Highlights, "upstream query expects an `integer` child inside `integer_decimal`, which `token(...)` collapses to a childless token"),
+    (
+        "flatbuffers",
+        QueryKind::Highlights,
+        "upstream typo: grammar.js defines `enum_val_decl`, the query says `enumval_decl`",
+    ),
+    (
+        "hurl",
+        QueryKind::Highlights,
+        "upstream renamed the option field to `option_key:` and wrote the query against `key:` in the same commit",
+    ),
+    (
+        "solidity",
+        QueryKind::Highlights,
+        "upstream query text is malformed s-expression syntax; vendored bytes are identical to upstream and no patch of ours touches it",
+    ),
+    (
+        "vhdl",
+        QueryKind::Highlights,
+        "upstream query expects an `integer` child inside `integer_decimal`, which `token(...)` collapses to a childless token",
+    ),
 ];
 
 fn known_upstream_breakage(language: &str, kind: QueryKind) -> Option<&'static str> {
@@ -68,11 +85,7 @@ impl std::fmt::Display for QueryFailure {
 /// Compiles every bundled query kind for `language`, returning the count of queries that
 /// actually compiled (kind bundled and `Query::new` succeeded) and appending any compile
 /// failure to `failures`. A bundled-but-absent kind (`Ok(None)`) is not a failure.
-fn compile_all_kinds_for(
-    language: &str,
-    failures: &mut Vec<QueryFailure>,
-    repaired: &mut Vec<String>,
-) -> usize {
+fn compile_all_kinds_for(language: &str, failures: &mut Vec<QueryFailure>, repaired: &mut Vec<String>) -> usize {
     let mut compiled = 0usize;
     for kind in ALL_QUERY_KINDS {
         let known = known_upstream_breakage(language, kind);

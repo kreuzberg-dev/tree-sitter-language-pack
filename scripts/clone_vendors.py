@@ -705,9 +705,7 @@ async def _discover_and_copy_queries(
         # ~keep scored as if it were the grammar's own directory, tying with the real one.
         relative = [(candidate, candidate.relative_to(vendor_repo)) for candidate in candidates]
         eligible = [
-            (c, r)
-            for c, r in relative
-            if not _is_foreign_grammar_query(r, directory, language_name, scoped_subdirs)
+            (c, r) for c, r in relative if not _is_foreign_grammar_query(r, directory, language_name, scoped_subdirs)
         ]
         if not eligible:
             print(f"Skipping {language_name} {query_type}: only other grammars in this repo provide it")
