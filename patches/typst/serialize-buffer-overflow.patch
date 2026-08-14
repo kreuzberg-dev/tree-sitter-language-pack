@@ -1,15 +1,18 @@
 --- a/src/scanner.c
 +++ b/src/scanner.c
-@@ -176,15 +176,27 @@
+@@ -176,15 +176,30 @@
  	assert(self->len > 0, "vec_u32_pop: empty vec");
  	return self->vec[self->len--];
  }
 -static size_t vec_u32_serialize(struct vec_u32* self, char* buffer) {
 +// `capacity` is the number of bytes left in tree-sitter's fixed serialization
 +// buffer. The runtime only ts_assert()s the returned length and that assert is
-+// compiled out under NDEBUG, so the bound has to be enforced here. The length
-+// prefix is written truncated, which is exactly what vec_u32_deserialize reads
-+// back, so a truncated vector round-trips. ~keep
++// compiled out under NDEBUG, so the bound has to be enforced here.
++//
++// `len` must stay `size_t`: vec_u32_deserialize reads the prefix back as
++// `sizeof self->len`, so narrowing it here would write 4 bytes and read 8, and
++// the garbage upper half becomes a huge element count that memmoves off the
++// end of the buffer. ~keep
 +static size_t vec_u32_serialize(struct vec_u32* self, char* buffer, size_t capacity) {
  	assert(self != NULL, "vec_u32_serialize");
  	size_t written = 0;
@@ -21,9 +24,9 @@
 +	if (capacity < sizeof self->len) {
 +		return 0;
  	}
-+	uint32_t len = self->len;
++	size_t len = self->len;
 +	if (len > (capacity - sizeof self->len) / sizeof(uint32_t)) {
-+		len = (uint32_t)((capacity - sizeof self->len) / sizeof(uint32_t));
++		len = (capacity - sizeof self->len) / sizeof(uint32_t);
 +	}
 +	memcpy(buffer, &len, sizeof len);
 +	written += sizeof len;
