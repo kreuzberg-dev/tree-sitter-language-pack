@@ -646,6 +646,9 @@ host_type = "*tree_sitter.Language"
 package = "github.com/tree-sitter/go-tree-sitter"
 package_version = "v0.25.0"
 construct_expr = "tree_sitter.NewLanguage(unsafe.Pointer({ptr}))"
+pointer_ownership = "borrowed_static"
+host_destructor = "none"
+abi_compatible = true
 
 [crates.java]
 package = "io.xberg.treesitterlanguagepack"
@@ -700,6 +703,9 @@ host_type = "SwiftTreeSitter.Language"
 package = "https://github.com/tree-sitter/swift-tree-sitter"
 package_version = "0.25.0"
 construct_expr = "SwiftTreeSitter.Language({ptr})"
+pointer_ownership = "borrowed_static"
+host_destructor = "none"
+abi_compatible = true
 
 [crates.zig]
 module_name = "tree_sitter_language_pack"
@@ -729,6 +735,9 @@ host_type = "?*const tree_sitter.Language"
 package = "https://github.com/tree-sitter/zig-tree-sitter/archive/refs/tags/v0.26.0.tar.gz"
 package_version = "tree_sitter-0.26.0-8heIf3CaAQDeVTQc0DMSBhbQAEx5aF-dTen4_LPxMgrv"
 construct_expr = "tree_sitter.Language.fromRaw(@ptrCast({ptr}))"
+pointer_ownership = "borrowed_static"
+host_destructor = "abi_noop"
+abi_compatible = true
 
 [crates.output]
 python = "crates/ts-pack-core-py/src/"
