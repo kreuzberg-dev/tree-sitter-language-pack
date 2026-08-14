@@ -17,4 +17,4 @@ ignored = ["serde_json"]
 
 [dependencies]
 serde_json = "1"
-tree_sitter_language_pack = { package = "tree-sitter-language-pack", version = "1.15.0", default-features = false, features = ["serde", "config", "download"] }
+tree_sitter_language_pack = { package = "tree-sitter-language-pack", version = "1.15.1", default-features = false, features = ["serde", "config", "download"] }

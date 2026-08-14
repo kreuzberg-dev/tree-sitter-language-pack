@@ -17,7 +17,7 @@ import 'package:http/http.dart' as http;
 /// subdirectory both derive from this, so a downloaded native can never
 /// mismatch the package version: an upgrade changes the cache path and forces
 /// a fresh download.
-const String nativeModuleVersion = '1.14.3';
+const String nativeModuleVersion = '1.15.1';
 
 /// GitHub repository base URL (e.g. `https://github.com/owner/repo`).
 const String nativeRepoUrl = 'https://github.com/xberg-io/tree-sitter-language-pack';
