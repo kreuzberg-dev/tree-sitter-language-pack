@@ -1134,6 +1134,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # ~keep `platform` becomes the `natives/<classifier>/` directory inside the JAR, and
+        # ~keep NativeLib.resolveNativesRid computes the name it looks for at runtime. That method is
+        # ~keep alef-generated from src/publish/platform.rs::go_java_platform(), which emits `aarch64`
+        # ~keep for every non-macOS ARM64 target and special-cases macOS to `arm64`. These values MUST
+        # ~keep match it exactly. Issue #178: they said `arm64`, the loader looked for `aarch64`, and
+        # ~keep the native core failed to load on every ARM64 Linux and Windows host.
         include:
           - os: ubuntu-latest
             label: linux-x86_64
@@ -1142,7 +1148,7 @@ jobs:
           - os: ubuntu-24.04-arm
             label: linux-aarch64
             target: aarch64-unknown-linux-gnu
-            platform: linux-arm64
+            platform: linux-aarch64
           - os: macos-latest
             label: macos-arm64
             target: aarch64-apple-darwin
@@ -1158,7 +1164,7 @@ jobs:
           - os: windows-11-arm
             label: windows-arm64
             target: aarch64-pc-windows-msvc
-            platform: windows-arm64
+            platform: windows-aarch64
     steps:
       - name: Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
@@ -1229,7 +1235,7 @@ jobs:
         with:
           artifacts-dir: artifacts/java-natives
           resources-dir: packages/java/src/main/resources/natives
-          required-classifiers: linux-x86_64 linux-arm64 macos-arm64 macos-x86_64 windows-x86_64 windows-arm64
+          required-classifiers: linux-x86_64 linux-aarch64 macos-arm64 macos-x86_64 windows-x86_64 windows-aarch64
           lib-name: ts_pack_core_ffi
 
       - name: Build and package
@@ -1258,7 +1264,7 @@ jobs:
           # because the re-stage loop walked one dirname too far. Require each
           # expected classifier directory to be present individually so the
           # collapse-to-`native` regression cannot ship again.
-          REQUIRED_CLASSIFIERS="linux-x86_64 linux-arm64 macos-arm64 macos-x86_64 windows-x86_64 windows-arm64"
+          REQUIRED_CLASSIFIERS="linux-x86_64 linux-aarch64 macos-arm64 macos-x86_64 windows-x86_64 windows-aarch64"
           missing=()
           for c in $REQUIRED_CLASSIFIERS; do
             if ! echo "$ENTRIES" | grep -qE "^natives/$c/(lib)?ts_pack_core_ffi\.(so|dll|dylib)$"; then
@@ -2890,7 +2896,7 @@ jobs:
         run: |
           ARTIFACTS_DIR="artifacts/java-natives"
           RESOURCES_DIR="packages/java/src/main/resources/natives"
-          REQUIRED_CLASSIFIERS="linux-x86_64 linux-arm64 macos-arm64 macos-x86_64 windows-x86_64 windows-arm64"
+          REQUIRED_CLASSIFIERS="linux-x86_64 linux-aarch64 macos-arm64 macos-x86_64 windows-x86_64 windows-aarch64"
           mkdir -p "$RESOURCES_DIR"
           # build-java-natives@v1 stages each lib at
           # `{output-dir}/native/{classifier}/{libfile}` and uploads that tree as
