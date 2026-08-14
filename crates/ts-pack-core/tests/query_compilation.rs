@@ -29,8 +29,7 @@ const OVERLAY_TAGS_LANGUAGES: [&str; 9] =
 /// This list is enforced in BOTH directions: an entry that starts compiling fails the test just
 /// as loudly as an unlisted failure. A known-failures list nobody is forced to revisit is how a
 /// gate rots into a green light that checks nothing. ~keep
-const KNOWN_UPSTREAM_BROKEN: [(&str, QueryKind, &str); 5] = [
-    ("brightscript", QueryKind::Highlights, "upstream added the `(m) @keyword` query line and the grammar.js `m` rule in one commit but never re-ran `tree-sitter generate`, so their committed parser has no `m` node"),
+const KNOWN_UPSTREAM_BROKEN: [(&str, QueryKind, &str); 4] = [
     ("flatbuffers", QueryKind::Highlights, "upstream typo: grammar.js defines `enum_val_decl`, the query says `enumval_decl`"),
     ("hurl", QueryKind::Highlights, "upstream renamed the option field to `option_key:` and wrote the query against `key:` in the same commit"),
     ("solidity", QueryKind::Highlights, "upstream query text is malformed s-expression syntax; vendored bytes are identical to upstream and no patch of ours touches it"),

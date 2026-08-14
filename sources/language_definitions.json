@@ -133,7 +133,7 @@
   "brightscript": {
     "extensions": ["brs"],
     "repo": "https://github.com/ajdelcimmuto/tree-sitter-brightscript",
-    "rev": "253fdfaa23814cb46c2d5fc19049fa0f2f62c6da"
+    "rev": "0c534d56bb04778d0a3510bed5e720d1fe15cb76"
   },
   "bsl": {
     "abi_version": 14,
