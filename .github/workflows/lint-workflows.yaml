@@ -1,0 +1,48 @@
+name: Lint Workflows
+
+# This gate lives in its own file on purpose. GitHub answers a schema-invalid
+# workflow by posting ZERO check-runs, so a job placed inside ci.yaml cannot
+# police ci.yaml — if ci.yaml breaks, that job never runs and the failure shows
+# up as a bare "failure" with an empty job list. Workflow files are parsed
+# independently, so this one still runs when the others are broken. That is the
+# whole point; do not fold it into ci.yaml. ~keep
+#
+# ci.yaml and ci-e2e.yaml were schema-invalid from 28cba65c6 (2026-08-12) to
+# 9249f05dd (2026-08-14) and ran zero jobs for six days, spanning the 1.15.0
+# release. Plain YAML parsing does not catch this; actionlint does. The tell is
+# `gh run view <id> --json jobs` returning []. ~keep
+
+on:
+  push:
+    paths:
+      - .github/workflows/**
+  pull_request:
+    paths:
+      - .github/workflows/**
+  workflow_dispatch:
+
+concurrency:
+  group: lint-workflows-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - name: Run actionlint
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(.github/workflows/*.yaml .github/workflows/*.yml)
+          test ${#files[@]} -gt 0 || { echo "::error::no workflow files found — this gate would be a no-op"; exit 1; }
+          echo "::notice::linting ${#files[@]} workflow file(s)"
+          docker run --rm -v "$PWD":/repo -w /repo \
+            rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 \
+            -color "${files[@]}"

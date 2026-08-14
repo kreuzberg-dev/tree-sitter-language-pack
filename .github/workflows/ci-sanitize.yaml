@@ -129,9 +129,11 @@ jobs:
           fi
 
           COUNT=$(echo "$LANGS" | tr ',' '\n' | sort -u | wc -l)
-          echo "mode=$MODE" >>"$GITHUB_OUTPUT"
-          echo "languages=$LANGS" >>"$GITHUB_OUTPUT"
-          echo "count=$COUNT" >>"$GITHUB_OUTPUT"
+          {
+            echo "mode=$MODE"
+            echo "languages=$LANGS"
+            echo "count=$COUNT"
+          } >>"$GITHUB_OUTPUT"
           echo "::notice::sanitizing $COUNT language(s) in $MODE mode"
 
       - name: Clone selected grammars
