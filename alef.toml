@@ -148,13 +148,8 @@ replace = '${1}{version}'
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/csharp/TreeSitterLanguagePack.E2eTests.csproj"
-search = 'Include="TreeSitterLanguagePack" Version="[^"]*"'
-replace = 'Include="TreeSitterLanguagePack" Version="{version}"'
-
-[[workspace.sync.text_replacements]]
-path = "test_apps/php/composer.json"
-search = '"xberg-io/tree-sitter-language-pack": "[^"]*"'
-replace = '"xberg-io/tree-sitter-language-pack": "{version}"'
+search = 'Include="XbergIo.TreeSitterLanguagePack" Version="[^"]*"'
+replace = 'Include="XbergIo.TreeSitterLanguagePack" Version="{version}"'
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/go/go.mod"
@@ -173,13 +168,17 @@ replace = "gem 'tree_sitter_language_pack', '{version}'"
 
 [[workspace.sync.text_replacements]]
 path = "packages/elixir/native/tree_sitter_language_pack_nif/Cargo.toml"
-search = '^version = "[^"]*"'
+# (?m) is required: the package version is not the first line of the file, and an
+# unanchored `^` matches only the start of the text, so this rule silently matched
+# nothing. A sync rule that matches nothing is invisible to the freshness gate,
+# which diffs the result and sees no change. ~keep
+search = '(?m)^version = "[^"]*"'
 replace = 'version = "{version}"'
 
 [[workspace.sync.text_replacements]]
-path = "packages/dart/bin/download_libs.dart"
-search = "_moduleVersion = '[^']*'"
-replace = "_moduleVersion = '{version}'"
+path = "packages/dart/lib/src/native_loader.dart"
+search = "nativeModuleVersion = '[^']*'"
+replace = "nativeModuleVersion = '{version}'"
 
 [[workspace.sync.text_replacements]]
 path = "packages/csharp/TreeSitterLanguagePack/TreeSitterLanguagePack.csproj"

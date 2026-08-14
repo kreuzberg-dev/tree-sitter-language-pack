@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.1] - 2026-08-14
+
+**Use this release instead of 1.15.0.** The 1.15.0 GitHub release is incomplete — it carries the
+parser bundles and the Rust CLI, but none of the Go, C FFI, Elixir, PHP, Swift or Zig archives — and
+most bindings were never published at all: crates.io and Packagist got 1.15.0, but PyPI, npm, the npm
+WASM package, RubyGems, both Maven Central artifacts, NuGet, Hex.pm, pub.dev and the Homebrew tap did
+not. 1.15.0 also shipped a crash in the typst grammar, described below.
+
+### Fixed
+
+- **Typst crashed the process on any input, including `#let x = 1`.** Introduced in 1.15.0 and
+  affecting no earlier release. The external scanner's serialization patch wrote the vector length
+  prefix as a 4-byte `uint32_t` but read it back as an 8-byte `size_t`, so deserialization took four
+  bytes of adjacent buffer as the high half of the element count and `memmove`d that many elements
+  off the end of tree-sitter's fixed 1 KiB serialization buffer. The result was a `SIGBUS` at a
+  different address on each run. The prefix is now `size_t` on both sides. If you parse typst, 1.15.0
+  is unusable; there is no workaround short of upgrading.
+- **Brightscript had no syntax highlighting at all.** Upstream added the `m` grammar rule and its
+  `(m) @keyword` highlight in one commit without re-running `tree-sitter generate`, so the committed
+  parser had no `m` node and the entire highlights query was rejected — not merely one keyword. Our
+  pin sat on that merge. Upstream has since regenerated, so the pin moves forward one commit.
+- **The Go module could not link out of the box on four of its five platforms.** FFI libraries were
+  staged under Go's `GOARCH` spellings (`linux-amd64`, `linux-arm64`) while `binding.go`'s cgo
+  `LDFLAGS` and `cmd/setup` both look for alef's labels (`linux-x86_64`, `linux-aarch64`) verbatim.
+  Only `macos-arm64` happened to line up; every other platform required running `cmd/setup` first.
+- **The Java JAR threw `UnsatisfiedLinkError` on every ARM64 Linux and Windows host.** The loader
+  resolves natives under `linux-aarch64` / `windows-aarch64`, but the build matrix packaged them as
+  `linux-arm64` / `windows-arm64`, so the JAR contained no directory the loader would look in and it
+  fell through to `System.loadLibrary`. macOS ARM was unaffected because the loader special-cases it.
+
+### Changed
+
+- **Publishing to crates.io is now ordered after the GitHub release is complete.** In 1.15.0 the
+  crate went out roughly seven hours before its release assets did, leaving a window where the
+  version resolved but the artifacts `build.rs` downloads returned 404 ([#177]). The draft-publish
+  step also gated on nothing, because the job opened with `if: always()`, which is how a release
+  missing most of its assets still went public. Asset uploads are now checked individually before
+  the release is published, and the crates.io publish depends on that.
+
+[#177]: https://github.com/xberg-io/tree-sitter-language-pack/issues/177
+
 ## [1.15.0] - 2026-08-13
 
 This release ships the Rust crates only. The language bindings are held back pending generator

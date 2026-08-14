@@ -7,8 +7,12 @@ VERSION="${1:?Usage: $0 <version>}"
 REPO="xberg-io/tree-sitter-language-pack"
 CHECKSUM_FILE="packages/elixir/checksum-Elixir.TreeSitterLanguagePack.Native.exs"
 
+# Must match :targets in packages/elixir/mix.exs and lib/.../native.ex, and the
+# build-elixir-nifs matrix in .github/workflows/publish.yaml. A target missing here
+# gets no checksum entry, and RustlerPrecompiled then refuses to install it. ~keep
 TARGETS=(
   "aarch64-apple-darwin"
+  "x86_64-apple-darwin"
   "aarch64-unknown-linux-gnu"
   "x86_64-unknown-linux-gnu"
 )
