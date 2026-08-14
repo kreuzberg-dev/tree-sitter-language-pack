@@ -164,16 +164,23 @@ jobs:
           # not call `no_default_flags()`, so this is the supported injection point.
           # `-fno-sanitize-recover=all` turns a UBSan diagnosis into a hard abort rather
           # than a printed warning that a green exit code would hide. ~keep
-          CFLAGS: >-
+          # Target-scoped, NOT bare CFLAGS/RUSTFLAGS. With an explicit --target, cargo builds
+          # host build scripts with HOST settings, so they stay uninstrumented. Bare CFLAGS
+          # instruments every cc-rs crate in the graph including ring and zstd-sys, whose
+          # objects then land in a build script that cargo executes mid-build — and an
+          # instrumented binary run without the ASan runtime preloaded aborts on startup,
+          # failing the build before any grammar is ever parsed. ~keep
+          CFLAGS_x86_64_unknown_linux_gnu: >-
             -fsanitize=address,undefined
             -fno-sanitize-recover=all
             -fno-omit-frame-pointer
             -fno-common
             -g
+          CC_x86_64_unknown_linux_gnu: cc
           # rustc links with `-nodefaultlibs`, which suppresses exactly the libraries the
           # `-fsanitize=` driver flag exists to add, so the sanitizer runtimes have to be
           # named explicitly or the link fails on undefined __asan_/__ubsan_ symbols. ~keep
-          RUSTFLAGS: >-
+          CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS: >-
             -Clink-arg=-fsanitize=address,undefined
             -Clink-arg=-lasan
             -Clink-arg=-lubsan
@@ -183,7 +190,7 @@ jobs:
         # the default linker. ~keep
         run: |
           set -o pipefail
-          cargo build --locked -p ts-pack-cli --bin ts-pack 2>&1 | tee build.log
+          cargo build --locked --target x86_64-unknown-linux-gnu -p ts-pack-cli --bin ts-pack 2>&1 | tee build.log
           # libasan must be first in the initial library list or it disables itself at
           # startup — the binary still carries __asan_ symbols, so only a runtime check
           # can tell the difference. Resolved once here for every step that runs it. ~keep
@@ -197,7 +204,7 @@ jobs:
       - name: Assert the binary is actually instrumented
         run: |
           set -euo pipefail
-          BIN=target/debug/ts-pack
+          BIN=target/x86_64-unknown-linux-gnu/debug/ts-pack
           test -x "$BIN" || { echo "::error::$BIN was not produced"; exit 1; }
           if ! nm -C "$BIN" 2>/dev/null | grep -q '__asan_'; then
             echo "::error::$BIN contains no __asan_ symbols — sanitizer flags did not take effect"
@@ -253,7 +260,7 @@ jobs:
           LD_PRELOAD: ${{ env.ASAN_RUNTIME }}
         run: |
           set -euo pipefail
-          target/debug/ts-pack list >linked.txt
+          target/x86_64-unknown-linux-gnu/debug/ts-pack list >linked.txt
           missing=""
           for lang in $(echo "$LANGS" | tr ',' ' '); do
             grep -qw -- "$lang" linked.txt || missing="$missing $lang"
@@ -301,7 +308,7 @@ jobs:
           for lang in $(echo "$LANGS" | tr ',' ' '); do
             for f in $FILES; do
               runs=$((runs + 1))
-              target/debug/ts-pack parse "$f" --language "$lang" >/dev/null 2>sweep.err
+              target/x86_64-unknown-linux-gnu/debug/ts-pack parse "$f" --language "$lang" >/dev/null 2>sweep.err
               rc=$?
               if [ "$rc" = "$SANITIZER_EXIT_CODE" ] || grep -qE 'ERROR: (Address|Leak)Sanitizer|runtime error:' sweep.err; then
                 failures=$((failures + 1))
