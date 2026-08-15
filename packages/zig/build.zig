@@ -18,7 +18,7 @@ pub fn build(b: *std.Build) void {
         []const u8,
         "ffi_include_path",
         "Path to directory containing the FFI C header"
-    ) orelse "../../crates/tree-sitter-language-pack-ffi/include";
+    ) orelse "../../crates/ts-pack-core-ffi/include";
 
     const module = b.addModule("tree_sitter_language_pack", .{
         .root_source_file = b.path("src/tree_sitter_language_pack.zig"),
