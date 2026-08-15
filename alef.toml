@@ -95,6 +95,13 @@ cwd = "packages/zig"
 manifest = "packages/zig/build.zig"
 env = { ZIG_GLOBAL_CACHE_DIR = ".zig-global-cache", ZIG_LOCAL_CACHE_DIR = ".zig-cache" }
 
+# Sessions are keyed by snippet target; C snippets declare `target = "ffi"`. Without
+# this block the C validator takes its session-less path, which compiles a bare temp
+# file with no `-I` at all, so every `#include "ts_pack.h"` fails to resolve.
+[workspace.docs.snippets.sessions.ffi]
+cwd = "crates/ts-pack-core-ffi"
+include_paths = ["crates/ts-pack-core-ffi/include"]
+
 [workspace.opaque_types]
 Language = "tree_sitter_language_pack::Language"
 
