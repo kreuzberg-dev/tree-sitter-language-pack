@@ -131,7 +131,6 @@ AGENTS.md
 GEMINI.md
 
 .cache/
-site/
 .lycheecache
 
 # Astro Starlight docs-site build artifacts
