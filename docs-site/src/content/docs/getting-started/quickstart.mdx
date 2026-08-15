@@ -30,7 +30,7 @@ import { Content as Snip_csharp_quickstart } from "../../../snippets/generated/c
 import { Content as Snip_elixir_quickstart } from "../../../snippets/generated/elixir/parsing/parsing_python_function.md";
 import { Content as Snip_dart_quickstart } from "../../../snippets/generated/dart/parsing/parsing_python_function.md";
 import { Content as Snip_swift_quickstart } from "../../../snippets/generated/swift/parsing/parsing_python_function.md";
-import { Content as Snip_zig_quickstart } from "../../../snippets/zig/quickstart.md";
+import { Content as Snip_zig_quickstart } from "../../../snippets/generated/zig/parsing/parsing_python_function.md";
 import { Content as Snip_kotlin_android_quickstart } from "../../../snippets/kotlin-android/quickstart.md";
 import { Content as Snip_wasm_quickstart } from "../../../snippets/generated/wasm/parsing/parsing_python_function.md";
 import { Content as Snip_rust_quickstart } from "../../../snippets/generated/rust/parsing/parsing_python_function.md";
@@ -45,10 +45,10 @@ import { Content as Snip_csharp_process } from "../../../snippets/generated/csha
 import { Content as Snip_elixir_process } from "../../../snippets/generated/elixir/process/config_all_python.md";
 import { Content as Snip_dart_process } from "../../../snippets/generated/dart/process/config_all_python.md";
 import { Content as Snip_swift_process } from "../../../snippets/generated/swift/process/config_all_python.md";
-import { Content as Snip_zig_process } from "../../../snippets/zig/process.md";
+import { Content as Snip_zig_process } from "../../../snippets/generated/zig/process/config_all_python.md";
 import { Content as Snip_kotlin_android_process } from "../../../snippets/kotlin-android/process.md";
 import { Content as Snip_wasm_process } from "../../../snippets/generated/wasm/process/config_all_python.md";
-import { Content as Snip_rust_process } from "../../../snippets/rust/process.md";
+import { Content as Snip_rust_process } from "../../../snippets/generated/rust/process/config_all_python.md";
 
 This guide walks you from install to parsing, code intelligence, and LLM chunking.
 
@@ -544,12 +544,15 @@ import { readFileSync } from "fs";
 
 {/* Generated corpus: docs-site/src/snippets/generated/`language`/`category`/`fixture-id`.md.
     Hand-written imports remain only where the generated corpus cannot supply the snippet:
-      - cli/*            no generated/cli directory exists (the CLI is not an alef binding target)
-      - zig/quickstart   generated/zig/parsing/parsing_python_function.md binds an unused const
-      - zig/process      generated/zig/process/config_all_python.md binds an unused const
-      - kotlin-android/* generated kotlin-android snippets reference an undefined `config`
-      - rust/process     generated/rust/process/config_all_python.md has an unterminated raw string
-    Repoint each of these at the generated corpus once the generator output compiles. */}
+      - cli/*            no generated/cli directory exists (the CLI is not an alef binding
+                         target, so no emitter produces shell invocations); these are permanent
+                         until alef gains a CLI/shell snippet recipe
+      - kotlin-android/* generated twins fail to compile: `unresolved reference 'io'`, i.e. the
+                         snippet cannot see io.xberg.tslp.android. Consistent with kotlin scoring
+                         0/521 at compile level — the session lacks the classpath, not the snippet
+    Repoint each of these at the generated corpus once the generator output compiles. Verify
+    against a session-based run (`alef snippets check`); `alef snippets validate` builds no
+    session and reports every compile-level snippet as failing. */}
 
 const source = readFileSync("large_module.ts", "utf8");
 
