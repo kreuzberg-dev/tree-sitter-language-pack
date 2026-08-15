@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.15.1] - 2026-08-14
+## [1.15.1] - 2026-08-15
 
 **Use this release instead of 1.15.0.** The 1.15.0 GitHub release is incomplete — it carries the
 parser bundles and the Rust CLI, but none of the Go, C FFI, Elixir, PHP, Swift or Zig archives — and
@@ -17,6 +17,13 @@ not. 1.15.0 also shipped a crash in the typst grammar, described below.
 
 ### Fixed
 
+- **The language bindings are generated again.** Two independent generator-configuration faults had
+  to be cleared, and because generation is all-or-nothing across backends, either one alone stopped
+  every binding from being produced. First, three keys in `alef.toml` were not in the generator's
+  schema; they had previously been discarded in silence, and a move to `deny_unknown_fields` turned
+  them into a hard parse error that failed the run before any backend was reached. Second, six
+  backends — C#, Java, Kotlin/Android, Go, Swift and Zig — now have to declare an ownership contract
+  for the types they hand to a host tree-sitter library, and none of them did.
 - **Typst crashed the process on any input, including `#let x = 1`.** Introduced in 1.15.0 and
   affecting no earlier release. The external scanner's serialization patch wrote the vector length
   prefix as a 4-byte `uint32_t` but read it back as an 8-byte `size_t`, so deserialization took four
@@ -37,8 +44,21 @@ not. 1.15.0 also shipped a crash in the typst grammar, described below.
   `linux-arm64` / `windows-arm64`, so the JAR contained no directory the loader would look in and it
   fell through to `System.loadLibrary`. macOS ARM was unaffected because the loader special-cases it.
 
+- **The Swift package pointed at the previous release's binary artifact.** `Package.swift`'s
+  `binaryTarget` URL is rewritten to the current version on each release, but it was left on
+  `v1.15.0`, while the publish workflow injects the checksum of the bundle built for the release
+  actually being cut. SwiftPM verifies the downloaded bundle against that checksum, so the two
+  disagreeing would have failed resolution outright rather than silently fetching a stale binary.
+  The test app's Rust dependency had drifted the same way and was two releases behind.
+
 ### Changed
 
+- **The `Language` handed to a host tree-sitter library is borrowed, and that is now stated and
+  enforced.** Every binding that exposes a grammar to a third-party tree-sitter runtime now declares
+  that the pointer is borrowed for the process lifetime, that the host must not free it, and that it
+  is ABI-compatible with the host's own language type. This is a declaration of what was always
+  true — the grammars are `'static` and were never owned by the caller — so no runtime behaviour
+  changes; the contract is simply checked at generation time now instead of being assumed.
 - **Publishing to crates.io is now ordered after the GitHub release is complete.** In 1.15.0 the
   crate went out roughly seven hours before its release assets did, leaving a window where the
   version resolved but the artifacts `build.rs` downloads returned 404 ([#177]). The draft-publish
