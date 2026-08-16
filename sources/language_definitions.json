@@ -4,7 +4,7 @@
     "extensions": ["p", "cls", "w"],
     "generate": true,
     "repo": "https://github.com/usagi-coffee/tree-sitter-abl",
-    "rev": "70a6eaeaf16a98a8bacac821e8ff50d226817712"
+    "rev": "5844930892b2f5157d40fa422618c11c44ec98de"
   },
   "actionscript": {
     "extensions": ["as"],
@@ -207,7 +207,7 @@
     "extensions": ["cfc"],
     "generate": true,
     "repo": "https://github.com/cfmleditor/tree-sitter-cfml",
-    "rev": "396c05fa41d956f5e27869d83f155598c09d2aa0"
+    "rev": "a4e04b0f1816284c182e3ac43d2e45fef7e10610"
   },
   "chatito": {
     "abi_version": 14,
@@ -376,7 +376,7 @@
     "extensions": ["diff", "patch"],
     "generate": true,
     "repo": "https://github.com/tree-sitter-grammars/tree-sitter-diff",
-    "rev": "0400db1417a28145bec93001f1ee1411155a7363"
+    "rev": "ada384ac7bfc1307f32de474620120add29998fb"
   },
   "djot": {
     "extensions": ["dj"],
@@ -398,7 +398,7 @@
     "branch": "master",
     "extensions": [],
     "repo": "https://github.com/tree-sitter-grammars/tree-sitter-doxygen",
-    "rev": "ccd998f378c3f9345ea4eeb223f56d7b84d16687"
+    "rev": "6069b1815b139080d6c562b5ff9ae2296cbc6602"
   },
   "dtd": {
     "directory": "dtd",
@@ -442,7 +442,7 @@
     "extensions": ["el"],
     "generate": true,
     "repo": "https://github.com/Wilfred/tree-sitter-elisp",
-    "rev": "d7f9ae238b4e0e085e95b7206578f84124864f15"
+    "rev": "0f20c8237f43e694374611025944f22fa87b2336"
   },
   "elixir": {
     "extensions": ["ex", "exs"],
@@ -1014,7 +1014,7 @@
     "extensions": ["magik"],
     "generate": true,
     "repo": "https://github.com/krn-robin/tree-sitter-magik",
-    "rev": "ba2035742bc9c5a125ade5d0556db8b2e0773b98"
+    "rev": "dbd92585a8092aa7a5825c6c0964f311e0093b61"
   },
   "make": {
     "extensions": ["mk", "makefile"],
@@ -1065,7 +1065,7 @@
     "extensions": ["mlir"],
     "generate": true,
     "repo": "https://github.com/artagnon/tree-sitter-mlir",
-    "rev": "aead512ee9abb7a644bb87cddb9b168f3cc38e5b"
+    "rev": "50857672166f6ba1efceb05c4ec82877d72b4043"
   },
   "mojo": {
     "extensions": ["mojo"],
@@ -1490,7 +1490,7 @@
     "extensions": ["scala"],
     "generate": true,
     "repo": "https://github.com/tree-sitter/tree-sitter-scala",
-    "rev": "818e8d1a6bdcda9203e8096ed6413f7cf9bddbee"
+    "rev": "b4c6409ead8a80ab8de7bf0a53a35bfd1ba7a207"
   },
   "scheme": {
     "extensions": ["scm"],
@@ -1961,7 +1961,7 @@
   "cypher": {
     "extensions": ["cypher", "cql"],
     "repo": "https://github.com/taekwombo/tree-sitter-cypher",
-    "rev": "d8782e3a8908bcce9652077e57bff5753d2debc1"
+    "rev": "8f156a9ef57843a4f37650b9237de09364e5a5ff"
   },
   "cython": {
     "extensions": ["pyx", "pxd", "pxi"],
@@ -2129,7 +2129,7 @@
   "sas": {
     "extensions": ["sas"],
     "repo": "https://github.com/ix-infrastructure/tree-sitter-sas",
-    "rev": "e2969f9738947edd3f1ee2800b4cdaaf4618991c"
+    "rev": "48728be2d495cd0fba9bdd7a1a360eecaff0f918"
   },
   "scfg": {
     "extensions": ["scfg"],
@@ -2204,7 +2204,7 @@
     "extensions": ["sysml"],
     "license": "MIT",
     "repo": "https://gitlab.com/nomograph/tree-sitter-sysml",
-    "rev": "6510a20e384d7109fef49982fca404fe644f385b"
+    "rev": "e76ff5678d8e6b023d40d89bb00e38c290c463a4"
   },
   "systemtap": {
     "extensions": ["stp", "stpm"],
