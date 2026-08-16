@@ -97,7 +97,8 @@ let package = Package(
       path: "Sources/TreeSitterLanguagePack",
       exclude: ["LICENSE"]),
     .testTarget(
-      name: "TreeSitterLanguagePackTests", dependencies: ["TreeSitterLanguagePack"],
+      name: "TreeSitterLanguagePackTests",
+      dependencies: ["TreeSitterLanguagePack", .product(name: "SwiftTreeSitter", package: "swift-tree-sitter")],
       path: "Tests/TreeSitterLanguagePackTests"),
   ]
 )
