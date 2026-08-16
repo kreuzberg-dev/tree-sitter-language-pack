@@ -47,6 +47,9 @@ packages/go/include/*
 # matters — the old `packages/go/lib/` rule matched nothing and let 203 MB of
 # compiled archives get committed. ~keep
 packages/go/.lib/
+# Compiled output of `go build ./cmd/setup`, which lands beside the source it was
+# built from. Anchored so it cannot match the cmd/setup source directory. ~keep
+/packages/go/setup
 
 # Compiled object files and static archives are always build output
 *.a
