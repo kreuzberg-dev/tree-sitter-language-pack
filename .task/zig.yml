@@ -52,7 +52,7 @@ tasks:
     preconditions:
       - sh: command -v zig >/dev/null 2>&1
     cmds:
-      - zig fmt src
+      - zig fmt src test
 
   lint:check:
     desc: Check Zig code formatting

@@ -30,8 +30,12 @@ pub fn build(b: *std.Build) void {
     module.addIncludePath(.{ .cwd_relative = ffi_include });
     module.linkSystemLibrary("ts_pack_core_ffi", .{});
 
+    // Real test suite for the binding, kept out of src/ because
+    // tree_sitter_language_pack.zig and main.zig are alef-generated
+    // ("Do not edit by hand.") and would have hand-written `test` blocks
+    // stripped on the next regeneration.
     const test_module = b.createModule(.{
-        .root_source_file = b.path("src/tree_sitter_language_pack.zig"),
+        .root_source_file = b.path("test/tree_sitter_language_pack_test.zig"),
         .target = target,
         .optimize = optimize,
         .link_libc = true,
@@ -46,6 +50,7 @@ pub fn build(b: *std.Build) void {
     });
     module.addImport("tree_sitter", tree_sitter_dep.module("tree_sitter"));
     test_module.addImport("tree_sitter", tree_sitter_dep.module("tree_sitter"));
+    test_module.addImport("tree_sitter_language_pack", module);
 
     const tests = b.addTest(.{
         .root_module = test_module,
