@@ -315,16 +315,10 @@ replace = '${1}{version}'
 
 [workspace.poly]
 exclude = [
-  "**/_generated/**",
-  "**/coverage/**",
   "**/pkg/**",
-  "**/.next/**",
   "**/*.min.js",
   "docs-site/src/snippets/**",
-  "**/vendored/**",
   "**/third_party/**",
-  "**/testdata/**",
-  "**/*.diff",
   "**/*.patch",
   "**/frb_generated.rs",
   # ai-rulez-generated coding-agent plugin outputs: owned by `ai-rulez generate
@@ -351,14 +345,11 @@ exclude = [
   "e2e/**",
   "test_apps/**",
   "**/*_bridge_generated/**",
-  "crates/*-dart/**",
   "crates/*-ffi/**",
   "crates/*-jni/**",
   "crates/*-node/**",
   "crates/*-php/**",
   "crates/*-py/**",
-  "crates/*-rb/**",
-  "crates/*-rs-jni/**",
   "crates/*-ruby/**",
   "crates/*-wasm/**",
   "crates/*-ffi/include/*.h",
