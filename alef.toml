@@ -68,6 +68,7 @@ manifest = "packages/java/pom.xml"
 
 [workspace.docs.snippets.sessions.csharp]
 cwd = "packages/csharp"
+manifest = "packages/csharp/TreeSitterLanguagePack/TreeSitterLanguagePack.csproj"
 
 [workspace.docs.snippets.sessions.elixir]
 cwd = "packages/elixir"
