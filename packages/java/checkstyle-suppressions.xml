@@ -8,6 +8,13 @@
     <suppress checks="ConstantName" files=".*FFI\.java"/>
     <suppress checks="MagicNumber" files=".*FFI\.java"/>
 
+    <!-- NativeLib.java is alef-generated ("DO NOT EDIT") and emits REQUIRED_SYMBOLS
+         as a single 3,800-character array literal, well past the 200 the LineLength
+         module allows the generator. It cannot be reflowed without editing generated
+         output, which the next regen would revert, so suppress the check for that one
+         file rather than raising the global limit and losing the rule everywhere. -->
+    <suppress checks="LineLength" files=".*NativeLib\.java"/>
+
 
     <!-- Allow star imports and magic numbers in test files -->
     <suppress checks="AvoidStarImport" files=".*Test\.java"/>

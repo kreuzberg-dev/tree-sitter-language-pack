@@ -9,9 +9,14 @@
     <property name="severity" value="error"/>
     <property name="fileExtensions" value="java"/>
 
+    <!-- ${config_loc} resolves relative to THIS file, not the working directory.
+         A bare relative path silently resolved to nothing whenever checkstyle ran
+         from the repo root (how `poly lint .` invokes it), and optional="true" meant
+         every suppression below was skipped without a word. Keep optional="false" so
+         a missing suppressions file fails loudly instead of disabling the filter. -->
     <module name="SuppressionFilter">
-        <property name="file" value="checkstyle-suppressions.xml"/>
-        <property name="optional" value="true"/>
+        <property name="file" value="${config_loc}/checkstyle-suppressions.xml"/>
+        <property name="optional" value="false"/>
     </module>
 
     <module name="LineLength">

@@ -147,6 +147,17 @@
                     <compilerArgs>
                         <arg>--enable-preview</arg>
                     </compilerArgs>
+                    <!-- sourceDirectory is the project basedir (see above), so main
+                         compilation otherwise sweeps up everything beneath it. Two
+                         things must stay out: src/test/java, which surefire compiles
+                         separately and which needs the test-scoped classpath, and
+                         .alef/, whose snippet-validation scratch sessions each contain
+                         an Example.java that collide as duplicate classes. -->
+                    <excludes>
+                        <exclude>src/test/java/**</exclude>
+                        <exclude>.alef/**</exclude>
+                        <exclude>target/**</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>

@@ -1,0 +1,63 @@
+package io.xberg.treesitterlanguagepack;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
+class DataNodeTest {
+
+    private static final Span SAMPLE_SPAN = new Span(0, 4, 0, 0, 0, 4);
+
+    @Test
+    void shouldExposeAllAccessorsForKeyValueNode() {
+        DataNode node = new DataNode(DataNodeKind.KeyValue, "name", "value", null, null, SAMPLE_SPAN);
+
+        assertEquals(DataNodeKind.KeyValue, node.kind());
+        assertEquals("name", node.key());
+        assertEquals("value", node.value());
+        assertNull(node.attributes());
+        assertNull(node.children());
+        assertEquals(SAMPLE_SPAN, node.span());
+    }
+
+    @Test
+    void shouldSupportNestedElementNodeWithAttributesAndChildren() {
+        DataAttribute attribute = new DataAttribute("id", "1", SAMPLE_SPAN);
+        DataNode child = new DataNode(DataNodeKind.Sequence, "0", "item", null, null, SAMPLE_SPAN);
+        DataNode parent = new DataNode(
+            DataNodeKind.Element, "ul", null, List.of(attribute), List.of(child), SAMPLE_SPAN
+        );
+
+        assertEquals(List.of(attribute), parent.attributes());
+        assertEquals(List.of(child), parent.children());
+        assertEquals("0", parent.children().get(0).key());
+    }
+
+    @Test
+    void shouldBuildEquivalentInstanceThroughBuilder() {
+        DataNode built = DataNode.builder()
+            .withKind(DataNodeKind.KeyValue)
+            .withKey("k")
+            .withValue("v")
+            .withSpan(SAMPLE_SPAN)
+            .build();
+
+        assertEquals(new DataNode(DataNodeKind.KeyValue, "k", "v", null, null, SAMPLE_SPAN), built);
+    }
+
+    @Test
+    void shouldRoundTripThroughJsonWithRecursiveChildren() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        DataNode child = new DataNode(DataNodeKind.KeyValue, "leaf", "1", null, null, SAMPLE_SPAN);
+        DataNode root = new DataNode(DataNodeKind.Element, "root", null, null, List.of(child), SAMPLE_SPAN);
+
+        String json = mapper.writeValueAsString(root);
+        DataNode parsed = mapper.readValue(json, DataNode.class);
+
+        assertEquals(root, parsed);
+        assertEquals("leaf", parsed.children().get(0).key());
+    }
+}
