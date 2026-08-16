@@ -287,3 +287,34 @@ fn node_walk_returns_cursor_at_same_node() {
     let cursor = root.walk();
     assert_eq!(cursor.node().kind(), root.kind());
 }
+
+#[test]
+fn debug_reports_configuration_of_a_fresh_parser() {
+    let rendered = format!("{:?}", Parser::new());
+    assert_eq!(
+        rendered,
+        "Parser { language_name: None, max_source_bytes: None, timeout_ms: None, .. }"
+    );
+}
+
+#[test]
+fn debug_reports_limits_once_they_are_set() {
+    let mut parser = Parser::new();
+    parser.set_max_source_bytes(Some(4096));
+    parser.set_parse_timeout_ms(Some(250));
+    let rendered = format!("{parser:?}");
+    assert!(
+        rendered.contains("max_source_bytes: Some(4096)"),
+        "max_source_bytes missing from {rendered}"
+    );
+    assert!(
+        rendered.contains("timeout_ms: Some(250)"),
+        "timeout_ms missing from {rendered}"
+    );
+}
+
+#[test]
+fn debug_of_a_get_parser_result_is_formattable() {
+    let result = get_parser("definitely-not-a-language");
+    assert!(format!("{result:?}").starts_with("Err("));
+}

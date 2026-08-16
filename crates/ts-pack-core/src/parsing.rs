@@ -208,6 +208,20 @@ impl Default for Parser {
     }
 }
 
+// `tree_sitter::Parser` is a `NonNull` newtype with no `Debug` of its own, so
+// this cannot be derived; the pointer is elided and only the configuration a
+// caller set is reported. ~keep
+impl std::fmt::Debug for Parser {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("Parser")
+            .field("language_name", &self.language_name)
+            .field("max_source_bytes", &self.max_source_bytes)
+            .field("timeout_ms", &self.timeout_ms)
+            .finish_non_exhaustive()
+    }
+}
+
 /// A parsed syntax tree. Cheap to clone (refcount bump).
 #[derive(Clone)]
 pub struct Tree(Arc<tree_sitter::Tree>);

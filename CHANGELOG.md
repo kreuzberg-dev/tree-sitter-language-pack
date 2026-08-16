@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Parser` now implements `Debug`, reporting the configured language name and parse limits. It could
+  not be derived — the wrapped `tree_sitter::Parser` is a `NonNull` newtype with no `Debug` of its
+  own — so the pointer is elided. Debug-printing a `Parser`, or a `Result<Parser, Error>` returned by
+  `get_parser`, previously failed to compile with E0277.
+
 ## [1.15.1] - 2026-08-15
 
 **Use this release instead of 1.15.0.** The 1.15.0 GitHub release is incomplete — it carries the
