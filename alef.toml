@@ -573,6 +573,25 @@ env_shims = [
   "strcmp",
 ]
 features = ["serde", "config", "dynamic-loading"]
+# ~keep The download family is intentionally absent from the wasm target: it sits behind
+# ts-pack-core-wasm's opt-in `download` feature, which the doc-snippet and e2e sessions do
+# not enable, so `[crates.include].functions` would otherwise emit snippets importing
+# symbols the package never exports. `prefetch` is NOT excluded — it is a real free
+# function (`crates/ts-pack-core-wasm/src/lib.rs:3234`). `cache_dir` IS excluded: it exists
+# only as a `WasmPackConfig` getter (`lib.rs:1723`, js_name "cacheDir"), never as a
+# module-level export, so a snippet importing it from the package cannot resolve.
+exclude_functions = [
+  "init",
+  "configure",
+  "download",
+  "download_all",
+  "download_group",
+  "manifest_languages",
+  "manifest_groups",
+  "downloaded_languages",
+  "clean_cache",
+  "cache_dir",
+]
 # ~keep `languages` drives alef's e2e skip logic only (unsupported languages get
 # `.skip("not in WASM's static language set")`); it does NOT control what the wasm
 # build actually compiles. The real compile set is `WASM_DEFAULT_LANGUAGES` in
