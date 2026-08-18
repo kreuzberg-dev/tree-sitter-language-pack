@@ -25,6 +25,7 @@ dev = [
   "pytest>=9.0.0",
   "pyyaml>=6.0.0",
   "tomli>=2.2.1; python_version<'3.11'",
+  "tree-sitter>=0.23",
   "typing-extensions>=4.15.0",
   "uv-bump",
 ]
