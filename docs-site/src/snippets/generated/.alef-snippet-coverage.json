@@ -37,8 +37,10 @@
     "c/data_extraction/data_extraction_yaml_sequence.md",
     "c/download/download_cache_dir.md",
     "c/download/download_clean_cache.md",
+    "c/download/download_configure_custom_dir.md",
     "c/download/download_downloaded_empty.md",
     "c/download/download_empty_list.md",
+    "c/download/download_init_default.md",
     "c/download/download_invalid_language.md",
     "c/download/download_manifest_languages.md",
     "c/download/download_multiple_languages.md",
@@ -8240,6 +8242,18 @@
     },
     {
       "key": {
+        "fixture_id": "download_configure_custom_dir",
+        "language": "ffi"
+      },
+      "path": "c/download/download_configure_custom_dir.md",
+      "language": "c",
+      "target": "ffi",
+      "session": "ffi",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "download_downloaded_empty",
         "language": "ffi"
       },
@@ -8256,6 +8270,18 @@
         "language": "ffi"
       },
       "path": "c/download/download_empty_list.md",
+      "language": "c",
+      "target": "ffi",
+      "session": "ffi",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "download_init_default",
+        "language": "ffi"
+      },
+      "path": "c/download/download_init_default.md",
       "language": "c",
       "target": "ffi",
       "session": "ffi",
@@ -137206,6 +137232,10 @@
     },
     {
       "fixture_id": "download_configure_custom_dir",
+      "language": "ffi"
+    },
+    {
+      "fixture_id": "download_configure_custom_dir",
       "language": "go"
     },
     {
@@ -137367,6 +137397,10 @@
     {
       "fixture_id": "download_init_default",
       "language": "elixir"
+    },
+    {
+      "fixture_id": "download_init_default",
+      "language": "ffi"
     },
     {
       "fixture_id": "download_init_default",
@@ -164814,22 +164848,5 @@
     }
   ],
   "missing": [],
-  "documented_exceptions": [
-    {
-      "key": {
-        "fixture_id": "download_configure_custom_dir",
-        "language": "ffi"
-      },
-      "reason": "TEMPORARY LOCAL CANARY UNBLOCK — NOT FOR COMMIT. alef 73ed70c32c51 refuses this C snippet because the returns_void path in c/test_function.rs passes an empty handle map and cannot construct the PackConfig AlefHandle. alef declares the gap as its own.",
-      "reference": "docs-site/src/content/docs/guides/building.md"
-    },
-    {
-      "key": {
-        "fixture_id": "download_init_default",
-        "language": "ffi"
-      },
-      "reason": "TEMPORARY LOCAL CANARY UNBLOCK — NOT FOR COMMIT. alef 73ed70c32c51 refuses this C snippet because the returns_void path in c/test_function.rs passes an empty handle map and cannot construct the PackConfig AlefHandle. alef declares the gap as its own.",
-      "reference": "docs-site/src/content/docs/guides/building.md"
-    }
-  ]
+  "documented_exceptions": []
 }
