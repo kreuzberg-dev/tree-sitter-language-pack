@@ -37,8 +37,11 @@ Future<String?> detectLanguageFromPath({required String path}) =>
 /// The `-S` flag accepted by some `env` implementations is skipped automatically.
 /// Version suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.
 ///
-/// Returns `null` when content does not start with `#!`, the shebang is
-/// malformed, or the interpreter is not recognised.
+/// A leading UTF-8 BOM (`U+FEFF`) is skipped before the `#!` check, so a
+/// BOM-prefixed script is still detected by its shebang.
+///
+/// Returns `null` when content does not start with `#!` (after stripping a
+/// leading BOM), the shebang is malformed, or the interpreter is not recognised.
 Future<String?> detectLanguageFromContent({required String content}) =>
     RustLib.instance.api.crateDetectLanguageFromContent(content: content);
 
@@ -173,6 +176,13 @@ Future<void> init({required PackConfig config}) =>
 /// after languages have been registered has no effect on already-loaded
 /// languages.
 ///
+/// `PackConfig.cache_dir` is a BASE directory, not the final libs path: this
+/// crate appends `tree-sitter-language-pack/v{version}/libs` to it, the same
+/// suffix applied to the platform default cache directory. In the example below,
+/// files actually land under `/tmp/my-parsers/tree-sitter-language-pack/v{version}/libs/`,
+/// never directly in `/tmp/my-parsers/`. Call `cache_dir` to read back the
+/// resolved, fully-suffixed path.
+///
 /// **Errors:**
 ///
 /// Returns an error if the lock cannot be acquired.
@@ -181,8 +191,11 @@ Future<void> configure({required PackConfig config}) =>
 
 /// Download specific languages to the local cache.
 ///
-/// Returns the number of requested languages available after the call. Already
+/// Returns the number of distinct languages available after the call. Already
 /// compiled or cached languages are included in the count.
+///
+/// Aliases are resolved before counting, so `["shell", "bash"]` names one
+/// language and returns 1.
 ///
 /// **Errors:**
 ///
@@ -231,7 +244,7 @@ Future<PlatformInt64> downloadAll() => RustLib.instance.api.crateDownloadAll();
 /// defines. The published manifest currently defines a single group, `"all"`;
 /// earlier revisions of this documentation advertised `"web"`, `"data"`, and
 /// `"systems"`, which the manifest has never contained, so every call following
-/// that example failed. Do not hardcode a group name without checking. ~keep
+/// that example failed. Do not hardcode a group name without checking.
 ///
 /// Returns the total number of languages now available (statically compiled
 /// plus downloaded and cached).
@@ -261,7 +274,7 @@ Future<List<String>> manifestLanguages() =>
 /// Group names are manifest data, not a compile-time constant of this library, so
 /// this is the only reliable way to learn what `download_group` and
 /// `PackConfig.groups` accept. The published manifest currently defines just
-/// `"all"`. ~keep
+/// `"all"`.
 ///
 /// **Errors:**
 ///
@@ -288,12 +301,19 @@ Future<void> cleanCache() => RustLib.instance.api.crateCleanCache();
 
 /// Return the effective cache directory path.
 ///
-/// This is either the custom path set via `configure` / `init` or the
-/// default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
+/// This is `{base}/tree-sitter-language-pack/v{version}/libs/`, where `{base}` is
+/// either the custom BASE directory set via `configure` / `init`
+/// (`PackConfig.cache_dir`) or the platform default cache directory — both are
+/// suffixed identically, so a custom `cache_dir` is never used as the final libs
+/// path. The default resolves to `~/.cache/tree-sitter-language-pack/v{version}/libs/`
+/// on a typical Unix system.
 ///
 /// **Errors:**
 ///
-/// Returns an error if the system cache directory cannot be determined.
+/// Returns an error if no cache directory can be resolved: `version` is somehow
+/// invalid, or (with no custom `cache_dir` configured) the platform reports none
+/// and `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR` is unset. This crate no longer falls
+/// back to the temporary directory for the latter case — see #101 H2.
 Future<String> cacheDir() => RustLib.instance.api.crateCacheDir();
 
 Future<DataAttribute> createDataAttributeFromJson({required String json}) =>
@@ -373,6 +393,9 @@ abstract class Language implements RustOpaqueInterface {}
 abstract class LanguageRegistry implements RustOpaqueInterface {
   Future<List<String>> availableLanguages();
 
+  static Future<LanguageRegistry> default_() =>
+      RustLib.instance.api.crateLanguageRegistryDefault();
+
   Future<Language> getLanguage({required String name});
 
   Future<bool> hasLanguage({required String name});
@@ -436,6 +459,8 @@ abstract class Node implements RustOpaqueInterface {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Parser>>
 abstract class Parser implements RustOpaqueInterface {
+  static Future<Parser> default_() => RustLib.instance.api.crateParserDefault();
+
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
   static Future<Parser> newInstance() => RustLib.instance.api.crateParserNew();
 
@@ -518,6 +543,10 @@ class ChunkContext {
   final List<CommentInfo> comments;
 
   /// Docstrings contained within this chunk.
+  ///
+  /// Populated only for Python — the same language for which
+  /// [`ProcessResult::docstrings`] is populated, and by the same
+  /// classifier. Always empty for every other language.
   final List<DocstringInfo> docstrings;
 
   /// Whether this chunk contains any tree-sitter error nodes.
@@ -577,7 +606,11 @@ class CodeChunk {
   /// Zero-indexed start line of this chunk.
   final PlatformInt64 startLine;
 
-  /// Zero-indexed end line of this chunk.
+  /// Zero-indexed row of the last byte actually included in this chunk
+  /// (inclusive — the same row a `Span::end_line` would report for a node
+  /// ending on that byte). Computed the same way regardless of whether the
+  /// source has a trailing newline: it is always the row of `end_byte - 1`,
+  /// never a phantom row past the file's real content.
   final PlatformInt64 endLine;
 
   /// Contextual metadata about this chunk.
@@ -915,6 +948,13 @@ class DocstringInfo {
   final String? associatedItem;
 
   /// Parsed sections of the docstring (Args, Returns, Raises, etc.).
+  ///
+  /// **Reserved: not yet populated.** Always empty, for every
+  /// [`DocstringFormat`]. Parsing a docstring body into sections requires
+  /// implementing each convention's own layout (Google/NumPy/reST style
+  /// for Python, `@param`/`@returns` for JSDoc/Javadoc, and so on), which
+  /// no extractor here does yet. The field is kept rather than removed so
+  /// a consumer's deserializer does not need updating once it is.
   final List<DocSection> parsedSections;
 
   const DocstringInfo({
@@ -1115,12 +1155,38 @@ class ImportInfo {
   final String source;
 
   /// Specific names imported from the source module.
+  ///
+  /// For `import a, b` / `from m import a, b`, every entry's base name
+  /// (never the alias). For a JavaScript/TypeScript named-imports clause
+  /// (`import { a, b as c } from 'm'`), every specifier's original name.
+  ///
+  /// Populated for Python and JavaScript/TypeScript only. Always empty for
+  /// every other language this crate recognises import statements for —
+  /// Rust, Go, Java, Kotlin, and Elixir (`import`/`alias`/`require`/`use`)
+  /// — and for a JS/TS namespace import (`import * as ns`) or default
+  /// import (`import x from 'm'`), neither of which names individual items.
   final List<String> items;
 
   /// Alias assigned to the import (e.g., `import numpy as np`).
+  ///
+  /// Populated for Python's single-name form (`import numpy as np`,
+  /// `from m import a as b`) and JavaScript/TypeScript's namespace form
+  /// (`import * as ns from 'm'`) or a named-imports clause naming exactly
+  /// one specifier (`import { a as b } from 'm'`). `None` for Rust, Go,
+  /// Java, Kotlin, and Elixir (which has its own `as:` alias option on
+  /// `alias` directives, not yet extracted here) — and for a Python
+  /// statement that aliases several names at once (`import os, sys as s`),
+  /// where there is no single alias to report for the statement as a
+  /// whole, so only `items` is populated for it.
   final String? alias;
 
   /// Whether this is a wildcard import (e.g., `import *` or `use foo::*`).
+  ///
+  /// Detected from the syntax tree — a dedicated wildcard node
+  /// (`wildcard_import` in Python, `use_wildcard` in Rust) or a bare `*`
+  /// token outside of string-literal content — not by searching the
+  /// import's source text for a `*` character, so a glob in an import path
+  /// string (`import a from './glob*.js'`) is not mistaken for one.
   final bool isWildcard;
 
   /// Source span covering the import statement.
@@ -1172,9 +1238,20 @@ class ImportInfo {
 /// };
 /// ```
 class PackConfig {
-  /// Override default cache directory.
+  /// Override the BASE directory the parser cache lives under.
   ///
-  /// Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
+  /// This is a base, not the final library path: the crate appends
+  /// `tree-sitter-language-pack/v{version}/libs` to it, exactly as it does to the
+  /// platform default. So `cache_dir = "/tmp/my-parsers"` resolves to
+  /// `/tmp/my-parsers/tree-sitter-language-pack/v{version}/libs/`.
+  ///
+  /// The suffix is not cosmetic. It keeps the whole cache tree — manifest, bundles
+  /// and lock file included — inside a directory this crate owns and versions.
+  /// Earlier releases used this path verbatim, which put those files in the
+  /// configured directory's PARENT and let a cache built by one crate version be
+  /// reused by another.
+  ///
+  /// Default base: the platform cache dir, e.g. `~/.cache` on Linux.
   final String? cacheDir;
 
   /// Languages to pre-download on init.
@@ -1187,7 +1264,7 @@ class PackConfig {
   /// Group names come from the remote manifest, so the valid set is not fixed
   /// by this crate; the published manifest currently defines only `"all"`.
   /// Call [`manifest_groups`](crate::manifest_groups) to enumerate them.
-  /// An unknown name makes [`init`](crate::init) fail. ~keep
+  /// An unknown name makes [`init`](crate::init) fail.
   final List<String>? groups;
 
   const PackConfig({this.cacheDir, this.languages, this.groups});
@@ -1223,7 +1300,7 @@ class Point {
   /// (characters) from this field is silently wrong on every row containing a
   /// non-ASCII byte, and must re-measure the row against the source text
   /// instead. Earlier releases documented this field as UTF-16 code units;
-  /// that was never what the value contained. ~keep
+  /// that was never what the value contained.
   final PlatformInt64 column;
 
   const Point({required this.row, required this.column});
@@ -1288,7 +1365,7 @@ class ProcessConfig {
   /// `Some(0)` is rejected by [`ProcessConfig::validate`] with
   /// [`Error::InvalidRange`](crate::Error::InvalidRange). A zero-sized chunk
   /// limit previously produced an empty chunk list and silently discarded the
-  /// whole source; use `None` to mean "do not chunk". ~keep
+  /// whole source; use `None` to mean "do not chunk".
   final PlatformInt64? chunkMaxSize;
 
   /// Extract hierarchical key/value data tree from data-format files. Default: false.
@@ -1318,7 +1395,7 @@ class ProcessConfig {
   /// unbounded parse of attacker-supplied input is a denial-of-service vector.
   /// The default stays unbounded for backward compatibility; services handling
   /// untrusted input should opt in, e.g. with
-  /// [`RECOMMENDED_MAX_SOURCE_BYTES`]. ~keep
+  /// [`RECOMMENDED_MAX_SOURCE_BYTES`].
   ///
   /// Exceeding the limit fails the call with
   /// [`Error::InvalidRange`](crate::Error::InvalidRange) — the source is never
@@ -1331,7 +1408,7 @@ class ProcessConfig {
   /// Enforced through tree-sitter's parse progress callback, which the parser
   /// invokes periodically; cancellation is therefore granular to that callback
   /// interval rather than exact. A parse that exceeds the budget fails with
-  /// [`Error::ParseFailed`](crate::Error::ParseFailed). ~keep
+  /// [`Error::ParseTimeout`](crate::Error::ParseTimeout).
   final PlatformInt64? parseTimeoutMs;
 
   const ProcessConfig({
@@ -1502,14 +1579,14 @@ class Span {
   final PlatformInt64 startLine;
 
   /// Zero-indexed column of the span's start, counted in **bytes** from the
-  /// start of the line — not characters, not UTF-16 code units. ~keep
+  /// start of the line — not characters, not UTF-16 code units.
   final PlatformInt64 startColumn;
 
   /// Zero-indexed line number of the span's end.
   final PlatformInt64 endLine;
 
   /// Zero-indexed column of the span's end, counted in **bytes** from the
-  /// start of the line — not characters, not UTF-16 code units. ~keep
+  /// start of the line — not characters, not UTF-16 code units.
   final PlatformInt64 endColumn;
 
   const Span({
@@ -1561,12 +1638,39 @@ class StructureItem {
   final List<StructureItem> children;
 
   /// Decorator or attribute names applied to the item.
+  ///
+  /// **Reserved: not yet populated.** Always empty, for every language.
+  /// Recognising a decorator requires per-language grammar knowledge (a
+  /// Python `decorated_definition` wrapper, Java/C# annotations, Rust
+  /// attributes each have a different shape), which no extractor here
+  /// implements yet. The field is kept rather than removed so a consumer's
+  /// deserializer does not need updating once it is.
   final List<String> decorators;
 
   /// Documentation comment attached to the item, if any.
+  ///
+  /// The text of the comment (or run of comments) immediately preceding
+  /// the item, with no blank line in between, when that comment is
+  /// classified as a doc comment. Multiple adjacent single-line doc
+  /// comments (Rust `///`) are joined with `\n` in source order.
+  ///
+  /// Populated for Rust (`///`/`//!`), Java (`/** */`), and JavaScript/
+  /// TypeScript (`/** */`). `None` for every other language, and for a
+  /// preceding comment that is not in doc-comment form (a plain `#`
+  /// comment in Python, Ruby, or Elixir) — Python's docstring convention is
+  /// captured separately, as [`DocstringInfo`], not through this field.
   final String? docComment;
 
   /// Full signature text of the item (e.g., function parameters and return type).
+  ///
+  /// The item's own source text from its start up to the start of its body
+  /// (see [`StructureItem::body_span`]), trimmed of trailing whitespace —
+  /// for example `fn add(a: i32, b: i32) -> i32` for a Rust function whose
+  /// body is `{ a + b }`. `None` only when that text is empty, which does
+  /// not happen for any item [`StructureKind`] currently reports. Populated
+  /// for every language and kind this crate extracts structure for, since
+  /// it is derived from `body_span`'s boundary rather than per-language
+  /// syntax.
   final String? signature;
 
   /// Source span covering only the body of the item, if distinct from the declaration.
@@ -1665,7 +1769,16 @@ class SymbolInfo {
   /// Explicit type annotation, if present in the source.
   final String? typeAnnotation;
 
-  /// Documentation comment associated with this symbol.
+  /// Documentation comment immediately preceding this symbol, resolved by
+  /// the same walk [`StructureItem::doc_comment`] uses (see
+  /// `doc_comment_at`) — never hard-coded `None`.
+  ///
+  /// Populated for Rust (`///`/`//!`), Java (`/** */`), and JavaScript/
+  /// TypeScript (`/** */`) — the languages whose comment classification
+  /// recognizes a doc-kind comment. `None` for every other language (e.g.
+  /// Python, Go, Ruby, which have no doc-kind comment classification), and
+  /// also `None` when a symbol in a supported language simply has no doc
+  /// comment immediately above it.
   final String? doc;
 
   const SymbolInfo({

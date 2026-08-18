@@ -3341,6 +3341,7 @@ dependencies = [
  "serde_json",
  "tokio",
  "tracing",
+ "tree-sitter",
  "tree-sitter-language-pack",
 ]
 
@@ -3384,6 +3385,7 @@ version = "1.15.1"
 dependencies = [
  "ahash",
  "cbindgen",
+ "serde",
  "serde_json",
  "tempfile",
  "tokio",

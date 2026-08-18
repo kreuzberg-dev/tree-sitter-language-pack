@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 88726794;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 591765349;
 
 // Section: executor
 
@@ -238,6 +238,33 @@ fn wire__crate__LanguageRegistry_available_languages_impl(
                     let api_that_guard = api_that_guard.unwrap();
                     let output_ok =
                         Result::<_, ()>::Ok(crate::LanguageRegistry::available_languages(&*api_that_guard))?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__LanguageRegistry_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LanguageRegistry_default",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Result::<_, ()>::Ok(crate::LanguageRegistry::default())?;
                     Ok(output_ok)
                 })())
             }
@@ -1305,6 +1332,33 @@ fn wire__crate__Node_walk_impl(
                     }
                     let api_that_guard = api_that_guard.unwrap();
                     let output_ok = Result::<_, ()>::Ok(crate::Node::walk(&*api_that_guard))?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__Parser_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "Parser_default",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Result::<_, ()>::Ok(crate::Parser::default())?;
                     Ok(output_ok)
                 })())
             }
@@ -4470,103 +4524,105 @@ fn pde_ffi_dispatcher_primary_impl(
         3 => wire__crate__DownloadManager_installed_languages_impl(port, ptr, rust_vec_len, data_len),
         4 => wire__crate__DownloadManager_new_impl(port, ptr, rust_vec_len, data_len),
         5 => wire__crate__LanguageRegistry_available_languages_impl(port, ptr, rust_vec_len, data_len),
-        6 => wire__crate__LanguageRegistry_get_language_impl(port, ptr, rust_vec_len, data_len),
-        7 => wire__crate__LanguageRegistry_has_language_impl(port, ptr, rust_vec_len, data_len),
-        8 => wire__crate__LanguageRegistry_has_parser_impl(port, ptr, rust_vec_len, data_len),
-        9 => wire__crate__LanguageRegistry_language_count_impl(port, ptr, rust_vec_len, data_len),
-        10 => wire__crate__LanguageRegistry_new_impl(port, ptr, rust_vec_len, data_len),
-        11 => wire__crate__LanguageRegistry_process_impl(port, ptr, rust_vec_len, data_len),
-        12 => wire__crate__Node_byte_range_impl(port, ptr, rust_vec_len, data_len),
-        13 => wire__crate__Node_child_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__Node_child_by_field_name_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__Node_child_count_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire__crate__Node_end_byte_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire__crate__Node_end_position_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__Node_has_error_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__Node_is_error_impl(port, ptr, rust_vec_len, data_len),
-        20 => wire__crate__Node_is_extra_impl(port, ptr, rust_vec_len, data_len),
-        21 => wire__crate__Node_is_missing_impl(port, ptr, rust_vec_len, data_len),
-        22 => wire__crate__Node_is_named_impl(port, ptr, rust_vec_len, data_len),
-        23 => wire__crate__Node_kind_impl(port, ptr, rust_vec_len, data_len),
-        24 => wire__crate__Node_kind_id_impl(port, ptr, rust_vec_len, data_len),
-        25 => wire__crate__Node_named_child_impl(port, ptr, rust_vec_len, data_len),
-        26 => wire__crate__Node_named_child_count_impl(port, ptr, rust_vec_len, data_len),
-        27 => wire__crate__Node_parent_impl(port, ptr, rust_vec_len, data_len),
-        28 => wire__crate__Node_start_byte_impl(port, ptr, rust_vec_len, data_len),
-        29 => wire__crate__Node_start_position_impl(port, ptr, rust_vec_len, data_len),
-        30 => wire__crate__Node_to_sexp_impl(port, ptr, rust_vec_len, data_len),
-        31 => wire__crate__Node_walk_impl(port, ptr, rust_vec_len, data_len),
-        32 => wire__crate__Parser_new_impl(port, ptr, rust_vec_len, data_len),
-        33 => wire__crate__Parser_parse_impl(port, ptr, rust_vec_len, data_len),
-        34 => wire__crate__Parser_parse_bytes_impl(port, ptr, rust_vec_len, data_len),
-        35 => wire__crate__Parser_reset_impl(port, ptr, rust_vec_len, data_len),
-        36 => wire__crate__Parser_set_language_impl(port, ptr, rust_vec_len, data_len),
-        37 => wire__crate__Parser_set_max_source_bytes_impl(port, ptr, rust_vec_len, data_len),
-        38 => wire__crate__Parser_set_parse_timeout_ms_impl(port, ptr, rust_vec_len, data_len),
-        39 => wire__crate__TreeCursor_field_name_impl(port, ptr, rust_vec_len, data_len),
-        40 => wire__crate__TreeCursor_goto_first_child_impl(port, ptr, rust_vec_len, data_len),
-        41 => wire__crate__TreeCursor_goto_next_sibling_impl(port, ptr, rust_vec_len, data_len),
-        42 => wire__crate__TreeCursor_goto_parent_impl(port, ptr, rust_vec_len, data_len),
-        43 => wire__crate__TreeCursor_node_impl(port, ptr, rust_vec_len, data_len),
-        44 => wire__crate__Tree_root_node_impl(port, ptr, rust_vec_len, data_len),
-        45 => wire__crate__Tree_walk_impl(port, ptr, rust_vec_len, data_len),
-        46 => wire__crate__available_languages_impl(port, ptr, rust_vec_len, data_len),
+        6 => wire__crate__LanguageRegistry_default_impl(port, ptr, rust_vec_len, data_len),
+        7 => wire__crate__LanguageRegistry_get_language_impl(port, ptr, rust_vec_len, data_len),
+        8 => wire__crate__LanguageRegistry_has_language_impl(port, ptr, rust_vec_len, data_len),
+        9 => wire__crate__LanguageRegistry_has_parser_impl(port, ptr, rust_vec_len, data_len),
+        10 => wire__crate__LanguageRegistry_language_count_impl(port, ptr, rust_vec_len, data_len),
+        11 => wire__crate__LanguageRegistry_new_impl(port, ptr, rust_vec_len, data_len),
+        12 => wire__crate__LanguageRegistry_process_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire__crate__Node_byte_range_impl(port, ptr, rust_vec_len, data_len),
+        14 => wire__crate__Node_child_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__Node_child_by_field_name_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__Node_child_count_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__Node_end_byte_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__Node_end_position_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__Node_has_error_impl(port, ptr, rust_vec_len, data_len),
+        20 => wire__crate__Node_is_error_impl(port, ptr, rust_vec_len, data_len),
+        21 => wire__crate__Node_is_extra_impl(port, ptr, rust_vec_len, data_len),
+        22 => wire__crate__Node_is_missing_impl(port, ptr, rust_vec_len, data_len),
+        23 => wire__crate__Node_is_named_impl(port, ptr, rust_vec_len, data_len),
+        24 => wire__crate__Node_kind_impl(port, ptr, rust_vec_len, data_len),
+        25 => wire__crate__Node_kind_id_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__crate__Node_named_child_impl(port, ptr, rust_vec_len, data_len),
+        27 => wire__crate__Node_named_child_count_impl(port, ptr, rust_vec_len, data_len),
+        28 => wire__crate__Node_parent_impl(port, ptr, rust_vec_len, data_len),
+        29 => wire__crate__Node_start_byte_impl(port, ptr, rust_vec_len, data_len),
+        30 => wire__crate__Node_start_position_impl(port, ptr, rust_vec_len, data_len),
+        31 => wire__crate__Node_to_sexp_impl(port, ptr, rust_vec_len, data_len),
+        32 => wire__crate__Node_walk_impl(port, ptr, rust_vec_len, data_len),
+        33 => wire__crate__Parser_default_impl(port, ptr, rust_vec_len, data_len),
+        34 => wire__crate__Parser_new_impl(port, ptr, rust_vec_len, data_len),
+        35 => wire__crate__Parser_parse_impl(port, ptr, rust_vec_len, data_len),
+        36 => wire__crate__Parser_parse_bytes_impl(port, ptr, rust_vec_len, data_len),
+        37 => wire__crate__Parser_reset_impl(port, ptr, rust_vec_len, data_len),
+        38 => wire__crate__Parser_set_language_impl(port, ptr, rust_vec_len, data_len),
+        39 => wire__crate__Parser_set_max_source_bytes_impl(port, ptr, rust_vec_len, data_len),
+        40 => wire__crate__Parser_set_parse_timeout_ms_impl(port, ptr, rust_vec_len, data_len),
+        41 => wire__crate__TreeCursor_field_name_impl(port, ptr, rust_vec_len, data_len),
+        42 => wire__crate__TreeCursor_goto_first_child_impl(port, ptr, rust_vec_len, data_len),
+        43 => wire__crate__TreeCursor_goto_next_sibling_impl(port, ptr, rust_vec_len, data_len),
+        44 => wire__crate__TreeCursor_goto_parent_impl(port, ptr, rust_vec_len, data_len),
+        45 => wire__crate__TreeCursor_node_impl(port, ptr, rust_vec_len, data_len),
+        46 => wire__crate__Tree_root_node_impl(port, ptr, rust_vec_len, data_len),
+        47 => wire__crate__Tree_walk_impl(port, ptr, rust_vec_len, data_len),
+        48 => wire__crate__available_languages_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "download")]
-        47 => wire__crate__cache_dir_impl(port, ptr, rust_vec_len, data_len),
+        49 => wire__crate__cache_dir_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "download")]
-        48 => wire__crate__clean_cache_impl(port, ptr, rust_vec_len, data_len),
+        50 => wire__crate__clean_cache_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "download")]
-        49 => wire__crate__configure_impl(port, ptr, rust_vec_len, data_len),
-        50 => wire__crate__create_byte_range_from_json_impl(port, ptr, rust_vec_len, data_len),
-        51 => wire__crate__create_chunk_context_from_json_impl(port, ptr, rust_vec_len, data_len),
-        52 => wire__crate__create_code_chunk_from_json_impl(port, ptr, rust_vec_len, data_len),
-        53 => wire__crate__create_comment_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        54 => wire__crate__create_data_attribute_from_json_impl(port, ptr, rust_vec_len, data_len),
-        55 => wire__crate__create_data_node_from_json_impl(port, ptr, rust_vec_len, data_len),
-        56 => wire__crate__create_diagnostic_from_json_impl(port, ptr, rust_vec_len, data_len),
-        57 => wire__crate__create_doc_section_from_json_impl(port, ptr, rust_vec_len, data_len),
-        58 => wire__crate__create_docstring_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        59 => wire__crate__create_export_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        60 => wire__crate__create_file_metrics_from_json_impl(port, ptr, rust_vec_len, data_len),
-        61 => wire__crate__create_import_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        62 => wire__crate__create_pack_config_from_json_impl(port, ptr, rust_vec_len, data_len),
-        63 => wire__crate__create_point_from_json_impl(port, ptr, rust_vec_len, data_len),
-        64 => wire__crate__create_process_config_from_json_impl(port, ptr, rust_vec_len, data_len),
-        65 => wire__crate__create_process_result_from_json_impl(port, ptr, rust_vec_len, data_len),
-        66 => wire__crate__create_span_from_json_impl(port, ptr, rust_vec_len, data_len),
-        67 => wire__crate__create_structure_item_from_json_impl(port, ptr, rust_vec_len, data_len),
-        68 => wire__crate__create_symbol_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        69 => wire__crate__detect_language_impl(port, ptr, rust_vec_len, data_len),
-        70 => wire__crate__detect_language_from_content_impl(port, ptr, rust_vec_len, data_len),
-        71 => wire__crate__detect_language_from_extension_impl(port, ptr, rust_vec_len, data_len),
-        72 => wire__crate__detect_language_from_path_impl(port, ptr, rust_vec_len, data_len),
+        51 => wire__crate__configure_impl(port, ptr, rust_vec_len, data_len),
+        52 => wire__crate__create_byte_range_from_json_impl(port, ptr, rust_vec_len, data_len),
+        53 => wire__crate__create_chunk_context_from_json_impl(port, ptr, rust_vec_len, data_len),
+        54 => wire__crate__create_code_chunk_from_json_impl(port, ptr, rust_vec_len, data_len),
+        55 => wire__crate__create_comment_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        56 => wire__crate__create_data_attribute_from_json_impl(port, ptr, rust_vec_len, data_len),
+        57 => wire__crate__create_data_node_from_json_impl(port, ptr, rust_vec_len, data_len),
+        58 => wire__crate__create_diagnostic_from_json_impl(port, ptr, rust_vec_len, data_len),
+        59 => wire__crate__create_doc_section_from_json_impl(port, ptr, rust_vec_len, data_len),
+        60 => wire__crate__create_docstring_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        61 => wire__crate__create_export_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        62 => wire__crate__create_file_metrics_from_json_impl(port, ptr, rust_vec_len, data_len),
+        63 => wire__crate__create_import_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        64 => wire__crate__create_pack_config_from_json_impl(port, ptr, rust_vec_len, data_len),
+        65 => wire__crate__create_point_from_json_impl(port, ptr, rust_vec_len, data_len),
+        66 => wire__crate__create_process_config_from_json_impl(port, ptr, rust_vec_len, data_len),
+        67 => wire__crate__create_process_result_from_json_impl(port, ptr, rust_vec_len, data_len),
+        68 => wire__crate__create_span_from_json_impl(port, ptr, rust_vec_len, data_len),
+        69 => wire__crate__create_structure_item_from_json_impl(port, ptr, rust_vec_len, data_len),
+        70 => wire__crate__create_symbol_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        71 => wire__crate__detect_language_impl(port, ptr, rust_vec_len, data_len),
+        72 => wire__crate__detect_language_from_content_impl(port, ptr, rust_vec_len, data_len),
+        73 => wire__crate__detect_language_from_extension_impl(port, ptr, rust_vec_len, data_len),
+        74 => wire__crate__detect_language_from_path_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "download")]
-        73 => wire__crate__download_impl(port, ptr, rust_vec_len, data_len),
+        75 => wire__crate__download_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "download")]
-        74 => wire__crate__download_all_impl(port, ptr, rust_vec_len, data_len),
+        76 => wire__crate__download_all_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "download")]
-        75 => wire__crate__download_group_impl(port, ptr, rust_vec_len, data_len),
+        77 => wire__crate__download_group_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "download")]
-        76 => wire__crate__downloaded_languages_impl(port, ptr, rust_vec_len, data_len),
-        77 => wire__crate__get_folds_query_impl(port, ptr, rust_vec_len, data_len),
-        78 => wire__crate__get_highlights_query_impl(port, ptr, rust_vec_len, data_len),
-        79 => wire__crate__get_indents_query_impl(port, ptr, rust_vec_len, data_len),
-        80 => wire__crate__get_injections_query_impl(port, ptr, rust_vec_len, data_len),
-        81 => wire__crate__get_language_impl(port, ptr, rust_vec_len, data_len),
-        82 => wire__crate__get_locals_query_impl(port, ptr, rust_vec_len, data_len),
-        83 => wire__crate__get_parser_impl(port, ptr, rust_vec_len, data_len),
-        84 => wire__crate__get_tags_query_impl(port, ptr, rust_vec_len, data_len),
-        85 => wire__crate__has_language_impl(port, ptr, rust_vec_len, data_len),
+        78 => wire__crate__downloaded_languages_impl(port, ptr, rust_vec_len, data_len),
+        79 => wire__crate__get_folds_query_impl(port, ptr, rust_vec_len, data_len),
+        80 => wire__crate__get_highlights_query_impl(port, ptr, rust_vec_len, data_len),
+        81 => wire__crate__get_indents_query_impl(port, ptr, rust_vec_len, data_len),
+        82 => wire__crate__get_injections_query_impl(port, ptr, rust_vec_len, data_len),
+        83 => wire__crate__get_language_impl(port, ptr, rust_vec_len, data_len),
+        84 => wire__crate__get_locals_query_impl(port, ptr, rust_vec_len, data_len),
+        85 => wire__crate__get_parser_impl(port, ptr, rust_vec_len, data_len),
+        86 => wire__crate__get_tags_query_impl(port, ptr, rust_vec_len, data_len),
+        87 => wire__crate__has_language_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "download")]
-        86 => wire__crate__init_impl(port, ptr, rust_vec_len, data_len),
-        87 => wire__crate__language_count_impl(port, ptr, rust_vec_len, data_len),
+        88 => wire__crate__init_impl(port, ptr, rust_vec_len, data_len),
+        89 => wire__crate__language_count_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "download")]
-        88 => wire__crate__manifest_groups_impl(port, ptr, rust_vec_len, data_len),
+        90 => wire__crate__manifest_groups_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "download")]
-        89 => wire__crate__manifest_languages_impl(port, ptr, rust_vec_len, data_len),
+        91 => wire__crate__manifest_languages_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(any(feature = "download", not(feature = "download")))]
-        90 => wire__crate__prefetch_impl(port, ptr, rust_vec_len, data_len),
-        91 => wire__crate__process_impl(port, ptr, rust_vec_len, data_len),
+        92 => wire__crate__prefetch_impl(port, ptr, rust_vec_len, data_len),
+        93 => wire__crate__process_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }

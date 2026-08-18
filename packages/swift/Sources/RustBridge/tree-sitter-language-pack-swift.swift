@@ -232,12 +232,6 @@ public func cleanCache() throws -> () {
 public func cacheDir() throws -> RustString {
     try { let val = __swift_bridge__$cache_dir(); if val.is_ok { return RustString(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
-public func packConfigFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> PackConfig {
-    try { let val = __swift_bridge__$pack_config_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return PackConfig(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
-}
-public func processConfigFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> ProcessConfig {
-    try { let val = __swift_bridge__$process_config_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return ProcessConfig(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
-}
 public func dataAttributeFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> DataAttribute {
     try { let val = __swift_bridge__$data_attribute_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return DataAttribute(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
@@ -283,11 +277,17 @@ public func codeChunkFromJson<GenericIntoRustString: IntoRustString>(_ json: Gen
 public func chunkContextFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> ChunkContext {
     try { let val = __swift_bridge__$chunk_context_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return ChunkContext(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
+public func packConfigFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> PackConfig {
+    try { let val = __swift_bridge__$pack_config_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return PackConfig(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
 public func pointFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> Point {
     try { let val = __swift_bridge__$point_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return Point(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
 public func byteRangeFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> ByteRange {
     try { let val = __swift_bridge__$byte_range_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return ByteRange(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func processConfigFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> ProcessConfig {
+    try { let val = __swift_bridge__$process_config_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return ProcessConfig(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
 public func dataNodeKindFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> DataNodeKind {
     try { let val = __swift_bridge__$data_node_kind_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return DataNodeKind(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
