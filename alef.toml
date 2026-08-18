@@ -238,6 +238,32 @@ path = "test_apps/zig/build.zig.zon"
 search = "download/v[0-9.]+/tree-sitter-language-pack-zig-v[0-9.]+"
 replace = "download/v{version}/tree-sitter-language-pack-zig-v{version}"
 
+# The four rules below cover generated files that carry the version but that no
+# other sync rule reached, so a release applied by hand -- rather than by a full
+# regenerate -- left them two releases stale at 1.14.3. alef emits the right
+# version on `generate`; these rules make the hand-bump path agree with it. ~keep
+
+[[workspace.sync.text_replacements]]
+path = "crates/ts-pack-core-php/src/lib.rs"
+search = '(ModuleBuilder::new\("tree_sitter_language_pack", ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "packages/python/tree_sitter_language_pack/__init__.py"
+# (?m) is required: the version sits in the module docstring, not on line 1. ~keep
+search = '(?m)^Version: [0-9][^\s]*'
+replace = 'Version: {version}'
+
+[[workspace.sync.text_replacements]]
+path = "packages/swift/README.md"
+search = '(exact: ")[^"]*'
+replace = '${1}{version}'
+
+[[workspace.sync.text_replacements]]
+path = "packages/zig/README.md"
+search = '(Fetch the `)[0-9][^`]*'
+replace = '${1}{version}'
+
 [[workspace.sync.text_replacements]]
 path = "alef.toml"
 search = '(\[crates\.e2e\.registry\.packages\.rust\]\s+name = "tree-sitter-language-pack"\s+version = ")[^"]*'
