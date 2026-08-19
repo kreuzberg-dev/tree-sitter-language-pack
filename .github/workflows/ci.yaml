@@ -142,11 +142,13 @@ jobs:
       setup-ruby: true
       setup-dart: true
       setup-elixir: true
-      # `check-fixture-snippets` and `alef-version` are declared only on xberg-io/actions
-      # main (821d566), which is NOT reachable from the `v1` tag this job pins. Passing an
-      # input the callee does not declare fails the whole workflow at parse time, so ci.yaml
-      # would run zero jobs. Restore both lines once ../actions is pushed and `v1` is
-      # re-pointed at a commit that declares them. ~keep
+      # Snippet validation is the only gate that catches generated examples which no longer
+      # compile against the API they document -- the class of defect that shipped a release
+      # whose every e2e suite failed. ~keep
+      check-fixture-snippets: true
+      # Pinned so CI installs the same alef that generated the tree in this commit; a drifting
+      # version would grade this output against a different generator. ~keep
+      alef-version: "0.62.2"
 
   validate-rust:
     name: Validate Rust & Alef
