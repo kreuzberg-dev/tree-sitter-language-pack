@@ -120,7 +120,7 @@ pub(crate) fn resolve_alias(name: &str) -> &str {
 /// [`crate::download::DownloadManager::installed_languages`] — never need their
 /// own copy of `LANGUAGE_ALIASES`. There is exactly one alias table; keeping a
 /// second copy elsewhere would let the two drift. ~keep
-#[cfg(any(feature = "dynamic-loading", feature = "download"))]
+#[cfg(feature = "download")]
 pub(crate) fn aliases_for(target: &str) -> Vec<&'static str> {
     LANGUAGE_ALIASES
         .iter()
@@ -1168,7 +1168,7 @@ mod tests {
         assert_eq!(resolve_alias(""), "");
     }
 
-    #[cfg(any(feature = "dynamic-loading", feature = "download"))]
+    #[cfg(feature = "download")]
     #[test]
     fn should_report_every_alias_that_resolves_to_a_canonical_target() {
         assert_eq!(aliases_for("bash"), vec!["shell"]);
@@ -1180,7 +1180,7 @@ mod tests {
         );
     }
 
-    #[cfg(any(feature = "dynamic-loading", feature = "download"))]
+    #[cfg(feature = "download")]
     #[test]
     fn should_agree_with_resolve_alias_for_every_alias_in_the_table() {
         // ~keep aliases_for is the reverse of resolve_alias; every alias must round-trip.
