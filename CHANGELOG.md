@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.2] - 2026-08-19
+
+**Use this release instead of 1.15.1.** 1.15.1 was tagged but never published — its release run
+failed every e2e gate (Ruby, Elixir, Python, Go, Rust, C#, WASM, Java, Node) plus the WASM build,
+so no artifact from it reached any registry. crates.io still tops out at 1.15.0. Everything listed
+under 1.15.1 below ships here.
+
+### Fixed
+
+- **Generated bindings no longer assert a required field is optional.** The generator derived
+  field optionality from a hand-maintained config list rather than from the extracted IR, so a
+  crate that declared none — as this one does — had every optional wrapper resolved wrongly across
+  13 language backends. Go's `assert.True(result.Data)` against a `*DataNode` is the shape that
+  failed the release. Regenerated on alef 0.62.0, which derives optionality from the IR.
+
+- **Generated C examples no longer call a constructor the FFI never exports.** A `Vec<String>`
+  argument resolved its element type to the std type `String`, so the generator emitted
+  `ts_pack_string_from_json("[]")` and a matching `ts_pack_string_free(...)` — symbols nothing
+  declares, failing every affected snippet with "call to undeclared function". The C ABI takes the
+  argument as a plain `const char *` JSON string, so it is now passed directly:
+  `ts_pack_prefetch("[]")`. Fixed in alef 0.62.2.
+
+- **`StructureItem.kind` is no longer typed as optional.** The Rust core declares
+  `pub kind: StructureKind` with `#[default] Function`; bindings emitted the equivalent of
+  `kind: StructureKind | str | None = None`, making a required field nullable and defaulting it to
+  the wrong value. It now carries the real default.
+
+### Changed
+
+- CI runs fixture snippet validation again (`check-fixture-snippets`), pinned to the alef version
+  that generated this tree. It had been disabled on the premise that the shared workflow's `v1` tag
+  does not declare the input; `v1` does declare it. This is the gate that catches generated examples
+  which no longer compile against the API they document.
+
 ## [1.15.1] - 2026-08-18
 
 ### Added
