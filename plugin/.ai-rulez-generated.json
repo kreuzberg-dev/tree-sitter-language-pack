@@ -1,15 +1,15 @@
 {
   "schema_version": "v1",
-  "source_hash": "blake3:d1d4b552595bb3faa982ffe658d6a804808da1fb9d0a3aeef32205e772aa9475",
+  "source_hash": "blake3:0cd158ce16abc7c1318e41b8b53536b089e883835e7192ec2699da18c57603a2",
   "outputs": {
     ".claude-plugin/plugin.json": {
-      "content_hash": "blake3:d9a90932c3e0f07b4a01d2a02ab2c2e65692d9bf1f4e4800c2d93545d0ae47bd"
+      "content_hash": "blake3:9bbc4f3f6dd6ad071ac5f6009d183f924944e7ae217c59bfacec629975a5b798"
     },
     ".codex-plugin/plugin.json": {
-      "content_hash": "blake3:dd0f9649b40825788dc2993de8d15144db809cea6e7ce3e9f11fb2156dccef40"
+      "content_hash": "blake3:6c8948616be337750a6aab6c03e098adb80345b3203a6957dcee5f69a9cd38c1"
     },
     ".cursor-plugin/plugin.json": {
-      "content_hash": "blake3:a69fa04a23b229a510c940dff8aa814b7f646a14f2714fc4e23172e5fb44515f"
+      "content_hash": "blake3:c9b761bf803e7451eca5fdeae6dded41d7c2b21361177bebb6fe10dc732314b0"
     },
     ".cursor-plugin/skills/chunking-for-llms/SKILL.md": {
       "content_hash": "blake3:194808ab41cbfc122dee398cccb0ecad135949fb11fd3201110a2ea6f8ec3369"
@@ -33,19 +33,19 @@
       "content_hash": "blake3:4c8c2a57d4c5fa03c6ff57dee5175b3229dcc0af0338d8e31901473b2d46a542"
     },
     ".factory-plugin/plugin.json": {
-      "content_hash": "blake3:421c2bd6efe11773f29c437b36bc461b2d5c9d489afc87ab4749ca7faf4bc1e4"
+      "content_hash": "blake3:e5137fc2ec05f07ddeda656ea46ba2b87ee52f1bd9f4f7822875bcef2fcd5ce9"
     },
     ".hermes/package/pyproject.toml": {
-      "content_hash": "blake3:dccca95f3aa6dc63efc4e8443afb59067751c32f5ed885d477da3fd7e6810ba6"
+      "content_hash": "blake3:0aac2d95a48ecb3e3d404c29419a1df4927f645065185b7dec360a496a373ee0"
     },
     ".hermes/package/src/tree_sitter_language_pack_hermes_plugin/__init__.py": {
-      "content_hash": "blake3:7b3a743eb0e79806f04b9fda128f35820c03363a2577932f542fa3412ed8013c"
+      "content_hash": "blake3:5caaf2cedd41754d72a98d6a37fdc9ebff181563d3f7acb59d97ab6e72598827"
     },
     ".hermes/package/src/tree_sitter_language_pack_hermes_plugin/hermes.py": {
       "content_hash": "blake3:01f26fe45622ee70976a7549f3fa2da411f1ea17332f3bb285ee2249ab62cb79"
     },
     ".hermes/package/src/tree_sitter_language_pack_hermes_plugin/plugin.yaml": {
-      "content_hash": "blake3:f4dbd8a0d473e84a35a640ef2cf78967ee6ee86e7bcc78f85ebccb531d2d0ea9"
+      "content_hash": "blake3:8f6b2d5d6af1241471a3ea7ee548249eb81de811220579239148ab6f6cba1f05"
     },
     ".hermes/package/src/tree_sitter_language_pack_hermes_plugin/skills/chunking-for-llms/SKILL.md": {
       "content_hash": "blake3:194808ab41cbfc122dee398cccb0ecad135949fb11fd3201110a2ea6f8ec3369"
@@ -69,13 +69,13 @@
       "content_hash": "blake3:4c8c2a57d4c5fa03c6ff57dee5175b3229dcc0af0338d8e31901473b2d46a542"
     },
     ".hermes/plugins/tree-sitter-language-pack/__init__.py": {
-      "content_hash": "blake3:7b3a743eb0e79806f04b9fda128f35820c03363a2577932f542fa3412ed8013c"
+      "content_hash": "blake3:5caaf2cedd41754d72a98d6a37fdc9ebff181563d3f7acb59d97ab6e72598827"
     },
     ".hermes/plugins/tree-sitter-language-pack/hermes.py": {
       "content_hash": "blake3:01f26fe45622ee70976a7549f3fa2da411f1ea17332f3bb285ee2249ab62cb79"
     },
     ".hermes/plugins/tree-sitter-language-pack/plugin.yaml": {
-      "content_hash": "blake3:f4dbd8a0d473e84a35a640ef2cf78967ee6ee86e7bcc78f85ebccb531d2d0ea9"
+      "content_hash": "blake3:8f6b2d5d6af1241471a3ea7ee548249eb81de811220579239148ab6f6cba1f05"
     },
     ".hermes/plugins/tree-sitter-language-pack/skills/chunking-for-llms/SKILL.md": {
       "content_hash": "blake3:194808ab41cbfc122dee398cccb0ecad135949fb11fd3201110a2ea6f8ec3369"
@@ -111,13 +111,13 @@
       "content_hash": "blake3:edbce41f41812957f6f07afa54d73e3ebd3d57b4578384e74d4f8bdcb7d5483b"
     },
     "gemini-extension.json": {
-      "content_hash": "blake3:2a046490af71a0a18d6b26e88ceb6a6845ab389fa6cbace24eda33563d3ace3c"
+      "content_hash": "blake3:b063e8ccb4220c6cf5d0eb481879ef7b6be78e732ddb1bc5ec44ca210dc42332"
     },
     "kimi.plugin.json": {
-      "content_hash": "blake3:cdcc954ba51831271a83138c905cde8085d5220808befe789aaf18e16baf9fae"
+      "content_hash": "blake3:357e357f6b799c8c096c6c449e12fc3486d497d1966f1c7a591533ef54c9a9a7"
     },
     "package.json": {
-      "content_hash": "blake3:f62b123f05fb5a00f23d3fbee592494a0ff2251ec4201a188cc62d69da0247c0"
+      "content_hash": "blake3:f114a48da5206f0c6207589be63a68303d24557780b8e9b8e439d8ba90c3b4f5"
     },
     "skills/chunking-for-llms/SKILL.md": {
       "content_hash": "blake3:194808ab41cbfc122dee398cccb0ecad135949fb11fd3201110a2ea6f8ec3369"
