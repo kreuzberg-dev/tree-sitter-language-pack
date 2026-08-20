@@ -2146,6 +2146,18 @@ jobs:
         with:
           python-version: "3.13"
       - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+      # `task python:e2e:test` goes through `alef test --lang python --e2e`, whose
+      # `[crates.test.python]` precondition needs `ruff` and whose `before` hook runs
+      # `maturin develop` — and `maturin develop` refuses to run outside a virtualenv.
+      # ci-e2e.yaml's `test-python` installs a prebuilt wheel and calls pytest directly, so
+      # it needs none of this; the release gate does. ~keep
+      - name: Install Python E2E tooling
+        shell: bash
+        run: |
+          uv venv .venv
+          uv pip install maturin ruff
+          echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
       - uses: xberg-io/actions/install-task@v1
       - uses: xberg-io/actions/install-alef@v1
       - name: Run Python E2E tests
@@ -2176,6 +2188,11 @@ jobs:
       - uses: xberg-io/actions/setup-node-workspace@v1
         with:
           node-version: "22"
+      # `[crates.test.node]`'s precondition and its `before` hook both need the `napi`
+      # binary, which no setup action provides. ci-e2e.yaml installs it in `build-node`
+      # before running the same NAPI build. ~keep
+      - name: Install NAPI-RS CLI
+        run: npm install -g @napi-rs/cli
       - uses: xberg-io/actions/install-task@v1
       - uses: xberg-io/actions/install-alef@v1
       - name: Run Node E2E tests
@@ -2204,9 +2221,15 @@ jobs:
           cache-key-prefix: publish-e2e-wasm
       - name: Install wasi-sdk
         uses: xberg-io/actions/install-wasi-sdk@v1
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      # `[crates.test.wasm]`'s precondition needs `pnpm` and `wasm-pack`, and its `before`
+      # hook runs `wasm-pack build`; the e2e command itself runs `pnpm install`. Plain
+      # actions/setup-node supplies neither, so use the workspace action (which brings pnpm)
+      # and install wasm-pack the same way ci-e2e.yaml's `build-wasm` does. ~keep
+      - uses: xberg-io/actions/setup-node-workspace@v1
         with:
           node-version: "22"
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - uses: xberg-io/actions/install-task@v1
       - uses: xberg-io/actions/install-alef@v1
       - name: Run WASM E2E tests
@@ -2237,6 +2260,16 @@ jobs:
       - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
           ruby-version: "3.4"
+      # `[crates.test.ruby]`'s `before` hook runs `bundle exec rake compile` in
+      # packages/ruby and its e2e command runs `bundle exec rspec` in e2e/ruby; neither
+      # installs gems, so both Gemfiles have to be resolved first. ci-e2e.yaml's `test-ruby`
+      # runs both installs. ~keep
+      - name: Install Ruby dependencies
+        working-directory: packages/ruby
+        run: bundle install
+      - name: Install Ruby E2E dependencies
+        working-directory: e2e/ruby
+        run: bundle install
       - uses: xberg-io/actions/install-task@v1
       - uses: xberg-io/actions/install-alef@v1
       - name: Run Ruby E2E tests
@@ -2274,6 +2307,8 @@ jobs:
       - uses: xberg-io/actions/install-alef@v1
       - name: Run Java E2E tests
         run: task java:e2e:test
+        env:
+          MAVEN_OPTS: "--enable-native-access=ALL-UNNAMED -Dsun.misc.unsafe.memory.access=allow"
 
   e2e-elixir:
     name: E2E gate — Elixir
@@ -2335,6 +2370,12 @@ jobs:
           php-version: "8.4"
           extensions: ffi
           tools: composer
+      # setup-php only puts the composer binary on PATH; e2e/php's own dependencies are
+      # never installed by it, so `run_tests.php` cannot find vendor/bin/phpunit.
+      # ci-e2e.yaml's `test-php` runs this install inline before the same harness. ~keep
+      - name: Install PHP E2E dependencies
+        working-directory: e2e/php
+        run: composer install --no-progress --prefer-dist
       - uses: xberg-io/actions/install-task@v1
       - uses: xberg-io/actions/install-alef@v1
       - name: Run PHP E2E tests
@@ -2492,6 +2533,14 @@ jobs:
           cache-key-prefix: publish-e2e-c
       - uses: xberg-io/actions/install-task@v1
       - uses: xberg-io/actions/install-alef@v1
+      - name: Install poly
+        uses: Goldziher/poly@v0
+      # e2e/c/test_*.c is gitignored (.gitignore:95), so a fresh checkout of the release ref
+      # contains only the Makefile, main.c and download_ffi.sh. Without regenerating them,
+      # `make` dies on the alphabetically first missing category with "No rule to make
+      # target 'test_data_extraction.c'". ci-e2e.yaml's `test-c-ffi` generates first. ~keep
+      - name: Generate C E2E tests
+        run: task c:e2e:generate
       - name: Run C E2E tests
         run: task c:e2e:test
 
