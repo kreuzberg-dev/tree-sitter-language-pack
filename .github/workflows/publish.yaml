@@ -2096,7 +2096,7 @@ jobs:
 
   e2e-rust:
     name: E2E gate — Rust
-    needs: [prepare, validate-versions, clone-vendors]
+    needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_crates == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -2112,6 +2112,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-rust
@@ -2122,7 +2127,7 @@ jobs:
 
   e2e-python:
     name: E2E gate — Python
-    needs: [prepare, validate-versions, clone-vendors]
+    needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_python == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -2139,6 +2144,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-python
@@ -2165,7 +2175,7 @@ jobs:
 
   e2e-node:
     name: E2E gate — Node
-    needs: [prepare, validate-versions, clone-vendors]
+    needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_node == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -2182,6 +2192,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-node
@@ -2237,7 +2252,7 @@ jobs:
 
   e2e-ruby:
     name: E2E gate — Ruby
-    needs: [prepare, validate-versions, clone-vendors]
+    needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_ruby == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -2254,6 +2269,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-ruby
@@ -2277,7 +2297,7 @@ jobs:
 
   e2e-java:
     name: E2E gate — Java
-    needs: [prepare, validate-versions, clone-vendors]
+    needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_java == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -2294,6 +2314,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-java
@@ -2312,7 +2337,7 @@ jobs:
 
   e2e-elixir:
     name: E2E gate — Elixir
-    needs: [prepare, validate-versions, clone-vendors]
+    needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_elixir == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -2329,6 +2354,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-elixir
@@ -2345,7 +2375,7 @@ jobs:
 
   e2e-php:
     name: E2E gate — PHP
-    needs: [prepare, validate-versions, clone-vendors]
+    needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_php == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -2362,6 +2392,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-php
@@ -2383,7 +2418,7 @@ jobs:
 
   e2e-csharp:
     name: E2E gate — C#
-    needs: [prepare, validate-versions, clone-vendors]
+    needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_csharp == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -2400,6 +2435,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-csharp
@@ -2413,7 +2453,7 @@ jobs:
 
   e2e-go:
     name: E2E gate — Go
-    needs: [prepare, validate-versions, clone-vendors]
+    needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_go == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -2429,6 +2469,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-go
@@ -2510,7 +2555,7 @@ jobs:
 
   e2e-c:
     name: E2E gate — C FFI
-    needs: [prepare, validate-versions, clone-vendors]
+    needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_c_ffi == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -2528,6 +2573,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-c
@@ -3365,7 +3415,7 @@ jobs:
   # release ref. ~keep
   e2e-dart:
     name: E2E gate — Dart
-    needs: [prepare, validate-versions, clone-vendors, check-registries]
+    needs: [prepare, validate-versions, clone-vendors, check-registries, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_dart == 'true' && (fromJson(needs.check-registries.outputs.results).pub != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -3382,6 +3432,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-dart
@@ -3481,7 +3536,7 @@ jobs:
 
   e2e-swift:
     name: E2E gate — Swift
-    needs: [prepare, validate-versions, clone-vendors]
+    needs: [prepare, validate-versions, clone-vendors, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_swift == 'true' }}
     runs-on: macos-latest
     timeout-minutes: 60
@@ -3498,6 +3553,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: macos-arm64
+          artifact-name: parsers-macos-arm64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-swift
@@ -3654,7 +3714,7 @@ jobs:
 
   e2e-zig:
     name: E2E gate — Zig
-    needs: [prepare, validate-versions, clone-vendors, check-registries]
+    needs: [prepare, validate-versions, clone-vendors, check-registries, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_zig == 'true' && (fromJson(needs.check-registries.outputs.results).zig != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -3670,6 +3730,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-zig
@@ -3760,7 +3825,7 @@ jobs:
 
   e2e-kotlin-android:
     name: E2E gate — Kotlin Android
-    needs: [prepare, check-registries, clone-vendors]
+    needs: [prepare, check-registries, clone-vendors, build-parser-binaries]
     if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && (fromJson(needs.check-registries.outputs.results).maven-kotlin-android != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -3777,6 +3842,11 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+      - name: Wire e2e manifest
+        uses: ./.github/actions/wire-e2e-manifest
+        with:
+          platform-label: linux-x86_64
+          artifact-name: parsers-linux-x86_64
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-kotlin-android
