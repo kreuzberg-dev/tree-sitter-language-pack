@@ -1,0 +1,33 @@
+name: Wire e2e manifest
+description: >-
+  Download the parser bundle built earlier in this run and point the runtime at it via
+  TREE_SITTER_LANGUAGE_PACK_MANIFEST_URL, so e2e suites resolve grammars from this run
+  instead of fetching a GitHub Release that does not exist yet.
+
+inputs:
+  platform-label:
+    description: "Canonical platform key of the bundle, e.g. linux-x86_64 or macos-arm64."
+    required: true
+  artifact-name:
+    description: "Workflow artifact holding parsers-<platform-label>.tar.zst."
+    required: true
+  bundle-dir:
+    description: "Workspace-relative directory the bundle is downloaded into."
+    required: false
+    default: e2e-bundles
+
+runs:
+  using: composite
+  steps:
+    - name: Download e2e parser bundle
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.bundle-dir }}
+
+    - name: Wire e2e manifest
+      shell: bash
+      env:
+        PLATFORM_LABEL: ${{ inputs.platform-label }}
+        BUNDLE_DIR: ${{ github.workspace }}/${{ inputs.bundle-dir }}
+      run: "${GITHUB_WORKSPACE}/scripts/ci/prepare_e2e_manifest.sh"
