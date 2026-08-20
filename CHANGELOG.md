@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Generated e2e tests no longer skip themselves where a `not_null` assertion was declared.**
+  Fixtures whose only assertion was "returns a valid X" rendered as
+  `assumeTrue(false, "alef rendered no runnable expectation")` — a test that reported green while
+  checking nothing. They now emit a real `assertNotNull(result, "expected non-null result")`.
+  844 assertions across the JVM targets were affected. Regenerated on alef 0.62.6.
+
+- **Enum-valued fields are compared against their wire value instead of an enum's `toString()`.**
+  `result.data.kind` is a `DataNodeKind`, and every backend compared it directly to the string
+  `"KeyValue"`. Each target now goes through its own wire-text conversion — `toWire()` in Kotlin,
+  `JsonSerializer.Serialize(...).Trim('"')` in C#, `_alefE2eText` in Dart, `_alef_e2e_text` in
+  Python, `to_string` in Elixir, `format!("{:?}", ...)` in Rust — so the assertion tests the
+  serialised value rather than an accidental `Debug`/`toString` match.
+
+- **The C examples free the enum handle they allocate.** `ts_pack_data_node_kind` returns a
+  `TS_PACKAlefHandle`, not a `char *`; the generated C now takes the handle, asserts it is
+  non-zero, converts with `ts_pack_data_node_kind_to_string`, and calls
+  `ts_pack_data_node_kind_free`. The previous form assigned a handle to `char *`.
+
+- **The JNI bridge formats errors with `to_string()` rather than `format!("{e}")`**, dropping an
+  allocation per thrown exception across 25 call sites.
+
+- **The Java package's javadoc and compiler source sets no longer fight each other.** alef now
+  emits both the `maven-javadoc-plugin` `<sourceFileIncludes>` (restricting javadoc to publishable
+  API sources, so test-scoped imports cannot fail `attach-javadocs`) and the `maven-compiler-plugin`
+  `<excludes>`, plus a checkstyle `<excludes>**/.alef/**</excludes>`. `packages/java/pom.xml` is now
+  alef-owned and carries a provenance marker; the hand-applied javadoc fix it previously held is
+  reproduced by the generator. Checkstyle moves to 13.11.0 and surefire/failsafe to 2.22.2.
+
+### Removed
+
+- **`DownloadTest` is gone from the Android e2e suites.** `crates.kotlin_android.features` does not
+  enable `download`, so alef now emits an `ExcludedBindingsTest` of `@Disabled` cases naming the
+  gating feature instead of tests that could never link.
+
+### Changed
+
+- alef pinned to 0.62.6 in `alef.toml` and in the CI `alef-version` input.
+
 ## [1.15.2] - 2026-08-19
 
 **Use this release instead of 1.15.1.** 1.15.1 was tagged but never published — its release run

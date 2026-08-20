@@ -17,19 +17,19 @@ if test "$PHP_TREE_SITTER_LANGUAGE_PACK_ENABLED" = "yes"; then
       (cd crates/tree-sitter-language-pack-php && cargo build --release) || exit 1
 
       dnl Detect output filename based on platform
-      if test -f "crates/tree-sitter-language-pack-php/target/release/libtree-sitter-language-pack_php.dylib"; then
-        cargo_lib="crates/tree-sitter-language-pack-php/target/release/libtree-sitter-language-pack_php.dylib"
-      elif test -f "crates/tree-sitter-language-pack-php/target/release/libtree-sitter-language-pack_php.so"; then
-        cargo_lib="crates/tree-sitter-language-pack-php/target/release/libtree-sitter-language-pack_php.so"
+      if test -f "crates/tree-sitter-language-pack-php/target/release/libtree_sitter_language_pack_php.dylib"; then
+        cargo_lib="crates/tree-sitter-language-pack-php/target/release/libtree_sitter_language_pack_php.dylib"
+      elif test -f "crates/tree-sitter-language-pack-php/target/release/libtree_sitter_language_pack_php.so"; then
+        cargo_lib="crates/tree-sitter-language-pack-php/target/release/libtree_sitter_language_pack_php.so"
       else
-        echo "ERROR: cargo build succeeded but .so/.dylib not found in crates/tree_sitter_language_pack-php/target/release" >&2
+        echo "ERROR: cargo build succeeded but .so/.dylib not found in crates/tree-sitter-language-pack-php/target/release" >&2
         exit 1
       fi
 
       mkdir -p modules
-      cp "$cargo_lib" "modules/tree-sitter-language-pack.so" || exit 1
+      cp "$cargo_lib" "modules/tree_sitter_language_pack.so" || exit 1
     else
-      echo "ERROR: crates/tree_sitter_language_pack-php/Cargo.toml not found" >&2
+      echo "ERROR: crates/tree-sitter-language-pack-php/Cargo.toml not found" >&2
       exit 1
     fi
   ], [])

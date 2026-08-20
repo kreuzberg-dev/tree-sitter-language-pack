@@ -23,7 +23,7 @@ final class CapsulePassthroughTests: XCTestCase {
     let source = "def greet(name):\n    return name\n"
     let tree = try parser.parse(source)
 
-    let root = try XCTUnwrap(tree.rootNode)
+    let root = try XCTUnwrap(tree?.rootNode)
     XCTAssertEqual(root.nodeType, "module")
   }
 
@@ -37,7 +37,7 @@ final class CapsulePassthroughTests: XCTestCase {
     let source = "const x = 1;\n"
     let tree = try parser.parse(source)
 
-    let root = try XCTUnwrap(tree.rootNode)
+    let root = try XCTUnwrap(tree?.rootNode)
     XCTAssertEqual(root.nodeType, "program")
   }
 }
