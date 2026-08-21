@@ -4,12 +4,18 @@ FROM rust:1.95-alpine3.22 AS builder
 
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
+# ~keep Fuzzy (`=~`) pins, not exact ones. Alpine's repository only ever carries the current
+# revision of a package, so an exact `python3=3.12.13-r0` stops resolving the moment a security
+# bump lands and the old revision is deleted -- which is exactly how the arm64 image build broke
+# ("python3-3.12.14-r0: breaks: world[python3=3.12.13-r0]"). The base image already pins Alpine to
+# 3.22, so the major.minor is fixed; letting the revision float is what keeps this reproducible
+# rather than merely deterministic-until-it-isn't.
 RUN apk add --no-cache \
-    bash=5.2.37-r0 \
-    g++=14.2.0-r6 \
-    gcc=14.2.0-r6 \
-    musl-dev=1.2.5-r12 \
-    python3=3.12.13-r0
+    bash=~5.2 \
+    g++=~14.2 \
+    gcc=~14.2 \
+    musl-dev=~1.2 \
+    python3=~3.12
 
 ENV CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=gcc
 
