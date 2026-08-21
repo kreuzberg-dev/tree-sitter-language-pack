@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.5] - 2026-08-21
+
+### Fixed
+
+- **`pnpm install` succeeds in the WASM e2e suite again, so the WASM package publishes.** The last
+  dependency upgrade moved `vitest` to ^4.1.10 in `e2e/wasm/package.json` without regenerating
+  `e2e/wasm/pnpm-lock.yaml`, and CI has `frozen-lockfile` on by default:
+  `specifiers in the lockfile don't match specifiers in package.json`. That failed the
+  `E2E gate — WASM` job, and `publish-wasm` requires it to succeed — so v1.15.4 would have shipped
+  every other ecosystem while silently leaving npm one version behind. The lockfile is regenerated.
+
+- **Nested `Cargo.lock` files track the workspace version.** Carried forward from v1.15.4: the
+  `Validate versions` gate failed on stale locks under `e2e/rust` and
+  `packages/ruby/ext/ts_pack_core_rb/native`, which skipped the crates.io publish job and cascaded
+  into every language build with `failed to select a version for the requirement`.
+
+Neither v1.15.3 nor v1.15.4 published artifacts to any registry — use this version.
+
 ## [1.15.4] - 2026-08-21
 
 ### Fixed
