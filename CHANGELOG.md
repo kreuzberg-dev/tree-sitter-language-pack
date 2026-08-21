@@ -11,11 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The generated Node e2e suite is valid TypeScript again.** A fixture whose call returns void and
+  whose only assertion is `not_error` renders `await expect(...).resolves.not.toThrow()`, but the
+  `it(...)` callback it lives in was only marked `async` when the *call* was async. For a
+  synchronous call — `cleanCache`, `configure`, `init`, `prefetch` — that produced `await` inside a
+  plain arrow function, a hard syntax error. Because `alef all` formats every language in a single
+  phase, the formatter rejecting one file aborted formatting for *all* of them, so the whole tree
+  was left unformatted and unstamped. Fixed in alef 0.62.8.
+
+- **The Zig e2e suite no longer panics on a serde-omitted field.** `data_extraction_json_empty_object`
+  asserts `is_empty` on a `Vec<DataNode>` that `#[serde(skip_serializing_if)]` omits entirely when
+  empty, so the generated JSON accessor's `.object.get("data").?` hit a missing key and panicked
+  with "attempt to use null value". alef now tracks `skip_serializing_if` as a fact distinct from
+  `Option<T>`-optionality and guards the lookup with `orelse .null`.
+
 - **Generated e2e tests no longer skip themselves where a `not_null` assertion was declared.**
   Fixtures whose only assertion was "returns a valid X" rendered as
   `assumeTrue(false, "alef rendered no runnable expectation")` — a test that reported green while
   checking nothing. They now emit a real `assertNotNull(result, "expected non-null result")`.
-  844 assertions across the JVM targets were affected. Regenerated on alef 0.62.6.
+  844 assertions across the JVM targets were affected. Regenerated on alef 0.62.8.
 
 - **Enum-valued fields are compared against their wire value instead of an enum's `toString()`.**
   `result.data.kind` is a `DataNodeKind`, and every backend compared it directly to the string
@@ -47,7 +61,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- alef pinned to 0.62.6 in `alef.toml` and in the CI `alef-version` input.
+- alef pinned to 0.62.8 in `alef.toml` and in the CI `alef-version` input.
+- All Rust dependencies taken to their latest versions (`cargo upgrade --incompatible`
+  followed by `cargo update`): 70 packages upgraded, one dropped, no downgrades.
 
 ## [1.15.2] - 2026-08-19
 
