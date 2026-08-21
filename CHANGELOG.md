@@ -92,8 +92,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   regeneration before their gates clear.
 
 - **Parser binaries are rebuilt for every release instead of being copied out of a stale cache.**
-  Every one of the 371 parser shared libraries shipped by the v1.15.5 release run was
-  byte-identical to v1.15.0's — nothing had been recompiled since 2026-08-13. The Rust cache
+  The v1.15.5 release run shipped a stale `linux-x86_64` parser set: every one of its 371 parser
+  shared libraries was byte-identical to v1.15.0's, nothing having been recompiled since
+  2026-08-13. (Measured per platform: `linux-aarch64`, `macos-arm64`, `macos-x86_64` and both
+  Windows targets were genuinely rebuilt — only `linux-x86_64` was stale, which is exactly the
+  platform GitHub #180 was reported on.) The Rust cache
   restores `target/` with mtimes newer than the fresh checkout, so cargo judged the build script
   up to date and skipped it, and the packaging step (`find target/release/build -path
   '*/out/libs/*' -exec cp`) then shipped whatever `out/libs/` the cache happened to carry. The
