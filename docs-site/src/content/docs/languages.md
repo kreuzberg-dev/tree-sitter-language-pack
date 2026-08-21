@@ -13,7 +13,7 @@ tree-sitter-language-pack supports **371** languages.
 | Ada | `.ada`, `.adb`, `.ads` | [briot/tree-sitter-ada](https://github.com/briot/tree-sitter-ada) | 14 |
 | Agda | `.agda` | [tree-sitter/tree-sitter-agda](https://github.com/tree-sitter/tree-sitter-agda) | 14 |
 | Aiken | `.ak` | [aiken-lang/tree-sitter-aiken](https://github.com/aiken-lang/tree-sitter-aiken) | 14 |
-| AL | `.al` | [SShadowS/tree-sitter-al](https://github.com/SShadowS/tree-sitter-al) | 14 |
+| AL | `.al` | [SShadowS/tree-sitter-al](https://github.com/SShadowS/tree-sitter-al) | 15 |
 | Angular | — | [dlvandenberg/tree-sitter-angular](https://github.com/dlvandenberg/tree-sitter-angular) | 14 |
 | Apex | `.trigger` | [aheber/tree-sitter-sfapex](https://github.com/aheber/tree-sitter-sfapex) | 14 |
 | Applescript | `.applescript`, `.scpt` | [waddie/tree-sitter-applescript](https://github.com/waddie/tree-sitter-applescript) | 14 |
@@ -386,6 +386,7 @@ The pack ships parsers at tree-sitter ABI 14. These load on any consumer tree-si
 The following grammars ship at a higher ABI because their committed `parser.c` is too large to regenerate. They require tree-sitter >=0.25:
 
 - Abl (ABI 15)
+- AL (ABI 15)
 - Cpp (ABI 15)
 - Csharp (ABI 15)
 - F# (ABI 15)

@@ -26,6 +26,7 @@ owned_paths = [
   ".github/skills/api/SKILL.md",
   ".github/skills/cli/SKILL.md",
   ".github/skills/mcp/SKILL.md",
+  "README.md",
   "config.m4",
   "crates/ts-pack-core-node/.gitignore",
   "crates/ts-pack-core-node/README.md",

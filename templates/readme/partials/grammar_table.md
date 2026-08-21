@@ -8,7 +8,7 @@
 | Ada | [briot/tree-sitter-ada](https://github.com/briot/tree-sitter-ada) | 14 | ✅ | ❌ | ✅ | ❌ | ✅ | ❌ |
 | Agda | [tree-sitter/tree-sitter-agda](https://github.com/tree-sitter/tree-sitter-agda) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Aiken | [aiken-lang/tree-sitter-aiken](https://github.com/aiken-lang/tree-sitter-aiken) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| AL | [SShadowS/tree-sitter-al](https://github.com/SShadowS/tree-sitter-al) | 14 | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| AL | [SShadowS/tree-sitter-al](https://github.com/SShadowS/tree-sitter-al) | 15 | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
 | Angular | [dlvandenberg/tree-sitter-angular](https://github.com/dlvandenberg/tree-sitter-angular) | 14 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ |
 | Apex | [aheber/tree-sitter-sfapex](https://github.com/aheber/tree-sitter-sfapex) | 14 | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ |
 | Applescript | [waddie/tree-sitter-applescript](https://github.com/waddie/tree-sitter-applescript) | 14 | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
@@ -102,7 +102,7 @@
 | Foam | [FoamScience/tree-sitter-foam](https://github.com/FoamScience/tree-sitter-foam) | 14 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Forth | [AlexanderBrevig/tree-sitter-forth](https://github.com/AlexanderBrevig/tree-sitter-forth) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Fortran | [stadelmanma/tree-sitter-fortran](https://github.com/stadelmanma/tree-sitter-fortran) | 15 | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| Fsharp Signature | [ionide/tree-sitter-fsharp](https://github.com/ionide/tree-sitter-fsharp) | 14 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| Fsharp Signature | [ionide/tree-sitter-fsharp](https://github.com/ionide/tree-sitter-fsharp) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Func | [tree-sitter-grammars/tree-sitter-func](https://github.com/tree-sitter-grammars/tree-sitter-func) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Fusion | [jirgn/tree-sitter-fusion](https://gitlab.com/jirgn/tree-sitter-fusion) | 14 | ✅ | ❌ | ✅ | ✅ | ✅ | ❌ |
 | Gap | [gap-system/tree-sitter-gap](https://github.com/gap-system/tree-sitter-gap) | 14 | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ |
@@ -178,7 +178,7 @@
 | LaTeX | [latex-lsp/tree-sitter-latex](https://github.com/latex-lsp/tree-sitter-latex) | 14 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Lean | [Julian/tree-sitter-lean](https://github.com/Julian/tree-sitter-lean) | 15 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Ledger | [cbarrete/tree-sitter-ledger](https://github.com/cbarrete/tree-sitter-ledger) | 14 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Leo | [r001/tree-sitter-leo](https://github.com/r001/tree-sitter-leo) | 14 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Leo | [r001/tree-sitter-leo](https://github.com/r001/tree-sitter-leo) | 14 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Less | [rhino1998/tree-sitter-less](https://github.com/rhino1998/tree-sitter-less) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Linkerscript | [tree-sitter-grammars/tree-sitter-linkerscript](https://github.com/tree-sitter-grammars/tree-sitter-linkerscript) | 14 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Liquid | [hankthetank27/tree-sitter-liquid](https://github.com/hankthetank27/tree-sitter-liquid) | 14 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
@@ -279,7 +279,7 @@
 | Scfg | [rockorager/tree-sitter-scfg](https://github.com/rockorager/tree-sitter-scfg) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Scheme | [6cdh/tree-sitter-scheme](https://github.com/6cdh/tree-sitter-scheme) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | SCSS | [tree-sitter-grammars/tree-sitter-scss](https://github.com/tree-sitter-grammars/tree-sitter-scss) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Sflog | [aheber/tree-sitter-sfapex](https://github.com/aheber/tree-sitter-sfapex) | 14 | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ |
+| Sflog | [aheber/tree-sitter-sfapex](https://github.com/aheber/tree-sitter-sfapex) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Slang | [tree-sitter-grammars/tree-sitter-slang](https://github.com/tree-sitter-grammars/tree-sitter-slang) | 15 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Slim | [kolen/tree-sitter-slim](https://github.com/kolen/tree-sitter-slim) | 14 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Slint | [slint-ui/tree-sitter-slint](https://github.com/slint-ui/tree-sitter-slint) | 14 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
@@ -290,8 +290,8 @@
 | Snakemake | [osthomas/tree-sitter-snakemake](https://github.com/osthomas/tree-sitter-snakemake) | 14 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Snl | [minijackson/tree-sitter-snl](https://github.com/minijackson/tree-sitter-snl) | 14 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Solidity | [JoranHonig/tree-sitter-solidity](https://github.com/JoranHonig/tree-sitter-solidity) | 14 | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ |
-| Soql | [aheber/tree-sitter-sfapex](https://github.com/aheber/tree-sitter-sfapex) | 14 | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ |
-| Sosl | [aheber/tree-sitter-sfapex](https://github.com/aheber/tree-sitter-sfapex) | 14 | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ |
+| Soql | [aheber/tree-sitter-sfapex](https://github.com/aheber/tree-sitter-sfapex) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Sosl | [aheber/tree-sitter-sfapex](https://github.com/aheber/tree-sitter-sfapex) | 14 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Souffle | [langston-barrett/tree-sitter-souffle](https://github.com/langston-barrett/tree-sitter-souffle) | 14 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Sourcepawn | [nilshelmig/tree-sitter-sourcepawn](https://github.com/nilshelmig/tree-sitter-sourcepawn) | 14 | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
 | Sparql | [GordianDziwis/tree-sitter-sparql](https://github.com/GordianDziwis/tree-sitter-sparql) | 14 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
