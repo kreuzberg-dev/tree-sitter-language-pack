@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.3] - 2026-08-20
+
 ### Fixed
 
 - **Generated e2e tests no longer skip themselves where a `not_null` assertion was declared.**
