@@ -7,7 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.15.5] - 2026-08-21
+### Fixed
+
+- **Parser binaries are rebuilt for every release instead of being copied out of a stale cache.**
+  Every one of the 371 parser shared libraries shipped by the v1.15.5 release run was
+  byte-identical to v1.15.0's — nothing had been recompiled since 2026-08-13. The Rust cache
+  restores `target/` with mtimes newer than the fresh checkout, so cargo judged the build script
+  up to date and skipped it, and the packaging step (`find target/release/build -path
+  '*/out/libs/*' -exec cp`) then shipped whatever `out/libs/` the cache happened to carry. The
+  build-script output directory is now dropped before the parser build in both `publish.yaml` and
+  `ci-e2e.yaml`, so `build.rs` reruns and no stale artifact survives to be packaged.
+
+  This is why the typst segfault (#161, GitHub #180) outlived its own fix. `process("#let x = 1",
+  {"language": "typst"})` crashed because the bounded-serialize patch added in v1.15.0 narrowed
+  the scanner's element-count prefix to `uint32_t` while `vec_u32_deserialize` still read it back
+  as `sizeof self->len` — 4 bytes written, 8 bytes read, so the garbage upper half became a huge
+  element count that memmoved off the end of tree-sitter's 1 KiB serialization buffer. The source
+  was corrected on 2026-08-14 in 61e331426 and has been present since v1.15.1, but the corrected
+  scanner was never compiled: the shipped `libtree_sitter_typst.so` still stores the prefix with a
+  4-byte `movl`. That crash took down the Ruby, Python, PHP, C FFI, Dart, Elixir and Go E2E gates.
 
 ### Fixed
 

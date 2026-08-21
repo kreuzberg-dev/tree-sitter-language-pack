@@ -145,6 +145,12 @@ jobs:
         id: langs
         uses: xberg-io/actions/list-language-definitions@v1
 
+      # See publish.yaml: a cache-restored target/ makes cargo skip the build script, and the
+      # packaging glob below then ships whatever stale out/libs/ the cache carried.
+      - name: Drop cache-restored parser build outputs
+        shell: bash
+        run: rm -rf target/release/build/tree-sitter-language-pack-*
+
       - name: Build all parsers
         run: cargo build -p tree-sitter-language-pack --release
         env:

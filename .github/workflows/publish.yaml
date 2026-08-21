@@ -398,6 +398,16 @@ jobs:
         id: langs
         uses: xberg-io/actions/list-language-definitions@v1
 
+      # The Rust cache restores target/ with mtimes newer than the fresh checkout, so cargo
+      # judges the build script fresh and skips it — and the packaging step below globs
+      # whatever out/libs/ the cache happened to carry. That shipped v1.15.0's parser
+      # binaries unchanged through v1.15.5, including the typst scanner segfault fixed in
+      # 61e331426. Dropping the build-script dirs forces build.rs to rerun and leaves no
+      # stale out/libs/ for the glob to find.
+      - name: Drop cache-restored parser build outputs
+        shell: bash
+        run: rm -rf target/release/build/tree-sitter-language-pack-*
+
       - name: Build all parsers
         run: cargo build --locked -p tree-sitter-language-pack --release
         env:
