@@ -1570,12 +1570,25 @@ path = "../../packages/elixir"
 name = "xberg-io/tree-sitter-language-pack"
 path = "../../crates/ts-pack-core-php"
 
+# ~keep python/node/wasm go through poly rather than `ruff` and `pnpm dlx oxfmt`
+# because poly is the only formatter the validate job is guaranteed to have:
+# `reusable-validate.yml` installs poly before `alef e2e generate` precisely so the
+# generated tree can be formatted, but it has no `setup-node` input and does not put
+# `ruff` on PATH. With the old commands alef logged "executable not found", emitted
+# unformatted node/wasm/python suites, and the `git diff --exit-code` drift gate failed
+# on 45 files that were correct everywhere a developer ran them. poly bundles the same
+# engines (ruff, oxc), so the output is byte-identical wherever poly is installed.
+# `--include-excluded` is required because poly.toml excludes `e2e/**`, and
+# `--fix-generated` because these files carry `DO NOT EDIT` markers. `poly fmt --fix`
+# exits 1 when it rewrote something, which alef reads as a failed format step, so the
+# `|| ... --check` pass converts "I reformatted files" into success while still failing
+# on a formatter that genuinely could not finish.
 [crates.e2e.format]
-python = "ruff check --fix {dir} && ruff format {dir}"
+python = "poly fmt --fix --include-excluded --fix-generated {dir} || poly fmt --check --include-excluded --fix-generated {dir}"
 go = "gofmt -w {dir}"
 rust = "(cd {dir} && cargo fmt --all)"
-node = "pnpm dlx oxfmt {dir}"
-wasm = "pnpm dlx oxfmt {dir}"
+node = "poly fmt --fix --include-excluded --fix-generated {dir} || poly fmt --check --include-excluded --fix-generated {dir}"
+wasm = "poly fmt --fix --include-excluded --fix-generated {dir} || poly fmt --check --include-excluded --fix-generated {dir}"
 
 [crates.e2e.registry]
 output = "test_apps"
