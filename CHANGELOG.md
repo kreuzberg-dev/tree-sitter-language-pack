@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.4] - 2026-08-21
+
+### Fixed
+
+- **The release actually publishes.** v1.15.3 was tagged and released but published nothing: the
+  `Validate versions` gate failed on stale `Cargo.lock` files under `e2e/rust` and
+  `packages/ruby/ext/ts_pack_core_rb/native`, which skipped the crates.io publish job. Every
+  language-package build downstream of it then failed with
+  `failed to select a version for the requirement ^1.15.3`, because `alef publish prepare` was
+  retrying against a registry version that had never been pushed. The lockfiles are refreshed and
+  the gate passes. v1.15.3 carries no artifacts on any registry — use this version instead.
+
 ## [1.15.3] - 2026-08-21
 
 ### Fixed
