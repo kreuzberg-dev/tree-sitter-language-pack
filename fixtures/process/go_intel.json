@@ -24,7 +24,7 @@
     },
     {
       "type": "contains",
-      "field": "structure",
+      "field": "structure[].kind",
       "value": "Function"
     },
     {

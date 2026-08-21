@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`process` fixtures name the field they actually assert on.** Twenty-one assertions said
+  `contains` on the bare `structure` or `imports` collection and meant "some item has this *kind*"
+  (or, for imports, "this *source*"). Up to alef 0.60.0 that generated a debug-string substring
+  match over the whole collection, which happened to be true. Alef then narrowed a collection
+  `contains` to compare only each item's `name`, and since `StructureItem.name` is the identifier
+  (`main`) rather than the kind (`Function`), every one of those assertions began failing — 19 of
+  the Rust E2E suite's 37 `process` tests. The fixtures now spell the path out as
+  `structure[].kind` and `imports[].source`, which restores the intended check explicitly.
+  `process_test` goes from 18 passed / 19 failed to 37 passed / 0 failed.
+
+  Only the Rust suite is regenerated here; the other language E2E suites need the same
+  regeneration before their gates clear.
+
 - **Parser binaries are rebuilt for every release instead of being copied out of a stale cache.**
   Every one of the 371 parser shared libraries shipped by the v1.15.5 release run was
   byte-identical to v1.15.0's — nothing had been recompiled since 2026-08-13. The Rust cache

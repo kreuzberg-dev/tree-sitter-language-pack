@@ -26,12 +26,12 @@
     },
     {
       "type": "contains",
-      "field": "structure",
+      "field": "structure[].kind",
       "value": "Module"
     },
     {
       "type": "contains",
-      "field": "structure",
+      "field": "structure[].kind",
       "value": "Class"
     },
     {

@@ -24,7 +24,7 @@
     },
     {
       "type": "contains",
-      "field": "imports",
+      "field": "imports[].source",
       "value": "os"
     }
   ],
