@@ -9,6 +9,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Five CI gates that had never actually executed.** Every one was masked by an earlier job
+  failing or being cancelled, so all five failures surfaced at once the first time the gates
+  ran.
+  - The Zig package tests called `has_parser` on the result of `new_language_registry()`
+    without `try`; that function returns `error{UnknownFfiError}!LanguageRegistry`, so both
+    Zig jobs failed to compile.
+  - `packages/kotlin-android/.../Language.kt` was a pre-alef-0.61 handle wrapper. `Language`
+    is a `kotlin_android` capsule type, so alef stopped emitting the wrapper, but it does not
+    delete files it no longer generates -- the stale class stayed on disk with a `close()`
+    calling `TreeSitterLanguagePackBridge.nativeFreeLanguage`, a symbol neither the Bridge
+    object nor the JNI shim declares. Both AAR jobs failed on the unresolved reference.
+  - `quickstart.mdx` still imported `wasm/download/download_single_language.md`, one of the ten
+    wasm download snippets dropped in c5da3347a because the wasm package never exported those
+    symbols. The docs build failed with `UNRESOLVED_IMPORT`; the tab now uses the wasm
+    `prefetch_languages` snippet.
+  - The `validate` job pinned alef to 0.62.8 while `alef.toml` moved to 0.62.10, so
+    `alef e2e generate && git diff --exit-code` graded the committed tree against a different
+    generator and reported 45 files as drift.
+  - `task swift:e2e:test` built only `tree-sitter-language-pack-swift`. `Package.swift` links
+    `libts_pack_core_ffi.a` by absolute path and silently falls back to `target/debug` when the
+    release archive is missing, so the Swift e2e link failed on a debug archive that was never
+    built. The four Swift task builds now include `-p ts-pack-core-ffi`, matching
+    `ci-swift.yaml`.
+
+- **The grammar tables record AL at ABI 15.** AL's committed `parser.c` is now over the 24 MB
+  regeneration exemption, so it ships at ABI 15 rather than the pack default of 14. The
+  languages page, the README partial and README claimed 14, and the bundled-query columns for
+  Fsharp Signature, Leo, Sflog, Soql and Sosl were stale.
+
 - **The typst scanner's `deserialize` bounds its reads, and `serialize` no longer truncates.**
   `vec_u32_deserialize` never took the `length` tree-sitter passes to
   `tree_sitter_typst_external_scanner_deserialize`. It read an 8-byte element count out of the
