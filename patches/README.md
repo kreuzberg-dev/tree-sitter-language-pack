@@ -58,10 +58,16 @@ invalidate the patch.
 
 Patches within one language directory are applied in sorted filename order.
 
+Two patches in the same directory must not overlap: no patch may carry, as *context*, a
+line another patch changes. Overlapping patches apply once and then fail forever — the
+build script treats a clean reverse-apply as "already applied", and a patch whose context
+was rewritten by its neighbour matches neither forward nor backward. Narrow the context of
+the patch that only reads the line; a hunk may carry context on one side only.
+
 ## What is in here
 
-Every current patch is named `serialize-buffer-overflow.patch` and fixes the same
-class of bug. Tree-sitter hands an external scanner's `serialize()` a buffer of
+Most patches are named `serialize-buffer-overflow.patch` and fix the same class of
+bug. Tree-sitter hands an external scanner's `serialize()` a buffer of
 exactly `TREE_SITTER_SERIALIZATION_BUFFER_SIZE` (1024) bytes. The only bound check in
 the runtime is `ts_assert(length <= TREE_SITTER_SERIALIZATION_BUFFER_SIZE)` in
 `ts_parser__external_scanner_serialize`, and `ts_assert` expands to `((void)(e))`
@@ -74,6 +80,10 @@ so `deserialize()` reads back a consistent state. Truncation is the correct trad
 a scanner that loses deep-nesting state produces a worse incremental re-parse, not
 memory corruption. It is also what upstream generally does — most tree-sitter
 scanners in this pack already clamp; these are the ones that do not.
+
+`patches/typst/vec-u32-pop-off-by-one.patch` is the one patch outside that class. Its
+`vec_u32_pop` returned `self->vec[self->len--]`, reading one element past the end of the
+vector, which is outside the allocation whenever `len` has reached `cap`.
 
 ## Regenerating a patch
 

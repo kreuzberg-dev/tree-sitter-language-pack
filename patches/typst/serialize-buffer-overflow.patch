@@ -1,9 +1,6 @@
 --- a/src/scanner.c
 +++ b/src/scanner.c
-@@ -176,6 +176,10 @@
- 	assert(self->len > 0, "vec_u32_pop: empty vec");
- 	return self->vec[self->len--];
- }
+@@ -179,3 +179,7 @@
 +// Precondition: the caller has already proven the whole scanner state fits in
 +// tree-sitter's fixed serialization buffer (see the fit check in
 +// tree_sitter_typst_external_scanner_serialize). This writes unbounded, so it must

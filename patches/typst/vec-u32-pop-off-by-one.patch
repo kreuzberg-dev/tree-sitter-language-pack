@@ -1,0 +1,22 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -171,8 +171,18 @@
+ 	}
+ 	self->vec[self->len++] = value;
+ }
++// `self->vec[self->len--]` read vec[len] -- one past the last element -- and returned
++// whatever followed it, while still decrementing the length. The index must be
++// decremented before the read, not after.
++//
++// The empty-vec check is written as real control flow because the assert() macro in
++// this file expands to `while (false);`. With `--self->len` an empty pop would wrap
++// the length to SIZE_MAX and index vec[SIZE_MAX]. ~keep
+ static uint32_t vec_u32_pop(struct vec_u32* self) {
+ 	assert(self != NULL, "vec_u32_pop");
+ 	assert(self->len > 0, "vec_u32_pop: empty vec");
+-	return self->vec[self->len--];
++	if (self->len == 0) {
++		return 0;
++	}
++	return self->vec[--self->len];
+ }

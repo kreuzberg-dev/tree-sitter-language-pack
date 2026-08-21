@@ -64,6 +64,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Python, PHP, Elixir, Java, Dart and Go E2E gates along with the C# test host and a Node vitest
   worker.
 
+- **`vec_u32_pop` in the typst scanner reads the last element instead of the one past it.**
+  Upstream returns `self->vec[self->len--]`. The post-decrement indexes `vec[len]` — one past the
+  last element — and only then shortens the vector, so every pop returned four bytes of whatever
+  followed the elements and read them from outside the allocation whenever `len` had reached `cap`
+  (which `deserialize` guarantees, since it sizes `cap` to exactly `len`). It is now
+  `vec[--self->len]`, and the empty-vector guard is written as real control flow because the
+  `assert()` macro in that file expands to `while (false);` and enforces nothing.
+
+  Nothing in the scanner consumed the value — all four call sites discard it — and the length
+  bookkeeping was already correct, which is why the defect outlived the serialization fix it was
+  found next to. `patches/typst/vec-u32-pop-off-by-one.patch` carries it; the existing
+  `serialize-buffer-overflow.patch` keeps its own scope, and its first hunk no longer takes the
+  `vec_u32_pop` line as context so the two patches apply and reverse-apply in either order.
+
 - **`process` fixtures name the field they actually assert on.** Twenty-one assertions said
   `contains` on the bare `structure` or `imports` collection and meant "some item has this *kind*"
   (or, for imports, "this *source*"). Up to alef 0.60.0 that generated a debug-string substring
