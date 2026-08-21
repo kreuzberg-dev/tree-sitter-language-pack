@@ -610,28 +610,27 @@ exclude_functions = [
   "cache_dir",
 ]
 # ~keep `languages` drives alef's e2e skip logic only (unsupported languages get
-# `.skip("not in WASM's static language set")`); it does NOT control what the wasm
-# build actually compiles. The real compile set is `WASM_DEFAULT_LANGUAGES` in
-# `crates/ts-pack-core/build.rs` (filtered by `language_definitions.json` and the
-# wasm32 skip-list/parser-size gate) because `.task/wasm.yml` never sets
-# `TSLP_LANGUAGES`, so build.rs falls through to that constant. This list must
-# mirror build.rs's actual output — keep it in sync by hand when that constant or
-# its skip-list changes, or the e2e skip logic will drift silently (as it had:
-# this list previously included "zig", which build.rs's wasm default never ships,
-# and was missing over a dozen languages build.rs does ship).
+# ~keep `.skip("not in WASM's static language set")`); it does NOT control what the wasm
+# ~keep build compiles. It must mirror the `TSLP_LANGUAGES` set the wasm *e2e* build uses,
+# ~keep which is the identical 31-language string at all four wasm build sites:
+# ~keep `[crates.test.wasm].before` below, `.github/workflows/ci-e2e.yaml` (build-wasm),
+# ~keep `.github/workflows/ci.yaml`, and `.github/workflows/publish.yaml`.
+# ~keep Do NOT mirror `WASM_DEFAULT_LANGUAGES` in `crates/ts-pack-core/build.rs`: that
+# ~keep constant is only build.rs's fallback for a wasm32 build that leaves `TSLP_LANGUAGES`
+# ~keep unset (the `.task/wasm.yml` path), and every e2e/CI wasm build sets it explicitly, so
+# ~keep the constant never applies there. Mirroring it is what broke this list before —
+# ~keep it carried 48 languages against a 31-language build, so 18 grammars
+# ~keep (clojure cmake dart graphql groovy hcl ini julia make nix objc ocaml powershell
+# ~keep proto r regex scss xml) were emitted as live tests and failed with
+# ~keep `Language 'X' not found`. Keep the four sites in sync by hand; TOML cannot derive
+# ~keep this list, and deriving it in the shell is unsafe (build.rs treats an empty
+# ~keep `TSLP_LANGUAGES` as a valid zero-grammar selection, so a failed derivation would
+# ~keep silently produce a wasm build with no grammars at all).
 languages = [
+  "python",
   "javascript",
   "typescript",
   "tsx",
-  "html",
-  "css",
-  "scss",
-  "json",
-  "yaml",
-  "toml",
-  "xml",
-  "markdown",
-  "python",
   "rust",
   "go",
   "java",
@@ -640,34 +639,25 @@ languages = [
   "csharp",
   "ruby",
   "php",
+  "html",
+  "css",
+  "json",
+  "yaml",
+  "toml",
+  "markdown",
   "bash",
+  "sql",
   "lua",
+  "scala",
   "kotlin",
   "swift",
-  "scala",
-  "dart",
-  "elixir",
-  "haskell",
-  "r",
-  "sql",
-  "graphql",
   "dockerfile",
-  "make",
-  "cmake",
-  "hcl",
-  "proto",
   "vue",
   "svelte",
-  "regex",
-  "ini",
-  "objc",
-  "julia",
-  "ocaml",
+  "elixir",
   "erlang",
-  "clojure",
-  "groovy",
-  "powershell",
-  "nix",
+  "haskell",
+  "zig",
 ]
 
 [crates.ffi]
