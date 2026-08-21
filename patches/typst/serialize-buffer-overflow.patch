@@ -1,53 +1,149 @@
 --- a/src/scanner.c
 +++ b/src/scanner.c
-@@ -176,15 +176,30 @@
+@@ -176,6 +176,10 @@
  	assert(self->len > 0, "vec_u32_pop: empty vec");
  	return self->vec[self->len--];
  }
--static size_t vec_u32_serialize(struct vec_u32* self, char* buffer) {
-+// `capacity` is the number of bytes left in tree-sitter's fixed serialization
-+// buffer. The runtime only ts_assert()s the returned length and that assert is
-+// compiled out under NDEBUG, so the bound has to be enforced here.
-+//
-+// `len` must stay `size_t`: vec_u32_deserialize reads the prefix back as
-+// `sizeof self->len`, so narrowing it here would write 4 bytes and read 8, and
-+// the garbage upper half becomes a huge element count that memmoves off the
-+// end of the buffer. ~keep
-+static size_t vec_u32_serialize(struct vec_u32* self, char* buffer, size_t capacity) {
++// Precondition: the caller has already proven the whole scanner state fits in
++// tree-sitter's fixed serialization buffer (see the fit check in
++// tree_sitter_typst_external_scanner_serialize). This writes unbounded, so it must
++// never be called without that check. ~keep
+ static size_t vec_u32_serialize(struct vec_u32* self, char* buffer) {
  	assert(self != NULL, "vec_u32_serialize");
  	size_t written = 0;
--	memcpy(buffer, &self->len, sizeof self->len);
--	written += sizeof self->len;
--	if (self->len > 0) {
--		memcpy(buffer + written, self->vec, self->len * sizeof(uint32_t));
--		written += self->len * sizeof(uint32_t);
-+	if (capacity < sizeof self->len) {
-+		return 0;
+@@ -187,19 +191,42 @@
  	}
-+	size_t len = self->len;
-+	if (len > (capacity - sizeof self->len) / sizeof(uint32_t)) {
-+		len = (capacity - sizeof self->len) / sizeof(uint32_t);
-+	}
-+	memcpy(buffer, &len, sizeof len);
-+	written += sizeof len;
-+	if (len > 0) {
-+		memcpy(buffer + written, self->vec, len * sizeof(uint32_t));
-+		written += len * sizeof(uint32_t);
-+	}
  	return written;
  }
- static size_t vec_u32_deserialize(struct vec_u32* self, const char* buffer) {
-@@ -348,8 +360,11 @@
+-static size_t vec_u32_deserialize(struct vec_u32* self, const char* buffer) {
++#define VEC_U32_DESERIALIZE_FAILED SIZE_MAX
++// Returns the number of bytes consumed, or VEC_U32_DESERIALIZE_FAILED if `remaining`
++// cannot hold the vector the buffer claims.
++//
++// The element count comes out of the buffer and is used directly as a memcpy length,
++// so it is only as trustworthy as the buffer. It must be bounded against `remaining`
++// *before* it is multiplied by the element size: that single check stops the
++// unbounded read, and stops `len * 4` and `sizeof(uint32_t) * cap` from wrapping into
++// an undersized allocation that the following memcpy would then overflow. The
++// assert() macro in this file expands to `while (false);`, so no check here is
++// load-bearing unless it is written as real control flow. ~keep
++static size_t vec_u32_deserialize(struct vec_u32* self, const char* buffer, size_t remaining) {
+ 	assert(self != NULL, "vec_u32_deserialize");
+-	size_t read = 0;
+-	memcpy(&self->len, buffer, sizeof self->len);
+-	read += sizeof self->len;
+-	if (self->len > self->cap) {
+-		self->cap = self->len;
++	self->len = 0;
++	if (remaining < sizeof self->len) {
++		return VEC_U32_DESERIALIZE_FAILED;
++	}
++	size_t len = 0;
++	memcpy(&len, buffer, sizeof len);
++	size_t read = sizeof len;
++	if (len > (remaining - read) / sizeof(uint32_t)) {
++		return VEC_U32_DESERIALIZE_FAILED;
++	}
++	if (len > self->cap) {
++		self->cap = len;
+ 		self->vec = realloc(self->vec, sizeof(uint32_t) * self->cap);
+ 		assert(self->vec != NULL, "vec_u32_deserialize: malloc failed")
++		if (self->vec == NULL) {
++			self->cap = 0;
++			return VEC_U32_DESERIALIZE_FAILED;
++		}
+ 	}
+-	if (self->len > 0) {
+-		memcpy(self->vec, buffer + read, self->len * sizeof *self->vec);
+-		read += self->len * sizeof *self->vec;
++	self->len = len;
++	if (len > 0) {
++		memcpy(self->vec, buffer + read, len * sizeof *self->vec);
++		read += len * sizeof *self->vec;
+ 	}
+ 	return read;
+ }
+@@ -347,6 +374,21 @@
+ 	char *buffer
  ) {
  	struct scanner* self = payload;
- 	size_t written = 0;
--	written += vec_u32_serialize(&self->indentation, buffer + written);
--	written += vec_u32_serialize(&self->containers, buffer + written);
-+	// Four trailing scalar bytes are written after the two vectors; keep room.
++	// The state is written all-or-nothing. If it does not fit, return 0: tree-sitter
++	// reads 0 as "no state to restore" and then calls deserialize with length == 0,
++	// which rebuilds exactly the base state the scanner starts from. Writing a
++	// truncated state instead would misframe the buffer -- the second vector's length
++	// prefix would be read from the trailing scalars and past the end of the buffer --
++	// and nothing in this format lets the reader detect that. ~keep
 +	const size_t trailing = 4;
-+	size_t budget = TREE_SITTER_SERIALIZATION_BUFFER_SIZE - trailing;
-+	written += vec_u32_serialize(&self->indentation, buffer + written, budget - written);
-+	written += vec_u32_serialize(&self->containers, buffer + written, budget - written);
- 	buffer[written++] = self->immediate;
- 	buffer[written++] = self->heading_level;
++	const size_t prefixes = 2 * sizeof(size_t);
++	const size_t budget = TREE_SITTER_SERIALIZATION_BUFFER_SIZE - prefixes - trailing;
++	// Compared as element counts so the byte count cannot overflow. The first clause
++	// short-circuits, so the subtraction in the second cannot wrap. ~keep
++	if (self->indentation.len > budget / sizeof(uint32_t)
++		|| self->containers.len > budget / sizeof(uint32_t) - self->indentation.len) {
++		return 0;
++	}
+ 	size_t written = 0;
+ 	written += vec_u32_serialize(&self->indentation, buffer + written);
+ 	written += vec_u32_serialize(&self->containers, buffer + written);
+@@ -355,6 +397,31 @@
  	buffer[written++] = self->line_start;
+ 	buffer[written++] = self->raw_level;
+ 	return written;
++}
++
++// Restore the serialized state, bounding every read against `length`. Returns false
++// if the buffer is short or misframed, leaving the scanner's state untrusted; the
++// caller then installs the base state. ~keep
++static bool scanner_try_deserialize(struct scanner* self, const char* buffer, size_t length) {
++	size_t read = vec_u32_deserialize(&self->indentation, buffer, length);
++	if (read == VEC_U32_DESERIALIZE_FAILED) {
++		return false;
++	}
++	size_t step = vec_u32_deserialize(&self->containers, buffer + read, length - read);
++	if (step == VEC_U32_DESERIALIZE_FAILED) {
++		return false;
++	}
++	read += step;
++	// The four trailing scalars are part of the state; a buffer that cannot supply
++	// them is truncated, not merely vector-less. ~keep
++	if (length - read < 4) {
++		return false;
++	}
++	self->immediate = buffer[read++];
++	self->heading_level = buffer[read++];
++	self->line_start = buffer[read++];
++	self->raw_level = buffer[read++];
++	return true;
+ }
+ 
+ void tree_sitter_typst_external_scanner_deserialize(
+@@ -370,18 +437,18 @@
+ 	self->heading_level = 0;
+ 	self->line_start = false;
+ 	self->raw_level = 0;
+-	if (length != 0) {
+-		size_t read = 0;
+-		read += vec_u32_deserialize(&self->indentation, buffer + read);
+-		read += vec_u32_deserialize(&self->containers, buffer + read);
+-		self->immediate = buffer[read++];
+-		self->heading_level = buffer[read++];
+-		self->line_start = buffer[read++];
+-		self->raw_level = buffer[read++];
++	if (length != 0 && scanner_try_deserialize(self, buffer, length)) {
++		return;
+ 	}
+-	else {
+-		vec_u32_push(&self->indentation, 0);
+-	}
++	// Base state. Reached for length == 0 and for any buffer that failed to restore:
++	// a partially-applied state is worse than none, so reset what the attempt touched. ~keep
++	self->indentation.len = 0;
++	self->containers.len = 0;
++	self->immediate = false;
++	self->heading_level = 0;
++	self->line_start = false;
++	self->raw_level = 0;
++	vec_u32_push(&self->indentation, 0);
+ }
+ 
+ // SCAN ////////////////////////////////////////////////////////////////////////

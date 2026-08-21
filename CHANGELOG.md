@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The typst scanner's `deserialize` bounds its reads, and `serialize` no longer truncates.**
+  `vec_u32_deserialize` never took the `length` tree-sitter passes to
+  `tree_sitter_typst_external_scanner_deserialize`. It read an 8-byte element count out of the
+  buffer and then `memcpy`'d `count * 4` bytes with no bound against the serialized length, so any
+  buffer that was shorter or differently framed than the one `serialize` wrote was read past its
+  end — the count itself came from the buffer and was used directly as a copy length. Given a
+  1-byte buffer the scanner restored a full 40-byte state, i.e. it read 39 bytes it was never
+  given. `deserialize` now takes the length, bounds the count *before* it is multiplied (which
+  also stops `count * 4` and `sizeof(uint32_t) * cap` from wrapping into an undersized allocation),
+  and fails closed to the base state rather than applying a half-restored one.
+
+  The previous patch bounded only the `serialize` side, and did it by truncating. That was itself
+  the mechanism that made a misframed buffer reachable from ordinary input: when `indentation`
+  consumed the budget, `containers` was silently written as nothing at all, the four trailing
+  scalars were appended in its place, and the reader then took those scalars plus four bytes of
+  whatever followed the buffer as `containers`' 8-byte length prefix. Truncation is undetectable
+  to the reader; absence is not. `serialize` is now all-or-nothing and returns 0 when the state
+  does not fit, which tree-sitter reads as "no state" and which `deserialize` already handles
+  exactly.
+
+  This is a distinct defect from the prefix-width mismatch described below, and it survived that
+  fix: the widths now agree, but nothing bounded the reads. It is the crash behind
+  `process("#let x = 1", {"language": "typst"})` (#161, GitHub #180), which took down the Ruby,
+  Python, PHP, Elixir, Java, Dart and Go E2E gates along with the C# test host and a Node vitest
+  worker.
+
 - **`process` fixtures name the field they actually assert on.** Twenty-one assertions said
   `contains` on the bare `structure` or `imports` collection and meant "some item has this *kind*"
   (or, for imports, "this *source*"). Up to alef 0.60.0 that generated a debug-string substring
