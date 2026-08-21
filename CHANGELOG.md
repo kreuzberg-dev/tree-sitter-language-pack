@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The e2e drift gate no longer depends on which formatters a machine happens to have.**
+  `alef e2e generate` ran `ruff` for python and `pnpm dlx oxfmt` for node and wasm. The
+  validate job has neither -- it sets up python, java, go, ruby, dart and elixir, and the
+  reusable workflow has no `setup-node` input -- so alef logged `skipped -- executable not
+  found`, emitted unformatted suites, and `git diff --exit-code` failed on 45 files that were
+  correct on every developer machine. All three now go through `poly`, which the job installs
+  before the generate step and which bundles the same engines.
+
+- **The Zig `get_language` test no longer pins the transport of an unknown-language failure.**
+  With the compile error fixed the suite ran for the first time and the last test failed:
+  `get_language` on an unknown name returned `error.Download`, not `error.LanguageNotFound`.
+  Both are documented outcomes -- the manifest lookup falls back to a fetch, and CI cannot
+  reach the release artifacts for the version under test -- so the test now asserts the
+  invariant, that no language is handed back.
+
 - **Five CI gates that had never actually executed.** Every one was masked by an earlier job
   failing or being cancelled, so all five failures surfaced at once the first time the gates
   ran.
