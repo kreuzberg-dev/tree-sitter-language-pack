@@ -64,7 +64,7 @@ test "should_map_py_extension_to_python_when_detecting_language_from_extension" 
 }
 
 test "should_report_local_python_parser_availability_without_network_when_queried_via_registry" {
-    var registry = tslp.new_language_registry();
+    var registry = try tslp.new_language_registry();
     defer registry.free();
 
     // `has_parser` is documented to never perform network I/O, so this is a
@@ -74,7 +74,7 @@ test "should_report_local_python_parser_availability_without_network_when_querie
 }
 
 test "should_report_parser_unavailable_when_registry_queried_for_unknown_language" {
-    var registry = tslp.new_language_registry();
+    var registry = try tslp.new_language_registry();
     defer registry.free();
 
     try std.testing.expect(!(try registry.has_parser("this-language-definitely-does-not-exist-xyz")));
