@@ -3161,16 +3161,6 @@
     "kotlin-android/data_extraction/data_extraction_yaml_flat.md",
     "kotlin-android/data_extraction/data_extraction_yaml_nested.md",
     "kotlin-android/data_extraction/data_extraction_yaml_sequence.md",
-    "kotlin-android/download/download_cache_dir.md",
-    "kotlin-android/download/download_clean_cache.md",
-    "kotlin-android/download/download_configure_custom_dir.md",
-    "kotlin-android/download/download_downloaded_empty.md",
-    "kotlin-android/download/download_empty_list.md",
-    "kotlin-android/download/download_init_default.md",
-    "kotlin-android/download/download_invalid_language.md",
-    "kotlin-android/download/download_manifest_languages.md",
-    "kotlin-android/download/download_multiple_languages.md",
-    "kotlin-android/download/download_single_language.md",
     "kotlin-android/download/prefetch_empty_list.md",
     "kotlin-android/download/prefetch_languages.md",
     "kotlin-android/error-handling/error_detect_content_empty.md",
@@ -45722,126 +45712,6 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/data_extraction/data_extraction_yaml_sequence.md",
-      "language": "kotlin",
-      "target": "kotlin_android",
-      "session": "kotlin_android",
-      "requires": [],
-      "side_effect": "safe"
-    },
-    {
-      "key": {
-        "fixture_id": "download_cache_dir",
-        "language": "kotlin_android"
-      },
-      "path": "kotlin-android/download/download_cache_dir.md",
-      "language": "kotlin",
-      "target": "kotlin_android",
-      "session": "kotlin_android",
-      "requires": [],
-      "side_effect": "safe"
-    },
-    {
-      "key": {
-        "fixture_id": "download_clean_cache",
-        "language": "kotlin_android"
-      },
-      "path": "kotlin-android/download/download_clean_cache.md",
-      "language": "kotlin",
-      "target": "kotlin_android",
-      "session": "kotlin_android",
-      "requires": [],
-      "side_effect": "safe"
-    },
-    {
-      "key": {
-        "fixture_id": "download_configure_custom_dir",
-        "language": "kotlin_android"
-      },
-      "path": "kotlin-android/download/download_configure_custom_dir.md",
-      "language": "kotlin",
-      "target": "kotlin_android",
-      "session": "kotlin_android",
-      "requires": [],
-      "side_effect": "safe"
-    },
-    {
-      "key": {
-        "fixture_id": "download_downloaded_empty",
-        "language": "kotlin_android"
-      },
-      "path": "kotlin-android/download/download_downloaded_empty.md",
-      "language": "kotlin",
-      "target": "kotlin_android",
-      "session": "kotlin_android",
-      "requires": [],
-      "side_effect": "safe"
-    },
-    {
-      "key": {
-        "fixture_id": "download_empty_list",
-        "language": "kotlin_android"
-      },
-      "path": "kotlin-android/download/download_empty_list.md",
-      "language": "kotlin",
-      "target": "kotlin_android",
-      "session": "kotlin_android",
-      "requires": [],
-      "side_effect": "safe"
-    },
-    {
-      "key": {
-        "fixture_id": "download_init_default",
-        "language": "kotlin_android"
-      },
-      "path": "kotlin-android/download/download_init_default.md",
-      "language": "kotlin",
-      "target": "kotlin_android",
-      "session": "kotlin_android",
-      "requires": [],
-      "side_effect": "safe"
-    },
-    {
-      "key": {
-        "fixture_id": "download_invalid_language",
-        "language": "kotlin_android"
-      },
-      "path": "kotlin-android/download/download_invalid_language.md",
-      "language": "kotlin",
-      "target": "kotlin_android",
-      "session": "kotlin_android",
-      "requires": [],
-      "side_effect": "safe"
-    },
-    {
-      "key": {
-        "fixture_id": "download_manifest_languages",
-        "language": "kotlin_android"
-      },
-      "path": "kotlin-android/download/download_manifest_languages.md",
-      "language": "kotlin",
-      "target": "kotlin_android",
-      "session": "kotlin_android",
-      "requires": [],
-      "side_effect": "safe"
-    },
-    {
-      "key": {
-        "fixture_id": "download_multiple_languages",
-        "language": "kotlin_android"
-      },
-      "path": "kotlin-android/download/download_multiple_languages.md",
-      "language": "kotlin",
-      "target": "kotlin_android",
-      "session": "kotlin_android",
-      "requires": [],
-      "side_effect": "safe"
-    },
-    {
-      "key": {
-        "fixture_id": "download_single_language",
-        "language": "kotlin_android"
-      },
-      "path": "kotlin-android/download/download_single_language.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -105910,10 +105780,6 @@
     },
     {
       "fixture_id": "download_cache_dir",
-      "language": "kotlin_android"
-    },
-    {
-      "fixture_id": "download_cache_dir",
       "language": "node"
     },
     {
@@ -105966,10 +105832,6 @@
     },
     {
       "fixture_id": "download_clean_cache",
-      "language": "kotlin_android"
-    },
-    {
-      "fixture_id": "download_clean_cache",
       "language": "node"
     },
     {
@@ -106022,10 +105884,6 @@
     },
     {
       "fixture_id": "download_configure_custom_dir",
-      "language": "kotlin_android"
-    },
-    {
-      "fixture_id": "download_configure_custom_dir",
       "language": "node"
     },
     {
@@ -106075,10 +105933,6 @@
     {
       "fixture_id": "download_downloaded_empty",
       "language": "java"
-    },
-    {
-      "fixture_id": "download_downloaded_empty",
-      "language": "kotlin_android"
     },
     {
       "fixture_id": "download_downloaded_empty",
@@ -106134,10 +105988,6 @@
     },
     {
       "fixture_id": "download_empty_list",
-      "language": "kotlin_android"
-    },
-    {
-      "fixture_id": "download_empty_list",
       "language": "node"
     },
     {
@@ -106187,10 +106037,6 @@
     {
       "fixture_id": "download_init_default",
       "language": "java"
-    },
-    {
-      "fixture_id": "download_init_default",
-      "language": "kotlin_android"
     },
     {
       "fixture_id": "download_init_default",
@@ -106246,10 +106092,6 @@
     },
     {
       "fixture_id": "download_invalid_language",
-      "language": "kotlin_android"
-    },
-    {
-      "fixture_id": "download_invalid_language",
       "language": "node"
     },
     {
@@ -106299,10 +106141,6 @@
     {
       "fixture_id": "download_manifest_languages",
       "language": "java"
-    },
-    {
-      "fixture_id": "download_manifest_languages",
-      "language": "kotlin_android"
     },
     {
       "fixture_id": "download_manifest_languages",
@@ -106358,10 +106196,6 @@
     },
     {
       "fixture_id": "download_multiple_languages",
-      "language": "kotlin_android"
-    },
-    {
-      "fixture_id": "download_multiple_languages",
       "language": "node"
     },
     {
@@ -106411,10 +106245,6 @@
     {
       "fixture_id": "download_single_language",
       "language": "java"
-    },
-    {
-      "fixture_id": "download_single_language",
-      "language": "kotlin_android"
     },
     {
       "fixture_id": "download_single_language",
@@ -137132,10 +136962,6 @@
     },
     {
       "fixture_id": "download_cache_dir",
-      "language": "kotlin_android"
-    },
-    {
-      "fixture_id": "download_cache_dir",
       "language": "node"
     },
     {
@@ -137188,10 +137014,6 @@
     },
     {
       "fixture_id": "download_clean_cache",
-      "language": "kotlin_android"
-    },
-    {
-      "fixture_id": "download_clean_cache",
       "language": "node"
     },
     {
@@ -137244,10 +137066,6 @@
     },
     {
       "fixture_id": "download_configure_custom_dir",
-      "language": "kotlin_android"
-    },
-    {
-      "fixture_id": "download_configure_custom_dir",
       "language": "node"
     },
     {
@@ -137297,10 +137115,6 @@
     {
       "fixture_id": "download_downloaded_empty",
       "language": "java"
-    },
-    {
-      "fixture_id": "download_downloaded_empty",
-      "language": "kotlin_android"
     },
     {
       "fixture_id": "download_downloaded_empty",
@@ -137356,10 +137170,6 @@
     },
     {
       "fixture_id": "download_empty_list",
-      "language": "kotlin_android"
-    },
-    {
-      "fixture_id": "download_empty_list",
       "language": "node"
     },
     {
@@ -137409,10 +137219,6 @@
     {
       "fixture_id": "download_init_default",
       "language": "java"
-    },
-    {
-      "fixture_id": "download_init_default",
-      "language": "kotlin_android"
     },
     {
       "fixture_id": "download_init_default",
@@ -137468,10 +137274,6 @@
     },
     {
       "fixture_id": "download_invalid_language",
-      "language": "kotlin_android"
-    },
-    {
-      "fixture_id": "download_invalid_language",
       "language": "node"
     },
     {
@@ -137521,10 +137323,6 @@
     {
       "fixture_id": "download_manifest_languages",
       "language": "java"
-    },
-    {
-      "fixture_id": "download_manifest_languages",
-      "language": "kotlin_android"
     },
     {
       "fixture_id": "download_manifest_languages",
@@ -137580,10 +137378,6 @@
     },
     {
       "fixture_id": "download_multiple_languages",
-      "language": "kotlin_android"
-    },
-    {
-      "fixture_id": "download_multiple_languages",
       "language": "node"
     },
     {
@@ -137633,10 +137427,6 @@
     {
       "fixture_id": "download_single_language",
       "language": "java"
-    },
-    {
-      "fixture_id": "download_single_language",
-      "language": "kotlin_android"
     },
     {
       "fixture_id": "download_single_language",
