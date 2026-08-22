@@ -92,7 +92,6 @@ test_apps/*/file:/
 
 # E2E build artifacts
 e2e/c/build/
-e2e/c/test_*
 e2e/swift_e2e/.build/
 e2e/swift_e2e/Package.resolved
 e2e/*/.gradle/
