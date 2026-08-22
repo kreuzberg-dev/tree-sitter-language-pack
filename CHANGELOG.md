@@ -9,6 +9,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The Docker image builds again (cc140342d, previously unreleased).** `Publish Docker Image`
+  for v1.15.5 failed on both architectures at `apk add ... python3=3.12.13-r0`: Alpine's
+  repository only ever carries the current revision of a package, so an exact `-rN` pin stops
+  resolving the moment a security bump lands and the old revision is deleted. The pins are now
+  fuzzy (`python3=~3.12`), which keeps the major.minor the base image already fixes while
+  letting the revision float. Note that pinning the base image by digest is not a substitute:
+  `apk --no-cache` fetches the package index over the network at build time, so a
+  digest-identical `rust:1.95-alpine3.22` still fails on the old exact pins today.
+
+- **Go snippets are validated against a library that exists.** All 521 of them failed in the
+  validate job with `ld: cannot find -lts_pack_core_ffi`. The `-L` path was right; nothing had
+  ever put a library behind it. `binding.go` links `${SRCDIR}/.lib/<platform>`, `.lib/` is
+  gitignored, and the validate job builds no binding packages -- so `go build ./...`, which is
+  what `compile`-level validation runs, could not link. The go snippet session now has a
+  `before` hook (`scripts/stage_go_native.sh`) that builds `ts-pack-core-ffi` and stages it
+  there, the same artifact `ci-e2e.yaml`'s Go job restores by hand. `timeout_secs` went from
+  120 to 900 because the same budget bounds `before` hooks, and a cold cargo build does not fit
+  in two minutes.
+
+- **Java snippets are compiled against a built package.** All 521 were `Unavailable` in the same
+  run, which under `strict` fails the run exactly as a `Fail` does -- `has_incomplete_coverage`
+  counts `Skip`, `Unavailable` and `Downgraded`. The Java validator builds its classpath from
+  `<pom dir>/target/{classes,test-classes,dependency/*.jar}` and nothing had built any of it, so
+  the session now runs `mvn compile` and `mvn dependency:copy-dependencies` first. That is a
+  different artifact and a different build from the Go fix above, not one change covering both.
+  513 of the 521 now compile; the remaining 8 are an upstream alef defect, not an environment
+  gap -- see Known issues.
+
+### Known issues
+
+- **8 generated Java snippets reference an exception class the binding never declares.**
+  `download_invalid_language`, `error_empty_language_name`,
+  `error_handling_get_language_empty_string`, `error_handling_unknown_language`,
+  `parse_empty_language`, `process_unknown_language`, `get_language_unknown` and
+  `get_parser_unknown` all `catch (TreeSitterLanguagePackException ...)`, which does not exist in
+  `packages/java` and is not referenced anywhere else in this repo. Alef derives that name twice
+  and disagrees with itself: the binding emitter uses
+  `backends::java::naming::exception_class_name`, which suffixes the *raw FFI* class and yields
+  `TreeSitterLanguagePackRsException`, while `e2e/codegen/java/snippet.rs` re-derives it as
+  `format!("{simple_class_name}Exception")` from the *facade* class, whose `Rs` suffix has been
+  stripped. No build step can close this, and hand-editing the snippets is pointless because the
+  same job regenerates them and gates on the diff. Until alef is fixed the Java session keeps 8
+  `Unavailable` results and the validate job stays red.
+
+- **`CI Sanitize` no longer instruments third-party C it cannot link.** The job injected the
+  sanitizer flags through `CFLAGS_x86_64_unknown_linux_gnu`, on the stated assumption that a
+  target-scoped variable leaves host build scripts alone. It does not: cc-rs keys that variable
+  on the triple alone, and on a Linux x86_64 runner the host triple *is*
+  `x86_64-unknown-linux-gnu`, so the flags also instrumented the C in `zstd-sys` and `ring` --
+  both build-dependencies of `ts-pack-core`, whose objects are linked into its build-script
+  binary. Cargo withholds RUSTFLAGS from host units when `--target` is passed, so that link
+  never received the `-lasan`/`-lubsan` the job adds and died with undefined `__asan_*` /
+  `__ubsan_*` symbols while linking `build_script_build`, before a single grammar was compiled.
+  `build.rs` now reads `TSLP_GRAMMAR_CFLAGS` and applies it to the vendored grammar C/C++ on the
+  static-link path only, which is the one place the host/target split is expressible on stable.
+
 - **The e2e drift gate no longer depends on which formatters a machine happens to have.**
   `alef e2e generate` ran `ruff` for python and `pnpm dlx oxfmt` for node and wasm. The
   validate job has neither -- it sets up python, java, go, ruby, dart and elixir, and the

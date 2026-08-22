@@ -19,10 +19,11 @@ name: CI Sanitize
 #     rotated by day-of-year over SHARD_COUNT shards, so the whole external-scanner
 #     surface is swept every SHARD_COUNT days without any single run being long.
 #
-# Only the C is instrumented (`CFLAGS=-fsanitize=...` + `-Clink-arg=-fsanitize=...`),
-# not Rust. That keeps the job on the pinned stable toolchain instead of requiring
-# nightly `-Zsanitizer` + `-Zbuild-std`, and the scanners are the entire target
-# anyway — the Rust side is already covered by clippy and the normal test suite.
+# Only the vendored grammar C is instrumented (`TSLP_GRAMMAR_CFLAGS=-fsanitize=...`
+# plus `-Clink-arg=` for the runtime), not Rust and not third-party C. That keeps the
+# job on the pinned stable toolchain instead of requiring nightly `-Zsanitizer` +
+# `-Zbuild-std`, and the scanners are the entire target anyway — the Rust side is
+# already covered by clippy and the normal test suite.
 #
 # Patches are applied by `patch_grammar_sources` in build.rs on the default path;
 # TSLP_SKIP_GRAMMAR_PATCHES is deliberately never set here, and the run asserts the
@@ -162,17 +163,19 @@ jobs:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: ${{ steps.select.outputs.languages }}
           TSLP_LINK_MODE: static
-          # cc-rs appends CFLAGS to every scanner/parser translation unit; build.rs does
-          # not call `no_default_flags()`, so this is the supported injection point.
-          # `-fno-sanitize-recover=all` turns a UBSan diagnosis into a hard abort rather
-          # than a printed warning that a green exit code would hide. ~keep
-          # Target-scoped, NOT bare CFLAGS/RUSTFLAGS. With an explicit --target, cargo builds
-          # host build scripts with HOST settings, so they stay uninstrumented. Bare CFLAGS
-          # instruments every cc-rs crate in the graph including ring and zstd-sys, whose
-          # objects then land in a build script that cargo executes mid-build — and an
-          # instrumented binary run without the ASan runtime preloaded aborts on startup,
-          # failing the build before any grammar is ever parsed. ~keep
-          CFLAGS_x86_64_unknown_linux_gnu: >-
+          # `TSLP_GRAMMAR_CFLAGS` is read by crates/ts-pack-core/build.rs and applied to the
+          # vendored grammar C/C++ only. `-fno-sanitize-recover=all` turns a UBSan diagnosis
+          # into a hard abort rather than a printed warning that a green exit code would hide.
+          # ~keep NOT `CFLAGS_x86_64_unknown_linux_gnu`, and not bare `CFLAGS`. cc-rs keys the
+          # triple-scoped variable on the triple alone, and on this runner the host triple IS
+          # x86_64-unknown-linux-gnu — so it also instruments the C in every build-dependency
+          # (zstd-sys via `zstd`, ring via `ureq`), whose objects are linked into ts-pack-core's
+          # build-script binary. Cargo withholds RUSTFLAGS from host units when `--target` is
+          # passed, so that link never receives the `-lasan`/`-lubsan` below and dies with
+          # undefined `__asan_*`/`__ubsan_*` while linking `build_script_build` (run
+          # 32550410081). Scoping the flags in build.rs is the only place the split is
+          # expressible on stable.
+          TSLP_GRAMMAR_CFLAGS: >-
             -fsanitize=address,undefined
             -fno-sanitize-recover=all
             -fno-omit-frame-pointer
@@ -198,11 +201,10 @@ jobs:
           # can tell the difference. Resolved once here for every step that runs it. ~keep
           echo "ASAN_RUNTIME=$(cc -print-file-name=libasan.so)" >>"$GITHUB_ENV"
 
-      # The single most important check in this job: it proves the CFLAGS above actually
-      # reached the compiler. If cc-rs ever stops forwarding CFLAGS, or build.rs starts
-      # calling `no_default_flags()`, every step below still exits 0 while checking
-      # nothing — a green gate that proves nothing. An uninstrumented binary has no
-      # `__asan_` symbols. ~keep
+      # The single most important check in this job: it proves the flags above actually
+      # reached the compiler. If build.rs ever stops forwarding `TSLP_GRAMMAR_CFLAGS` to the
+      # grammar `cc::Build`s, every step below still exits 0 while checking nothing — a green
+      # gate that proves nothing. An uninstrumented binary has no `__asan_` symbols. ~keep
       - name: Assert the binary is actually instrumented
         run: |
           set -euo pipefail
