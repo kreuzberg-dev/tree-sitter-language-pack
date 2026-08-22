@@ -142,6 +142,9 @@ jobs:
       setup-ruby: true
       setup-dart: true
       setup-elixir: true
+      # The zig snippet session needs a real `zig` on PATH -- without it every zig snippet was
+      # `Unavailable` with "zig toolchain not found" (521 of them in CI run 32520643605). ~keep
+      setup-zig: true
       # Snippet validation is the only gate that catches generated examples which no longer
       # compile against the API they document -- the class of defect that shipped a release
       # whose every e2e suite failed. ~keep

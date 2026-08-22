@@ -51,9 +51,16 @@ manifest = "packages/python/pyproject.toml"
 cwd = "crates/ts-pack-core-node"
 manifest = "crates/ts-pack-core-node/package.json"
 
+# The TypeScript validator resolves `@xberg-io/tree-sitter-language-pack-wasm` through the
+# manifest's `types` field (pkg/nodejs/ts_pack_core_wasm.d.ts), not through node_modules. That
+# file only exists after a wasm-pack build, and `pkg/` is gitignored, so without this hook every
+# wasm snippet is `Unavailable` with "Cannot find module ..." (511 of them in CI run
+# 32520643605). See scripts/stage_wasm_types.sh for why the language selection it builds with is
+# tiny and deliberate. ~keep
 [workspace.docs.snippets.sessions.wasm]
 cwd = "crates/ts-pack-core-wasm"
 manifest = "crates/ts-pack-core-wasm/package.json"
+before = ["bash ../../scripts/stage_wasm_types.sh"]
 
 [workspace.docs.snippets.sessions.ruby]
 cwd = "packages/ruby"
@@ -94,9 +101,12 @@ manifest = "packages/elixir/mix.exs"
 cwd = "crates/ts-pack-core"
 manifest = "crates/ts-pack-core/Cargo.toml"
 
+# See scripts/stage_kotlin_android_sdk.sh for why this hook writes local.properties itself
+# rather than relying on the CI runner's ANDROID_HOME. ~keep
 [workspace.docs.snippets.sessions.kotlin_android]
 cwd = "packages/kotlin-android"
 manifest = "packages/kotlin-android/build.gradle.kts"
+before = ["bash ../../scripts/stage_kotlin_android_sdk.sh"]
 
 [workspace.docs.snippets.sessions.swift]
 cwd = "packages/swift"
@@ -107,9 +117,14 @@ before = ["swift build"]
 cwd = "packages/dart"
 manifest = "packages/dart/pubspec.yaml"
 
+# Compile-level zig validation links a real executable against the binding, not just type-checks
+# it (see scripts/stage_zig_ffi.sh), so it needs the same FFI artifact `[crates.test.zig]` builds
+# before testing. Without it every zig snippet was `Unavailable` with "zig toolchain not found"
+# before setup-zig closed that gap, and would otherwise fail to link next. ~keep
 [workspace.docs.snippets.sessions.zig]
 cwd = "packages/zig"
 manifest = "packages/zig/build.zig"
+before = ["bash ../../scripts/stage_zig_ffi.sh"]
 env = { ZIG_GLOBAL_CACHE_DIR = ".zig-global-cache", ZIG_LOCAL_CACHE_DIR = ".zig-cache" }
 
 # Sessions are keyed by snippet target; C snippets declare `target = "ffi"`. Without
@@ -734,6 +749,23 @@ style = "frb"
 [crates.kotlin_android]
 package = "io.xberg.tslp.android"
 features = ["serde"]
+# The download family is absent from the kotlin_android target for the same reason it is
+# absent from wasm (see [crates.wasm] above): it sits behind ts-pack-core's opt-in `download`
+# feature, which this crate does not enable (crates/tree-sitter-language-pack-jni/Cargo.toml
+# only turns on `serde`), so a snippet importing it cannot resolve. Without this, 10 download-
+# family snippets were `Unavailable` with "unresolved reference" in every CI run. ~keep
+exclude_functions = [
+  "init",
+  "configure",
+  "download",
+  "download_all",
+  "download_group",
+  "manifest_languages",
+  "manifest_groups",
+  "downloaded_languages",
+  "clean_cache",
+  "cache_dir",
+]
 
 [crates.kotlin_android.capsule_types.Language]
 host_type = "io.github.treesitter.ktreesitter.Language"

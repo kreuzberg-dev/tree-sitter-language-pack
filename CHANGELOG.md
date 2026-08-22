@@ -37,6 +37,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   513 of the 521 now compile; the remaining 8 are an upstream alef defect, not an environment
   gap -- see Known issues.
 
+- **wasm/typescript snippets are type-checked against a package that has type declarations.**
+  All 511 were `Unavailable` with "Cannot find module '@xberg-io/tree-sitter-language-pack-wasm'"
+  -- the TypeScript validator resolves that module through the manifest's `types` field
+  (`pkg/nodejs/ts_pack_core_wasm.d.ts`), which only exists after a `wasm-pack build`, and `pkg/`
+  is gitignored. The wasm snippet session now runs `scripts/stage_wasm_types.sh`, which builds
+  with `TSLP_LANGUAGES=mojo,nim,norg` -- all three are wasm32-unbuildable and already skipped by
+  `build.rs`, so the build needs no wasi-sdk and finishes in well under a minute, and the
+  generated public API surface does not vary with which grammars are statically linked in.
+
+- **kotlin_android snippets are compiled against a built package.** All 521 were `Unavailable`
+  with `unresolved reference 'io'` -- the Kotlin validator resolves its classpath through
+  Gradle's own task model, which reports `compileDebugKotlin`'s `destinationDirectory` whether
+  or not anything has been compiled into it, and nothing had. The session now runs
+  `scripts/stage_kotlin_android_sdk.sh`, which writes `local.properties` itself (alef's snippet
+  runner does not pass ANDROID_HOME/ANDROID_SDK_ROOT through to session commands) and then
+  compiles. `[crates.kotlin_android]` also gained the same `exclude_functions` list `[crates.wasm]`
+  already has: the 10 `download`-family snippets fail for the identical reason wasm's do (the
+  feature isn't enabled for this target), so they are excluded from generation entirely rather
+  than validated against a package that can't have them. 511 of the 521 now compile against a
+  built package locally; the remaining 10 need a fixture regenerate to pick up the exclusion,
+  which is out of scope for this change.
+
+- **zig snippets are validated with a zig toolchain, then linked against a built FFI library.**
+  All 521 were `Unavailable` with "zig toolchain not found" -- the validate job never installed
+  one; `ci.yaml` now passes `setup-zig: true` to `reusable-validate.yml@v1`, which gained the
+  input upstream. That alone was not enough: compile-level zig validation links a real
+  executable (the generated per-snippet `build.zig` calls `b.addExecutable` +
+  `b.default_step.dependOn`), so it also needs `ts-pack-core-ffi` built at
+  `packages/zig/build.zig`'s default `-Dffi_path` (`target/release`). The session now runs
+  `scripts/stage_zig_ffi.sh` first, mirroring `stage_go_native.sh`'s FFI build. All 521 now pass.
+
 ### Known issues
 
 - **8 generated Java snippets reference an exception class the binding never declares.**
