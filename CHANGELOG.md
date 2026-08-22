@@ -37,6 +37,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   513 of the 521 now compile; the remaining 8 are an upstream alef defect, not an environment
   gap -- see Known issues.
 
+- **wasm/typescript snippets are type-checked against a package that has type declarations.**
+  All 511 were `Unavailable` with "Cannot find module '@xberg-io/tree-sitter-language-pack-wasm'"
+  -- the TypeScript validator resolves that module through the manifest's `types` field
+  (`pkg/nodejs/ts_pack_core_wasm.d.ts`), which only exists after a `wasm-pack build`, and `pkg/`
+  is gitignored. The wasm snippet session now runs `scripts/stage_wasm_types.sh`, which builds
+  with `TSLP_LANGUAGES=mojo,nim,norg` -- all three are wasm32-unbuildable and already skipped by
+  `build.rs`, so the build needs no wasi-sdk and finishes in well under a minute, and the
+  generated public API surface does not vary with which grammars are statically linked in.
+
 ### Known issues
 
 - **8 generated Java snippets reference an exception class the binding never declares.**

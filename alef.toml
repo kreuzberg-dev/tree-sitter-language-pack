@@ -51,9 +51,16 @@ manifest = "packages/python/pyproject.toml"
 cwd = "crates/ts-pack-core-node"
 manifest = "crates/ts-pack-core-node/package.json"
 
+# The TypeScript validator resolves `@xberg-io/tree-sitter-language-pack-wasm` through the
+# manifest's `types` field (pkg/nodejs/ts_pack_core_wasm.d.ts), not through node_modules. That
+# file only exists after a wasm-pack build, and `pkg/` is gitignored, so without this hook every
+# wasm snippet is `Unavailable` with "Cannot find module ..." (511 of them in CI run
+# 32520643605). See scripts/stage_wasm_types.sh for why the language selection it builds with is
+# tiny and deliberate. ~keep
 [workspace.docs.snippets.sessions.wasm]
 cwd = "crates/ts-pack-core-wasm"
 manifest = "crates/ts-pack-core-wasm/package.json"
+before = ["bash ../../scripts/stage_wasm_types.sh"]
 
 [workspace.docs.snippets.sessions.ruby]
 cwd = "packages/ruby"
