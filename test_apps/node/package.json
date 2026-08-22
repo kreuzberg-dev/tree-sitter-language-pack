@@ -10,7 +10,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@xberg-io/tree-sitter-language-pack": "1.15.6",
+    "@xberg-io/tree-sitter-language-pack": "1.15.7",
     "@types/node": "^26.0.0",
     "vitest": "^4.1.10"
   }
