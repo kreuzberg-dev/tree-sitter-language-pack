@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`Validate (Lint & Format)` no longer fails on every release commit.** The job passed
+  `python-extra-projects: packages/python` to the shared validate workflow, which runs
+  `uv pip install -e packages/python` -- a maturin build of `crates/ts-pack-core-py`, and so a run
+  of `crates/ts-pack-core/build.rs`. That job never downloads the `language-parsers` artifact, so
+  `parsers/` is empty and build.rs falls through to the `parser-sources-<version>.tar.zst` release
+  asset for the version in `Cargo.toml` -- which does not exist yet on a release commit, because
+  the version is always bumped before its release is published. Run 32562369389 (v1.15.6) died on
+  that 404 at step 9 of 32, so `Format check` and `Lint` never ran at all. The input is dropped:
+  its stated purpose (letting pyrefly resolve `tree_sitter`) was already satisfied by the root dev
+  group in `pyproject.toml`, and `._native` resolves from the checked-in `_native.pyi` stub, so
+  `pyrefly check packages/python` reports 0 errors without the wheel being built.
+- **Rust snippet validation no longer downloads parser sources.** The `rust` snippet session now
+  sets `TSLP_OFFLINE=1`. Its `cargo check` builds ts-pack-core through a path dependency and so
+  runs the same build.rs against the same empty `parsers/` tree -- the identical 404 on a release
+  commit, one step later in the same job. `TSLP_LANGUAGES` is unset there, so no grammar is
+  compiled into that check either way; skipping the sources changes nothing it validates.
 - Quick Start's kotlin-android `process` and `quickstart` tabs now import the generated corpus
   (`generated/kotlin-android/process/config_all_python.md` and
   `generated/kotlin-android/parsing/parsing_python_function.md`) instead of two hand-written

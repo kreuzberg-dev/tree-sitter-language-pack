@@ -104,9 +104,17 @@ manifest = "packages/csharp/TreeSitterLanguagePack/TreeSitterLanguagePack.csproj
 cwd = "packages/elixir"
 manifest = "packages/elixir/mix.exs"
 
+# The rust validator `cargo check`s a scratch crate with a path dependency on ts-pack-core, so it
+# runs that crate's build.rs. `parsers/` is gitignored and the validate job never downloads the
+# `language-parsers` artifact, so build.rs would clone every upstream grammar or fetch
+# `parser-sources-<version>.tar.zst` — which does not exist yet on a release commit, panicking on
+# a 404 and failing all 521 rust snippets. TSLP_LANGUAGES is unset here, so `selected` is empty
+# and not one grammar is compiled into this check either way: skipping the sources changes
+# nothing it validates and drops a per-run download that only ever worked between releases. ~keep
 [workspace.docs.snippets.sessions.rust]
 cwd = "crates/ts-pack-core"
 manifest = "crates/ts-pack-core/Cargo.toml"
+env = { TSLP_OFFLINE = "1" }
 
 # See scripts/stage_kotlin_android_sdk.sh for why this hook writes local.properties itself
 # rather than relying on the CI runner's ANDROID_HOME. ~keep

@@ -129,9 +129,19 @@ jobs:
       setup-rust: false
       setup-python: true
       python-version: "3.13"
-      # packages/python is not a member of the root uv workspace, so `uv sync` never
-      # installs its `tree-sitter` dependency and pyrefly reports it missing. ~keep
-      python-extra-projects: packages/python
+      # `python-extra-projects: packages/python` is deliberately NOT set, and must not come
+      # back. It made the job run `uv pip install -e packages/python`, which is a maturin build
+      # of crates/ts-pack-core-py and therefore runs crates/ts-pack-core/build.rs. This job
+      # never downloads the `language-parsers` artifact, so `parsers/` is empty and build.rs
+      # falls through to the `parser-sources-<version>.tar.zst` release asset for the version
+      # in Cargo.toml. On a release commit that asset does not exist yet — the Publish run is
+      # still queued — so the build panics on a 404 and the job dies before `Format check` and
+      # `Lint` ever run. That recurs on every release, structurally, because the version is
+      # always bumped before its release assets exist (run 32562369389, v1.15.6).
+      # Nothing is lost by dropping it: pyrefly resolves `tree_sitter` from the root dev group
+      # that `uv sync` installs (added in e8ee8f55d, after this input was introduced) and
+      # `._native` from the checked-in `_native.pyi` stub, so `pyrefly check packages/python`
+      # reports 0 errors without the wheel ever being built. ~keep
       setup-java: true
       java-version: "25"
       # The remaining whole-project checks poly runs (golangci-lint, rubocop, steep,
