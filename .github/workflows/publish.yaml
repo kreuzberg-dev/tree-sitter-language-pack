@@ -2834,6 +2834,13 @@ jobs:
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           dry-run: ${{ needs.prepare.outputs.dry_run }}
 
+  # The `publish-node` gate below is deliberately negative-form. Unlike the
+  # `publish-crates` gates elsewhere in this file, WASM does not CONSUME the node
+  # package -- it is an independent npm package and the dependency is ordering
+  # only. `== 'success'` would wrongly block WASM whenever publish-node is
+  # legitimately skipped (npm already at this version, or node not in targets),
+  # which is a skip-cascade, not a safety gate. Blocking only on an actual
+  # failure is the correct semantics here. ~keep
   publish-wasm:
     name: Publish WASM to npm
     needs: [prepare, validate-versions, check-registries, build-wasm, publish-node, e2e-wasm]
@@ -2843,6 +2850,8 @@ jobs:
       needs.validate-versions.result == 'success' &&
       needs.build-wasm.result == 'success' &&
       needs.e2e-wasm.result == 'success' &&
+      needs.publish-node.result != 'failure' &&
+      needs.publish-node.result != 'cancelled' &&
       (fromJson(needs.check-registries.outputs.results)['npm-wasm'] != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -4886,6 +4895,7 @@ jobs:
       always() &&
       !cancelled() &&
       needs.prepare.outputs.dry_run != 'true' &&
+      needs.release-finalize.result == 'success' &&
       !contains(needs.*.result, 'failure')
     runs-on: ubuntu-latest
     permissions:

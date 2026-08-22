@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A failed publish can no longer announce itself as a successful release.**
+  `announce-discord` gated on `!contains(needs.*.result, 'failure')`, which is satisfied when
+  every dependency is *skipped* -- the exact shape of the v1.15.5 run, where all 13 publish jobs
+  skipped and the release reached zero registries. It now additionally requires
+  `release-finalize` (the job that asserts every enabled target actually published) to have
+  succeeded.
+- **`publish-wasm` now genuinely waits on `publish-node`.** `publish-node` was listed in its
+  `needs:` but never restated in its `if:`; because the job opens with `always()`, the `needs:`
+  entry alone gated nothing and WASM could publish to npm after the node publish had failed. The
+  gate is deliberately negative-form (`!= 'failure'`) so a legitimately skipped `publish-node`
+  -- npm already at this version, or node not among the release targets -- does not cascade into
+  skipping WASM.
+
 - **68 of the 85 files `alef verify` reported frozen are now recorded as alef-owned.** Every one
   of them is a create-once seed, so plain `alef adopt` refuses them and the report's own remedy is
   unreachable without `--clobber-create-once-seeds`. Only the files that already match generated
