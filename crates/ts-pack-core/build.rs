@@ -129,6 +129,32 @@ fn apply_ctype_shim(build: &mut cc::Build, header: &Path, utf8proc_include: &Pat
     }
 }
 
+/// Extra compiler flags applied to the vendored grammar C/C++ on the static-link
+/// path, and to nothing else.
+///
+/// ~keep This exists because `CFLAGS_<triple>` cannot express "instrument only the
+/// grammars". cc-rs keys that variable on the triple alone, and on a Linux x86_64
+/// runner the host triple equals the target triple — so it also reaches the C in
+/// every *build-dependency* (zstd-sys, ring), whose objects are linked into this
+/// crate's build-script binary. Cargo deliberately withholds RUSTFLAGS from host
+/// units when `--target` is passed, so that link never gets `-lasan`/`-lubsan` and
+/// fails with undefined `__asan_*`/`__ubsan_*` (CI Sanitize run 32550410081). The
+/// dynamic-link path is not covered: it drives the compiler through a raw `Command`
+/// and would additionally need `-shared-libasan` on each shared object.
+fn grammar_extra_flags() -> Vec<String> {
+    env::var("TSLP_GRAMMAR_CFLAGS")
+        .unwrap_or_default()
+        .split_whitespace()
+        .map(str::to_string)
+        .collect()
+}
+
+fn apply_grammar_extra_flags(build: &mut cc::Build) {
+    for flag in grammar_extra_flags() {
+        build.flag(flag);
+    }
+}
+
 /// Compile the vendored utf8proc exactly once into a static archive linked into
 /// the final binary, backing the wide-ctype shim's wrappers.
 ///
@@ -659,6 +685,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
     build.std("c11");
     apply_wasm32_sysroot(&mut build);
     apply_wasm32_optimizations(&mut build);
+    apply_grammar_extra_flags(&mut build);
     if common_dir.exists() {
         build.include(&common_dir);
     }
@@ -683,6 +710,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
         scanner_build.std("c11");
         apply_wasm32_sysroot(&mut scanner_build);
         apply_wasm32_optimizations(&mut scanner_build);
+        apply_grammar_extra_flags(&mut scanner_build);
         if common_dir.exists() {
             scanner_build.include(&common_dir);
         }
@@ -711,6 +739,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
         apply_scanner_symbol_prefix(&mut cpp_build, name, &scanner_cc);
         apply_wasm32_sysroot(&mut cpp_build);
         apply_wasm32_optimizations(&mut cpp_build);
+        apply_grammar_extra_flags(&mut cpp_build);
         if common_dir.exists() {
             cpp_build.include(&common_dir);
         }
@@ -1758,6 +1787,7 @@ fn main() {
     println!("cargo:rerun-if-env-changed=PROJECT_ROOT");
     println!("cargo:rerun-if-env-changed=TSLP_LINK_MODE");
     println!("cargo:rerun-if-env-changed=TSLP_WASM_MAX_PARSER_BYTES");
+    println!("cargo:rerun-if-env-changed=TSLP_GRAMMAR_CFLAGS");
 
     let (shim_header, _, utf8proc_source) = ctype_shim_assets();
     println!("cargo:rerun-if-changed={}", shim_header.display());

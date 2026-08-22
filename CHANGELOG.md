@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`CI Sanitize` no longer instruments third-party C it cannot link.** The job injected the
+  sanitizer flags through `CFLAGS_x86_64_unknown_linux_gnu`, on the stated assumption that a
+  target-scoped variable leaves host build scripts alone. It does not: cc-rs keys that variable
+  on the triple alone, and on a Linux x86_64 runner the host triple *is*
+  `x86_64-unknown-linux-gnu`, so the flags also instrumented the C in `zstd-sys` and `ring` --
+  both build-dependencies of `ts-pack-core`, whose objects are linked into its build-script
+  binary. Cargo withholds RUSTFLAGS from host units when `--target` is passed, so that link
+  never received the `-lasan`/`-lubsan` the job adds and died with undefined `__asan_*` /
+  `__ubsan_*` symbols while linking `build_script_build`, before a single grammar was compiled.
+  `build.rs` now reads `TSLP_GRAMMAR_CFLAGS` and applies it to the vendored grammar C/C++ on the
+  static-link path only, which is the one place the host/target split is expressible on stable.
+
 - **The e2e drift gate no longer depends on which formatters a machine happens to have.**
   `alef e2e generate` ran `ruff` for python and `pnpm dlx oxfmt` for node and wasm. The
   validate job has neither -- it sets up python, java, go, ruby, dart and elixir, and the
