@@ -46,6 +46,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `build.rs`, so the build needs no wasi-sdk and finishes in well under a minute, and the
   generated public API surface does not vary with which grammars are statically linked in.
 
+- **kotlin_android snippets are compiled against a built package.** All 521 were `Unavailable`
+  with `unresolved reference 'io'` -- the Kotlin validator resolves its classpath through
+  Gradle's own task model, which reports `compileDebugKotlin`'s `destinationDirectory` whether
+  or not anything has been compiled into it, and nothing had. The session now runs
+  `scripts/stage_kotlin_android_sdk.sh`, which writes `local.properties` itself (alef's snippet
+  runner does not pass ANDROID_HOME/ANDROID_SDK_ROOT through to session commands) and then
+  compiles. `[crates.kotlin_android]` also gained the same `exclude_functions` list `[crates.wasm]`
+  already has: the 10 `download`-family snippets fail for the identical reason wasm's do (the
+  feature isn't enabled for this target), so they are excluded from generation entirely rather
+  than validated against a package that can't have them. 511 of the 521 now compile against a
+  built package locally; the remaining 10 need a fixture regenerate to pick up the exclusion,
+  which is out of scope for this change.
+
 ### Known issues
 
 - **8 generated Java snippets reference an exception class the binding never declares.**
