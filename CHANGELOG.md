@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Quick Start docs import kotlin-android's `download/prefetch_languages.md` snippet instead of
+  `download_single_language.md`. The latter no longer exists: excluding the download family from
+  the kotlin_android target (it sits behind ts-pack-core's opt-in `download` feature, which the
+  JNI crate does not enable) removed it, breaking the Astro build with UNRESOLVED_IMPORT. This
+  mirrors what wasm — excluded for the same reason — already did.
 - **The Docker image builds again (cc140342d, previously unreleased).** `Publish Docker Image`
   for v1.15.5 failed on both architectures at `apk add ... python3=3.12.13-r0`: Alpine's
   repository only ever carries the current revision of a package, so an exact `-rN` pin stops
