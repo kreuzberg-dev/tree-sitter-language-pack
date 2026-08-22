@@ -161,7 +161,7 @@ jobs:
       check-fixture-snippets: true
       # Pinned so CI installs the same alef that generated the tree in this commit; a drifting
       # version would grade this output against a different generator. ~keep
-      alef-version: "0.63.1"
+      alef-version: "0.65.0"
 
   validate-rust:
     name: Validate Rust & Alef
