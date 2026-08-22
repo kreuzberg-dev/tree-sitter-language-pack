@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Go snippets are validated against a library that exists.** All 521 of them failed in the
+  validate job with `ld: cannot find -lts_pack_core_ffi`. The `-L` path was right; nothing had
+  ever put a library behind it. `binding.go` links `${SRCDIR}/.lib/<platform>`, `.lib/` is
+  gitignored, and the validate job builds no binding packages -- so `go build ./...`, which is
+  what `compile`-level validation runs, could not link. The go snippet session now has a
+  `before` hook (`scripts/stage_go_native.sh`) that builds `ts-pack-core-ffi` and stages it
+  there, the same artifact `ci-e2e.yaml`'s Go job restores by hand. `timeout_secs` went from
+  120 to 900 because the same budget bounds `before` hooks, and a cold cargo build does not fit
+  in two minutes. This does not cover the 521 `java` snippets reported `Unavailable` in the
+  same run: those need `packages/java/target/classes`, a different artifact and a different
+  build, and unlike the Go failures they do not fail the run.
+
 - **`CI Sanitize` no longer instruments third-party C it cannot link.** The job injected the
   sanitizer flags through `CFLAGS_x86_64_unknown_linux_gnu`, on the stated assumption that a
   target-scoped variable leaves host build scripts alone. It does not: cc-rs keys that variable

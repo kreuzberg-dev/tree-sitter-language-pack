@@ -35,7 +35,11 @@ outputs = [".codex/skills", ".agents/skills", ".github/skills", ".claude/skills"
 [workspace.docs.snippets]
 dirs = ["docs-site/src/snippets/generated"]
 validation_level = "compile"
-timeout_secs = 120
+# This bounds each session's `before` hook as well as the validation commands, and the hooks
+# here build native artifacts (`swift build`, a cargo release build of the FFI). 120s was a
+# validation-shaped budget; a cold cargo build does not fit in it and would be reported as a
+# session-preparation timeout rather than a build. ~keep
+timeout_secs = 900
 strict = true
 deny_unclassified = true
 
@@ -58,9 +62,14 @@ cwd = "packages/ruby"
 cwd = "."
 manifest = "composer.json"
 
+# Go snippets validate at `compile` level, which is `go build ./...` — a real cgo link against
+# `.lib/<platform>/libts_pack_core_ffi`. `.lib/` is gitignored, so without this hook every Go
+# snippet fails with `cannot find -lts_pack_core_ffi` and the failure describes the environment,
+# not the snippet (521 of them in CI run 32520643605). ~keep
 [workspace.docs.snippets.sessions.go]
 cwd = "packages/go"
 manifest = "packages/go/go.mod"
+before = ["bash ../../scripts/stage_go_native.sh"]
 
 [workspace.docs.snippets.sessions.java]
 cwd = "packages/java"
