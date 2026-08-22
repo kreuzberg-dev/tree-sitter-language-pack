@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`task docs:snippets:validate:lang` runs again.** It invoked `alef snippets validate`, a
+  subcommand that does not exist (`alef snippets` has `list`, `check`, `parse`, `audit`, `gaps`),
+  so the target could only ever fail with `unrecognized subcommand`. It now calls
+  `alef snippets check --strict --cache off --lang {{.LANGUAGES}}`, matching
+  `docs:snippets:validate` with the per-language filter added. The `--snippets` path is dropped
+  because `check` reads `[workspace.docs.snippets]`, and `LEVEL` is dropped because `check` has no
+  level flag -- each validator picks the deepest level its toolchain supports.
 - **`alef verify` no longer reports 8,415 stale files.** `alef all` ran at ada0fac4e and the
   1.15.6 version bump landed after it at e9816afda; `alef.toml` is a hashed generation input, so
   every generated file was stamped against pre-bump inputs and nothing re-stamped them. The tree

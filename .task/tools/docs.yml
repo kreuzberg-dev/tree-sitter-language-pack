@@ -49,13 +49,11 @@ tasks:
       - alef snippets check --strict --cache off
 
   snippets:validate:lang:
-    desc: Validate snippets for specific languages (LANGUAGES=rust,python LEVEL=syntax)
+    desc: Validate snippets for specific languages (LANGUAGES=rust,python)
     requires:
       vars: [LANGUAGES]
-    vars:
-      LEVEL: '{{ .LEVEL | default "syntax" }}'
     cmds:
-      - alef snippets validate --snippets docs-site/src/snippets --languages {{.LANGUAGES}} --level {{.LEVEL}}
+      - alef snippets check --strict --cache off --lang {{.LANGUAGES}}
 
   snippets:gaps:
     desc: Report unreferenced snippets + missing language variants
