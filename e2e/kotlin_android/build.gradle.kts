@@ -144,8 +144,15 @@ tasks.withType<Test> {
     val libPath = System.getProperty("kb.lib.path") ?: "${rootDir}/../../target/release"
     systemProperty("jna.library.path", libPath)
 
-    // Resolve fixture paths (e.g. "docx/fake.docx") against test_documents/
-    workingDir = file("${rootDir}/../../test_documents")
+    // Resolve fixture paths (e.g. "docx/fake.docx") against test_documents/ when
+    // the consumer ships such fixtures. Guard on existence: Gradle test workers
+    // fail to fork if workingDir points at a directory that does not exist, and
+    // Gradle then reports only the misleading "Cannot abort process 'Gradle Test
+    // Executor N' because it is not in started or detached state". ~keep
+    val testDocuments = file("${rootDir}/../../test_documents")
+    if (testDocuments.isDirectory) {
+        workingDir = testDocuments
+    }
 
     if (project.properties["alef.skipHostJni"] != "true") {
         val hostPlatform = if (System.getProperty("os.name").lowercase().contains("mac")) {
