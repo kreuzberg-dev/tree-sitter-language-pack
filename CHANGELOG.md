@@ -26,9 +26,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `before` hook (`scripts/stage_go_native.sh`) that builds `ts-pack-core-ffi` and stages it
   there, the same artifact `ci-e2e.yaml`'s Go job restores by hand. `timeout_secs` went from
   120 to 900 because the same budget bounds `before` hooks, and a cold cargo build does not fit
-  in two minutes. This does not cover the 521 `java` snippets reported `Unavailable` in the
-  same run: those need `packages/java/target/classes`, a different artifact and a different
-  build, and unlike the Go failures they do not fail the run.
+  in two minutes.
+
+- **Java snippets are compiled against a built package.** All 521 were `Unavailable` in the same
+  run, which under `strict` fails the run exactly as a `Fail` does -- `has_incomplete_coverage`
+  counts `Skip`, `Unavailable` and `Downgraded`. The Java validator builds its classpath from
+  `<pom dir>/target/{classes,test-classes,dependency/*.jar}` and nothing had built any of it, so
+  the session now runs `mvn compile` and `mvn dependency:copy-dependencies` first. That is a
+  different artifact and a different build from the Go fix above, not one change covering both.
+  513 of the 521 now compile; the remaining 8 are an upstream alef defect, not an environment
+  gap -- see Known issues.
+
+### Known issues
+
+- **8 generated Java snippets reference an exception class the binding never declares.**
+  `download_invalid_language`, `error_empty_language_name`,
+  `error_handling_get_language_empty_string`, `error_handling_unknown_language`,
+  `parse_empty_language`, `process_unknown_language`, `get_language_unknown` and
+  `get_parser_unknown` all `catch (TreeSitterLanguagePackException ...)`, which does not exist in
+  `packages/java` and is not referenced anywhere else in this repo. Alef derives that name twice
+  and disagrees with itself: the binding emitter uses
+  `backends::java::naming::exception_class_name`, which suffixes the *raw FFI* class and yields
+  `TreeSitterLanguagePackRsException`, while `e2e/codegen/java/snippet.rs` re-derives it as
+  `format!("{simple_class_name}Exception")` from the *facade* class, whose `Rs` suffix has been
+  stripped. No build step can close this, and hand-editing the snippets is pointless because the
+  same job regenerates them and gates on the diff. Until alef is fixed the Java session keeps 8
+  `Unavailable` results and the validate job stays red.
 
 - **`CI Sanitize` no longer instruments third-party C it cannot link.** The job injected the
   sanitizer flags through `CFLAGS_x86_64_unknown_linux_gnu`, on the stated assumption that a

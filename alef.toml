@@ -71,9 +71,16 @@ cwd = "packages/go"
 manifest = "packages/go/go.mod"
 before = ["bash ../../scripts/stage_go_native.sh"]
 
+# The Java validator builds its classpath from `<pom dir>/target/{classes,test-classes,
+# dependency/*.jar}`, none of which exist in a fresh checkout -- so without these hooks every
+# Java snippet is `Unavailable`, which `strict` fails exactly like a `Fail` (521 of them in CI
+# run 32520643605). `dependency:copy-dependencies` is not redundant with `compile`: snippets
+# that name a jtreesitter type need that jar on the classpath, not just this package's classes.
+# ~keep
 [workspace.docs.snippets.sessions.java]
 cwd = "packages/java"
 manifest = "packages/java/pom.xml"
+before = ["mvn -B -q compile", "mvn -B -q dependency:copy-dependencies"]
 
 [workspace.docs.snippets.sessions.csharp]
 cwd = "packages/csharp"
