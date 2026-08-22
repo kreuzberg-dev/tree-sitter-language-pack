@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The Docker image builds again (cc140342d, previously unreleased).** `Publish Docker Image`
+  for v1.15.5 failed on both architectures at `apk add ... python3=3.12.13-r0`: Alpine's
+  repository only ever carries the current revision of a package, so an exact `-rN` pin stops
+  resolving the moment a security bump lands and the old revision is deleted. The pins are now
+  fuzzy (`python3=~3.12`), which keeps the major.minor the base image already fixes while
+  letting the revision float. Note that pinning the base image by digest is not a substitute:
+  `apk --no-cache` fetches the package index over the network at build time, so a
+  digest-identical `rust:1.95-alpine3.22` still fails on the old exact pins today.
+
 - **Go snippets are validated against a library that exists.** All 521 of them failed in the
   validate job with `ld: cannot find -lts_pack_core_ffi`. The `-L` path was right; nothing had
   ever put a library behind it. `binding.go` links `${SRCDIR}/.lib/<platform>`, `.lib/` is
