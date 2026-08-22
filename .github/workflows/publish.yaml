@@ -66,7 +66,13 @@ jobs:
       release_dart: ${{ steps.meta.outputs.release_dart }}
       release_swift: ${{ steps.meta.outputs.release_swift }}
       release_zig: ${{ steps.meta.outputs.release_zig }}
-      release_kotlin_android: ${{ steps.meta.outputs.release_kotlin }}
+      # `release_kotlin_android`, NOT `release_kotlin` — prepare-release-metadata
+      # emits both, and `kotlin` is the desktop/JVM target this repo does not
+      # ship. Reading the wrong key pinned this to false and is why
+      # io.xberg.tslp.android:tree-sitter-language-pack-android has never been
+      # publish. `kotlin-android` must also appear in `available-targets`.
+      # below, or the flag is false regardless of which key is read. ~keep
+      release_kotlin_android: ${{ steps.meta.outputs.release_kotlin_android }}
     steps:
       - name: Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
@@ -74,7 +80,7 @@ jobs:
         id: meta
         uses: xberg-io/actions/prepare-release-metadata@v1
         with:
-          available-targets: "crates,python,node,wasm,ruby,go,java,elixir,c-ffi,php,csharp,homebrew,dart,swift,zig"
+          available-targets: "crates,python,node,wasm,ruby,go,java,elixir,c-ffi,php,csharp,homebrew,dart,swift,zig,kotlin-android"
 
       - name: Resolve checkout ref
         id: ref
@@ -154,7 +160,7 @@ jobs:
           {
             "name": "maven",
             "registry": "maven",
-            "package": "io.xberg:tree-sitter-language-pack"
+            "package": "io.xberg.treesitterlanguagepack:tree-sitter-language-pack"
           },
           {
             "name": "hex",
@@ -169,7 +175,7 @@ jobs:
           {
             "name": "nuget",
             "registry": "nuget",
-            "package": "TreeSitterLanguagePack"
+            "package": "XbergIo.TreeSitterLanguagePack"
           },
           {
             "name": "homebrew",
@@ -192,7 +198,7 @@ jobs:
           {
             "name": "maven-kotlin-android",
             "registry": "maven",
-            "package": "io.xberg.tslp:tslp-android"
+            "package": "io.xberg.tslp.android:tree-sitter-language-pack-android"
           }
         ]
 
@@ -506,7 +512,12 @@ jobs:
   build-python-sdist:
     name: Build Python sdist
     needs: [prepare, validate-versions, clone-vendors, publish-crates]
-    if: ${{ !cancelled() && needs.publish-crates.result != 'failure' && needs.prepare.outputs.release_python == 'true' }}
+    # `== 'success'`, never `!= 'failure'`: a SKIPPED publish-crates satisfies
+    # `!= 'failure'`, so this job used to build an sdist whose Cargo manifest
+    # resolves `tree-sitter-language-pack = "^<version>"` from crates.io — a
+    # version that was never published — and burn its full retry budget on
+    # `failed to select a version for the requirement` (#177). ~keep
+    if: ${{ !cancelled() && needs.publish-crates.result == 'success' && needs.prepare.outputs.release_python == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -705,7 +716,12 @@ jobs:
     # "Verify platform gem" step downloads it at runtime, so it must run first
     # (otherwise get_parser 404s on the not-yet-uploaded manifest).
     needs: [prepare, validate-versions, clone-vendors, publish-crates, upload-parser-binaries]
-    if: ${{ !cancelled() && needs.publish-crates.result != 'failure' && needs.prepare.outputs.release_ruby == 'true' }}
+    # `== 'success'` on both, never `!= 'failure'` and never a bare `needs:`
+    # edge: `!cancelled()` disables the implicit all-needs-succeeded rule, so a
+    # SKIPPED publish-crates or upload-parser-binaries would otherwise let this
+    # job build a gem against a crate that is not on crates.io and a parsers.json
+    # that is not on the release. ~keep
+    if: ${{ !cancelled() && needs.publish-crates.result == 'success' && needs.upload-parser-binaries.result == 'success' && needs.prepare.outputs.release_ruby == 'true' }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     env:
@@ -1297,7 +1313,10 @@ jobs:
   build-elixir-nifs:
     name: Build Elixir NIF (${{ matrix.label }})
     needs: [prepare, validate-versions, clone-vendors, publish-crates]
-    if: ${{ !cancelled() && needs.publish-crates.result != 'failure' && needs.prepare.outputs.release_elixir == 'true' }}
+    # `== 'success'`, never `!= 'failure'` — see build-python-sdist. The NIF's
+    # release build resolves the crate from crates.io, so a SKIPPED
+    # publish-crates guarantees a resolver failure, not a usable NIF. ~keep
+    if: ${{ !cancelled() && needs.publish-crates.result == 'success' && needs.prepare.outputs.release_elixir == 'true' }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -1546,7 +1565,10 @@ jobs:
   build-php-extension:
     name: Build PHP PIE binary (php${{ matrix.php }} ${{ matrix.platform.label }})
     needs: [prepare, validate-versions, clone-vendors, publish-crates]
-    if: ${{ !cancelled() && needs.publish-crates.result != 'failure' && needs.prepare.outputs.release_php == 'true' }}
+    # `== 'success'`, never `!= 'failure'` — see build-python-sdist. This matrix
+    # is 18 jobs wide; a SKIPPED publish-crates used to fan the same crates.io
+    # resolver failure out across all of them. ~keep
+    if: ${{ !cancelled() && needs.publish-crates.result == 'success' && needs.prepare.outputs.release_php == 'true' }}
     runs-on: ${{ matrix.platform.os }}
     timeout-minutes: 60
     permissions:
@@ -1790,8 +1812,13 @@ jobs:
   upload-parser-binaries:
     name: Upload parser binaries to GitHub Release
     needs: [prepare, validate-versions, build-parser-binaries]
+    # `always()` disables the implicit all-needs-succeeded rule, so every `needs:`
+    # edge that must actually gate has to be restated as an explicit
+    # `== 'success'`. build-parser-binaries is deliberately NOT restated: the
+    # manifest step below tolerates a partial platform matrix and warns. ~keep
     if: |
       always() &&
+      needs.validate-versions.result == 'success' &&
       needs.prepare.outputs.dry_run != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -1968,8 +1995,10 @@ jobs:
     needs: [prepare, validate-versions, build-go-ffi, e2e-go]
     if: |
       always() &&
+      needs.validate-versions.result == 'success' &&
       needs.prepare.outputs.dry_run != 'true' &&
       needs.prepare.outputs.release_go == 'true' &&
+      needs.build-go-ffi.result == 'success' &&
       needs.e2e-go.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -2008,8 +2037,10 @@ jobs:
     needs: [prepare, validate-versions, build-c-ffi, e2e-c]
     if: |
       always() &&
+      needs.validate-versions.result == 'success' &&
       needs.prepare.outputs.dry_run != 'true' &&
       needs.prepare.outputs.release_c_ffi == 'true' &&
+      needs.build-c-ffi.result == 'success' &&
       needs.e2e-c.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -2047,6 +2078,7 @@ jobs:
     needs: [prepare, validate-versions, build-elixir-nifs, e2e-elixir]
     if: |
       always() &&
+      needs.validate-versions.result == 'success' &&
       needs.prepare.outputs.dry_run != 'true' &&
       needs.prepare.outputs.release_elixir == 'true' &&
       needs.build-elixir-nifs.result == 'success' &&
@@ -2661,6 +2693,7 @@ jobs:
     if: |
       always() &&
       needs.prepare.outputs.release_python == 'true' &&
+      needs.validate-versions.result == 'success' &&
       needs.build-python-wheels.result == 'success' &&
       needs.e2e-python.result == 'success' &&
       needs.build-python-sdist.result == 'success' &&
@@ -2685,7 +2718,7 @@ jobs:
           path: dist
 
       - name: Dry run summary
-        if: ${{ inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         run: |
           {
             echo "## PyPI Dry Run"
@@ -2711,6 +2744,7 @@ jobs:
     if: |
       always() &&
       needs.prepare.outputs.release_node == 'true' &&
+      needs.validate-versions.result == 'success' &&
       needs.build-node-native.result == 'success' &&
       needs.e2e-node.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).npm != 'true' || needs.prepare.outputs.force_republish == 'true')
@@ -2764,7 +2798,7 @@ jobs:
           ls -lh ./*.tgz
 
       - name: Dry run summary
-        if: ${{ inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         working-directory: crates/ts-pack-core-node
         run: |
           {
@@ -2776,7 +2810,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Re-check npm before publish
-        if: ${{ !inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         id: recheck
         uses: xberg-io/actions/check-registry@v1
         with:
@@ -2785,20 +2819,20 @@ jobs:
           version: ${{ needs.prepare.outputs.version }}
 
       - name: Publish platform packages to npm
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: xberg-io/actions/publish-npm@v1
         with:
           packages-dir: crates/ts-pack-core-node/npm
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
-          dry-run: ${{ inputs.dry_run }}
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
 
       - name: Publish main package to npm
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: xberg-io/actions/publish-npm@v1
         with:
           package-dir: crates/ts-pack-core-node
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
-          dry-run: ${{ inputs.dry_run }}
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
 
   publish-wasm:
     name: Publish WASM to npm
@@ -2806,6 +2840,7 @@ jobs:
     if: |
       always() &&
       needs.prepare.outputs.release_wasm == 'true' &&
+      needs.validate-versions.result == 'success' &&
       needs.build-wasm.result == 'success' &&
       needs.e2e-wasm.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results)['npm-wasm'] != 'true' || needs.prepare.outputs.force_republish == 'true')
@@ -2833,7 +2868,7 @@ jobs:
           path: crates/ts-pack-core-wasm/pkg
 
       - name: Dry run summary
-        if: ${{ inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         run: |
           {
             echo "## npm WASM Dry Run"
@@ -2844,7 +2879,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Re-check npm before publish
-        if: ${{ !inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         id: recheck
         uses: xberg-io/actions/check-registry@v1
         with:
@@ -2853,16 +2888,16 @@ jobs:
           version: ${{ needs.prepare.outputs.version }}
 
       - name: Publish to npm
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: xberg-io/actions/publish-npm@v1
         with:
           package-dir: crates/ts-pack-core-wasm/pkg
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           provenance: "true"
-          dry-run: ${{ inputs.dry_run }}
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
 
       - name: Wait for npm indexing
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: xberg-io/actions/wait-for-package@v1
         with:
           registry: npm
@@ -2876,6 +2911,7 @@ jobs:
     if: |
       always() &&
       needs.prepare.outputs.release_ruby == 'true' &&
+      needs.validate-versions.result == 'success' &&
       needs.build-ruby-gem.result == 'success' &&
       needs.e2e-ruby.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).rubygems != 'true' || needs.prepare.outputs.force_republish == 'true')
@@ -2926,7 +2962,7 @@ jobs:
           echo "Total gems: $gem_count"
 
       - name: Dry run summary
-        if: ${{ inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         run: |
           {
             echo "## RubyGems Dry Run"
@@ -2937,7 +2973,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Re-check RubyGems before publish
-        if: ${{ !inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         id: recheck
         uses: xberg-io/actions/check-registry@v1
         with:
@@ -2946,14 +2982,14 @@ jobs:
           version: ${{ needs.prepare.outputs.version }}
 
       - name: Configure trusted publishing credentials
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: rubygems/configure-rubygems-credentials@762a4b77c3300434bb57c7ce80b20e36231927aa # v2.0.0
       - name: Publish gems to RubyGems
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: xberg-io/actions/publish-rubygems@v1
         with:
           gems-dir: dist
-          dry-run: ${{ inputs.dry_run }}
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
 
   publish-maven:
     name: Publish Maven package
@@ -2961,6 +2997,7 @@ jobs:
     if: |
       always() &&
       needs.prepare.outputs.release_java == 'true' &&
+      needs.validate-versions.result == 'success' &&
       needs.build-java-package.result == 'success' &&
       needs.e2e-java.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).maven != 'true' || needs.prepare.outputs.force_republish == 'true')
@@ -2976,15 +3013,15 @@ jobs:
 
       - name: Re-check Maven Central before publish
         id: recheck
-        if: ${{ !inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         uses: xberg-io/actions/check-registry@v1
         with:
           registry: maven
-          package: io.xberg:tree-sitter-language-pack
+          package: io.xberg.treesitterlanguagepack:tree-sitter-language-pack
           version: ${{ needs.prepare.outputs.version }}
 
       - name: Setup Java
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
         with:
           distribution: temurin
@@ -2997,11 +3034,11 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Setup Maven
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: xberg-io/actions/setup-maven@v1
 
       - name: Download Java native artifacts (re-stage for deploy rebuild)
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: java-natives-*
@@ -3009,7 +3046,7 @@ jobs:
           merge-multiple: false
 
       - name: Re-stage Java native resources
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         shell: bash
         run: |
           ARTIFACTS_DIR="artifacts/java-natives"
@@ -3046,7 +3083,7 @@ jobs:
           fi
 
       - name: Publish to Maven Central
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: xberg-io/actions/publish-maven@v1
         with:
           pom-file: packages/java/pom.xml
@@ -3059,7 +3096,7 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Dry run summary
-        if: ${{ inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         run: echo "Dry run requested; Maven publish skipped." >> "$GITHUB_STEP_SUMMARY"
 
   publish-hex:
@@ -3068,6 +3105,7 @@ jobs:
     if: |
       always() &&
       needs.prepare.outputs.release_elixir == 'true' &&
+      needs.validate-versions.result == 'success' &&
       needs.upload-elixir-release.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).hex != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
@@ -3141,7 +3179,7 @@ jobs:
           version: ${{ needs.prepare.outputs.version }}
 
       - name: Validate Hex tarball build (dry-run)
-        if: ${{ inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         uses: xberg-io/actions/build-elixir-hex@v1
         with:
           package-dir: packages/elixir
@@ -3150,7 +3188,7 @@ jobs:
           rewrite-native-deps: "false"
 
       - name: Publish to Hex.pm
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: xberg-io/actions/publish-hex@v1
         with:
           package-dir: packages/elixir
@@ -3160,7 +3198,7 @@ jobs:
           HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
 
       - name: Dry run summary
-        if: ${{ inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         run: echo "Dry run requested; Hex.pm publish skipped (tarball build validated above)." >> "$GITHUB_STEP_SUMMARY"
 
   upload-php-pie-release:
@@ -3168,6 +3206,7 @@ jobs:
     needs: [prepare, validate-versions, build-php-extension, e2e-php]
     if: |
       always() &&
+      needs.validate-versions.result == 'success' &&
       needs.prepare.outputs.dry_run != 'true' &&
       needs.prepare.outputs.release_php == 'true' &&
       needs.build-php-extension.result == 'success' &&
@@ -3207,6 +3246,7 @@ jobs:
     if: |
       always() &&
       needs.prepare.outputs.release_php == 'true' &&
+      needs.validate-versions.result == 'success' &&
       needs.build-php-extension.result == 'success' &&
       needs.e2e-php.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).packagist != 'true' || needs.prepare.outputs.force_republish == 'true')
@@ -3222,11 +3262,11 @@ jobs:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Dry run summary
-        if: ${{ inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         run: echo "Dry run requested; Packagist publish skipped." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish to Packagist
-        if: ${{ !inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         uses: xberg-io/actions/publish-packagist@v1
         with:
           packagist-username: Goldziher
@@ -3243,6 +3283,7 @@ jobs:
     if: |
       always() &&
       needs.prepare.outputs.release_csharp == 'true' &&
+      needs.validate-versions.result == 'success' &&
       needs.build-csharp-package.result == 'success' &&
       needs.e2e-csharp.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).nuget != 'true' || needs.prepare.outputs.force_republish == 'true')
@@ -3268,7 +3309,7 @@ jobs:
           path: dist/nuget
 
       - name: Dry run summary
-        if: ${{ inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         run: |
           {
             echo "## NuGet Dry Run"
@@ -3279,7 +3320,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish to NuGet
-        if: ${{ !inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         uses: xberg-io/actions/publish-nuget@v1
         with:
           packages-dir: dist/nuget
@@ -3461,9 +3502,10 @@ jobs:
     if: |
       needs.prepare.outputs.release_dart == 'true' &&
       needs.assemble-dart-package.result == 'success' &&
-      !inputs.dry_run &&
+      needs.prepare.outputs.dry_run != 'true' &&
       (fromJson(needs.check-registries.outputs.results).pub != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
         id: app-token
@@ -3472,14 +3514,60 @@ jobs:
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           owner: xberg-io
 
-      - name: Dispatch publish-pubdev workflow
+      # `gh workflow run` returns as soon as GitHub accepts the dispatch, so this
+      # job used to go green whether or not pub.dev ever saw the package — the
+      # publish outcome lived in a run nothing in this workflow observed. Poll
+      # the dispatched run to completion and adopt its conclusion, so a pub.dev
+      # failure is a failure HERE, where the aggregate gate can see it.
+      #
+      # The indirection itself is not optional: pub.dev OIDC trusted publishing
+      # rejects tokens minted for a `release` event, so publish.yaml cannot
+      # publish to pub.dev directly. See publish-pubdev.yaml. ~keep
+      - name: Dispatch publish-pubdev workflow and wait for it
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          SOURCE_RUN_ID: ${{ github.run_id }}
         run: |
-          gh workflow run publish-pubdev.yaml \
-            --ref ${{ needs.prepare.outputs.tag }} \
-            -f run_id=${{ github.run_id }}
+          set -euo pipefail
+
+          # 60s of slack absorbs any skew between this runner's clock and the
+          # createdAt GitHub stamps on the run. ~keep
+          dispatched_after="$(date -u -d '60 seconds ago' +%Y-%m-%dT%H:%M:%SZ)"
+          gh workflow run publish-pubdev.yaml --ref "${TAG}" -f run_id="${SOURCE_RUN_ID}"
+
+          # The dispatch API returns no run id, so find the run it created: the
+          # newest publish-pubdev workflow_dispatch run on this tag that started
+          # at or after the dispatch. ~keep
+          # `|| true` and `if/then/break` rather than `cmd && break`: under
+          # `set -e` a transient API error, or a falsy test as the loop body's
+          # last command, would abort the job instead of retrying. ~keep
+          run_id=""
+          for _ in $(seq 1 30); do
+            sleep 10
+            run_id="$(gh run list \
+              --workflow=publish-pubdev.yaml \
+              --event=workflow_dispatch \
+              --branch "${TAG}" \
+              --limit 20 \
+              --json databaseId,createdAt \
+              --jq "[.[] | select(.createdAt >= \"${dispatched_after}\")] | sort_by(.createdAt) | last | .databaseId // empty" \
+              || true)"
+            if [[ -n "${run_id}" ]]; then
+              break
+            fi
+          done
+
+          if [[ -z "${run_id}" ]]; then
+            echo "::error::publish-pubdev.yaml was dispatched for ${TAG} but no matching run appeared within 5 minutes."
+            exit 1
+          fi
+
+          echo "Watching publish-pubdev run ${run_id}"
+          # `gh run watch --exit-status` exits non-zero when the run fails, so
+          # this job's conclusion becomes the pub.dev publish conclusion. ~keep
+          gh run watch "${run_id}" --exit-status --interval 15
 
   build-swift-artifactbundle:
     name: Build Swift artifact bundle
@@ -4528,6 +4616,9 @@ jobs:
       - upload-cli-release
       - verify-binstall
       - publish-homebrew-bottles
+      - trigger-pubdev
+      - publish-zig
+      - publish-kotlin-android
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -4619,9 +4710,155 @@ jobs:
             echo ""
             echo "- **Tag**: ${{ needs.prepare.outputs.tag }}"
             echo "- **Version**: ${{ needs.prepare.outputs.version }}"
-            echo "- **Dry run**: ${{ inputs.dry_run }}"
-            echo "- **Force republish**: ${{ inputs.force_republish }}"
+            echo "- **Dry run**: ${{ needs.prepare.outputs.dry_run }}"
+            echo "- **Force republish**: ${{ needs.prepare.outputs.force_republish }}"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # This job used to only WRITE a summary, so run 32484453913 published a
+      # v1.15.5 GitHub release to zero registries — every publish job SKIPPED,
+      # 40+ jobs failed — and still reported "Aggregate release status: success".
+      # A release that ships nothing must not be green (#177). Modelled on
+      # finalize-github-release's "Verify release assets are complete": inspect
+      # each job's actual RESULT and treat `skipped` as failure, because a bare
+      # `needs:` edge gates nothing once a job opens with `always()`.
+      #
+      # `skipped` is only legitimate for two reasons, both encoded below:
+      #   * the target is not enabled for this release (release_* != 'true'), or
+      #   * check-registries already found this exact version published and
+      #     force_republish was not requested.
+      # Anything else is a hole in the pipeline, not a decision.
+      #
+      # Dart, Zig and kotlin-android are gated HERE rather than in
+      # finalize-github-release: their build+gate+publish chains all share one
+      # `fromJson(check-registries...) != 'true'` condition, so all three jobs
+      # skip together and no downstream job would otherwise notice. They are not
+      # release assets that crates.io consumers resolve at build time, so they
+      # must not block the draft-release publish — but they must still fail the
+      # run when an enabled target silently ships nothing. ~keep
+      - name: Verify every enabled publish target succeeded
+        if: always() && needs.prepare.outputs.dry_run != 'true'
+        env:
+          CHECK_RESULTS: ${{ needs.check-registries.outputs.results }}
+          RESULT_PREPARE: ${{ needs.prepare.result }}
+          RESULT_VALIDATE: ${{ needs.validate-versions.result }}
+          RESULT_CHECK_REGISTRIES: ${{ needs.check-registries.result }}
+          RESULT_FINALIZE_RELEASE: ${{ needs.finalize-github-release.result }}
+          RESULT_PUBLISH_CRATES: ${{ needs.publish-crates.result }}
+          RESULT_PUBLISH_PYPI: ${{ needs.publish-pypi.result }}
+          RESULT_PUBLISH_NODE: ${{ needs.publish-node.result }}
+          RESULT_PUBLISH_WASM: ${{ needs.publish-wasm.result }}
+          RESULT_PUBLISH_RUBYGEMS: ${{ needs.publish-rubygems.result }}
+          RESULT_PUBLISH_MAVEN: ${{ needs.publish-maven.result }}
+          RESULT_PUBLISH_HEX: ${{ needs.publish-hex.result }}
+          RESULT_PUBLISH_PACKAGIST: ${{ needs.publish-packagist.result }}
+          RESULT_PUBLISH_NUGET: ${{ needs.publish-nuget.result }}
+          RESULT_PUBLISH_HOMEBREW: ${{ needs.publish-homebrew-bottles.result }}
+          RESULT_TRIGGER_PUBDEV: ${{ needs.trigger-pubdev.result }}
+          RESULT_PUBLISH_ZIG: ${{ needs.publish-zig.result }}
+          RESULT_PUBLISH_KOTLIN_ANDROID: ${{ needs.publish-kotlin-android.result }}
+          RESULT_UPLOAD_PARSERS: ${{ needs.upload-parser-binaries.result }}
+          RESULT_UPLOAD_CLI: ${{ needs.upload-cli-release.result }}
+          RESULT_VERIFY_BINSTALL: ${{ needs.verify-binstall.result }}
+          RESULT_UPLOAD_GO: ${{ needs.upload-go-release.result }}
+          RESULT_STAGE_GO_FFI: ${{ needs.stage-go-ffi-libraries.result }}
+          RESULT_UPLOAD_C_FFI: ${{ needs.upload-c-ffi-release.result }}
+          RESULT_UPLOAD_ELIXIR: ${{ needs.upload-elixir-release.result }}
+          RESULT_UPLOAD_PHP_PIE: ${{ needs.upload-php-pie-release.result }}
+          RESULT_SWIFT_MANIFEST: ${{ needs.update-swift-package-manifest.result }}
+          RELEASE_CRATES: ${{ needs.prepare.outputs.release_crates }}
+          RELEASE_PYTHON: ${{ needs.prepare.outputs.release_python }}
+          RELEASE_NODE: ${{ needs.prepare.outputs.release_node }}
+          RELEASE_WASM: ${{ needs.prepare.outputs.release_wasm }}
+          RELEASE_RUBY: ${{ needs.prepare.outputs.release_ruby }}
+          RELEASE_JAVA: ${{ needs.prepare.outputs.release_java }}
+          RELEASE_ELIXIR: ${{ needs.prepare.outputs.release_elixir }}
+          RELEASE_PHP: ${{ needs.prepare.outputs.release_php }}
+          RELEASE_CSHARP: ${{ needs.prepare.outputs.release_csharp }}
+          RELEASE_HOMEBREW: ${{ needs.prepare.outputs.release_homebrew }}
+          RELEASE_DART: ${{ needs.prepare.outputs.release_dart }}
+          RELEASE_ZIG: ${{ needs.prepare.outputs.release_zig }}
+          RELEASE_KOTLIN_ANDROID: ${{ needs.prepare.outputs.release_kotlin_android }}
+          RELEASE_GO: ${{ needs.prepare.outputs.release_go }}
+          RELEASE_C_FFI: ${{ needs.prepare.outputs.release_c_ffi }}
+          RELEASE_SWIFT: ${{ needs.prepare.outputs.release_swift }}
+          FORCE_REPUBLISH: ${{ needs.prepare.outputs.force_republish }}
+        run: |
+          set -uo pipefail
+          failed=0
+
+          # Jobs the release cannot be correct without, regardless of targets.
+          require_success() {
+            local name="$1" result="$2"
+            if [[ "$result" != "success" ]]; then
+              echo "::error::Required release job '$name' finished with '$result' — this release did not ship."
+              failed=1
+            fi
+          }
+
+          # Target-scoped jobs: must succeed when the target is enabled, unless
+          # check-registries already found this version published.
+          require_publish() {
+            local name="$1" result="$2" enabled="$3" check_key="${4:-}"
+            local already=""
+
+            if [[ "$enabled" != "true" ]]; then
+              echo "  - $name: not enabled for this release"
+              return
+            fi
+
+            if [[ -n "$check_key" ]]; then
+              already="$(printf '%s' "$CHECK_RESULTS" | jq -r --arg k "$check_key" '.[$k] // ""')"
+            fi
+
+            if [[ "$already" == "true" && "$FORCE_REPUBLISH" != "true" ]]; then
+              echo "  - $name: already published at this version (correctly skipped)"
+              return
+            fi
+
+            if [[ "$result" != "success" ]]; then
+              echo "::error::Publish target '$name' is enabled and not yet published, but its job finished with '$result' — refusing to report this release as successful."
+              failed=1
+              return
+            fi
+
+            echo "  - $name: published"
+          }
+
+          require_success "prepare" "$RESULT_PREPARE"
+          require_success "validate-versions" "$RESULT_VALIDATE"
+          require_success "check-registries" "$RESULT_CHECK_REGISTRIES"
+          require_success "github-release" "$RESULT_FINALIZE_RELEASE"
+          require_success "parser-binaries" "$RESULT_UPLOAD_PARSERS"
+
+          require_publish "crates.io" "$RESULT_PUBLISH_CRATES" "$RELEASE_CRATES" "cratesio"
+          require_publish "pypi" "$RESULT_PUBLISH_PYPI" "$RELEASE_PYTHON" "pypi"
+          require_publish "npm" "$RESULT_PUBLISH_NODE" "$RELEASE_NODE" "npm"
+          require_publish "npm-wasm" "$RESULT_PUBLISH_WASM" "$RELEASE_WASM" "npm-wasm"
+          require_publish "rubygems" "$RESULT_PUBLISH_RUBYGEMS" "$RELEASE_RUBY" "rubygems"
+          require_publish "maven" "$RESULT_PUBLISH_MAVEN" "$RELEASE_JAVA" "maven"
+          require_publish "hex" "$RESULT_PUBLISH_HEX" "$RELEASE_ELIXIR" "hex"
+          require_publish "packagist" "$RESULT_PUBLISH_PACKAGIST" "$RELEASE_PHP" "packagist"
+          require_publish "nuget" "$RESULT_PUBLISH_NUGET" "$RELEASE_CSHARP" "nuget"
+          require_publish "homebrew" "$RESULT_PUBLISH_HOMEBREW" "$RELEASE_HOMEBREW" "homebrew"
+          require_publish "pub.dev" "$RESULT_TRIGGER_PUBDEV" "$RELEASE_DART" "pub"
+          require_publish "zig" "$RESULT_PUBLISH_ZIG" "$RELEASE_ZIG" "zig"
+          require_publish "maven-kotlin-android" "$RESULT_PUBLISH_KOTLIN_ANDROID" "$RELEASE_KOTLIN_ANDROID" "maven-kotlin-android"
+
+          # Release assets have no registry probe — enabled means required.
+          require_publish "cli-binaries" "$RESULT_UPLOAD_CLI" "$RELEASE_HOMEBREW"
+          require_publish "binstall-verify" "$RESULT_VERIFY_BINSTALL" "$RELEASE_HOMEBREW"
+          require_publish "go-ffi-assets" "$RESULT_UPLOAD_GO" "$RELEASE_GO"
+          require_publish "go-ffi-stage" "$RESULT_STAGE_GO_FFI" "$RELEASE_GO"
+          require_publish "c-ffi-assets" "$RESULT_UPLOAD_C_FFI" "$RELEASE_C_FFI"
+          require_publish "elixir-nif-assets" "$RESULT_UPLOAD_ELIXIR" "$RELEASE_ELIXIR"
+          require_publish "php-pie-assets" "$RESULT_UPLOAD_PHP_PIE" "$RELEASE_PHP"
+          require_publish "swift-manifest" "$RESULT_SWIFT_MANIFEST" "$RELEASE_SWIFT"
+
+          if [[ "$failed" -eq 1 ]]; then
+            echo "::error::Release ${{ needs.prepare.outputs.tag }} did not reach every enabled target. See the errors above."
+            exit 1
+          fi
+          echo "Every enabled publish target for ${{ needs.prepare.outputs.tag }} succeeded."
 
   announce-discord:
     name: Announce release on Discord
@@ -4705,7 +4942,7 @@ jobs:
       # Plain ESM adapter — no build step. Skip if this version is already on npm so a
       # release re-run is idempotent (plugin version tracks the core release). ~keep
       - name: Re-check npm before publish
-        if: ${{ !inputs.dry_run }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         id: recheck
         uses: xberg-io/actions/check-registry@v1
         with:
@@ -4713,13 +4950,13 @@ jobs:
           package: "@xberg-io/opencode-tree-sitter-language-pack"
           version: ${{ needs.prepare.outputs.version }}
       - name: Publish to npm
-        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: xberg-io/actions/publish-npm@v1
         with:
           package-dir: plugin
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           provenance: "true"
-          dry-run: ${{ inputs.dry_run }}
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
 
   publish-plugin-hermes:
     name: Publish Hermes plugin to PyPI
