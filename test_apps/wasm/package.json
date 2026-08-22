@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">= 22"
+  },
   "scripts": {
     "test": "NODE_OPTIONS=--max-old-space-size=4096 vitest run"
   },
@@ -10,8 +13,5 @@
     "@xberg-io/tree-sitter-language-pack-wasm": "1.15.6",
     "rollup": "^4.53.3",
     "vitest": "^4.1.10"
-  },
-  "engines": {
-    "node": ">= 22"
   }
 }

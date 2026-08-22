@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">= 22"
+  },
   "scripts": {
     "test": "vitest run"
   },
   "devDependencies": {
-    "@types/node": "^26.0.0",
     "@xberg-io/tree-sitter-language-pack": "1.15.6",
+    "@types/node": "^26.0.0",
     "vitest": "^4.1.10"
-  },
-  "engines": {
-    "node": ">= 22"
   }
 }

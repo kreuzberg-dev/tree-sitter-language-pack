@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`alef verify` no longer reports 8,415 stale files.** `alef all` ran at ada0fac4e and the
+  1.15.6 version bump landed after it at e9816afda; `alef.toml` is a hashed generation input, so
+  every generated file was stamped against pre-bump inputs and nothing re-stamped them. The tree
+  is regenerated after the bump, which rewrites the `alef:hash:` line in ~8,380 files. The
+  remaining diffs are real drift the earlier regen never covered: all of `test_apps/*` (`alef all`
+  does not run the test-apps stage -- `alef test-apps generate` is a separate command), plus the
+  `packages/*/README.md` version strings. Regeneration order is now bump-then-generate; running
+  `alef all` before `alef sync-versions` re-opens this.
 - **`Validate (Lint & Format)` no longer fails on every release commit.** The job passed
   `python-extra-projects: packages/python` to the shared validate workflow, which runs
   `uv pip install -e packages/python` -- a maturin build of `crates/ts-pack-core-py`, and so a run
