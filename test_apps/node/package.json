@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.0.0",
-    "@xberg-io/tree-sitter-language-pack": "1.15.5",
+    "@xberg-io/tree-sitter-language-pack": "1.15.6",
     "vitest": "^4.1.10"
   },
   "engines": {
