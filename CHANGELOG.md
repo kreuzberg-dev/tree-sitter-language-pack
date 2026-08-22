@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **68 of the 85 files `alef verify` reported frozen are now recorded as alef-owned.** Every one
+  of them is a create-once seed, so plain `alef adopt` refuses them and the report's own remedy is
+  unreachable without `--clobber-create-once-seeds`. Only the files that already match generated
+  output byte-for-byte were adopted, so no content changed: 66 are recorded in
+  `.alef-ownership.toml` (formats that cannot carry a marker), and `packages/go/go.mod` plus
+  `packages/zig/build.zig.zon` gained the marker header. The 17 left frozen all differ from
+  generated output and need a content decision -- notably `packages/java/checkstyle.xml`, whose
+  generated form reverts the `${config_loc}` + `optional="false"` SuppressionFilter fix, and
+  `checkstyle-suppressions.xml`, whose generated form drops the NativeLib `LineLength`
+  suppression. `alef verify` stays red on those 17.
 - **`task docs:snippets:validate:lang` runs again.** It invoked `alef snippets validate`, a
   subcommand that does not exist (`alef snippets` has `list`, `check`, `parse`, `audit`, `gaps`),
   so the target could only ever fail with `unrecognized subcommand`. It now calls
