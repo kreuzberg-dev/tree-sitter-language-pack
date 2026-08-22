@@ -59,6 +59,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   built package locally; the remaining 10 need a fixture regenerate to pick up the exclusion,
   which is out of scope for this change.
 
+- **zig snippets are validated with a zig toolchain, then linked against a built FFI library.**
+  All 521 were `Unavailable` with "zig toolchain not found" -- the validate job never installed
+  one; `ci.yaml` now passes `setup-zig: true` to `reusable-validate.yml@v1`, which gained the
+  input upstream. That alone was not enough: compile-level zig validation links a real
+  executable (the generated per-snippet `build.zig` calls `b.addExecutable` +
+  `b.default_step.dependOn`), so it also needs `ts-pack-core-ffi` built at
+  `packages/zig/build.zig`'s default `-Dffi_path` (`target/release`). The session now runs
+  `scripts/stage_zig_ffi.sh` first, mirroring `stage_go_native.sh`'s FFI build. All 521 now pass.
+
 ### Known issues
 
 - **8 generated Java snippets reference an exception class the binding never declares.**

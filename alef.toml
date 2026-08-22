@@ -117,9 +117,14 @@ before = ["swift build"]
 cwd = "packages/dart"
 manifest = "packages/dart/pubspec.yaml"
 
+# Compile-level zig validation links a real executable against the binding, not just type-checks
+# it (see scripts/stage_zig_ffi.sh), so it needs the same FFI artifact `[crates.test.zig]` builds
+# before testing. Without it every zig snippet was `Unavailable` with "zig toolchain not found"
+# before setup-zig closed that gap, and would otherwise fail to link next. ~keep
 [workspace.docs.snippets.sessions.zig]
 cwd = "packages/zig"
 manifest = "packages/zig/build.zig"
+before = ["bash ../../scripts/stage_zig_ffi.sh"]
 env = { ZIG_GLOBAL_CACHE_DIR = ".zig-global-cache", ZIG_LOCAL_CACHE_DIR = ".zig-cache" }
 
 # Sessions are keyed by snippet target; C snippets declare `target = "ffi"`. Without
