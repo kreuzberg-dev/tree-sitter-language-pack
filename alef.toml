@@ -32,6 +32,13 @@ sources = ["crates/ts-pack-cli/src/commands/mcp.rs"]
 template_dir = "templates/docs/skills"
 outputs = [".codex/skills", ".agents/skills", ".github/skills", ".claude/skills"]
 
+# docs-site/src/snippets/cli/*.md (download.md, quickstart.md, process.md) are deliberately
+# hand-written and outside this `dirs` list, so `alef snippets check` never validates them. The
+# CLI is not an alef binding target -- no emitter produces shell invocations -- so there is no
+# generated/cli directory to migrate them into. quickstart.mdx documents the same thing next to
+# its imports. This is permanent until alef gains a CLI/shell snippet recipe; if that ever lands,
+# migrate these three by hand and delete them, the same way kotlin-android's stand-ins were
+# migrated once its classpath defect was fixed. ~keep
 [workspace.docs.snippets]
 dirs = ["docs-site/src/snippets/generated"]
 validation_level = "compile"

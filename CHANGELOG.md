@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Quick Start's kotlin-android `process` and `quickstart` tabs now import the generated corpus
+  (`generated/kotlin-android/process/config_all_python.md` and
+  `generated/kotlin-android/parsing/parsing_python_function.md`) instead of two hand-written
+  stand-ins. Those stand-ins were kept back in 064e3c325 because the generated twins failed with
+  `unresolved reference 'io'`; that classpath defect was fixed today (651ddbac1), so the
+  stand-ins were deleted. Not re-verified with a session-based `alef snippets check` run -- watch
+  the next CI run for kotlin_android snippet failures.
+
+### Changed
+
+- `alef.toml` now documents next to `[workspace.docs.snippets] dirs` why `docs-site/src/snippets/
+  cli/*.md` stay outside the validated snippet tree: the CLI is not an alef binding target, so no
+  generated/cli directory can exist for them to migrate into. This was previously only implied by
+  their absence from `dirs` -- nothing recorded that the gap was deliberate.
+
 ## [1.15.6] - 2026-08-22
 
 ### Fixed
