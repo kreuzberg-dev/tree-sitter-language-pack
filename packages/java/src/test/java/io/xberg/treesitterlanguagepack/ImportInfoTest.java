@@ -30,7 +30,7 @@ class ImportInfoTest {
 
         assertEquals("np", importInfo.alias());
         assertTrue(importInfo.isWildcard());
-        assertNull(importInfo.items());
+        assertEquals(List.of(), importInfo.items());
     }
 
     @Test

@@ -31,15 +31,15 @@ class StructureItemTest {
     }
 
     @Test
-    void shouldAllowNullOptionalFields() {
+    void shouldNormalizeNullCollectionsToEmptyAndLeaveScalarOptionalsNull() {
         StructureItem item = new StructureItem(
             StructureKind.Class, null, null, SAMPLE_SPAN, null, null, null, null, null
         );
 
+        assertEquals(List.of(), item.children());
+        assertEquals(List.of(), item.decorators());
         assertNull(item.name());
         assertNull(item.visibility());
-        assertNull(item.children());
-        assertNull(item.decorators());
         assertNull(item.docComment());
         assertNull(item.signature());
         assertNull(item.bodySpan());

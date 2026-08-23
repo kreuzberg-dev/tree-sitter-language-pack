@@ -27,19 +27,19 @@ class ProcessResultTest {
     }
 
     @Test
-    void shouldAllowAllOptionalListFieldsToBeNull() {
+    void shouldNormalizeEveryNullListFieldToAnEmptyList() {
         ProcessResult result = new ProcessResult(
             "go", SAMPLE_METRICS, null, null, null, null, null, null, null, null, null
         );
 
-        assertNull(result.structure());
-        assertNull(result.imports());
-        assertNull(result.exports());
-        assertNull(result.comments());
-        assertNull(result.docstrings());
-        assertNull(result.symbols());
-        assertNull(result.diagnostics());
-        assertNull(result.chunks());
+        assertEquals(List.of(), result.structure());
+        assertEquals(List.of(), result.imports());
+        assertEquals(List.of(), result.exports());
+        assertEquals(List.of(), result.comments());
+        assertEquals(List.of(), result.docstrings());
+        assertEquals(List.of(), result.symbols());
+        assertEquals(List.of(), result.diagnostics());
+        assertEquals(List.of(), result.chunks());
         assertNull(result.data());
     }
 
@@ -49,7 +49,7 @@ class ProcessResultTest {
 
         assertEquals("java", built.language());
         assertEquals(SAMPLE_METRICS, built.metrics());
-        assertNull(built.structure());
+        assertEquals(List.of(), built.structure());
     }
 
     @Test

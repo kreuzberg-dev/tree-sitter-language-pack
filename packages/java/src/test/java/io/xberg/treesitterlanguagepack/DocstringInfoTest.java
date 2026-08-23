@@ -26,13 +26,13 @@ class DocstringInfoTest {
     }
 
     @Test
-    void shouldAllowNullOptionalFields() {
+    void shouldNormalizeNullParsedSectionsToEmptyAndLeaveAssociatedItemNull() {
         DocstringInfo docstring = new DocstringInfo(
             "/** jsdoc */", DocstringFormat.JSDoc, SAMPLE_SPAN, null, null
         );
 
+        assertEquals(List.of(), docstring.parsedSections());
         assertNull(docstring.associatedItem());
-        assertNull(docstring.parsedSections());
     }
 
     @Test

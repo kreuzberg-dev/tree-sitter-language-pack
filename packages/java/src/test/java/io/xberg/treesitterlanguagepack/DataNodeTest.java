@@ -1,7 +1,6 @@
 package io.xberg.treesitterlanguagepack;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -18,8 +17,8 @@ class DataNodeTest {
         assertEquals(DataNodeKind.KeyValue, node.kind());
         assertEquals("name", node.key());
         assertEquals("value", node.value());
-        assertNull(node.attributes());
-        assertNull(node.children());
+        assertEquals(List.of(), node.attributes());
+        assertEquals(List.of(), node.children());
         assertEquals(SAMPLE_SPAN, node.span());
     }
 
