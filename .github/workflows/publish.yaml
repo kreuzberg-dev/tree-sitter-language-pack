@@ -124,6 +124,11 @@ jobs:
         with:
           version: ${{ needs.prepare.outputs.version }}
 
+      # A registry-mode test app pinned to an older release still installs and still passes, so it
+      # gates nothing. Five were up to six releases behind before this check existed. ~keep
+      - name: Check test-app pins match the release being published
+        run: python3 scripts/check_test_app_pins.py --release "${{ needs.prepare.outputs.version }}"
+
   check-registries:
     name: Check registries
     needs: prepare

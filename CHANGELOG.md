@@ -17,12 +17,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   go, python, ruby, dart, elixir and swift; `status` names the remaining targets and why each
   needs a built artifact rather than a source path.
 
+- **`scripts/check_test_app_pins.py` — a gate that fails when a test app is pinned to a release
+  other than the one being built.** It re-derives all 18 pins across every `test_apps/` app plus
+  the `alef.toml` registry pins from `Cargo.toml`, deliberately independent of alef, so a change
+  in what `alef sync-versions` is willing to write surfaces as a failure instead of as silent
+  drift. A pattern that matches nothing is an error, not a pass — that was the Dart failure mode.
+  `--fix` repins everything; `--release X` checks against the version being published and also
+  catches a `Cargo.toml` that disagrees with the tag.
+
+  Wired in three places: `task version:sync` repins after `alef sync-versions`, the `Check version
+  sync` CI step gates every push, and the publish workflow's `validate-versions` job gates the
+  release itself against the tag. Also exposed as `task test-apps:check-pins` / `:fix-pins`.
+
 ### Fixed
 
+- **Five registry-mode test apps were validating an already-published release, not the one being
+  built.** `test_apps/{elixir,swift_e2e,php}` were pinned at 1.15.1 and
+  `test_apps/{dart,kotlin_android}` at 1.15.2, against a 1.15.7 tree. Each gate passed — it
+  proved the *old* release still installs, which is not what a registry-mode gate is for.
+  All five are now repinned to the release being built.
+
+  The cause is not the matched-nothing regex fixed for Dart below. Every one of these five sync
+  rules does match its file. `alef sync-versions` reaches these paths through its catch-all
+  branch, which refuses to rewrite a file that carries no alef provenance marker on the grounds
+  that it reads as hand-written; it emits a `WARN` naming each skipped path and exits 0. So the
+  rules looked applied and never were. `alef.toml`'s own
+  `[crates.e2e.registry.packages.*]` pins are skipped for the same reason.
+
+  Compounding it, the `Check version sync` CI step diffs only `packages/` and `crates/`, so
+  `test_apps/` drift was outside the gate's scope even when sync did rewrite it.
+
 - The `test_apps/dart/pubspec.yaml` version-sync rule required a caret the generated pubspec does
-  not contain, so it matched nothing and the Dart registry-mode test app stayed pinned at 1.15.2
-  while every other pin moved to 1.15.7. The rule now accepts the exact pin that is actually
-  written.
+  not contain, so it matched nothing. Fixing the rule was necessary but not sufficient: the file
+  is one of the five skipped by the catch-all branch above, so it stayed at 1.15.2 afterwards.
 
 ## [1.15.7] - 2026-08-23
 

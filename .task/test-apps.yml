@@ -92,6 +92,16 @@ tasks:
     cmds:
       - alef test-apps run --lang zig
 
+  check-pins:
+    desc: Fail if any test_app is pinned to a release other than the one being built
+    cmds:
+      - python3 scripts/check_test_app_pins.py
+
+  fix-pins:
+    desc: Repin every test_app to the version in Cargo.toml
+    cmds:
+      - python3 scripts/check_test_app_pins.py --fix
+
   prerelease:status:
     desc: Show which test_apps can run against in-repo sources instead of a registry
     cmds:

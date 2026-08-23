@@ -345,6 +345,13 @@ jobs:
             echo "::error::Versions are out of sync. Run 'alef sync-versions' and commit."
             exit 1
           }
+          # The diff above deliberately scopes to packages/ and crates/, so it cannot see
+          # test_apps/ drift -- and sync-versions skips five of those manifests outright,
+          # WARNing rather than failing. Gate them explicitly. ~keep
+          python3 scripts/check_test_app_pins.py || {
+            echo "::error::A registry-mode test app is pinned to a different release than this build."
+            exit 1
+          }
 
   # Blocks PRs that introduce a grammar under a copyleft (GPL/AGPL/LGPL/MPL/EUPL/OSL)
   # licence, or one whose licence cannot be resolved at all. This job does NOT need
