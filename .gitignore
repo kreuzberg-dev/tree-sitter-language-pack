@@ -252,5 +252,8 @@ poly.local.toml
 **/.alef-cache/
 **/.alef/
 
+# Prerelease test-app staging (scripts/prerelease_test_apps.py) ~keep
+.prerelease/
+
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 # END ai-rulez

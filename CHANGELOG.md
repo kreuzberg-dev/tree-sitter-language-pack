@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Prerelease mode for the registry-mode test apps.** `task test-apps:prerelease:run` (and
+  `:verify`, `:status`, `:clean`) stages a throwaway copy of each `test_apps/` app under
+  `.prerelease/` and redirects its dependency resolution at the in-repo package source, so the
+  suite is runnable between a version bump and the publish — the window in which the pinned
+  version exists on no registry and `alef test-apps run` cannot resolve anything. Covers rust,
+  go, python, ruby, dart, elixir and swift; `status` names the remaining targets and why each
+  needs a built artifact rather than a source path.
+
 ### Fixed
 
 - The `test_apps/dart/pubspec.yaml` version-sync rule required a caret the generated pubspec does

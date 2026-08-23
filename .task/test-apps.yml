@@ -92,6 +92,26 @@ tasks:
     cmds:
       - alef test-apps run --lang zig
 
+  prerelease:status:
+    desc: Show which test_apps can run against in-repo sources instead of a registry
+    cmds:
+      - python3 scripts/prerelease_test_apps.py status
+
+  prerelease:verify:
+    desc: Prove each prerelease test_app resolves to in-repo sources (resolve only, no build)
+    cmds:
+      - python3 scripts/prerelease_test_apps.py verify {{.CLI_ARGS}}
+
+  prerelease:run:
+    desc: Run test_apps against in-repo sources — usable between a version bump and the publish
+    cmds:
+      - python3 scripts/prerelease_test_apps.py run {{.CLI_ARGS}}
+
+  prerelease:clean:
+    desc: Remove the .prerelease/ staging tree
+    cmds:
+      - python3 scripts/prerelease_test_apps.py clean
+
   homebrew:
     desc: Run Homebrew CLI + FFI smoke test (not yet alef-managed)
     dir: test_apps/homebrew
