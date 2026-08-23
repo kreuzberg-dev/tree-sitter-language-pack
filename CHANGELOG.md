@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.7] - 2026-08-23
+
+### Fixed
+
+- **Regenerated against alef 0.66.0** (from 0.64.0, via 0.65.0). This clears the Swift E2E gate
+  failure that blocked the v1.15.6 release: `is_empty` on a non-optional array reached through an
+  optional parent emitted a `Bool?` into `XCTAssertTrue`, which does not typecheck, so the gate
+  could never pass and every publish job downstream of it was skipped. The generated assertion now
+  coalesces (`?? true`). `alef verify --exit-code` returns 0 against the regenerated tree.
+- Generated documentation snippets omit the `level:` front-matter key instead of emitting
+  `level: null`, and every backend now orders IR items before emission — both are deliberate
+  changes in alef 0.65.0/0.66.0 and account for the bulk of the regeneration diff.
+
 ### Fixed
 
 - **A failed publish can no longer announce itself as a successful release.**
