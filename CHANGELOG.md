@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.8] - 2026-08-23
+
+### Fixed
+
+- **The plain-Java artifact reaches Maven Central again.** It was the only registry still stuck at
+  1.14.3: every 1.15.x publish skipped `Publish Maven package`, because the `E2E gate — Java` it
+  sits behind failed first on 8 assertions of the shape `expected: <null> but was: <[]>`.
+
+  The cause was a disagreement inside each generated Java record. A component backed by a Rust
+  `Vec` carrying `#[serde(default, skip_serializing_if = "Vec::is_empty")]` was emitted as
+  `@Nullable`, and the canonical constructor stored whatever it was handed — `null` included —
+  while the Jackson builder defaulted the same component to `List.of()`. A record built through
+  the builder, or round-tripped through JSON, therefore never compared equal to the same record
+  built through the constructor. Regenerating against **alef 0.67.2** drops `@Nullable` on those
+  components and adds a compact constructor normalizing `null` to an empty collection, so both
+  construction paths agree. Affected records: `DataNode`, `DocstringInfo`, `ImportInfo`,
+  `ProcessResult`, `StructureItem`.
+
+- **The hand-written Java unit tests asserted the old, wrong contract.** They required such a
+  component to arrive as `null`; the Rust fields behind them are plain `Vec`, never
+  `Option<Vec>`, so empty is the truthful representation. They now assert
+  `assertEquals(List.of(), ...)`, which fails on `null` as well as on a non-empty list — the
+  assertions were tightened, not relaxed to accept either shape. `mvn test` in `packages/java`
+  reports 150 tests, 0 failures, 0 errors.
+
 ### Added
 
 - **Prerelease mode for the registry-mode test apps.** `task test-apps:prerelease:run` (and
