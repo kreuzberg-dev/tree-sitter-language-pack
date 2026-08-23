@@ -680,7 +680,7 @@ jobs:
 
       - name: Install cargo-zigbuild
         if: matrix.musl
-        uses: taiki-e/install-action@7f4eb899022d8fe70b20c4f3de697aa85c309026 # v2.85.11
+        uses: taiki-e/install-action@6cd13508893c0e7eab5f273c2575d3859bd7229a # v2.86.6
         with:
           tool: cargo-zigbuild
 
@@ -2197,7 +2197,7 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.13"
-      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+      - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
       # `task python:e2e:test` goes through `alef test --lang python --e2e`, whose
       # `[crates.test.python]` precondition needs `ruff` and whose `before` hook runs
       # `maturin develop` — and `maturin develop` refuses to run outside a virtualenv.
@@ -2442,7 +2442,7 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-php
-      - uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: "8.4"
           extensions: ffi
@@ -2992,7 +2992,7 @@ jobs:
 
       - name: Configure trusted publishing credentials
         if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
-        uses: rubygems/configure-rubygems-credentials@762a4b77c3300434bb57c7ce80b20e36231927aa # v2.0.0
+        uses: rubygems/configure-rubygems-credentials@dc5a8d8553e6ee01fc26761a49e99e733d17954a # v2.1.0
       - name: Publish gems to RubyGems
         if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: xberg-io/actions/publish-rubygems@v1
@@ -3500,7 +3500,7 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-e2e-dart
-      - uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260 # v1.7.2
+      - uses: dart-lang/setup-dart@7654d458321ee25acccccfdb86cd48bd95768ff1 # v1.8.0
       - uses: xberg-io/actions/install-task@v1
       - name: Run Dart E2E tests
         run: task dart:e2e:test

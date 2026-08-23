@@ -1073,7 +1073,7 @@ jobs:
         uses: xberg-io/actions/install-task@v1
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: "8.4"
           extensions: ffi
@@ -1321,7 +1321,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Dart
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260 # v1.7.2
+        uses: dart-lang/setup-dart@7654d458321ee25acccccfdb86cd48bd95768ff1 # v1.8.0
       - name: Install Task
         uses: xberg-io/actions/install-task@v1
 
