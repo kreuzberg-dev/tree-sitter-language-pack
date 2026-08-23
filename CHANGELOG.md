@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The `test_apps/dart/pubspec.yaml` version-sync rule required a caret the generated pubspec does
+  not contain, so it matched nothing and the Dart registry-mode test app stayed pinned at 1.15.2
+  while every other pin moved to 1.15.7. The rule now accepts the exact pin that is actually
+  written.
+
 ## [1.15.7] - 2026-08-23
 
 ### Fixed

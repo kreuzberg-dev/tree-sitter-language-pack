@@ -251,8 +251,11 @@ replace = "tree-sitter-language-pack=={version}"
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/dart/pubspec.yaml"
-search = "tree_sitter_language_pack: \\^[^\\s]*"
-replace = "tree_sitter_language_pack: ^{version}"
+# The generated pubspec pins an exact version, with no caret. Requiring one here made this
+# rule match nothing, so the dart test app stayed pinned at 1.15.2 across four releases while
+# every other test_apps pin moved. ~keep
+search = "tree_sitter_language_pack: \\^?[0-9][^\\s]*"
+replace = "tree_sitter_language_pack: {version}"
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/elixir/mix.exs"
