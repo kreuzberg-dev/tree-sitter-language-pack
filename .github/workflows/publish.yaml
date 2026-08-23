@@ -3891,6 +3891,123 @@ jobs:
             **/*.tar.gz
             **/*.zip
 
+  refresh-zig-package-hashes:
+    name: Refresh test_apps/zig package hashes from the published tarballs
+    needs: [prepare, publish-zig]
+    if: |
+      always() &&
+      needs.prepare.outputs.release_zig == 'true' &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.publish-zig.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # A Zig package hash is a digest of the tarball, so it cannot be derived from a version
+    # string: `alef sync-versions` repoints every `.url` during release prep and leaves the
+    # `.hash` frozen at whatever release last set it. From 1.14.3 through 1.15.7 that meant
+    # `test_apps/zig` shipped a manifest resolving nothing. The value is only knowable once the
+    # assets exist, which is why this runs after `publish-zig` rather than during prep. ~keep
+    #
+    # `continue-on-error` is deliberate. The packages are already published by the time this
+    # runs and nothing downstream consumes the test app, so a problem here must not turn an
+    # otherwise successful release red. The trade-off is that a failure is easy to miss, so the
+    # job writes its outcome — including the failure — to the run summary, and `ci-zig`
+    # re-checks the same hashes on whatever commit this pushes. ~keep
+    continue-on-error: true
+    steps:
+      - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
+        id: app-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: xberg-io
+
+      # `main`, not `checkout_ref`: on a real release `checkout_ref` is the tag, and a commit
+      # made on that detached head could only reach `main` by force-moving the tag. The
+      # refreshed manifest belongs on `main`, which is where the next release reads it. ~keep
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: true
+
+      - uses: xberg-io/actions/setup-zig@v1
+        with:
+          version: "0.16.0"
+
+      # `main` can advance past the tag while a publish runs. If it already carries a newer,
+      # unpublished version every URL would 404 and there is nothing here to refresh, so skip
+      # rather than report a failure for the normal case. ~keep
+      - name: Check the manifest still names this release
+        id: scope
+        env:
+          TAG: ${{ needs.prepare.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if grep -q "/releases/download/${TAG}/" test_apps/zig/build.zig.zon; then
+            echo "applies=true" >> "$GITHUB_OUTPUT"
+            echo "test_apps/zig/build.zig.zon on main points at ${TAG}; refreshing its hashes."
+          else
+            echo "applies=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "### Zig package hashes — skipped"
+              echo
+              echo "\`test_apps/zig/build.zig.zon\` on \`main\` no longer points at \`${TAG}\`."
+              echo "\`main\` has moved to another version, so there is nothing to refresh for"
+              echo "this release. The next release refreshes it."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # `--require-published` because `publish-zig` succeeded: an asset that 404s here is a
+      # missing upload, not the pre-publish window, and must not pass quietly. The script
+      # fetches into a per-run global Zig cache so each digest is recomputed from a fresh
+      # download — a warm cache would happily confirm the stale hash it is meant to reject. ~keep
+      - name: Recompute hashes from the published tarballs
+        if: steps.scope.outputs.applies == 'true'
+        run: python3 scripts/sync_zig_zon_hashes.py --fix --require-published
+
+      - name: Commit and push the refreshed hashes
+        if: steps.scope.outputs.applies == 'true'
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          git config user.name "xberg-dev-publisher[bot]"
+          git config user.email "291994444+xberg-dev-publisher[bot]@users.noreply.github.com"
+          if git diff --quiet -- test_apps/zig/build.zig.zon; then
+            echo "Hashes already match the published tarballs; nothing to commit."
+            echo "### Zig package hashes — already current for v${VERSION}" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git --no-pager diff -- test_apps/zig/build.zig.zon
+          git add test_apps/zig/build.zig.zon
+          git commit --no-verify -m "chore(zig): refresh test_apps package hashes for v${VERSION}"
+          git push origin HEAD:refs/heads/main
+          {
+            echo "### Zig package hashes — refreshed"
+            echo
+            echo "\`test_apps/zig/build.zig.zon\` on \`main\` now matches the \`v${VERSION}\` tarballs."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # `continue-on-error` keeps a problem here from failing the release, which also means a
+      # silent failure would go unnoticed. Say so in the run summary instead. ~keep
+      - name: Report that the refresh did not happen
+        if: failure()
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          {
+            echo "### Zig package hashes — NOT refreshed"
+            echo
+            echo "This job failed. \`continue-on-error\` kept that from failing the release, so"
+            echo "the published packages are unaffected — but \`test_apps/zig/build.zig.zon\` on"
+            echo "\`main\` still declares hashes that do not match the \`v${VERSION}\` tarballs,"
+            echo "and \`zig build\` in that app fails until they are regenerated."
+            echo
+            echo "Fix locally with \`task test-apps:fix-zig-hashes\` and commit the result."
+            echo "See the step logs above for which asset or push failed."
+          } >> "$GITHUB_STEP_SUMMARY"
+
   build-kotlin-android-natives:
     name: Build kotlin-android natives (${{ matrix.abi }})
     needs: [prepare, check-registries, clone-vendors]

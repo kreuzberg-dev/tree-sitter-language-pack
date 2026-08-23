@@ -25,6 +25,11 @@ Because the digest comes from the tarball, `--fix` only works once the release h
 Zig assets. It runs *after* a publish, never during release prep. Verification distinguishes that
 window explicitly: an asset that 404s is reported as not-yet-published and is not a failure.
 
+`--require-published` inverts that tolerance for the one caller that knows the assets must exist:
+the post-publish job in `publish.yaml`, which runs only after the upload succeeded. There a 404 is
+not the release window, it is a missing artifact, and staying quiet about it would leave the
+hashes stale for another release. Every other caller wants the default.
+
 Usage:
     python3 scripts/sync_zig_zon_hashes.py          # verify every hash against its tarball
     python3 scripts/sync_zig_zon_hashes.py --fix    # rewrite every hash from `zig fetch`
@@ -97,6 +102,11 @@ def fetch_hash(url: str, probe: Path, cache: Path) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--fix", action="store_true", help="rewrite each hash from `zig fetch` instead of reporting")
+    parser.add_argument(
+        "--require-published",
+        action="store_true",
+        help="treat a missing release asset as a failure instead of the normal pre-publish window",
+    )
     args = parser.parse_args()
 
     if shutil.which("zig") is None:
@@ -144,6 +154,16 @@ def main() -> int:
         print("not published yet (expected between a version bump and its release):")
         for entry in pending:
             print(f"  {entry}")
+        if args.require_published:
+            # ~keep The caller asserted the release assets exist, so a 404 is a missing artifact
+            # rather than the release window. Writing the hashes that did resolve would produce a
+            # half-refreshed manifest, so nothing is written.
+            print(
+                f"\n--require-published: the {len(pending)} asset(s) above should already exist.\n"
+                "No hash was rewritten. Check that the release uploaded every Zig tarball.",
+                file=sys.stderr,
+            )
+            return 2
 
     if not stale:
         checked = len(dependencies) - len(pending)

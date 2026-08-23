@@ -40,6 +40,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   job with a Zig toolchain. Because the digest only exists once the release has published its Zig
   assets, `--fix` runs *after* a publish, never during release prep.
 
+- **The publish workflow now refreshes the Zig package hashes itself.** A new
+  `refresh-zig-package-hashes` job runs after `publish-zig` — the earliest point at which the
+  tarballs the digests are taken over exist — recomputes every hash and commits
+  `test_apps/zig/build.zig.zon` back to `main`, modelled on the Swift
+  `update-swift-package-manifest` job. Catching the drift only made the manual `--fix` step
+  forgettable again; this removes the step. The job cannot break a release that would otherwise succeed: nothing depends
+  on it, it is `continue-on-error`, and it commits one file or none. It skips when `main` has
+  already moved to a version this release did not publish, and reports every outcome — refreshed,
+  already current, skipped, failed — in the run summary, since `continue-on-error` would
+  otherwise let a failure pass unnoticed. `--require-published` is new on the script for this
+  caller: after a successful publish a 404 is a missing upload, not the pre-publish window, and
+  is a failure rather than a skip.
+
 ### Fixed
 
 - **`test_apps/zig` could not build at all — its five package hashes had been stale since 1.14.3.**
