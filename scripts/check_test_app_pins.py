@@ -49,6 +49,12 @@ class Pin:
     version string only -- any surrounding sigil (`v`, `^`, `==`) stays outside it so the rewrite
     preserves it. Every occurrence in the file is checked and rewritten, because some manifests
     repeat the coordinate (kotlin_android names it twice, zig once per platform tarball).
+
+    Only pins that are pure version strings belong here. `test_apps/zig/build.zig.zon`'s `.hash`
+    fields also embed a version, but they are content digests over the tarball and legitimately
+    name the *previous* release between a version bump and its publish, so gating on them here
+    would block the release that has to happen before they can be regenerated. They are checked
+    against the artifact instead, by `scripts/sync_zig_zon_hashes.py`. ~keep
     """
 
     app: str

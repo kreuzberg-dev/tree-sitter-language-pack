@@ -29,7 +29,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   sync` CI step gates every push, and the publish workflow's `validate-versions` job gates the
   release itself against the tag. Also exposed as `task test-apps:check-pins` / `:fix-pins`.
 
+- **`scripts/sync_zig_zon_hashes.py` — regenerates and verifies the `test_apps/zig/build.zig.zon`
+  package hashes from the tarballs their URLs name.** A Zig package hash is a content digest, so
+  it cannot be derived from a version string the way every other test-app pin can; the only
+  reproducible source is `zig fetch <url>`, which prints the exact hash Zig will demand. `--fix`
+  rewrites them, the default verifies. Assets that 404 are reported as not-yet-published rather
+  than as failures, which is the normal state between a version bump and its publish, so the
+  check is safe to run at any point in the release cycle. Exposed as
+  `task test-apps:check-zig-hashes` / `:fix-zig-hashes` and wired into the `ci-zig` job — the only
+  job with a Zig toolchain. Because the digest only exists once the release has published its Zig
+  assets, `--fix` runs *after* a publish, never during release prep.
+
 ### Fixed
+
+- **`test_apps/zig` could not build at all — its five package hashes had been stale since 1.14.3.**
+  `alef sync-versions` repoints each `.url` at the release being cut, but a Zig package hash is a
+  content digest over the fetched tarball, so nothing recomputed it and all five sat at the 1.14.3
+  values while the URLs advanced to 1.15.7. `zig build` failed outright:
+
+  ```text
+  error: hash mismatch: manifest declares tree_sitter_language_pack-1.14.3-jCz0Y85sQQ...
+  but the fetched package has tree_sitter_language_pack-1.15.7-jCz0Y86TSQ...
+  ```
+
+  This is not the cosmetic staleness it looks like — the declared hashes are byte-identical to the
+  real 1.14.3 tarball hashes, so every release from 1.15.0 to 1.15.7 shipped an app that resolves
+  nothing. Nothing reported it because no workflow builds `test_apps/zig`: `ci-zig` builds
+  `packages/zig` from the working tree and `ci-e2e` runs `e2e/zig`, so the one app that resolves
+  these URLs was never exercised. All five are regenerated via `zig fetch`, and `ci-zig` now
+  verifies them.
 
 - **Five registry-mode test apps were validating an already-published release, not the one being
   built.** `test_apps/{elixir,swift_e2e,php}` were pinned at 1.15.1 and

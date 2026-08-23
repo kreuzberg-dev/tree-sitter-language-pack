@@ -102,6 +102,16 @@ tasks:
     cmds:
       - python3 scripts/check_test_app_pins.py --fix
 
+  check-zig-hashes:
+    desc: Fail if a test_apps/zig package hash does not match the tarball its URL names
+    cmds:
+      - python3 scripts/sync_zig_zon_hashes.py
+
+  fix-zig-hashes:
+    desc: Regenerate the test_apps/zig package hashes via `zig fetch` (run after a release publishes)
+    cmds:
+      - python3 scripts/sync_zig_zon_hashes.py --fix
+
   prerelease:status:
     desc: Show which test_apps can run against in-repo sources instead of a registry
     cmds:

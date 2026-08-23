@@ -106,3 +106,13 @@ jobs:
       - name: Run Zig tests
         working-directory: packages/zig
         run: zig build test -Dffi_path=../../target/release
+      # `packages/zig` is built from the working tree, so it can never catch a stale
+      # `test_apps/zig/build.zig.zon` hash -- and no job builds `test_apps/zig` itself, which is
+      # how its hashes stayed at the 1.14.3 values from 1.14.3 through 1.15.7 while `zig build`
+      # there failed with a mismatch on every one. This is the only job with a Zig toolchain, so
+      # the check lives here. It self-skips assets that 404, which is the normal state between a
+      # version bump and its publish, and fails once the tarballs exist but disagree. Ubuntu only:
+      # the hashes are of downloaded tarballs, so the result is identical on both runners. ~keep
+      - name: Check test_apps/zig package hashes
+        if: matrix.os == 'ubuntu-latest'
+        run: python3 scripts/sync_zig_zon_hashes.py
