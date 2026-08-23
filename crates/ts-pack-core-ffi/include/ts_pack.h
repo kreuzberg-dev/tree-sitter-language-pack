@@ -362,6 +362,269 @@ void ts_pack_free_string(char *ptr);
 const char *ts_pack_version(void);
 
 /**
+ * Create a `ByteRange` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_byte_range_free`.
+ */
+TS_PACKAlefHandle ts_pack_byte_range_from_json(const char *json);
+
+/**
+ * Serialize a `ByteRange` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_byte_range_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `ByteRange` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_byte_range_free(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `start` field from a `ByteRange`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_byte_range_start(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `end` field from a `ByteRange`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_byte_range_end(TS_PACKAlefHandle handle);
+
+/**
+ * Create a `ChunkContext` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_chunk_context_free`.
+ */
+TS_PACKAlefHandle ts_pack_chunk_context_from_json(const char *json);
+
+/**
+ * Serialize a `ChunkContext` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_chunk_context_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `ChunkContext` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_chunk_context_free(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `language` field from a `ChunkContext`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_chunk_context_language(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `chunk_index` field from a `ChunkContext`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_chunk_context_chunk_index(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `total_chunks` field from a `ChunkContext`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_chunk_context_total_chunks(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `node_types` field from a `ChunkContext`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_chunk_context_node_types(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `context_path` field from a `ChunkContext`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_chunk_context_context_path(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `symbols_defined` field from a `ChunkContext`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_chunk_context_symbols_defined(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `comments` field from a `ChunkContext`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_chunk_context_comments(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `docstrings` field from a `ChunkContext`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_chunk_context_docstrings(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `has_error_nodes` field from a `ChunkContext`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+int32_t ts_pack_chunk_context_has_error_nodes(TS_PACKAlefHandle handle);
+
+/**
+ * Create a `CodeChunk` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_code_chunk_free`.
+ */
+TS_PACKAlefHandle ts_pack_code_chunk_from_json(const char *json);
+
+/**
+ * Serialize a `CodeChunk` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_code_chunk_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `CodeChunk` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_code_chunk_free(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `content` field from a `CodeChunk`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_code_chunk_content(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `start_byte` field from a `CodeChunk`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_code_chunk_start_byte(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `end_byte` field from a `CodeChunk`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_code_chunk_end_byte(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `start_line` field from a `CodeChunk`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_code_chunk_start_line(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `end_line` field from a `CodeChunk`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_code_chunk_end_line(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `metadata` field from a `CodeChunk`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_chunk_context_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKAlefHandle ts_pack_code_chunk_metadata(TS_PACKAlefHandle handle);
+
+/**
+ * Create a `CommentInfo` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_comment_info_free`.
+ */
+TS_PACKAlefHandle ts_pack_comment_info_from_json(const char *json);
+
+/**
+ * Serialize a `CommentInfo` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_comment_info_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `CommentInfo` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_comment_info_free(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `text` field from a `CommentInfo`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_comment_info_text(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `kind` field from a `CommentInfo`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_comment_kind_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKAlefHandle ts_pack_comment_info_kind(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `span` field from a `CommentInfo`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_span_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKAlefHandle ts_pack_comment_info_span(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `associated_node` field from a `CommentInfo`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_comment_info_associated_node(TS_PACKAlefHandle handle);
+
+/**
  * Create a `DataAttribute` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
@@ -489,191 +752,290 @@ char *ts_pack_data_node_children(TS_PACKAlefHandle handle);
 TS_PACKAlefHandle ts_pack_data_node_span(TS_PACKAlefHandle handle);
 
 /**
- * Create a `Span` from a JSON string. Returns null on failure.
+ * Create a `Diagnostic` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_span_free`.
+ * Returned handle must be freed with `ts_pack_diagnostic_free`.
  */
-TS_PACKAlefHandle ts_pack_span_from_json(const char *json);
+TS_PACKAlefHandle ts_pack_diagnostic_from_json(const char *json);
 
 /**
- * Serialize a `Span` to a JSON string. Returns null on failure.
+ * Serialize a `Diagnostic` to a JSON string. Returns null on failure.
  * # Safety
  * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
  * The returned string must be freed with `ts_pack_free_string`.
  */
-char *ts_pack_span_to_json(TS_PACKAlefHandle handle);
+char *ts_pack_diagnostic_to_json(TS_PACKAlefHandle handle);
 
 /**
- * Free a `Span` handle.
+ * Free a `Diagnostic` handle.
  * # Safety
  * Handle must have been returned by this library, or be zero.
  */
-void ts_pack_span_free(TS_PACKAlefHandle handle);
+void ts_pack_diagnostic_free(TS_PACKAlefHandle handle);
 
 /**
- * Get the `start_byte` field from a `Span`.
+ * Get the `message` field from a `Diagnostic`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
-uintptr_t ts_pack_span_start_byte(TS_PACKAlefHandle handle);
+char *ts_pack_diagnostic_message(TS_PACKAlefHandle handle);
 
 /**
- * Get the `end_byte` field from a `Span`.
+ * Get the `severity` field from a `Diagnostic`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_diagnostic_severity_free`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
-uintptr_t ts_pack_span_end_byte(TS_PACKAlefHandle handle);
+TS_PACKAlefHandle ts_pack_diagnostic_severity(TS_PACKAlefHandle handle);
 
 /**
- * Get the `start_line` field from a `Span`.
+ * Get the `span` field from a `Diagnostic`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_span_free`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
-uintptr_t ts_pack_span_start_line(TS_PACKAlefHandle handle);
+TS_PACKAlefHandle ts_pack_diagnostic_span(TS_PACKAlefHandle handle);
 
 /**
- * Get the `start_column` field from a `Span`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_span_start_column(TS_PACKAlefHandle handle);
-
-/**
- * Get the `end_line` field from a `Span`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_span_end_line(TS_PACKAlefHandle handle);
-
-/**
- * Get the `end_column` field from a `Span`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_span_end_column(TS_PACKAlefHandle handle);
-
-/**
- * Create a `ProcessResult` from a JSON string. Returns null on failure.
+ * Create a `DocSection` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_process_result_free`.
+ * Returned handle must be freed with `ts_pack_doc_section_free`.
  */
-TS_PACKAlefHandle ts_pack_process_result_from_json(const char *json);
+TS_PACKAlefHandle ts_pack_doc_section_from_json(const char *json);
 
 /**
- * Serialize a `ProcessResult` to a JSON string. Returns null on failure.
+ * Serialize a `DocSection` to a JSON string. Returns null on failure.
  * # Safety
  * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
  * The returned string must be freed with `ts_pack_free_string`.
  */
-char *ts_pack_process_result_to_json(TS_PACKAlefHandle handle);
+char *ts_pack_doc_section_to_json(TS_PACKAlefHandle handle);
 
 /**
- * Free a `ProcessResult` handle.
+ * Free a `DocSection` handle.
  * # Safety
  * Handle must have been returned by this library, or be zero.
  */
-void ts_pack_process_result_free(TS_PACKAlefHandle handle);
+void ts_pack_doc_section_free(TS_PACKAlefHandle handle);
 
 /**
- * Get the `language` field from a `ProcessResult`.
+ * Get the `kind` field from a `DocSection`.
  * A non-null returned pointer is owned by the caller.
  * It must be freed with `ts_pack_free_string`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
-char *ts_pack_process_result_language(TS_PACKAlefHandle handle);
+char *ts_pack_doc_section_kind(TS_PACKAlefHandle handle);
 
 /**
- * Get the `metrics` field from a `ProcessResult`.
+ * Get the `name` field from a `DocSection`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_doc_section_name(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `description` field from a `DocSection`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_doc_section_description(TS_PACKAlefHandle handle);
+
+/**
+ * Create a `DocstringInfo` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_docstring_info_free`.
+ */
+TS_PACKAlefHandle ts_pack_docstring_info_from_json(const char *json);
+
+/**
+ * Serialize a `DocstringInfo` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_docstring_info_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `DocstringInfo` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_docstring_info_free(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `text` field from a `DocstringInfo`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_docstring_info_text(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `format` field from a `DocstringInfo`.
  * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_file_metrics_free`.
+ * It must be freed with `ts_pack_docstring_format_free`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
-TS_PACKAlefHandle ts_pack_process_result_metrics(TS_PACKAlefHandle handle);
+TS_PACKAlefHandle ts_pack_docstring_info_format(TS_PACKAlefHandle handle);
 
 /**
- * Get the `structure` field from a `ProcessResult`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_process_result_structure(TS_PACKAlefHandle handle);
-
-/**
- * Get the `imports` field from a `ProcessResult`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_process_result_imports(TS_PACKAlefHandle handle);
-
-/**
- * Get the `exports` field from a `ProcessResult`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_process_result_exports(TS_PACKAlefHandle handle);
-
-/**
- * Get the `comments` field from a `ProcessResult`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_process_result_comments(TS_PACKAlefHandle handle);
-
-/**
- * Get the `docstrings` field from a `ProcessResult`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_process_result_docstrings(TS_PACKAlefHandle handle);
-
-/**
- * Get the `symbols` field from a `ProcessResult`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_process_result_symbols(TS_PACKAlefHandle handle);
-
-/**
- * Get the `diagnostics` field from a `ProcessResult`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_process_result_diagnostics(TS_PACKAlefHandle handle);
-
-/**
- * Get the `chunks` field from a `ProcessResult`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_process_result_chunks(TS_PACKAlefHandle handle);
-
-/**
- * Get the `data` field from a `ProcessResult`.
+ * Get the `span` field from a `DocstringInfo`.
  * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_data_node_free`.
+ * It must be freed with `ts_pack_span_free`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
-TS_PACKAlefHandle ts_pack_process_result_data(TS_PACKAlefHandle handle);
+TS_PACKAlefHandle ts_pack_docstring_info_span(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `associated_item` field from a `DocstringInfo`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_docstring_info_associated_item(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `parsed_sections` field from a `DocstringInfo`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_docstring_info_parsed_sections(TS_PACKAlefHandle handle);
+
+#if defined(TS_PACK_FEATURE_DOWNLOAD)
+/**
+ * Free a `DownloadManager` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_download_manager_free(TS_PACKAlefHandle handle);
+#endif
+
+#if defined(TS_PACK_FEATURE_DOWNLOAD)
+TS_PACKAlefHandle ts_pack_download_manager_new(const char *version);
+#endif
+
+#if defined(TS_PACK_FEATURE_DOWNLOAD)
+/**
+ * List languages that are already downloaded and cached.
+ *
+ * Derived from the on-disk cache filenames, one canonical name per file, plus
+ * every alias that resolves to it (via `aliases_for`) â so
+ * this list agrees with the user-facing
+ * `LanguageRegistry::available_languages` (crate::LanguageRegistry::available_languages)
+ * about which names are "available"; both report `"shell"` once `bash` is
+ * cached, for example. A previous version reported canonical names only,
+ * which could never agree with `available_languages()`. See #107.
+ *
+ * Returns an empty list if the cache directory does not exist. If it exists
+ * but cannot be read (e.g. a permission error), also returns an empty list â
+ * changing this to a `Result` would be a breaking change across every
+ * language binding â but logs a `tracing::warn!` so the failure is not
+ * silently indistinguishable from "nothing installed".
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+char *ts_pack_download_manager_installed_languages(TS_PACKAlefHandle this_);
+#endif
+
+#if defined(TS_PACK_FEATURE_DOWNLOAD)
+/**
+ * Download the platform bundle and extract every library file it contains.
+ *
+ * Unlike `Self.ensure_languages`, this does not check the manifest language list
+ * against archive contents â it simply extracts all `.so`/`.dylib`/`.dll` files
+ * from the bundle. Languages in the manifest that are missing from the archive
+ * are silently ignored rather than returning an error.
+ *
+ * Returns the number of library files extracted (including those already cached).
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+uintptr_t ts_pack_download_manager_download_all_best_effort(TS_PACKAlefHandle this_);
+#endif
+
+#if defined(TS_PACK_FEATURE_DOWNLOAD)
+/**
+ * Remove all cached parser libraries.
+ *
+ * Acquires the cross-process lock so `clean_cache` cannot race a concurrent
+ * downloader (avoids Windows sharing-violation errors against an in-flight
+ * bundle write). The `.download.lock` file itself is **not** removed â it is
+ * permanent infrastructure; deleting it could allow a concurrent process that
+ * already opened the file to continue holding a stale lock handle while a new
+ * process opens a fresh inode, breaking the mutual-exclusion guarantee.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+int32_t ts_pack_download_manager_clean_cache(TS_PACKAlefHandle this_);
+#endif
+
+/**
+ * Create a `ExportInfo` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_export_info_free`.
+ */
+TS_PACKAlefHandle ts_pack_export_info_from_json(const char *json);
+
+/**
+ * Serialize a `ExportInfo` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_export_info_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `ExportInfo` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_export_info_free(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `name` field from a `ExportInfo`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_export_info_name(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `kind` field from a `ExportInfo`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_export_kind_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKAlefHandle ts_pack_export_info_kind(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `span` field from a `ExportInfo`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_span_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKAlefHandle ts_pack_export_info_span(TS_PACKAlefHandle handle);
 
 /**
  * Create a `FileMetrics` from a JSON string. Returns null on failure.
@@ -755,287 +1117,6 @@ uintptr_t ts_pack_file_metrics_error_count(TS_PACKAlefHandle handle);
 uintptr_t ts_pack_file_metrics_max_depth(TS_PACKAlefHandle handle);
 
 /**
- * Create a `StructureItem` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_structure_item_free`.
- */
-TS_PACKAlefHandle ts_pack_structure_item_from_json(const char *json);
-
-/**
- * Serialize a `StructureItem` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_structure_item_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Free a `StructureItem` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_structure_item_free(TS_PACKAlefHandle handle);
-
-/**
- * Get the `kind` field from a `StructureItem`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_structure_kind_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_structure_item_kind(TS_PACKAlefHandle handle);
-
-/**
- * Get the `name` field from a `StructureItem`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_structure_item_name(TS_PACKAlefHandle handle);
-
-/**
- * Get the `visibility` field from a `StructureItem`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_structure_item_visibility(TS_PACKAlefHandle handle);
-
-/**
- * Get the `span` field from a `StructureItem`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_span_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_structure_item_span(TS_PACKAlefHandle handle);
-
-/**
- * Get the `children` field from a `StructureItem`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_structure_item_children(TS_PACKAlefHandle handle);
-
-/**
- * Get the `decorators` field from a `StructureItem`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_structure_item_decorators(TS_PACKAlefHandle handle);
-
-/**
- * Get the `doc_comment` field from a `StructureItem`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_structure_item_doc_comment(TS_PACKAlefHandle handle);
-
-/**
- * Get the `signature` field from a `StructureItem`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_structure_item_signature(TS_PACKAlefHandle handle);
-
-/**
- * Get the `body_span` field from a `StructureItem`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_span_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_structure_item_body_span(TS_PACKAlefHandle handle);
-
-/**
- * Create a `CommentInfo` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_comment_info_free`.
- */
-TS_PACKAlefHandle ts_pack_comment_info_from_json(const char *json);
-
-/**
- * Serialize a `CommentInfo` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_comment_info_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Free a `CommentInfo` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_comment_info_free(TS_PACKAlefHandle handle);
-
-/**
- * Get the `text` field from a `CommentInfo`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_comment_info_text(TS_PACKAlefHandle handle);
-
-/**
- * Get the `kind` field from a `CommentInfo`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_comment_kind_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_comment_info_kind(TS_PACKAlefHandle handle);
-
-/**
- * Get the `span` field from a `CommentInfo`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_span_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_comment_info_span(TS_PACKAlefHandle handle);
-
-/**
- * Get the `associated_node` field from a `CommentInfo`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_comment_info_associated_node(TS_PACKAlefHandle handle);
-
-/**
- * Create a `DocstringInfo` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_docstring_info_free`.
- */
-TS_PACKAlefHandle ts_pack_docstring_info_from_json(const char *json);
-
-/**
- * Serialize a `DocstringInfo` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_docstring_info_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Free a `DocstringInfo` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_docstring_info_free(TS_PACKAlefHandle handle);
-
-/**
- * Get the `text` field from a `DocstringInfo`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_docstring_info_text(TS_PACKAlefHandle handle);
-
-/**
- * Get the `format` field from a `DocstringInfo`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_docstring_format_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_docstring_info_format(TS_PACKAlefHandle handle);
-
-/**
- * Get the `span` field from a `DocstringInfo`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_span_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_docstring_info_span(TS_PACKAlefHandle handle);
-
-/**
- * Get the `associated_item` field from a `DocstringInfo`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_docstring_info_associated_item(TS_PACKAlefHandle handle);
-
-/**
- * Get the `parsed_sections` field from a `DocstringInfo`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_docstring_info_parsed_sections(TS_PACKAlefHandle handle);
-
-/**
- * Create a `DocSection` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_doc_section_free`.
- */
-TS_PACKAlefHandle ts_pack_doc_section_from_json(const char *json);
-
-/**
- * Serialize a `DocSection` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_doc_section_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Free a `DocSection` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_doc_section_free(TS_PACKAlefHandle handle);
-
-/**
- * Get the `kind` field from a `DocSection`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_doc_section_kind(TS_PACKAlefHandle handle);
-
-/**
- * Get the `name` field from a `DocSection`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_doc_section_name(TS_PACKAlefHandle handle);
-
-/**
- * Get the `description` field from a `DocSection`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_doc_section_description(TS_PACKAlefHandle handle);
-
-/**
  * Create a `ImportInfo` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
@@ -1102,582 +1183,131 @@ int32_t ts_pack_import_info_is_wildcard(TS_PACKAlefHandle handle);
 TS_PACKAlefHandle ts_pack_import_info_span(TS_PACKAlefHandle handle);
 
 /**
- * Create a `ExportInfo` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_export_info_free`.
- */
-TS_PACKAlefHandle ts_pack_export_info_from_json(const char *json);
-
-/**
- * Serialize a `ExportInfo` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_export_info_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Free a `ExportInfo` handle.
+ * Free a `Language` handle.
  * # Safety
  * Handle must have been returned by this library, or be zero.
  */
-void ts_pack_export_info_free(TS_PACKAlefHandle handle);
+void ts_pack_language_free(TS_PACKAlefHandle handle);
 
 /**
- * Get the `name` field from a `ExportInfo`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_export_info_name(TS_PACKAlefHandle handle);
-
-/**
- * Get the `kind` field from a `ExportInfo`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_export_kind_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_export_info_kind(TS_PACKAlefHandle handle);
-
-/**
- * Get the `span` field from a `ExportInfo`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_span_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_export_info_span(TS_PACKAlefHandle handle);
-
-/**
- * Create a `SymbolInfo` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_symbol_info_free`.
- */
-TS_PACKAlefHandle ts_pack_symbol_info_from_json(const char *json);
-
-/**
- * Serialize a `SymbolInfo` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_symbol_info_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Free a `SymbolInfo` handle.
+ * Free a `LanguageRegistry` handle.
  * # Safety
  * Handle must have been returned by this library, or be zero.
  */
-void ts_pack_symbol_info_free(TS_PACKAlefHandle handle);
+void ts_pack_language_registry_free(TS_PACKAlefHandle handle);
+
+TS_PACKAlefHandle ts_pack_language_registry_new(void);
 
 /**
- * Get the `name` field from a `SymbolInfo`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_symbol_info_name(TS_PACKAlefHandle handle);
-
-/**
- * Get the `kind` field from a `SymbolInfo`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_symbol_kind_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_symbol_info_kind(TS_PACKAlefHandle handle);
-
-/**
- * Get the `span` field from a `SymbolInfo`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_span_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_symbol_info_span(TS_PACKAlefHandle handle);
-
-/**
- * Get the `type_annotation` field from a `SymbolInfo`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_symbol_info_type_annotation(TS_PACKAlefHandle handle);
-
-/**
- * Get the `doc` field from a `SymbolInfo`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_symbol_info_doc(TS_PACKAlefHandle handle);
-
-/**
- * Create a `Diagnostic` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_diagnostic_free`.
- */
-TS_PACKAlefHandle ts_pack_diagnostic_from_json(const char *json);
-
-/**
- * Serialize a `Diagnostic` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_diagnostic_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Free a `Diagnostic` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_diagnostic_free(TS_PACKAlefHandle handle);
-
-/**
- * Get the `message` field from a `Diagnostic`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_diagnostic_message(TS_PACKAlefHandle handle);
-
-/**
- * Get the `severity` field from a `Diagnostic`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_diagnostic_severity_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_diagnostic_severity(TS_PACKAlefHandle handle);
-
-/**
- * Get the `span` field from a `Diagnostic`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_span_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_diagnostic_span(TS_PACKAlefHandle handle);
-
-/**
- * Create a `CodeChunk` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_code_chunk_free`.
- */
-TS_PACKAlefHandle ts_pack_code_chunk_from_json(const char *json);
-
-/**
- * Serialize a `CodeChunk` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_code_chunk_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Free a `CodeChunk` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_code_chunk_free(TS_PACKAlefHandle handle);
-
-/**
- * Get the `content` field from a `CodeChunk`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_code_chunk_content(TS_PACKAlefHandle handle);
-
-/**
- * Get the `start_byte` field from a `CodeChunk`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_code_chunk_start_byte(TS_PACKAlefHandle handle);
-
-/**
- * Get the `end_byte` field from a `CodeChunk`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_code_chunk_end_byte(TS_PACKAlefHandle handle);
-
-/**
- * Get the `start_line` field from a `CodeChunk`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_code_chunk_start_line(TS_PACKAlefHandle handle);
-
-/**
- * Get the `end_line` field from a `CodeChunk`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_code_chunk_end_line(TS_PACKAlefHandle handle);
-
-/**
- * Get the `metadata` field from a `CodeChunk`.
- * A non-null returned handle is owned by the caller.
- * It must be freed with `ts_pack_chunk_context_free`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-TS_PACKAlefHandle ts_pack_code_chunk_metadata(TS_PACKAlefHandle handle);
-
-/**
- * Create a `ChunkContext` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_chunk_context_free`.
- */
-TS_PACKAlefHandle ts_pack_chunk_context_from_json(const char *json);
-
-/**
- * Serialize a `ChunkContext` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_chunk_context_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Free a `ChunkContext` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_chunk_context_free(TS_PACKAlefHandle handle);
-
-/**
- * Get the `language` field from a `ChunkContext`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_chunk_context_language(TS_PACKAlefHandle handle);
-
-/**
- * Get the `chunk_index` field from a `ChunkContext`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_chunk_context_chunk_index(TS_PACKAlefHandle handle);
-
-/**
- * Get the `total_chunks` field from a `ChunkContext`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_chunk_context_total_chunks(TS_PACKAlefHandle handle);
-
-/**
- * Get the `node_types` field from a `ChunkContext`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_chunk_context_node_types(TS_PACKAlefHandle handle);
-
-/**
- * Get the `context_path` field from a `ChunkContext`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_chunk_context_context_path(TS_PACKAlefHandle handle);
-
-/**
- * Get the `symbols_defined` field from a `ChunkContext`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_chunk_context_symbols_defined(TS_PACKAlefHandle handle);
-
-/**
- * Get the `comments` field from a `ChunkContext`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_chunk_context_comments(TS_PACKAlefHandle handle);
-
-/**
- * Get the `docstrings` field from a `ChunkContext`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_chunk_context_docstrings(TS_PACKAlefHandle handle);
-
-/**
- * Get the `has_error_nodes` field from a `ChunkContext`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-int32_t ts_pack_chunk_context_has_error_nodes(TS_PACKAlefHandle handle);
-
-/**
- * Create a `PackConfig` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_pack_config_free`.
- */
-TS_PACKAlefHandle ts_pack_pack_config_from_json(const char *json);
-
-/**
- * Serialize a `PackConfig` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_pack_config_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Free a `PackConfig` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_pack_config_free(TS_PACKAlefHandle handle);
-
-/**
- * Get the `cache_dir` field from a `PackConfig`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_pack_config_cache_dir(TS_PACKAlefHandle handle);
-
-/**
- * Get the `languages` field from a `PackConfig`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_pack_config_languages(TS_PACKAlefHandle handle);
-
-/**
- * Get the `groups` field from a `PackConfig`.
- * A non-null returned pointer is owned by the caller.
- * It must be freed with `ts_pack_free_string`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_pack_config_groups(TS_PACKAlefHandle handle);
-
-/**
- * Create a `Point` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_point_free`.
- */
-TS_PACKAlefHandle ts_pack_point_from_json(const char *json);
-
-/**
- * Serialize a `Point` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_point_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Free a `Point` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_point_free(TS_PACKAlefHandle handle);
-
-/**
- * Get the `row` field from a `Point`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_point_row(TS_PACKAlefHandle handle);
-
-/**
- * Get the `column` field from a `Point`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_point_column(TS_PACKAlefHandle handle);
-
-/**
- * Create a `ByteRange` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_byte_range_free`.
- */
-TS_PACKAlefHandle ts_pack_byte_range_from_json(const char *json);
-
-/**
- * Serialize a `ByteRange` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_byte_range_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Free a `ByteRange` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_byte_range_free(TS_PACKAlefHandle handle);
-
-/**
- * Get the `start` field from a `ByteRange`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_byte_range_start(TS_PACKAlefHandle handle);
-
-/**
- * Get the `end` field from a `ByteRange`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uintptr_t ts_pack_byte_range_end(TS_PACKAlefHandle handle);
-
-/**
- * Free a `Parser` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_parser_free(TS_PACKAlefHandle handle);
-
-TS_PACKAlefHandle ts_pack_parser_new(void);
-
-/**
- * Refuse to parse sources longer than `max_bytes`.
+ * Get a tree-sitter `Language` by name.
  *
- * `None` (the default) means no limit. Over-limit input makes
- * `parse` (Self::parse) and `parse_bytes` (Self::parse_bytes) return
- * `None` after emitting a `WARN`; input is never silently truncated.
- *
- * See `RECOMMENDED_MAX_SOURCE_BYTES` (crate::process_config::RECOMMENDED_MAX_SOURCE_BYTES).
+ * Resolves aliases (e.g., `"shell"` -> `"bash"`, `"makefile"` -> `"make"`),
+ * then looks up the language in the static table. When the `dynamic-loading`
+ * feature is enabled, falls back to loading a shared library on demand.
+ * \note Returns `Error.LanguageNotFound` if the name (after alias resolution)
+ * does not match any known grammar.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
-void ts_pack_parser_set_max_source_bytes(TS_PACKAlefHandle this_,
-                                         uintptr_t max_bytes);
+TS_PACKAlefHandle ts_pack_language_registry_get_language(TS_PACKAlefHandle this_,
+                                                         const char *name);
 
 /**
- * Cancel a parse that exceeds `timeout_ms` milliseconds of wall clock.
+ * List all available language names, sorted and deduplicated.
  *
- * `None` (the default) means no budget. Cancellation runs through
- * tree-sitter's parse progress callback, so it is granular to that
- * callback's interval rather than exact.
- *
- * See `RECOMMENDED_PARSE_TIMEOUT_MS` (crate::process_config::RECOMMENDED_PARSE_TIMEOUT_MS).
+ * Includes statically compiled languages, dynamically loadable languages
+ * (if the `dynamic-loading` feature is enabled), and all configured aliases.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
-void ts_pack_parser_set_parse_timeout_ms(TS_PACKAlefHandle this_,
-                                         uint64_t timeout_ms);
+char *ts_pack_language_registry_available_languages(TS_PACKAlefHandle this_);
 
 /**
- * Configure the parser to use the language identified by name (e.g. `"python"`).
+ * Check whether this language can be parsed right now, without downloading.
  *
- * Resolves the language through the global registry â auto-downloading
- * if necessary, when the `download` feature is enabled.
- * \note Returns `Error.LanguageNotFound` if the language is not recognized,
- * or `Error.ParserSetup` if the language ABI is incompatible.
+ * Resolves aliases, then answers from exactly the lookup
+ * `get_language` (Self::get_language) performs: the statically compiled
+ * table, the already-loaded dynamic grammars, and the parser shared
+ * libraries present in the primary and extra (download-cache) library
+ * directories. It never performs network I/O.
+ *
+ * A previous implementation consulted only the statically compiled table.
+ * That table is empty in every build that does not set `TSLP_LANGUAGES`,
+ * so the function answered `false` for languages this registry parses
+ * perfectly well.
+ *
+ * Contrast `has_language` (Self::has_language), which is also `true` for a
+ * grammar that is merely *known to the manifest* and would have to be
+ * downloaded first. The pair distinguishes "we can parse it offline, now"
+ * from "we recognise the name".
+ *
+ * The first `true` answer for a dynamic grammar loads its shared library:
+ * loading is the only way to know the grammar is usable, since a truncated
+ * or wrong-architecture library exists on disk but cannot parse. Loads are
+ * cached process-wide, so repeat calls are cheap.
+ *
+ * ```no_run
+ * use tree_sitter_language_pack::{detect_language_from_extension, LanguageRegistry};
+ *
+ * let registry = LanguageRegistry::new();
+ * // Extension detection uses the static ext table for all 371 grammars.
+ * let lang = detect_language_from_extension("feature"); // always returns Some("gherkin")
+ * // Parser availability depends on what is compiled in or cached on disk.
+ * let can_parse = lang.map(|name| registry.has_parser(name)).unwrap_or(false);
+ * ```
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
-int32_t ts_pack_parser_set_language(TS_PACKAlefHandle this_,
-                                    const char *name);
+int32_t ts_pack_language_registry_has_parser(TS_PACKAlefHandle this_,
+                                             const char *name);
 
 /**
- * Parse a UTF-8 source string.
+ * Check whether a language is available by name or alias.
  *
- * Returns `None` if no language is set, if the parse was cancelled by the
- * configured timeout (Self::set_parse_timeout_ms), or if the source
- * exceeds the configured size limit (Self::set_max_source_bytes). Each
- * non-parse outcome is logged, so an empty result is never silent.
+ * Returns `true` if the language can be loaded, either from the static
+ * table or from a dynamic library on disk.
  *
- * # Concurrency
- *
- * Parsing runs fully in parallel across threads for almost every language â no lock is
- * taken. The exception is the small set of grammars whose external scanner keeps mutable
- * process-global state (currently just `properties`): parses of that language are
- * serialized against each other through an internal per-language lock, so that concurrent
- * threads can't corrupt shared scanner state. Every other language is unaffected by that
- * lock and never waits on it.
+ * Every branch is one more way to answer `true`, so they are ordered
+ * cheapest-first and the filesystem is only consulted once every in-memory
+ * source has said no. Probing the loaded-grammar map and the manifest ahead
+ * of the `stat` calls is what keeps this off the syscall path for the
+ * languages a process actually uses.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
-TS_PACKAlefHandle ts_pack_parser_parse(TS_PACKAlefHandle this_,
-                                       const char *source);
+int32_t ts_pack_language_registry_has_language(TS_PACKAlefHandle this_,
+                                               const char *name);
 
 /**
- * Parse a raw byte slice.
+ * Return the total number of available languages (including aliases).
  *
- * Same outcomes as `parse` (Self::parse), including the concurrency behaviour documented
- * there.
+ * Counts the same set `available_languages` (Self::available_languages)
+ * lists, without materialising or sorting it.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
-TS_PACKAlefHandle ts_pack_parser_parse_bytes(TS_PACKAlefHandle this_,
-                                             const uint8_t *source,
-                                             uintptr_t source_len);
+uintptr_t ts_pack_language_registry_language_count(TS_PACKAlefHandle this_);
 
 /**
- * Reset internal state. The next call to `parse` (Self::parse) will
- * not be incremental.
+ * Parse source code and extract file intelligence based on config in a single pass.
+ * \note Returns `Error.InvalidRange` if the config is invalid (see
+ * `ProcessConfig::validate` (crate::ProcessConfig::validate)) or if the source
+ * exceeds the configured
+ * `max_source_bytes` (crate::ProcessConfig::max_source_bytes);
+ * `Error.LanguageNotFound` if the language is unknown; or
+ * `Error.ParseFailed` if parsing produces no tree.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
-void ts_pack_parser_reset(TS_PACKAlefHandle this_);
+TS_PACKAlefHandle ts_pack_language_registry_process(TS_PACKAlefHandle this_,
+                                                    const char *source,
+                                                    TS_PACKAlefHandle config);
 
 /**
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
-TS_PACKAlefHandle ts_pack_parser_default(void);
-
-/**
- * Free a `Tree` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_tree_free(TS_PACKAlefHandle handle);
-
-/**
- * Return the root `Node` of this tree.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- */
-TS_PACKAlefHandle ts_pack_tree_root_node(TS_PACKAlefHandle this_);
-
-/**
- * Return a `TreeCursor` positioned at the root.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- */
-TS_PACKAlefHandle ts_pack_tree_walk(TS_PACKAlefHandle this_);
+TS_PACKAlefHandle ts_pack_language_registry_default(void);
 
 /**
  * Free a `Node` handle.
@@ -1837,49 +1467,189 @@ char *ts_pack_node_to_sexp(TS_PACKAlefHandle this_);
 TS_PACKAlefHandle ts_pack_node_walk(TS_PACKAlefHandle this_);
 
 /**
- * Free a `TreeCursor` handle.
+ * Create a `PackConfig` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_pack_config_free`.
+ */
+TS_PACKAlefHandle ts_pack_pack_config_from_json(const char *json);
+
+/**
+ * Serialize a `PackConfig` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_pack_config_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `PackConfig` handle.
  * # Safety
  * Handle must have been returned by this library, or be zero.
  */
-void ts_pack_tree_cursor_free(TS_PACKAlefHandle handle);
+void ts_pack_pack_config_free(TS_PACKAlefHandle handle);
 
 /**
- * Return the `Node` at the cursor's current position.
+ * Get the `cache_dir` field from a `PackConfig`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_pack_config_cache_dir(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `languages` field from a `PackConfig`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_pack_config_languages(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `groups` field from a `PackConfig`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_pack_config_groups(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `Parser` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_parser_free(TS_PACKAlefHandle handle);
+
+TS_PACKAlefHandle ts_pack_parser_new(void);
+
+/**
+ * Refuse to parse sources longer than `max_bytes`.
+ *
+ * `None` (the default) means no limit. Over-limit input makes
+ * `parse` (Self::parse) and `parse_bytes` (Self::parse_bytes) return
+ * `None` after emitting a `WARN`; input is never silently truncated.
+ *
+ * See `RECOMMENDED_MAX_SOURCE_BYTES` (crate::process_config::RECOMMENDED_MAX_SOURCE_BYTES).
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
-TS_PACKAlefHandle ts_pack_tree_cursor_node(TS_PACKAlefHandle this_);
+void ts_pack_parser_set_max_source_bytes(TS_PACKAlefHandle this_,
+                                         uintptr_t max_bytes);
 
 /**
- * Move the cursor to the first child of the current node.
- * Returns `true` if a child existed.
+ * Cancel a parse that exceeds `timeout_ms` milliseconds of wall clock.
+ *
+ * `None` (the default) means no budget. Cancellation runs through
+ * tree-sitter's parse progress callback, so it is granular to that
+ * callback's interval rather than exact.
+ *
+ * See `RECOMMENDED_PARSE_TIMEOUT_MS` (crate::process_config::RECOMMENDED_PARSE_TIMEOUT_MS).
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
-int32_t ts_pack_tree_cursor_goto_first_child(TS_PACKAlefHandle this_);
+void ts_pack_parser_set_parse_timeout_ms(TS_PACKAlefHandle this_,
+                                         uint64_t timeout_ms);
 
 /**
- * Move the cursor to the parent of the current node.
- * Returns `true` if a parent existed.
+ * Configure the parser to use the language identified by name (e.g. `"python"`).
+ *
+ * Resolves the language through the global registry â auto-downloading
+ * if necessary, when the `download` feature is enabled.
+ * \note Returns `Error.LanguageNotFound` if the language is not recognized,
+ * or `Error.ParserSetup` if the language ABI is incompatible.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
-int32_t ts_pack_tree_cursor_goto_parent(TS_PACKAlefHandle this_);
+int32_t ts_pack_parser_set_language(TS_PACKAlefHandle this_,
+                                    const char *name);
 
 /**
- * Move the cursor to the next sibling of the current node.
- * Returns `true` if a sibling existed.
+ * Parse a UTF-8 source string.
+ *
+ * Returns `None` if no language is set, if the parse was cancelled by the
+ * configured timeout (Self::set_parse_timeout_ms), or if the source
+ * exceeds the configured size limit (Self::set_max_source_bytes). Each
+ * non-parse outcome is logged, so an empty result is never silent.
+ *
+ * # Concurrency
+ *
+ * Parsing runs fully in parallel across threads for almost every language â no lock is
+ * taken. The exception is the small set of grammars whose external scanner keeps mutable
+ * process-global state (currently just `properties`): parses of that language are
+ * serialized against each other through an internal per-language lock, so that concurrent
+ * threads can't corrupt shared scanner state. Every other language is unaffected by that
+ * lock and never waits on it.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
-int32_t ts_pack_tree_cursor_goto_next_sibling(TS_PACKAlefHandle this_);
+TS_PACKAlefHandle ts_pack_parser_parse(TS_PACKAlefHandle this_,
+                                       const char *source);
 
 /**
- * Return the field name for the current node, if any.
+ * Parse a raw byte slice.
+ *
+ * Same outcomes as `parse` (Self::parse), including the concurrency behaviour documented
+ * there.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
-char *ts_pack_tree_cursor_field_name(TS_PACKAlefHandle this_);
+TS_PACKAlefHandle ts_pack_parser_parse_bytes(TS_PACKAlefHandle this_,
+                                             const uint8_t *source,
+                                             uintptr_t source_len);
+
+/**
+ * Reset internal state. The next call to `parse` (Self::parse) will
+ * not be incremental.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+void ts_pack_parser_reset(TS_PACKAlefHandle this_);
+
+/**
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+TS_PACKAlefHandle ts_pack_parser_default(void);
+
+/**
+ * Create a `Point` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_point_free`.
+ */
+TS_PACKAlefHandle ts_pack_point_from_json(const char *json);
+
+/**
+ * Serialize a `Point` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_point_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `Point` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_point_free(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `row` field from a `Point`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_point_row(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `column` field from a `Point`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_point_column(TS_PACKAlefHandle handle);
 
 /**
  * Create a `ProcessConfig` from a JSON string. Returns null on failure.
@@ -2070,199 +1840,444 @@ TS_PACKAlefHandle ts_pack_process_config_with_parse_timeout_ms(TS_PACKAlefHandle
 int32_t ts_pack_process_config_validate(TS_PACKAlefHandle this_);
 
 /**
- * Free a `LanguageRegistry` handle.
+ * Create a `ProcessResult` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_process_result_free`.
+ */
+TS_PACKAlefHandle ts_pack_process_result_from_json(const char *json);
+
+/**
+ * Serialize a `ProcessResult` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_process_result_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `ProcessResult` handle.
  * # Safety
  * Handle must have been returned by this library, or be zero.
  */
-void ts_pack_language_registry_free(TS_PACKAlefHandle handle);
-
-TS_PACKAlefHandle ts_pack_language_registry_new(void);
+void ts_pack_process_result_free(TS_PACKAlefHandle handle);
 
 /**
- * Get a tree-sitter `Language` by name.
- *
- * Resolves aliases (e.g., `"shell"` -> `"bash"`, `"makefile"` -> `"make"`),
- * then looks up the language in the static table. When the `dynamic-loading`
- * feature is enabled, falls back to loading a shared library on demand.
- * \note Returns `Error.LanguageNotFound` if the name (after alias resolution)
- * does not match any known grammar.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * Get the `language` field from a `ProcessResult`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
-TS_PACKAlefHandle ts_pack_language_registry_get_language(TS_PACKAlefHandle this_,
-                                                         const char *name);
+char *ts_pack_process_result_language(TS_PACKAlefHandle handle);
 
 /**
- * List all available language names, sorted and deduplicated.
- *
- * Includes statically compiled languages, dynamically loadable languages
- * (if the `dynamic-loading` feature is enabled), and all configured aliases.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * Get the `metrics` field from a `ProcessResult`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_file_metrics_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
-char *ts_pack_language_registry_available_languages(TS_PACKAlefHandle this_);
+TS_PACKAlefHandle ts_pack_process_result_metrics(TS_PACKAlefHandle handle);
 
 /**
- * Check whether this language can be parsed right now, without downloading.
- *
- * Resolves aliases, then answers from exactly the lookup
- * `get_language` (Self::get_language) performs: the statically compiled
- * table, the already-loaded dynamic grammars, and the parser shared
- * libraries present in the primary and extra (download-cache) library
- * directories. It never performs network I/O.
- *
- * A previous implementation consulted only the statically compiled table.
- * That table is empty in every build that does not set `TSLP_LANGUAGES`,
- * so the function answered `false` for languages this registry parses
- * perfectly well.
- *
- * Contrast `has_language` (Self::has_language), which is also `true` for a
- * grammar that is merely *known to the manifest* and would have to be
- * downloaded first. The pair distinguishes "we can parse it offline, now"
- * from "we recognise the name".
- *
- * The first `true` answer for a dynamic grammar loads its shared library:
- * loading is the only way to know the grammar is usable, since a truncated
- * or wrong-architecture library exists on disk but cannot parse. Loads are
- * cached process-wide, so repeat calls are cheap.
- *
- * ```no_run
- * use tree_sitter_language_pack::{detect_language_from_extension, LanguageRegistry};
- *
- * let registry = LanguageRegistry::new();
- * // Extension detection uses the static ext table for all 371 grammars.
- * let lang = detect_language_from_extension("feature"); // always returns Some("gherkin")
- * // Parser availability depends on what is compiled in or cached on disk.
- * let can_parse = lang.map(|name| registry.has_parser(name)).unwrap_or(false);
- * ```
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * Get the `structure` field from a `ProcessResult`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
-int32_t ts_pack_language_registry_has_parser(TS_PACKAlefHandle this_,
-                                             const char *name);
+char *ts_pack_process_result_structure(TS_PACKAlefHandle handle);
 
 /**
- * Check whether a language is available by name or alias.
- *
- * Returns `true` if the language can be loaded, either from the static
- * table or from a dynamic library on disk.
- *
- * Every branch is one more way to answer `true`, so they are ordered
- * cheapest-first and the filesystem is only consulted once every in-memory
- * source has said no. Probing the loaded-grammar map and the manifest ahead
- * of the `stat` calls is what keeps this off the syscall path for the
- * languages a process actually uses.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * Get the `imports` field from a `ProcessResult`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
-int32_t ts_pack_language_registry_has_language(TS_PACKAlefHandle this_,
-                                               const char *name);
+char *ts_pack_process_result_imports(TS_PACKAlefHandle handle);
 
 /**
- * Return the total number of available languages (including aliases).
- *
- * Counts the same set `available_languages` (Self::available_languages)
- * lists, without materialising or sorting it.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * Get the `exports` field from a `ProcessResult`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
-uintptr_t ts_pack_language_registry_language_count(TS_PACKAlefHandle this_);
+char *ts_pack_process_result_exports(TS_PACKAlefHandle handle);
 
 /**
- * Parse source code and extract file intelligence based on config in a single pass.
- * \note Returns `Error.InvalidRange` if the config is invalid (see
- * `ProcessConfig::validate` (crate::ProcessConfig::validate)) or if the source
- * exceeds the configured
- * `max_source_bytes` (crate::ProcessConfig::max_source_bytes);
- * `Error.LanguageNotFound` if the language is unknown; or
- * `Error.ParseFailed` if parsing produces no tree.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * Get the `comments` field from a `ProcessResult`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
-TS_PACKAlefHandle ts_pack_language_registry_process(TS_PACKAlefHandle this_,
-                                                    const char *source,
-                                                    TS_PACKAlefHandle config);
+char *ts_pack_process_result_comments(TS_PACKAlefHandle handle);
 
 /**
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * Get the `docstrings` field from a `ProcessResult`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
-TS_PACKAlefHandle ts_pack_language_registry_default(void);
+char *ts_pack_process_result_docstrings(TS_PACKAlefHandle handle);
 
-#if defined(TS_PACK_FEATURE_DOWNLOAD)
 /**
- * Free a `DownloadManager` handle.
+ * Get the `symbols` field from a `ProcessResult`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_process_result_symbols(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `diagnostics` field from a `ProcessResult`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_process_result_diagnostics(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `chunks` field from a `ProcessResult`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_process_result_chunks(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `data` field from a `ProcessResult`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_data_node_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKAlefHandle ts_pack_process_result_data(TS_PACKAlefHandle handle);
+
+/**
+ * Create a `Span` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_span_free`.
+ */
+TS_PACKAlefHandle ts_pack_span_from_json(const char *json);
+
+/**
+ * Serialize a `Span` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_span_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `Span` handle.
  * # Safety
  * Handle must have been returned by this library, or be zero.
  */
-void ts_pack_download_manager_free(TS_PACKAlefHandle handle);
-#endif
+void ts_pack_span_free(TS_PACKAlefHandle handle);
 
-#if defined(TS_PACK_FEATURE_DOWNLOAD)
-TS_PACKAlefHandle ts_pack_download_manager_new(const char *version);
-#endif
-
-#if defined(TS_PACK_FEATURE_DOWNLOAD)
 /**
- * List languages that are already downloaded and cached.
- *
- * Derived from the on-disk cache filenames, one canonical name per file, plus
- * every alias that resolves to it (via `aliases_for`) â so
- * this list agrees with the user-facing
- * `LanguageRegistry::available_languages` (crate::LanguageRegistry::available_languages)
- * about which names are "available"; both report `"shell"` once `bash` is
- * cached, for example. A previous version reported canonical names only,
- * which could never agree with `available_languages()`. See #107.
- *
- * Returns an empty list if the cache directory does not exist. If it exists
- * but cannot be read (e.g. a permission error), also returns an empty list â
- * changing this to a `Result` would be a breaking change across every
- * language binding â but logs a `tracing::warn!` so the failure is not
- * silently indistinguishable from "nothing installed".
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * Get the `start_byte` field from a `Span`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
-char *ts_pack_download_manager_installed_languages(TS_PACKAlefHandle this_);
-#endif
+uintptr_t ts_pack_span_start_byte(TS_PACKAlefHandle handle);
 
-#if defined(TS_PACK_FEATURE_DOWNLOAD)
 /**
- * Download the platform bundle and extract every library file it contains.
- *
- * Unlike `Self.ensure_languages`, this does not check the manifest language list
- * against archive contents â it simply extracts all `.so`/`.dylib`/`.dll` files
- * from the bundle. Languages in the manifest that are missing from the archive
- * are silently ignored rather than returning an error.
- *
- * Returns the number of library files extracted (including those already cached).
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * Get the `end_byte` field from a `Span`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
-uintptr_t ts_pack_download_manager_download_all_best_effort(TS_PACKAlefHandle this_);
-#endif
+uintptr_t ts_pack_span_end_byte(TS_PACKAlefHandle handle);
 
-#if defined(TS_PACK_FEATURE_DOWNLOAD)
 /**
- * Remove all cached parser libraries.
- *
- * Acquires the cross-process lock so `clean_cache` cannot race a concurrent
- * downloader (avoids Windows sharing-violation errors against an in-flight
- * bundle write). The `.download.lock` file itself is **not** removed â it is
- * permanent infrastructure; deleting it could allow a concurrent process that
- * already opened the file to continue holding a stale lock handle while a new
- * process opens a fresh inode, breaking the mutual-exclusion guarantee.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
+ * Get the `start_line` field from a `Span`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
  */
-int32_t ts_pack_download_manager_clean_cache(TS_PACKAlefHandle this_);
-#endif
+uintptr_t ts_pack_span_start_line(TS_PACKAlefHandle handle);
 
 /**
- * Free a `Language` handle.
+ * Get the `start_column` field from a `Span`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_span_start_column(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `end_line` field from a `Span`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_span_end_line(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `end_column` field from a `Span`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_span_end_column(TS_PACKAlefHandle handle);
+
+/**
+ * Create a `StructureItem` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_structure_item_free`.
+ */
+TS_PACKAlefHandle ts_pack_structure_item_from_json(const char *json);
+
+/**
+ * Serialize a `StructureItem` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_structure_item_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `StructureItem` handle.
  * # Safety
  * Handle must have been returned by this library, or be zero.
  */
-void ts_pack_language_free(TS_PACKAlefHandle handle);
+void ts_pack_structure_item_free(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `kind` field from a `StructureItem`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_structure_kind_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKAlefHandle ts_pack_structure_item_kind(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `name` field from a `StructureItem`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_structure_item_name(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `visibility` field from a `StructureItem`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_structure_item_visibility(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `span` field from a `StructureItem`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_span_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKAlefHandle ts_pack_structure_item_span(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `children` field from a `StructureItem`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_structure_item_children(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `decorators` field from a `StructureItem`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_structure_item_decorators(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `doc_comment` field from a `StructureItem`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_structure_item_doc_comment(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `signature` field from a `StructureItem`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_structure_item_signature(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `body_span` field from a `StructureItem`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_span_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKAlefHandle ts_pack_structure_item_body_span(TS_PACKAlefHandle handle);
+
+/**
+ * Create a `SymbolInfo` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_symbol_info_free`.
+ */
+TS_PACKAlefHandle ts_pack_symbol_info_from_json(const char *json);
+
+/**
+ * Serialize a `SymbolInfo` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_symbol_info_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `SymbolInfo` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_symbol_info_free(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `name` field from a `SymbolInfo`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_symbol_info_name(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `kind` field from a `SymbolInfo`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_symbol_kind_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKAlefHandle ts_pack_symbol_info_kind(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `span` field from a `SymbolInfo`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `ts_pack_span_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKAlefHandle ts_pack_symbol_info_span(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `type_annotation` field from a `SymbolInfo`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_symbol_info_type_annotation(TS_PACKAlefHandle handle);
+
+/**
+ * Get the `doc` field from a `SymbolInfo`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `ts_pack_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_symbol_info_doc(TS_PACKAlefHandle handle);
+
+/**
+ * Free a `Tree` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_tree_free(TS_PACKAlefHandle handle);
+
+/**
+ * Return the root `Node` of this tree.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+TS_PACKAlefHandle ts_pack_tree_root_node(TS_PACKAlefHandle this_);
+
+/**
+ * Return a `TreeCursor` positioned at the root.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+TS_PACKAlefHandle ts_pack_tree_walk(TS_PACKAlefHandle this_);
+
+/**
+ * Free a `TreeCursor` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_tree_cursor_free(TS_PACKAlefHandle handle);
+
+/**
+ * Return the `Node` at the cursor's current position.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+TS_PACKAlefHandle ts_pack_tree_cursor_node(TS_PACKAlefHandle this_);
+
+/**
+ * Move the cursor to the first child of the current node.
+ * Returns `true` if a child existed.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+int32_t ts_pack_tree_cursor_goto_first_child(TS_PACKAlefHandle this_);
+
+/**
+ * Move the cursor to the parent of the current node.
+ * Returns `true` if a parent existed.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+int32_t ts_pack_tree_cursor_goto_parent(TS_PACKAlefHandle this_);
+
+/**
+ * Move the cursor to the next sibling of the current node.
+ * Returns `true` if a sibling existed.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+int32_t ts_pack_tree_cursor_goto_next_sibling(TS_PACKAlefHandle this_);
+
+/**
+ * Return the field name for the current node, if any.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+char *ts_pack_tree_cursor_field_name(TS_PACKAlefHandle this_);
+
+/**
+ * Convert an integer to a `CommentKind` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t ts_pack_comment_kind_from_i32(int32_t value);
+
+/**
+ * Convert a `CommentKind` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ */
+int32_t ts_pack_comment_kind_from_str(const char *name);
 
 /**
  * Convert an integer to a `DataNodeKind` variant. Returns -1 on invalid input.
@@ -2280,34 +2295,19 @@ int32_t ts_pack_data_node_kind_from_i32(int32_t value);
 int32_t ts_pack_data_node_kind_from_str(const char *name);
 
 /**
- * Convert an integer to a `StructureKind` variant. Returns -1 on invalid input.
+ * Convert an integer to a `DiagnosticSeverity` variant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
-int32_t ts_pack_structure_kind_from_i32(int32_t value);
+int32_t ts_pack_diagnostic_severity_from_i32(int32_t value);
 
 /**
- * Convert a `StructureKind` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
+ * Convert a `DiagnosticSeverity` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
-int32_t ts_pack_structure_kind_from_str(const char *name);
-
-/**
- * Convert an integer to a `CommentKind` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t ts_pack_comment_kind_from_i32(int32_t value);
-
-/**
- * Convert a `CommentKind` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
- */
-int32_t ts_pack_comment_kind_from_str(const char *name);
+int32_t ts_pack_diagnostic_severity_from_str(const char *name);
 
 /**
  * Convert an integer to a `DocstringFormat` variant. Returns -1 on invalid input.
@@ -2340,6 +2340,21 @@ int32_t ts_pack_export_kind_from_i32(int32_t value);
 int32_t ts_pack_export_kind_from_str(const char *name);
 
 /**
+ * Convert an integer to a `StructureKind` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t ts_pack_structure_kind_from_i32(int32_t value);
+
+/**
+ * Convert a `StructureKind` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ */
+int32_t ts_pack_structure_kind_from_str(const char *name);
+
+/**
  * Convert an integer to a `SymbolKind` variant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -2355,19 +2370,29 @@ int32_t ts_pack_symbol_kind_from_i32(int32_t value);
 int32_t ts_pack_symbol_kind_from_str(const char *name);
 
 /**
- * Convert an integer to a `DiagnosticSeverity` variant. Returns -1 on invalid input.
+ * Free a `CommentKind` handle.
  * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
+ * Handle must have been returned by this library, or be zero.
  */
-int32_t ts_pack_diagnostic_severity_from_i32(int32_t value);
+void ts_pack_comment_kind_free(TS_PACKAlefHandle handle);
 
 /**
- * Convert a `DiagnosticSeverity` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
+ * Serialize a `CommentKind` to a JSON string. Returns null on failure.
  * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
  */
-int32_t ts_pack_diagnostic_severity_from_str(const char *name);
+char *ts_pack_comment_kind_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Render a `CommentKind` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_comment_kind_to_string(TS_PACKAlefHandle handle);
 
 /**
  * Free a `DataNodeKind` handle.
@@ -2395,54 +2420,29 @@ char *ts_pack_data_node_kind_to_json(TS_PACKAlefHandle handle);
 char *ts_pack_data_node_kind_to_string(TS_PACKAlefHandle handle);
 
 /**
- * Free a `StructureKind` handle.
+ * Free a `DiagnosticSeverity` handle.
  * # Safety
  * Handle must have been returned by this library, or be zero.
  */
-void ts_pack_structure_kind_free(TS_PACKAlefHandle handle);
+void ts_pack_diagnostic_severity_free(TS_PACKAlefHandle handle);
 
 /**
- * Serialize a `StructureKind` to a JSON string. Returns null on failure.
+ * Serialize a `DiagnosticSeverity` to a JSON string. Returns null on failure.
  * # Safety
  * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
  * The returned string must be freed with `ts_pack_free_string`.
  */
-char *ts_pack_structure_kind_to_json(TS_PACKAlefHandle handle);
+char *ts_pack_diagnostic_severity_to_json(TS_PACKAlefHandle handle);
 
 /**
- * Render a `StructureKind` as its string representation
+ * Render a `DiagnosticSeverity` as its string representation
  * (the unit-variant name as serialized by serde — e.g. `"completed"`,
  * without surrounding JSON quotes).
  * # Safety
  * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
  * The returned string must be freed with `ts_pack_free_string`.
  */
-char *ts_pack_structure_kind_to_string(TS_PACKAlefHandle handle);
-
-/**
- * Free a `CommentKind` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
- */
-void ts_pack_comment_kind_free(TS_PACKAlefHandle handle);
-
-/**
- * Serialize a `CommentKind` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_comment_kind_to_json(TS_PACKAlefHandle handle);
-
-/**
- * Render a `CommentKind` as its string representation
- * (the unit-variant name as serialized by serde — e.g. `"completed"`,
- * without surrounding JSON quotes).
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_comment_kind_to_string(TS_PACKAlefHandle handle);
+char *ts_pack_diagnostic_severity_to_string(TS_PACKAlefHandle handle);
 
 /**
  * Free a `DocstringFormat` handle.
@@ -2495,6 +2495,31 @@ char *ts_pack_export_kind_to_json(TS_PACKAlefHandle handle);
 char *ts_pack_export_kind_to_string(TS_PACKAlefHandle handle);
 
 /**
+ * Free a `StructureKind` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void ts_pack_structure_kind_free(TS_PACKAlefHandle handle);
+
+/**
+ * Serialize a `StructureKind` to a JSON string. Returns null on failure.
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_structure_kind_to_json(TS_PACKAlefHandle handle);
+
+/**
+ * Render a `StructureKind` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_structure_kind_to_string(TS_PACKAlefHandle handle);
+
+/**
  * Free a `SymbolKind` handle.
  * # Safety
  * Handle must have been returned by this library, or be zero.
@@ -2520,29 +2545,183 @@ char *ts_pack_symbol_kind_to_json(TS_PACKAlefHandle handle);
 char *ts_pack_symbol_kind_to_string(TS_PACKAlefHandle handle);
 
 /**
- * Free a `DiagnosticSeverity` handle.
- * # Safety
- * Handle must have been returned by this library, or be zero.
+ * List all available language names (sorted, deduplicated, includes aliases).
+ *
+ * Returns names of both statically compiled and dynamically loadable languages,
+ * plus any configured aliases.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::available_languages;
+ *
+ * let langs = available_languages();
+ * for name in &langs {
+ *     println!("{}", name);
+ * }
+ * \endcode
  */
-void ts_pack_diagnostic_severity_free(TS_PACKAlefHandle handle);
+char *ts_pack_available_languages(void);
 
 /**
- * Serialize a `DiagnosticSeverity` to a JSON string. Returns null on failure.
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
+ * Return the byte length of the C string most recently returned by `ts_pack_available_languages` on
+ * this thread. Returns 0 when the primary call returned null or failed before producing a string.
+ * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
+ * with `ts_pack_available_languages`.
  */
-char *ts_pack_diagnostic_severity_to_json(TS_PACKAlefHandle handle);
+uintptr_t ts_pack_available_languages_len(void);
+
+#if defined(TS_PACK_FEATURE_DOWNLOAD)
+/**
+ * Return the effective cache directory path.
+ *
+ * This is `{base}/tree-sitter-language-pack/v{version}/libs/`, where `{base}` is
+ * either the custom BASE directory set via `configure` / `init`
+ * (`PackConfig::cache_dir`) or the platform default cache directory â both are
+ * suffixed identically, so a custom `cache_dir` is never used as the final libs
+ * path. The default resolves to `~/.cache/tree-sitter-language-pack/v{version}/libs/`
+ * on a typical Unix system.
+ * \note Returns an error if no cache directory can be resolved: `version` is somehow
+ * invalid, or (with no custom `cache_dir` configured) the platform reports none
+ * and `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR` is unset. This crate no longer falls
+ * back to the temporary directory for the latter case â see #101 H2.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::cache_dir;
+ *
+ * let dir = cache_dir().unwrap();
+ * println!("Cache directory: {dir}");
+ * \endcode
+ */
+char *ts_pack_cache_dir(void);
+#endif
+
+#if defined(TS_PACK_FEATURE_DOWNLOAD)
+/**
+ * Return the byte length of the C string most recently returned by `ts_pack_cache_dir` on this thread.
+ * Returns 0 when the primary call returned null or failed before producing a string. Enables safe
+ * slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
+ * with `ts_pack_cache_dir`.
+ */
+uintptr_t ts_pack_cache_dir_len(void);
+#endif
+
+#if defined(TS_PACK_FEATURE_DOWNLOAD)
+/**
+ * Delete all cached parser shared libraries.
+ *
+ * Resets the cache registration so the next call to `get_language` or
+ * a download function will re-register the (now empty) cache directory.
+ * \note Returns an error if the cache directory cannot be removed.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::clean_cache;
+ *
+ * clean_cache().unwrap();
+ * println!("Cache cleared");
+ * \endcode
+ */
+int32_t ts_pack_clean_cache(void);
+#endif
+
+#if defined(TS_PACK_FEATURE_DOWNLOAD)
+/**
+ * Apply download configuration without downloading anything.
+ *
+ * Use this to set a custom cache directory before the first call to
+ * `get_language` or any download function. Changing the cache dir
+ * after languages have been registered has no effect on already-loaded
+ * languages.
+ *
+ * `PackConfig::cache_dir` is a BASE directory, not the final libs path: this
+ * crate appends `tree-sitter-language-pack/v{version}/libs` to it, the same
+ * suffix applied to the platform default cache directory. In the example below,
+ * files actually land under `/tmp/my-parsers/tree-sitter-language-pack/v{version}/libs/`,
+ * never directly in `/tmp/my-parsers/`. Call `cache_dir` to read back the
+ * resolved, fully-suffixed path.
+ * \note Returns an error if the lock cannot be acquired.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use std::path::PathBuf;
+ * use tree_sitter_language_pack::{PackConfig, configure};
+ *
+ * let config = PackConfig {
+ *     cache_dir: Some(PathBuf::from("/tmp/my-parsers")),
+ *     languages: None,
+ *     groups: None,
+ * };
+ * configure(&config).unwrap();
+ * \endcode
+ */
+int32_t ts_pack_configure(TS_PACKAlefHandle config);
+#endif
 
 /**
- * Render a `DiagnosticSeverity` as its string representation
- * (the unit-variant name as serialized by serde — e.g. `"completed"`,
- * without surrounding JSON quotes).
- * # Safety
- * `handle` must be a valid, non-zero handle returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
+ * Detect language name from a file path or extension.
+ *
+ * This compatibility alias matches the pre-Alef Python binding API.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
  */
-char *ts_pack_diagnostic_severity_to_string(TS_PACKAlefHandle handle);
+char *ts_pack_detect_language(const char *path);
+
+/**
+ * Return the byte length of the C string most recently returned by `ts_pack_detect_language` on this
+ * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
+ * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
+ * with `ts_pack_detect_language`.
+ */
+uintptr_t ts_pack_detect_language_len(const char *_path);
+
+/**
+ * Detect language name from file content using the shebang line (`#!`).
+ *
+ * Inspects only the first line of `content`. If it begins with `#!`, the
+ * interpreter name is extracted and mapped to a language name.
+ *
+ * Handles common patterns:
+ * - `#!/usr/bin/env python3` â `"python"`
+ * - `#!/bin/bash` â `"bash"`
+ * - `#!/usr/bin/env node` â `"javascript"`
+ *
+ * The `-S` flag accepted by some `env` implementations is skipped automatically.
+ * Version suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.
+ *
+ * A leading UTF-8 BOM (`U+FEFF`) is skipped before the `#!` check, so a
+ * BOM-prefixed script is still detected by its shebang.
+ *
+ * Returns `None` when content does not start with `#!` (after stripping a
+ * leading BOM), the shebang is malformed, or the interpreter is not recognised.
+ *
+ * ```
+ * use tree_sitter_language_pack::detect_language_from_content;
+ * assert_eq!(detect_language_from_content("#!/usr/bin/env python3\npass"), Some("python"));
+ * assert_eq!(detect_language_from_content("#!/bin/bash\necho hi"), Some("bash"));
+ * assert_eq!(detect_language_from_content("no shebang here"), None);
+ * assert_eq!(
+ *     detect_language_from_content("\u{FEFF}#!/usr/bin/env python3\npass"),
+ *     Some("python")
+ * );
+ * ```
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+char *ts_pack_detect_language_from_content(const char *content);
+
+/**
+ * Return the byte length of the C string most recently returned by
+ * `ts_pack_detect_language_from_content` on this thread. Returns 0 when the primary call returned null
+ * or failed before producing a string. Enables safe slice construction in Zig and Java FFM Panama
+ * without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
+ * with `ts_pack_detect_language_from_content`.
+ */
+uintptr_t ts_pack_detect_language_from_content_len(const char *_content);
 
 /**
  * Detect language name from a file extension (without leading dot).
@@ -2596,418 +2775,6 @@ char *ts_pack_detect_language_from_path(const char *path);
  */
 uintptr_t ts_pack_detect_language_from_path_len(const char *_path);
 
-/**
- * Detect language name from file content using the shebang line (`#!`).
- *
- * Inspects only the first line of `content`. If it begins with `#!`, the
- * interpreter name is extracted and mapped to a language name.
- *
- * Handles common patterns:
- * - `#!/usr/bin/env python3` â `"python"`
- * - `#!/bin/bash` â `"bash"`
- * - `#!/usr/bin/env node` â `"javascript"`
- *
- * The `-S` flag accepted by some `env` implementations is skipped automatically.
- * Version suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.
- *
- * A leading UTF-8 BOM (`U+FEFF`) is skipped before the `#!` check, so a
- * BOM-prefixed script is still detected by its shebang.
- *
- * Returns `None` when content does not start with `#!` (after stripping a
- * leading BOM), the shebang is malformed, or the interpreter is not recognised.
- *
- * ```
- * use tree_sitter_language_pack::detect_language_from_content;
- * assert_eq!(detect_language_from_content("#!/usr/bin/env python3\npass"), Some("python"));
- * assert_eq!(detect_language_from_content("#!/bin/bash\necho hi"), Some("bash"));
- * assert_eq!(detect_language_from_content("no shebang here"), None);
- * assert_eq!(
- *     detect_language_from_content("\u{FEFF}#!/usr/bin/env python3\npass"),
- *     Some("python")
- * );
- * ```
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- */
-char *ts_pack_detect_language_from_content(const char *content);
-
-/**
- * Return the byte length of the C string most recently returned by
- * `ts_pack_detect_language_from_content` on this thread. Returns 0 when the primary call returned null
- * or failed before producing a string. Enables safe slice construction in Zig and Java FFM Panama
- * without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_detect_language_from_content`.
- */
-uintptr_t ts_pack_detect_language_from_content_len(const char *_content);
-
-/**
- * Get the highlights query for a language, if bundled.
- *
- * Returns the contents of `highlights.scm` as a static string, or `None`
- * if no highlights query is bundled for this language.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::get_highlights_query;
- *
- * // Returns Some(...) for languages with bundled queries
- * let query = get_highlights_query("python");
- * // Returns None for languages without bundled highlights queries
- * let missing = get_highlights_query("nonexistent_lang");
- * assert!(missing.is_none());
- * \endcode
- */
-char *ts_pack_get_highlights_query(const char *language);
-
-/**
- * Return the byte length of the C string most recently returned by `ts_pack_get_highlights_query` on
- * this thread. Returns 0 when the primary call returned null or failed before producing a string.
- * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_get_highlights_query`.
- */
-uintptr_t ts_pack_get_highlights_query_len(const char *_language);
-
-/**
- * Get the injections query for a language, if bundled.
- *
- * Returns the contents of `injections.scm` as a static string, or `None`
- * if no injections query is bundled for this language.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::get_injections_query;
- *
- * let query = get_injections_query("markdown");
- * // Returns None for languages without bundled injections queries
- * let missing = get_injections_query("nonexistent_lang");
- * assert!(missing.is_none());
- * \endcode
- */
-char *ts_pack_get_injections_query(const char *language);
-
-/**
- * Return the byte length of the C string most recently returned by `ts_pack_get_injections_query` on
- * this thread. Returns 0 when the primary call returned null or failed before producing a string.
- * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_get_injections_query`.
- */
-uintptr_t ts_pack_get_injections_query_len(const char *_language);
-
-/**
- * Get the locals query for a language, if bundled.
- *
- * Returns the contents of `locals.scm` as a static string, or `None`
- * if no locals query is bundled for this language.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::get_locals_query;
- *
- * let query = get_locals_query("python");
- * // Returns None for languages without bundled locals queries
- * let missing = get_locals_query("nonexistent_lang");
- * assert!(missing.is_none());
- * \endcode
- */
-char *ts_pack_get_locals_query(const char *language);
-
-/**
- * Return the byte length of the C string most recently returned by `ts_pack_get_locals_query` on this
- * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
- * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_get_locals_query`.
- */
-uintptr_t ts_pack_get_locals_query_len(const char *_language);
-
-/**
- * Get the tags query for a language, if bundled.
- *
- * Returns the contents of `tags.scm` as a static string, or `None`
- * if no tags query is bundled for this language.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::get_tags_query;
- *
- * let query = get_tags_query("rust");
- * // Returns None for languages without bundled tags queries
- * let missing = get_tags_query("nonexistent_lang");
- * assert!(missing.is_none());
- * \endcode
- */
-char *ts_pack_get_tags_query(const char *language);
-
-/**
- * Return the byte length of the C string most recently returned by `ts_pack_get_tags_query` on this
- * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
- * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_get_tags_query`.
- */
-uintptr_t ts_pack_get_tags_query_len(const char *_language);
-
-/**
- * Get the indents query for a language, if bundled.
- *
- * Returns the contents of `indents.scm` (used for auto-indentation) as a static
- * string, or `None` if no indents query is bundled for this language.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::get_indents_query;
- *
- * let query = get_indents_query("objc");
- * // Returns None for languages without bundled indents queries
- * let missing = get_indents_query("nonexistent_lang");
- * assert!(missing.is_none());
- * \endcode
- */
-char *ts_pack_get_indents_query(const char *language);
-
-/**
- * Return the byte length of the C string most recently returned by `ts_pack_get_indents_query` on this
- * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
- * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_get_indents_query`.
- */
-uintptr_t ts_pack_get_indents_query_len(const char *_language);
-
-/**
- * Get the folds query for a language, if bundled.
- *
- * Returns the contents of `folds.scm` (used for code folding) as a static string,
- * or `None` if no folds query is bundled for this language.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::get_folds_query;
- *
- * let query = get_folds_query("rust");
- * // Returns None for languages without bundled folds queries
- * let missing = get_folds_query("nonexistent_lang");
- * assert!(missing.is_none());
- * \endcode
- */
-char *ts_pack_get_folds_query(const char *language);
-
-/**
- * Return the byte length of the C string most recently returned by `ts_pack_get_folds_query` on this
- * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
- * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_get_folds_query`.
- */
-uintptr_t ts_pack_get_folds_query_len(const char *_language);
-
-/**
- * Get a tree-sitter `Language` by name using the global registry.
- *
- * Resolves language aliases (e.g., `"shell"` maps to `"bash"`).
- * When the `download` feature is enabled (default), automatically downloads
- * the parser from GitHub releases if not found locally.
- * \note Returns `Error.LanguageNotFound` if the language is not recognized,
- * or `Error.Download` if auto-download fails.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::{get_language, Parser};
- *
- * let _lang = get_language("python")?;
- * let mut parser = Parser::new();
- * parser.set_language("python")?;
- * let tree = parser.parse("x = 1").expect("parse failed");
- * assert_eq!(tree.root_node().kind(), "module");
- * # Ok::<(), tree_sitter_language_pack::Error>(())
- * \endcode
- */
-const TSLanguage *ts_pack_get_language(const char *name);
-
-/**
- * Get a `Parser` pre-configured for the given language.
- *
- * This is a convenience function that calls `get_language` and configures
- * a new parser in one step.
- * \note Returns `Error.LanguageNotFound` if the language is not recognized, or
- * `Error.ParserSetup` if the language cannot be applied to the parser.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::get_parser;
- *
- * let mut parser = get_parser("rust")?;
- * let tree = parser.parse("fn main() {}").expect("parse failed");
- * assert!(!tree.root_node().has_error());
- * # Ok::<(), tree_sitter_language_pack::Error>(())
- * \endcode
- */
-TS_PACKAlefHandle ts_pack_get_parser(const char *name);
-
-/**
- * Detect language name from a file path or extension.
- *
- * This compatibility alias matches the pre-Alef Python binding API.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- */
-char *ts_pack_detect_language(const char *path);
-
-/**
- * Return the byte length of the C string most recently returned by `ts_pack_detect_language` on this
- * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
- * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_detect_language`.
- */
-uintptr_t ts_pack_detect_language_len(const char *_path);
-
-/**
- * List all available language names (sorted, deduplicated, includes aliases).
- *
- * Returns names of both statically compiled and dynamically loadable languages,
- * plus any configured aliases.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::available_languages;
- *
- * let langs = available_languages();
- * for name in &langs {
- *     println!("{}", name);
- * }
- * \endcode
- */
-char *ts_pack_available_languages(void);
-
-/**
- * Return the byte length of the C string most recently returned by `ts_pack_available_languages` on
- * this thread. Returns 0 when the primary call returned null or failed before producing a string.
- * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_available_languages`.
- */
-uintptr_t ts_pack_available_languages_len(void);
-
-/**
- * Check if a language is available by name or alias.
- *
- * Returns `true` if the language can be loaded (statically compiled,
- * dynamically available, or a known alias for one of these).
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::has_language;
- *
- * assert!(has_language("python"));
- * assert!(has_language("shell")); // alias for "bash"
- * assert!(!has_language("nonexistent_language"));
- * \endcode
- */
-int32_t ts_pack_has_language(const char *name);
-
-/**
- * Return the number of available languages.
- *
- * Includes statically compiled languages, dynamically loadable languages,
- * and aliases.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::language_count;
- *
- * let count = language_count();
- * println!("{} languages available", count);
- * \endcode
- */
-uintptr_t ts_pack_language_count(void);
-
-/**
- * Process source code and extract file intelligence using the global registry.
- *
- * Parses the source with tree-sitter and extracts metrics, structure, imports,
- * exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
- * the flags set in `ProcessConfig`.
- * \note Returns `Error.InvalidRange` if the config carries a zero-valued limit or
- * the source exceeds `ProcessConfig.max_source_bytes`,
- * `Error.ParseTimeout` if the parse exceeds
- * `ProcessConfig.parse_timeout_ms`, `Error.LanguageNotFound` if the
- * language is unknown, or `Error.ParseFailed` if parsing yields no tree.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::{ProcessConfig, process};
- *
- * let config = ProcessConfig::new("python").all();
- * let result = process("def hello(): pass", &config).unwrap();
- * println!("Language: {}", result.language);
- * println!("Lines: {}", result.metrics.total_lines);
- * println!("Structures: {}", result.structure.len());
- * \endcode
- */
-TS_PACKAlefHandle ts_pack_process(const char *source,
-                                  TS_PACKAlefHandle config);
-
-#if defined(TS_PACK_FEATURE_DOWNLOAD)
-/**
- * Initialize the language pack with the given configuration.
- *
- * Applies any custom cache directory, then downloads all languages and groups
- * specified in the config. This is the recommended entry point when you want
- * to pre-warm the cache before use.
- * \note Returns an error if configuration cannot be applied or if downloads fail.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::{PackConfig, init};
- *
- * let config = PackConfig {
- *     cache_dir: None,
- *     languages: Some(vec!["python".to_string(), "rust".to_string()]),
- *     groups: None,
- * };
- * init(&config).unwrap();
- * \endcode
- */
-int32_t ts_pack_init(TS_PACKAlefHandle config);
-#endif
-
-#if defined(TS_PACK_FEATURE_DOWNLOAD)
-/**
- * Apply download configuration without downloading anything.
- *
- * Use this to set a custom cache directory before the first call to
- * `get_language` or any download function. Changing the cache dir
- * after languages have been registered has no effect on already-loaded
- * languages.
- *
- * `PackConfig::cache_dir` is a BASE directory, not the final libs path: this
- * crate appends `tree-sitter-language-pack/v{version}/libs` to it, the same
- * suffix applied to the platform default cache directory. In the example below,
- * files actually land under `/tmp/my-parsers/tree-sitter-language-pack/v{version}/libs/`,
- * never directly in `/tmp/my-parsers/`. Call `cache_dir` to read back the
- * resolved, fully-suffixed path.
- * \note Returns an error if the lock cannot be acquired.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use std::path::PathBuf;
- * use tree_sitter_language_pack::{PackConfig, configure};
- *
- * let config = PackConfig {
- *     cache_dir: Some(PathBuf::from("/tmp/my-parsers")),
- *     languages: None,
- *     groups: None,
- * };
- * configure(&config).unwrap();
- * \endcode
- */
-int32_t ts_pack_configure(TS_PACKAlefHandle config);
-#endif
-
 #if defined(TS_PACK_FEATURE_DOWNLOAD)
 /**
  * Download specific languages to the local cache.
@@ -3029,29 +2796,6 @@ int32_t ts_pack_configure(TS_PACKAlefHandle config);
  * \endcode
  */
 uintptr_t ts_pack_download(const char *names);
-#endif
-
-#if (defined(TS_PACK_FEATURE_DOWNLOAD) || !defined(TS_PACK_FEATURE_DOWNLOAD))
-/**
- * Prefetch grammars: download any not already loadable from disk, then load every
- * requested language into the process registry so a subsequent hot loop only parses.
- *
- * Unlike `download()`, this does not trust in-memory availability â it downloads
- * whenever a grammar is not actually loadable from disk (fixing the case where a
- * known-but-not-downloaded grammar is reported present), then resolves and caches
- * every requested language. Call it once, up front, before a parallel workload.
- * \note Returns `Error.Download` if a required grammar cannot be fetched, or
- * `Error.LanguageNotFound` if a requested name is unknown.
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- * \code
- * use tree_sitter_language_pack::prefetch;
- *
- * prefetch(&["rust", "python", "go"])?;
- * # Ok::<(), tree_sitter_language_pack::Error>(())
- * \endcode
- */
-int32_t ts_pack_prefetch(const char *languages);
 #endif
 
 #if defined(TS_PACK_FEATURE_DOWNLOAD)
@@ -3113,34 +2857,295 @@ uintptr_t ts_pack_download_group(const char *name);
 
 #if defined(TS_PACK_FEATURE_DOWNLOAD)
 /**
- * Return all language names available in the remote manifest (371).
+ * Return languages that are already downloaded and cached locally.
  *
- * Fetches (and caches) the remote manifest to discover the full list of
- * downloadable languages. Use `downloaded_languages` to list what is
- * already cached locally.
- * \note Returns an error if the manifest cannot be fetched.
+ * Does not perform any network requests. Returns an empty list if the
+ * cache directory does not exist or cannot be read.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  * \code
- * use tree_sitter_language_pack::manifest_languages;
+ * use tree_sitter_language_pack::downloaded_languages;
  *
- * let langs = manifest_languages().unwrap();
- * println!("{} languages available for download", langs.len());
+ * let langs = downloaded_languages();
+ * println!("{} languages already cached", langs.len());
  * \endcode
  */
-char *ts_pack_manifest_languages(void);
+char *ts_pack_downloaded_languages(void);
 #endif
 
 #if defined(TS_PACK_FEATURE_DOWNLOAD)
 /**
- * Return the byte length of the C string most recently returned by `ts_pack_manifest_languages` on
+ * Return the byte length of the C string most recently returned by `ts_pack_downloaded_languages` on
  * this thread. Returns 0 when the primary call returned null or failed before producing a string.
  * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
  * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_manifest_languages`.
+ * with `ts_pack_downloaded_languages`.
  */
-uintptr_t ts_pack_manifest_languages_len(void);
+uintptr_t ts_pack_downloaded_languages_len(void);
 #endif
+
+/**
+ * Get the folds query for a language, if bundled.
+ *
+ * Returns the contents of `folds.scm` (used for code folding) as a static string,
+ * or `None` if no folds query is bundled for this language.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::get_folds_query;
+ *
+ * let query = get_folds_query("rust");
+ * // Returns None for languages without bundled folds queries
+ * let missing = get_folds_query("nonexistent_lang");
+ * assert!(missing.is_none());
+ * \endcode
+ */
+char *ts_pack_get_folds_query(const char *language);
+
+/**
+ * Return the byte length of the C string most recently returned by `ts_pack_get_folds_query` on this
+ * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
+ * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
+ * with `ts_pack_get_folds_query`.
+ */
+uintptr_t ts_pack_get_folds_query_len(const char *_language);
+
+/**
+ * Get the highlights query for a language, if bundled.
+ *
+ * Returns the contents of `highlights.scm` as a static string, or `None`
+ * if no highlights query is bundled for this language.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::get_highlights_query;
+ *
+ * // Returns Some(...) for languages with bundled queries
+ * let query = get_highlights_query("python");
+ * // Returns None for languages without bundled highlights queries
+ * let missing = get_highlights_query("nonexistent_lang");
+ * assert!(missing.is_none());
+ * \endcode
+ */
+char *ts_pack_get_highlights_query(const char *language);
+
+/**
+ * Return the byte length of the C string most recently returned by `ts_pack_get_highlights_query` on
+ * this thread. Returns 0 when the primary call returned null or failed before producing a string.
+ * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
+ * with `ts_pack_get_highlights_query`.
+ */
+uintptr_t ts_pack_get_highlights_query_len(const char *_language);
+
+/**
+ * Get the indents query for a language, if bundled.
+ *
+ * Returns the contents of `indents.scm` (used for auto-indentation) as a static
+ * string, or `None` if no indents query is bundled for this language.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::get_indents_query;
+ *
+ * let query = get_indents_query("objc");
+ * // Returns None for languages without bundled indents queries
+ * let missing = get_indents_query("nonexistent_lang");
+ * assert!(missing.is_none());
+ * \endcode
+ */
+char *ts_pack_get_indents_query(const char *language);
+
+/**
+ * Return the byte length of the C string most recently returned by `ts_pack_get_indents_query` on this
+ * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
+ * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
+ * with `ts_pack_get_indents_query`.
+ */
+uintptr_t ts_pack_get_indents_query_len(const char *_language);
+
+/**
+ * Get the injections query for a language, if bundled.
+ *
+ * Returns the contents of `injections.scm` as a static string, or `None`
+ * if no injections query is bundled for this language.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::get_injections_query;
+ *
+ * let query = get_injections_query("markdown");
+ * // Returns None for languages without bundled injections queries
+ * let missing = get_injections_query("nonexistent_lang");
+ * assert!(missing.is_none());
+ * \endcode
+ */
+char *ts_pack_get_injections_query(const char *language);
+
+/**
+ * Return the byte length of the C string most recently returned by `ts_pack_get_injections_query` on
+ * this thread. Returns 0 when the primary call returned null or failed before producing a string.
+ * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
+ * with `ts_pack_get_injections_query`.
+ */
+uintptr_t ts_pack_get_injections_query_len(const char *_language);
+
+/**
+ * Get a tree-sitter `Language` by name using the global registry.
+ *
+ * Resolves language aliases (e.g., `"shell"` maps to `"bash"`).
+ * When the `download` feature is enabled (default), automatically downloads
+ * the parser from GitHub releases if not found locally.
+ * \note Returns `Error.LanguageNotFound` if the language is not recognized,
+ * or `Error.Download` if auto-download fails.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::{get_language, Parser};
+ *
+ * let _lang = get_language("python")?;
+ * let mut parser = Parser::new();
+ * parser.set_language("python")?;
+ * let tree = parser.parse("x = 1").expect("parse failed");
+ * assert_eq!(tree.root_node().kind(), "module");
+ * # Ok::<(), tree_sitter_language_pack::Error>(())
+ * \endcode
+ */
+const TSLanguage *ts_pack_get_language(const char *name);
+
+/**
+ * Get the locals query for a language, if bundled.
+ *
+ * Returns the contents of `locals.scm` as a static string, or `None`
+ * if no locals query is bundled for this language.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::get_locals_query;
+ *
+ * let query = get_locals_query("python");
+ * // Returns None for languages without bundled locals queries
+ * let missing = get_locals_query("nonexistent_lang");
+ * assert!(missing.is_none());
+ * \endcode
+ */
+char *ts_pack_get_locals_query(const char *language);
+
+/**
+ * Return the byte length of the C string most recently returned by `ts_pack_get_locals_query` on this
+ * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
+ * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
+ * with `ts_pack_get_locals_query`.
+ */
+uintptr_t ts_pack_get_locals_query_len(const char *_language);
+
+/**
+ * Get a `Parser` pre-configured for the given language.
+ *
+ * This is a convenience function that calls `get_language` and configures
+ * a new parser in one step.
+ * \note Returns `Error.LanguageNotFound` if the language is not recognized, or
+ * `Error.ParserSetup` if the language cannot be applied to the parser.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::get_parser;
+ *
+ * let mut parser = get_parser("rust")?;
+ * let tree = parser.parse("fn main() {}").expect("parse failed");
+ * assert!(!tree.root_node().has_error());
+ * # Ok::<(), tree_sitter_language_pack::Error>(())
+ * \endcode
+ */
+TS_PACKAlefHandle ts_pack_get_parser(const char *name);
+
+/**
+ * Get the tags query for a language, if bundled.
+ *
+ * Returns the contents of `tags.scm` as a static string, or `None`
+ * if no tags query is bundled for this language.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::get_tags_query;
+ *
+ * let query = get_tags_query("rust");
+ * // Returns None for languages without bundled tags queries
+ * let missing = get_tags_query("nonexistent_lang");
+ * assert!(missing.is_none());
+ * \endcode
+ */
+char *ts_pack_get_tags_query(const char *language);
+
+/**
+ * Return the byte length of the C string most recently returned by `ts_pack_get_tags_query` on this
+ * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
+ * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
+ * with `ts_pack_get_tags_query`.
+ */
+uintptr_t ts_pack_get_tags_query_len(const char *_language);
+
+/**
+ * Check if a language is available by name or alias.
+ *
+ * Returns `true` if the language can be loaded (statically compiled,
+ * dynamically available, or a known alias for one of these).
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::has_language;
+ *
+ * assert!(has_language("python"));
+ * assert!(has_language("shell")); // alias for "bash"
+ * assert!(!has_language("nonexistent_language"));
+ * \endcode
+ */
+int32_t ts_pack_has_language(const char *name);
+
+#if defined(TS_PACK_FEATURE_DOWNLOAD)
+/**
+ * Initialize the language pack with the given configuration.
+ *
+ * Applies any custom cache directory, then downloads all languages and groups
+ * specified in the config. This is the recommended entry point when you want
+ * to pre-warm the cache before use.
+ * \note Returns an error if configuration cannot be applied or if downloads fail.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::{PackConfig, init};
+ *
+ * let config = PackConfig {
+ *     cache_dir: None,
+ *     languages: Some(vec!["python".to_string(), "rust".to_string()]),
+ *     groups: None,
+ * };
+ * init(&config).unwrap();
+ * \endcode
+ */
+int32_t ts_pack_init(TS_PACKAlefHandle config);
+#endif
+
+/**
+ * Return the number of available languages.
+ *
+ * Includes statically compiled languages, dynamically loadable languages,
+ * and aliases.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::language_count;
+ *
+ * let count = language_count();
+ * println!("{} languages available", count);
+ * \endcode
+ */
+uintptr_t ts_pack_language_count(void);
 
 #if defined(TS_PACK_FEATURE_DOWNLOAD)
 /**
@@ -3178,87 +3183,82 @@ uintptr_t ts_pack_manifest_groups_len(void);
 
 #if defined(TS_PACK_FEATURE_DOWNLOAD)
 /**
- * Return languages that are already downloaded and cached locally.
+ * Return all language names available in the remote manifest (371).
  *
- * Does not perform any network requests. Returns an empty list if the
- * cache directory does not exist or cannot be read.
+ * Fetches (and caches) the remote manifest to discover the full list of
+ * downloadable languages. Use `downloaded_languages` to list what is
+ * already cached locally.
+ * \note Returns an error if the manifest cannot be fetched.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  * \code
- * use tree_sitter_language_pack::downloaded_languages;
+ * use tree_sitter_language_pack::manifest_languages;
  *
- * let langs = downloaded_languages();
- * println!("{} languages already cached", langs.len());
+ * let langs = manifest_languages().unwrap();
+ * println!("{} languages available for download", langs.len());
  * \endcode
  */
-char *ts_pack_downloaded_languages(void);
+char *ts_pack_manifest_languages(void);
 #endif
 
 #if defined(TS_PACK_FEATURE_DOWNLOAD)
 /**
- * Return the byte length of the C string most recently returned by `ts_pack_downloaded_languages` on
+ * Return the byte length of the C string most recently returned by `ts_pack_manifest_languages` on
  * this thread. Returns 0 when the primary call returned null or failed before producing a string.
  * Enables safe slice construction in Zig and Java FFM Panama without a NUL-scan.
  * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_downloaded_languages`.
+ * with `ts_pack_manifest_languages`.
  */
-uintptr_t ts_pack_downloaded_languages_len(void);
+uintptr_t ts_pack_manifest_languages_len(void);
 #endif
 
-#if defined(TS_PACK_FEATURE_DOWNLOAD)
+#if (defined(TS_PACK_FEATURE_DOWNLOAD) || !defined(TS_PACK_FEATURE_DOWNLOAD))
 /**
- * Delete all cached parser shared libraries.
+ * Prefetch grammars: download any not already loadable from disk, then load every
+ * requested language into the process registry so a subsequent hot loop only parses.
  *
- * Resets the cache registration so the next call to `get_language` or
- * a download function will re-register the (now empty) cache directory.
- * \note Returns an error if the cache directory cannot be removed.
+ * Unlike `download()`, this does not trust in-memory availability â it downloads
+ * whenever a grammar is not actually loadable from disk (fixing the case where a
+ * known-but-not-downloaded grammar is reported present), then resolves and caches
+ * every requested language. Call it once, up front, before a parallel workload.
+ * \note Returns `Error.Download` if a required grammar cannot be fetched, or
+ * `Error.LanguageNotFound` if a requested name is unknown.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  * \code
- * use tree_sitter_language_pack::clean_cache;
+ * use tree_sitter_language_pack::prefetch;
  *
- * clean_cache().unwrap();
- * println!("Cache cleared");
+ * prefetch(&["rust", "python", "go"])?;
+ * # Ok::<(), tree_sitter_language_pack::Error>(())
  * \endcode
  */
-int32_t ts_pack_clean_cache(void);
+int32_t ts_pack_prefetch(const char *languages);
 #endif
 
-#if defined(TS_PACK_FEATURE_DOWNLOAD)
 /**
- * Return the effective cache directory path.
+ * Process source code and extract file intelligence using the global registry.
  *
- * This is `{base}/tree-sitter-language-pack/v{version}/libs/`, where `{base}` is
- * either the custom BASE directory set via `configure` / `init`
- * (`PackConfig::cache_dir`) or the platform default cache directory â both are
- * suffixed identically, so a custom `cache_dir` is never used as the final libs
- * path. The default resolves to `~/.cache/tree-sitter-language-pack/v{version}/libs/`
- * on a typical Unix system.
- * \note Returns an error if no cache directory can be resolved: `version` is somehow
- * invalid, or (with no custom `cache_dir` configured) the platform reports none
- * and `TREE_SITTER_LANGUAGE_PACK_CACHE_DIR` is unset. This crate no longer falls
- * back to the temporary directory for the latter case â see #101 H2.
+ * Parses the source with tree-sitter and extracts metrics, structure, imports,
+ * exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+ * the flags set in `ProcessConfig`.
+ * \note Returns `Error.InvalidRange` if the config carries a zero-valued limit or
+ * the source exceeds `ProcessConfig.max_source_bytes`,
+ * `Error.ParseTimeout` if the parse exceeds
+ * `ProcessConfig.parse_timeout_ms`, `Error.LanguageNotFound` if the
+ * language is unknown, or `Error.ParseFailed` if parsing yields no tree.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  * \code
- * use tree_sitter_language_pack::cache_dir;
+ * use tree_sitter_language_pack::{ProcessConfig, process};
  *
- * let dir = cache_dir().unwrap();
- * println!("Cache directory: {dir}");
+ * let config = ProcessConfig::new("python").all();
+ * let result = process("def hello(): pass", &config).unwrap();
+ * println!("Language: {}", result.language);
+ * println!("Lines: {}", result.metrics.total_lines);
+ * println!("Structures: {}", result.structure.len());
  * \endcode
  */
-char *ts_pack_cache_dir(void);
-#endif
-
-#if defined(TS_PACK_FEATURE_DOWNLOAD)
-/**
- * Return the byte length of the C string most recently returned by `ts_pack_cache_dir` on this thread.
- * Returns 0 when the primary call returned null or failed before producing a string. Enables safe
- * slice construction in Zig and Java FFM Panama without a NUL-scan.
- * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
- * with `ts_pack_cache_dir`.
- */
-uintptr_t ts_pack_cache_dir_len(void);
-#endif
+TS_PACKAlefHandle ts_pack_process(const char *source,
+                                  TS_PACKAlefHandle config);
 
 #endif  /* TS_PACK_H */
