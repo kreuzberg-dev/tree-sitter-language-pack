@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **The plugin version gate now runs on the commits that cause drift, and blocks the release when it
+  finds any.** `scripts/sync_plugin_version.py --check` was correct and `CI Plugin` ran it, but
+  `ci-plugin.yaml`'s `paths:` filter did not list `Cargo.toml` — and a release commit bumps
+  `Cargo.toml` and usually nothing under `plugin/`. The 1.15.7 and 1.15.6 release commits match zero
+  paths in the old filter, so the gate was skipped on exactly the commits that strand `plugin/` a
+  release behind. Being in sync at 1.15.8 was luck: that one commit happened to touch `plugin/` too.
+
+  `Cargo.toml` and `.task/version.yml` are now in the filter, so any core bump re-runs the gate. And
+  `sync_plugin_version.py` gains `--expect <version>`, asserting core and plugin both equal the
+  version being released; `publish.yaml`'s `validate-versions` job runs it against the tag, so a
+  drifted plugin fails the release instead of shipping a bundle that lags the version it claims to be.
+
 ## [1.15.8] - 2026-08-23
 
 ### Fixed
