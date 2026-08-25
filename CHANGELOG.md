@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.9] - 2026-08-25
+
+### Changed
+
+- Regenerated all language bindings on alef 0.68.0.
+
 ### Fixed
 
 - **The plugin version gate now runs on the commits that cause drift, and blocks the release when it
