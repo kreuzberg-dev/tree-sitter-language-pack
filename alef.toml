@@ -1129,6 +1129,12 @@ result_fields = [
 
 [crates.e2e.snippets]
 output = "docs-site/src/snippets/generated"
+# docs-site/src/snippets/cli/*.md are hand-authored `ts-pack` shell invocations. The CLI is
+# not an alef binding target -- no backend emits shell commands -- so no fixture can ever
+# stand behind them and `snippets-migrate` reported all three as coverage gaps. Declaring
+# them curated states that intent instead. Globs are project-root-relative, not relative to
+# `output`. Retire this only if alef gains a CLI/shell snippet recipe. ~keep
+curated_snippets = ["docs-site/src/snippets/cli/*.md"]
 languages = [
   "python",
   "node",
