@@ -41,6 +41,7 @@ outputs = [".codex/skills", ".agents/skills", ".github/skills", ".claude/skills"
 # migrated once its classpath defect was fixed. ~keep
 [workspace.docs.snippets]
 dirs = ["docs-site/src/snippets/generated"]
+docs_dirs = ["docs-site/src/content/docs/reference"]
 validation_level = "compile"
 # This bounds each session's `before` hook as well as the validation commands, and the hooks
 # here build native artifacts (`swift build`, a cargo release build of the FFI). 120s was a
