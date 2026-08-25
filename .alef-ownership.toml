@@ -29,6 +29,7 @@ owned_paths = [
   "README.md",
   "composer.json",
   "config.m4",
+  "crates/ts-pack-core-ffi/cmake/ts-pack-core-ffi-config.cmake",
   "crates/ts-pack-core-node/.gitignore",
   "crates/ts-pack-core-node/LICENSE",
   "crates/ts-pack-core-node/README.md",
