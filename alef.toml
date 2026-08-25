@@ -1472,6 +1472,13 @@ args = [{ name = "config", field = "config", type = "json_object" }]
 returns_result = true
 returns_void = true
 
+# `returns_void = true` calls surface in C as a bare `int32_t` status code, but the C e2e
+# generator only treats `result_is_bytes`/`result_is_simple`/`result_is_json_struct` as
+# "no named result type", not `returns_void`. Without this the call resolves to
+# Unresolvable and warns on every fixture. The scalar declaration is accurate here. ~keep
+[crates.e2e.calls.init_pack.overrides.c]
+result_is_simple = true
+
 [crates.e2e.calls.init_pack.overrides.go]
 options_type = "PackConfig"
 
@@ -1500,6 +1507,13 @@ result_var = "result"
 args = [{ name = "config", field = "config", type = "json_object" }]
 returns_result = true
 returns_void = true
+
+# `returns_void = true` calls surface in C as a bare `int32_t` status code, but the C e2e
+# generator only treats `result_is_bytes`/`result_is_simple`/`result_is_json_struct` as
+# "no named result type", not `returns_void`. Without this the call resolves to
+# Unresolvable and warns on every fixture. The scalar declaration is accurate here. ~keep
+[crates.e2e.calls.configure_pack.overrides.c]
+result_is_simple = true
 
 [crates.e2e.calls.configure_pack.overrides.go]
 options_type = "PackConfig"
@@ -1584,9 +1598,14 @@ returns_result = true
 returns_void = true
 args = []
 
+# `returns_void = true` calls surface in C as a bare `int32_t` status code, but the C e2e
+# generator only treats `result_is_bytes`/`result_is_simple`/`result_is_json_struct` as
+# "no named result type", not `returns_void`. Without this the call resolves to
+# Unresolvable and warns on every fixture. The scalar declaration is accurate here. ~keep
 [crates.e2e.calls.clean_cache.overrides.c]
 function = "ts_pack_clean_cache"
 raw_c_result_type = "int32_t"
+result_is_simple = true
 
 [crates.e2e.calls.prefetch]
 function = "prefetch"
@@ -1602,9 +1621,14 @@ args = [
 function = "Prefetch"
 result_is_pointer = false
 
+# `returns_void = true` calls surface in C as a bare `int32_t` status code, but the C e2e
+# generator only treats `result_is_bytes`/`result_is_simple`/`result_is_json_struct` as
+# "no named result type", not `returns_void`. Without this the call resolves to
+# Unresolvable and warns on every fixture. The scalar declaration is accurate here. ~keep
 [crates.e2e.calls.prefetch.overrides.c]
 function = "ts_pack_prefetch"
 raw_c_result_type = "int32_t"
+result_is_simple = true
 
 [crates.e2e.calls.cache_dir]
 function = "cache_dir"
