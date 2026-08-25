@@ -280,7 +280,25 @@ jobs:
             echo "::error::docs-site/src/content/docs/reference/ is missing — the freshness gate below would be a no-op."
             exit 1
           }
-          alef docs
+          # `alef docs` runs strict snippet compile validation as a side effect (it is the only
+          # command that calls `docs::build_dependency::enforce_build_dependency`). That gate is a
+          # pre-flight check over static config — it asks whether each session declares a
+          # non-no-op `before`, never whether an artifact exists — so it bails before generating a
+          # single page here ("4689 snippet(s) validate at compile with no pipeline-guaranteed
+          # build", run 32757399583) and the freshness diff below never ran. Running `alef build`
+          # first cannot help: the gate has no way to observe it. This job installs only Rust and
+          # uv/Python; every other toolchain in this repo is set up by a dedicated per-language
+          # job, so a snippet verdict from this runner would be meaningless even past the gate.
+          # The coverage is not lost — the `validate` job's `check-fixture-snippets` step runs
+          # `alef snippets check --strict --cache off` with the toolchains actually installed, and
+          # that path never consults this gate. The guard below fails this job if that
+          # compensating gate is ever removed, so the flag cannot become a silent hole. Snippet
+          # validation emits zero generated files, so skipping it does not weaken the diff. ~keep
+          grep -q 'check-fixture-snippets: true' .github/workflows/ci.yaml || {
+            echo "::error::snippet validation is skipped here and is no longer covered by the validate job's check-fixture-snippets gate."
+            exit 1
+          }
+          alef docs --skip-snippet-validation
           # Ignore whitespace-only diffs — markdown formatter (rumdl) collapses
           # blank lines and table column padding that alef emits.
           git diff -w --ignore-blank-lines --exit-code -- docs-site/src/content/docs/reference/ || {
