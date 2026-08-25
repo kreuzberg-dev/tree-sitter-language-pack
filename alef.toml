@@ -878,7 +878,10 @@ types = [
   "ChunkContext",
   "Span",
   "PackConfig",
-  "Error",
+  # The crate error enum (`ts_pack_core::Error`) is deliberately absent. alef extracts it
+  # into `ApiSurface.errors`, a collection the include allowlist never filters, so listing
+  # it here retained nothing; since 0.67.6 the include resolver only searches `types`/`enums`
+  # and hard-fails on the unmatched entry. Error bindings are emitted regardless. ~keep
   "LanguageRegistry",
   "DownloadManager",
   "Parser",
