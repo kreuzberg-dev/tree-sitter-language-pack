@@ -159,9 +159,11 @@ jobs:
       # compile against the API they document -- the class of defect that shipped a release
       # whose every e2e suite failed. ~keep
       check-fixture-snippets: true
-      # Pinned so CI installs the same alef that generated the tree in this commit; a drifting
-      # version would grade this output against a different generator. ~keep
-      alef-version: "0.67.7"
+      # No alef-version override here: install-alef@v1 defaults to "latest", which its
+      # resolve.sh reads as the alef.toml pin. A hard-coded version here drifted out of sync
+      # with alef.toml (0.67.7 vs 0.68.0, neither of which alef.toml agreed with after the
+      # next repin) and broke every CI run until the two sources of truth were collapsed to
+      # one. ~keep
 
   validate-rust:
     name: Validate Rust & Alef
