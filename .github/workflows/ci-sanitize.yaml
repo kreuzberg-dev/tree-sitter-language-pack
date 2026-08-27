@@ -92,6 +92,19 @@ jobs:
         with:
           use-sccache: "false"
           install-llvm-cov: "false"
+          # `setup-rust`'s default cache key is `rust-build-v4-<os>-<arch>-default-<Cargo.lock
+          # hash>` — every other job in this repo that omits `target:` and
+          # `cache-key-prefix:` (most of ci.yaml, ci-cli.yaml, ci-rust.yaml, ...) resolves to
+          # that identical key on the same commit, since the key has no notion of RUSTFLAGS,
+          # CFLAGS, or which job produced the cached `target/`. This job sets
+          # CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS + TSLP_GRAMMAR_CFLAGS to build a
+          # sanitizer-instrumented binary; restoring another job's un-instrumented `target/`
+          # under that shared key left the final `ts-pack` link missing `-fsanitize`/`-lasan`/
+          # `-lubsan` entirely (run 32688858106: undefined symbol `__asan_handle_no_return`
+          # while linking the CLI binary itself, not the build script this time). A
+          # dedicated prefix keeps this job's cache fully isolated from every unsanitized
+          # build. ~keep
+          cache-key-prefix: "rust-sanitize"
 
       # `patches/*/` is the pinned regression set, so adding a patch automatically
       # widens the per-PR gate with no workflow edit. The rotating shard is a stable
@@ -123,7 +136,14 @@ jobs:
           print(','.join(names[shard::count]))
           " "$SHARD" "$SHARD_COUNT")
             test -n "$ROTATED" || { echo "::error::shard $SHARD of $SHARD_COUNT is empty"; exit 1; }
-            LANGS="$PATCHED,$ROTATED"
+            # `sort -u` here is load-bearing, not cosmetic: PATCHED is a fixed set and
+            # ROTATED is a day-of-year shard of the whole registry, so on any day the
+            # shard happens to land on a patched grammar, the naive concatenation
+            # duplicates that language in TSLP_LANGUAGES. build.rs then emits two
+            # `extern "C" { fn tree_sitter_<name>() }` blocks for the same symbol and
+            # the build dies with E0428 — which language duplicates changes daily with
+            # the shard, so it looked nondeterministic until traced here. ~keep
+            LANGS=$(echo "$PATCHED,$ROTATED" | tr ',' '\n' | sort -u | paste -sd, -)
           else
             MODE=regression
             LANGS="$PATCHED"

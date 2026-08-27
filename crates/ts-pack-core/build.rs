@@ -210,7 +210,17 @@ fn selected_languages(definitions: &BTreeMap<String, LanguageDefinition>) -> Vec
         if trimmed.eq_ignore_ascii_case("all") || trimmed == "*" {
             return definitions.keys().cloned().collect();
         }
-        let selected: Vec<String> = trimmed.split(',').map(|s| s.trim().to_string()).collect();
+        // ~keep A duplicate name here (e.g. a CI shard selection that concatenates two
+        // ~keep overlapping lists) would make `generate_registry` emit two `extern "C"`
+        // ~keep blocks for the same symbol and fail the build with E0428. `seen` is only
+        // ~keep ever probed with `insert`, never iterated, so de-duplicating this way
+        // ~keep stays deterministic and preserves first-occurrence order.
+        let mut seen = std::collections::HashSet::new();
+        let selected: Vec<String> = trimmed
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .filter(|name| seen.insert(name.clone()))
+            .collect();
         for name in &selected {
             if !name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
                 panic!(
