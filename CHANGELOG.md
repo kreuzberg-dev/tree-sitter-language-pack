@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.10] - 2026-08-27
+
+### Fixed
+
+- **`task alef:sync` now runs the full version sync chain.** It ran `alef sync-versions` alone,
+  which reaches the binding manifests but not the registry test-app pins or the plugin version
+  pin. It is also the only sync task `task --list-all` surfaces, because `version:sync` lives in
+  an internal included taskfile -- so the discoverable entry point was the incomplete one, and
+  releases propagated through it stranded the plugin pin a version behind.
+
+### Note on 1.15.9
+
+1.15.9 was tagged but never published to any registry. Its publish run aborted on the
+`sync_plugin_version.py --expect` gate, because at that tag `Cargo.toml` was 1.15.9 while
+`plugin/.ai-rulez/config.toml` was still 1.15.8 -- the drift the fix above prevents. 1.15.10
+supersedes it; no artifact for 1.15.9 exists on crates.io, PyPI or npm.
+
 ## [1.15.9] - 2026-08-25
 
 ### Changed
