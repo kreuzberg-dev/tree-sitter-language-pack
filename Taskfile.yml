@@ -324,9 +324,14 @@ tasks:
       - alef fmt
 
   alef:sync:
-    desc: Sync version from Cargo.toml to all manifests
+    desc: Sync the version to all manifests, registry test-app pins, and the plugin
     cmds:
-      - alef sync-versions
+      # Delegate instead of calling `alef sync-versions` directly. This is the only
+      # sync task `task --list-all` surfaces -- `version:sync` is in an internal
+      # included taskfile -- so this name is what release runs actually reach for,
+      # while the bare command misses the registry test-app pins and the plugin
+      # version pin. That gap is what left the plugin pin at 1.15.8 on a 1.15.9 core. ~keep
+      - task: version:sync
 
   alef:docs:
     desc: Generate API reference documentation
