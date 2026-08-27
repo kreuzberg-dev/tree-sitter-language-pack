@@ -1220,6 +1220,7 @@ function = "process"
 [crates.e2e.call.overrides.node]
 module = "@xberg-io/tree-sitter-language-pack"
 function = "process"
+options_type = "ProcessConfig"
 
 [crates.e2e.call.overrides.go]
 module = "github.com/xberg-io/tree-sitter-language-pack/packages/go"
@@ -1256,6 +1257,9 @@ result_field_accessor = { "structure" = "kind", "imports" = "source" }
 [crates.e2e.call.overrides.zig]
 options_type = "ProcessConfig"
 result_is_json_struct = true
+
+[crates.e2e.call.overrides.wasm]
+options_type = "ProcessConfig"
 
 [crates.e2e.calls.detect_extension]
 function = "detect_language_from_extension"
