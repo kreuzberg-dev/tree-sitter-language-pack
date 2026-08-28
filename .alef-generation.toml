@@ -1,0 +1,14 @@
+# alef generation-inputs record -- COMMIT THIS FILE, do not add it to .gitignore.
+#
+# Records, per crate, the generation-inputs fingerprint (Rust sources + alef.toml -- see
+# `core::hash::compute_inputs_hash`) as of that crate's most recent successful `alef
+# generate`/`alef all` run. `alef verify` recomputes the current fingerprint and compares it
+# to the value recorded here to detect a stale tree -- inputs changed since the last
+# generation -- without folding that fingerprint into every generated file's own
+# `alef:hash:` stamp, which used to restamp every file on any unrelated config or source
+# change (see `core::hash`'s module doc for the incident this record replaces).
+#
+# Do not hand-edit; it is rewritten by `alef generate`/`alef all` on every successful run.
+
+[crates]
+tree-sitter-language-pack = "646ae40163d7c40b0a814b5f9cb84a1d4d2d4d854b5440a366e848c2417d2aa1"
