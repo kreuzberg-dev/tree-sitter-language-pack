@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.11] - 2026-08-28
+
+### Changed
+
+- **Refreshed 26 grammar pins to upstream latest.** `apex`, `avro`, `cfml`, `dotenv`, `elisp`,
+  `fish`, `gitcommit`, `json`, `magik`, `matlab`, `mlir`, `pkl`, `racket`, `rego`, `robot`, `roc`,
+  `scala`, `sflog`, `soql`, `sosl`, `sourcepawn`, `spicedb`, `swift`, `sysml`, `tmux`, and `twig`.
+  `sflog`/`soql`/`sosl`/`apex` share one upstream monorepo and therefore one revision. The
+  remaining 344 grammars were already current.
+
+- **Refreshed dependencies.** `cargo upgrade --incompatible` reported all 58 workspace packages
+  already at their latest versions, so only `Cargo.lock` and `e2e/rust/Cargo.lock` moved. Python
+  (gitpython, idna, packaging, pygments, pyrefly), Node (pnpm 11.24.0 plus 35 workspace packages),
+  PHP (phpunit 13.x line), and Ruby (activesupport, csv, json, rubocop, rubocop-performance,
+  sorbet-runtime) were taken to latest. C#, Elixir, and Swift re-resolved to identical lockfiles --
+  they were already current.
+
+### Note on the `abl` pin
+
+`abl` had an upstream update available and it was **deliberately not taken**. At
+`e5a40fd0dd`, upstream's own `queries/highlights.scm` matches `(outer_join)`, a node type that
+its committed `src/parser.c` and `src/node-types.json` at that same revision do not define.
+`abl` is one of two grammars whose committed `parser.c` we ship as-is rather than regenerate
+(99 MB, above what standard runners can regenerate), so we cannot resolve the mismatch by
+regenerating from `grammar.js` the way we can elsewhere. Taking the bump made
+`query_compilation` fail with `Invalid node type "outer_join"`, so the pin stays at
+`5844930892`. This is a hold at a known-good revision, not a downgrade.
+
+### Note on the Dart `freezed` pin
+
+`dart pub upgrade --major-versions` proposes `freezed ^4.0.0-dev.3`. That is a prerelease, and
+the `4.0.0` stable release requires Dart SDK >= 3.13.0 while this package declares
+`sdk: '>=3.11.0 <4.0.0'`. Raising the SDK floor is a breaking change and does not belong in a
+patch release, so `freezed` stays on the `^3.2.5` stable line and `pubspec.lock` is unchanged.
+
 ## [1.15.10] - 2026-08-27
 
 ### Fixed
