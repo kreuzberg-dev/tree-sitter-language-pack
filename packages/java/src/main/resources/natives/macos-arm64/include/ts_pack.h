@@ -1740,6 +1740,19 @@ int32_t ts_pack_process_config_diagnostics(TS_PACKAlefHandle handle);
 uintptr_t ts_pack_process_config_chunk_max_size(TS_PACKAlefHandle handle);
 
 /**
+ * Report whether the `chunk_max_size` field on a `ProcessConfig` is `Some`.
+ *
+ * `ts_pack_process_config_chunk_max_size` cannot distinguish a `None` field from a
+ * legitimate zero-valued `Some` at the C ABI boundary -- there is no null representation for a
+ * numeric return, so both collapse to the same sentinel. Call this function first: `1` means
+ * the field getter's return value is meaningful, `0` means the field is absent and the getter's
+ * sentinel must be ignored, `-1` reports an invalid handle (see `ts_pack_last_error_code`).
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+int32_t ts_pack_process_config_has_chunk_max_size(TS_PACKAlefHandle handle);
+
+/**
  * Get the `data_extraction` field from a `ProcessConfig`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
@@ -1754,11 +1767,37 @@ int32_t ts_pack_process_config_data_extraction(TS_PACKAlefHandle handle);
 uintptr_t ts_pack_process_config_max_source_bytes(TS_PACKAlefHandle handle);
 
 /**
+ * Report whether the `max_source_bytes` field on a `ProcessConfig` is `Some`.
+ *
+ * `ts_pack_process_config_max_source_bytes` cannot distinguish a `None` field from a
+ * legitimate zero-valued `Some` at the C ABI boundary -- there is no null representation for a
+ * numeric return, so both collapse to the same sentinel. Call this function first: `1` means
+ * the field getter's return value is meaningful, `0` means the field is absent and the getter's
+ * sentinel must be ignored, `-1` reports an invalid handle (see `ts_pack_last_error_code`).
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+int32_t ts_pack_process_config_has_max_source_bytes(TS_PACKAlefHandle handle);
+
+/**
  * Get the `parse_timeout_ms` field from a `ProcessConfig`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
 uint64_t ts_pack_process_config_parse_timeout_ms(TS_PACKAlefHandle handle);
+
+/**
+ * Report whether the `parse_timeout_ms` field on a `ProcessConfig` is `Some`.
+ *
+ * `ts_pack_process_config_parse_timeout_ms` cannot distinguish a `None` field from a
+ * legitimate zero-valued `Some` at the C ABI boundary -- there is no null representation for a
+ * numeric return, so both collapse to the same sentinel. Call this function first: `1` means
+ * the field getter's return value is meaningful, `0` means the field is absent and the getter's
+ * sentinel must be ignored, `-1` reports an invalid handle (see `ts_pack_last_error_code`).
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+int32_t ts_pack_process_config_has_parse_timeout_ms(TS_PACKAlefHandle handle);
 
 /**
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
