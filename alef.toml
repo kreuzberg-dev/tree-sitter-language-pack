@@ -1484,6 +1484,12 @@ returns_void = true
 [crates.e2e.calls.init_pack.overrides.c]
 result_is_simple = true
 
+# node's file-level default is `ProcessConfig` ([crates.e2e.call.overrides.node]), but this call
+# takes a PackConfig. Without a per-call override the typescript generator validates the fixture
+# against ProcessConfig, which has no `cache_dir`, and panics. ~keep
+[crates.e2e.calls.init_pack.overrides.node]
+options_type = "PackConfig"
+
 [crates.e2e.calls.init_pack.overrides.go]
 options_type = "PackConfig"
 
@@ -1519,6 +1525,12 @@ returns_void = true
 # Unresolvable and warns on every fixture. The scalar declaration is accurate here. ~keep
 [crates.e2e.calls.configure_pack.overrides.c]
 result_is_simple = true
+
+# node's file-level default is `ProcessConfig` ([crates.e2e.call.overrides.node]), but this call
+# takes a PackConfig. Without a per-call override the typescript generator validates the fixture
+# against ProcessConfig, which has no `cache_dir`, and panics. ~keep
+[crates.e2e.calls.configure_pack.overrides.node]
+options_type = "PackConfig"
 
 [crates.e2e.calls.configure_pack.overrides.go]
 options_type = "PackConfig"
