@@ -32,7 +32,7 @@
              without re-running this test — defeats the point of this module.
         -->
     <jtreesitter.version>0.26.1</jtreesitter.version>
-    <ktreesitter.version>0.25.0</ktreesitter.version>
+    <ktreesitter.version>0.25.1</ktreesitter.version>
   </properties>
 
   <dependencies>

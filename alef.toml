@@ -789,7 +789,7 @@ exclude_functions = [
 [crates.kotlin_android.capsule_types.Language]
 host_type = "io.github.treesitter.ktreesitter.Language"
 package = "io.github.tree-sitter:ktreesitter"
-package_version = "0.25.0"
+package_version = "0.25.1"
 construct_expr = "io.github.treesitter.ktreesitter.Language({ptr})"
 pointer_ownership = "borrowed_static"
 host_destructor = "none"

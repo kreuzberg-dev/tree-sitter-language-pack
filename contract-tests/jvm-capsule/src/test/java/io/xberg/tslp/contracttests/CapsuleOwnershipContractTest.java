@@ -40,13 +40,13 @@ import org.junit.jupiter.api.Test;
  *
  * <p>Two controls keep a vacuous pass from reading as a real one. {@code jtreesitter}'s
  * {@code Parser} IS {@link AutoCloseable}, so it is an in-library control. {@code ktreesitter} has
- * no such control available: measured against {@code ktreesitter-jvm:0.25.0}, not one of its 62
+ * no such control available: measured against {@code ktreesitter-jvm:0.25.1}, not one of its 62
  * classes declares close/finalize/free/dispose. Its control is therefore
  * {@link #detectorRejectsAKnownDestructorBearingClass()} (the detector must actually fire) plus
  * {@link #ktreesitterLanguageIsTheRealClass()} (we are inspecting the real class, not a stub).
  *
  * <p>The pin in alef.toml is the Android artifact, not {@code -jvm}. Their {@code Language} classes
- * were compared with {@code javap} at 0.25.0 and are shape-identical — same 9 fields, same 24
+ * were compared with {@code javap} at 0.25.1 and are shape-identical — same 9 fields, same 29
  * methods, no destructor in either — so the classpath-friendly {@code -jvm} artifact is a faithful
  * proxy for the contract. They do NOT agree on {@code Parser}: the Android build implements
  * {@link AutoCloseable}, the {@code -jvm} build does not. That is why {@code Parser} cannot serve
