@@ -205,14 +205,7 @@ jobs:
           # rustc links with `-nodefaultlibs`, which suppresses exactly the libraries the
           # `-fsanitize=` driver flag exists to add, so the sanitizer runtimes have to be
           # named explicitly or the link fails on undefined __asan_/__ubsan_ symbols. ~keep
-          # `-Clink-self-contained=-linker` opts this link back out of rust-lld, which became
-          # the default linker for this target in recent stable and is what the note above
-          # records as breaking it. The `-lasan`/`-lubsan` below are GNU-ld-style library
-          # references that must resolve AFTER the objects that need them; rust-lld does not
-          # place them that way and leaves `__asan_option_detect_stack_use_after_return`
-          # undefined against the instrumented grammar scanners. ~keep
           CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS: >-
-            -Clink-self-contained=-linker
             -Clink-arg=-fsanitize=address,undefined
             -Clink-arg=-lasan
             -Clink-arg=-lubsan
