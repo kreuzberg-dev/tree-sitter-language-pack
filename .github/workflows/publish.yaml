@@ -4346,7 +4346,25 @@ jobs:
           fi
           git add Formula/ts-pack.rb Formula/libts-pack.rb
           git commit -m "tree-sitter-language-pack ${{ needs.prepare.outputs.version }}"
-          git push origin HEAD
+          # Every repo's publish pipeline pushes to this one shared tap, so a concurrent
+          # release can land between our checkout and our push and reject it as non-fast-forward.
+          # Each repo touches only its own formulas, so rebasing onto the new tip and retrying is
+          # safe -- there is nothing for two releases to genuinely conflict over. ~keep
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD; then
+              exit 0
+            fi
+            echo "push rejected (attempt $attempt); rebasing onto the current tap tip"
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::tap rebase hit a real conflict; refusing to force the push"
+              exit 1
+            fi
+            sleep $((attempt * 3))
+          done
+          echo "::error::could not push to the tap after 5 attempts"
+          exit 1
 
   homebrew-bottles:
     name: Build Homebrew bottle (${{ matrix.bottle_tag }})
@@ -4473,7 +4491,25 @@ jobs:
           fi
           git add Formula/ts-pack.rb Formula/libts-pack.rb
           git commit -m "tree-sitter-language-pack ${{ needs.prepare.outputs.version }}: add bottle DSL"
-          git push origin HEAD
+          # Every repo's publish pipeline pushes to this one shared tap, so a concurrent
+          # release can land between our checkout and our push and reject it as non-fast-forward.
+          # Each repo touches only its own formulas, so rebasing onto the new tip and retrying is
+          # safe -- there is nothing for two releases to genuinely conflict over. ~keep
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD; then
+              exit 0
+            fi
+            echo "push rejected (attempt $attempt); rebasing onto the current tap tip"
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::tap rebase hit a real conflict; refusing to force the push"
+              exit 1
+            fi
+            sleep $((attempt * 3))
+          done
+          echo "::error::could not push to the tap after 5 attempts"
+          exit 1
 
   stage-go-ffi-libraries:
     name: Stage Go FFI libraries for Go module distribution
