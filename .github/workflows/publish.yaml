@@ -42,6 +42,13 @@ permissions:
 jobs:
   prepare:
     name: Prepare release
+    # This workflow publishes the release object itself, which re-enters it through
+    # `on: release` and queues a full duplicate publish run behind the dispatch run that
+    # created it. Keyed on triggering_actor, not release.author: the bot creates the release
+    # as a draft, so a human publishing that draft must still publish. ~keep
+    if: >-
+      github.event_name != 'release' ||
+      github.triggering_actor != 'xberg-dev-publisher[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
@@ -4758,7 +4765,7 @@ jobs:
       - trigger-pubdev
       - publish-zig
       - publish-kotlin-android
-    if: always()
+    if: always() && (github.event_name != 'release' || github.triggering_actor != 'xberg-dev-publisher[bot]')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
