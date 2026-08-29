@@ -27,13 +27,18 @@ import os
 import platform
 import re
 import signal
+import subprocess
 import sys
-from contextlib import suppress
-from functools import partial
+import tarfile
+from collections.abc import Iterator
+from contextlib import contextmanager, suppress
+from functools import cache, partial
 from json import dumps, loads
 from pathlib import Path
-from shutil import copytree, move, rmtree, which
-from typing import NotRequired, TypedDict
+from shutil import copyfileobj, copytree, move, rmtree, which
+from tempfile import mkdtemp
+from typing import IO, NotRequired, TypedDict
+from urllib.request import urlopen
 
 from _vendor_sources import validate_branch, validate_language_definitions, validate_repo_url, validate_rev
 from anyio import Path as AsyncPath
@@ -66,6 +71,26 @@ SHARD_INDEX = int(os.environ.get("TSLP_SHARD_INDEX", "0"))
 SHARD_COUNT = int(os.environ.get("TSLP_SHARD_COUNT", "1"))
 
 COMMON_RE_PATTERN = re.compile(r"\.\.[/\\](?:\.\.[/\\])*common[/\\]")
+
+# ~keep A grammar whose parser.c lives in Git LFS becomes uncloneable the moment its upstream
+# ~keep account runs out of LFS budget — the content is gone for everyone, so no retry, mirror
+# ~keep or credential helps. Our own published parser-sources bundle already carries a copy of
+# ~keep those bytes, and an LFS pointer file names the exact sha256 the content must have, so
+# ~keep the recovery needs no trust in the bundle: verify against the pointer and the fallback
+# ~keep is as safe as the original fetch. Point TSLP_LFS_FALLBACK_URL at a newer bundle when a
+# ~keep later release is known to contain the affected grammar.
+DEFAULT_LFS_FALLBACK_RELEASE = "1.15.10"
+LFS_FALLBACK_URL = os.environ.get(
+    "TSLP_LFS_FALLBACK_URL",
+    f"https://github.com/xberg-io/tree-sitter-language-pack/releases/download/"
+    f"v{DEFAULT_LFS_FALLBACK_RELEASE}/parser-sources-{DEFAULT_LFS_FALLBACK_RELEASE}.tar.zst",
+)
+LFS_FALLBACK_TIMEOUT_SECONDS = int(os.environ.get("TSLP_LFS_FALLBACK_TIMEOUT", "300"))
+LFS_POINTER_MAGIC = b"version https://git-lfs.github.com/spec/v1"
+LFS_POINTER_MAX_BYTES = 1024
+LFS_POINTER_OID_PATTERN = re.compile(r"^oid sha256:([0-9a-f]{64})$", re.MULTILINE)
+LFS_POINTER_SIZE_PATTERN = re.compile(r"^size (\d+)$", re.MULTILINE)
+_lfs_bundle_lock = asyncio.Lock()
 
 
 def _no_cache() -> bool:
@@ -219,8 +244,287 @@ def _is_transient_git_error(error_str: str) -> bool:
     return any(re.search(pattern, error_str, re.IGNORECASE) for pattern in transient_patterns)
 
 
+def _is_lfs_smudge_error(error_str: str) -> bool:
+    """Check if a git error came from Git LFS failing to fetch object content.
+
+    Matches the smudge/transfer signatures rather than any one upstream reason: an exhausted
+    LFS budget, a rate limit and a plain outage all reach git through the same failing smudge
+    filter and differ only in the message the server returned. ~keep
+
+    Args:
+        error_str: The stringified git error.
+
+    Returns:
+        True if the failure is an LFS content download failure.
+    """
+    lfs_patterns = [
+        r"smudge filter",
+        r"smudge error",
+        r"git-lfs",
+        r"error downloading object",
+        r"batch response",
+    ]
+    return any(re.search(pattern, error_str, re.IGNORECASE) for pattern in lfs_patterns)
+
+
+def _parse_lfs_pointer(path: Path) -> tuple[str, int] | None:
+    """Parse a Git LFS pointer file into the sha256 oid and byte size it records.
+
+    Args:
+        path: A candidate file inside a checkout made with ``GIT_LFS_SKIP_SMUDGE=1``.
+
+    Returns:
+        ``(oid, size)`` for a well-formed pointer, or None if the file is not one.
+    """
+    try:
+        if path.stat().st_size > LFS_POINTER_MAX_BYTES:
+            return None
+        raw = path.read_bytes()
+    except OSError:
+        return None
+
+    if not raw.startswith(LFS_POINTER_MAGIC):
+        return None
+
+    text = raw.decode("utf-8", errors="replace")
+    oid_match = LFS_POINTER_OID_PATTERN.search(text)
+    size_match = LFS_POINTER_SIZE_PATTERN.search(text)
+    if oid_match is None or size_match is None:
+        return None
+    return oid_match.group(1), int(size_match.group(1))
+
+
+def _find_lfs_pointers(root: Path) -> dict[Path, tuple[str, int]]:
+    """Collect every Git LFS pointer file in a checkout.
+
+    Args:
+        root: The checkout root to walk.
+
+    Returns:
+        Mapping of pointer file path to the ``(oid, size)`` it records.
+    """
+    pointers: dict[Path, tuple[str, int]] = {}
+    for candidate in root.rglob("*"):
+        if ".git" in candidate.parts or not candidate.is_file():
+            continue
+        parsed = _parse_lfs_pointer(candidate)
+        if parsed is not None:
+            pointers[candidate] = parsed
+    return pointers
+
+
+@cache
+def _download_lfs_fallback_bundle() -> Path:
+    """Download the parser-sources release bundle used to rehydrate LFS objects.
+
+    Cached for the life of the process so that N pointers across N repositories cost one
+    download.
+
+    Returns:
+        Path to the downloaded ``.tar.zst`` inside a temporary directory.
+
+    Raises:
+        RuntimeError: If the configured URL is not HTTPS, or the download fails.
+    """
+    if not LFS_FALLBACK_URL.startswith("https://"):
+        raise RuntimeError(f"TSLP_LFS_FALLBACK_URL must be an https:// URL, got {LFS_FALLBACK_URL!r}")
+
+    destination = Path(mkdtemp(prefix="tslp-lfs-fallback-")) / "parser-sources.tar.zst"
+    print(f"[clone_vendors] downloading LFS fallback bundle from {LFS_FALLBACK_URL}", flush=True)
+    try:
+        with (
+            urlopen(LFS_FALLBACK_URL, timeout=LFS_FALLBACK_TIMEOUT_SECONDS) as response,
+            destination.open("wb") as sink,
+        ):
+            copyfileobj(response, sink)
+    except (OSError, ValueError) as e:
+        raise RuntimeError(f"failed to download LFS fallback bundle from {LFS_FALLBACK_URL}: {e}") from e
+
+    print(f"[clone_vendors] cached LFS fallback bundle ({destination.stat().st_size} bytes)", flush=True)
+    return destination
+
+
+def _stdlib_zstd_file() -> type | None:
+    """Return the stdlib ``ZstdFile`` class, or None on interpreters that lack it.
+
+    The import is deliberately function-local: ``compression.zstd`` does not exist before
+    Python 3.14, so a module-level import would break the script on every older
+    interpreter for a code path most runs never reach. ~keep
+    """
+    try:
+        from compression.zstd import ZstdFile  # noqa: PLC0415
+    except ImportError:
+        return None
+    return ZstdFile
+
+
+@contextmanager
+def _open_zstd_stream(archive: Path) -> Iterator[IO[bytes]]:
+    """Open a zstd-compressed file as a readable, sequential binary stream.
+
+    ``compression.zstd`` only exists on Python 3.14+ and this script runs on 3.12 through
+    3.14 across the workflows, so fall back to piping through the ``zstd`` binary rather
+    than depending on a package that is not declared anywhere. ~keep
+
+    Args:
+        archive: Path to the ``.tar.zst`` file.
+
+    Yields:
+        A binary stream of the decompressed bytes.
+
+    Raises:
+        RuntimeError: If neither a stdlib decompressor nor a ``zstd`` binary is available.
+    """
+    zstd_file = _stdlib_zstd_file()
+    if zstd_file is not None:
+        with zstd_file(archive, "rb") as stream:
+            yield stream
+        return
+
+    zstd_binary = which("zstd")
+    if zstd_binary is None:
+        raise RuntimeError(
+            "cannot decompress the LFS fallback bundle: this interpreter has no compression.zstd "
+            "module and no 'zstd' binary is on PATH"
+        )
+    process = subprocess.Popen([zstd_binary, "-d", "-c", str(archive)], stdout=subprocess.PIPE)
+    if process.stdout is None:
+        process.kill()
+        raise RuntimeError(f"failed to open a pipe to {zstd_binary} for the LFS fallback bundle")
+    try:
+        yield process.stdout
+    finally:
+        process.stdout.close()
+        process.kill()
+        process.wait()
+
+
+def _extract_lfs_objects(archive: Path, wanted: dict[str, int]) -> dict[str, bytes]:
+    """Pull LFS object contents out of the fallback bundle, keyed by their verified sha256.
+
+    Members are pre-filtered on exact byte size and then hashed, so the bundle's own paths and
+    layout are never trusted: a member is accepted only because its content hashes to an oid
+    some pointer file asked for. That is what makes an arbitrary fallback source safe. ~keep
+
+    Args:
+        archive: The downloaded ``.tar.zst`` bundle.
+        wanted: Mapping of pointer oid to the byte size that pointer recorded.
+
+    Returns:
+        Mapping of oid to matching content, for every wanted oid present in the bundle.
+    """
+    wanted_sizes = set(wanted.values())
+    found: dict[str, bytes] = {}
+    with _open_zstd_stream(archive) as stream, tarfile.open(fileobj=stream, mode="r|") as bundle:
+        for member in bundle:
+            if not member.isfile() or member.size not in wanted_sizes:
+                continue
+            handle = bundle.extractfile(member)
+            if handle is None:
+                continue
+            content = handle.read()
+            digest = hashlib.sha256(content).hexdigest()
+            if wanted.get(digest) == len(content):
+                found[digest] = content
+            if len(found) == len(wanted):
+                break
+    return found
+
+
+def _write_verified_lfs_object(path: Path, content: bytes, oid: str, size: int, language_name: str) -> None:
+    """Write recovered LFS content, but only when it matches the pointer file exactly.
+
+    Args:
+        path: The pointer file to replace with real content.
+        content: The candidate bytes recovered from the fallback bundle.
+        oid: The sha256 the pointer file recorded.
+        size: The byte size the pointer file recorded.
+        language_name: The grammar being restored, for the error message.
+
+    Raises:
+        RuntimeError: If the content does not hash to ``oid`` or is not ``size`` bytes long.
+    """
+    digest = hashlib.sha256(content).hexdigest()
+    if digest != oid or len(content) != size:
+        raise RuntimeError(
+            f"{language_name}: refusing to write {path.name} from the LFS fallback bundle "
+            f"{LFS_FALLBACK_URL} — the pointer file expects sha256 {oid} ({size} bytes) but the "
+            f"recovered content is sha256 {digest} ({len(content)} bytes)"
+        )
+    path.write_bytes(content)
+    print(f"[clone_vendors] {language_name}: restored {path.name} ({size} bytes, sha256 {oid})", flush=True)
+
+
+async def _hydrate_lfs_pointers(clone_target: Path, language_name: str) -> None:
+    """Replace the LFS pointer files in a checkout with verified object content.
+
+    Args:
+        clone_target: The checkout made with ``GIT_LFS_SKIP_SMUDGE=1``.
+        language_name: The grammar being restored.
+
+    Raises:
+        RuntimeError: If the fallback bundle holds no object matching a pointer's oid.
+    """
+    pointers = await run_sync(_find_lfs_pointers, clone_target)
+    if not pointers:
+        print(f"[clone_vendors] {language_name}: no LFS pointer files in the checkout", flush=True)
+        return
+
+    wanted = dict(pointers.values())
+    print(f"[clone_vendors] {language_name}: recovering {len(pointers)} LFS object(s)", flush=True)
+    async with _lfs_bundle_lock:
+        archive = await run_sync(_download_lfs_fallback_bundle)
+    objects = await run_sync(partial(_extract_lfs_objects, archive, wanted))
+
+    for path, (oid, size) in pointers.items():
+        content = objects.get(oid)
+        if content is None:
+            raise RuntimeError(
+                f"{language_name}: the LFS fallback bundle {LFS_FALLBACK_URL} contains no object "
+                f"with sha256 {oid} ({size} bytes) for {path.relative_to(clone_target)} — refusing "
+                "to continue with a pointer file standing in for the real content"
+            )
+        await run_sync(partial(_write_verified_lfs_object, path, content, oid, size, language_name))
+
+
+async def _clone_with_lfs_fallback(
+    clone_kwargs: dict[str, object],
+    rev: str | None,
+    language_name: str,
+    clone_target: Path,
+) -> None:
+    """Re-clone with LFS smudging disabled and restore the object content ourselves.
+
+    Args:
+        clone_kwargs: The ``Repo.clone_from`` keyword arguments the failed attempt used.
+        rev: The revision to check out, if the definition pins one.
+        language_name: The grammar being cloned.
+        clone_target: The working-tree path of the clone.
+
+    Raises:
+        RuntimeError: If the pointer-only clone fails, or an object cannot be recovered.
+    """
+    if clone_target.exists():
+        await run_sync(rmtree, clone_target)
+
+    skip_smudge = {"GIT_LFS_SKIP_SMUDGE": "1"}
+    try:
+        repo = await run_sync(partial(Repo.clone_from, env=skip_smudge, **clone_kwargs))  # type: ignore[arg-type]
+        repo.git.update_environment(**skip_smudge)
+        if rev:
+            await run_sync(lambda r=repo: r.git.checkout(rev))
+    except Exception as e:
+        raise RuntimeError(f"failed to clone {language_name} with LFS smudging disabled: {e}") from e
+
+    await _hydrate_lfs_pointers(clone_target, language_name)
+
+
 async def clone_repository(repo_url: str, branch: str | None, language_name: str, rev: str | None = None) -> None:
     """Clone a repository with retry on transient network errors.
+
+    A clone that fails because Git LFS could not supply object content falls back to a
+    pointer-only clone plus content-addressed recovery — see ``_clone_with_lfs_fallback``.
+    Nothing about the successful path changes.
 
     Args:
         repo_url: The repository URL.
@@ -249,7 +553,7 @@ async def clone_repository(repo_url: str, branch: str | None, language_name: str
     if clone_target.exists():
         await run_sync(rmtree, clone_target)
 
-    kwargs = {"url": repo_url, "to_path": clone_target}
+    kwargs: dict[str, object] = {"url": repo_url, "to_path": clone_target}
     if branch:
         kwargs["branch"] = branch
     if not rev:
@@ -269,6 +573,18 @@ async def clone_repository(repo_url: str, branch: str | None, language_name: str
             return
         except Exception as e:  # noqa: PERF203
             error_str = str(e)
+            # ~keep An LFS smudge failure is not transient — the object is unavailable to
+            # ~keep everyone until upstream fixes their account — so recover instead of
+            # ~keep retrying. It has to be tested before the transient check, which its
+            # ~keep `exit code(128)` would otherwise match and burn two more full clones on.
+            if _is_lfs_smudge_error(error_str):
+                print(
+                    f"[clone_vendors] {language_name}: Git LFS could not supply object content "
+                    f"({e}); re-cloning with pointer files and restoring from the fallback bundle",
+                    flush=True,
+                )
+                await _clone_with_lfs_fallback(kwargs, rev, language_name, clone_target)
+                return
             if _is_transient_git_error(error_str) and attempt < max_attempts - 1:
                 delay = backoff_delays[attempt]
                 print(
