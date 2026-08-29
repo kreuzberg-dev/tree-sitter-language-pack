@@ -1,6 +1,6 @@
 # AI-RULEZ :: GENERATED FILE — DO NOT EDIT
 # Content-Hash: blake3:01f26fe45622ee70976a7549f3fa2da411f1ea17332f3bb285ee2249ab62cb79
-# Source-Hash: blake3:42147ebbbe4078183283fdbeacd26b585e8b6e5184b9d64fd4842c76c2fe2e58
+# Source-Hash: blake3:5742daf8cb1557e58ce8eed409a804ef04ae58f9a02b82e7160702bcc6fb3625
 # Schema-Version: v1
 
 """Hermes adapter for tree-sitter-language-pack.

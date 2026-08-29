@@ -28,7 +28,7 @@ importers:
         specifier: workspace:*
         version: link:../../crates/ts-pack-core-node
       tree-sitter:
-        specifier: ^0.25.1
+        specifier: ^0.25.0
         version: 0.25.1
       vitest:
         specifier: ^4.1.11
