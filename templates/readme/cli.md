@@ -43,6 +43,9 @@
   <a href="https://github.com/xberg-io/homebrew-tap">
     <img src="https://img.shields.io/badge/homebrew-ts--pack-007ec6?logo=homebrew" alt="Homebrew">
   </a>
+  <a href="https://github.com/xberg-io/scoop-bucket">
+    <img src="https://img.shields.io/badge/scoop-ts--pack-007ec6" alt="Scoop">
+  </a>
   <a href="https://docs.tree-sitter-language-pack.xberg.io">
     <img src="https://img.shields.io/badge/Docs-tree--sitter--language--pack-007ec6" alt="Docs">
   </a>
@@ -79,8 +82,8 @@ Or install via Homebrew:
 Homebrew 6.0+ requires explicit trust for third-party taps. Trust once, then install:
 
 ```sh
-brew trust xberg-io/homebrew-tap
-brew install xberg-io/homebrew-tap/ts-pack
+brew trust xberg-io/tap
+brew install xberg-io/tap/ts-pack
 ```
 
 Windows users can install the same binary through [Scoop](https://scoop.sh):

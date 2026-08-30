@@ -210,8 +210,8 @@ cargo binstall ts-pack-cli
 ```
 
 ```sh
-brew tap xberg-io/homebrew-tap
-brew install xberg-io/homebrew-tap/ts-pack
+brew trust xberg-io/tap
+brew install xberg-io/tap/ts-pack
 ```
 
 Windows users can install the same binary through [Scoop](https://scoop.sh):

@@ -92,8 +92,15 @@ cargo add tree-sitter-language-pack
 <TabItem label="CLI">
 
 ```bash
-brew tap xberg-io/homebrew-tap
-brew install xberg-io/homebrew-tap/ts-pack
+brew trust xberg-io/tap
+brew install xberg-io/tap/ts-pack
+```
+
+On Windows:
+
+```powershell
+scoop bucket add xberg https://github.com/xberg-io/scoop-bucket
+scoop install ts-pack
 ```
 
 </TabItem>
