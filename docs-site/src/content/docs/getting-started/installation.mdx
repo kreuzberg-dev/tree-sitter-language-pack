@@ -37,6 +37,14 @@ brew install xberg-io/homebrew-tap/ts-pack
 ```
 
 </TabItem>
+<TabItem label="Scoop (Windows)">
+
+```powershell
+scoop bucket add xberg https://github.com/xberg-io/scoop-bucket
+scoop install ts-pack
+```
+
+</TabItem>
 <TabItem label=" Cargo">
 
 ```bash
@@ -61,7 +69,7 @@ ts-pack list           # language names, then a blank line and an "N language(s)
 `ts-pack list` reports the grammars this binary can parse right now — those compiled into it,
 plus any already in your download cache, plus their aliases. That differs by install method:
 
-- **Homebrew and `cargo binstall`** fetch the prebuilt release binary, which has all 371
+- **Homebrew, Scoop, and `cargo binstall`** fetch the prebuilt release binary, which has all 371
   grammars statically linked. `ts-pack list` prints 377 names (371 grammars + 6 aliases), so
   `ts-pack list | wc -l` is 379 — the 377 names, a blank line, and the `377 language(s)` total.
 - **`cargo install ts-pack-cli`** compiles from source on your machine with no grammars linked

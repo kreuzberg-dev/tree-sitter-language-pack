@@ -1,0 +1,12 @@
+{
+  "manifests": [
+    {
+      "name": "ts-pack",
+      "template": "scripts/publish/ts-pack.json.tmpl",
+      "assets": {
+        "win_x64_sha": "ts-pack-x86_64-pc-windows-msvc.zip",
+        "win_arm64_sha": "ts-pack-aarch64-pc-windows-msvc.zip"
+      }
+    }
+  ]
+}

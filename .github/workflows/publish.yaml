@@ -73,6 +73,7 @@ jobs:
       release_php: ${{ steps.meta.outputs.release_php }}
       release_csharp: ${{ steps.meta.outputs.release_csharp }}
       release_homebrew: ${{ steps.meta.outputs.release_homebrew }}
+      release_scoop: ${{ steps.meta.outputs.release_scoop }}
       release_dart: ${{ steps.meta.outputs.release_dart }}
       release_swift: ${{ steps.meta.outputs.release_swift }}
       release_zig: ${{ steps.meta.outputs.release_zig }}
@@ -4369,6 +4370,85 @@ jobs:
           echo "::error::could not push to the tap after 5 attempts"
           exit 1
 
+  # The Windows counterpart of publish-homebrew-formula. There is deliberately no
+  # `check-scoop` idempotency gate: the render step rewrites the manifest in place and
+  # the commit below is guarded by `git diff --quiet bucket/`, so re-running a release
+  # is already a no-op. ~keep
+  publish-scoop-manifest:
+    name: Update Scoop manifest
+    needs: [prepare, upload-cli-release]
+    if: ${{ needs.prepare.outputs.release_scoop == 'true' && needs.upload-cli-release.result == 'success' && needs.prepare.outputs.dry_run != 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
+        id: bucket-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: xberg-io
+          repositories: scoop-bucket
+
+      - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
+        id: source-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: xberg-io
+
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          repository: xberg-io/scoop-bucket
+          token: ${{ steps.bucket-token.outputs.token }}
+          path: scoop-bucket
+          persist-credentials: true
+
+      - uses: xberg-io/actions/publish-scoop-manifests@v1
+        with:
+          bucket-dir: ${{ github.workspace }}/scoop-bucket
+          config-file: scripts/publish/scoop.json
+          tag: ${{ needs.prepare.outputs.tag }}
+          version: ${{ needs.prepare.outputs.version }}
+          github-repo: ${{ github.repository }}
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          token: ${{ steps.source-token.outputs.token }}
+
+      - name: Commit and push to bucket
+        working-directory: scoop-bucket
+        env:
+          GH_TOKEN: ${{ steps.bucket-token.outputs.token }}
+        run: |
+          git config user.name "xberg-dev-publisher[bot]"
+          git config user.email "291994444+xberg-dev-publisher[bot]@users.noreply.github.com"
+          if git diff --quiet bucket/; then
+            echo "No manifest changes; skipping commit."
+            exit 0
+          fi
+          git add bucket/ts-pack.json
+          git commit -m "ts-pack ${{ needs.prepare.outputs.version }}"
+          # Six release pipelines push to this one bucket, so a concurrent release can land
+          # between our checkout and our push and reject it as non-fast-forward. Each repo
+          # touches only its own manifest, so rebasing onto the new tip and retrying is safe --
+          # there is nothing for two releases to genuinely conflict over. ~keep
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD; then
+              exit 0
+            fi
+            echo "push rejected (attempt $attempt); rebasing onto the current bucket tip"
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::bucket rebase hit a real conflict; refusing to force the push"
+              exit 1
+            fi
+            sleep $((attempt * 3))
+          done
+          echo "::error::could not push to the bucket after 5 attempts"
+          exit 1
+
   homebrew-bottles:
     name: Build Homebrew bottle (${{ matrix.bottle_tag }})
     needs: [prepare, publish-homebrew-formula]
@@ -4801,6 +4881,7 @@ jobs:
       - upload-cli-release
       - verify-binstall
       - publish-homebrew-bottles
+      - publish-scoop-manifest
       - trigger-pubdev
       - publish-zig
       - publish-kotlin-android
@@ -4829,6 +4910,7 @@ jobs:
           RESULT_UPLOAD_ELIXIR: ${{ needs.upload-elixir-release.result }}
           RESULT_UPLOAD_HOMEBREW: ${{ needs.homebrew-bottles.result }}
           RESULT_PUBLISH_HOMEBREW: ${{ needs.publish-homebrew-bottles.result }}
+          RESULT_PUBLISH_SCOOP: ${{ needs.publish-scoop-manifest.result }}
         run: |
           {
             echo "## Release Summary"
@@ -4863,6 +4945,7 @@ jobs:
             results[packagist]="${RESULT_PUBLISH_PACKAGIST}"
             results[nuget]="${RESULT_PUBLISH_NUGET}"
             results[homebrew]="${RESULT_PUBLISH_HOMEBREW}"
+            results[scoop]="${RESULT_PUBLISH_SCOOP}"
 
             declare -A checks
             checks[crates]="$(printf '%s' "$CHECK_RESULTS" | jq -r '.cratesio // ""')"
@@ -4876,7 +4959,7 @@ jobs:
             checks[nuget]="$(printf '%s' "$CHECK_RESULTS" | jq -r '.nuget // ""')"
             checks[homebrew]="$(printf '%s' "$CHECK_RESULTS" | jq -r '.homebrew // ""')"
 
-            for target in crates python node wasm ruby maven hex packagist nuget homebrew parser-binaries go-ffi c-ffi elixir-nifs; do
+            for target in crates python node wasm ruby maven hex packagist nuget homebrew scoop parser-binaries go-ffi c-ffi elixir-nifs; do
               result="${results[$target]}"
               check="${checks[$target]:-}"
               if [[ "$result" == "success" ]]; then
@@ -4938,6 +5021,7 @@ jobs:
           RESULT_PUBLISH_PACKAGIST: ${{ needs.publish-packagist.result }}
           RESULT_PUBLISH_NUGET: ${{ needs.publish-nuget.result }}
           RESULT_PUBLISH_HOMEBREW: ${{ needs.publish-homebrew-bottles.result }}
+          RESULT_PUBLISH_SCOOP: ${{ needs.publish-scoop-manifest.result }}
           RESULT_TRIGGER_PUBDEV: ${{ needs.trigger-pubdev.result }}
           RESULT_PUBLISH_ZIG: ${{ needs.publish-zig.result }}
           RESULT_PUBLISH_KOTLIN_ANDROID: ${{ needs.publish-kotlin-android.result }}
@@ -4960,6 +5044,7 @@ jobs:
           RELEASE_PHP: ${{ needs.prepare.outputs.release_php }}
           RELEASE_CSHARP: ${{ needs.prepare.outputs.release_csharp }}
           RELEASE_HOMEBREW: ${{ needs.prepare.outputs.release_homebrew }}
+          RELEASE_SCOOP: ${{ needs.prepare.outputs.release_scoop }}
           RELEASE_DART: ${{ needs.prepare.outputs.release_dart }}
           RELEASE_ZIG: ${{ needs.prepare.outputs.release_zig }}
           RELEASE_KOTLIN_ANDROID: ${{ needs.prepare.outputs.release_kotlin_android }}
@@ -5025,6 +5110,7 @@ jobs:
           require_publish "packagist" "$RESULT_PUBLISH_PACKAGIST" "$RELEASE_PHP" "packagist"
           require_publish "nuget" "$RESULT_PUBLISH_NUGET" "$RELEASE_CSHARP" "nuget"
           require_publish "homebrew" "$RESULT_PUBLISH_HOMEBREW" "$RELEASE_HOMEBREW" "homebrew"
+          require_publish "scoop" "$RESULT_PUBLISH_SCOOP" "$RELEASE_SCOOP"
           require_publish "pub.dev" "$RESULT_TRIGGER_PUBDEV" "$RELEASE_DART" "pub"
           require_publish "zig" "$RESULT_PUBLISH_ZIG" "$RELEASE_ZIG" "zig"
           require_publish "maven-kotlin-android" "$RESULT_PUBLISH_KOTLIN_ANDROID" "$RELEASE_KOTLIN_ANDROID" "maven-kotlin-android"
@@ -5060,6 +5146,7 @@ jobs:
       - publish-nuget
       - publish-homebrew-formula
       - publish-homebrew-bottles
+      - publish-scoop-manifest
       - upload-parser-binaries
       - upload-go-release
       - upload-c-ffi-release

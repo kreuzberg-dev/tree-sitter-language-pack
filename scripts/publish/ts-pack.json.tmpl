@@ -1,0 +1,34 @@
+{
+  "$$schema": "https://raw.githubusercontent.com/ScoopInstaller/Scoop/master/schema.json",
+  "version": "${version}",
+  "description": "Tree-sitter language pack CLI - download and manage 371 parser grammars",
+  "homepage": "https://github.com/xberg-io/tree-sitter-language-pack",
+  "license": "MIT|Apache-2.0",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/${tag}/ts-pack-x86_64-pc-windows-msvc.zip",
+      "hash": "${win_x64_sha}"
+    },
+    "arm64": {
+      "url": "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/${tag}/ts-pack-aarch64-pc-windows-msvc.zip",
+      "hash": "${win_arm64_sha}"
+    }
+  },
+  "bin": "ts-pack.exe",
+  "suggest": {
+    "vcredist": "extras/vcredist2022"
+  },
+  "checkver": {
+    "github": "https://github.com/xberg-io/tree-sitter-language-pack"
+  },
+  "autoupdate": {
+    "architecture": {
+      "64bit": {
+        "url": "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v$$version/ts-pack-x86_64-pc-windows-msvc.zip"
+      },
+      "arm64": {
+        "url": "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v$$version/ts-pack-aarch64-pc-windows-msvc.zip"
+      }
+    }
+  }
+}

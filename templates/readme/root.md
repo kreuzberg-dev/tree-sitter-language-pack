@@ -214,6 +214,13 @@ brew tap xberg-io/homebrew-tap
 brew install xberg-io/homebrew-tap/ts-pack
 ```
 
+Windows users can install the same binary through [Scoop](https://scoop.sh):
+
+```powershell
+scoop bucket add xberg https://github.com/xberg-io/scoop-bucket
+scoop install ts-pack
+```
+
 Or run without a persistent install (the proxy package fetches the native binary):
 
 ```sh
