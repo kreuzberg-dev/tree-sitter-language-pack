@@ -96,8 +96,8 @@ jobs:
           # hash>` — every other job in this repo that omits `target:` and
           # `cache-key-prefix:` (most of ci.yaml, ci-cli.yaml, ci-rust.yaml, ...) resolves to
           # that identical key on the same commit, since the key has no notion of RUSTFLAGS,
-          # CFLAGS, or which job produced the cached `target/`. This job sets
-          # CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS + TSLP_GRAMMAR_CFLAGS to build a
+          # CFLAGS, or which job produced the cached `target/`. This job appends sanitizer
+          # link flags to RUSTFLAGS and sets TSLP_GRAMMAR_CFLAGS to build a
           # sanitizer-instrumented binary; restoring another job's un-instrumented `target/`
           # under that shared key left the final `ts-pack` link missing `-fsanitize`/`-lasan`/
           # `-lubsan` entirely (run 32688858106: undefined symbol `__asan_handle_no_return`
@@ -202,19 +202,42 @@ jobs:
             -fno-common
             -g
           CC_x86_64_unknown_linux_gnu: cc
-          # rustc links with `-nodefaultlibs`, which suppresses exactly the libraries the
-          # `-fsanitize=` driver flag exists to add, so the sanitizer runtimes have to be
-          # named explicitly or the link fails on undefined __asan_/__ubsan_ symbols. ~keep
-          CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS: >-
-            -Clink-arg=-fsanitize=address,undefined
-            -Clink-arg=-lasan
-            -Clink-arg=-lubsan
-            -Cforce-frame-pointers=yes
         # `| tee` without pipefail reports tee's exit status, so a failed build was scored
-        # as a successful step; the link has been broken and green since rust-lld became
-        # the default linker. ~keep
+        # as a successful step. ~keep
         run: |
           set -o pipefail
+          # Cargo reads rustflags from exactly ONE source, by precedence:
+          # CARGO_ENCODED_RUSTFLAGS, then RUSTFLAGS, then `target.<triple>.rustflags` (env
+          # form CARGO_TARGET_<TRIPLE>_RUSTFLAGS), then `build.rustflags`. They do not
+          # merge — the first one present wins and every lower source is discarded in
+          # silence. `setup-rust` writes RUSTFLAGS to $GITHUB_ENV (configure-flags.sh), so
+          # the CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS this step used to set was
+          # never read by cargo at all: run 33303668074's linker line carries no
+          # `-fsanitize`, no `-lasan` and no `-lubsan`, and run 33249060210 put an unstable
+          # `-Clink-self-contained=-linker` in that variable without rustc ever emitting
+          # the unstable-flag error it would have to. Appending is the only way to add
+          # flags on top of a RUSTFLAGS the setup action already owns; ci.yaml and
+          # ci-e2e.yaml do the same thing for their own link args. ~keep
+          #
+          # rustc links with `-nodefaultlibs`, which suppresses exactly the libraries the
+          # `-fsanitize=` driver flag exists to add, so the sanitizer runtimes have to be
+          # named explicitly or the link fails on undefined __asan_/__ubsan_ symbols. The
+          # `--no-as-needed` bracket around them is load-bearing rather than defensive:
+          # rustc emits `-Wl,--as-needed` ahead of everything, and a shared library that
+          # resolves nothing *at the point it appears* is dropped from DT_NEEDED outright,
+          # which would reproduce these exact undefined symbols and be indistinguishable
+          # from the bug above. Forcing DT_NEEDED makes resolution independent of wherever
+          # rustc chooses to place `-C link-arg`. ~keep
+          #
+          # RUSTFLAGS reaches only target units because `--target` is passed, so the host
+          # build-script link stays uninstrumented and unsanitized — see the
+          # TSLP_GRAMMAR_CFLAGS note above, which depends on the same split. ~keep
+          RUSTFLAGS="${RUSTFLAGS:-} -Clink-arg=-fsanitize=address,undefined"
+          RUSTFLAGS="$RUSTFLAGS -Clink-arg=-Wl,--push-state,--no-as-needed"
+          RUSTFLAGS="$RUSTFLAGS -Clink-arg=-lasan -Clink-arg=-lubsan"
+          RUSTFLAGS="$RUSTFLAGS -Clink-arg=-Wl,--pop-state -Cforce-frame-pointers=yes"
+          export RUSTFLAGS
+          echo "::notice::RUSTFLAGS=$RUSTFLAGS"
           cargo build --locked --target x86_64-unknown-linux-gnu -p ts-pack-cli --bin ts-pack 2>&1 | tee build.log
           # libasan must be first in the initial library list or it disables itself at
           # startup — the binary still carries __asan_ symbols, so only a runtime check
@@ -230,6 +253,14 @@ jobs:
           set -euo pipefail
           BIN=target/x86_64-unknown-linux-gnu/debug/ts-pack
           test -x "$BIN" || { echo "::error::$BIN was not produced"; exit 1; }
+          # Every step after this one runs the binary with LD_PRELOAD=$ASAN_RUNTIME, which
+          # assumes the runtime is a dynamic dependency. DT_NEEDED is the direct evidence
+          # of that; the `nm` checks below see instrumentation, not linkage. ~keep
+          if ! readelf -d "$BIN" | grep -q 'NEEDED.*libasan'; then
+            echo "::error::$BIN has no libasan in DT_NEEDED — the sanitizer runtime was not linked"
+            readelf -d "$BIN"
+            exit 1
+          fi
           if ! nm -C "$BIN" 2>/dev/null | grep -q '__asan_'; then
             echo "::error::$BIN contains no __asan_ symbols — sanitizer flags did not take effect"
             exit 1
