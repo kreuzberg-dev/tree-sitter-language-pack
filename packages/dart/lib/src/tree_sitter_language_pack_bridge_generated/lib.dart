@@ -8,6 +8,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'lib.freezed.dart';
 
+// These functions are ignored because they are not marked as `pub`: `try_convert_comment_kind_from_core`, `try_convert_data_node_kind_from_core`, `try_convert_diagnostic_severity_from_core`, `try_convert_docstring_format_from_core`, `try_convert_export_kind_from_core`, `try_convert_structure_kind_from_core`, `try_convert_symbol_kind_from_core`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 /// Detect language name from a file extension (without leading dot).
@@ -372,6 +373,28 @@ Future<ByteRange> createByteRangeFromJson({required String json}) =>
 
 Future<ProcessConfig> createProcessConfigFromJson({required String json}) =>
     RustLib.instance.api.crateCreateProcessConfigFromJson(json: json);
+
+Future<DataNodeKind> createDataNodeKindFromJson({required String json}) =>
+    RustLib.instance.api.crateCreateDataNodeKindFromJson(json: json);
+
+Future<StructureKind> createStructureKindFromJson({required String json}) =>
+    RustLib.instance.api.crateCreateStructureKindFromJson(json: json);
+
+Future<CommentKind> createCommentKindFromJson({required String json}) =>
+    RustLib.instance.api.crateCreateCommentKindFromJson(json: json);
+
+Future<DocstringFormat> createDocstringFormatFromJson({required String json}) =>
+    RustLib.instance.api.crateCreateDocstringFormatFromJson(json: json);
+
+Future<ExportKind> createExportKindFromJson({required String json}) =>
+    RustLib.instance.api.crateCreateExportKindFromJson(json: json);
+
+Future<SymbolKind> createSymbolKindFromJson({required String json}) =>
+    RustLib.instance.api.crateCreateSymbolKindFromJson(json: json);
+
+Future<DiagnosticSeverity> createDiagnosticSeverityFromJson({
+  required String json,
+}) => RustLib.instance.api.crateCreateDiagnosticSeverityFromJson(json: json);
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DownloadManager>>
 abstract class DownloadManager implements RustOpaqueInterface {

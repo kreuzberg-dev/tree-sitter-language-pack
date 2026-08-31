@@ -696,4 +696,6 @@ files = "packages/elixir/**/*.{ex,exs}"
 id = "ai-rulez"
 git = "https://github.com/Goldziher/ai-rulez.git"
 revision = "v4.9.3"
-hooks = ["ai-rulez-validate"]
+hooks = [
+  "ai-rulez-validate",
+]

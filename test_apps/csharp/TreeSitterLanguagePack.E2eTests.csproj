@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="XbergIo.TreeSitterLanguagePack" Version="1.15.12" />
+    <PackageReference Include="XbergIo.TreeSitterLanguagePack" Version="1.16.0" />
   </ItemGroup>
 
   <ItemGroup>
