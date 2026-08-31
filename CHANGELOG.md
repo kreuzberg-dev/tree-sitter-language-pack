@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.16.0] - 2026-08-31
+
+### Added
+
+- Scoop is now a live release channel alongside Homebrew: a release publishes a Scoop manifest for
+  the CLI, and the install instructions cover it. The channel was inert until now because `scoop`
+  was held out of the workflow's `available-targets` -- alef only gained the target after v0.79.2,
+  and naming one it does not recognise hard-errors the whole publish pipeline. The pinned alef is
+  now 0.79.5, which carries it.
+
+### Changed
+
+- Refreshed 10 grammar pins to their upstream latest: `c3`, `cedar`, `cedarschema`, `cfml`,
+  `dotenv`, `foam`, `mlir`, `nginx`, `sysml` and `twig`. Parsing behaviour for those languages
+  follows upstream. `abl` is deliberately held back -- upstream's newer `highlights.scm` references
+  nodes its own `parser.c` does not define, and the grammar exceeds the regeneration threshold, so
+  a bump fails query compilation.
+
+### Fixed
+
+- The grammar table generator no longer emits a plausible-looking wrong answer when parsers are
+  missing. `_grammar_abi` fell back to the default ABI for any parser it could not read, so running
+  the generator against an incomplete `parsers/` tree -- what a `TSLP_LANGUAGES`-scoped clone
+  leaves behind, since it prunes rather than filters -- silently rewrote the published ABI column
+  for every language. It now fails, naming the count and the first ten missing parsers.
+
 ## [1.15.11] - 2026-08-28
 
 ### Changed
