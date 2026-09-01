@@ -4565,9 +4565,16 @@ jobs:
           - os: macos-latest
             bottle_tag: arm64_sequoia
             install_brew: false
-          - os: macos-15-intel
-            bottle_tag: sequoia
-            install_brew: false
+          # ~keep The Intel macOS `sequoia` bottle is deliberately absent, not forgotten. From
+          # 2026-09-01 Homebrew serves no `openssl@3` bottle for x86_64 macOS -- "We do not
+          # provide support for this platform (as-of September 2026, announced August 2025)",
+          # after Apple dropped Intel in macOS 27 -- so the bottle cannot build and no change
+          # here can fix it. Leaving the entry in is not harmless: this job's failure propagates
+          # into the aggregate release-status job, which reverts the GitHub release to a DRAFT
+          # after every registry has already received its packages. That is what happened to
+          # liter-llm 1.19.1 and to crawlberg 1.5.0 on 2026-09-01 -- both had shipped, and both
+          # were invisible until the release was manually un-drafted. Re-adding this entry
+          # re-arms that cascade.
           - os: ubuntu-latest
             bottle_tag: x86_64_linux
             install_brew: true
