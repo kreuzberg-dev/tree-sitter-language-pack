@@ -88,8 +88,14 @@ PINS: tuple[Pin, ...] = (
     Pin("kotlin_android", "test_apps/kotlin_android/build.gradle.kts", r'tree-sitter-language-pack-android:([^"]*)"'),
     Pin("swift_e2e", "test_apps/swift_e2e/Package.swift", r'branch: "release/swift/([^"]*)"'),
     Pin("swift", "test_apps/swift/Package.swift", r'tree-sitter-language-pack\.git",\s*from: "([^"]*)"'),
-    Pin("php", "test_apps/php/install.sh", r'VERSION="\$\{1:-([0-9][0-9.]*)\}"'),
-    Pin("c", "test_apps/c/download_ffi.sh", r'VERSION="([0-9][^"]*)"'),
+    # ~keep Both installers are alef-generated, so their exact shell syntax is alef's to change:
+    # 0.79.5 moved the php pin out of the `${1:-...}` default into its own `PINNED_VERSION`
+    # assignment and switched both files' literals from double to single quotes, which turned
+    # both patterns into no-matches. Quoting is the half most likely to churn again, so accept
+    # either character; the assignment name is anchored to the line start to keep it unambiguous.
+    # A further template change still lands here as a loud "matched nothing", which is the point.
+    Pin("php", "test_apps/php/install.sh", r"""(?m)^PINNED_VERSION=["']([0-9][0-9.]*)["']"""),
+    Pin("c", "test_apps/c/download_ffi.sh", r"""(?m)^VERSION=["']([0-9][0-9.]*)["']"""),
     Pin("zig", "test_apps/zig/build.zig.zon", r"/releases/download/v([0-9][0-9.]*)/tree-sitter-language-pack-zig-"),
     Pin("zig", "test_apps/zig/build.zig.zon", r"tree-sitter-language-pack-zig-v([0-9][0-9.]*)-"),
 )

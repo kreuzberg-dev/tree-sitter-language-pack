@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.16.1] - 2026-09-01
+
+### Fixed
+
+- **The test-app pin check could no longer match the two alef-generated installers, so the release
+  gate was permanently blocked rather than merely stale.** The 0.79.5 regen moved `test_apps/php`'s
+  pin out of the `VERSION="${1:-...}"` default into its own `PINNED_VERSION=` assignment and
+  switched both installers' shell literals from double to single quotes; the checker's patterns
+  matched nothing, and `--fix` therefore could not repair them either. The patterns are now
+  quote-agnostic and line-anchored, so a future template change still surfaces loudly as a
+  no-match instead of silently passing.
+- **`task version:sync` was never run for 1.16.0**, leaving the dart, elixir, kotlin_android and
+  swift_e2e test-app manifests plus the plugin's own version source pinned at 1.15.12.
+- **The plugin publish jobs no longer report success having published nothing.** Both jobs probe
+  the registry for the *release* version while uploading an artifact carrying the plugin's own
+  version, and neither depended on version validation. In v1.16.0 the npm job took a 403 for
+  republishing 1.15.12 and still concluded success, and the PyPI job skipped an existing 1.15.12.
+  Both now assert the bundle matches the release before uploading.
+- Completed the alef regeneration interrupted in the 1.16.0 cycle, which had left 18 generated
+  files stale.
+
+### Note
+
+- v1.16.0 reached no registry; 1.16.1 is the first complete 1.16 release.
+
 ## [1.16.0] - 2026-08-31
 
 ### Added

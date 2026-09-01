@@ -5223,6 +5223,14 @@ jobs:
           registry: npm
           package: "@xberg-io/opencode-tree-sitter-language-pack"
           version: ${{ needs.prepare.outputs.version }}
+      # ~keep The bundle carries its own version (plugin/.ai-rulez/config.toml [plugin].version),
+      # which the tag does not set. At v1.16.0 that pin was still 1.15.12, so npm was handed a
+      # 1.15.12 tarball, answered 403 "cannot publish over the previously published version", and
+      # the job still reported success -- a release that shipped no plugin and said it had. The
+      # re-check above cannot catch this: it probes the release version, which the artifact never
+      # carried. Assert the two agree before anything is uploaded.
+      - name: Assert the plugin bundle matches the release
+        run: python3 scripts/sync_plugin_version.py --expect "${{ needs.prepare.outputs.version }}"
       - name: Publish to npm
         if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: xberg-io/actions/publish-npm@v1
@@ -5250,6 +5258,14 @@ jobs:
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           python-version: "3.13"
+      # ~keep The bundle carries its own version (plugin/.ai-rulez/config.toml [plugin].version),
+      # which the tag does not set. At v1.16.0 that pin was still 1.15.12, so npm was handed a
+      # 1.15.12 tarball, answered 403 "cannot publish over the previously published version", and
+      # the job still reported success -- a release that shipped no plugin and said it had. The
+      # re-check above cannot catch this: it probes the release version, which the artifact never
+      # carried. Assert the two agree before anything is uploaded.
+      - name: Assert the plugin bundle matches the release
+        run: python3 scripts/sync_plugin_version.py --expect "${{ needs.prepare.outputs.version }}"
       - name: Build Hermes wheel
         run: uv build --wheel --out-dir dist-hermes plugin/.hermes/package
       # publish-pypi is idempotent (skips a version already on PyPI). ~keep
