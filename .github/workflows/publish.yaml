@@ -385,6 +385,9 @@ jobs:
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         uses: xberg-io/actions/publish-github-release@v1
         with:
+          # Hold the release as a draft. finalize-github-release is the only job that
+          # flips it public, and only after its asset-completeness check passes. ~keep
+          draft: "true"
           tag: ${{ needs.prepare.outputs.tag }}
           title: "Release ${{ needs.prepare.outputs.tag }}"
           artifacts: |
@@ -2030,6 +2033,9 @@ jobs:
       - name: Upload to GitHub Release
         uses: xberg-io/actions/publish-github-release@v1
         with:
+          # Hold the release as a draft. finalize-github-release is the only job that
+          # flips it public, and only after its asset-completeness check passes. ~keep
+          draft: "true"
           tag: ${{ needs.prepare.outputs.tag }}
           title: "Release ${{ needs.prepare.outputs.tag }}"
           artifacts: |
@@ -2125,6 +2131,9 @@ jobs:
       - name: Upload to GitHub Release
         uses: xberg-io/actions/publish-github-release@v1
         with:
+          # Hold the release as a draft. finalize-github-release is the only job that
+          # flips it public, and only after its asset-completeness check passes. ~keep
+          draft: "true"
           tag: ${{ needs.prepare.outputs.tag }}
           title: "Release ${{ needs.prepare.outputs.tag }}"
           artifacts: "dist/c-ffi/tree-sitter-language-pack-ffi-*.tar.gz"
@@ -2712,7 +2721,7 @@ jobs:
       needs.validate-versions.result == 'success' &&
       needs.clone-vendors.result == 'success' &&
       needs.build-parser-sources.result == 'success' &&
-      needs.finalize-github-release.result == 'success' &&
+      needs.finalize-github-release.outputs.promoted == 'true' &&
       (fromJson(needs.check-registries.outputs.results).cratesio != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -3954,11 +3963,12 @@ jobs:
 
   refresh-zig-package-hashes:
     name: Refresh test_apps/zig package hashes from the published tarballs
-    needs: [prepare, publish-zig]
+    needs: [prepare, publish-zig, finalize-github-release]
     if: |
       always() &&
       needs.prepare.outputs.release_zig == 'true' &&
       needs.prepare.outputs.dry_run != 'true' &&
+      needs.finalize-github-release.outputs.promoted == 'true' &&
       needs.publish-zig.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -4019,8 +4029,9 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      # `--require-published` because `publish-zig` succeeded: an asset that 404s here is a
-      # missing upload, not the pre-publish window, and must not pass quietly. The script
+      # `--require-published` because `publish-zig` succeeded and the release is already out
+      # of draft: an asset that 404s here is a missing upload, not the pre-publish window, and
+      # must not pass quietly. The script
       # fetches into a per-run global Zig cache so each digest is recomputed from a fresh
       # download — a warm cache would happily confirm the stale hash it is meant to reject. ~keep
       - name: Recompute hashes from the published tarballs
@@ -4314,6 +4325,9 @@ jobs:
       - name: Upload to GitHub Release
         uses: xberg-io/actions/publish-github-release@v1
         with:
+          # Hold the release as a draft. finalize-github-release is the only job that
+          # flips it public, and only after its asset-completeness check passes. ~keep
+          draft: "true"
           tag: ${{ needs.prepare.outputs.tag }}
           title: "Release ${{ needs.prepare.outputs.tag }}"
           artifacts: |
@@ -4322,10 +4336,14 @@ jobs:
           dry-run: ${{ needs.prepare.outputs.dry_run }}
           token: ${{ steps.app-token.outputs.token }}
 
+  # `[package.metadata.binstall] pkg-url` resolves to a `releases/download/<tag>/` URL,
+  # which 404s while the release is still a draft, so this can only run once
+  # finalize-github-release has flipped it public. It gates on that job's `promoted`
+  # output rather than its `.result`, which an unrelated upstream failure can poison. ~keep
   verify-binstall:
     name: Verify cargo-binstall install
-    needs: [prepare, upload-cli-release]
-    if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.upload-cli-release.result == 'success' }}
+    needs: [prepare, upload-cli-release, finalize-github-release]
+    if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.upload-cli-release.result == 'success' && needs.finalize-github-release.outputs.promoted == 'true' }}
     uses: xberg-io/actions/.github/workflows/reusable-binstall-verify.yml@v1
     with:
       package-name: ts-pack-cli
@@ -4336,13 +4354,18 @@ jobs:
         ts-pack --version
         ts-pack list
 
+  # Waits on the promotion: the render step hashes the release assets it points the
+  # formula at, and both that download and the formula's own URLs 404 while the release
+  # is a draft. Pushing the tap first would leave `brew install ts-pack` broken for the
+  # length of the window. ~keep
   publish-homebrew-formula:
     name: Update Homebrew formula
-    needs: [prepare, check-registries, upload-cli-release, upload-c-ffi-release]
+    needs: [prepare, check-registries, upload-cli-release, upload-c-ffi-release, finalize-github-release]
     if: |
       always() &&
       needs.prepare.outputs.release_homebrew == 'true' &&
       needs.prepare.outputs.dry_run != 'true' &&
+      needs.finalize-github-release.outputs.promoted == 'true' &&
       needs.upload-cli-release.result == 'success' &&
       needs.upload-c-ffi-release.result == 'success' &&
       (fromJson(needs.check-registries.outputs.results).homebrew != 'true' || needs.prepare.outputs.force_republish == 'true')
@@ -4418,8 +4441,10 @@ jobs:
   # is already a no-op. ~keep
   publish-scoop-manifest:
     name: Update Scoop manifest
-    needs: [prepare, upload-cli-release]
-    if: ${{ needs.prepare.outputs.release_scoop == 'true' && needs.upload-cli-release.result == 'success' }}
+    # Same reason as publish-homebrew-formula: the render step hashes release assets
+    # that 404 until finalize-github-release flips the release out of draft. ~keep
+    needs: [prepare, upload-cli-release, finalize-github-release]
+    if: ${{ needs.prepare.outputs.release_scoop == 'true' && needs.upload-cli-release.result == 'success' && needs.finalize-github-release.outputs.promoted == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
@@ -4796,18 +4821,26 @@ jobs:
     name: Publish GitHub release from draft
     needs:
       - prepare
+      - validate-versions
       - upload-parser-binaries
       - upload-go-release
       - upload-c-ffi-release
       - update-swift-package-manifest
       - stage-go-ffi-libraries
       - upload-cli-release
-      - verify-binstall
     if: |
       always() &&
-      needs.prepare.outputs.dry_run != 'true'
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.validate-versions.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Every consumer of this job reads `outputs.promoted`, never
+    # `needs.finalize-github-release.result`. A failure anywhere in this job's `needs`
+    # ancestry poisons the VALUE downstream reads for `.result` even when this job itself
+    # concluded success, so one per-language upload failing would make every consumer
+    # believe the release was never published. Job outputs carry no such poison. ~keep
+    outputs:
+      promoted: ${{ steps.promote.outputs.promoted }}
     steps:
       - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
         id: app-token
@@ -4841,7 +4874,19 @@ jobs:
       # publish-crates -> finalize-github-release), not just an ordering preference —
       # GitHub Actions rejects the workflow outright if that edge is added. Elixir/PHP
       # assets land on the release after it is already public, same as before this fix.
-      # ~keep
+      #
+      # verify-binstall is NOT required here either, and for a harder reason: the
+      # `[package.metadata.binstall] pkg-url` in crates/ts-pack-cli resolves to a
+      # `releases/download/<tag>/` URL, which 404s while the release is still a draft.
+      # Requiring it before the flip is a genuine deadlock — binstall cannot pass until
+      # the release is public and the release cannot go public until binstall passes.
+      # It runs after this job instead, and release-finalize is what makes a binstall
+      # failure fail the release.
+      #
+      # cli-binaries is target-scoped rather than unconditional: build-cli is gated on
+      # release_homebrew, so a targeted workflow_dispatch that omits homebrew skips the
+      # CLI upload, and requiring it unconditionally would strand that release as a
+      # permanent draft. ~keep
       - name: Verify release assets are complete
         if: needs.prepare.result == 'success'
         env:
@@ -4851,10 +4896,10 @@ jobs:
           RESULT_SWIFT_MANIFEST: ${{ needs.update-swift-package-manifest.result }}
           RESULT_STAGE_GO_FFI: ${{ needs.stage-go-ffi-libraries.result }}
           RESULT_UPLOAD_CLI: ${{ needs.upload-cli-release.result }}
-          RESULT_VERIFY_BINSTALL: ${{ needs.verify-binstall.result }}
           RELEASE_GO: ${{ needs.prepare.outputs.release_go }}
           RELEASE_C_FFI: ${{ needs.prepare.outputs.release_c_ffi }}
           RELEASE_SWIFT: ${{ needs.prepare.outputs.release_swift }}
+          RELEASE_HOMEBREW: ${{ needs.prepare.outputs.release_homebrew }}
         run: |
           failed=0
 
@@ -4875,8 +4920,7 @@ jobs:
           }
 
           require_success "parser-binaries" "$RESULT_UPLOAD_PARSERS"
-          require_success "cli-binaries" "$RESULT_UPLOAD_CLI"
-          require_success "binstall-verify" "$RESULT_VERIFY_BINSTALL"
+          require_success_when_enabled "cli-binaries" "$RESULT_UPLOAD_CLI" "$RELEASE_HOMEBREW"
           require_success_when_enabled "go-ffi" "$RESULT_UPLOAD_GO" "$RELEASE_GO"
           require_success_when_enabled "go-ffi-stage" "$RESULT_STAGE_GO_FFI" "$RELEASE_GO"
           require_success_when_enabled "c-ffi" "$RESULT_UPLOAD_C_FFI" "$RELEASE_C_FFI"
@@ -4895,6 +4939,13 @@ jobs:
           go-module-path: ""
           dry-run: ${{ needs.prepare.outputs.dry_run }}
           token: ${{ steps.app-token.outputs.token }}
+
+      # Reached only when the flip above succeeded, so `promoted` is the one signal that
+      # means "this tag is a public release" — see the outputs comment on this job. ~keep
+      - name: Record promotion
+        id: promote
+        if: needs.prepare.result == 'success'
+        run: echo "promoted=true" >>"$GITHUB_OUTPUT"
 
   release-finalize:
     name: Aggregate release status
@@ -4937,7 +4988,9 @@ jobs:
         env:
           CHECK_RESULTS: ${{ needs.check-registries.outputs.results }}
           RESULT_VALIDATE: ${{ needs.validate-versions.result }}
-          RESULT_FINALIZE_RELEASE: ${{ needs.finalize-github-release.result }}
+          # ~keep The promotion output, not `.result` — see the outputs comment on
+          # finalize-github-release for why `.result` cannot be trusted downstream.
+          PROMOTED: ${{ needs.finalize-github-release.outputs.promoted }}
           RESULT_PUBLISH_CRATES: ${{ needs.publish-crates.result }}
           RESULT_PUBLISH_PYPI: ${{ needs.publish-pypi.result }}
           RESULT_PUBLISH_NODE: ${{ needs.publish-node.result }}
@@ -4967,8 +5020,8 @@ jobs:
               echo "| version-check | passed |"
             fi
 
-            if [[ "$RESULT_FINALIZE_RELEASE" != "success" ]]; then
-              echo "| github-release | **FAILED** |"
+            if [[ "$PROMOTED" != "true" ]]; then
+              echo "| github-release | **NOT PROMOTED OUT OF DRAFT** |"
             else
               echo "| github-release | published |"
             fi
@@ -5053,7 +5106,7 @@ jobs:
           RESULT_PREPARE: ${{ needs.prepare.result }}
           RESULT_VALIDATE: ${{ needs.validate-versions.result }}
           RESULT_CHECK_REGISTRIES: ${{ needs.check-registries.result }}
-          RESULT_FINALIZE_RELEASE: ${{ needs.finalize-github-release.result }}
+          PROMOTED: ${{ needs.finalize-github-release.outputs.promoted }}
           RESULT_PUBLISH_CRATES: ${{ needs.publish-crates.result }}
           RESULT_PUBLISH_PYPI: ${{ needs.publish-pypi.result }}
           RESULT_PUBLISH_NODE: ${{ needs.publish-node.result }}
@@ -5140,7 +5193,10 @@ jobs:
           require_success "prepare" "$RESULT_PREPARE"
           require_success "validate-versions" "$RESULT_VALIDATE"
           require_success "check-registries" "$RESULT_CHECK_REGISTRIES"
-          require_success "github-release" "$RESULT_FINALIZE_RELEASE"
+          if [[ "$PROMOTED" != "true" ]]; then
+            echo "::error::Release ${{ needs.prepare.outputs.tag }} was never promoted out of draft — this release did not ship."
+            failed=1
+          fi
           require_success "parser-binaries" "$RESULT_UPLOAD_PARSERS"
 
           require_publish "crates.io" "$RESULT_PUBLISH_CRATES" "$RELEASE_CRATES" "cratesio"
