@@ -5352,8 +5352,15 @@ jobs:
       # the job still reported success -- a release that shipped no plugin and said it had. The
       # re-check above cannot catch this: it probes the release version, which the artifact never
       # carried. Assert the two agree before anything is uploaded.
+      # ~keep A dry run synthesizes its tag as `<version>-dryrun-<sha>`, which no manifest
+      # ever carries, so comparing it verbatim fails on a bundle that is in fact correct.
+      # Strip it rather than skipping the assertion on dry runs -- a dry run is where a
+      # drifted bundle should surface, while nothing has been published.
       - name: Assert the plugin bundle matches the release
-        run: python3 scripts/sync_plugin_version.py --expect "${{ needs.prepare.outputs.version }}"
+        shell: bash
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: python3 scripts/sync_plugin_version.py --expect "${VERSION%%-dryrun-*}"
       - name: Publish to npm
         if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         uses: xberg-io/actions/publish-npm@v1
@@ -5391,8 +5398,15 @@ jobs:
       # the job still reported success -- a release that shipped no plugin and said it had. The
       # re-check above cannot catch this: it probes the release version, which the artifact never
       # carried. Assert the two agree before anything is uploaded.
+      # ~keep A dry run synthesizes its tag as `<version>-dryrun-<sha>`, which no manifest
+      # ever carries, so comparing it verbatim fails on a bundle that is in fact correct.
+      # Strip it rather than skipping the assertion on dry runs -- a dry run is where a
+      # drifted bundle should surface, while nothing has been published.
       - name: Assert the plugin bundle matches the release
-        run: python3 scripts/sync_plugin_version.py --expect "${{ needs.prepare.outputs.version }}"
+        shell: bash
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: python3 scripts/sync_plugin_version.py --expect "${VERSION%%-dryrun-*}"
       - name: Build Hermes wheel
         run: uv build --wheel --out-dir dist-hermes plugin/.hermes/package
       # publish-pypi is idempotent (skips a version already on PyPI). ~keep
