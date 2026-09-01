@@ -3775,14 +3775,36 @@ jobs:
           name: swift-checksum
           path: swift-checksums
 
+      # A substitution has to prove it changed something. Count the placeholder BEFORE
+      # substituting and fail on zero; asserting afterwards that the placeholder is gone
+      # passes both when the sed worked and when the generator renamed the token, which is
+      # the case the assertion exists to catch. `__ALEF_SWIFT_VERSION__` was exactly that
+      # no-op here: Package.swift carries the artifactbundle version literally inside the
+      # download URL, so that sed had nothing to match and silently did nothing every
+      # release. The version is asserted against the URL instead. ~keep
       - name: Update Package.swift with version and checksum
         run: |
+          set -euo pipefail
           VERSION="${{ needs.prepare.outputs.version }}"
           CHECKSUM=$(cat swift-checksums/*.checksum | tr -d '[:space:]')
 
-          # Replace placeholders in Package.swift
-          sed -i "s/__ALEF_SWIFT_VERSION__/${VERSION}/g" Package.swift
+          if [[ -z "$CHECKSUM" ]]; then
+            echo "::error::the swift-checksum artifact is empty; refusing to write a blank checksum"
+            exit 1
+          fi
+
+          placeholders=$(grep -c '__ALEF_SWIFT_CHECKSUM__' Package.swift || true)
+          if [[ "$placeholders" -eq 0 ]]; then
+            echo "::error::Package.swift has no __ALEF_SWIFT_CHECKSUM__ to substitute — the release prep did not reset it, or the token was renamed."
+            exit 1
+          fi
           sed -i "s/__ALEF_SWIFT_CHECKSUM__/${CHECKSUM}/g" Package.swift
+
+          if ! grep -q "/releases/download/v${VERSION}/" Package.swift; then
+            echo "::error::the Package.swift artifactbundle URL does not point at v${VERSION}."
+            grep -n 'releases/download' Package.swift || true
+            exit 1
+          fi
 
           echo "Updated Package.swift:"
           head -40 Package.swift
