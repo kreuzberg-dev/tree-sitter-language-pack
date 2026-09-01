@@ -5238,8 +5238,11 @@ jobs:
 
   publish-plugin-opencode:
     name: Publish OpenCode plugin to npm
-    needs: [prepare, e2e-plugin]
-    if: ${{ !cancelled() && needs.prepare.outputs.release_node == 'true' && needs.e2e-plugin.result == 'success' }}
+    needs: [prepare, validate-versions, e2e-plugin]
+    # ~keep `!cancelled()` opts out of automatic failure propagation, so the `needs:` edge on
+    # validate-versions gates nothing by itself -- the explicit result check below is what stops
+    # a bundle whose version the release already rejected from reaching npm.
+    if: ${{ !cancelled() && needs.validate-versions.result == 'success' && needs.prepare.outputs.release_node == 'true' && needs.e2e-plugin.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -5285,8 +5288,11 @@ jobs:
 
   publish-plugin-hermes:
     name: Publish Hermes plugin to PyPI
-    needs: [prepare, e2e-plugin]
-    if: ${{ !cancelled() && needs.prepare.outputs.release_python == 'true' && needs.e2e-plugin.result == 'success' }}
+    needs: [prepare, validate-versions, e2e-plugin]
+    # ~keep `!cancelled()` opts out of automatic failure propagation, so the `needs:` edge on
+    # validate-versions gates nothing by itself -- the explicit result check below is what stops
+    # a bundle whose version the release already rejected from reaching PyPI.
+    if: ${{ !cancelled() && needs.validate-versions.result == 'success' && needs.prepare.outputs.release_python == 'true' && needs.e2e-plugin.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: pypi
