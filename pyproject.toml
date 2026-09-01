@@ -27,7 +27,6 @@ dev = [
   "tomli>=2.2.1; python_version<'3.11'",
   "tree-sitter>=0.23",
   "typing-extensions>=4.15.0",
-  "uv-bump",
 ]
 
 [tool.setuptools]
@@ -37,4 +36,3 @@ packages = []
 ignore-words-list = "wast,inout,wit,abl"
 
 [tool.uv]
-sources.uv-bump = { git = "https://github.com/Goldziher/uv-bump" }
