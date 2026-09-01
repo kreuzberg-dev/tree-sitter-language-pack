@@ -5124,6 +5124,8 @@ jobs:
       - name: Verify every enabled publish target succeeded
         if: always() && needs.prepare.outputs.dry_run != 'true'
         env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.prepare.outputs.tag }}
           CHECK_RESULTS: ${{ needs.check-registries.outputs.results }}
           RESULT_PREPARE: ${{ needs.prepare.result }}
           RESULT_VALIDATE: ${{ needs.validate-versions.result }}
@@ -5215,8 +5217,15 @@ jobs:
           require_success "prepare" "$RESULT_PREPARE"
           require_success "validate-versions" "$RESULT_VALIDATE"
           require_success "check-registries" "$RESULT_CHECK_REGISTRIES"
-          if [[ "$PROMOTED" != "true" ]]; then
-            echo "::error::Release ${{ needs.prepare.outputs.tag }} was never promoted out of draft — this release did not ship."
+          # ~keep `finalize-github-release.outputs.promoted` reports only whether THIS run
+          # flipped the draft bit. A partial-target dispatch skips that job and leaves the output
+          # empty, so asserting on it declares a release that is in fact public, with all its
+          # assets attached, to have never shipped (observed on html-to-markdown v3.12.0, run
+          # 33498311069). Ask the release what it IS, not the job what it did; the job's own
+          # report stays in the message so a genuine promote failure is still named.
+          release_is_draft="$(gh release view "$TAG" --json isDraft --jq '.isDraft' 2>/dev/null || echo unknown)"
+          if [[ "$release_is_draft" != "false" ]]; then
+            echo "::error::Release $TAG is not a published release (isDraft=$release_is_draft; finalize-github-release reported '${PROMOTED:-<skipped>}')."
             failed=1
           fi
           require_success "parser-binaries" "$RESULT_UPLOAD_PARSERS"
