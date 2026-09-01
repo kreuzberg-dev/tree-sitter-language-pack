@@ -4365,7 +4365,12 @@ jobs:
   verify-binstall:
     name: Verify cargo-binstall install
     needs: [prepare, upload-cli-release, finalize-github-release]
-    if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.upload-cli-release.result == 'success' && needs.finalize-github-release.outputs.promoted == 'true' }}
+    # ~keep `!cancelled()` is load-bearing. `finalize-github-release` is an `always()`/
+    # `!cancelled()` job, so on a partial-target dispatch GitHub's skipped-state propagation
+    # resumes at this job -- skipping it before this `if:` is ever evaluated, even with every
+    # upstream leg green. Diagnosed on html-to-markdown runs 33491693123/33494806766/33495781759,
+    # fixed there in 98d4537c41. Every need that must have succeeded is named explicitly below.
+    if: ${{ !cancelled() && needs.prepare.outputs.dry_run != 'true' && needs.upload-cli-release.result == 'success' && needs.finalize-github-release.outputs.promoted == 'true' }}
     uses: xberg-io/actions/.github/workflows/reusable-binstall-verify.yml@v1
     with:
       package-name: ts-pack-cli
@@ -4466,7 +4471,12 @@ jobs:
     # Same reason as publish-homebrew-formula: the render step hashes release assets
     # that 404 until finalize-github-release flips the release out of draft. ~keep
     needs: [prepare, upload-cli-release, finalize-github-release]
-    if: ${{ needs.prepare.outputs.release_scoop == 'true' && needs.upload-cli-release.result == 'success' && needs.finalize-github-release.outputs.promoted == 'true' }}
+    # ~keep `!cancelled()` is load-bearing. `finalize-github-release` is an `always()`/
+    # `!cancelled()` job, so on a partial-target dispatch GitHub's skipped-state propagation
+    # resumes at this job -- skipping it before this `if:` is ever evaluated, even with every
+    # upstream leg green. Diagnosed on html-to-markdown runs 33491693123/33494806766/33495781759,
+    # fixed there in 98d4537c41. Every need that must have succeeded is named explicitly below.
+    if: ${{ !cancelled() && needs.prepare.outputs.release_scoop == 'true' && needs.upload-cli-release.result == 'success' && needs.finalize-github-release.outputs.promoted == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
