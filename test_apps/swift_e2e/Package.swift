@@ -1,6 +1,4 @@
 // swift-tools-version: 6.0
-// The first-party dependency pin below is managed by alef (sync.text_replacements); do not edit it by hand.
-// alef:hash:43fbecbaa2785e3749e4b6559f7509af39fe989b9fc8b99a6e3de7f5cd1f2c59
 import PackageDescription
 
 let package = Package(
