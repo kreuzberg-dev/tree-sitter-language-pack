@@ -5,6 +5,7 @@ use thiserror::Error;
 /// Covers language lookup failures, parse errors, query errors, and I/O issues.
 /// Feature-gated variants are included when `config`, `download`, or related
 /// features are enabled.
+///
 /// # Matching on `Error`
 ///
 /// The set of variants is not stable: new failure modes are added in minor
