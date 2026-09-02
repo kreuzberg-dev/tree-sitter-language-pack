@@ -6,7 +6,7 @@
 set -euo pipefail
 
 REPO_URL='https://github.com/xberg-io/tree-sitter-language-pack'
-VERSION='1.16.1'
+VERSION='1.16.2'
 FFI_PKG_NAME='tree-sitter-language-pack-ffi'
 FFI_DIR="ffi"
 

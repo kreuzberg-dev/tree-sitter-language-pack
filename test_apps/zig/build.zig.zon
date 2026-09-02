@@ -5,27 +5,27 @@
     .minimum_zig_version = "0.16.0",
     .dependencies = .{
         .tree_sitter_language_pack_aarch64_apple_darwin = .{
-            .url = "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.16.1/tree-sitter-language-pack-zig-v1.16.1-aarch64-apple-darwin.tar.gz",
+            .url = "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.16.2/tree-sitter-language-pack-zig-v1.16.2-aarch64-apple-darwin.tar.gz",
             .hash = "tree_sitter_language_pack-1.16.1-jCz0Y4bbSQBvrnmeXyDNsMjTswJYXmEMctsZlfsB8N_Z",
             .lazy = true,
         },
         .tree_sitter_language_pack_aarch64_unknown_linux_gnu = .{
-            .url = "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.16.1/tree-sitter-language-pack-zig-v1.16.1-aarch64-unknown-linux-gnu.tar.gz",
+            .url = "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.16.2/tree-sitter-language-pack-zig-v1.16.2-aarch64-unknown-linux-gnu.tar.gz",
             .hash = "tree_sitter_language_pack-1.16.1-jCz0Yw5LTwA59kZMVeSN1P6Suz6LVzqYyBB01ABoErjy",
             .lazy = true,
         },
         .tree_sitter_language_pack_x86_64_apple_darwin = .{
-            .url = "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.16.1/tree-sitter-language-pack-zig-v1.16.1-x86_64-apple-darwin.tar.gz",
+            .url = "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.16.2/tree-sitter-language-pack-zig-v1.16.2-x86_64-apple-darwin.tar.gz",
             .hash = "tree_sitter_language_pack-1.16.1-jCz0Y3JATwDmC47KZza6RNn7C520ZxDrTozWSssA-6KQ",
             .lazy = true,
         },
         .tree_sitter_language_pack_x86_64_pc_windows_msvc = .{
-            .url = "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.16.1/tree-sitter-language-pack-zig-v1.16.1-x86_64-pc-windows-msvc.tar.gz",
+            .url = "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.16.2/tree-sitter-language-pack-zig-v1.16.2-x86_64-pc-windows-msvc.tar.gz",
             .hash = "tree_sitter_language_pack-1.16.1-jCz0Y_U1XgA997kM3F2YWp55XIS6-v4YHkXh9cvq-3vg",
             .lazy = true,
         },
         .tree_sitter_language_pack_x86_64_unknown_linux_gnu = .{
-            .url = "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.16.1/tree-sitter-language-pack-zig-v1.16.1-x86_64-unknown-linux-gnu.tar.gz",
+            .url = "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.16.2/tree-sitter-language-pack-zig-v1.16.2-x86_64-unknown-linux-gnu.tar.gz",
             .hash = "tree_sitter_language_pack-1.16.1-jCz0Y04MWADEetb6A5UAFNsBlzyDgAOnMveUdTItBTzi",
             .lazy = true,
         },
