@@ -363,12 +363,27 @@ jobs:
           for lang in $(echo "$LANGS" | tr ',' ' '); do
             for f in $FILES; do
               runs=$((runs + 1))
-              target/x86_64-unknown-linux-gnu/debug/ts-pack parse "$f" --language "$lang" >/dev/null 2>sweep.err
-              rc=$?
+              rc=0
+              # ~keep `set -uo pipefail` above does NOT clear errexit: GitHub runs every `run:`
+              # block under `bash --noprofile --norc -e -o pipefail`, and this step sets no
+              # `shell:`. Without `|| rc=$?` the sanitizer's own exit 42 aborts the step on the
+              # spot, so `rc` is never read, the `::error::` line below never prints and
+              # `sweep.err` is never shown: runs 33488384849 and 33606137406 emitted no step
+              # output at all between `##[endgroup]` and `Process completed with exit code 42`,
+              # so a real finding was thrown away twice. A finding must be reported, not exited
+              # on. `|| rc=$?` also keeps an ordinary non-zero parse exit from ending the sweep.
+              target/x86_64-unknown-linux-gnu/debug/ts-pack parse "$f" --language "$lang" \
+                >/dev/null 2>sweep.err || rc=$?
               if [ "$rc" = "$SANITIZER_EXIT_CODE" ] || grep -qE 'ERROR: (Address|Leak)Sanitizer|runtime error:' sweep.err; then
                 failures=$((failures + 1))
-                echo "::error::sanitizer fired on $lang with $f"
-                cat sweep.err
+                echo "::error::sanitizer fired on $lang with $f (exit $rc)"
+                # ~keep `sweep.err` is truncated by the next parse, so the report has to be
+                # copied into a file that survives the loop and gets uploaded.
+                {
+                  echo "=== $lang $f (exit $rc) ==="
+                  cat sweep.err
+                  echo
+                } | tee -a sanitizer-findings.log
               fi
             done
           done
@@ -377,11 +392,16 @@ jobs:
           test "$runs" -gt 0 || { echo "::error::zero parses ran; the sweep proved nothing"; exit 1; }
           test "$failures" -eq 0 || { echo "::error::$failures sanitizer findings"; exit 1; }
 
-      - name: Upload build log
+      # ~keep `sanitizer-findings.log` is the only durable copy of a sweep report: `sweep.err`
+      # is overwritten by the next parse and the step log is the wrong place to read a
+      # multi-frame ASan stack from. Upload it alongside the build log.
+      - name: Upload build log and sanitizer findings
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sanitize-build-log-${{ github.run_id }}
-          path: build.log
+          path: |
+            build.log
+            sanitizer-findings.log
           retention-days: 7
           if-no-files-found: warn
