@@ -514,6 +514,29 @@ revision = "v4.9.3"
 hooks = ["ai-rulez-validate"]
 
 [workspace.poly.per-file-ignores]
+# Quality metrics do not apply to test code. A test function's length is its assertion
+# count and a table-driven test's arity mirrors its cases; splitting either to satisfy a
+# production-code maintainability metric makes the test harder to read, not easier. Only
+# `file-too-long` and `type-too-long` still apply here -- an oversized test FILE is a real
+# organisational problem, unlike an oversized test function. ~keep
+"**/tests/**/*" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/test/**/*" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/benches/**/*" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*_test.rs" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*_tests.rs" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/test_*.py" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*_test.py" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/conftest.py" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*.test.ts" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*.test.js" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*.test.mjs" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*.spec.ts" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*.spec.js" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*_test.go" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*Test.java" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*Tests.cs" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*_test.dart" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
+"**/*_spec.rb" = ["cyclomatic-complexity", "function-too-long", "nesting-too-deep", "too-many-parameters"]
 # Stylistic rules disabled repo-wide. Each is a formatting or idiom preference with no
 # correctness or security consequence, and each fires in volumes no one can hand-maintain
 # (`require-unicode-regexp` alone was 724 across the polyrepo, `no-inline-comments` 200).
@@ -527,6 +550,9 @@ hooks = ["ai-rulez-validate"]
   "UnorderedKey",
   "eqeqeq",
   "no-inline-comments",
+  # remove-todos = false in [workspace.poly.uncomment] says TODOs are deliberately kept;
+  # no-warning-comments flagging them contradicts that. ~keep
+  "no-warning-comments",
   "no-negated-condition",
   "require-unicode-regexp",
   "unicorn/consistent-function-scoping",
@@ -563,6 +589,11 @@ hooks = ["ai-rulez-validate"]
 "scripts/**/*.py" = ["ASYNC", "D", "S", "T201", "INP001", "RUF100"]
 "cli-proxy/**/*.py" = ["ASYNC", "D", "PLR0917", "PLR2004", "T201", "RUF100"]
 "docker/**" = ["DL3006", "DL3059"]
+# `@opencode-ai/plugin` contract entrypoints. The exported `Plugin` factory is typed to return
+# a promise of the hooks object, and each tool `execute` is declared `async` by the same
+# contract. Dropping `async` to satisfy require-await would change the declared return types
+# for an external runtime we cannot audit here. ~keep
+"plugin/.ai-rulez/opencode/index.js" = ["require-await"]
 
 [workspace.poly.typos.extend-words]
 # flate2 crate + PDF FlateDecode filter (THE ORIGINAL BUG: flate -> flat)

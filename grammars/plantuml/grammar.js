@@ -50,8 +50,8 @@ module.exports = grammar({
     identifier: (_$) => /[a-zA-Z0-9_./]+/,
     // TODO: multiline comment
     comment: ($) => choice($._signallinecomment, $._mutilinecomment),
-    _signallinecomment: (_) => token(seq("'", /[^\n]+/g)),
+    _signallinecomment: (_$) => token(seq("'", /[^\n]+/g)),
 
-    _mutilinecomment: (_) => seq("/'", repeat(/[^\n^']+/g), "'/"),
+    _mutilinecomment: (_$) => seq("/'", repeat(/[^\n^']+/g), "'/"),
   },
 });
