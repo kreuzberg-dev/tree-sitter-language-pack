@@ -396,6 +396,43 @@ values = [
 
 [[entries]]
 relative_path = "poly.toml"
+key_path = "per-file-ignores.**"
+values = [
+  "CPY001",
+  "UnorderedKey",
+  "eqeqeq",
+  "no-inline-comments",
+  "no-negated-condition",
+  "require-unicode-regexp",
+  "unicorn/consistent-function-scoping",
+  "unicorn/escape-case",
+  "unicorn/explicit-length-check",
+  "unicorn/new-for-builtins",
+  "unicorn/no-array-sort",
+  "unicorn/no-hex-escape",
+  "unicorn/no-lonely-if",
+  "unicorn/no-negated-condition",
+  "unicorn/no-typeof-undefined",
+  "unicorn/no-useless-undefined",
+  "unicorn/prefer-add-event-listener",
+  "unicorn/prefer-at",
+  "unicorn/prefer-code-point",
+  "unicorn/prefer-dom-node-append",
+  "unicorn/prefer-dom-node-remove",
+  "unicorn/prefer-import-meta-properties",
+  "unicorn/prefer-native-coercion-functions",
+  "unicorn/prefer-number-coercion",
+  "unicorn/prefer-query-selector",
+  "unicorn/prefer-single-call",
+  "unicorn/prefer-string-replace-all",
+  "unicorn/prefer-string-slice",
+  "unicorn/prefer-top-level-await",
+  "unicorn/prefer-type-error",
+  "unicorn/require-module-specifiers",
+]
+
+[[entries]]
+relative_path = "poly.toml"
 key_path = "per-file-ignores.**/*.pyi"
 values = ["A002", "F401", "I001", "PYI033", "TC006", "UP035"]
 
@@ -558,6 +595,11 @@ values = ["ASYNC", "D", "PLR0917", "PLR2004", "T201", "RUF100"]
 relative_path = "poly.toml"
 key_path = "per-file-ignores.docker/**"
 values = ["DL3006", "DL3059"]
+
+[[entries]]
+relative_path = "poly.toml"
+key_path = "per-file-ignores.docs-site/src/content/docs/reference/**"
+values = ["file-too-long"]
 
 [[entries]]
 relative_path = "poly.toml"

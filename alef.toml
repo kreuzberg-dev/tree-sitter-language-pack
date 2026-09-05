@@ -514,6 +514,52 @@ revision = "v4.9.3"
 hooks = ["ai-rulez-validate"]
 
 [workspace.poly.per-file-ignores]
+# Stylistic rules disabled repo-wide. Each is a formatting or idiom preference with no
+# correctness or security consequence, and each fires in volumes no one can hand-maintain
+# (`require-unicode-regexp` alone was 724 across the polyrepo, `no-inline-comments` 200).
+# `eqeqeq` is here for a stronger reason: every occurrence audited was the deliberate
+# `== null` nullish idiom, so the rule had a 100% false-positive rate here.
+# Rules with a real correctness or security angle are deliberately NOT listed and stay on:
+# unicorn/require-post-message-target-origin, unicorn/no-array-callback-reference,
+# unicorn/no-immediate-mutation, unicorn/no-array-fill-with-reference-type. ~keep
+"**" = [
+  "CPY001",
+  "UnorderedKey",
+  "eqeqeq",
+  "no-inline-comments",
+  "no-negated-condition",
+  "require-unicode-regexp",
+  "unicorn/consistent-function-scoping",
+  "unicorn/escape-case",
+  "unicorn/explicit-length-check",
+  "unicorn/new-for-builtins",
+  "unicorn/no-array-sort",
+  "unicorn/no-hex-escape",
+  "unicorn/no-lonely-if",
+  "unicorn/no-negated-condition",
+  "unicorn/no-typeof-undefined",
+  "unicorn/no-useless-undefined",
+  "unicorn/prefer-add-event-listener",
+  "unicorn/prefer-at",
+  "unicorn/prefer-code-point",
+  "unicorn/prefer-dom-node-append",
+  "unicorn/prefer-dom-node-remove",
+  "unicorn/prefer-import-meta-properties",
+  "unicorn/prefer-native-coercion-functions",
+  "unicorn/prefer-number-coercion",
+  "unicorn/prefer-query-selector",
+  "unicorn/prefer-single-call",
+  "unicorn/prefer-string-replace-all",
+  "unicorn/prefer-string-slice",
+  "unicorn/prefer-top-level-await",
+  "unicorn/prefer-type-error",
+  "unicorn/require-module-specifiers",
+]
+# Alef-generated API reference pages: one page per language, each a full rendering of the
+# public surface, so `file-too-long` is a property of the surface's size rather than of
+# anything editable here. poly reports on generated files by design (only `--fix-generated`
+# gates rewriting), so regeneration would revert any edit made to silence this. ~keep
+"docs-site/src/content/docs/reference/**" = ["file-too-long"]
 "scripts/**/*.py" = ["ASYNC", "D", "S", "T201", "INP001", "RUF100"]
 "cli-proxy/**/*.py" = ["ASYNC", "D", "PLR0917", "PLR2004", "T201", "RUF100"]
 "docker/**" = ["DL3006", "DL3059"]
