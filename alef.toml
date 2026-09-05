@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.82.2"
+alef_version = "0.84.1"
 languages = [
   "python",
   "node",
@@ -16,6 +16,38 @@ languages = [
   "swift",
   "zig",
   "jni",
+]
+
+# ~keep These five are create-once seeds whose alef template has since diverged from the copy we
+# maintain by hand. `alef verify` reports each under "frozen path(s) DRIFTED" every run, and
+# `task version:sync` greps that heading and treats a hit as fatal -- so leaving them undeclared
+# blocks every release. In all five cases the on-disk copy is the correct one and adopting the
+# template would be a regression, which is why this is `user_owned` and not `alef adopt`:
+#
+#   test_apps/dart/pubspec.yaml, e2e/dart/pubspec.yaml
+#     The template raises `sdk: ">=3.11.0"` to `">=3.13.0"` and moves `test`/`http` to ^1.31.2 /
+#     ^1.6.0. Raising the Dart SDK floor is a breaking change that does not belong in a patch
+#     release -- the same deliberate hold recorded under "Note on the Dart `freezed` pin" in the
+#     1.15.11 CHANGELOG entry, for the same reason. Revisit on a minor or major bump.
+#
+#   test_apps/kotlin_android/build.gradle.kts, e2e/kotlin_android/build.gradle.kts
+#     The template proposes AGP 9.4.0 over our 9.2.1, and downgrades the precision of the
+#     jackson-annotations pin from `2.22.2` to `2.22` while leaving its jackson-databind and
+#     jackson-datatype-jdk8 siblings at `2.22.2`. Our copy keeps all three exact and in lockstep.
+#
+#   test_apps/zig/build.zig.zon
+#     Only differs pre-publish: alef omits the five `.hash` lines because the v1.16.2 release
+#     assets do not exist yet (it logs "zig hash skipped -- ... regen after release"), while our
+#     copy still carries the v1.16.1 hashes. REVISIT THIS ENTRY AFTER v1.16.2 PUBLISHES -- unlike
+#     the other four this one is expected to self-resolve, and once the hashes regenerate against
+#     a real release the declaration should come back out rather than mask genuine drift.
+[workspace.ownership]
+user_owned = [
+  "e2e/dart/pubspec.yaml",
+  "e2e/kotlin_android/build.gradle.kts",
+  "test_apps/dart/pubspec.yaml",
+  "test_apps/kotlin_android/build.gradle.kts",
+  "test_apps/zig/build.zig.zon",
 ]
 
 [workspace.docs]

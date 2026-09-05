@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.16.2] - 2026-09-05
+
+### Fixed
+
+- **`process()` returns a `ProcessResult` object again in Python, so attribute access works.**
+  In 1.16.1 the generator emitted `options.ProcessResult` as `class ProcessResult(TypedDict,
+  total=False)`, which is a type annotation and not a runtime class -- `process()` therefore handed
+  back a plain `dict`, and every documented access (`result.language`, `result.chunks`,
+  `result.metrics.total_lines`) raised `AttributeError`. Only Python was affected; the TypedDict
+  path existed in no other binding, so the same call in Node, Go, Ruby or Java kept returning a
+  real object throughout. `ProcessResult` is a `@dataclass(frozen=True, slots=True)` again, as it
+  was before 1.16.1 and as every sibling binding already models it. (#183)
+- **The generated e2e suites assert against the shape their binding actually returns.** Two
+  backends were broken by one generator-level disagreement, in which the e2e emitter and the
+  binding emitter held different ideas about the shape of a value they share. In Python, 72 of the
+  523 tests failed because the emitter wrote attribute assertions (`result.language == "python"`)
+  against a value the binding emitter was generating as a dict. In TypeScript, 18 of the 37
+  `process` tests failed because the emitter wrote `String(e.kind).includes("Function")` against
+  `kind`, which is an object -- `String({ type: "Function" })` is `"[object Object]"`, so every
+  structure-kind assertion evaluated false and reported it as the uninformative `expected false to
+  be true`. Both emitters now read the value the way the binding presents it -- the dataclass
+  attribute in Python, `e.kind?.["type"] === "Function"` in TypeScript -- and both suites are 523
+  passed / 0 failed. (#182)
+
+### Changed
+
+- Regenerated all bindings, stubs, scaffolding, READMEs, test apps and e2e suites on alef 0.84.1
+  (from 0.82.2). 0.82.1 deleted the TypedDict path from the Python binding emitter and 0.75.0
+  fixed the e2e emitter, so this is the first release carrying both. 0.84.1 also makes generation
+  reproducible across runs, which clears the 459 spurious TypeScript snippet-compile failures the
+  0.84.0 line reported.
+
+### Note on the npm package
+
+`@xberg-io/tree-sitter-language-pack` skipped both 1.16.0 and 1.16.1 -- npm's latest is still
+1.15.8 -- for two different reasons. 1.16.0 never got past `Validate version consistency`, the
+unrun `task version:sync` recorded in the 1.16.1 notes below. 1.16.1 cleared that gate and then
+failed `E2E gate — Node` on the 18 TypeScript failures above; that job blocks the npm publish, so
+the package never reached the registry. The wasm package is gated separately and did ship 1.16.1.
+1.16.2 is the first release in which both gates pass.
+
+### Note
+
+- 1.16.2 is a fix-only release. The two defects above landed together in 1.16.1 and are the whole
+  content of this one; no grammar pins moved.
+
 ## [1.16.1] - 2026-09-01
 
 ### Fixed

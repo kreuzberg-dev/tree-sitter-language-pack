@@ -12,6 +12,6 @@
   "devDependencies": {
     "@xberg-io/tree-sitter-language-pack-wasm": "file:../../crates/ts-pack-core-wasm/pkg/nodejs",
     "rollup": "^4.63.1",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.0"
   }
 }
