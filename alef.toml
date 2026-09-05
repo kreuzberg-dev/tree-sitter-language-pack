@@ -514,6 +514,47 @@ revision = "v4.9.3"
 hooks = ["ai-rulez-validate"]
 
 [workspace.poly.per-file-ignores]
+# Alef-generated config files. Both grow with the size of the surface alef manages and
+# with the quality-debt baseline below; a line count on generated config is not a
+# maintainability signal. ~keep
+"poly.toml" = ["file-too-long"]
+".alef-toml-merge-provenance.toml" = ["file-too-long"]
+# --- quality-debt baseline (generated) ---
+# 35 size/complexity findings across 28 files that predate these
+# metrics. Listed per file rather than switching the rules off, so the metrics still
+# fire on every file NOT listed here -- new code stays covered, and each path below is
+# one discrete unit of work.
+# TODO(tree-sitter-language-pack-quality-debt): pay this down file by file and delete each entry as it goes green.
+# Do not add new paths here without a very good reason. ~keep
+".alef-ownership.toml" = ["file-too-long"]
+".github/workflows/ci-e2e.yaml" = ["file-too-long"]
+".github/workflows/ci.yaml" = ["file-too-long"]
+".github/workflows/publish.yaml" = ["file-too-long"]
+"CHANGELOG.md" = ["file-too-long"]
+"alef.toml" = ["file-too-long"]
+"crates/ts-pack-cli/src/commands/mcp.rs" = ["file-too-long"]
+"crates/ts-pack-cli/src/main.rs" = ["cyclomatic-complexity", "function-too-long"]
+"crates/ts-pack-core/build.rs" = ["cyclomatic-complexity", "file-too-long", "function-too-long"]
+"crates/ts-pack-core/language_definitions.json" = ["file-too-long"]
+"crates/ts-pack-core/src/download.rs" = ["file-too-long"]
+"crates/ts-pack-core/src/intel/chunking.rs" = ["too-many-parameters"]
+"crates/ts-pack-core/src/intel/data_extraction.rs" = ["file-too-long"]
+"crates/ts-pack-core/src/intel/extract.rs" = ["too-many-parameters"]
+"crates/ts-pack-core/src/intel/intelligence.rs" = ["file-too-long"]
+"crates/ts-pack-core/src/intel/legacy.rs" = ["too-many-parameters"]
+"crates/ts-pack-core/src/lib.rs" = ["file-too-long"]
+"crates/ts-pack-core/src/registry.rs" = ["file-too-long"]
+"crates/ts-pack-core/src/text_splitter.rs" = ["function-too-long", "nesting-too-deep", "too-many-parameters"]
+"docs-site/src/content/docs/changelog.md" = ["file-too-long"]
+"grammars/reason/src/scanner.c" = ["cyclomatic-complexity", "function-too-long"]
+"grammars/wolfram/grammar.js" = ["too-many-parameters"]
+"grammars/wolfram/src/scanner.c" = ["nesting-too-deep"]
+"grammars/xquery/grammar.js" = ["function-too-long"]
+"scripts/clone_vendors.py" = ["file-too-long", "function-too-long"]
+"scripts/generate_grammar_table.py" = ["function-too-long"]
+"scripts/sync_zig_zon_hashes.py" = ["function-too-long"]
+"sources/language_definitions.json" = ["file-too-long"]
+# --- end quality-debt baseline ---
 # Quality metrics do not apply to test code. A test function's length is its assertion
 # count and a table-driven test's arity mirrors its cases; splitting either to satisfy a
 # production-code maintainability metric makes the test harder to read, not easier. Only
